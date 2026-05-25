@@ -98,6 +98,18 @@ def test_quote_routeros_value_escapes_special_characters():
     assert checker.quote_routeros_value('lab"01\\rack') == '"lab\\"01\\\\rack"'
 
 
+def test_keyboard_interactive_handler_returns_password_for_each_prompt():
+    handler = checker.make_keyboard_interactive_handler("secret")
+
+    responses = handler(
+        "title",
+        "instructions",
+        [("Password: ", False), ("Verification: ", False)],
+    )
+
+    assert responses == ["secret", "secret"]
+
+
 def test_validate_identity_name_rejects_newline():
     with pytest.raises(ValueError, match="newline"):
         checker.validate_identity_name("lab01\nbad")

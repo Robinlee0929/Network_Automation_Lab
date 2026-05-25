@@ -148,21 +148,69 @@ def quote_routeros_value(value: str) -> str:
     return f'"{escaped}"'
 
 
+def make_keyboard_interactive_handler(password: str):
+    def handler(
+        _title: str,
+        _instructions: str,
+        prompts: List[Tuple[str, bool]],
+    ) -> List[str]:
+        return [password for _prompt, _echo in prompts]
+
+    return handler
+
+
+def connect_ssh_keyboard_interactive(config: RouterConfig) -> paramiko.SSHClient:
+    sock: Optional[socket.socket] = None
+    transport: Optional[paramiko.Transport] = None
+
+    try:
+        sock = socket.create_connection(
+            (config.router_ip, config.ssh_port),
+            timeout=SSH_TIMEOUT_SECONDS,
+        )
+        transport = paramiko.Transport(sock)
+        transport.start_client(timeout=SSH_TIMEOUT_SECONDS)
+        transport.auth_interactive(
+            config.username,
+            make_keyboard_interactive_handler(config.password),
+        )
+
+        if not transport.is_authenticated():
+            raise paramiko.AuthenticationException(
+                "Keyboard-interactive authentication failed."
+            )
+
+        client = paramiko.SSHClient()
+        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        client._transport = transport
+        return client
+    except Exception:
+        if transport:
+            transport.close()
+        elif sock:
+            sock.close()
+        raise
+
+
 def connect_ssh(config: RouterConfig) -> paramiko.SSHClient:
     client = paramiko.SSHClient()
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    client.connect(
-        hostname=config.router_ip,
-        port=config.ssh_port,
-        username=config.username,
-        password=config.password,
-        timeout=SSH_TIMEOUT_SECONDS,
-        banner_timeout=SSH_TIMEOUT_SECONDS,
-        auth_timeout=SSH_TIMEOUT_SECONDS,
-        look_for_keys=False,
-        allow_agent=False,
-    )
-    return client
+    try:
+        client.connect(
+            hostname=config.router_ip,
+            port=config.ssh_port,
+            username=config.username,
+            password=config.password,
+            timeout=SSH_TIMEOUT_SECONDS,
+            banner_timeout=SSH_TIMEOUT_SECONDS,
+            auth_timeout=SSH_TIMEOUT_SECONDS,
+            look_for_keys=False,
+            allow_agent=False,
+        )
+        return client
+    except paramiko.AuthenticationException:
+        client.close()
+        return connect_ssh_keyboard_interactive(config)
 
 
 def run_raw_command(
