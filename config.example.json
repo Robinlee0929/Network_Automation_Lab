@@ -1,0 +1,6 @@
+{
+  "router_ip": "192.168.88.1",
+  "ssh_port": 22,
+  "username": "admin",
+  "password": "CHANGE_ME"
+}
