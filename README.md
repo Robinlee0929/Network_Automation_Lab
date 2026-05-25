@@ -149,6 +149,12 @@ Update `config.json` from `config.example.json`:
 }
 ```
 
+Leave `password` empty for normal use. The script prompts for the SSH password at runtime and does not echo the value on screen:
+
+```text
+Please input SSH password:
+```
+
 Run:
 
 ```powershell
@@ -162,10 +168,13 @@ python mikrotik_day2_auto_setup.py
 - `enable_apply_config: true` applies only the conservative Day 2 baseline:
   - `/system identity set name=<device_name>`
   - `/system clock set time-zone-name=<timezone>`
-  - `/system ntp client set enabled=yes`
+  - `/system ntp client set enabled=no`
+  - `/system ntp client set enabled=yes mode=unicast servers=pool.ntp.org`
   - `/ip service disable [find name=<service>]` only for services listed in `disable_services`
 
 The script never disables SSH, HTTP (`www`), or HTTPS (`www-ssl`). It does not change the admin password, delete users, reboot, import config, upgrade RouterOS packages, or run RouterBOARD firmware upgrade.
+
+After apply or dry-run validation, the script checks `/system ntp client print`. If NTP reports `status=waiting`, it retries every 10 seconds for up to 120 seconds. `status=synchronized` is treated as PASS. If NTP is still not synchronized after the timeout, the report shows `WARNING` instead of failing the entire run.
 
 ### Version and Firmware Checks
 
@@ -182,7 +191,7 @@ When `enable_report` is true, the script writes:
 - `reports/day2/day2_auto_setup_report.json`
 - `reports/day2/day2_auto_setup_report.txt`
 
-The report includes SSH result, RouterOS package version, RouterBOARD firmware fields, backup/apply/validation results, executed commands, warnings, and errors. The SSH password is never written to console or report.
+The report includes SSH result, RouterOS package version, RouterBOARD firmware fields, NTP client fields, backup/apply/validation results, executed commands, warnings, and errors. The SSH password is never written to console or report.
 
 ### Day 2 Acceptance Criteria
 
@@ -190,8 +199,10 @@ The report includes SSH result, RouterOS package version, RouterBOARD firmware f
 - SSH failure stops configuration apply and is reported clearly.
 - Dry-run mode does not apply identity, timezone, NTP, or service changes.
 - Apply mode changes only identity, timezone, NTP, and services listed in `disable_services`.
+- NTP validation records `enabled`, `mode`, `servers`, `status`, `synced-server`, `synced-stratum`, and `system-offset`.
 - RouterOS `routeros` package version is parsed and written to report.
 - RouterBOARD firmware fields are parsed and written to report.
 - Firmware mismatch produces `WARNING` without upgrade or reboot.
-- JSON and Markdown reports are generated when `enable_report` is true.
+- NTP not synchronized after retry produces `WARNING`, not overall `FAIL`.
+- JSON and TXT reports are generated when `enable_report` is true.
 - `pytest` passes without a live MikroTik connection.

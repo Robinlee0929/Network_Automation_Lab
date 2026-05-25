@@ -1,3 +1,4 @@
+import getpass
 import json
 import re
 import socket
@@ -21,6 +22,8 @@ DEFAULT_TIMEZONE = "Asia/Taipei"
 
 SSH_TIMEOUT_SECONDS = 15
 COMMAND_TIMEOUT_SECONDS = 30
+NTP_SYNC_TIMEOUT_SECONDS = 120
+NTP_SYNC_RETRY_INTERVAL_SECONDS = 10
 
 REPORT_FIELDS = [
     "device_name",
@@ -33,6 +36,7 @@ REPORT_FIELDS = [
     "upgrade_firmware",
     "factory_firmware",
     "routerboard_firmware_synced",
+    "ntp_client",
     "version_gate_result",
     "ssh_connect_result",
     "backup_result",
@@ -105,6 +109,16 @@ def load_config(path: Path = CONFIG_PATH) -> Day2Config:
         timezone=str(raw_config.get("timezone", DEFAULT_TIMEZONE)).strip() or DEFAULT_TIMEZONE,
         disable_services=list(raw_config.get("disable_services", [])),
     )
+
+
+def get_password(default_password: str = "") -> str:
+    if default_password:
+        return default_password
+
+    password = getpass.getpass("Please input SSH password: ")
+    if not password:
+        raise ValueError("SSH password is required.")
+    return password
 
 
 def make_keyboard_interactive_handler(password: str):
@@ -269,6 +283,19 @@ def parse_routerboard_firmware(output: str) -> Dict[str, str]:
     }
 
 
+def parse_ntp_client(output: str) -> Dict[str, str]:
+    values = parse_key_value_output(output)
+    return {
+        "enabled": values.get("enabled", ""),
+        "mode": values.get("mode", ""),
+        "servers": values.get("servers", ""),
+        "status": values.get("status", ""),
+        "synced-server": values.get("synced-server", ""),
+        "synced-stratum": values.get("synced-stratum", ""),
+        "system-offset": values.get("system-offset", ""),
+    }
+
+
 def check_version_gate(routeros_version: str, target_routeros_version: str) -> Tuple[str, bool]:
     if not routeros_version:
         return "FAIL", False
@@ -326,7 +353,8 @@ def build_apply_commands(config: Day2Config) -> List[str]:
     commands = [
         f"/system identity set name={quote_routeros_value(config.device_name)}",
         f"/system clock set time-zone-name={quote_routeros_value(config.timezone)}",
-        "/system ntp client set enabled=yes",
+        "/system ntp client set enabled=no",
+        "/system ntp client set enabled=yes mode=unicast servers=pool.ntp.org",
     ]
     for service in disable_services:
         commands.append(f"/ip service disable [find name={quote_routeros_value(service)}]")
@@ -345,6 +373,15 @@ def make_empty_report(config: Day2Config) -> Dict[str, Any]:
         "upgrade_firmware": "",
         "factory_firmware": "",
         "routerboard_firmware_synced": False,
+        "ntp_client": {
+            "enabled": "",
+            "mode": "",
+            "servers": "",
+            "status": "",
+            "synced-server": "",
+            "synced-stratum": "",
+            "system-offset": "",
+        },
         "version_gate_result": "FAIL",
         "ssh_connect_result": "FAIL",
         "backup_result": "SKIPPED",
@@ -437,6 +474,30 @@ def apply_or_dry_run(client: paramiko.SSHClient, config: Day2Config, report: Dic
     report["apply_config_result"] = "PASS"
 
 
+def wait_for_ntp_synchronized(
+    client: paramiko.SSHClient,
+    report: Dict[str, Any],
+    timeout_seconds: int = NTP_SYNC_TIMEOUT_SECONDS,
+    interval_seconds: int = NTP_SYNC_RETRY_INTERVAL_SECONDS,
+) -> Dict[str, str]:
+    deadline = time.monotonic() + timeout_seconds
+    last_ntp_client: Dict[str, str] = {}
+
+    while True:
+        output = run_and_record(client, "/system ntp client print", report)
+        report["validation_outputs"]["/system ntp client print"] = output
+        last_ntp_client = parse_ntp_client(output)
+        report["ntp_client"] = last_ntp_client
+
+        if last_ntp_client.get("status") == "synchronized":
+            return last_ntp_client
+
+        if time.monotonic() >= deadline:
+            return last_ntp_client
+
+        time.sleep(interval_seconds)
+
+
 def validate_after_apply(client: paramiko.SSHClient, report: Dict[str, Any]) -> None:
     validation_outputs: Dict[str, str] = {}
     validation_errors: List[str] = []
@@ -452,6 +513,7 @@ def validate_after_apply(client: paramiko.SSHClient, report: Dict[str, Any]) -> 
     resource_output = validation_outputs.get("/system resource print", "")
     package_output = validation_outputs.get("/system package print", "")
     routerboard_output = validation_outputs.get("/system routerboard print", "")
+    ntp_output = validation_outputs.get("/system ntp client print", "")
 
     if resource_output:
         resource = parse_system_resource(resource_output)
@@ -478,11 +540,32 @@ def validate_after_apply(client: paramiko.SSHClient, report: Dict[str, Any]) -> 
             bool(report["current_firmware"])
             and report["current_firmware"] == report["upgrade_firmware"]
         )
+    if ntp_output:
+        report["ntp_client"] = parse_ntp_client(ntp_output)
+
+    ntp_client = report["ntp_client"]
+    if ntp_client.get("status") != "synchronized":
+        try:
+            ntp_client = wait_for_ntp_synchronized(client, report)
+        except Exception as error:
+            validation_errors.append(
+                f"/system ntp client print retry: {type(error).__name__}: {error}"
+            )
+
+    ntp_synchronized = ntp_client.get("status") == "synchronized"
+    if not ntp_synchronized:
+        report["warnings"].append(
+            "NTP client did not reach status=synchronized within 120 seconds; validation marked WARNING."
+        )
 
     if validation_errors:
         report["errors"].extend(validation_errors)
         report["validation_result"] = "FAIL"
-    elif report["version_gate_result"] == "WARNING" or not report["routerboard_firmware_synced"]:
+    elif (
+        report["version_gate_result"] == "WARNING"
+        or not report["routerboard_firmware_synced"]
+        or not ntp_synchronized
+    ):
         report["validation_result"] = "WARNING"
     elif report["version_gate_result"] == "PASS":
         report["validation_result"] = "PASS"
@@ -507,6 +590,7 @@ def build_text_report(report: Dict[str, Any], json_path: Path, txt_path: Path) -
         f"{'Upgrade Firmware':<28}: {report['upgrade_firmware']}",
         f"{'Factory Firmware':<28}: {report['factory_firmware']}",
         f"{'RouterBOARD Firmware Synced':<28}: {report['routerboard_firmware_synced']}",
+        f"{'NTP Status':<28}: {report.get('ntp_client', {}).get('status', '')}",
         short_divider,
         "Results",
         f"{'SSH Connect':<28}: {report['ssh_connect_result']}",
@@ -530,6 +614,21 @@ def build_text_report(report: Dict[str, Any], json_path: Path, txt_path: Path) -
     if report.get("manual_update_steps"):
         lines.extend([short_divider, "Manual RouterOS Update Guidance"])
         lines.extend(f"- {step}" for step in report["manual_update_steps"])
+
+    ntp_client = report.get("ntp_client", {})
+    lines.extend(
+        [
+            short_divider,
+            "NTP Client Status",
+            f"{'enabled':<28}: {ntp_client.get('enabled', '')}",
+            f"{'mode':<28}: {ntp_client.get('mode', '')}",
+            f"{'servers':<28}: {ntp_client.get('servers', '')}",
+            f"{'status':<28}: {ntp_client.get('status', '')}",
+            f"{'synced-server':<28}: {ntp_client.get('synced-server', '')}",
+            f"{'synced-stratum':<28}: {ntp_client.get('synced-stratum', '')}",
+            f"{'system-offset':<28}: {ntp_client.get('system-offset', '')}",
+        ]
+    )
 
     lines.extend([short_divider, "Warnings"])
     if report["warnings"]:
@@ -583,11 +682,11 @@ def color_text(text: str, color: str) -> str:
 
 def result_text(result: Any) -> str:
     text = str(result)
-    if text == "PASS" or text == "True":
+    if text in {"PASS", "True", "synchronized"}:
         return color_text(text, COLOR_GREEN)
-    if text == "FAIL" or text == "False":
+    if text in {"FAIL", "False"}:
         return color_text(text, COLOR_RED)
-    if text in {"WARNING", "SKIPPED"}:
+    if text in {"WARNING", "SKIPPED", "waiting"}:
         return color_text(text, COLOR_YELLOW)
     return text
 
@@ -603,6 +702,7 @@ def print_summary(report: Dict[str, Any], json_path: Optional[Path], txt_path: O
     print(f"{'Host':<16}: {report['host']}")
     print(f"{'RouterOS':<16}: {report['routeros_version']} target={report['target_routeros_version']}")
     print(f"{'Firmware Sync':<16}: {result_text(report['routerboard_firmware_synced'])}")
+    print(f"{'NTP Status':<16}: {result_text(report.get('ntp_client', {}).get('status', ''))}")
     print(color_text(short_divider, COLOR_CYAN))
     print(f"{'SSH':<16}: {result_text(report['ssh_connect_result'])}")
     print(f"{'Version Gate':<16}: {result_text(report['version_gate_result'])}")
@@ -683,6 +783,7 @@ def run_day2_auto_setup(config: Day2Config) -> Dict[str, Any]:
 def main() -> int:
     try:
         config = load_config(CONFIG_PATH)
+        config.password = get_password(config.password)
         validate_identity_name(config.device_name)
         validate_disable_services(config.disable_services)
     except Exception as error:

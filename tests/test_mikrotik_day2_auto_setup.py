@@ -37,6 +37,25 @@ RESOURCE_OUTPUT = """
 """
 
 
+NTP_WAITING_OUTPUT = """
+         enabled: yes
+            mode: unicast
+         servers: pool.ntp.org
+          status: waiting
+"""
+
+
+NTP_SYNCED_OUTPUT = """
+         enabled: yes
+            mode: unicast
+         servers: pool.ntp.org
+          status: synchronized
+   synced-server: pool.ntp.org
+  synced-stratum: 2
+   system-offset: 7.154 ms
+"""
+
+
 def test_parse_package_version_from_routeros_table():
     assert day2.parse_package_version(PACKAGE_OUTPUT) == "7.22.3"
 
@@ -60,6 +79,18 @@ def test_parse_system_resource_fields():
     assert resource["total-memory"] == "256.0MiB"
     assert resource["free-memory"] == "178.0MiB"
     assert resource["uptime"] == "1h2m3s"
+
+
+def test_parse_ntp_client_fields():
+    ntp_client = day2.parse_ntp_client(NTP_SYNCED_OUTPUT)
+
+    assert ntp_client["enabled"] == "yes"
+    assert ntp_client["mode"] == "unicast"
+    assert ntp_client["servers"] == "pool.ntp.org"
+    assert ntp_client["status"] == "synchronized"
+    assert ntp_client["synced-server"] == "pool.ntp.org"
+    assert ntp_client["synced-stratum"] == "2"
+    assert ntp_client["system-offset"] == "7.154 ms"
 
 
 def test_check_version_gate_passes_when_versions_match():
@@ -150,6 +181,32 @@ def test_load_config_supports_legacy_host_keys(tmp_path):
     assert config.enable_apply_config is False
 
 
+def test_get_password_uses_config_value_without_prompt(monkeypatch):
+    prompts = []
+
+    def fake_getpass(prompt):
+        prompts.append(prompt)
+        return "runtime-secret"
+
+    monkeypatch.setattr(day2.getpass, "getpass", fake_getpass)
+
+    assert day2.get_password("config-secret") == "config-secret"
+    assert prompts == []
+
+
+def test_get_password_prompts_when_config_password_empty(monkeypatch):
+    monkeypatch.setattr(day2.getpass, "getpass", lambda _: "runtime-secret")
+
+    assert day2.get_password("") == "runtime-secret"
+
+
+def test_get_password_rejects_empty_runtime_password(monkeypatch):
+    monkeypatch.setattr(day2.getpass, "getpass", lambda _: "")
+
+    with pytest.raises(ValueError, match="SSH password is required"):
+        day2.get_password("")
+
+
 def test_make_empty_report_has_required_fields():
     config = day2.Day2Config(
         host="192.168.88.1",
@@ -191,7 +248,8 @@ def test_build_apply_commands_uses_config_and_keeps_management_services():
 
     assert '/system identity set name="Hex-s-2025-lab01"' in commands
     assert '/system clock set time-zone-name="Asia/Taipei"' in commands
-    assert "/system ntp client set enabled=yes" in commands
+    assert "/system ntp client set enabled=no" in commands
+    assert "/system ntp client set enabled=yes mode=unicast servers=pool.ntp.org" in commands
     assert '/ip service disable [find name="ftp"]' in commands
     assert all('name="ssh"' not in command for command in commands)
     assert all('name="www"' not in command for command in commands)
@@ -254,6 +312,7 @@ def test_build_text_report_omits_password_and_uses_plain_format(tmp_path):
     report = day2.make_empty_report(config)
     report["commands_executed"] = ["/system resource print"]
     report["manual_update_steps"] = day2.build_manual_update_steps("7.22.2", "7.22.3")
+    report["ntp_client"] = day2.parse_ntp_client(NTP_SYNCED_OUTPUT)
 
     text_report = day2.build_text_report(
         report,
@@ -264,6 +323,9 @@ def test_build_text_report_omits_password_and_uses_plain_format(tmp_path):
     assert "super-secret" not in text_report
     assert "MikroTik Day 2 Auto Setup" in text_report
     assert "Commands Executed" in text_report
+    assert "NTP Client Status" in text_report
+    assert "synchronized" in text_report
+    assert "pool.ntp.org" in text_report
     assert "Manual RouterOS Update Guidance" in text_report
     assert "/system package update check-for-updates" in text_report
     assert "/system resource print" in text_report
@@ -293,3 +355,76 @@ def test_write_reports_creates_json_and_txt(tmp_path, monkeypatch):
     assert txt_path.name == "day2_auto_setup_report.txt"
     assert json_path.exists()
     assert txt_path.exists()
+
+
+def test_wait_for_ntp_synchronized_retries_until_synced(monkeypatch):
+    report = {"commands_executed": [], "validation_outputs": {}, "ntp_client": {}}
+    outputs = [NTP_WAITING_OUTPUT, NTP_SYNCED_OUTPUT]
+    sleeps = []
+
+    def fake_run_and_record(_client, command, received_report):
+        received_report["commands_executed"].append(command)
+        return outputs.pop(0)
+
+    monkeypatch.setattr(day2, "run_and_record", fake_run_and_record)
+    monkeypatch.setattr(day2.time, "sleep", lambda seconds: sleeps.append(seconds))
+
+    ntp_client = day2.wait_for_ntp_synchronized(
+        object(),
+        report,
+        timeout_seconds=20,
+        interval_seconds=10,
+    )
+
+    assert ntp_client["status"] == "synchronized"
+    assert sleeps == [10]
+    assert report["commands_executed"] == [
+        "/system ntp client print",
+        "/system ntp client print",
+    ]
+
+
+def test_validate_after_apply_marks_warning_when_ntp_never_syncs(monkeypatch):
+    report = day2.make_empty_report(
+        day2.Day2Config(
+            host="192.168.88.1",
+            port=22,
+            username="admin",
+            password="secret",
+            device_name="Hex-s-2025-lab01",
+            target_routeros_version="7.22.3",
+            enable_apply_config=False,
+            enable_backup=True,
+            enable_report=True,
+            timezone="Asia/Taipei",
+            disable_services=[],
+        )
+    )
+    report["version_gate_result"] = "PASS"
+    report["routerboard_firmware_synced"] = True
+
+    outputs = {
+        "/system identity print": "name: Hex-s-2025-lab01",
+        "/system clock print": "time-zone-name: Asia/Taipei",
+        "/system ntp client print": NTP_WAITING_OUTPUT,
+        "/ip service print": "",
+        "/system resource print": RESOURCE_OUTPUT,
+        "/system package print": PACKAGE_OUTPUT,
+        "/system routerboard print": ROUTERBOARD_OUTPUT,
+    }
+
+    def fake_run_and_record(_client, command, _report):
+        return outputs[command]
+
+    monkeypatch.setattr(day2, "run_and_record", fake_run_and_record)
+    monkeypatch.setattr(
+        day2,
+        "wait_for_ntp_synchronized",
+        lambda _client, received_report: received_report["ntp_client"],
+    )
+
+    day2.validate_after_apply(object(), report)
+
+    assert report["validation_result"] == "WARNING"
+    assert report["ntp_client"]["status"] == "waiting"
+    assert any("NTP client did not reach" in warning for warning in report["warnings"])
