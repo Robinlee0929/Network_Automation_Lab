@@ -1,6 +1,13 @@
 {
-  "router_ip": "192.168.88.1",
-  "ssh_port": 22,
+  "host": "192.168.88.1",
+  "port": 22,
   "username": "admin",
-  "password": "CHANGE_ME"
+  "password": "",
+  "device_name": "Hex-s-2025-lab01",
+  "target_routeros_version": "7.22.3",
+  "enable_apply_config": false,
+  "enable_backup": true,
+  "enable_report": true,
+  "timezone": "Asia/Taipei",
+  "disable_services": ["ftp", "telnet", "www"]
 }

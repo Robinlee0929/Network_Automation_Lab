@@ -2,5 +2,6 @@ config.json
 reports/
 __pycache__/
 .pytest_cache/
+.pytest_tmp/
 .venv/
 *.pyc

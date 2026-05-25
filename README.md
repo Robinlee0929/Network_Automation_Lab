@@ -100,9 +100,9 @@ The run passes only when all checks pass:
 The script writes:
 
 - Console PASS / FAIL result
-- Timestamped JSON report, for example `reports/report_20260525_133500_PASS.json`
-- Timestamped text report, for example `reports/report_20260525_133500_PASS.txt`
-- Latest-report aliases: `reports/report.json` and `reports/report.txt`
+- Timestamped JSON report, for example `reports/day1/report_20260525_133500_PASS.json`
+- Timestamped text report, for example `reports/day1/report_20260525_133500_PASS.txt`
+- Latest-report aliases: `reports/day1/report.json` and `reports/day1/report.txt`
 
 The console output also lists each check item and its PASS / FAIL result.
 
@@ -126,3 +126,72 @@ The script reports failures for:
 - Authentication failure
 - Command timeout
 - Unexpected RouterOS output format
+
+## Day 2 Reset Auto Setup
+
+`mikrotik_day2_auto_setup.py` is the Day 2 workflow for a MikroTik hEX S 2025 after reset. It connects by SSH, checks RouterOS and RouterBOARD versions, optionally applies a conservative baseline, validates the result, and writes JSON and text reports.
+
+Update `config.json` from `config.example.json`:
+
+```json
+{
+  "host": "192.168.88.1",
+  "port": 22,
+  "username": "admin",
+  "password": "",
+  "device_name": "Hex-s-2025-lab01",
+  "target_routeros_version": "7.22.3",
+  "enable_apply_config": false,
+  "enable_backup": true,
+  "enable_report": true,
+  "timezone": "Asia/Taipei",
+  "disable_services": ["ftp", "telnet", "www"]
+}
+```
+
+Run:
+
+```powershell
+python mikrotik_day2_auto_setup.py
+```
+
+### Dry-Run vs Apply Mode
+
+- `enable_apply_config: false` runs version checks, backup if enabled, validation commands, and report output. It lists the identity, timezone, NTP, and service commands that would be applied, but does not apply them.
+- If dry-run finds a RouterOS package version mismatch, the console and text report include manual update guidance. The script still does not download, install, upgrade, or reboot automatically.
+- `enable_apply_config: true` applies only the conservative Day 2 baseline:
+  - `/system identity set name=<device_name>`
+  - `/system clock set time-zone-name=<timezone>`
+  - `/system ntp client set enabled=yes`
+  - `/ip service disable [find name=<service>]` only for services listed in `disable_services`
+
+The script never disables SSH. It does not change the admin password, delete users, reboot, import config, upgrade RouterOS packages, or run RouterBOARD firmware upgrade.
+
+### Version and Firmware Checks
+
+Day 2 checks but does not upgrade:
+
+- `/system package print` is parsed for the `routeros` package version and compared with `target_routeros_version`.
+- `/system routerboard print` is parsed for `current-firmware`, `upgrade-firmware`, and `factory-firmware`.
+- If `current-firmware != upgrade-firmware`, the report shows `WARNING`; no `/system routerboard upgrade` or reboot is executed.
+
+### Day 2 Reports
+
+When `enable_report` is true, the script writes:
+
+- `reports/day2/day2_auto_setup_report.json`
+- `reports/day2/day2_auto_setup_report.txt`
+
+The report includes SSH result, RouterOS package version, RouterBOARD firmware fields, backup/apply/validation results, executed commands, warnings, and errors. The SSH password is never written to console or report.
+
+### Day 2 Acceptance Criteria
+
+- `python mikrotik_day2_auto_setup.py` can run from this project folder.
+- SSH failure stops configuration apply and is reported clearly.
+- Dry-run mode does not apply identity, timezone, NTP, or service changes.
+- Apply mode changes only identity, timezone, NTP, and services listed in `disable_services`.
+- RouterOS `routeros` package version is parsed and written to report.
+- RouterBOARD firmware fields are parsed and written to report.
+- Firmware mismatch produces `WARNING` without upgrade or reboot.
+- JSON and Markdown reports are generated when `enable_report` is true.
+- `pytest` passes without a live MikroTik connection.
