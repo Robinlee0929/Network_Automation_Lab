@@ -305,13 +305,14 @@ def validate_identity_name(device_name: str) -> None:
 
 
 def validate_disable_services(services: List[str]) -> List[str]:
+    protected_services = {"ssh", "www", "www-ssl"}
     safe_services = []
     for service in services:
         normalized = str(service).strip()
         if not normalized:
             continue
-        if normalized.lower() == "ssh":
-            raise ValueError("disable_services must not include ssh.")
+        if normalized.lower() in protected_services:
+            raise ValueError("disable_services must not include ssh, www, or www-ssl.")
         if "\n" in normalized or "\r" in normalized or '"' in normalized:
             raise ValueError(f"Invalid service name in disable_services: {normalized!r}")
         safe_services.append(normalized)

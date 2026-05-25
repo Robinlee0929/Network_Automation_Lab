@@ -109,7 +109,7 @@ def test_load_config_reads_day2_fields(tmp_path):
                 "enable_backup": True,
                 "enable_report": True,
                 "timezone": "Asia/Taipei",
-                "disable_services": ["ftp", "telnet", "www"],
+                "disable_services": ["ftp", "telnet"],
             }
         ),
         encoding="utf-8",
@@ -127,7 +127,7 @@ def test_load_config_reads_day2_fields(tmp_path):
     assert config.enable_backup is True
     assert config.enable_report is True
     assert config.timezone == "Asia/Taipei"
-    assert config.disable_services == ["ftp", "telnet", "www"]
+    assert config.disable_services == ["ftp", "telnet"]
 
 
 def test_load_config_supports_legacy_host_keys(tmp_path):
@@ -172,7 +172,7 @@ def test_make_empty_report_has_required_fields():
     assert "password" not in report
 
 
-def test_build_apply_commands_uses_config_and_does_not_disable_ssh():
+def test_build_apply_commands_uses_config_and_keeps_management_services():
     config = day2.Day2Config(
         host="192.168.88.1",
         port=22,
@@ -184,7 +184,7 @@ def test_build_apply_commands_uses_config_and_does_not_disable_ssh():
         enable_backup=True,
         enable_report=True,
         timezone="Asia/Taipei",
-        disable_services=["ftp", "telnet", "www"],
+        disable_services=["ftp", "telnet"],
     )
 
     commands = day2.build_apply_commands(config)
@@ -194,6 +194,8 @@ def test_build_apply_commands_uses_config_and_does_not_disable_ssh():
     assert "/system ntp client set enabled=yes" in commands
     assert '/ip service disable [find name="ftp"]' in commands
     assert all('name="ssh"' not in command for command in commands)
+    assert all('name="www"' not in command for command in commands)
+    assert all('name="www-ssl"' not in command for command in commands)
 
 
 def test_build_apply_commands_rejects_ssh_disable():
@@ -212,6 +214,26 @@ def test_build_apply_commands_rejects_ssh_disable():
     )
 
     with pytest.raises(ValueError, match="ssh"):
+        day2.build_apply_commands(config)
+
+
+@pytest.mark.parametrize("service", ["www", "www-ssl"])
+def test_build_apply_commands_rejects_http_https_disable(service):
+    config = day2.Day2Config(
+        host="192.168.88.1",
+        port=22,
+        username="admin",
+        password="secret",
+        device_name="Hex-s-2025-lab01",
+        target_routeros_version="7.22.3",
+        enable_apply_config=True,
+        enable_backup=True,
+        enable_report=True,
+        timezone="Asia/Taipei",
+        disable_services=[service],
+    )
+
+    with pytest.raises(ValueError, match="www"):
         day2.build_apply_commands(config)
 
 

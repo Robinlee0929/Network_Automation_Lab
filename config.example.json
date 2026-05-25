@@ -9,5 +9,5 @@
   "enable_backup": true,
   "enable_report": true,
   "timezone": "Asia/Taipei",
-  "disable_services": ["ftp", "telnet", "www"]
+  "disable_services": ["ftp", "telnet"]
 }

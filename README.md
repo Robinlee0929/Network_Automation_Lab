@@ -145,7 +145,7 @@ Update `config.json` from `config.example.json`:
   "enable_backup": true,
   "enable_report": true,
   "timezone": "Asia/Taipei",
-  "disable_services": ["ftp", "telnet", "www"]
+  "disable_services": ["ftp", "telnet"]
 }
 ```
 
@@ -165,7 +165,7 @@ python mikrotik_day2_auto_setup.py
   - `/system ntp client set enabled=yes`
   - `/ip service disable [find name=<service>]` only for services listed in `disable_services`
 
-The script never disables SSH. It does not change the admin password, delete users, reboot, import config, upgrade RouterOS packages, or run RouterBOARD firmware upgrade.
+The script never disables SSH, HTTP (`www`), or HTTPS (`www-ssl`). It does not change the admin password, delete users, reboot, import config, upgrade RouterOS packages, or run RouterBOARD firmware upgrade.
 
 ### Version and Firmware Checks
 
