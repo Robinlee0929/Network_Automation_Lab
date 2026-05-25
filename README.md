@@ -41,6 +41,12 @@ Provide a device name from the command line:
 python mikrotik_baseline_check.py --device-name hex-s-2025-lab01
 ```
 
+Version 2 can also set the MikroTik `/system identity` to the device name. This is optional and only runs when `--set-identity` is provided:
+
+```powershell
+python mikrotik_baseline_check.py --device-name hex-s-2025-lab01 --set-identity
+```
+
 Or run without `--device-name` and enter it when prompted:
 
 ```powershell
@@ -59,11 +65,11 @@ Password prompt:
 Please input SSH password (press Enter to use config.json default):
 ```
 
-The device name is used only for console and report identification. The script does not modify `/system identity`.
+Without `--set-identity`, the device name is used only for console and report identification.
 
 ## Read-Only Commands
 
-First version allows only these commands:
+Baseline checks allow only these read-only commands:
 
 ```text
 /system clock print
@@ -73,6 +79,8 @@ First version allows only these commands:
 ```
 
 Blocked operations include reset, reboot, backup load, import, identity changes, and IP, firewall, bridge, or DHCP modifications.
+
+Exception: Version 2 allows `/system identity set name=<device_name>` only through the explicit `--set-identity` option. Other write operations remain blocked.
 
 ## Acceptance Criteria
 

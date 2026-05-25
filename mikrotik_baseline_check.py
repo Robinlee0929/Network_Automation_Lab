@@ -87,7 +87,12 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--device-name",
-        help="Device name used only for report identification. This does not change RouterOS identity.",
+        help="Device name used for report identification, and optionally RouterOS identity with --set-identity.",
+    )
+    parser.add_argument(
+        "--set-identity",
+        action="store_true",
+        help="Set RouterOS /system identity name to --device-name before running baseline checks.",
     )
     return parser.parse_args()
 
@@ -129,6 +134,20 @@ def validate_read_only_command(command: str) -> None:
             raise ValueError(f"Forbidden command blocked: {command}")
 
 
+def validate_identity_name(device_name: str) -> None:
+    if not device_name:
+        raise ValueError("Device name is required before setting RouterOS identity.")
+    if len(device_name) > 64:
+        raise ValueError("Device name must be 64 characters or fewer for RouterOS identity.")
+    if "\n" in device_name or "\r" in device_name:
+        raise ValueError("Device name must not contain newline characters.")
+
+
+def quote_routeros_value(value: str) -> str:
+    escaped = value.replace("\\", "\\\\").replace('"', '\\"')
+    return f'"{escaped}"'
+
+
 def connect_ssh(config: RouterConfig) -> paramiko.SSHClient:
     client = paramiko.SSHClient()
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -146,38 +165,11 @@ def connect_ssh(config: RouterConfig) -> paramiko.SSHClient:
     return client
 
 
-def connect_ssh_with_auth_retry(
-    config: RouterConfig,
-    max_attempts: int = 3,
-) -> paramiko.SSHClient:
-    last_error: Optional[paramiko.AuthenticationException] = None
-
-    for attempt in range(1, max_attempts + 1):
-        try:
-            return connect_ssh(config)
-        except paramiko.AuthenticationException as error:
-            last_error = error
-            if attempt >= max_attempts:
-                break
-
-            print("Authentication failed. Please try again.")
-            config.password = getpass.getpass("Please input SSH password: ")
-            if not config.password:
-                print("Empty password entered; retrying may fail.")
-
-    if last_error:
-        raise last_error
-
-    raise paramiko.AuthenticationException("Authentication failed.")
-
-
-def run_command(
+def run_raw_command(
     client: paramiko.SSHClient,
     command: str,
     timeout_seconds: int = COMMAND_TIMEOUT_SECONDS,
 ) -> str:
-    validate_read_only_command(command)
-
     stdin, stdout, stderr = client.exec_command(command, timeout=timeout_seconds)
     stdin.close()
 
@@ -212,6 +204,63 @@ def run_command(
         )
 
     return output
+
+
+def connect_ssh_with_auth_retry(
+    config: RouterConfig,
+    max_attempts: int = 3,
+) -> paramiko.SSHClient:
+    last_error: Optional[paramiko.AuthenticationException] = None
+
+    for attempt in range(1, max_attempts + 1):
+        try:
+            return connect_ssh(config)
+        except paramiko.AuthenticationException as error:
+            last_error = error
+            if attempt >= max_attempts:
+                break
+
+            print("Authentication failed. Please try again.")
+            config.password = getpass.getpass("Please input SSH password: ")
+            if not config.password:
+                print("Empty password entered; retrying may fail.")
+
+    if last_error:
+        raise last_error
+
+    raise paramiko.AuthenticationException("Authentication failed.")
+
+
+def run_command(
+    client: paramiko.SSHClient,
+    command: str,
+    timeout_seconds: int = COMMAND_TIMEOUT_SECONDS,
+) -> str:
+    validate_read_only_command(command)
+    return run_raw_command(client, command, timeout_seconds)
+
+
+def set_routeros_identity(client: paramiko.SSHClient, device_name: str) -> Dict[str, Any]:
+    validate_identity_name(device_name)
+    command = f"/system identity set name={quote_routeros_value(device_name)}"
+
+    try:
+        run_raw_command(client, command)
+        return make_check(
+            "set RouterOS identity",
+            True,
+            f"/system identity name is set to {device_name}",
+            "RouterOS identity was updated because --set-identity was provided.",
+            command,
+        )
+    except Exception as error:
+        return make_check(
+            "set RouterOS identity",
+            False,
+            f"/system identity name is set to {device_name}",
+            f"{type(error).__name__}: {error}",
+            command,
+        )
 
 
 def make_check(
@@ -580,6 +629,8 @@ def main() -> int:
                 "Authenticated successfully.",
             )
         )
+        if args.set_identity:
+            checks.append(set_routeros_identity(client, device_name))
         checks.extend(run_acceptance_checks(client))
     except paramiko.AuthenticationException as error:
         checks.append(

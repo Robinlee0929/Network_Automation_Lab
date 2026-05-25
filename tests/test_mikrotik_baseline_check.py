@@ -89,6 +89,35 @@ def test_validate_read_only_command_rejects_forbidden_command():
         checker.validate_read_only_command("/system reboot")
 
 
+def test_validate_read_only_command_still_rejects_identity_set():
+    with pytest.raises(ValueError, match="read-only allowlist"):
+        checker.validate_read_only_command('/system identity set name="hex-s-2025-lab01"')
+
+
+def test_quote_routeros_value_escapes_special_characters():
+    assert checker.quote_routeros_value('lab"01\\rack') == '"lab\\"01\\\\rack"'
+
+
+def test_validate_identity_name_rejects_newline():
+    with pytest.raises(ValueError, match="newline"):
+        checker.validate_identity_name("lab01\nbad")
+
+
+def test_set_routeros_identity_uses_explicit_identity_command(monkeypatch):
+    calls = []
+
+    def fake_run_raw_command(_client, command):
+        calls.append(command)
+        return ""
+
+    monkeypatch.setattr(checker, "run_raw_command", fake_run_raw_command)
+
+    check = checker.set_routeros_identity(object(), "hex-s-2025-lab01")
+
+    assert check["result"] == "PASS"
+    assert calls == ['/system identity set name="hex-s-2025-lab01"']
+
+
 def test_output_has_field_matches_routeros_key_value_output():
     output = """
         time: 13:41:20
