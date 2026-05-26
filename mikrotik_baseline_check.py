@@ -74,7 +74,7 @@ def load_config(path: Path) -> RouterConfig:
         raw_config = json.load(file)
 
     return RouterConfig(
-        router_ip=raw_config.get("router_ip", DEFAULT_ROUTER_IP),
+        router_ip=raw_config.get("router_ip", raw_config.get("host", DEFAULT_ROUTER_IP)),
         ssh_port=int(raw_config.get("ssh_port", DEFAULT_SSH_PORT)),
         username=raw_config.get("username", DEFAULT_USERNAME),
         password=str(raw_config.get("password", "")),
@@ -105,6 +105,19 @@ def get_device_name(arg_value: Optional[str]) -> str:
     if not device_name:
         raise ValueError("Device name is required.")
     return device_name
+
+
+def get_router_ip(default_router_ip: str) -> str:
+    prompt = (
+        "Please input router IP "
+        f"(press Enter to use config.json default: {default_router_ip}): "
+    )
+    router_ip = input(prompt).strip()
+    if router_ip:
+        return router_ip
+    if default_router_ip:
+        return default_router_ip
+    raise ValueError("Router IP is required.")
 
 
 def get_password(default_password: str) -> str:
@@ -659,6 +672,7 @@ def main() -> int:
         args = parse_args()
         device_name = get_device_name(args.device_name)
         config = load_config(CONFIG_PATH)
+        config.router_ip = get_router_ip(config.router_ip)
         config.password = get_password(config.password)
     except Exception as error:
         print(f"ERROR: {error}")

@@ -93,6 +93,22 @@ def test_parse_ntp_client_fields():
     assert ntp_client["system-offset"] == "7.154 ms"
 
 
+def test_parse_identity():
+    assert day2.parse_identity("name: Hex-s-2025-lab01") == "Hex-s-2025-lab01"
+
+
+def test_parse_disabled_services_keeps_management_services_protected():
+    output = """
+Flags: X - disabled
+ 0 X telnet 23
+ 1 X ftp 21
+ 2 X ssh 22
+ 3   www 80
+"""
+
+    assert day2.parse_disabled_services(output) == ["telnet", "ftp"]
+
+
 def test_check_version_gate_passes_when_versions_match():
     result, package_latest = day2.check_version_gate("7.22.3", "7.22.3")
 
@@ -200,11 +216,29 @@ def test_get_password_prompts_when_config_password_empty(monkeypatch):
     assert day2.get_password("") == "runtime-secret"
 
 
+def test_get_password_strips_runtime_whitespace(monkeypatch):
+    monkeypatch.setattr(day2.getpass, "getpass", lambda _: " runtime-secret ")
+
+    assert day2.get_password("") == "runtime-secret"
+
+
 def test_get_password_rejects_empty_runtime_password(monkeypatch):
     monkeypatch.setattr(day2.getpass, "getpass", lambda _: "")
 
     with pytest.raises(ValueError, match="SSH password is required"):
         day2.get_password("")
+
+
+def test_get_host_uses_prompt_value(monkeypatch):
+    monkeypatch.setattr("builtins.input", lambda _prompt: "192.168.88.2")
+
+    assert day2.get_host("192.168.88.1") == "192.168.88.2"
+
+
+def test_get_host_falls_back_to_config_default(monkeypatch):
+    monkeypatch.setattr("builtins.input", lambda _prompt: "")
+
+    assert day2.get_host("192.168.88.1") == "192.168.88.1"
 
 
 def test_make_empty_report_has_required_fields():
@@ -252,7 +286,6 @@ def test_build_apply_commands_uses_config_and_keeps_management_services():
     assert "/system ntp client set enabled=yes mode=unicast servers=pool.ntp.org" in commands
     assert '/ip service disable [find name="ftp"]' in commands
     assert all('name="ssh"' not in command for command in commands)
-    assert all('name="www"' not in command for command in commands)
     assert all('name="www-ssl"' not in command for command in commands)
 
 
@@ -275,8 +308,7 @@ def test_build_apply_commands_rejects_ssh_disable():
         day2.build_apply_commands(config)
 
 
-@pytest.mark.parametrize("service", ["www", "www-ssl"])
-def test_build_apply_commands_rejects_http_https_disable(service):
+def test_build_apply_commands_rejects_https_disable():
     config = day2.Day2Config(
         host="192.168.88.1",
         port=22,
@@ -288,7 +320,26 @@ def test_build_apply_commands_rejects_http_https_disable(service):
         enable_backup=True,
         enable_report=True,
         timezone="Asia/Taipei",
-        disable_services=[service],
+        disable_services=["www-ssl"],
+    )
+
+    with pytest.raises(ValueError, match="www"):
+        day2.build_apply_commands(config)
+
+
+def test_build_apply_commands_rejects_http_disable():
+    config = day2.Day2Config(
+        host="192.168.88.1",
+        port=22,
+        username="admin",
+        password="secret",
+        device_name="Hex-s-2025-lab01",
+        target_routeros_version="7.22.3",
+        enable_apply_config=True,
+        enable_backup=True,
+        enable_report=True,
+        timezone="Asia/Taipei",
+        disable_services=["www"],
     )
 
     with pytest.raises(ValueError, match="www"):
@@ -357,7 +408,75 @@ def test_write_reports_creates_json_and_txt(tmp_path, monkeypatch):
     assert txt_path.exists()
 
 
-def test_wait_for_ntp_synchronized_retries_until_synced(monkeypatch):
+def test_build_golden_template_from_discovery_forces_safe_values():
+    discovery_report = {
+        "suggested_config": {
+            "device": {
+                "vendor": "mikrotik",
+                "platform": "routeros",
+            },
+            "host": "192.168.88.1",
+            "port": 22,
+            "username": "admin",
+            "password": "do-not-copy",
+            "device_name": "Hex-s-2025-lab01",
+            "target_routeros_version": "7.22.3",
+            "enable_apply_config": True,
+            "enable_backup": True,
+            "enable_report": True,
+            "timezone": "Asia/Taipei",
+            "disable_services": ["ftp", "telnet"],
+        }
+    }
+
+    template = day2.build_golden_template_from_discovery(discovery_report)
+
+    assert template["password"] == ""
+    assert template["enable_apply_config"] is False
+    assert template["device"] == {"vendor": "mikrotik", "platform": "routeros"}
+    assert template["target_routeros_version"] == "7.22.3"
+    assert template["timezone"] == "Asia/Taipei"
+    assert template["disable_services"] == ["ftp", "telnet"]
+
+
+def test_export_golden_template_writes_file_without_password(tmp_path):
+    discovery_path = tmp_path / "discovered_day2_config.json"
+    template_path = tmp_path / "golden_day2_config.example.json"
+    discovery_path.write_text(
+        json.dumps(
+            {
+                "suggested_config": {
+                    "device": {
+                        "vendor": "mikrotik",
+                        "platform": "routeros",
+                    },
+                    "host": "192.168.88.1",
+                    "port": 22,
+                    "username": "admin",
+                    "password": "do-not-copy",
+                    "device_name": "Hex-s-2025-lab01",
+                    "target_routeros_version": "7.22.3",
+                    "enable_apply_config": True,
+                    "enable_backup": True,
+                    "enable_report": True,
+                    "timezone": "Asia/Taipei",
+                    "disable_services": ["ftp"],
+                }
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    template = day2.export_golden_template(discovery_path, template_path)
+
+    assert template_path.exists()
+    written = json.loads(template_path.read_text(encoding="utf-8"))
+    assert template == written
+    assert written["password"] == ""
+    assert written["enable_apply_config"] is False
+
+
+def test_wait_for_ntp_synchronized_retries_until_synced(monkeypatch, capsys):
     report = {"commands_executed": [], "validation_outputs": {}, "ntp_client": {}}
     outputs = [NTP_WAITING_OUTPUT, NTP_SYNCED_OUTPUT]
     sleeps = []
@@ -382,6 +501,10 @@ def test_wait_for_ntp_synchronized_retries_until_synced(monkeypatch):
         "/system ntp client print",
         "/system ntp client print",
     ]
+    output = capsys.readouterr().out
+    assert "NTP is not synchronized yet" in output
+    assert "retrying in 10 seconds" in output
+    assert "NTP status is synchronized" in output
 
 
 def test_validate_after_apply_marks_warning_when_ntp_never_syncs(monkeypatch):
@@ -428,3 +551,125 @@ def test_validate_after_apply_marks_warning_when_ntp_never_syncs(monkeypatch):
     assert report["validation_result"] == "WARNING"
     assert report["ntp_client"]["status"] == "waiting"
     assert any("NTP client did not reach" in warning for warning in report["warnings"])
+
+
+def test_validate_after_apply_skips_ntp_retry_wait_during_dry_run(monkeypatch):
+    report = day2.make_empty_report(
+        day2.Day2Config(
+            host="192.168.88.1",
+            port=22,
+            username="admin",
+            password="secret",
+            device_name="Hex-s-2025-lab01",
+            target_routeros_version="7.22.3",
+            enable_apply_config=False,
+            enable_backup=True,
+            enable_report=True,
+            timezone="Asia/Taipei",
+            disable_services=[],
+        )
+    )
+    report["version_gate_result"] = "PASS"
+    report["routerboard_firmware_synced"] = True
+    report["dry_run_commands"] = ["/system ntp client set enabled=yes"]
+
+    outputs = {
+        "/system identity print": "name: Hex-s-2025-lab01",
+        "/system clock print": "time-zone-name: Asia/Taipei",
+        "/system ntp client print": NTP_WAITING_OUTPUT,
+        "/ip service print": "",
+        "/system resource print": RESOURCE_OUTPUT,
+        "/system package print": PACKAGE_OUTPUT,
+        "/system routerboard print": ROUTERBOARD_OUTPUT,
+    }
+
+    def fake_run_and_record(_client, command, _report):
+        return outputs[command]
+
+    def fail_if_waits(_client, _report):
+        raise AssertionError("dry-run should not wait for NTP synchronization")
+
+    monkeypatch.setattr(day2, "run_and_record", fake_run_and_record)
+    monkeypatch.setattr(day2, "wait_for_ntp_synchronized", fail_if_waits)
+
+    day2.validate_after_apply(object(), report)
+
+    assert report["validation_result"] == "WARNING"
+    assert report["ntp_client"]["status"] == "waiting"
+    assert any("retry wait was skipped" in warning for warning in report["warnings"])
+
+
+def test_create_baseline_marker_backup_writes_expected_files(monkeypatch):
+    report = {
+        "commands_executed": [],
+        "errors": [],
+        "warnings": [],
+        "validation_result": "PASS",
+        "ntp_client": {"status": "synchronized"},
+    }
+
+    def fake_run_and_record(_client, command, received_report):
+        received_report["commands_executed"].append(command)
+        return ""
+
+    monkeypatch.setattr(day2, "run_and_record", fake_run_and_record)
+
+    day2.create_baseline_marker_backup(object(), report)
+
+    assert report["baseline_marker_result"] == "PASS"
+    assert report["commands_executed"] == [
+        "/export file=baseline-wan-ntp-ok",
+        "/system backup save name=baseline-wan-ntp-ok",
+    ]
+
+
+def test_create_baseline_marker_backup_skips_when_ntp_is_not_synced(monkeypatch):
+    report = {
+        "commands_executed": [],
+        "errors": [],
+        "warnings": [],
+        "validation_result": "WARNING",
+        "ntp_client": {"status": "waiting"},
+    }
+
+    def fail_if_called(_client, _command, _report):
+        raise AssertionError("baseline marker backup should not run without NTP sync")
+
+    monkeypatch.setattr(day2, "run_and_record", fail_if_called)
+
+    day2.create_baseline_marker_backup(object(), report)
+
+    assert report["baseline_marker_result"] == "SKIPPED"
+    assert report["commands_executed"] == []
+    assert any("NTP is not synchronized" in warning for warning in report["warnings"])
+
+
+def test_main_handles_keyboard_interrupt_during_run(monkeypatch, capsys):
+    monkeypatch.setattr(day2, "parse_args", lambda: type("Args", (), {
+        "export_template": False,
+        "dry_run": False,
+        "discover_config": False,
+    })())
+    monkeypatch.setattr(
+        day2,
+        "load_config",
+        lambda _path: day2.Day2Config(
+            host="192.168.88.1",
+            port=22,
+            username="admin",
+            password="secret",
+            device_name="Hex-s-2025-lab01",
+            target_routeros_version="7.22.3",
+            enable_apply_config=True,
+            enable_backup=True,
+            enable_report=True,
+            timezone="Asia/Taipei",
+            disable_services=[],
+        ),
+    )
+    monkeypatch.setattr(day2, "get_host", lambda default_host: default_host)
+    monkeypatch.setattr(day2, "get_password", lambda default_password: default_password)
+    monkeypatch.setattr(day2, "run_day2_auto_setup", lambda _config: (_ for _ in ()).throw(KeyboardInterrupt()))
+
+    assert day2.main() == 130
+    assert "Interrupted by user" in capsys.readouterr().out

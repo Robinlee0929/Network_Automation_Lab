@@ -9,6 +9,18 @@ def test_get_device_name_uses_cli_value():
     assert checker.get_device_name(" hex-s-2025-lab01 ") == "hex-s-2025-lab01"
 
 
+def test_get_router_ip_uses_prompt_value(monkeypatch):
+    monkeypatch.setattr("builtins.input", lambda _prompt: "192.168.88.2")
+
+    assert checker.get_router_ip("192.168.88.1") == "192.168.88.2"
+
+
+def test_get_router_ip_falls_back_to_config_default(monkeypatch):
+    monkeypatch.setattr("builtins.input", lambda _prompt: "")
+
+    assert checker.get_router_ip("192.168.88.1") == "192.168.88.1"
+
+
 def test_get_password_uses_prompt_value(monkeypatch):
     monkeypatch.setattr(checker.getpass, "getpass", lambda _: "runtime-password")
 
