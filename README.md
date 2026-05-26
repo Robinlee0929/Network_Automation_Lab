@@ -2,6 +2,8 @@
 
 Python automation for MikroTik reset setup, acceptance checks, and post-setup validation.
 
+![MikroTik Day 3 Automation Test Topology](docs/assets/mikrotik-day3-topology.png)
+
 ## Current Supported Platforms
 
 - MikroTik RouterOS
