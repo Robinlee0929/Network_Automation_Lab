@@ -10,7 +10,12 @@ import paramiko
 
 from mikrotik_day2_auto_setup import (
     CONFIG_PATH,
+    COLOR_BOLD,
+    COLOR_CYAN,
+    COLOR_DIM,
     Day2Config,
+    apply_device_profile,
+    color_text,
     connect_ssh_with_auth_retry,
     get_host,
     get_password,
@@ -21,6 +26,7 @@ from mikrotik_day2_auto_setup import (
 
 
 REPORT_ROOT = Path("reports")
+REQUIRED_DISABLED_SERVICES = ["ftp", "telnet"]
 
 CHECK_COMMANDS = {
     "identity": "/system identity print",
@@ -31,6 +37,29 @@ CHECK_COMMANDS = {
     "ip_address": "/ip address print",
     "services": "/ip service print",
 }
+
+
+def status_text(status: str) -> str:
+    padded = f"{status:<8}"
+    if status == "PASS":
+        return color_text(padded, "\033[32m")
+    if status == "FAIL":
+        return color_text(padded, "\033[31m")
+    if status == "WARNING":
+        return color_text(padded, "\033[33m")
+    if status == "SKIP":
+        return color_text(padded, "\033[36m")
+    return padded
+
+
+def expected_disabled_services(config: Day2Config) -> List[str]:
+    configured = config.required_disabled_services or REQUIRED_DISABLED_SERVICES
+    services = [
+        str(service).strip()
+        for service in configured
+        if str(service).strip() in REQUIRED_DISABLED_SERVICES
+    ]
+    return services or REQUIRED_DISABLED_SERVICES
 
 
 def parse_args() -> argparse.Namespace:
@@ -186,7 +215,7 @@ def evaluate_setup_acceptance(
     device_name: str,
     config: Day2Config,
 ) -> List[Dict[str, Any]]:
-    expected_disabled = config.required_disabled_services or ["ftp", "telnet"]
+    expected_disabled = expected_disabled_services(config)
     results: List[Dict[str, Any]] = []
 
     identity = parse_identity(outputs.get("identity", ""))
@@ -339,8 +368,7 @@ def build_report(
             "wan_dhcp_client_required": config.expected_wan_dhcp_client_required,
             "lan_bridge": config.expected_lan_bridge,
             "lan_ip_cidr": config.expected_lan_ip_cidr,
-            "required_disabled_services": config.required_disabled_services
-            or ["ftp", "telnet"],
+            "required_disabled_services": expected_disabled_services(config),
         },
         "summary": build_summary(results),
         "check_results": results,
@@ -417,19 +445,19 @@ def run_acceptance_check(device_name: str, config: Day2Config) -> Dict[str, Any]
 
 def print_summary(report: Dict[str, Any], json_path: Path, txt_path: Path) -> None:
     print()
-    print("=" * 72)
-    print("MikroTik Setup Acceptance Check")
-    print("=" * 72)
+    print(color_text("=" * 72, COLOR_CYAN))
+    print(color_text("MikroTik Setup Acceptance Check", COLOR_BOLD))
+    print(color_text("=" * 72, COLOR_CYAN))
     print(f"{'Device Name':<18}: {report['device_name']}")
     print(f"{'Host':<18}: {report['host']}")
     print(f"{'Summary':<18}: {report['summary']}")
-    print("-" * 72)
+    print(color_text("-" * 72, COLOR_CYAN))
     for result in report["check_results"]:
-        print(f"{result['status']:<8} {result['name']}: {result['reason']}")
-    print("-" * 72)
-    print(f"{'JSON report':<18}: {json_path}")
-    print(f"{'TXT report':<18}: {txt_path}")
-    print("=" * 72)
+        print(f"{status_text(result['status'])} {result['name']}: {result['reason']}")
+    print(color_text("-" * 72, COLOR_CYAN))
+    print(f"{'JSON report':<18}: {color_text(str(json_path), COLOR_DIM)}")
+    print(f"{'TXT report':<18}: {color_text(str(txt_path), COLOR_DIM)}")
+    print(color_text("=" * 72, COLOR_CYAN))
 
 
 def main() -> int:
@@ -437,6 +465,7 @@ def main() -> int:
         args = parse_args()
         config = load_config(CONFIG_PATH)
         device_name = get_device_name(args.device_name, config.device_name)
+        apply_device_profile(config, device_name)
         config.host = get_host(config.host)
         config.password = get_password(config.password)
     except KeyboardInterrupt:

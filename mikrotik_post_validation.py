@@ -12,7 +12,12 @@ import paramiko
 
 from mikrotik_day2_auto_setup import (
     CONFIG_PATH,
+    COLOR_BOLD,
+    COLOR_CYAN,
+    COLOR_DIM,
     Day2Config,
+    apply_device_profile,
+    color_text,
     connect_ssh_with_auth_retry,
     get_host,
     get_password,
@@ -28,6 +33,7 @@ from mikrotik_day2_auto_setup import (
 REPORT_ROOT = Path("reports")
 PING_TARGET_IP = "8.8.8.8"
 PING_TARGET_DNS = "google.com"
+REQUIRED_DISABLED_SERVICES = ["ftp", "telnet"]
 
 DAY3_COMMANDS = {
     "resource": "/system resource print",
@@ -42,6 +48,29 @@ DAY3_COMMANDS = {
 }
 
 
+def status_text(status: str) -> str:
+    padded = f"{status:<8}"
+    if status == "PASS":
+        return color_text(padded, "\033[32m")
+    if status == "FAIL":
+        return color_text(padded, "\033[31m")
+    if status == "WARNING":
+        return color_text(padded, "\033[33m")
+    if status == "SKIP":
+        return color_text(padded, "\033[36m")
+    return padded
+
+
+def expected_disabled_services(config: Day2Config) -> List[str]:
+    configured = config.required_disabled_services or REQUIRED_DISABLED_SERVICES
+    services = [
+        str(service).strip()
+        for service in configured
+        if str(service).strip() in REQUIRED_DISABLED_SERVICES
+    ]
+    return services or REQUIRED_DISABLED_SERVICES
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="MikroTik post-setup validation automation."
@@ -50,9 +79,12 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def get_device_name(arg_value: Optional[str]) -> str:
+def get_device_name(arg_value: Optional[str], default_value: str = "") -> str:
     if arg_value and arg_value.strip():
         return arg_value.strip()
+
+    if default_value.strip():
+        return default_value.strip()
 
     device_name = input("Please input device name: ").strip()
     if not device_name:
@@ -158,8 +190,12 @@ def has_default_route(output: str) -> bool:
     return "0.0.0.0/0" in normalized or "dst-address=0.0.0.0/0" in normalized
 
 
-def parse_disabled_services(output: str) -> Dict[str, bool]:
-    protected = {"ftp": False, "telnet": False, "www": False}
+def parse_disabled_services(
+    output: str,
+    required_services: Optional[List[str]] = None,
+) -> Dict[str, bool]:
+    required = required_services or REQUIRED_DISABLED_SERVICES
+    protected = {service: False for service in required}
     for line in output.splitlines():
         stripped = line.strip()
         if not stripped or stripped.startswith(("Flags:", "Columns:", "#", ";;;")):
@@ -221,6 +257,8 @@ def collect_outputs(client: paramiko.SSHClient) -> Tuple[Dict[str, str], List[Di
 def evaluate_results(
     outputs: Dict[str, str],
     target_routeros_version: str,
+    required_disabled_services: Optional[List[str]] = None,
+    expected_lan_ip_cidr: str = "",
 ) -> Tuple[List[Dict[str, Any]], Dict[str, Any]]:
     results: List[Dict[str, Any]] = []
 
@@ -349,24 +387,33 @@ def evaluate_results(
         if "bridge" in interface:
             lan_ip = address.get("address", "")
             break
+    lan_ip_ok = bool(lan_ip)
+    lan_reason = f"LAN bridge IP: {lan_ip or 'not found'}."
+    if expected_lan_ip_cidr:
+        lan_ip_ok = lan_ip == expected_lan_ip_cidr
+        lan_reason = f"LAN bridge IP: {lan_ip or 'not found'}; expected {expected_lan_ip_cidr}."
     results.append(
         make_result(
             "LAN bridge IP",
-            "PASS" if lan_ip else "FAIL",
-            f"LAN bridge IP: {lan_ip or 'not found'}.",
+            "PASS" if lan_ip_ok else "FAIL",
+            lan_reason,
             DAY3_COMMANDS["ip_address"],
             outputs.get("ip_address", ""),
         )
     )
 
-    disabled_services = parse_disabled_services(outputs.get("service", ""))
+    expected_disabled = required_disabled_services or REQUIRED_DISABLED_SERVICES
+    disabled_services = parse_disabled_services(
+        outputs.get("service", ""),
+        expected_disabled,
+    )
     unsafe_open = [service for service, disabled in disabled_services.items() if not disabled]
     results.append(
         make_result(
             "Service hardening",
             "PASS" if not unsafe_open else "WARNING",
             (
-                "ftp, telnet, and www are disabled."
+                f"{', '.join(expected_disabled)} are disabled."
                 if not unsafe_open
                 else f"Services not disabled: {', '.join(unsafe_open)}."
             ),
@@ -477,21 +524,21 @@ def write_reports(report: Dict[str, Any]) -> Tuple[Path, Path]:
 
 def print_summary(report: Dict[str, Any], json_path: Path, txt_path: Path) -> None:
     print()
-    print("=" * 72)
-    print("MikroTik Post-Setup Validation")
-    print("=" * 72)
+    print(color_text("=" * 72, COLOR_CYAN))
+    print(color_text("MikroTik Post-Setup Validation", COLOR_BOLD))
+    print(color_text("=" * 72, COLOR_CYAN))
     print(f"{'Device Name':<18}: {report['device_name']}")
     print(f"{'Host':<18}: {report['host']}")
     print(f"{'WAN IP':<18}: {report['wan_ip']}")
     print(f"{'LAN IP':<18}: {report['lan_ip']}")
     print(f"{'Summary':<18}: {report['summary']}")
-    print("-" * 72)
+    print(color_text("-" * 72, COLOR_CYAN))
     for result in report["test_results"]:
-        print(f"{result['status']:<8} {result['name']}: {result['reason']}")
-    print("-" * 72)
-    print(f"{'JSON report':<18}: {json_path}")
-    print(f"{'TXT report':<18}: {txt_path}")
-    print("=" * 72)
+        print(f"{status_text(result['status'])} {result['name']}: {result['reason']}")
+    print(color_text("-" * 72, COLOR_CYAN))
+    print(f"{'JSON report':<18}: {color_text(str(json_path), COLOR_DIM)}")
+    print(f"{'TXT report':<18}: {color_text(str(txt_path), COLOR_DIM)}")
+    print(color_text("=" * 72, COLOR_CYAN))
 
 
 def run_post_validation(device_name: str, config: Day2Config) -> Dict[str, Any]:
@@ -506,6 +553,8 @@ def run_post_validation(device_name: str, config: Day2Config) -> Dict[str, Any]:
         evaluated_results, metadata = evaluate_results(
             outputs,
             config.target_routeros_version,
+            expected_disabled_services(config),
+            config.expected_lan_ip_cidr,
         )
         results.extend(evaluated_results)
     except (paramiko.AuthenticationException, socket.timeout, TimeoutError) as error:
@@ -528,8 +577,9 @@ def run_post_validation(device_name: str, config: Day2Config) -> Dict[str, Any]:
 def main() -> int:
     try:
         args = parse_args()
-        device_name = get_device_name(args.device_name)
         config = load_config(CONFIG_PATH)
+        device_name = get_device_name(args.device_name, config.device_name)
+        apply_device_profile(config, device_name)
         config.host = get_host(config.host)
         config.password = get_password(config.password)
     except KeyboardInterrupt:

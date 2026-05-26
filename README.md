@@ -48,16 +48,16 @@ For a reset MikroTik, keep using the original setup command. The acceptance chec
 
 ```powershell
 # Setup dry-run
-python mikrotik_day2_auto_setup.py --dry-run
+python mikrotik_day2_auto_setup.py --dry-run --device-name Hex-s-2025-lab01
 
 # Apply setup
-python mikrotik_day2_auto_setup.py
+python mikrotik_day2_auto_setup.py --device-name Hex-s-2025-lab01
 
 # Setup acceptance check
-python mikrotik_acceptance_check.py --device-name Hex-s-2025-lab02
+python mikrotik_acceptance_check.py --device-name Hex-s-2025-lab01
 
 # Post-setup validation
-python mikrotik_post_validation.py --device-name Hex-s-2025-lab02
+python mikrotik_post_validation.py --device-name Hex-s-2025-lab01
 ```
 
 The short alias also works, but the original command remains the primary documented entry point:
@@ -65,13 +65,17 @@ The short alias also works, but the original command remains the primary documen
 ```powershell
 python mikrotik_setup.py --dry-run
 python mikrotik_setup.py
+python mikrotik_auto_setup.py --dry-run
+python mikrotik_auto_setup.py
 ```
+
+Both setup commands also accept `--device-name`. If you omit it, the script prompts for a device name and uses the `config.json` default only when you press Enter.
 
 Name mapping:
 
 | Command | Alias | Purpose |
 | --- | --- | --- |
-| `mikrotik_day2_auto_setup.py` | `mikrotik_setup.py` | Apply setup, backup, report, and baseline marker |
+| `mikrotik_day2_auto_setup.py` | `mikrotik_setup.py`, `mikrotik_auto_setup.py` | Apply setup, backup, report, and baseline marker |
 | `mikrotik_acceptance_check.py` | - | Read-only setup acceptance check |
 | `mikrotik_post_validation.py` | - | Read-only post-setup validation |
 
@@ -248,7 +252,28 @@ Update `config.json` from `config.example.json`:
   "enable_backup": true,
   "enable_report": true,
   "timezone": "Asia/Taipei",
-  "disable_services": ["ftp", "telnet"]
+  "disable_services": ["ftp", "telnet"],
+  "expected": {
+    "wan_interface": "ether1",
+    "wan_dhcp_client_required": true,
+    "lan_bridge": "bridge",
+    "lan_ip_cidr": "192.168.88.1/24",
+    "required_disabled_services": ["ftp", "telnet"]
+  },
+  "devices": {
+    "Hex-s-2025-lab01": {
+      "host": "192.168.88.1",
+      "expected": {
+        "lan_ip_cidr": "192.168.88.1/24"
+      }
+    },
+    "Hex-s-2025-lab02": {
+      "host": "192.168.89.1",
+      "expected": {
+        "lan_ip_cidr": "192.168.89.1/24"
+      }
+    }
+  }
 }
 ```
 
@@ -259,6 +284,22 @@ Please input SSH password:
 ```
 
 The script also prompts for the router host/IP at runtime. Press Enter to use the `host` value from `config.json`, or type a different IP for the current run.
+
+The setup device name can be provided on the command line:
+
+```powershell
+python mikrotik_day2_auto_setup.py --dry-run --device-name Hex-s-2025-lab01
+python mikrotik_setup.py --dry-run --device-name Hex-s-2025-lab01
+python mikrotik_auto_setup.py --dry-run --device-name Hex-s-2025-lab01
+```
+
+When `--device-name` matches a key under `devices`, that device profile overrides the shared defaults. For example, `Hex-s-2025-lab02` uses `host=192.168.89.1` and `expected.lan_ip_cidr=192.168.89.1/24`, so Day 2 dry-run uses the lab02 bridge IP instead of the lab01 IP.
+
+If `--device-name` is omitted, the script prompts for it:
+
+```text
+Please input device name (press Enter to use config.json default: Hex-s-2025-lab02):
+```
 
 Run:
 
@@ -311,9 +352,11 @@ For Cisco IOS structure testing, copy `config.cisco.example.json` to `config.jso
   - `/system clock set time-zone-name=<timezone>`
   - `/system ntp client set enabled=no`
   - `/system ntp client set enabled=yes mode=unicast servers=pool.ntp.org`
-  - `/ip service disable [find name=<service>]` only for services listed in `disable_services`
+  - `/ip service disable [find name=<service>]` only for `ftp` and `telnet`
 
-The script never disables SSH, HTTP (`www`), or HTTPS (`www-ssl`). It does not change the admin password, delete users, reboot, import config, upgrade RouterOS packages, or run RouterBOARD firmware upgrade.
+The script never disables SSH, HTTP (`www`), HTTPS (`www-ssl`), WinBox, or unknown numeric service names from old local configs. It does not change the admin password, delete users, reboot, import config, upgrade RouterOS packages, or run RouterBOARD firmware upgrade.
+
+During validation, the script also checks bridge LAN IP drift. If a device profile expects `192.168.89.1/24` but the bridge still has `192.168.88.1/24`, the report marks `WARNING` and prints a suggested `/ip address remove ...` cleanup command for review instead of silently leaving the stale IP unnoticed.
 
 After apply or dry-run validation, the script checks `/system ntp client print`. If NTP reports `status=waiting`, it retries every 10 seconds for up to 120 seconds. `status=synchronized` is treated as PASS. If NTP is still not synchronized after the timeout, the report shows `WARNING` instead of failing the entire run.
 
@@ -371,8 +414,26 @@ python mikrotik_day2_auto_setup.py
 
 When `enable_report` is true, the script writes:
 
-- `reports/day2/day2_auto_setup_report.json`
-- `reports/day2/day2_auto_setup_report.txt`
+- `reports/<device_name>/day2_auto_setup_report.json`
+- `reports/<device_name>/day2_auto_setup_report.txt`
+
+Examples:
+
+```text
+reports/
+  Hex-s-2025-lab01/
+    day2_auto_setup_report.json
+    day2_auto_setup_report.txt
+    day3_test_report.json
+    day3_test_report.txt
+  Hex-s-2025-lab02/
+    day2_auto_setup_report.json
+    day2_auto_setup_report.txt
+    day3_test_report.json
+    day3_test_report.txt
+```
+
+The Day 2 report path uses the final resolved device name. `--device-name` takes priority over `config.json`, so reports from different MikroTik devices do not overwrite each other.
 
 The report includes SSH result, RouterOS package version, RouterBOARD firmware fields, NTP client fields, backup/apply/validation results, executed commands, warnings, and errors. The SSH password is never written to console or report.
 

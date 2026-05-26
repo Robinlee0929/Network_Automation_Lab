@@ -1,4 +1,5 @@
 import json
+import json
 
 import mikrotik_acceptance_check as acceptance
 from mikrotik_day2_auto_setup import Day2Config
@@ -115,6 +116,31 @@ def test_expected_lan_ip_cidr_mismatch_should_fail():
     )
 
     assert status_for(results, "LAN bridge IP matches expected") == "FAIL"
+
+
+def test_lab02_acceptance_expected_lan_ip_uses_profile():
+    config = make_config(
+        device_name="Hex-s-2025-lab02",
+        host="192.168.89.1",
+        expected_lan_ip_cidr="192.168.89.1/24",
+    )
+    outputs = dict(
+        BASE_OUTPUTS,
+        identity="name: Hex-s-2025-lab02",
+        ip_address="0 address=192.168.89.1/24 interface=bridge",
+    )
+
+    results = acceptance.evaluate_setup_acceptance(
+        outputs,
+        "Hex-s-2025-lab02",
+        config,
+    )
+    lan_result = [
+        result for result in results if result["name"] == "LAN bridge IP matches expected"
+    ][0]
+
+    assert lan_result["status"] == "PASS"
+    assert "Expected 192.168.89.1/24 on bridge." == lan_result["reason"]
 
 
 def test_no_expected_config_uses_default_ether1_and_bridge_fallback(tmp_path):

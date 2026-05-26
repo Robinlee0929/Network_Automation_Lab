@@ -20,5 +20,19 @@
     "lan_bridge": "bridge",
     "lan_ip_cidr": "192.168.88.1/24",
     "required_disabled_services": ["ftp", "telnet"]
+  },
+  "devices": {
+    "Hex-s-2025-lab01": {
+      "host": "192.168.88.1",
+      "expected": {
+        "lan_ip_cidr": "192.168.88.1/24"
+      }
+    },
+    "Hex-s-2025-lab02": {
+      "host": "192.168.89.1",
+      "expected": {
+        "lan_ip_cidr": "192.168.89.1/24"
+      }
+    }
   }
 }

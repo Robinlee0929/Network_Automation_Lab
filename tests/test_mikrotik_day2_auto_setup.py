@@ -197,6 +197,64 @@ def test_load_config_supports_legacy_host_keys(tmp_path):
     assert config.enable_apply_config is False
 
 
+def test_apply_device_profile_lab01_uses_expected_lan_ip(tmp_path):
+    config_path = tmp_path / "config.json"
+    config_path.write_text(
+        json.dumps(
+            {
+                "host": "192.168.88.254",
+                "device_name": "Hex-s-2025-lab01",
+                "devices": {
+                    "Hex-s-2025-lab01": {
+                        "host": "192.168.88.1",
+                        "expected": {"lan_ip_cidr": "192.168.88.1/24"},
+                    },
+                    "Hex-s-2025-lab02": {
+                        "host": "192.168.89.1",
+                        "expected": {"lan_ip_cidr": "192.168.89.1/24"},
+                    },
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    config = day2.load_config(config_path)
+    day2.apply_device_profile(config, "Hex-s-2025-lab01")
+
+    assert config.host == "192.168.88.1"
+    assert config.expected_lan_ip_cidr == "192.168.88.1/24"
+
+
+def test_apply_device_profile_lab02_uses_expected_lan_ip(tmp_path):
+    config_path = tmp_path / "config.json"
+    config_path.write_text(
+        json.dumps(
+            {
+                "host": "192.168.88.254",
+                "device_name": "Hex-s-2025-lab01",
+                "devices": {
+                    "Hex-s-2025-lab01": {
+                        "host": "192.168.88.1",
+                        "expected": {"lan_ip_cidr": "192.168.88.1/24"},
+                    },
+                    "Hex-s-2025-lab02": {
+                        "host": "192.168.89.1",
+                        "expected": {"lan_ip_cidr": "192.168.89.1/24"},
+                    },
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    config = day2.load_config(config_path)
+    day2.apply_device_profile(config, "Hex-s-2025-lab02")
+
+    assert config.host == "192.168.89.1"
+    assert config.expected_lan_ip_cidr == "192.168.89.1/24"
+
+
 def test_get_password_uses_config_value_without_prompt(monkeypatch):
     prompts = []
 
@@ -275,7 +333,7 @@ def test_build_apply_commands_uses_config_and_keeps_management_services():
         enable_backup=True,
         enable_report=True,
         timezone="Asia/Taipei",
-        disable_services=["ftp", "telnet"],
+        disable_services=["ftp", "telnet", "443", "8291"],
     )
 
     commands = day2.build_apply_commands(config)
@@ -285,8 +343,77 @@ def test_build_apply_commands_uses_config_and_keeps_management_services():
     assert "/system ntp client set enabled=no" in commands
     assert "/system ntp client set enabled=yes mode=unicast servers=pool.ntp.org" in commands
     assert '/ip service disable [find name="ftp"]' in commands
+    assert '/ip service disable [find name="telnet"]' in commands
+    assert all('name="443"' not in command for command in commands)
+    assert all('name="8291"' not in command for command in commands)
     assert all('name="ssh"' not in command for command in commands)
     assert all('name="www-ssl"' not in command for command in commands)
+
+
+def test_lab02_dry_run_commands_use_profile_lan_ip_and_not_lab01_ip():
+    config = day2.Day2Config(
+        host="192.168.89.1",
+        port=22,
+        username="admin",
+        password="secret",
+        device_name="Hex-s-2025-lab02",
+        target_routeros_version="7.22.3",
+        enable_apply_config=False,
+        enable_backup=True,
+        enable_report=True,
+        timezone="Asia/Taipei",
+        disable_services=["ftp", "telnet"],
+        expected_lan_ip_cidr="192.168.89.1/24",
+    )
+
+    commands = day2.build_apply_commands(config)
+    command_text = "\n".join(commands)
+
+    assert 'address="192.168.89.1/24"' in command_text
+    assert 'address="192.168.88.1/24"' not in command_text
+
+
+def test_lan_ip_drift_warning_suggests_cleanup_command():
+    config = day2.Day2Config(
+        host="192.168.89.1",
+        port=22,
+        username="admin",
+        password="secret",
+        device_name="Hex-s-2025-lab02",
+        target_routeros_version="7.22.3",
+        enable_apply_config=False,
+        enable_backup=True,
+        enable_report=True,
+        timezone="Asia/Taipei",
+        disable_services=[],
+        expected_lan_ip_cidr="192.168.89.1/24",
+    )
+
+    warnings = day2.lan_ip_drift_warnings(
+        "0 address=192.168.88.1/24 interface=bridge\n"
+        "1 address=192.168.89.1/24 interface=bridge\n",
+        config,
+    )
+
+    assert warnings
+    assert "192.168.88.1/24" in warnings[0]
+    assert "/ip address remove" in warnings[0]
+
+
+def test_get_device_name_uses_argument_before_config_default():
+    assert day2.get_device_name("Hex-s-2025-lab01", "Hex-s-2025-lab02") == "Hex-s-2025-lab01"
+
+
+def test_get_device_name_prompts_and_can_use_config_default(monkeypatch):
+    monkeypatch.setattr("builtins.input", lambda _prompt: "")
+
+    assert day2.get_device_name("", "Hex-s-2025-lab02") == "Hex-s-2025-lab02"
+
+
+def test_get_device_name_prompts_for_override(monkeypatch):
+    monkeypatch.setattr("builtins.input", lambda _prompt: "Hex-s-2025-lab01")
+
+    assert day2.get_device_name("", "Hex-s-2025-lab02") == "Hex-s-2025-lab01"
 
 
 def test_build_apply_commands_rejects_ssh_disable():
@@ -384,7 +511,7 @@ def test_build_text_report_omits_password_and_uses_plain_format(tmp_path):
 
 
 def test_write_reports_creates_json_and_txt(tmp_path, monkeypatch):
-    monkeypatch.setattr(day2, "REPORT_DIR", tmp_path / "reports")
+    monkeypatch.setattr(day2, "REPORT_ROOT", tmp_path / "reports")
     config = day2.Day2Config(
         host="192.168.88.1",
         port=22,
@@ -402,10 +529,102 @@ def test_write_reports_creates_json_and_txt(tmp_path, monkeypatch):
 
     json_path, txt_path = day2.write_reports(report)
 
+    assert json_path.parent == tmp_path / "reports" / "Hex-s-2025-lab01"
     assert json_path.name == "day2_auto_setup_report.json"
     assert txt_path.name == "day2_auto_setup_report.txt"
     assert json_path.exists()
     assert txt_path.exists()
+
+
+def test_write_reports_uses_lab01_device_folder(tmp_path, monkeypatch):
+    monkeypatch.setattr(day2, "REPORT_ROOT", tmp_path / "reports")
+    report = day2.make_empty_report(
+        day2.Day2Config(
+            host="192.168.88.1",
+            port=22,
+            username="admin",
+            password="secret",
+            device_name="Hex-s-2025-lab01",
+            target_routeros_version="7.22.3",
+            enable_apply_config=False,
+            enable_backup=True,
+            enable_report=True,
+            timezone="Asia/Taipei",
+            disable_services=[],
+        )
+    )
+
+    json_path, txt_path = day2.write_reports(report)
+
+    assert json_path == tmp_path / "reports" / "Hex-s-2025-lab01" / "day2_auto_setup_report.json"
+    assert txt_path == tmp_path / "reports" / "Hex-s-2025-lab01" / "day2_auto_setup_report.txt"
+
+
+def test_write_reports_uses_lab02_device_folder(tmp_path, monkeypatch):
+    monkeypatch.setattr(day2, "REPORT_ROOT", tmp_path / "reports")
+    report = day2.make_empty_report(
+        day2.Day2Config(
+            host="192.168.88.2",
+            port=22,
+            username="admin",
+            password="secret",
+            device_name="Hex-s-2025-lab02",
+            target_routeros_version="7.22.3",
+            enable_apply_config=False,
+            enable_backup=True,
+            enable_report=True,
+            timezone="Asia/Taipei",
+            disable_services=[],
+        )
+    )
+
+    json_path, txt_path = day2.write_reports(report)
+
+    assert json_path == tmp_path / "reports" / "Hex-s-2025-lab02" / "day2_auto_setup_report.json"
+    assert txt_path == tmp_path / "reports" / "Hex-s-2025-lab02" / "day2_auto_setup_report.txt"
+
+
+def test_write_reports_different_device_names_do_not_overwrite(tmp_path, monkeypatch):
+    monkeypatch.setattr(day2, "REPORT_ROOT", tmp_path / "reports")
+    lab01 = day2.make_empty_report(
+        day2.Day2Config(
+            host="192.168.88.1",
+            port=22,
+            username="admin",
+            password="secret",
+            device_name="Hex-s-2025-lab01",
+            target_routeros_version="7.22.3",
+            enable_apply_config=False,
+            enable_backup=True,
+            enable_report=True,
+            timezone="Asia/Taipei",
+            disable_services=[],
+        )
+    )
+    lab02 = day2.make_empty_report(
+        day2.Day2Config(
+            host="192.168.88.2",
+            port=22,
+            username="admin",
+            password="secret",
+            device_name="Hex-s-2025-lab02",
+            target_routeros_version="7.22.3",
+            enable_apply_config=False,
+            enable_backup=True,
+            enable_report=True,
+            timezone="Asia/Taipei",
+            disable_services=[],
+        )
+    )
+
+    lab01_json, _lab01_txt = day2.write_reports(lab01)
+    lab02_json, _lab02_txt = day2.write_reports(lab02)
+
+    assert lab01_json != lab02_json
+    assert lab01_json.exists()
+    assert lab02_json.exists()
+    assert json.loads(lab01_json.read_text(encoding="utf-8"))["device_name"] == "Hex-s-2025-lab01"
+    assert json.loads(lab02_json.read_text(encoding="utf-8"))["device_name"] == "Hex-s-2025-lab02"
 
 
 def test_build_golden_template_from_discovery_forces_safe_values():
@@ -508,21 +727,20 @@ def test_wait_for_ntp_synchronized_retries_until_synced(monkeypatch, capsys):
 
 
 def test_validate_after_apply_marks_warning_when_ntp_never_syncs(monkeypatch):
-    report = day2.make_empty_report(
-        day2.Day2Config(
-            host="192.168.88.1",
-            port=22,
-            username="admin",
-            password="secret",
-            device_name="Hex-s-2025-lab01",
-            target_routeros_version="7.22.3",
-            enable_apply_config=False,
-            enable_backup=True,
-            enable_report=True,
-            timezone="Asia/Taipei",
-            disable_services=[],
-        )
+    config = day2.Day2Config(
+        host="192.168.88.1",
+        port=22,
+        username="admin",
+        password="secret",
+        device_name="Hex-s-2025-lab01",
+        target_routeros_version="7.22.3",
+        enable_apply_config=False,
+        enable_backup=True,
+        enable_report=True,
+        timezone="Asia/Taipei",
+        disable_services=[],
     )
+    report = day2.make_empty_report(config)
     report["version_gate_result"] = "PASS"
     report["routerboard_firmware_synced"] = True
 
@@ -531,6 +749,7 @@ def test_validate_after_apply_marks_warning_when_ntp_never_syncs(monkeypatch):
         "/system clock print": "time-zone-name: Asia/Taipei",
         "/system ntp client print": NTP_WAITING_OUTPUT,
         "/ip service print": "",
+        "/ip address print": "0 address=192.168.88.1/24 interface=bridge",
         "/system resource print": RESOURCE_OUTPUT,
         "/system package print": PACKAGE_OUTPUT,
         "/system routerboard print": ROUTERBOARD_OUTPUT,
@@ -546,7 +765,7 @@ def test_validate_after_apply_marks_warning_when_ntp_never_syncs(monkeypatch):
         lambda _client, received_report: received_report["ntp_client"],
     )
 
-    day2.validate_after_apply(object(), report)
+    day2.validate_after_apply(object(), report, config)
 
     assert report["validation_result"] == "WARNING"
     assert report["ntp_client"]["status"] == "waiting"
@@ -554,21 +773,20 @@ def test_validate_after_apply_marks_warning_when_ntp_never_syncs(monkeypatch):
 
 
 def test_validate_after_apply_skips_ntp_retry_wait_during_dry_run(monkeypatch):
-    report = day2.make_empty_report(
-        day2.Day2Config(
-            host="192.168.88.1",
-            port=22,
-            username="admin",
-            password="secret",
-            device_name="Hex-s-2025-lab01",
-            target_routeros_version="7.22.3",
-            enable_apply_config=False,
-            enable_backup=True,
-            enable_report=True,
-            timezone="Asia/Taipei",
-            disable_services=[],
-        )
+    config = day2.Day2Config(
+        host="192.168.88.1",
+        port=22,
+        username="admin",
+        password="secret",
+        device_name="Hex-s-2025-lab01",
+        target_routeros_version="7.22.3",
+        enable_apply_config=False,
+        enable_backup=True,
+        enable_report=True,
+        timezone="Asia/Taipei",
+        disable_services=[],
     )
+    report = day2.make_empty_report(config)
     report["version_gate_result"] = "PASS"
     report["routerboard_firmware_synced"] = True
     report["dry_run_commands"] = ["/system ntp client set enabled=yes"]
@@ -578,6 +796,7 @@ def test_validate_after_apply_skips_ntp_retry_wait_during_dry_run(monkeypatch):
         "/system clock print": "time-zone-name: Asia/Taipei",
         "/system ntp client print": NTP_WAITING_OUTPUT,
         "/ip service print": "",
+        "/ip address print": "0 address=192.168.88.1/24 interface=bridge",
         "/system resource print": RESOURCE_OUTPUT,
         "/system package print": PACKAGE_OUTPUT,
         "/system routerboard print": ROUTERBOARD_OUTPUT,
@@ -592,7 +811,7 @@ def test_validate_after_apply_skips_ntp_retry_wait_during_dry_run(monkeypatch):
     monkeypatch.setattr(day2, "run_and_record", fake_run_and_record)
     monkeypatch.setattr(day2, "wait_for_ntp_synchronized", fail_if_waits)
 
-    day2.validate_after_apply(object(), report)
+    day2.validate_after_apply(object(), report, config)
 
     assert report["validation_result"] == "WARNING"
     assert report["ntp_client"]["status"] == "waiting"
@@ -649,6 +868,7 @@ def test_main_handles_keyboard_interrupt_during_run(monkeypatch, capsys):
         "export_template": False,
         "dry_run": False,
         "discover_config": False,
+        "device_name": "Hex-s-2025-lab01",
     })())
     monkeypatch.setattr(
         day2,

@@ -1,4 +1,5 @@
 import json
+import json
 
 import mikrotik_post_validation as day3
 
@@ -73,8 +74,8 @@ def test_parse_disabled_services():
     assert day3.parse_disabled_services(SERVICE_OUTPUT) == {
         "ftp": True,
         "telnet": True,
-        "www": True,
     }
+    assert day3.parse_disabled_services(SERVICE_OUTPUT, ["www"]) == {"www": True}
 
 
 def test_evaluate_results_all_core_checks_pass():
@@ -105,7 +106,7 @@ def test_evaluate_results_all_core_checks_pass():
     assert metadata["lan_ip"] == "192.168.88.1/24"
 
 
-def test_evaluate_results_warns_for_version_and_open_www():
+def test_evaluate_results_ignores_open_www_when_ftp_telnet_disabled():
     outputs = {
         "resource": RESOURCE_OUTPUT,
         "package": "0 routeros 7.20.7",
@@ -122,7 +123,76 @@ def test_evaluate_results_warns_for_version_and_open_www():
     statuses = {result["name"]: result["status"] for result in results}
 
     assert statuses["RouterOS version"] == "WARNING"
+    assert statuses["Service hardening"] == "PASS"
+
+
+def test_evaluate_results_warns_for_open_required_service():
+    outputs = {
+        "resource": RESOURCE_OUTPUT,
+        "package": "0 routeros 7.22.3",
+        "routerboard": ROUTERBOARD_OUTPUT,
+        "dhcp_client": DHCP_CLIENT_BOUND_OUTPUT,
+        "ip_address": IP_ADDRESS_OUTPUT,
+        "route": ROUTE_OUTPUT,
+        "ping_ip": PING_OK_OUTPUT,
+        "ping_dns": PING_OK_OUTPUT,
+        "service": "0 ftp 21\n1 X telnet 23\n2 www 80\n",
+    }
+
+    results, _metadata = day3.evaluate_results(outputs, "7.22.3")
+    statuses = {result["name"]: result["status"] for result in results}
+
     assert statuses["Service hardening"] == "WARNING"
+
+
+def test_lab02_post_validation_uses_expected_lan_ip():
+    outputs = {
+        "resource": RESOURCE_OUTPUT,
+        "package": PACKAGE_OUTPUT,
+        "routerboard": ROUTERBOARD_OUTPUT,
+        "dhcp_client": DHCP_CLIENT_BOUND_OUTPUT,
+        "ip_address": (
+            "0 address=10.0.0.10/24 interface=ether1\n"
+            "1 address=192.168.89.1/24 interface=bridge\n"
+        ),
+        "route": ROUTE_OUTPUT,
+        "ping_ip": PING_OK_OUTPUT,
+        "ping_dns": PING_OK_OUTPUT,
+        "service": SERVICE_OUTPUT,
+    }
+
+    results, metadata = day3.evaluate_results(
+        outputs,
+        "7.22.3",
+        expected_lan_ip_cidr="192.168.89.1/24",
+    )
+    statuses = {result["name"]: result["status"] for result in results}
+
+    assert statuses["LAN bridge IP"] == "PASS"
+    assert metadata["lan_ip"] == "192.168.89.1/24"
+
+
+def test_lab02_post_validation_fails_lab01_lan_ip():
+    outputs = {
+        "resource": RESOURCE_OUTPUT,
+        "package": PACKAGE_OUTPUT,
+        "routerboard": ROUTERBOARD_OUTPUT,
+        "dhcp_client": DHCP_CLIENT_BOUND_OUTPUT,
+        "ip_address": IP_ADDRESS_OUTPUT,
+        "route": ROUTE_OUTPUT,
+        "ping_ip": PING_OK_OUTPUT,
+        "ping_dns": PING_OK_OUTPUT,
+        "service": SERVICE_OUTPUT,
+    }
+
+    results, _metadata = day3.evaluate_results(
+        outputs,
+        "7.22.3",
+        expected_lan_ip_cidr="192.168.89.1/24",
+    )
+    statuses = {result["name"]: result["status"] for result in results}
+
+    assert statuses["LAN bridge IP"] == "FAIL"
 
 
 def test_write_reports_uses_device_folder(tmp_path, monkeypatch):

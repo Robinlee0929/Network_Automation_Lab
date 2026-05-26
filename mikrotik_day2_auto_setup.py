@@ -1,6 +1,7 @@
 import argparse
 import getpass
 import json
+import os
 import re
 import socket
 import sys
@@ -13,6 +14,7 @@ import paramiko
 
 
 CONFIG_PATH = Path("config.json")
+REPORT_ROOT = Path("reports")
 REPORT_DIR = Path("reports") / "day2"
 DISCOVERED_CONFIG_REPORT_PATH = REPORT_DIR / "discovered_day2_config.json"
 GOLDEN_TEMPLATE_PATH = Path("golden_day2_config.example.json")
@@ -22,6 +24,8 @@ DEFAULT_PORT = 22
 DEFAULT_USERNAME = "admin"
 DEFAULT_TARGET_ROUTEROS_VERSION = "7.22.3"
 DEFAULT_TIMEZONE = "Asia/Taipei"
+REQUIRED_DISABLED_SERVICES = ["ftp", "telnet"]
+ALLOWED_DISABLED_SERVICES = set(REQUIRED_DISABLED_SERVICES)
 
 SSH_TIMEOUT_SECONDS = 15
 COMMAND_TIMEOUT_SECONDS = 30
@@ -57,6 +61,7 @@ VALIDATION_COMMANDS = [
     "/system clock print",
     "/system ntp client print",
     "/ip service print",
+    "/ip address print",
     "/system resource print",
     "/system package print",
     "/system routerboard print",
@@ -101,6 +106,7 @@ class Day2Config:
     expected_lan_bridge: str = "bridge"
     expected_lan_ip_cidr: str = "192.168.88.1/24"
     required_disabled_services: List[str] = None
+    device_profiles: Dict[str, Any] = None
 
 
 class CommandTimeoutError(RuntimeError):
@@ -149,10 +155,49 @@ def load_config(path: Path = CONFIG_PATH) -> Day2Config:
         required_disabled_services=list(
             expected_config.get(
                 "required_disabled_services",
-                raw_config.get("disable_services", ["ftp", "telnet"]),
+                raw_config.get("disable_services", REQUIRED_DISABLED_SERVICES),
             )
         ),
+        device_profiles=raw_config.get("devices", {})
+        if isinstance(raw_config.get("devices", {}), dict)
+        else {},
     )
+
+
+def apply_device_profile(config: Day2Config, device_name: str) -> Day2Config:
+    config.device_name = device_name
+    profiles = config.device_profiles or {}
+    profile = profiles.get(device_name, {})
+    if not isinstance(profile, dict):
+        return config
+
+    if profile.get("host"):
+        config.host = str(profile["host"]).strip()
+    if profile.get("port"):
+        config.port = int(profile["port"])
+    if profile.get("username"):
+        config.username = str(profile["username"]).strip()
+    if profile.get("target_routeros_version"):
+        config.target_routeros_version = str(profile["target_routeros_version"]).strip()
+
+    expected = profile.get("expected", {})
+    if not isinstance(expected, dict):
+        return config
+
+    if expected.get("wan_interface"):
+        config.expected_wan_interface = str(expected["wan_interface"]).strip()
+    if "wan_dhcp_client_required" in expected:
+        config.expected_wan_dhcp_client_required = bool(
+            expected["wan_dhcp_client_required"]
+        )
+    if expected.get("lan_bridge"):
+        config.expected_lan_bridge = str(expected["lan_bridge"]).strip()
+    if expected.get("lan_ip_cidr"):
+        config.expected_lan_ip_cidr = str(expected["lan_ip_cidr"]).strip()
+    if "required_disabled_services" in expected:
+        config.required_disabled_services = list(expected["required_disabled_services"])
+
+    return config
 
 
 def parse_args() -> argparse.Namespace:
@@ -171,6 +216,10 @@ def parse_args() -> argparse.Namespace:
         "--export-template",
         action="store_true",
         help="Create golden_day2_config.example.json from reports/day2/discovered_day2_config.json.",
+    )
+    parser.add_argument(
+        "--device-name",
+        help="Override device_name from config.json for this setup run.",
     )
     return parser.parse_args()
 
@@ -193,6 +242,35 @@ def get_host(default_host: str) -> str:
     if default_host:
         return default_host
     raise ValueError("Router host/IP is required.")
+
+
+def get_device_name(arg_value: Optional[str], default_value: str = "") -> str:
+    if arg_value and arg_value.strip():
+        return arg_value.strip()
+
+    default_value = default_value.strip()
+    if default_value:
+        prompt = (
+            "Please input device name "
+            f"(press Enter to use config.json default: {default_value}): "
+        )
+    else:
+        prompt = "Please input device name: "
+
+    device_name = input(prompt).strip()
+    if device_name:
+        return device_name
+    if default_value:
+        return default_value
+    raise ValueError("device_name is required.")
+
+
+def sanitize_path_name(value: str) -> str:
+    sanitized = re.sub(r"[^A-Za-z0-9_.-]+", "-", value.strip())
+    sanitized = sanitized.strip(".-")
+    if not sanitized:
+        raise ValueError("Device name cannot be converted to a report folder name.")
+    return sanitized
 
 
 def make_keyboard_interactive_handler(password: str):
@@ -428,7 +506,7 @@ def parse_disabled_services(output: str) -> List[str]:
             service_name = parts[1]
         else:
             continue
-        if service_name in known_services and service_name not in {"ssh", "www", "www-ssl"}:
+        if service_name in ALLOWED_DISABLED_SERVICES:
             disabled_services.append(service_name)
     return disabled_services
 
@@ -479,8 +557,46 @@ def validate_disable_services(services: List[str]) -> List[str]:
             raise ValueError("disable_services must not include ssh, www, or www-ssl.")
         if "\n" in normalized or "\r" in normalized or '"' in normalized:
             raise ValueError(f"Invalid service name in disable_services: {normalized!r}")
-        safe_services.append(normalized)
+        if normalized.lower() in ALLOWED_DISABLED_SERVICES:
+            safe_services.append(normalized.lower())
     return safe_services
+
+
+def bridge_ip_addresses(output: str, bridge_name: str) -> List[str]:
+    addresses: List[str] = []
+    bridge = bridge_name.lower()
+    for line in output.splitlines():
+        normalized = re.sub(r"\s+", " ", line.strip()).lower()
+        if not normalized or bridge not in normalized:
+            continue
+        address_match = re.search(r"\b\d+\.\d+\.\d+\.\d+/\d+\b", normalized)
+        if address_match:
+            addresses.append(address_match.group(0))
+            continue
+        key_value = parse_key_value_output(line)
+        if key_value.get("interface", "").lower() == bridge and key_value.get("address"):
+            addresses.append(key_value["address"])
+    return addresses
+
+
+def lan_ip_drift_warnings(ip_output: str, config: Day2Config) -> List[str]:
+    current_addresses = bridge_ip_addresses(ip_output, config.expected_lan_bridge)
+    stale_addresses = [
+        address
+        for address in current_addresses
+        if address != config.expected_lan_ip_cidr
+    ]
+    warnings: List[str] = []
+    for address in stale_addresses:
+        warnings.append(
+            "Bridge LAN IP drift detected: "
+            f"{address} is still on {config.expected_lan_bridge}; "
+            f"expected {config.expected_lan_ip_cidr}. "
+            "Review before cleanup. Suggested cleanup command: "
+            f"/ip address remove [find interface={quote_routeros_value(config.expected_lan_bridge)} "
+            f"address={quote_routeros_value(address)}]"
+        )
+    return warnings
 
 
 def build_apply_commands(config: Day2Config) -> List[str]:
@@ -550,7 +666,7 @@ def make_empty_report(config: Day2Config) -> Dict[str, Any]:
             "lan_bridge": config.expected_lan_bridge,
             "lan_ip_cidr": config.expected_lan_ip_cidr,
             "required_disabled_services": config.required_disabled_services
-            or ["ftp", "telnet"],
+            or REQUIRED_DISABLED_SERVICES,
         },
     }
 
@@ -721,7 +837,11 @@ def wait_for_ntp_synchronized(
         time.sleep(interval_seconds)
 
 
-def validate_after_apply(client: paramiko.SSHClient, report: Dict[str, Any]) -> None:
+def validate_after_apply(
+    client: paramiko.SSHClient,
+    report: Dict[str, Any],
+    config: Day2Config,
+) -> None:
     validation_outputs: Dict[str, str] = {}
     validation_errors: List[str] = []
 
@@ -737,6 +857,7 @@ def validate_after_apply(client: paramiko.SSHClient, report: Dict[str, Any]) -> 
     package_output = validation_outputs.get("/system package print", "")
     routerboard_output = validation_outputs.get("/system routerboard print", "")
     ntp_output = validation_outputs.get("/system ntp client print", "")
+    ip_output = validation_outputs.get("/ip address print", "")
 
     if resource_output:
         resource = parse_system_resource(resource_output)
@@ -765,6 +886,9 @@ def validate_after_apply(client: paramiko.SSHClient, report: Dict[str, Any]) -> 
         )
     if ntp_output:
         report["ntp_client"] = parse_ntp_client(ntp_output)
+    if ip_output:
+        drift_warnings = lan_ip_drift_warnings(ip_output, config)
+        report["warnings"].extend(drift_warnings)
 
     ntp_client = report["ntp_client"]
     is_dry_run = report.get("apply_config_result") == "SKIPPED" and bool(
@@ -795,6 +919,7 @@ def validate_after_apply(client: paramiko.SSHClient, report: Dict[str, Any]) -> 
         report["version_gate_result"] == "WARNING"
         or not report["routerboard_firmware_synced"]
         or not ntp_synchronized
+        or bool(lan_ip_drift_warnings(ip_output, config))
     ):
         report["validation_result"] = "WARNING"
     elif report["version_gate_result"] == "PASS":
@@ -888,9 +1013,10 @@ def build_text_report(report: Dict[str, Any], json_path: Path, txt_path: Path) -
 
 
 def write_reports(report: Dict[str, Any]) -> Tuple[Path, Path]:
-    REPORT_DIR.mkdir(parents=True, exist_ok=True)
-    json_path = REPORT_DIR / "day2_auto_setup_report.json"
-    txt_path = REPORT_DIR / "day2_auto_setup_report.txt"
+    report_dir = REPORT_ROOT / sanitize_path_name(str(report.get("device_name", "")))
+    report_dir.mkdir(parents=True, exist_ok=True)
+    json_path = report_dir / "day2_auto_setup_report.json"
+    txt_path = report_dir / "day2_auto_setup_report.txt"
 
     with json_path.open("w", encoding="utf-8") as file:
         json.dump(ensure_report_fields(report), file, indent=2, ensure_ascii=False)
@@ -998,10 +1124,10 @@ def build_golden_template_from_discovery(discovery_report: Dict[str, Any]) -> Di
             else "192.168.88.1/24",
             "required_disabled_services": suggested.get("expected", {}).get(
                 "required_disabled_services",
-                ["ftp", "telnet"],
+                REQUIRED_DISABLED_SERVICES,
             )
             if isinstance(suggested.get("expected", {}), dict)
-            else ["ftp", "telnet"],
+            else REQUIRED_DISABLED_SERVICES,
         },
     }
 
@@ -1092,7 +1218,7 @@ def discover_day2_config(config: Day2Config) -> Dict[str, Any]:
                 "lan_bridge": config.expected_lan_bridge,
                 "lan_ip_cidr": config.expected_lan_ip_cidr,
                 "required_disabled_services": config.required_disabled_services
-                or ["ftp", "telnet"],
+                or REQUIRED_DISABLED_SERVICES,
             },
         }
     except Exception as error:
@@ -1148,6 +1274,8 @@ def print_export_template_summary(template: Dict[str, Any], template_path: Path)
 
 
 def supports_color() -> bool:
+    if sys.platform == "win32":
+        os.system("")
     return sys.stdout.isatty()
 
 
@@ -1250,7 +1378,7 @@ def run_day2_auto_setup(config: Day2Config) -> Dict[str, Any]:
                 report["backup_result"] = "FAIL"
                 report["errors"].append(f"After backup failed: {type(error).__name__}: {error}")
 
-        validate_after_apply(client, report)
+        validate_after_apply(client, report, config)
 
         if config.enable_apply_config:
             create_baseline_marker_backup(client, report)
@@ -1278,13 +1406,17 @@ def main() -> int:
         config = load_config(CONFIG_PATH)
         if args.dry_run:
             config.enable_apply_config = False
-        config.host = get_host(config.host)
-        config.password = get_password(config.password)
         if args.discover_config:
+            config.host = get_host(config.host)
+            config.password = get_password(config.password)
             report = discover_day2_config(config)
             json_path, txt_path = write_discovery_report(report)
             print_discovery_summary(report, json_path, txt_path)
             return 0 if not report.get("errors") else 1
+        config.device_name = get_device_name(args.device_name, config.device_name)
+        apply_device_profile(config, config.device_name)
+        config.host = get_host(config.host)
+        config.password = get_password(config.password)
         validate_identity_name(config.device_name)
         validate_disable_services(config.disable_services)
     except KeyboardInterrupt:
