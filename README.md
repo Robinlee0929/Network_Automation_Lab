@@ -2,7 +2,7 @@
 
 Python automation for MikroTik reset setup, acceptance checks, and post-setup validation.
 
-![MikroTik Day 3 Automation Test Topology](docs/assets/mikrotik-day3-topology.png)
+![Day 3 MikroTik Automated Testing Topology](docs/assets/mikrotik-day3-automated-testing-topology.png)
 
 ## Current Supported Platforms
 
@@ -171,6 +171,8 @@ The console output also lists each check item and its PASS / FAIL result.
 ## Post-Setup Validation
 
 `mikrotik_post_validation.py` is the Day 3 workflow. Run it after setup and setup acceptance when you want a broader read-only validation of WAN, LAN, service hardening, version, firmware, and internet/DNS reachability.
+
+![MikroTik Day 3 Automation Validation Checklist](docs/assets/mikrotik-day3-topology.png)
 
 Run:
 
