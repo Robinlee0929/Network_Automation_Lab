@@ -103,6 +103,7 @@ class Day2Config:
     disable_services: List[str]
     expected_wan_interface: str = "ether1"
     expected_wan_dhcp_client_required: bool = True
+    expected_wan_mode: str = "dhcp"
     expected_lan_bridge: str = "bridge"
     expected_lan_ip_cidr: str = "192.168.88.1/24"
     required_disabled_services: List[str] = None
@@ -146,10 +147,18 @@ def load_config(path: Path = CONFIG_PATH) -> Day2Config:
         expected_wan_dhcp_client_required=bool(
             expected_config.get("wan_dhcp_client_required", True)
         ),
+        expected_wan_mode=str(expected_config.get("wan_mode", "dhcp")).strip()
+        or "dhcp",
         expected_lan_bridge=str(expected_config.get("lan_bridge", "bridge")).strip()
         or "bridge",
         expected_lan_ip_cidr=str(
-            expected_config.get("lan_ip_cidr", "192.168.88.1/24")
+            expected_config.get(
+                "lan_ip_cidr",
+                expected_config.get(
+                    "lan_bridge_ip",
+                    expected_config.get("expected_lan_bridge_ip", "192.168.88.1/24"),
+                ),
+            )
         ).strip()
         or "192.168.88.1/24",
         required_disabled_services=list(
@@ -173,8 +182,12 @@ def apply_device_profile(config: Day2Config, device_name: str) -> Day2Config:
 
     if profile.get("host"):
         config.host = str(profile["host"]).strip()
+    if profile.get("password") is not None:
+        config.password = str(profile.get("password", ""))
     if profile.get("port"):
         config.port = int(profile["port"])
+    if profile.get("ssh_port"):
+        config.port = int(profile["ssh_port"])
     if profile.get("username"):
         config.username = str(profile["username"]).strip()
     if profile.get("target_routeros_version"):
@@ -190,10 +203,16 @@ def apply_device_profile(config: Day2Config, device_name: str) -> Day2Config:
         config.expected_wan_dhcp_client_required = bool(
             expected["wan_dhcp_client_required"]
         )
+    if expected.get("wan_mode"):
+        config.expected_wan_mode = str(expected["wan_mode"]).strip()
     if expected.get("lan_bridge"):
         config.expected_lan_bridge = str(expected["lan_bridge"]).strip()
     if expected.get("lan_ip_cidr"):
         config.expected_lan_ip_cidr = str(expected["lan_ip_cidr"]).strip()
+    if expected.get("lan_bridge_ip"):
+        config.expected_lan_ip_cidr = str(expected["lan_bridge_ip"]).strip()
+    if expected.get("expected_lan_bridge_ip"):
+        config.expected_lan_ip_cidr = str(expected["expected_lan_bridge_ip"]).strip()
     if "required_disabled_services" in expected:
         config.required_disabled_services = list(expected["required_disabled_services"])
 

@@ -225,6 +225,174 @@ To validate a second MikroTik, run the same command with a different device name
 python mikrotik_post_validation.py --device-name Hex-s-2025-lab02
 ```
 
+## Day 4 Pre-check - WAN SSH Management Access
+
+![MikroTik Day 4 WAN SSH Pre-check Topology](docs/assets/mikrotik-day4-wan-ssh-precheck-topology.png)
+
+Before running the Day 4 multi-device baseline through each router's WAN DHCP IP, use the WAN SSH pre-check to prepare a narrow firewall exception for the Windows Automation PC.
+
+Why this may be needed:
+
+- The Windows Automation PC may be able to ping the MikroTik WAN IP.
+- `Test-NetConnection <router_wan_ip> -Port 22` may still fail.
+- SSH can be enabled on RouterOS, but the default firewall commonly drops WAN-side input traffic before it reaches the SSH service.
+
+Run the pre-check from the project folder:
+
+```powershell
+python mikrotik_day4_precheck_wan_ssh.py
+```
+
+The script first connects through the router's LAN management IP, then asks for:
+
+- LAN management IP
+- device name
+- username
+- password
+- allowed SSH source
+
+Allowed SSH source modes:
+
+| Mode | Example | Use Case |
+| --- | --- | --- |
+| Safe mode | `192.168.0.159/32` | Only the Automation PC can SSH from the WAN side |
+| Lab convenience mode | `192.168.0.0/24` | Any host on the home lab LAN subnet can SSH |
+
+`0.0.0.0/0` is rejected. Do not expose MikroTik SSH to the public Internet.
+
+The script verifies or applies:
+
+- SSH service exists and is enabled.
+- Firewall input accept rule exists for TCP/22 from the allowed source on `in-interface-list=WAN`.
+- The allow rule uses comment `Day4 allow SSH from automation source`.
+- The allow rule is moved before the default WAN input drop rule `defconf: drop all not coming from LAN`.
+- WAN DHCP IP on `ether1` is read and reported.
+
+Verify from PowerShell after the pre-check:
+
+```powershell
+Test-NetConnection <router_wan_ip> -Port 22
+```
+
+Reports:
+
+```text
+reports/<device_name>/day4_precheck_wan_ssh.json
+reports/<device_name>/day4_precheck_wan_ssh.txt
+```
+
+The reports include device name, LAN management IP, WAN DHCP IP, allowed SSH source, SSH service status, firewall rule status, and whether the rule was added, already existed, updated, or moved. Passwords are never written to reports.
+
+## Day 4 Multi-Device Baseline Validation
+
+Day 4 converts the post-setup device checks into formal baseline test cases for multiple MikroTik routers. Each check has structured `expected`, `actual`, `result`, and `message` fields, making the output closer to a QA Automation / SDET test report than a simple status dump.
+
+Run:
+
+```powershell
+python mikrotik_day4_multi_device_baseline.py
+```
+
+Topology summary:
+
+- Automation PC runs Python and connects to each MikroTik over SSH TCP/22.
+- `Hex-s-2025-lab01` uses LAN bridge IP `192.168.88.1/24` and WAN `ether1` DHCP.
+- `Hex-s-2025-lab02` uses LAN bridge IP `192.168.89.1/24` and WAN `ether1` DHCP.
+- Reports are written per device and as one Day 4 summary.
+
+Expected public-safe `config.example.json` device profile format:
+
+```json
+{
+  "devices": {
+    "Hex-s-2025-lab01": {
+      "device_name": "Hex-s-2025-lab01",
+      "host": "192.168.88.1",
+      "day4_host": "192.168.0.199",
+      "ssh_port": 22,
+      "username": "admin",
+      "password": "",
+      "expected": {
+        "wan_interface": "ether1",
+        "wan_mode": "dhcp",
+        "expected_lan_bridge_ip": "192.168.88.1/24"
+      }
+    },
+    "Hex-s-2025-lab02": {
+      "device_name": "Hex-s-2025-lab02",
+      "host": "192.168.89.1",
+      "day4_host": "192.168.0.113",
+      "ssh_port": 22,
+      "username": "admin",
+      "password": "",
+      "expected": {
+        "wan_interface": "ether1",
+        "wan_mode": "dhcp",
+        "expected_lan_bridge_ip": "192.168.89.1/24"
+      }
+    }
+  }
+}
+```
+
+For Day 4, `day4_host` is the preferred SSH target. Use the MikroTik WAN DHCP IP that passed the PowerShell check:
+
+```powershell
+Test-NetConnection <router_wan_ip> -Port 22
+```
+
+If `day4_host` is omitted, Day 4 first checks the pre-check report at `reports/<device_name>/day4_precheck_wan_ssh.json` and uses its `wan_dhcp_ip` as the default SSH target. If no pre-check report exists, Day 4 falls back to `wan_host`, then `host`. This keeps `host` available for Day 2 / Day 3 LAN management workflows while Day 4 can validate WAN-side SSH access.
+
+Checks performed per device:
+
+- SSH connection
+- Device identity
+- RouterOS version
+- RouterBOARD current firmware
+- RouterBOARD upgrade firmware
+- WAN DHCP client status on `ether1`
+- LAN bridge IP
+- SSH service status
+- Report generation
+
+Example output:
+
+```text
+Device: Hex-s-2025-lab01
+Overall Result: PASS
+
+Check: LAN bridge IP
+Expected: 192.168.88.1/24
+Actual: 192.168.88.1/24
+Result: PASS
+
+Check: WAN DHCP client status
+Expected: ether1 bound
+Actual: ether1 bound
+Result: PASS
+```
+
+Day 4 report paths:
+
+```text
+reports/Hex-s-2025-lab01/day4_baseline_validation.json
+reports/Hex-s-2025-lab01/day4_baseline_validation.txt
+reports/Hex-s-2025-lab01/day4_baseline_validation.html
+reports/Hex-s-2025-lab02/day4_baseline_validation.json
+reports/Hex-s-2025-lab02/day4_baseline_validation.txt
+reports/Hex-s-2025-lab02/day4_baseline_validation.html
+reports/day4_summary_report.json
+reports/day4_summary_report.txt
+reports/day4_summary_report.html
+```
+
+Day 3 vs Day 4:
+
+| Stage | Purpose | Output Style |
+| --- | --- | --- |
+| Day 3 | Read-only post-setup validation for one selected device | Operational validation report |
+| Day 4 | Multi-device baseline validation across configured devices | Formal test-case style report with PASS / FAIL / SKIP |
+
 ## Error Handling
 
 The script reports failures for:
