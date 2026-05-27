@@ -6,3 +6,9 @@ __pycache__/
 .pytest_tmp/
 .venv/
 *.pyc
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
