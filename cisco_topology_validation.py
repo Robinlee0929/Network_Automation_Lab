@@ -118,6 +118,28 @@ def prompt_password(config: Dict[str, Any], prompt: str) -> None:
     config["password"] = getpass.getpass(prompt)
 
 
+def prompt_switch_host(config: Dict[str, Any], interactive: Optional[bool] = None) -> None:
+    if interactive is None:
+        interactive = sys.stdin.isatty()
+    if not interactive:
+        return
+
+    current_host = str(config.get("host", "")).strip()
+    entered_host = input(
+        "Please input Cisco switch host/IP "
+        f"(press Enter to use config default: {current_host}): "
+    ).strip()
+    if not entered_host:
+        if not config.get("expected_management_ip") and current_host:
+            config["expected_management_ip"] = current_host
+        return
+
+    current_expected = str(config.get("expected_management_ip", "")).strip()
+    config["host"] = entered_host
+    if not current_expected or current_expected == current_host:
+        config["expected_management_ip"] = entered_host
+
+
 def connect_with_auth_retry(config: Dict[str, Any], attempts: int = 3) -> CiscoIOS:
     last_error: Optional[Exception] = None
     for attempt in range(1, attempts + 1):
@@ -846,6 +868,7 @@ def main() -> int:
         args = parse_args()
         config_path = resolve_config_path(args.config)
         config = load_config(config_path)
+        prompt_switch_host(config)
         report = run_validation(config)
         print_summary(report)
         return 0 if report["overall_result"] == "PASS" else 1

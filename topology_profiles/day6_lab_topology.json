@@ -1,0 +1,29 @@
+{
+  "topology_name": "day6_lab_topology",
+  "devices": [
+    {
+      "device_name": "cisco-switch",
+      "device_type": "cisco_ios",
+      "role": "core_switch",
+      "management_ip": "192.168.0.111",
+      "report_path": "reports/cisco-switch/switch_topology_report.json",
+      "required": true
+    },
+    {
+      "device_name": "Hex-s-2025-lab01",
+      "device_type": "mikrotik_routeros",
+      "role": "router_under_test",
+      "management_ip": "192.168.88.1",
+      "report_path": "reports/Hex-s-2025-lab01/day4_baseline_validation.json",
+      "required": true
+    },
+    {
+      "device_name": "Hex-s-2025-lab02",
+      "device_type": "mikrotik_routeros",
+      "role": "router_under_test",
+      "management_ip": "192.168.89.1",
+      "report_path": "reports/Hex-s-2025-lab02/day4_baseline_validation.json",
+      "required": true
+    }
+  ]
+}

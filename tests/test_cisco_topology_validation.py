@@ -162,6 +162,36 @@ def test_resolve_config_path_falls_back_to_cisco_example(tmp_path, monkeypatch):
     assert cisco_validation.resolve_config_path() == cisco_validation.CISCO_EXAMPLE_CONFIG_PATH
 
 
+def test_prompt_switch_host_keeps_config_host_on_enter(monkeypatch):
+    config = sample_config()
+    monkeypatch.setattr("builtins.input", lambda _prompt: "")
+
+    cisco_validation.prompt_switch_host(config, interactive=True)
+
+    assert config["host"] == "192.168.0.111"
+    assert config["expected_management_ip"] == "192.168.0.111"
+
+
+def test_prompt_switch_host_updates_host_and_matching_expected_ip(monkeypatch):
+    config = sample_config()
+    monkeypatch.setattr("builtins.input", lambda _prompt: "192.168.0.222")
+
+    cisco_validation.prompt_switch_host(config, interactive=True)
+
+    assert config["host"] == "192.168.0.222"
+    assert config["expected_management_ip"] == "192.168.0.222"
+
+
+def test_prompt_switch_host_preserves_explicit_expected_ip(monkeypatch):
+    config = sample_config(expected_management_ip="192.168.0.250")
+    monkeypatch.setattr("builtins.input", lambda _prompt: "192.168.0.222")
+
+    cisco_validation.prompt_switch_host(config, interactive=True)
+
+    assert config["host"] == "192.168.0.222"
+    assert config["expected_management_ip"] == "192.168.0.250"
+
+
 def test_write_json_and_html_reports(tmp_path, monkeypatch):
     monkeypatch.setattr(cisco_validation, "REPORT_DIR", tmp_path)
     monkeypatch.setattr(cisco_validation, "REPORT_JSON", tmp_path / "switch_topology_report.json")
