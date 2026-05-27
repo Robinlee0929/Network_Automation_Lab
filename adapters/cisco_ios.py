@@ -1,5 +1,5 @@
 import time
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 import paramiko
 
@@ -21,10 +21,15 @@ class CiscoIOS(NetworkDevice):
         self.port = int(config.get("port", config.get("ssh_port", 22)))
         self.username = str(config.get("username", "admin"))
         self.password = str(config.get("password", ""))
+        self.legacy_ssh = bool(config.get("legacy_ssh", False))
         self.client: Optional[paramiko.SSHClient] = None
         self.command_log: List[Dict[str, str]] = []
 
     def connect(self) -> None:
+        if self.legacy_ssh:
+            self.client = self._connect_legacy_ssh()
+            return
+
         client = paramiko.SSHClient()
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         client.connect(
@@ -39,6 +44,74 @@ class CiscoIOS(NetworkDevice):
             allow_agent=False,
         )
         self.client = client
+
+    def _connect_legacy_ssh(self) -> paramiko.SSHClient:
+        client = paramiko.SSHClient()
+        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+
+        transport = self._create_legacy_transport()
+        try:
+            transport.auth_password(self.username, self.password)
+        except paramiko.AuthenticationException:
+            transport.close()
+            transport = self._create_legacy_transport()
+            transport.auth_interactive(self.username, self._keyboard_interactive_handler)
+        client._transport = transport
+        return client
+
+    def _create_legacy_transport(self) -> paramiko.Transport:
+        transport = paramiko.Transport((self.host, self.port))
+
+        security_options = transport.get_security_options()
+        security_options.kex = self._prefer_supported_algorithms(
+            security_options.kex,
+            [
+                "diffie-hellman-group14-sha1",
+                "diffie-hellman-group1-sha1",
+                "diffie-hellman-group-exchange-sha1",
+            ],
+        )
+        security_options.ciphers = self._prefer_supported_algorithms(
+            security_options.ciphers,
+            ["aes128-cbc", "3des-cbc", "aes192-cbc", "aes256-cbc"],
+        )
+        if hasattr(security_options, "digests"):
+            security_options.digests = self._prefer_supported_algorithms(
+                security_options.digests,
+                ["hmac-sha1"],
+            )
+        security_options.key_types = self._prefer_supported_algorithms(
+            security_options.key_types,
+            ["ssh-rsa", "ssh-dss"],
+        )
+
+        transport.banner_timeout = SSH_TIMEOUT_SECONDS
+        transport.auth_timeout = SSH_TIMEOUT_SECONDS
+        transport.start_client(timeout=SSH_TIMEOUT_SECONDS)
+        return transport
+
+    def _prefer_supported_algorithms(
+        self,
+        current: Tuple[str, ...],
+        preferred: List[str],
+    ) -> Tuple[str, ...]:
+        supported = set(current)
+        ordered: List[str] = []
+        for algorithm in preferred:
+            if algorithm in supported and algorithm not in ordered:
+                ordered.append(algorithm)
+        for algorithm in current:
+            if algorithm not in ordered:
+                ordered.append(algorithm)
+        return tuple(ordered)
+
+    def _keyboard_interactive_handler(
+        self,
+        _title: str,
+        _instructions: str,
+        prompts: List[Tuple[str, bool]],
+    ) -> List[str]:
+        return [self.password for _prompt, _echo in prompts]
 
     def get_identity(self) -> str:
         return self._run_command("show running-config | include hostname")

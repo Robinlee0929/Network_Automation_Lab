@@ -1,6 +1,6 @@
-# MikroTik Reset Automation Platform
+# Network Automation Testing Platform
 
-Python automation for MikroTik reset setup, acceptance checks, and post-setup validation.
+Python automation for MikroTik reset setup, acceptance checks, post-setup validation, multi-device baseline validation, and Cisco switch topology validation.
 
 ![Day 3 MikroTik Automated Testing Topology](docs/assets/mikrotik-day3-automated-testing-topology.png)
 
@@ -11,9 +11,68 @@ Python automation for MikroTik reset setup, acceptance checks, and post-setup va
 
 The project is being moved in small steps toward an adapter-based architecture. The existing MikroTik scripts remain the stable path, while `experimental_cross_platform_baseline.py` uses `core/device_factory.py` to select a device adapter from `device.vendor` and `device.platform` in `config.json`.
 
-Cisco IOS support is currently read-only baseline only. It runs SSH login, show commands, NTP status checks, ping, and running-config collection for reporting; it does not enter configuration mode, change VLANs, IP addresses, ports, STP, or save configuration.
+Cisco IOS support is read-only. It runs SSH login and show commands for switch topology validation; it does not enter configuration mode, change VLANs, IP addresses, ports, STP, or save configuration.
 
-## Environment
+## Quick Start
+
+Use separate runtime configs for each platform:
+
+| Platform | Runtime config | Main command | Report |
+| --- | --- | --- | --- |
+| MikroTik | `config.json` | `python mikrotik_day4_multi_device_baseline.py` | `reports/<device_name>/...`, `reports/day4_summary_report.html` |
+| Cisco switch | `config.cisco.json` | `python cisco_topology_validation.py` | `reports/cisco-switch/switch_topology_report.html` |
+
+First-time setup:
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+```
+
+Run MikroTik workflows:
+
+```powershell
+Copy-Item config.example.json config.json
+notepad config.json
+
+python mikrotik_day2_auto_setup.py --dry-run --device-name Hex-s-2025-lab01
+python mikrotik_day2_auto_setup.py --device-name Hex-s-2025-lab01
+python mikrotik_acceptance_check.py --device-name Hex-s-2025-lab01
+python mikrotik_post_validation.py --device-name Hex-s-2025-lab01
+python mikrotik_day4_multi_device_baseline.py
+```
+
+Run Cisco switch topology validation:
+
+```powershell
+Copy-Item config.cisco.example.json config.cisco.json
+notepad config.cisco.json
+
+python cisco_topology_validation.py
+python cisco_topology_validation.py --config config.cisco.json
+```
+
+The Cisco compatibility alias also works:
+
+```powershell
+python cisco_day5_topology_validation.py
+```
+
+Run unit tests without connecting to devices:
+
+```powershell
+python -m pytest
+```
+
+Rules of thumb:
+
+- Keep MikroTik settings in `config.json`.
+- Keep Cisco settings in `config.cisco.json`.
+- Leave passwords empty in config files and enter them at runtime.
+- Review JSON/HTML reports under `reports/` after each run.
+
+## Default MikroTik Lab Environment
 
 - OS: Windows
 - RouterOS device: MikroTik
@@ -393,6 +452,51 @@ Day 3 vs Day 4:
 | Day 3 | Read-only post-setup validation for one selected device | Operational validation report |
 | Day 4 | Multi-device baseline validation across configured devices | Formal test-case style report with PASS / FAIL / SKIP |
 
+## Cisco Switch Topology Validation
+
+This separate read-only Cisco WS-C2960CG-8TC-L switch validation workflow checks SSH access, switch model, IOS version parsing, Vlan1 management IP state, expected connected ports, VLAN 1 state, dynamic MAC learning, and spanning-tree blocking ports.
+
+Run with a Cisco config:
+
+```powershell
+Copy-Item config.cisco.example.json config.cisco.json
+python cisco_topology_validation.py
+```
+
+Or run directly against the Cisco example config:
+
+```powershell
+python cisco_topology_validation.py --config config.cisco.example.json
+```
+
+Cisco read-only commands:
+
+```text
+show version
+show ip interface brief
+show interfaces status
+show vlan brief
+show mac address-table
+show spanning-tree summary
+```
+
+Reports:
+
+```text
+reports/cisco-switch/switch_topology_report.json
+reports/cisco-switch/switch_topology_report.html
+```
+
+Older Catalyst 2960 SSH servers may require legacy algorithms. The Cisco example config sets `legacy_ssh` to `true`; if SSH negotiation still fails, review the switch SSH server settings and the script's console hint.
+
+Windows OpenSSH legacy connectivity check used in the lab:
+
+```powershell
+ssh -oKexAlgorithms=+diffie-hellman-group14-sha1 -oHostKeyAlgorithms=+ssh-rsa -oPubkeyAcceptedAlgorithms=+ssh-rsa -oMACs=+hmac-sha1 admin@192.168.0.111
+```
+
+Cisco topology validation uses `config.cisco.json` by default so Cisco switch settings stay separate from the MikroTik `config.json`.
+
 ## Error Handling
 
 The script reports failures for:
@@ -513,7 +617,7 @@ Run the experimental adapter-based baseline:
 python experimental_cross_platform_baseline.py
 ```
 
-For Cisco IOS structure testing, copy `config.cisco.example.json` to `config.json` on a Cisco test host and keep in mind this first version is read-only baseline only.
+For Cisco switch topology validation, copy `config.cisco.example.json` to `config.cisco.json` and run `python cisco_topology_validation.py`. Cisco settings stay separate from the MikroTik `config.json`.
 
 ### Dry-Run vs Apply Mode
 

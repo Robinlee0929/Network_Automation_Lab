@@ -1,4 +1,5 @@
 config.json
+config.cisco.json
 reports/
 __pycache__/
 .pytest_cache/
