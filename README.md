@@ -12,6 +12,7 @@ The current implementation covers Day 1 through Day 6:
 - MikroTik Day 4 multi-device baseline validation
 - Cisco Catalyst switch topology validation
 - Day 6 lab-level topology summary report
+- Day 8 Router performance automation with iperf3
 
 The project is designed as a practical QA Automation / SDET portfolio project for network infrastructure. It focuses on repeatable validation, structured test evidence, and readable JSON / HTML reports rather than one-off manual checks.
 
@@ -59,6 +60,7 @@ Cisco validation is read-only. It runs show commands for topology evidence and d
 | Day 5 | Cisco switch topology validation | Complete |
 | Day 6 | Lab-level topology summary generated from existing device reports | Complete |
 | Day 7 | Documentation cleanup, user guide, topology notes, and portfolio packaging | Complete |
+| Day 8 | RouterOS precheck and iperf3 router performance automation | Complete |
 
 ## Lab Topology
 
@@ -193,6 +195,12 @@ Run Day 6 lab topology summary:
 python day6_lab_topology_summary.py
 ```
 
+Run Day 8 iperf3 router performance automation:
+
+```powershell
+python performance_test.py
+```
+
 Compatibility aliases are also available:
 
 ```powershell
@@ -201,6 +209,90 @@ python mikrotik_auto_setup.py
 python cisco_day5_topology_validation.py
 python topology_summary.py
 ```
+
+## Day 8 iperf3 Router Performance Automation
+
+Day 8 validates router performance with iperf3 and records structured JSON / HTML evidence. The WAN-side PC runs `performance_test.py` and the iperf3 client. The LAN-side PC runs the iperf3 server.
+
+Test topology:
+
+```text
+WAN PC 192.168.0.114
+-> MikroTik Router WAN IP 192.168.0.199
+-> DNAT TCP/5201
+-> LAN PC 192.168.88.254
+```
+
+Start the LAN-side server:
+
+```powershell
+iperf3 -s
+```
+
+Example RouterOS DNAT rule:
+
+```text
+/ip firewall nat add chain=dstnat in-interface=ether1 protocol=tcp dst-port=5201 action=dst-nat to-addresses=192.168.88.254 to-ports=5201 comment="day8 iperf3 WAN to LAN dst-nat"
+```
+
+Example RouterOS firewall allow rule:
+
+```text
+/ip firewall filter add chain=forward in-interface=ether1 protocol=tcp dst-address=192.168.88.254 dst-port=5201 action=accept comment="day8 allow iperf3 WAN to LAN"
+```
+
+Confirm Router WAN IP on RouterOS:
+
+```text
+/ip address print
+```
+
+Interactive mode:
+
+```powershell
+python performance_test.py
+```
+
+WAN_TO_LAN:
+
+```powershell
+python performance_test.py --device-name Hex-s-2025-lab01 --router-wan-ip 192.168.0.199 --lan-server-ip 192.168.88.254 --direction WAN_TO_LAN --router-host 192.168.88.1 --router-username admin
+```
+
+LAN_TO_WAN:
+
+```powershell
+python performance_test.py --device-name Hex-s-2025-lab01 --router-wan-ip 192.168.0.199 --lan-server-ip 192.168.88.254 --direction LAN_TO_WAN --router-host 192.168.88.1 --router-username admin
+```
+
+Skip RouterOS precheck:
+
+```powershell
+python performance_test.py --device-name Hex-s-2025-lab01 --router-wan-ip 192.168.0.199 --lan-server-ip 192.168.88.254 --direction WAN_TO_LAN --skip-router-precheck
+```
+
+Important Day 8 notes:
+
+- `router_wan_ip` is the IP that the iperf3 client actually connects to.
+- `lan_server_ip` is the LAN PC that runs `iperf3 -s`.
+- `LAN_TO_WAN` uses iperf3 `-R` reverse mode.
+- `-O 10` excludes the first 10 seconds as warm-up.
+- The default test duration is 40 seconds, with the first 10 seconds omitted from throughput calculation.
+- Throughput Mbps is the primary Day 8 performance evidence.
+- The default threshold is 800 Mbps.
+- If required parameters are missing, the script asks for them in PowerShell.
+- Day 8 uses SSH for RouterOS precheck by default.
+- The first RouterOS precheck version is read-only and does not modify RouterOS.
+- If DNAT or firewall filter allow rules are missing, the script provides suggested MikroTik commands.
+
+Day 8 report output:
+
+```text
+reports/Hex-s-2025-lab01/day8_iperf3_performance_report.json
+reports/Hex-s-2025-lab01/day8_iperf3_performance_report.html
+```
+
+Day 8 HTML report uses a dashboard-style layout for portfolio presentation.
 
 ## How to Read Reports
 
@@ -266,6 +358,13 @@ Day 6 lab summary:
 ```text
 reports/day6_lab_topology_summary.json
 reports/day6_lab_topology_summary.html
+```
+
+Day 8 iperf3 router performance:
+
+```text
+reports/Hex-s-2025-lab01/day8_iperf3_performance_report.json
+reports/Hex-s-2025-lab01/day8_iperf3_performance_report.html
 ```
 
 ## Testing Strategy

@@ -1,0 +1,37 @@
+{
+  "day": "Day 8",
+  "test_name": "iperf3_router_performance",
+  "default_duration_sec": 40,
+  "default_omit_sec": 10,
+  "default_parallel_streams": 4,
+  "default_threshold_mbps": 800,
+  "default_lan_server_ip": "192.168.88.254",
+  "iperf3_server_port": 5201,
+  "supported_directions": [
+    "WAN_TO_LAN",
+    "LAN_TO_WAN"
+  ],
+  "wan_to_lan": {
+    "description": "WAN-side PC runs iperf3 client to Router WAN IP. Router DNAT forwards TCP/5201 to LAN-side iperf3 server.",
+    "command_template": "iperf3 -c <router_wan_ip> -t <duration> -P <parallel> -O <omit> -J",
+    "requires_dnat": true,
+    "reverse_mode": false,
+    "traffic_direction": "WAN_TO_LAN",
+    "control_connection": "WAN_PC_TO_ROUTER_WAN_IP"
+  },
+  "lan_to_wan": {
+    "description": "WAN-side PC runs iperf3 client with reverse mode. LAN-side iperf3 server sends traffic back to WAN-side PC.",
+    "command_template": "iperf3 -c <router_wan_ip> -t <duration> -P <parallel> -R -O <omit> -J",
+    "requires_dnat": true,
+    "reverse_mode": true,
+    "traffic_direction": "LAN_TO_WAN",
+    "control_connection": "WAN_PC_TO_ROUTER_WAN_IP"
+  },
+  "manual_prerequisite": [
+    "Start iperf3 server on LAN-side PC: iperf3 -s",
+    "Configure RouterOS dst-nat TCP/5201 from WAN interface to LAN server IP",
+    "Configure RouterOS firewall forward allow TCP/5201 to LAN server IP",
+    "Run performance_test.py from WAN-side PC",
+    "Confirm router WAN IP before running iperf3"
+  ]
+}
