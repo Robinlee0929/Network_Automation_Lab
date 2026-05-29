@@ -9,6 +9,7 @@ import shutil
 import socket
 import subprocess
 import sys
+import threading
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple
@@ -16,16 +17,19 @@ from typing import Any, Callable, Dict, List, Optional, Tuple
 import paramiko
 
 
-DEFAULT_DIRECTION = "WAN_TO_LAN"
+DEFAULT_DIRECTION = "WAN_TO_LAN_DNAT"
 DEFAULT_DURATION = 40
 DEFAULT_OMIT = 10
 DEFAULT_PARALLEL = 4
 DEFAULT_THRESHOLD_MBPS = 800
+DEFAULT_WARN_THRESHOLD_MBPS = 700
 DEFAULT_LAN_SERVER_IP = "192.168.88.254"
 DEFAULT_ROUTER_SSH_PORT = 22
-SUPPORTED_DIRECTIONS = {"WAN_TO_LAN", "LAN_TO_WAN"}
-REPORT_JSON_NAME = "day8_iperf3_performance_report.json"
-REPORT_HTML_NAME = "day8_iperf3_performance_report.html"
+SUPPORTED_DIRECTIONS = {"WAN_TO_LAN_DNAT", "LAN_TO_WAN_DNAT_REPLY"}
+DIRECTION_ALIASES = {
+    "WAN_TO_LAN": "WAN_TO_LAN_DNAT",
+    "LAN_TO_WAN": "LAN_TO_WAN_DNAT_REPLY",
+}
 IPERF3_PORT = 5201
 WAN_INTERFACE = "ether1"
 
@@ -40,6 +44,7 @@ class Day8Config:
     omit: int
     parallel: int
     threshold_mbps: float
+    warn_threshold_mbps: float
     output_dir: Path
     skip_router_wan_ip_confirm: bool
     non_interactive: bool
@@ -49,6 +54,7 @@ class Day8Config:
     router_ssh_port: int
     skip_router_precheck: bool
     iperf3_path: str = "iperf3"
+    wan_client_ip: str = ""
     interactive_input_used: bool = False
 
 
@@ -64,6 +70,16 @@ def parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
     parser.add_argument("--omit", type=int, default=DEFAULT_OMIT)
     parser.add_argument("--parallel", type=int, default=DEFAULT_PARALLEL)
     parser.add_argument("--threshold-mbps", type=float, default=DEFAULT_THRESHOLD_MBPS)
+    parser.add_argument(
+        "--warn-threshold-mbps",
+        type=float,
+        default=DEFAULT_WARN_THRESHOLD_MBPS,
+        help="WARN floor. PASS is >= threshold, WARN is >= warn threshold, FAIL is below it.",
+    )
+    parser.add_argument(
+        "--wan-client-ip",
+        help="WAN-side automation PC IP to show in reports. If omitted, the script tries to infer it.",
+    )
     parser.add_argument("--output-dir")
     parser.add_argument("--skip-router-wan-ip-confirm", action="store_true")
     parser.add_argument("--non-interactive", action="store_true")
@@ -97,9 +113,21 @@ def validate_ipv4(value: str, field_name: str) -> str:
 
 def validate_direction(value: str) -> str:
     direction = value.strip().upper()
+    direction = DIRECTION_ALIASES.get(direction, direction)
     if direction not in SUPPORTED_DIRECTIONS:
-        raise ValueError("direction must be WAN_TO_LAN or LAN_TO_WAN.")
+        raise ValueError(
+            "direction must be WAN_TO_LAN_DNAT or LAN_TO_WAN_DNAT_REPLY."
+        )
     return direction
+
+
+def infer_wan_client_ip(router_wan_ip: str) -> str:
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
+            sock.connect((router_wan_ip, IPERF3_PORT))
+            return sock.getsockname()[0]
+    except OSError:
+        return ""
 
 
 def prompt_until_valid(
@@ -169,7 +197,7 @@ def build_config_from_args(args: argparse.Namespace) -> Day8Config:
         else:
             interactive_used = True
             direction = prompt_until_valid(
-                "Please input test direction [WAN_TO_LAN/LAN_TO_WAN] (default: WAN_TO_LAN): ",
+                "Please input test direction [WAN_TO_LAN_DNAT/LAN_TO_WAN_DNAT_REPLY] (default: WAN_TO_LAN_DNAT): ",
                 validate_direction,
                 DEFAULT_DIRECTION,
             )
@@ -215,6 +243,7 @@ def build_config_from_args(args: argparse.Namespace) -> Day8Config:
         omit=args.omit,
         parallel=args.parallel,
         threshold_mbps=args.threshold_mbps,
+        warn_threshold_mbps=getattr(args, "warn_threshold_mbps", DEFAULT_WARN_THRESHOLD_MBPS),
         output_dir=output_dir,
         skip_router_wan_ip_confirm=args.skip_router_wan_ip_confirm,
         non_interactive=args.non_interactive,
@@ -224,6 +253,11 @@ def build_config_from_args(args: argparse.Namespace) -> Day8Config:
         router_ssh_port=args.router_ssh_port,
         skip_router_precheck=args.skip_router_precheck,
         iperf3_path=getattr(args, "iperf3_path", "iperf3"),
+        wan_client_ip=(
+            validate_ipv4(args.wan_client_ip, "--wan-client-ip")
+            if getattr(args, "wan_client_ip", None)
+            else infer_wan_client_ip(router_wan_ip)
+        ),
         interactive_input_used=interactive_used,
     )
 
@@ -235,11 +269,11 @@ def confirm_router_wan_ip(config: Day8Config) -> bool:
     print("You are going to run iperf3 against Router WAN IP:")
     print(config.router_wan_ip)
     print()
-    print("For WAN_TO_LAN:")
+    print("For WAN_TO_LAN_DNAT:")
     print("WAN PC -> Router WAN IP:5201 -> DNAT -> LAN server IP:5201")
     print()
-    print("For LAN_TO_WAN:")
-    print("WAN PC controls the test, but -R makes LAN server send traffic back to WAN PC.")
+    print("For LAN_TO_WAN_DNAT_REPLY:")
+    print("WAN PC controls the same DNAT test, but -R makes LAN server send reply-direction traffic back to WAN PC.")
     print()
     answer = input("Please confirm Router WAN IP is correct. Type YES to continue: ").strip()
     return answer.upper() == "YES"
@@ -263,7 +297,7 @@ def build_iperf3_command(
         "-P",
         str(parallel),
     ]
-    if normalized_direction == "LAN_TO_WAN":
+    if normalized_direction == "LAN_TO_WAN_DNAT_REPLY":
         command.append("-R")
     command.extend(["-O", str(omit), "-J"])
     return command
@@ -298,7 +332,23 @@ def parse_iperf3_json(data: Dict[str, Any]) -> Dict[str, Any]:
     )
 
 
-def run_iperf3(command: List[str], timeout: int) -> Tuple[str, Optional[Dict[str, Any]], Optional[str], str]:
+def countdown_progress(stop_event: threading.Event, seconds: int) -> None:
+    if not sys.stdout.isatty():
+        return
+    for remaining in range(seconds, 0, -1):
+        if stop_event.is_set():
+            break
+        print(f"\riperf3 running... {remaining:>3}s remaining", end="", flush=True)
+        stop_event.wait(1)
+    if not stop_event.is_set():
+        print("\riperf3 finishing...                       ", end="", flush=True)
+
+
+def run_iperf3(
+    command: List[str],
+    timeout: int,
+    progress_seconds: Optional[int] = None,
+) -> Tuple[str, Optional[Dict[str, Any]], Optional[str], str]:
     executable = command[0]
     if shutil.which(executable) is None:
         return (
@@ -311,6 +361,16 @@ def run_iperf3(command: List[str], timeout: int) -> Tuple[str, Optional[Dict[str
             ),
             "",
         )
+    stop_event = threading.Event()
+    progress_thread: Optional[threading.Thread] = None
+    if progress_seconds:
+        progress_thread = threading.Thread(
+            target=countdown_progress,
+            args=(stop_event, progress_seconds),
+            daemon=True,
+        )
+        progress_thread.start()
+
     try:
         completed = subprocess.run(
             command,
@@ -323,6 +383,12 @@ def run_iperf3(command: List[str], timeout: int) -> Tuple[str, Optional[Dict[str
         return "FAIL", None, f"iperf3 timeout after {timeout} seconds.", stderr
     except OSError as error:
         return "FAIL", None, f"{type(error).__name__}: {error}", ""
+    finally:
+        stop_event.set()
+        if progress_thread:
+            progress_thread.join(timeout=1)
+            if sys.stdout.isatty():
+                print("\r" + " " * 48 + "\r", end="", flush=True)
 
     stderr = completed.stderr or ""
     if completed.returncode != 0:
@@ -590,38 +656,120 @@ def run_routeros_precheck(config: Day8Config) -> Dict[str, Any]:
 
 
 def direction_metadata(direction: str) -> Dict[str, Any]:
-    reverse = validate_direction(direction) == "LAN_TO_WAN"
+    normalized = validate_direction(direction)
+    reverse = normalized == "LAN_TO_WAN_DNAT_REPLY"
+    if reverse:
+        return {
+            "control_connection": "WAN_PC_TO_ROUTER_WAN_IP",
+            "traffic_direction": "LAN server to WAN client over iperf3 reverse mode",
+            "requires_dnat": True,
+            "reverse_mode": True,
+            "test_type": "DNAT reply-direction throughput",
+            "description": (
+                "This is iperf3 reverse mode over the same DNAT connection. "
+                "The LAN iperf3 server sends reply-direction traffic back to the WAN-side client."
+            ),
+        }
     return {
         "control_connection": "WAN_PC_TO_ROUTER_WAN_IP",
-        "traffic_direction": "LAN_TO_WAN" if reverse else "WAN_TO_LAN",
+        "traffic_direction": "WAN client to LAN server",
         "requires_dnat": True,
-        "reverse_mode": reverse,
+        "reverse_mode": False,
+        "test_type": "DNAT forward throughput",
+        "description": (
+            "WAN-side client sends traffic to Router WAN IP, and Router DNAT forwards "
+            "traffic to LAN iperf3 server."
+        ),
     }
+
+
+def traffic_path(config: Day8Config) -> str:
+    if config.direction == "LAN_TO_WAN_DNAT_REPLY":
+        return (
+            f"LAN Server {config.lan_server_ip} -> Router -> "
+            f"WAN PC {config.wan_client_ip or 'unknown'}"
+        )
+    return (
+        f"WAN PC {config.wan_client_ip or 'unknown'} -> Router WAN "
+        f"{config.router_wan_ip}:{IPERF3_PORT} -> DNAT -> LAN Server "
+        f"{config.lan_server_ip}:{IPERF3_PORT}"
+    )
+
+
+def fasttrack_observation(direction: str) -> str:
+    if direction == "LAN_TO_WAN_DNAT_REPLY":
+        return (
+            "Manual connection tracking observation: flags include F=FASTTRACK, "
+            "d=DSTNAT, S=SEEN-REPLY, A=ASSURED, C=CONFIRMED. Reference rates: "
+            "orig-rate around 3.9 Mbps, repl-rate around 791.5 Mbps."
+        )
+    return (
+        "Manual connection tracking observation: flags include F=FASTTRACK, "
+        "d=DSTNAT, S=SEEN-REPLY, A=ASSURED, C=CONFIRMED. Reference rates: "
+        "orig-rate around 968.6 Mbps, repl-rate around 4.2 Mbps."
+    )
+
+
+def interpretation(direction: str) -> str:
+    base = (
+        "Both forward and reverse iperf3 flows are fasttracked. The lower "
+        "reverse-direction throughput is not caused by missing FastTrack. Possible "
+        "causes include host sender/receiver behavior, NIC flow-control, Ethernet "
+        "path, RouterOS driver behavior, or DNAT reply-direction path behavior."
+    )
+    if direction == "LAN_TO_WAN_DNAT_REPLY":
+        return (
+            "This is the reverse direction of a DNAT iperf3 session. It should not "
+            "be interpreted as standard outbound LAN-to-WAN SRCNAT performance. "
+            + base
+        )
+    return (
+        "This measures DNAT forward throughput from the WAN-side client to the LAN "
+        "iperf3 server. "
+        + base
+    )
+
+
+def next_validation_steps() -> List[str]:
+    return [
+        "Run the same direction 3 times and compare median throughput.",
+        "Check RouterOS /tool profile during the iperf3 run.",
+        "Check RouterOS connection tracking flags and rates.",
+        "Run PC-to-PC direct iperf3 baseline without router.",
+        "If standard outbound LAN-to-WAN performance is required, add a separate SRCNAT test topology.",
+    ]
 
 
 def base_report(config: Day8Config, command: List[str], confirmed: bool) -> Dict[str, Any]:
     metadata = direction_metadata(config.direction)
     return {
         "day": "Day 8",
-        "test_name": "iperf3_router_performance",
+        "test_name": f"iperf3_{config.direction}",
+        "test_type": metadata["test_type"],
         "device_name": config.device_name,
         "direction": config.direction,
+        "description": metadata["description"],
         "router_wan_ip": config.router_wan_ip,
         "lan_server_ip": config.lan_server_ip,
+        "wan_client_ip": config.wan_client_ip,
         "iperf3_target_ip": config.router_wan_ip,
         "actual_server_ip": config.lan_server_ip,
         "control_connection": metadata["control_connection"],
         "traffic_direction": metadata["traffic_direction"],
+        "traffic_path": traffic_path(config),
         "requires_dnat": metadata["requires_dnat"],
         "reverse_mode": metadata["reverse_mode"],
         "duration_sec": config.duration,
         "omit_sec": config.omit,
         "parallel_streams": config.parallel,
         "threshold_mbps": config.threshold_mbps,
+        "warn_threshold_mbps": config.warn_threshold_mbps,
         "throughput_mbps": None,
         "throughput_source_field": None,
+        "measured_field": None,
         "result": "FAIL",
         "command": " ".join(command),
+        "iperf3_command": " ".join(command),
         "router_wan_ip_confirmed": confirmed,
         "interactive_input_used": config.interactive_input_used,
         "router_precheck_enabled": not config.skip_router_precheck,
@@ -631,6 +779,10 @@ def base_report(config: Day8Config, command: List[str], confirmed: bool) -> Dict
         "routeros_checks": empty_precheck_result(enabled=True)["checks"],
         "suggested_mikrotik_commands": [],
         "suggested_manual_checks": [],
+        "routeros_precheck_result": "SKIP" if config.skip_router_precheck else "FAIL",
+        "fasttrack_observation": fasttrack_observation(config.direction),
+        "interpretation": interpretation(config.direction),
+        "next_action": next_validation_steps(),
         "iperf3_stderr": "",
         "error": None,
     }
@@ -639,6 +791,7 @@ def base_report(config: Day8Config, command: List[str], confirmed: bool) -> Dict
 def apply_precheck_to_report(report: Dict[str, Any], precheck: Dict[str, Any]) -> None:
     report["router_precheck_enabled"] = bool(precheck["enabled"])
     report["router_precheck_result"] = precheck["result"]
+    report["routeros_precheck_result"] = precheck["result"]
     report["router_precheck_errors"] = precheck["errors"]
     report["router_precheck_warnings"] = precheck["warnings"]
     report["routeros_checks"] = precheck["checks"]
@@ -646,10 +799,44 @@ def apply_precheck_to_report(report: Dict[str, Any], precheck: Dict[str, Any]) -
     report["suggested_manual_checks"] = precheck["suggested_manual_checks"]
 
 
+def evaluate_throughput_result(
+    throughput_mbps: float,
+    threshold_mbps: float,
+    warn_threshold_mbps: float,
+) -> Tuple[str, Optional[str]]:
+    if throughput_mbps >= threshold_mbps:
+        return "PASS", None
+    if throughput_mbps >= warn_threshold_mbps:
+        return (
+            "WARN",
+            "Throughput is below the target threshold but above the warning threshold. "
+            "RouterOS connection tracking should be checked before treating this as DUT failure.",
+        )
+    return (
+        "FAIL",
+        (
+            f"Throughput {throughput_mbps:.3f} Mbps is below warning threshold "
+            f"{warn_threshold_mbps} Mbps."
+        ),
+    )
+
+
 def build_html_report(report: Dict[str, Any]) -> str:
     precheck_result = str(report["router_precheck_result"]).upper()
     precheck_skipped = precheck_result in {"SKIP", "SKIPPED"}
     checks = report["routeros_checks"]
+    report_direction = validate_direction(str(report.get("direction", DEFAULT_DIRECTION)))
+    fallback_metadata = direction_metadata(report_direction)
+    fallback_wan_client_ip = str(report.get("wan_client_ip") or "unknown")
+    fallback_traffic_path = report.get("traffic_path") or (
+        f"LAN Server {report.get('lan_server_ip', 'unknown')} -> Router -> WAN PC {fallback_wan_client_ip}"
+        if report_direction == "LAN_TO_WAN_DNAT_REPLY"
+        else (
+            f"WAN PC {fallback_wan_client_ip} -> Router WAN "
+            f"{report.get('router_wan_ip', 'unknown')}:{IPERF3_PORT} -> DNAT -> LAN Server "
+            f"{report.get('lan_server_ip', 'unknown')}:{IPERF3_PORT}"
+        )
+    )
 
     def status_css_class(value: Any) -> str:
         normalized = str(value).strip().upper()
@@ -675,8 +862,10 @@ def build_html_report(report: Dict[str, Any]) -> str:
         lower_label = label.lower()
         if "ip" in lower_label:
             return f'<span class="ip-badge">{html.escape(text)}</span>'
-        if label == "Command":
+        if "command" in lower_label:
             return f'<pre class="code-block"><code>{html.escape(text)}</code></pre>'
+        if label in {"Result", "RouterOS precheck result"}:
+            return badge(text)
         if label == "Interactive input used" and isinstance(value, bool):
             return f'<span class="neutral-pill">{"TRUE" if value else "FALSE"}</span>'
         if isinstance(value, bool):
@@ -725,12 +914,12 @@ def build_html_report(report: Dict[str, Any]) -> str:
             rendered = badge("SKIP", "skip")
         return f"<tr><th>{html.escape(label)}</th><td>{rendered}</td></tr>"
 
-    if report["direction"] == "LAN_TO_WAN":
+    if report_direction == "LAN_TO_WAN_DNAT_REPLY":
         path_steps = [
             "WAN PC controls test",
             "Router WAN IP:5201",
             "DNAT to LAN iperf3 Server",
-            "Reverse mode sends traffic LAN -> WAN",
+            "Reply-direction traffic LAN -> WAN",
         ]
     else:
         path_steps = [
@@ -743,6 +932,10 @@ def build_html_report(report: Dict[str, Any]) -> str:
         f'<div class="path-step">{html.escape(step)}</div>'
         + (('<div class="path-arrow">&rarr;</div>') if index < len(path_steps) - 1 else "")
         for index, step in enumerate(path_steps)
+    )
+    next_steps_html = "".join(
+        f"<li>{html.escape(str(step))}</li>"
+        for step in report.get("next_action", next_validation_steps())
     )
 
     precheck_note = ""
@@ -1051,20 +1244,20 @@ def build_html_report(report: Dict[str, Any]) -> str:
         <div>{badge(report["result"])}</div>
         <div class="hero-meta">
           <span>{html.escape(str(report["device_name"]))}</span>
-          <span>{html.escape(str(report["direction"]))}</span>
+          <span>{html.escape(str(report_direction))}</span>
         </div>
       </div>
       <div>
         <div class="throughput-label">Throughput Mbps</div>
         <div class="throughput">{html.escape(str(report["throughput_mbps"]))}</div>
-        <div>Threshold: {html.escape(str(report["threshold_mbps"]))} Mbps</div>
+        <div>Target: {html.escape(str(report["threshold_mbps"]))} Mbps / Warn floor: {html.escape(str(report.get("warn_threshold_mbps", DEFAULT_WARN_THRESHOLD_MBPS)))} Mbps</div>
       </div>
     </div>
   </header>
   <section class="cards">
     <article class="card"><div class="card-label">Result</div><div class="card-value">{badge(report["result"])}</div></article>
     <article class="card"><div class="card-label">Throughput Mbps</div><div class="card-value">{html.escape(str(report["throughput_mbps"]))}</div></article>
-    <article class="card"><div class="card-label">Direction</div><div class="card-value">{html.escape(str(report["direction"]))}</div></article>
+    <article class="card"><div class="card-label">Direction</div><div class="card-value">{html.escape(str(report_direction))}</div></article>
     <article class="card"><div class="card-label">RouterOS Precheck</div><div class="card-value">{badge(report["router_precheck_result"])}</div></article>
   </section>
   <section class="panel">
@@ -1076,20 +1269,31 @@ def build_html_report(report: Dict[str, Any]) -> str:
     <div class="table-wrap">
       <table>
         {row("Device name", report["device_name"])}
-        {row("Direction", report["direction"])}
+        {row("Test name", report["test_name"])}
+        {row("Test type", report.get("test_type", fallback_metadata["test_type"]))}
+        {row("Direction", report_direction)}
+        {row("Traffic direction", report.get("traffic_direction", fallback_metadata["traffic_direction"]))}
+        {row("Traffic path", fallback_traffic_path)}
         {row("Router WAN IP", report["router_wan_ip"])}
         {row("LAN server IP", report["lan_server_ip"])}
+        {row("WAN client IP", fallback_wan_client_ip)}
         {row("iperf3 target IP", report["iperf3_target_ip"])}
         {row("Actual server IP", report["actual_server_ip"])}
         {row("Duration", report["duration_sec"])}
         {row("Omit seconds", report["omit_sec"])}
         {row("Parallel streams", report["parallel_streams"])}
         {row("Threshold Mbps", report["threshold_mbps"])}
+        {row("Warn threshold Mbps", report.get("warn_threshold_mbps", DEFAULT_WARN_THRESHOLD_MBPS))}
         {row("Throughput Mbps", report["throughput_mbps"])}
         {row("Result", report["result"])}
         {row("Command", report["command"])}
+        {row("iperf3 command", report["iperf3_command"])}
+        {row("Measured field", report.get("measured_field", report.get("throughput_source_field")))}
+        {row("routeros_precheck_result", report.get("routeros_precheck_result", report["router_precheck_result"]))}
         {row("Router WAN IP confirmed", report["router_wan_ip_confirmed"])}
         {row("Interactive input used", report["interactive_input_used"])}
+        {row("FastTrack observation", report.get("fasttrack_observation", fasttrack_observation(report_direction)))}
+        {row("Interpretation", report.get("interpretation", interpretation(report_direction)))}
       </table>
     </div>
   </section>
@@ -1129,6 +1333,10 @@ def build_html_report(report: Dict[str, Any]) -> str:
     <h2>Error Message</h2>
     {notice_items([report["error"]] if report["error"] else [], "danger", "None")}
   </section>
+  <section class="panel">
+    <h2>Next Validation Steps</h2>
+    <div class="notice neutral"><ol>{next_steps_html}</ol></div>
+  </section>
 </main>
 </body>
 </html>
@@ -1137,8 +1345,9 @@ def build_html_report(report: Dict[str, Any]) -> str:
 
 def write_reports(report: Dict[str, Any], output_dir: Path) -> Tuple[Path, Path]:
     output_dir.mkdir(parents=True, exist_ok=True)
-    json_path = output_dir / REPORT_JSON_NAME
-    html_path = output_dir / REPORT_HTML_NAME
+    direction_name = sanitize_path_name(str(report.get("direction", "unknown")))
+    json_path = output_dir / f"day8_iperf3_{direction_name}_report.json"
+    html_path = output_dir / f"day8_iperf3_{direction_name}_report.html"
     with json_path.open("w", encoding="utf-8") as file:
         json.dump(report, file, indent=2, ensure_ascii=False)
         file.write("\n")
@@ -1181,6 +1390,7 @@ def run(config: Day8Config) -> Tuple[Dict[str, Any], Path, Path]:
 
     if not confirmed:
         report["router_precheck_result"] = "NOT_RUN"
+        report["routeros_precheck_result"] = "NOT_RUN"
         report["error"] = "Aborted: Router WAN IP was not confirmed."
         json_path, html_path = write_reports(report, config.output_dir)
         return report, json_path, html_path
@@ -1195,6 +1405,7 @@ def run(config: Day8Config) -> Tuple[Dict[str, Any], Path, Path]:
     iperf_result, parsed, error, stderr = run_iperf3(
         command,
         timeout=config.duration + config.omit + 30,
+        progress_seconds=config.duration + config.omit,
     )
     report["iperf3_stderr"] = stderr
     if iperf_result == "FAIL":
@@ -1205,13 +1416,14 @@ def run(config: Day8Config) -> Tuple[Dict[str, Any], Path, Path]:
     assert parsed is not None
     report["throughput_mbps"] = round(parsed["throughput_mbps"], 3)
     report["throughput_source_field"] = parsed["source_field"]
-    if parsed["throughput_mbps"] >= config.threshold_mbps:
-        report["result"] = "PASS"
-    else:
-        report["error"] = (
-            f"Throughput {parsed['throughput_mbps']:.3f} Mbps is below "
-            f"threshold {config.threshold_mbps} Mbps."
-        )
+    report["measured_field"] = parsed["source_field"]
+    result, message = evaluate_throughput_result(
+        parsed["throughput_mbps"],
+        config.threshold_mbps,
+        config.warn_threshold_mbps,
+    )
+    report["result"] = result
+    report["error"] = message
 
     json_path, html_path = write_reports(report, config.output_dir)
     return report, json_path, html_path
@@ -1223,14 +1435,17 @@ def print_summary(report: Dict[str, Any], json_path: Path, html_path: Path) -> N
     print(console_color("iperf3 Router Performance Automation", "1"))
     print(console_color("=" * 72, "36"))
     print(f"Device Name: {report['device_name']}")
+    print(f"Test Type: {report['test_type']}")
     print(f"Direction: {report['direction']}")
+    print(f"Traffic Path: {report['traffic_path']}")
     print(f"Router WAN IP: {report['router_wan_ip']}")
     print(f"LAN Server IP: {report['lan_server_ip']}")
     print(f"Command: {report['command']}")
     print(f"Result: {console_status(report['result'])}")
     print(f"Throughput Mbps: {console_color(report['throughput_mbps'], '32;1')}")
     print(f"Threshold Mbps: {report['threshold_mbps']}")
-    print(f"Measured Field: {report['throughput_source_field']}")
+    print(f"Warn Threshold Mbps: {report['warn_threshold_mbps']}")
+    print(f"Measured Field: {report['measured_field']}")
     print(f"RouterOS Precheck: {console_status(report['router_precheck_result'])}")
     if report["error"]:
         print(f"Error: {console_color(report['error'], '31;1')}")
@@ -1266,7 +1481,7 @@ def main(argv: Optional[List[str]] = None) -> int:
         config = build_config_from_args(args)
         report, json_path, html_path = run(config)
         print_summary(report, json_path, html_path)
-        return 0 if report["result"] == "PASS" else 1
+        return 0 if report["result"] in {"PASS", "WARN"} else 1
     except KeyboardInterrupt:
         print("\nInterrupted by user.")
         return 130

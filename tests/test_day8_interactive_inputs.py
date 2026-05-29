@@ -10,11 +10,12 @@ def args(**overrides):
         "device_name": "Hex-s-2025-lab01",
         "router_wan_ip": "192.168.0.199",
         "lan_server_ip": "192.168.88.254",
-        "direction": "WAN_TO_LAN",
+        "direction": "WAN_TO_LAN_DNAT",
         "duration": 60,
         "omit": 10,
         "parallel": 4,
         "threshold_mbps": 800,
+        "warn_threshold_mbps": 700,
         "output_dir": None,
         "skip_router_wan_ip_confirm": True,
         "non_interactive": False,
@@ -24,6 +25,7 @@ def args(**overrides):
         "router_ssh_port": 22,
         "skip_router_precheck": True,
         "iperf3_path": "iperf3",
+        "wan_client_ip": "192.168.0.114",
     }
     values.update(overrides)
     return argparse.Namespace(**values)
@@ -61,7 +63,7 @@ def test_missing_direction_can_use_default(monkeypatch):
 
     config = day8.build_config_from_args(args(direction=None))
 
-    assert config.direction == "WAN_TO_LAN"
+    assert config.direction == "WAN_TO_LAN_DNAT"
 
 
 def test_missing_lan_server_ip_can_use_default(monkeypatch):
@@ -85,11 +87,12 @@ def test_router_wan_ip_not_confirmed_does_not_execute_iperf3(tmp_path, monkeypat
         device_name="Hex-s-2025-lab01",
         router_wan_ip="192.168.0.199",
         lan_server_ip="192.168.88.254",
-        direction="WAN_TO_LAN",
+        direction="WAN_TO_LAN_DNAT",
         duration=60,
         omit=10,
         parallel=4,
         threshold_mbps=800,
+        warn_threshold_mbps=700,
         output_dir=tmp_path,
         skip_router_wan_ip_confirm=False,
         non_interactive=False,
@@ -121,11 +124,12 @@ def test_skip_router_wan_ip_confirm_does_not_prompt(monkeypatch, tmp_path):
         device_name="Hex-s-2025-lab01",
         router_wan_ip="192.168.0.199",
         lan_server_ip="192.168.88.254",
-        direction="WAN_TO_LAN",
+        direction="WAN_TO_LAN_DNAT",
         duration=60,
         omit=10,
         parallel=4,
         threshold_mbps=800,
+        warn_threshold_mbps=700,
         output_dir=tmp_path,
         skip_router_wan_ip_confirm=True,
         non_interactive=True,
@@ -150,10 +154,15 @@ def test_skip_router_wan_ip_confirm_does_not_prompt(monkeypatch, tmp_path):
         ),
     )
 
-    report, _json_path, _html_path = day8.run(config)
+    report, json_path, html_path = day8.run(config)
 
     assert report["router_wan_ip_confirmed"] is True
     assert report["result"] == "PASS"
+    assert report["test_name"] == "iperf3_WAN_TO_LAN_DNAT"
+    assert report["test_type"] == "DNAT forward throughput"
+    assert report["traffic_direction"] == "WAN client to LAN server"
+    assert json_path.name == "day8_iperf3_WAN_TO_LAN_DNAT_report.json"
+    assert html_path.name == "day8_iperf3_WAN_TO_LAN_DNAT_report.html"
 
 
 def test_router_wan_ip_confirm_accepts_lowercase_yes(monkeypatch, tmp_path):
@@ -161,11 +170,12 @@ def test_router_wan_ip_confirm_accepts_lowercase_yes(monkeypatch, tmp_path):
         device_name="Hex-s-2025-lab01",
         router_wan_ip="192.168.0.199",
         lan_server_ip="192.168.88.254",
-        direction="WAN_TO_LAN",
+        direction="WAN_TO_LAN_DNAT",
         duration=60,
         omit=10,
         parallel=4,
         threshold_mbps=800,
+        warn_threshold_mbps=700,
         output_dir=tmp_path,
         skip_router_wan_ip_confirm=False,
         non_interactive=False,
@@ -194,3 +204,52 @@ def test_router_wan_ip_confirm_accepts_lowercase_yes(monkeypatch, tmp_path):
 
     assert report["router_wan_ip_confirmed"] is True
     assert report["result"] == "PASS"
+
+
+def test_reverse_dnat_reply_warn_does_not_mark_dut_fail(monkeypatch, tmp_path):
+    config = day8.Day8Config(
+        device_name="Hex-s-2025-lab01",
+        router_wan_ip="192.168.0.199",
+        lan_server_ip="192.168.88.254",
+        direction="LAN_TO_WAN_DNAT_REPLY",
+        duration=40,
+        omit=10,
+        parallel=4,
+        threshold_mbps=800,
+        warn_threshold_mbps=700,
+        output_dir=tmp_path,
+        skip_router_wan_ip_confirm=True,
+        non_interactive=True,
+        router_host=None,
+        router_username=None,
+        router_password=None,
+        router_ssh_port=22,
+        skip_router_precheck=True,
+        wan_client_ip="192.168.0.114",
+    )
+    monkeypatch.setattr(
+        day8,
+        "run_iperf3",
+        lambda *_args, **_kwargs: (
+            "PASS",
+            {
+                "throughput_mbps": 769.354,
+                "source_field": "end.sum_received.bits_per_second",
+            },
+            None,
+            "",
+        ),
+    )
+
+    report, json_path, html_path = day8.run(config)
+
+    assert report["result"] == "WARN"
+    assert report["test_name"] == "iperf3_LAN_TO_WAN_DNAT_REPLY"
+    assert "not be interpreted as standard outbound LAN-to-WAN SRCNAT" in report[
+        "interpretation"
+    ]
+    assert "below the target threshold" in report["error"]
+    assert report["test_type"] == "DNAT reply-direction throughput"
+    assert report["traffic_direction"] == "LAN server to WAN client over iperf3 reverse mode"
+    assert json_path.name == "day8_iperf3_LAN_TO_WAN_DNAT_REPLY_report.json"
+    assert html_path.name == "day8_iperf3_LAN_TO_WAN_DNAT_REPLY_report.html"

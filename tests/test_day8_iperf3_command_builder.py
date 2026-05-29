@@ -4,7 +4,7 @@ import performance_test as day8
 
 
 def test_wan_to_lan_command_does_not_include_reverse_mode():
-    command = day8.build_iperf3_command("192.168.0.199", "WAN_TO_LAN", 60, 4, 10)
+    command = day8.build_iperf3_command("192.168.0.199", "WAN_TO_LAN_DNAT", 60, 4, 10)
 
     assert command == [
         "iperf3",
@@ -22,7 +22,13 @@ def test_wan_to_lan_command_does_not_include_reverse_mode():
 
 
 def test_lan_to_wan_command_includes_reverse_mode():
-    command = day8.build_iperf3_command("192.168.0.199", "LAN_TO_WAN", 60, 4, 10)
+    command = day8.build_iperf3_command(
+        "192.168.0.199",
+        "LAN_TO_WAN_DNAT_REPLY",
+        60,
+        4,
+        10,
+    )
 
     assert command == [
         "iperf3",
@@ -40,21 +46,21 @@ def test_lan_to_wan_command_includes_reverse_mode():
 
 
 def test_command_target_uses_router_wan_ip():
-    command = day8.build_iperf3_command("192.168.0.199", "WAN_TO_LAN", 30, 2, 5)
+    command = day8.build_iperf3_command("192.168.0.199", "WAN_TO_LAN_DNAT", 30, 2, 5)
 
     assert command[2] == "192.168.0.199"
     assert "192.168.88.254" not in command
 
 
 def test_invalid_direction_has_clear_error():
-    with pytest.raises(ValueError, match="WAN_TO_LAN or LAN_TO_WAN"):
+    with pytest.raises(ValueError, match="WAN_TO_LAN_DNAT or LAN_TO_WAN_DNAT_REPLY"):
         day8.build_iperf3_command("192.168.0.199", "SIDEWAYS", 60, 4, 10)
 
 
 def test_command_can_use_custom_iperf3_path():
     command = day8.build_iperf3_command(
         "192.168.0.199",
-        "WAN_TO_LAN",
+        "WAN_TO_LAN_DNAT",
         20,
         4,
         10,
@@ -100,7 +106,7 @@ def test_default_args_use_40_second_duration_and_10_second_omit():
             "--lan-server-ip",
             "192.168.88.254",
             "--direction",
-            "WAN_TO_LAN",
+            "WAN_TO_LAN_DNAT",
             "--skip-router-precheck",
             "--non-interactive",
         ]
@@ -116,6 +122,8 @@ def test_default_args_use_40_second_duration_and_10_second_omit():
 
     assert config.duration == 40
     assert config.omit == 10
+    assert config.warn_threshold_mbps == 700
+    assert config.direction == "WAN_TO_LAN_DNAT"
     assert command == [
         "iperf3",
         "-c",
@@ -128,3 +136,15 @@ def test_default_args_use_40_second_duration_and_10_second_omit():
         "10",
         "-J",
     ]
+
+
+def test_legacy_direction_aliases_are_normalized():
+    assert day8.validate_direction("WAN_TO_LAN") == "WAN_TO_LAN_DNAT"
+    assert day8.validate_direction("LAN_TO_WAN") == "LAN_TO_WAN_DNAT_REPLY"
+
+
+def test_warn_result_between_warn_floor_and_target_threshold():
+    result, message = day8.evaluate_throughput_result(769.354, 800, 700)
+
+    assert result == "WARN"
+    assert "below the target threshold" in message

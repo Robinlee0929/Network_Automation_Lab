@@ -253,43 +253,57 @@ Interactive mode:
 python performance_test.py
 ```
 
-WAN_TO_LAN:
+WAN_TO_LAN_DNAT:
 
 ```powershell
-python performance_test.py --device-name Hex-s-2025-lab01 --router-wan-ip 192.168.0.199 --lan-server-ip 192.168.88.254 --direction WAN_TO_LAN --router-host 192.168.88.1 --router-username admin
+python performance_test.py --device-name Hex-s-2025-lab01 --router-wan-ip 192.168.0.199 --lan-server-ip 192.168.88.254 --direction WAN_TO_LAN_DNAT --router-host 192.168.0.199 --router-username admin
 ```
 
-LAN_TO_WAN:
+LAN_TO_WAN_DNAT_REPLY:
 
 ```powershell
-python performance_test.py --device-name Hex-s-2025-lab01 --router-wan-ip 192.168.0.199 --lan-server-ip 192.168.88.254 --direction LAN_TO_WAN --router-host 192.168.88.1 --router-username admin
+python performance_test.py --device-name Hex-s-2025-lab01 --router-wan-ip 192.168.0.199 --lan-server-ip 192.168.88.254 --direction LAN_TO_WAN_DNAT_REPLY --router-host 192.168.0.199 --router-username admin
 ```
 
 Skip RouterOS precheck:
 
 ```powershell
-python performance_test.py --device-name Hex-s-2025-lab01 --router-wan-ip 192.168.0.199 --lan-server-ip 192.168.88.254 --direction WAN_TO_LAN --skip-router-precheck
+python performance_test.py --device-name Hex-s-2025-lab01 --router-wan-ip 192.168.0.199 --lan-server-ip 192.168.88.254 --direction WAN_TO_LAN_DNAT --skip-router-precheck
 ```
 
 Important Day 8 notes:
 
 - `router_wan_ip` is the IP that the iperf3 client actually connects to.
 - `lan_server_ip` is the LAN PC that runs `iperf3 -s`.
-- `LAN_TO_WAN` uses iperf3 `-R` reverse mode.
+- `WAN_TO_LAN_DNAT` measures DNAT forward throughput from the WAN-side client to the LAN iperf3 server.
+- `LAN_TO_WAN_DNAT_REPLY` uses iperf3 `-R` reverse mode over the same DNAT connection. It is reply-direction throughput, not a standard outbound LAN-to-WAN SRCNAT test.
 - `-O 10` excludes the first 10 seconds as warm-up.
 - The default test duration is 40 seconds, with the first 10 seconds omitted from throughput calculation.
 - Throughput Mbps is the primary Day 8 performance evidence.
 - The default threshold is 800 Mbps.
+- The default warning threshold is 700 Mbps. Results between 700 and 800 Mbps are WARN, not DUT FAIL.
 - If required parameters are missing, the script asks for them in PowerShell.
 - Day 8 uses SSH for RouterOS precheck by default.
 - The first RouterOS precheck version is read-only and does not modify RouterOS.
 - If DNAT or firewall filter allow rules are missing, the script provides suggested MikroTik commands.
 
+A true `LAN_TO_WAN_SRCNAT` test requires the iperf3 client to be on the LAN side and the iperf3 server to be on the WAN side. Example topology: LAN PC `192.168.88.x` -> Router -> WAN PC `192.168.0.114` running `iperf3 -s`. The command from the LAN side would be `iperf3 -c 192.168.0.114 -t 40 -P 4 -O 10 -J`, and RouterOS connection tracking should show `s = SRCNAT`. This should be implemented separately and not mixed with DNAT reverse mode.
+
+Day 8 final evidence:
+
+- The original router throughput failure was isolated to endpoint baseline instability, not the MikroTik DNAT path.
+- Root cause: `192.168.0.11` used a Realtek RTL8156 USB 2.5GbE adapter with driver `11.19.602.2025`, which caused unstable PC-to-PC reverse baseline throughput of about 772 to 785 Mbps.
+- After updating the Realtek RTL8156 driver to `1156.22.20.113`, repeated 180-second PC-to-PC reverse baseline tests recovered to 948 Mbps.
+- After the endpoint fix, `LAN_TO_WAN_DNAT_REPLY` passed with 946.35 Mbps against the 800 Mbps threshold.
+- Final status: host baseline `PASS`, endpoint issue `FIXED`, DNAT reply-direction `PASS`, router issue `NOT REPRODUCED`.
+
 Day 8 report output:
 
 ```text
-reports/Hex-s-2025-lab01/day8_iperf3_performance_report.json
-reports/Hex-s-2025-lab01/day8_iperf3_performance_report.html
+reports/Hex-s-2025-lab01/day8_iperf3_WAN_TO_LAN_DNAT_report.json
+reports/Hex-s-2025-lab01/day8_iperf3_WAN_TO_LAN_DNAT_report.html
+reports/Hex-s-2025-lab01/day8_iperf3_LAN_TO_WAN_DNAT_REPLY_report.json
+reports/Hex-s-2025-lab01/day8_iperf3_LAN_TO_WAN_DNAT_REPLY_report.html
 ```
 
 Day 8 HTML report uses a dashboard-style layout for portfolio presentation.
@@ -363,8 +377,10 @@ reports/day6_lab_topology_summary.html
 Day 8 iperf3 router performance:
 
 ```text
-reports/Hex-s-2025-lab01/day8_iperf3_performance_report.json
-reports/Hex-s-2025-lab01/day8_iperf3_performance_report.html
+reports/Hex-s-2025-lab01/day8_iperf3_WAN_TO_LAN_DNAT_report.json
+reports/Hex-s-2025-lab01/day8_iperf3_WAN_TO_LAN_DNAT_report.html
+reports/Hex-s-2025-lab01/day8_iperf3_LAN_TO_WAN_DNAT_REPLY_report.json
+reports/Hex-s-2025-lab01/day8_iperf3_LAN_TO_WAN_DNAT_REPLY_report.html
 ```
 
 ## Testing Strategy

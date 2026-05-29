@@ -5,26 +5,29 @@
   "default_omit_sec": 10,
   "default_parallel_streams": 4,
   "default_threshold_mbps": 800,
+  "default_warn_threshold_mbps": 700,
   "default_lan_server_ip": "192.168.88.254",
   "iperf3_server_port": 5201,
   "supported_directions": [
-    "WAN_TO_LAN",
-    "LAN_TO_WAN"
+    "WAN_TO_LAN_DNAT",
+    "LAN_TO_WAN_DNAT_REPLY"
   ],
-  "wan_to_lan": {
-    "description": "WAN-side PC runs iperf3 client to Router WAN IP. Router DNAT forwards TCP/5201 to LAN-side iperf3 server.",
+  "wan_to_lan_dnat": {
+    "test_type": "DNAT forward throughput",
+    "description": "WAN-side client sends traffic to Router WAN IP. Router DNAT forwards traffic to LAN iperf3 server.",
     "command_template": "iperf3 -c <router_wan_ip> -t <duration> -P <parallel> -O <omit> -J",
     "requires_dnat": true,
     "reverse_mode": false,
-    "traffic_direction": "WAN_TO_LAN",
+    "traffic_direction": "WAN client to LAN server",
     "control_connection": "WAN_PC_TO_ROUTER_WAN_IP"
   },
-  "lan_to_wan": {
-    "description": "WAN-side PC runs iperf3 client with reverse mode. LAN-side iperf3 server sends traffic back to WAN-side PC.",
+  "lan_to_wan_dnat_reply": {
+    "test_type": "DNAT reply-direction throughput",
+    "description": "This is iperf3 reverse mode over the same DNAT connection. The LAN iperf3 server sends reply-direction traffic back to the WAN-side client. This is not a standard outbound LAN-to-WAN SRCNAT test.",
     "command_template": "iperf3 -c <router_wan_ip> -t <duration> -P <parallel> -R -O <omit> -J",
     "requires_dnat": true,
     "reverse_mode": true,
-    "traffic_direction": "LAN_TO_WAN",
+    "traffic_direction": "LAN server to WAN client over iperf3 reverse mode",
     "control_connection": "WAN_PC_TO_ROUTER_WAN_IP"
   },
   "manual_prerequisite": [
