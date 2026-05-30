@@ -4,7 +4,7 @@
 
 Network Automation Testing Platform is a Python-based lab automation project for validating network device configuration, connectivity, topology, and report output across a small multi-vendor lab.
 
-The current implementation covers Day 1 through Day 6:
+The current implementation covers Day 1 through Day 9:
 
 - MikroTik baseline and post-reset validation
 - MikroTik Day 2 setup workflow after reset
@@ -13,6 +13,7 @@ The current implementation covers Day 1 through Day 6:
 - Cisco Catalyst switch topology validation
 - Day 6 lab-level topology summary report
 - Day 8 Router performance automation with iperf3
+- Day 9 Router performance regression framework
 
 The project is designed as a practical QA Automation / SDET portfolio project for network infrastructure. It focuses on repeatable validation, structured test evidence, and readable JSON / HTML reports rather than one-off manual checks.
 
@@ -61,6 +62,7 @@ Cisco validation is read-only. It runs show commands for topology evidence and d
 | Day 6 | Lab-level topology summary generated from existing device reports | Complete |
 | Day 7 | Documentation cleanup, user guide, topology notes, and portfolio packaging | Complete |
 | Day 8 | RouterOS precheck and iperf3 router performance automation | Complete |
+| Day 9 | Repeatable iperf3 router performance regression with JSON / HTML / TXT reports | Complete |
 
 ## Lab Topology
 
@@ -201,6 +203,12 @@ Run Day 8 iperf3 router performance automation:
 python performance_test.py
 ```
 
+Run Day 9 router performance regression:
+
+```powershell
+python performance_regression.py --device-name Hex-s-2025-lab01 --direction LAN_TO_WAN_DNAT_REPLY --router-wan-ip 192.168.0.199 --lan-server-ip 192.168.88.254 --duration 40 --parallel 4 --omit 10 --runs 3 --threshold-mbps 800 --baseline-mbps 948 --regression-ratio 0.90
+```
+
 Compatibility aliases are also available:
 
 ```powershell
@@ -308,6 +316,52 @@ reports/Hex-s-2025-lab01/day8_iperf3_LAN_TO_WAN_DNAT_REPLY_report.html
 
 Day 8 HTML report uses a dashboard-style layout for portfolio presentation.
 
+## Day 9 Router Performance Regression Framework
+
+Day 9 upgrades the Day 8 single-run iperf3 validation into a repeatable router performance regression framework. It runs the same iperf3 scenario multiple times, compares each run against a required threshold and an optional baseline, calculates aggregate statistics, and writes stable JSON / HTML / TXT reports for later review.
+
+Day 9 keeps Day 8 behavior intact. Day 8 remains the router performance automation and RouterOS precheck workflow; Day 9 focuses on repeatable regression detection and report generation.
+
+Supported directions:
+
+- `WAN_TO_LAN_DNAT`
+- `LAN_TO_WAN_DNAT_REPLY`
+- `LAN_TO_WAN_ROUTING`
+
+Example command:
+
+```powershell
+python performance_regression.py --device-name Hex-s-2025-lab01 --direction LAN_TO_WAN_DNAT_REPLY --router-wan-ip 192.168.0.199 --lan-server-ip 192.168.88.254 --duration 40 --parallel 4 --omit 10 --runs 3 --threshold-mbps 800 --baseline-mbps 948 --regression-ratio 0.90
+```
+
+Generated Day 9 report paths:
+
+```text
+reports/Hex-s-2025-lab01/day9_performance_regression_report.json
+reports/Hex-s-2025-lab01/day9_performance_regression_report.html
+reports/Hex-s-2025-lab01/day9_performance_regression_report.txt
+```
+
+Result criteria with `--baseline-mbps`:
+
+- `PASS`: throughput is greater than or equal to `threshold_mbps` and greater than or equal to `baseline_mbps * regression_ratio`.
+- `WARNING`: throughput is greater than or equal to `threshold_mbps` but below `baseline_mbps * regression_ratio`.
+- `FAIL`: throughput is below `threshold_mbps`.
+
+Result criteria without `--baseline-mbps`:
+
+- `PASS`: throughput is greater than or equal to `threshold_mbps`.
+- `FAIL`: throughput is below `threshold_mbps`.
+- `WARNING` is not used unless baseline comparison is available.
+
+Overall result:
+
+- `FAIL` if any run fails.
+- `WARNING` if no run fails but at least one run warns.
+- `PASS` if all runs pass.
+
+`reports/` remains ignored and generated Day 9 JSON / HTML / TXT reports should not be committed. The fixed Day 9 JSON schema keeps the top-level keys `metadata`, `config`, `aggregate`, and `runs` for future dashboard aggregation.
+
 ## How to Read Reports
 
 Reports are written as structured evidence for each workflow.
@@ -381,6 +435,14 @@ reports/Hex-s-2025-lab01/day8_iperf3_WAN_TO_LAN_DNAT_report.json
 reports/Hex-s-2025-lab01/day8_iperf3_WAN_TO_LAN_DNAT_report.html
 reports/Hex-s-2025-lab01/day8_iperf3_LAN_TO_WAN_DNAT_REPLY_report.json
 reports/Hex-s-2025-lab01/day8_iperf3_LAN_TO_WAN_DNAT_REPLY_report.html
+```
+
+Day 9 router performance regression:
+
+```text
+reports/Hex-s-2025-lab01/day9_performance_regression_report.json
+reports/Hex-s-2025-lab01/day9_performance_regression_report.html
+reports/Hex-s-2025-lab01/day9_performance_regression_report.txt
 ```
 
 ## Testing Strategy
