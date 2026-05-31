@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Reports - Network Automation Lab Dashboard</title>
+  <title>Execution Logs - Network Automation Lab Dashboard</title>
   <style>
     :root {
       --bg: #f4f7fb;
@@ -41,7 +41,6 @@
     }
     nav a.active { border-color: var(--accent); color: var(--accent); }
     h1 { margin: 0 0 8px; font-size: 30px; line-height: 1.15; }
-    h2 { margin: 26px 0 10px; font-size: 18px; }
     p { margin: 0 0 18px; color: var(--muted); }
     section {
       background: var(--panel);
@@ -57,7 +56,6 @@
     th, td { border-bottom: 1px solid var(--border); padding: 10px; text-align: left; vertical-align: top; }
     tr:last-child td { border-bottom: 0; }
     th { color: var(--muted); font-weight: 800; white-space: nowrap; }
-    code { font-family: Consolas, "Courier New", monospace; overflow-wrap: anywhere; }
     .badge {
       display: inline-block;
       min-width: 78px;
@@ -68,7 +66,7 @@
       text-align: center;
     }
     .pass { background: var(--pass-bg); color: var(--pass); }
-    .fail { background: var(--fail-bg); color: var(--fail); }
+    .fail, .error, .timeout { background: var(--fail-bg); color: var(--fail); }
     .warning { background: var(--warning-bg); color: var(--warning); }
     .unknown, .malformed { background: var(--unknown-bg); color: var(--unknown); }
     .empty {
@@ -90,57 +88,46 @@
 <main>
   <nav>
     <a href="{{ url_for('home') }}">Home</a>
-    <a class="active" href="{{ url_for('reports') }}">Reports</a>
+    <a href="{{ url_for('reports') }}">Reports</a>
     <a href="{{ url_for('commands') }}">Commands</a>
+    <a class="active" href="{{ url_for('command_logs') }}">Execution Logs</a>
     <a href="{{ url_for('ai_checklist') }}">AI Checklist</a>
   </nav>
-  <h1>Reports</h1>
-  <p>Local JSON and HTML reports discovered under the repository reports folder.</p>
-  <p>UNKNOWN means the dashboard could not find a supported result field in the JSON report, or the HTML report has no matching JSON file to read status from.</p>
+  <h1>Execution Logs</h1>
+  <p>Previous safe command executions saved under reports/execution_logs/. New logs use the local system time.</p>
 
-  {% if not reports_exist %}
-  <div class="empty">reports/ folder was not found. The dashboard is ready, but no generated reports are available yet.</div>
-  {% elif not grouped_reports %}
-  <div class="empty">No JSON or HTML reports were found under reports/.</div>
-  {% endif %}
-
-  {% for device, entries in grouped_reports.items() %}
+  {% if not logs %}
+  <div class="empty">No command execution logs were found yet.</div>
+  {% else %}
   <section>
-    <h2>{{ device }}</h2>
     <div class="table-wrap">
       <table>
         <thead>
           <tr>
-            <th>Device / folder</th>
-            <th>Report filename</th>
-            <th>Report type</th>
+            <th>Started</th>
+            <th>Command</th>
             <th>Status</th>
-            <th>HTML</th>
-            <th>Last modified</th>
+            <th>Exit</th>
+            <th>Duration</th>
+            <th>Detail</th>
           </tr>
         </thead>
         <tbody>
-          {% for report in entries %}
+          {% for log in logs %}
           <tr>
-            <td>{{ report.device }}</td>
-            <td><code>{{ report.filename }}</code></td>
-            <td>{{ report.report_type }}</td>
-            <td><span class="badge {{ report.status|status_class }}">{{ report.status }}</span></td>
-            <td>
-              {% if report.html_relative_path %}
-              <a href="{{ report_url(report.html_relative_path) }}">Open HTML</a>
-              {% else %}
-              <span class="badge unknown">MISSING</span>
-              {% endif %}
-            </td>
-            <td>{{ report.modified_at }}</td>
+            <td>{{ log.started_at }}</td>
+            <td>{{ log.command_label }}</td>
+            <td><span class="badge {{ log.status|status_class }}">{{ log.status }}</span></td>
+            <td>{{ log.exit_code if log.exit_code is not none else "-" }}</td>
+            <td>{{ log.duration_seconds }}s</td>
+            <td><a href="{{ url_for('command_log_detail', log_id=log.log_id) }}">Open</a></td>
           </tr>
           {% endfor %}
         </tbody>
       </table>
     </div>
   </section>
-  {% endfor %}
+  {% endif %}
 </main>
 </body>
 </html>

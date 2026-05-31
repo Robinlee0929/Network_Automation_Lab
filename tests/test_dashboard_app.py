@@ -88,6 +88,18 @@ def test_classify_report_type_recognizes_day8_and_day9():
     )
 
 
+def test_ai_review_checklist_documents_day11_controls():
+    checklist = dashboard.ai_review_checklist()
+
+    text = " ".join(
+        f"{item['category']} {item['item']} {item['expected']} {item['evidence']}"
+        for item in checklist
+    )
+    assert "Allowlist-only execution" in text
+    assert "Day9 performance_regression.py should not run from the dashboard" in text
+    assert "local system time" in text
+
+
 def test_flask_routes_are_available(tmp_path):
     if dashboard.Flask is None:
         pytest.skip("Flask is not installed in this test environment.")
@@ -102,11 +114,19 @@ def test_flask_routes_are_available(tmp_path):
         encoding="utf-8",
     )
 
-    app = dashboard.create_app(reports_dir=reports_dir)
+    app = dashboard.create_app(
+        reports_dir=reports_dir,
+        execution_logs_dir=tmp_path / "execution_logs",
+    )
     client = app.test_client()
 
     assert client.get("/").status_code == 200
     assert client.get("/reports").status_code == 200
     assert client.get("/commands").status_code == 200
+    assert client.get("/commands/logs").status_code == 200
+    checklist_response = client.get("/ai-checklist")
+    assert checklist_response.status_code == 200
+    assert b"AI Review Checklist" in checklist_response.data
+    assert client.post("/commands/not_allowed/run").status_code == 404
     html_response = client.get("/reports/open/router1/day9_performance_regression_report.html")
     assert html_response.status_code == 200
