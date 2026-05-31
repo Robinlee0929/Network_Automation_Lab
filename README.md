@@ -1,10 +1,12 @@
-# Network Automation Testing Platform
+# Network Automation Lab
 
 ## Project Overview
 
-Network Automation Testing Platform is a Python-based lab automation project for validating network device configuration, connectivity, topology, and report output across a small multi-vendor lab.
+Network Automation Lab is a Python-based lab automation project for validating network device configuration, connectivity, topology, and report output across a small multi-vendor lab.
 
-The current implementation covers Day 1 through Day 9:
+A Python-based network automation and validation lab for MikroTik RouterOS, Cisco switch topology checks, iperf3 performance testing, regression checks, and local report visualization.
+
+The current implementation covers Day 1 through Day 10:
 
 - MikroTik baseline and post-reset validation
 - MikroTik Day 2 setup workflow after reset
@@ -14,6 +16,7 @@ The current implementation covers Day 1 through Day 9:
 - Day 6 lab-level topology summary report
 - Day 8 Router performance automation with iperf3
 - Day 9 Router performance regression framework
+- Day 10 Local dashboard for report visualization
 
 The project is designed as a practical QA Automation / SDET portfolio project for network infrastructure. It focuses on repeatable validation, structured test evidence, and readable JSON / HTML reports rather than one-off manual checks.
 
@@ -63,6 +66,7 @@ Cisco validation is read-only. It runs show commands for topology evidence and d
 | Day 7 | Documentation cleanup, user guide, topology notes, and portfolio packaging | Complete |
 | Day 8 | RouterOS precheck and iperf3 router performance automation | Complete |
 | Day 9 | Repeatable iperf3 router performance regression with JSON / HTML / TXT reports | Complete |
+| Day 10 | Local dashboard for viewing reports and safe command examples | Complete |
 
 ## Lab Topology
 
@@ -361,6 +365,56 @@ Overall result:
 - `PASS` if all runs pass.
 
 `reports/` remains ignored and generated Day 9 JSON / HTML / TXT reports should not be committed. The fixed Day 9 JSON schema keeps the top-level keys `metadata`, `config`, `aggregate`, and `runs` for future dashboard aggregation.
+
+## Day 10 Local Dashboard
+
+Day 10 adds a local Web GUI prototype for viewing automation reports. It converts CLI-based automation outputs into a user-readable dashboard, improves demo usability, and keeps execution safe by separating report viewing from command execution.
+
+Purpose:
+
+- Local dashboard for viewing automation reports.
+- Show report summary cards for MikroTik baseline, Cisco topology, lab topology summary, iperf3 performance, and performance regression.
+- Show PASS / FAIL / WARNING / UNKNOWN status when the JSON report exposes a supported result field.
+- Link to existing HTML reports under `reports/`.
+- Show safe PowerShell-friendly commands that can be copied and run manually.
+
+Install the dashboard dependency:
+
+```powershell
+pip install flask
+```
+
+Or install all project dependencies:
+
+```powershell
+pip install -r requirements.txt
+```
+
+Start the dashboard:
+
+```powershell
+python dashboard_app.py
+```
+
+Open the local dashboard:
+
+```text
+http://127.0.0.1:5000
+```
+
+Dashboard pages:
+
+- `/` shows the report summary cards, including Day 9 performance regression visibility.
+- `/reports` scans `reports/` recursively for JSON and HTML reports and works even when `reports/` is missing.
+- `/commands` shows copyable command examples only.
+
+Current limitation:
+
+- Day 10 dashboard is read/report-oriented.
+- It does not execute router configuration commands.
+- It does not run performance regression from the web UI.
+- It does not run pytest from the web UI.
+- Command execution can be planned for Day 11 or later.
 
 ## How to Read Reports
 

@@ -4,8 +4,11 @@ reports/
 __pycache__/
 .pytest_cache/
 .pytest_tmp/
+.pytest-tmp/
 .venv/
 *.pyc
+dashboard_stdout.log
+dashboard_stderr.log
 .env
 .env.*
 *.pem
