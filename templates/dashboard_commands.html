@@ -13,6 +13,14 @@
       --border: #d8e0ec;
       --accent: #0f766e;
       --ink: #111827;
+      --pass: #147a3d;
+      --pass-bg: #e8f6ee;
+      --fail: #b42318;
+      --fail-bg: #fdecec;
+      --warning: #9a6700;
+      --warning-bg: #fff4d8;
+      --unknown: #475467;
+      --unknown-bg: #eef2f6;
     }
     * { box-sizing: border-box; }
     body {
@@ -35,7 +43,7 @@
     nav a.active { border-color: var(--accent); color: var(--accent); }
     h1 { margin: 0 0 8px; font-size: 30px; line-height: 1.15; }
     p { margin: 0 0 18px; color: var(--muted); }
-    .command {
+    .command, section {
       background: var(--panel);
       border: 1px solid var(--border);
       border-radius: 8px;
@@ -44,6 +52,80 @@
       box-shadow: 0 10px 24px rgba(16, 24, 40, .07);
     }
     h2 { margin: 0 0 10px; font-size: 16px; }
+    h3 { margin: 0 0 8px; font-size: 15px; }
+    .command-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 14px;
+    }
+    .safe-command {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px;
+      min-height: 170px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .meta { color: var(--muted); margin-bottom: 10px; }
+    .category {
+      display: inline-block;
+      margin-bottom: 10px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: #eef6ff;
+      color: #175cd3;
+      font-size: 12px;
+      font-weight: 850;
+    }
+    .argv {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px;
+      overflow-wrap: anywhere;
+      margin: 10px 0;
+    }
+    .effect {
+      background: #fff8eb;
+      border: 1px solid #f3d29b;
+      border-radius: 8px;
+      color: #7a4d00;
+      font-weight: 700;
+      margin: 10px 0;
+      padding: 10px;
+    }
+    button {
+      border: 0;
+      border-radius: 8px;
+      background: var(--accent);
+      color: #ffffff;
+      cursor: pointer;
+      font-weight: 800;
+      padding: 9px 12px;
+    }
+    button:disabled {
+      background: #98a2b3;
+      cursor: not-allowed;
+    }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { border-bottom: 1px solid var(--border); padding: 10px; text-align: left; vertical-align: top; }
+    tr:last-child td { border-bottom: 0; }
+    th { color: var(--muted); font-weight: 800; white-space: nowrap; }
+    .badge {
+      display: inline-block;
+      min-width: 78px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 850;
+      text-align: center;
+    }
+    .pass { background: var(--pass-bg); color: var(--pass); }
+    .fail, .error, .timeout { background: var(--fail-bg); color: var(--fail); }
+    .warning { background: var(--warning-bg); color: var(--warning); }
+    .unknown { background: var(--unknown-bg); color: var(--unknown); }
     pre {
       margin: 0;
       padding: 12px;
@@ -64,9 +146,19 @@
       font-weight: 700;
       margin: 18px 0;
     }
+    .empty {
+      background: #fff8eb;
+      border: 1px solid #f3d29b;
+      border-radius: 8px;
+      padding: 12px;
+      color: #7a4d00;
+      font-weight: 700;
+      margin-top: 10px;
+    }
     @media (max-width: 620px) {
       main { padding: 20px 12px 36px; }
       h1 { font-size: 25px; }
+      .command-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -76,12 +168,74 @@
     <a href="{{ url_for('home') }}">Home</a>
     <a href="{{ url_for('reports') }}">Reports</a>
     <a class="active" href="{{ url_for('commands') }}">Commands</a>
+    <a href="{{ url_for('command_logs') }}">Execution Logs</a>
+    <a href="{{ url_for('ai_checklist') }}">AI Checklist</a>
   </nav>
-  <h1>Command Helper</h1>
-  <p>PowerShell-friendly examples for manual copy and paste. The dashboard does not execute commands in Day10.</p>
-  <div class="note">Use placeholders like &lt;ROUTER_WAN_IP&gt;, &lt;LAN_SERVER_IP&gt;, and &lt;DEVICE_NAME&gt; before running commands.</div>
+  <h1>Safe Command Execution</h1>
+  <p>Run a limited allowlist of local repository commands. The dashboard never accepts arbitrary shell input and does not run device SSH workflows.</p>
+  <div class="note">Only enabled commands in this registry can run. Generated logs are saved under reports/execution_logs/.</div>
 
-  {% for item in commands %}
+  <section>
+    <h2>Available Commands</h2>
+    <div class="command-grid">
+      {% for item in commands %}
+      <article class="safe-command">
+        <div>
+          <h3>{{ item.label }}</h3>
+          <span class="category">{{ item.category }}</span>
+          <p class="meta">{{ item.description }}</p>
+          <div class="effect">{{ item.effect }}</div>
+          <div class="argv"><code>{{ item.argv|join(" ") }}</code></div>
+          <p class="meta">Timeout: {{ item.timeout_seconds }} seconds</p>
+          {% if not item.enabled %}
+          <p class="meta">{{ item.unavailable_reason }}</p>
+          {% endif %}
+        </div>
+        <form method="post" action="{{ url_for('run_command', command_id=item.command_id) }}">
+          <button type="submit" {% if not item.enabled or not item.available %}disabled{% endif %}>Run</button>
+        </form>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section>
+    <h2>Recent Execution Logs</h2>
+    {% if recent_logs %}
+    <table>
+      <thead>
+        <tr>
+          <th>Started</th>
+          <th>Command</th>
+          <th>Status</th>
+          <th>Exit</th>
+          <th>Duration</th>
+          <th>Log</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for log in recent_logs %}
+        <tr>
+          <td>{{ log.started_at }}</td>
+          <td>{{ log.command_label }}</td>
+          <td><span class="badge {{ log.status|status_class }}">{{ log.status }}</span></td>
+          <td>{{ log.exit_code if log.exit_code is not none else "-" }}</td>
+          <td>{{ log.duration_seconds }}s</td>
+          <td><a href="{{ url_for('command_log_detail', log_id=log.log_id) }}">Open</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <p class="meta"><a href="{{ url_for('command_logs') }}">View all execution logs</a></p>
+    {% else %}
+    <div class="empty">No command execution logs were found yet.</div>
+    {% endif %}
+  </section>
+
+  <h1>Manual Command Helper</h1>
+  <p>PowerShell-friendly examples for manual copy and paste. Use placeholders like &lt;ROUTER_WAN_IP&gt;, &lt;LAN_SERVER_IP&gt;, and &lt;DEVICE_NAME&gt; before running commands.</p>
+
+  {% for item in manual_commands %}
   <article class="command">
     <h2>{{ item.title }}</h2>
     <pre><code>{{ item.command }}</code></pre>

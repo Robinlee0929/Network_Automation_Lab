@@ -6,7 +6,7 @@ Network Automation Lab is a Python-based lab automation project for validating n
 
 A Python-based network automation and validation lab for MikroTik RouterOS, Cisco switch topology checks, iperf3 performance testing, regression checks, and local report visualization.
 
-The current implementation covers Day 1 through Day 10:
+The current implementation covers Day 1 through Day 11:
 
 - MikroTik baseline and post-reset validation
 - MikroTik Day 2 setup workflow after reset
@@ -17,6 +17,7 @@ The current implementation covers Day 1 through Day 10:
 - Day 8 Router performance automation with iperf3
 - Day 9 Router performance regression framework
 - Day 10 Local dashboard for report visualization
+- Day 11 Dashboard safe command execution and execution log viewer
 
 The project is designed as a practical QA Automation / SDET portfolio project for network infrastructure. It focuses on repeatable validation, structured test evidence, and readable JSON / HTML reports rather than one-off manual checks.
 
@@ -67,6 +68,7 @@ Cisco validation is read-only. It runs show commands for topology evidence and d
 | Day 8 | RouterOS precheck and iperf3 router performance automation | Complete |
 | Day 9 | Repeatable iperf3 router performance regression with JSON / HTML / TXT reports | Complete |
 | Day 10 | Local dashboard for viewing reports and safe command examples | Complete |
+| Day 11 | Dashboard safe command execution and execution log viewer | Complete |
 
 ## Lab Topology
 
@@ -406,7 +408,7 @@ Dashboard pages:
 
 - `/` shows the report summary cards, including Day 9 performance regression visibility.
 - `/reports` scans `reports/` recursively for JSON and HTML reports and works even when `reports/` is missing.
-- `/commands` shows copyable command examples only.
+- `/commands` shows safe command execution controls, recent execution logs, and copyable command examples.
 
 Current limitation:
 
@@ -414,7 +416,79 @@ Current limitation:
 - It does not execute router configuration commands.
 - It does not run performance regression from the web UI.
 - It does not run pytest from the web UI.
-- Command execution can be planned for Day 11 or later.
+- Safe command execution is introduced separately in Day 11 with a strict allowlist.
+
+## Day 11 Dashboard Safe Command Execution
+
+Day 11 extends the local Flask dashboard with a safe command runner and execution log viewer. It keeps the Day10 report dashboard intact while adding a limited way to trigger approved local repository commands from the browser.
+
+Safety model:
+
+- The dashboard uses a strict allowlist registry in `dashboard_command_runner.py`.
+- The UI never accepts arbitrary shell commands.
+- Commands run with `subprocess.run()` argument lists and `shell=False`.
+- Unknown command IDs are rejected.
+- Missing scripts are marked unavailable instead of replaced with unrelated behavior.
+- Commands have timeouts and failures are logged instead of crashing Flask.
+
+Enabled dashboard commands:
+
+- `python -m pytest`
+- `python -m pytest tests`
+- `python -m pytest tests/test_performance_regression.py`
+- `python topology_summary.py`
+
+`topology_summary.py` rebuilds `reports/day6_lab_topology_summary.json` and `.html` from existing report files. It does not rerun Day8 iperf3 or Day9 performance regression tests.
+
+Listed but disabled by default:
+
+- `python performance_regression.py`
+
+The Day9 performance regression script needs explicit lab parameters such as device name, direction, router WAN IP, LAN iperf3 server IP, thresholds, and baseline values. Run it manually with those arguments instead of using a one-click dashboard action.
+
+Forbidden from the dashboard:
+
+- Router or switch SSH command execution.
+- Password entry or credential collection.
+- MikroTik or Cisco configuration apply workflows.
+- Firewall, NAT, reboot, reset, or destructive device actions.
+- Arbitrary command text boxes.
+
+Start the dashboard:
+
+```powershell
+python dashboard_app.py
+```
+
+Open:
+
+```text
+http://127.0.0.1:5000/
+```
+
+Day 11 routes:
+
+- `/commands` lists safe commands, run buttons, and recent logs.
+- `POST /commands/<command_id>/run` executes only registered command IDs.
+- `/commands/logs` lists previous command executions.
+- `/commands/logs/<log_id>` shows stdout, stderr, status, exit code, and duration.
+- `/ai-checklist` lists Day11 review items for confirming safe command execution behavior.
+
+Execution logs are saved as JSON under:
+
+```text
+reports/execution_logs/
+```
+
+`reports/` is ignored by git, so generated execution logs should remain local.
+
+New Day11 execution logs use the local system time for `started_at`, `finished_at`, and the timestamp prefix in `log_id`.
+
+Run Day11 tests:
+
+```powershell
+python -m pytest tests/test_dashboard_command_runner.py tests/test_dashboard_app.py
+```
 
 ## How to Read Reports
 

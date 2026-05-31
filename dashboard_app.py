@@ -5,17 +5,27 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional
 
 try:
-    from flask import Flask, abort, render_template, send_from_directory, url_for
+    from flask import Flask, abort, redirect, render_template, send_from_directory, url_for
 except ImportError:  # pragma: no cover - exercised by environments without Flask.
     Flask = None  # type: ignore[assignment]
     abort = None  # type: ignore[assignment]
+    redirect = None  # type: ignore[assignment]
     render_template = None  # type: ignore[assignment]
     send_from_directory = None  # type: ignore[assignment]
     url_for = None  # type: ignore[assignment]
 
+from dashboard_command_runner import (
+    CommandUnavailableError,
+    build_command_registry,
+    execute_registered_command,
+    list_execution_logs,
+    load_execution_log,
+)
+
 
 PROJECT_ROOT = Path(__file__).resolve().parent
 DEFAULT_REPORTS_DIR = PROJECT_ROOT / "reports"
+DEFAULT_EXECUTION_LOGS_DIR = DEFAULT_REPORTS_DIR / "execution_logs"
 
 STATUS_FIELDS = (
     "overall_result",
@@ -247,7 +257,75 @@ def command_examples() -> List[Dict[str, str]]:
     ]
 
 
-def create_app(reports_dir: Optional[Path] = None) -> Flask:
+def ai_review_checklist() -> List[Dict[str, str]]:
+    return [
+        {
+            "category": "Command safety",
+            "item": "Allowlist-only execution",
+            "expected": "Dashboard can run only registered command IDs; it must not accept arbitrary shell text.",
+            "evidence": "dashboard_command_runner.py build_command_registry(); /commands/<command_id>/run rejects unknown IDs.",
+        },
+        {
+            "category": "Command safety",
+            "item": "No direct device operations",
+            "expected": "Dashboard must not collect passwords, open SSH sessions, apply router/switch config, reboot, reset, or modify firewall/NAT.",
+            "evidence": "Allowed commands are local pytest/report workflows only; Day9 lab workflow is listed but disabled.",
+        },
+        {
+            "category": "Command safety",
+            "item": "No shell injection surface",
+            "expected": "Commands should run with argument lists and shell=False.",
+            "evidence": "dashboard_command_runner.py execute_command() uses subprocess.run(command.argv, shell=False).",
+        },
+        {
+            "category": "Command safety",
+            "item": "Timeout handling",
+            "expected": "Long-running commands should finish, fail, or be logged as TIMEOUT without crashing Flask.",
+            "evidence": "CommandSpec.timeout_seconds and subprocess.TimeoutExpired handling write TIMEOUT logs.",
+        },
+        {
+            "category": "Dashboard behavior",
+            "item": "Commands page separates command types",
+            "expected": "Test commands, report/local workflows, and disabled manual lab workflows should be visibly distinct.",
+            "evidence": "/commands shows category badges and effect notes for each registered command.",
+        },
+        {
+            "category": "Dashboard behavior",
+            "item": "Day9 real lab regression is not one-click",
+            "expected": "Day9 performance_regression.py should not run from the dashboard without explicit lab parameters.",
+            "evidence": "performance_regression command is available when script exists but disabled with a lab-parameter reason.",
+        },
+        {
+            "category": "Report behavior",
+            "item": "Topology summary scope is clear",
+            "expected": "Rebuild Day6 topology summary should update Day6 summary reports only and not rerun Day8 or Day9 tests.",
+            "evidence": "topology_summary effect text names reports/day6_lab_topology_summary.json/.html and says it does not rerun Day8 or Day9.",
+        },
+        {
+            "category": "Execution logs",
+            "item": "Structured JSON log is saved",
+            "expected": "Every execution should write a JSON log with status, argv, timestamps, duration, stdout, stderr, exit code, and working directory.",
+            "evidence": "reports/execution_logs/<log_id>.json; /commands/logs/<log_id> detail page.",
+        },
+        {
+            "category": "Execution logs",
+            "item": "Local system time is used",
+            "expected": "New execution logs should use local system time instead of UTC Z timestamps.",
+            "evidence": "dashboard_command_runner.py _local_timestamp(); log detail Started/Finished fields.",
+        },
+        {
+            "category": "Testing",
+            "item": "Automated checks cover Day11",
+            "expected": "Tests should verify registry behavior, unknown command rejection, log writing, failures, timeouts, and Flask routes.",
+            "evidence": "tests/test_dashboard_command_runner.py and tests/test_dashboard_app.py.",
+        },
+    ]
+
+
+def create_app(
+    reports_dir: Optional[Path] = None,
+    execution_logs_dir: Optional[Path] = None,
+) -> Flask:
     if Flask is None:
         raise RuntimeError(
             "Flask is required for the Day10 dashboard. Install it with: pip install flask"
@@ -255,6 +333,11 @@ def create_app(reports_dir: Optional[Path] = None) -> Flask:
 
     app = Flask(__name__)
     app.config["REPORTS_DIR"] = Path(reports_dir) if reports_dir else DEFAULT_REPORTS_DIR
+    app.config["EXECUTION_LOGS_DIR"] = (
+        Path(execution_logs_dir)
+        if execution_logs_dir
+        else DEFAULT_EXECUTION_LOGS_DIR
+    )
 
     @app.route("/")
     def home():
@@ -284,9 +367,47 @@ def create_app(reports_dir: Optional[Path] = None) -> Flask:
 
     @app.route("/commands")
     def commands():
+        registry = build_command_registry(PROJECT_ROOT)
+        logs = list_execution_logs(app.config["EXECUTION_LOGS_DIR"])
         return render_template(
             "dashboard_commands.html",
-            commands=command_examples(),
+            commands=list(registry.values()),
+            manual_commands=command_examples(),
+            recent_logs=logs[:5],
+        )
+
+    @app.post("/commands/<command_id>/run")
+    def run_command(command_id: str):
+        registry = build_command_registry(PROJECT_ROOT)
+        try:
+            log = execute_registered_command(
+                registry,
+                command_id,
+                app.config["EXECUTION_LOGS_DIR"],
+            )
+        except (KeyError, CommandUnavailableError):
+            abort(404)
+        return redirect(url_for("command_log_detail", log_id=log["log_id"]))
+
+    @app.route("/commands/logs")
+    def command_logs():
+        return render_template(
+            "dashboard_command_logs.html",
+            logs=list_execution_logs(app.config["EXECUTION_LOGS_DIR"]),
+        )
+
+    @app.route("/commands/logs/<log_id>")
+    def command_log_detail(log_id: str):
+        log = load_execution_log(app.config["EXECUTION_LOGS_DIR"], log_id)
+        if log is None:
+            abort(404)
+        return render_template("dashboard_command_log.html", log=log)
+
+    @app.route("/ai-checklist")
+    def ai_checklist():
+        return render_template(
+            "dashboard_ai_checklist.html",
+            checklist=ai_review_checklist(),
         )
 
     @app.route("/reports/open/<path:report_path>")
@@ -305,7 +426,7 @@ def create_app(reports_dir: Optional[Path] = None) -> Flask:
     @app.template_filter("status_class")
     def status_class(value: str) -> str:
         normalized = str(value).lower()
-        if normalized in {"pass", "fail", "warning", "malformed"}:
+        if normalized in {"pass", "fail", "warning", "malformed", "timeout", "error"}:
             return normalized
         return "unknown"
 

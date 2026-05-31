@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI Checklist - Network Automation Lab Dashboard</title>
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --panel: #ffffff;
+      --text: #172033;
+      --muted: #667085;
+      --border: #d8e0ec;
+      --accent: #0f766e;
+      --note: #fff8eb;
+      --note-border: #f3d29b;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Segoe UI", Arial, sans-serif;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+    main { max-width: 1180px; margin: 0 auto; padding: 28px 18px 48px; }
+    nav { display: flex; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; }
+    nav a {
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 750;
+      padding: 8px 10px;
+      border-bottom: 2px solid transparent;
+    }
+    nav a.active { border-color: var(--accent); color: var(--accent); }
+    h1 { margin: 0 0 8px; font-size: 30px; line-height: 1.15; }
+    p { margin: 0 0 18px; color: var(--muted); max-width: 900px; }
+    section {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      margin-top: 14px;
+      box-shadow: 0 10px 24px rgba(16, 24, 40, .07);
+      overflow: hidden;
+    }
+    .note {
+      background: var(--note);
+      border: 1px solid var(--note-border);
+      border-radius: 8px;
+      color: #7a4d00;
+      font-weight: 700;
+      padding: 12px;
+      margin: 18px 0;
+    }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border-bottom: 1px solid var(--border); padding: 10px; text-align: left; vertical-align: top; }
+    tr:last-child td { border-bottom: 0; }
+    th { color: var(--muted); font-weight: 800; white-space: nowrap; }
+    .category {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: #eef6ff;
+      color: #175cd3;
+      font-size: 12px;
+      font-weight: 850;
+      white-space: nowrap;
+    }
+    code {
+      font-family: Consolas, "Courier New", monospace;
+      overflow-wrap: anywhere;
+    }
+    @media (max-width: 620px) {
+      main { padding: 20px 12px 36px; }
+      h1 { font-size: 25px; }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <nav>
+    <a href="{{ url_for('home') }}">Home</a>
+    <a href="{{ url_for('reports') }}">Reports</a>
+    <a href="{{ url_for('commands') }}">Commands</a>
+    <a href="{{ url_for('command_logs') }}">Execution Logs</a>
+    <a class="active" href="{{ url_for('ai_checklist') }}">AI Checklist</a>
+  </nav>
+  <h1>AI Review Checklist</h1>
+  <p>Checklist for confirming whether the Day11 dashboard behavior matches the safe command execution requirements.</p>
+  <div class="note">Use this page as review evidence. It lists what should be true and where to verify it in the code or dashboard.</div>
+
+  <section>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Category</th>
+            <th>Item</th>
+            <th>Expected</th>
+            <th>Evidence to Check</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in checklist %}
+          <tr>
+            <td><span class="category">{{ row.category }}</span></td>
+            <td>{{ row.item }}</td>
+            <td>{{ row.expected }}</td>
+            <td><code>{{ row.evidence }}</code></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>
+</body>
+</html>
