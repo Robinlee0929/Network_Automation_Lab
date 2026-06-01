@@ -1,6 +1,9 @@
 config.json
 config.cisco.json
+Set_WireguardVPN_config.json
 reports/
+exports/
+*.conf
 __pycache__/
 .pytest_cache/
 .pytest_tmp/
