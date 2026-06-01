@@ -104,6 +104,61 @@
   <div class="empty">No JSON or HTML reports were found under reports/.</div>
   {% endif %}
 
+  <section>
+    <h2>WireGuard VPN Automation</h2>
+    <p>WireGuard Client Config Export + VPN Throughput Baseline.</p>
+    {% if not day12_summaries %}
+    <div class="empty">WireGuard VPN report not found. Expected a generated report under reports/&lt;device_name&gt;/.</div>
+    {% else %}
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Device</th>
+            <th>Result</th>
+            <th>Interface</th>
+            <th>Peer</th>
+            <th>Client</th>
+            <th>Export Path</th>
+            <th>Handshake</th>
+            <th>Ping Gateway</th>
+            <th>Ping LAN Host</th>
+            <th>TCP 5201</th>
+            <th>iperf Fwd</th>
+            <th>iperf Rev</th>
+            <th>HTML</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in day12_summaries %}
+          <tr>
+            <td>{{ item.device_name }}</td>
+            <td><span class="badge {{ item.overall_result|status_class }}">{{ item.overall_result }}</span></td>
+            <td>{{ item.interface_name }}</td>
+            <td>{{ item.peer_name }}</td>
+            <td>{{ item.client_address }}</td>
+            <td><code>{{ item.exported_config_path }}</code></td>
+            <td>{{ item.handshake_status }}</td>
+            <td>{{ item.ping_lan_gateway }}</td>
+            <td>{{ item.ping_lan_host }}</td>
+            <td>{{ item.tcp_5201 }}</td>
+            <td>{{ item.iperf_forward_mbps }}</td>
+            <td>{{ item.iperf_reverse_mbps }}</td>
+            <td>
+              {% if item.html_relative_path %}
+              <a href="{{ url_for('open_wireguard_vpn_report', device_name=item.device_folder) }}">Open HTML</a>
+              {% else %}
+              <span class="badge unknown">MISSING</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endif %}
+  </section>
+
   {% for device, entries in grouped_reports.items() %}
   <section>
     <h2>{{ device }}</h2>
