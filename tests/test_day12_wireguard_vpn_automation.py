@@ -88,6 +88,104 @@ def test_private_key_leak_detection_fails_if_report_contains_real_private_key():
     assert "PrivateKey leaked" in errors[0]
 
 
+def test_redact_private_keys_recurses_before_report_write():
+    report = {
+        "config": CLIENT_CONFIG,
+        "nested": [
+            {"summary": "PrivateKey=another-secret"},
+            "PrivateKey = REDACTED",
+        ],
+    }
+
+    redacted = day12.redact_private_keys(report)
+
+    assert day12.private_key_leaked(redacted) is False
+    assert "super-secret-private-key" not in json.dumps(redacted)
+    assert "another-secret" not in json.dumps(redacted)
+
+
+def test_write_reports_redacts_private_key_before_disk_write(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    report = {
+        "device_name": "Hex-s-2025-lab01",
+        "overall_result": "PASS",
+        "wireguard_summary": {"raw": CLIENT_CONFIG},
+        "checks": dict(base_checks()),
+        "warnings": [],
+        "errors": [],
+        "suggestions": [],
+        "sanitized_client_config_summary": CLIENT_CONFIG,
+    }
+
+    json_path, html_path = day12.write_reports(report)
+    json_text = json_path.read_text(encoding="utf-8")
+    html_text = html_path.read_text(encoding="utf-8")
+    saved = json.loads(json_text)
+
+    assert "super-secret-private-key" not in json_text
+    assert "super-secret-private-key" not in html_text
+    assert saved["overall_result"] == "FAIL"
+    assert saved["checks"]["private_key_redacted_in_report"] == "FAIL"
+    assert any("PrivateKey leaked" in error for error in saved["errors"])
+
+
+def test_html_report_uses_wireguard_title_without_day_label():
+    html_report = day12.build_html_report(
+        {
+            "device_name": "Hex-s-2025-lab01",
+            "overall_result": "PASS",
+            "wireguard_summary": {},
+            "checks": {},
+            "warnings": [],
+            "errors": [],
+            "suggestions": [],
+            "sanitized_client_config_summary": "",
+        }
+    )
+
+    assert "<title>WireGuard VPN Automation</title>" in html_report
+    assert "<h1>WireGuard VPN Automation</h1>" in html_report
+    assert "Day12" not in html_report
+
+
+def test_html_report_shows_config_path_without_rendering_conf_content():
+    html_report = day12.build_html_report(
+        {
+            "device_name": "Hex-s-2025-lab01",
+            "overall_result": "PASS",
+            "wireguard_summary": {
+                "interface_name": "wg0",
+                "listen_port": 13231,
+                "client_address": "10.10.10.2/32",
+                "client_dns": "192.168.88.1",
+                "client_endpoint_host": "192.168.0.199",
+                "exported_config_path": "exports/wireguard/robin-laptop-day12.conf",
+            },
+            "checks": {},
+            "warnings": [],
+            "errors": [],
+            "suggestions": [],
+            "sanitized_client_config_summary": CLIENT_CONFIG,
+        }
+    )
+
+    assert "exports/wireguard/robin-laptop-day12.conf" in html_report
+    assert "Sanitized Client Config Summary" not in html_report
+    for forbidden in (
+        "[Interface]",
+        "[Peer]",
+        "PrivateKey",
+        "PublicKey",
+        "AllowedIPs",
+        "Endpoint",
+        "PersistentKeepalive",
+        "Address",
+        "DNS",
+        "ListenPort",
+    ):
+        assert forbidden not in html_report
+
+
 def test_show_client_config_output_parsed_correctly():
     parsed = day12.parse_wireguard_client_config(CLIENT_CONFIG)
 

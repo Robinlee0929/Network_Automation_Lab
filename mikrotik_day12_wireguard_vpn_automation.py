@@ -115,11 +115,23 @@ def sanitize_client_config_for_report(config_text: str) -> str:
     )
 
 
+def redact_private_keys(value: Any) -> Any:
+    if isinstance(value, str):
+        return sanitize_client_config_for_report(value)
+    if isinstance(value, dict):
+        return {key: redact_private_keys(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [redact_private_keys(item) for item in value]
+    if isinstance(value, tuple):
+        return tuple(redact_private_keys(item) for item in value)
+    return value
+
+
 def private_key_leaked(value: Any) -> bool:
     if isinstance(value, str):
         for line in value.splitlines():
             match = re.match(r"(?i)^\s*PrivateKey\s*=\s*(.*?)\s*$", line)
-            if match and match.group(1) != "REDACTED":
+            if match and match.group(1).strip().upper() != "REDACTED":
                 return True
         return False
     if isinstance(value, dict):
@@ -794,14 +806,20 @@ def write_reports(report: Dict[str, Any]) -> Tuple[Path, Path]:
     json_path = report_dir / "day12_wireguard_vpn_automation_report.json"
     html_path = report_dir / "day12_wireguard_vpn_automation_report.html"
     if private_key_leaked(report):
+        report = redact_private_keys(report)
         report["overall_result"] = "FAIL"
         report.setdefault("errors", []).append("PrivateKey leaked into report before write.")
+        report.setdefault("checks", {})["private_key_redacted_in_report"] = "FAIL"
     json_path.write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     html_path.write_text(build_html_report(report), encoding="utf-8")
     return json_path, html_path
 
 
 def build_html_report(report: Dict[str, Any]) -> str:
+    wireguard_summary = report.get("wireguard_summary", {})
+    exported_config_path = ""
+    if isinstance(wireguard_summary, dict):
+        exported_config_path = str(wireguard_summary.get("exported_config_path", ""))
     rows = "\n".join(
         f"<tr><td>{html.escape(name)}</td><td class='{html.escape(str(status).lower())}'>{html.escape(str(status))}</td></tr>"
         for name, status in report.get("checks", {}).items()
@@ -809,12 +827,11 @@ def build_html_report(report: Dict[str, Any]) -> str:
     warnings = "".join(f"<li>{html.escape(item)}</li>" for item in report.get("warnings", [])) or "<li>None</li>"
     errors = "".join(f"<li>{html.escape(item)}</li>" for item in report.get("errors", [])) or "<li>None</li>"
     suggestions = "".join(f"<pre>{html.escape(item)}</pre>" for item in report.get("suggestions", [])) or "<p>None</p>"
-    sanitized = html.escape(report.get("sanitized_client_config_summary", ""))
     return f"""<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Day12 WireGuard VPN Automation</title>
+  <title>WireGuard VPN Automation</title>
   <style>
     body {{ font-family: Segoe UI, Arial, sans-serif; margin: 24px; color: #1f2937; }}
     .badge {{ display: inline-block; padding: 4px 10px; border-radius: 4px; font-weight: 700; }}
@@ -825,17 +842,16 @@ def build_html_report(report: Dict[str, Any]) -> str:
   </style>
 </head>
 <body>
-  <h1>Day12 WireGuard VPN Automation</h1>
+  <h1>WireGuard VPN Automation</h1>
   <p><strong>Device:</strong> {html.escape(str(report.get("device_name", "")))}</p>
   <p><strong>Result:</strong> <span class="badge {html.escape(str(report.get("overall_result", "")).lower())}">{html.escape(str(report.get("overall_result", "")))}</span></p>
-  <h2>WireGuard Summary</h2>
-  <pre>{html.escape(json.dumps(report.get("wireguard_summary", {}), indent=2, ensure_ascii=False))}</pre>
+  <h2>Exported Config</h2>
+  <p><strong>Path:</strong> {html.escape(exported_config_path)}</p>
   <h2>Checks</h2>
   <table><tbody>{rows}</tbody></table>
   <h2>Warnings</h2><ul>{warnings}</ul>
   <h2>Errors</h2><ul>{errors}</ul>
   <h2>Suggestions</h2>{suggestions}
-  <h2>Sanitized Client Config Summary</h2><pre>{sanitized}</pre>
 </body>
 </html>
 """
