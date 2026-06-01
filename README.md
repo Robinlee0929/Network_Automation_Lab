@@ -6,7 +6,7 @@ Network Automation Lab is a Python-based lab automation project for validating n
 
 A Python-based network automation and validation lab for MikroTik RouterOS, Cisco switch topology checks, iperf3 performance testing, regression checks, and local report visualization.
 
-The current implementation covers Day 1 through Day 11:
+The current implementation covers Day 1 through Day 12:
 
 - MikroTik baseline and post-reset validation
 - MikroTik Day 2 setup workflow after reset
@@ -18,6 +18,7 @@ The current implementation covers Day 1 through Day 11:
 - Day 9 Router performance regression framework
 - Day 10 Local dashboard for report visualization
 - Day 11 Dashboard safe command execution and execution log viewer
+- Day 12 WireGuard VPN client config export and throughput baseline automation
 
 The project is designed as a practical QA Automation / SDET portfolio project for network infrastructure. It focuses on repeatable validation, structured test evidence, and readable JSON / HTML reports rather than one-off manual checks.
 
@@ -41,6 +42,7 @@ This project exists to turn a home lab network into an automated testing target:
 - Multi-device MikroTik baseline validation using device profiles from `config.json`.
 - Cisco switch topology validation using a separate Cisco config file.
 - Lab-level topology summary based on existing JSON reports.
+- WireGuard client config export and VPN throughput baseline evidence.
 - JSON and HTML report output for device-level and lab-level evidence.
 - Adapter-oriented structure for cross-platform baseline validation experiments.
 - Password-safe workflow: runtime password prompts are used, and passwords are not written to reports.
@@ -69,6 +71,7 @@ Cisco validation is read-only. It runs show commands for topology evidence and d
 | Day 9 | Repeatable iperf3 router performance regression with JSON / HTML / TXT reports | Complete |
 | Day 10 | Local dashboard for viewing reports and safe command examples | Complete |
 | Day 11 | Dashboard safe command execution and execution log viewer | Complete |
+| Day 12 | WireGuard VPN client config export and throughput baseline automation | Complete |
 
 ## Lab Topology
 
@@ -490,6 +493,110 @@ Run Day11 tests:
 python -m pytest tests/test_dashboard_command_runner.py tests/test_dashboard_app.py
 ```
 
+## Day12 WireGuard VPN Automation
+
+Day 12 automates WireGuard client config export and VPN throughput baseline validation for the MikroTik lab. It keeps the real WireGuard client `.conf` local, validates router-side state, checks tunnel connectivity after the client is active, and records forward/reverse iperf3 evidence in JSON and HTML reports.
+
+Purpose:
+
+- Export a Windows WireGuard client config from an existing MikroTik peer.
+- Validate `wg0`, peer state, firewall rules, handshake, rx/tx, LAN reachability, TCP 5201, and iperf3 throughput.
+- Keep secrets out of Git, reports, README, PRs, and dashboard pages.
+
+Topology:
+
+```text
+WAN PC WireGuard Client 10.10.10.2
+MikroTik hEX S wg0 10.10.10.1
+LAN PC iperf3 Server 192.168.88.254
+```
+
+Manual baseline summary:
+
+- WireGuard interface: `wg0`
+- MikroTik wg0 IP: `10.10.10.1/24`
+- Client IP: `10.10.10.2/32`
+- Endpoint host: `192.168.0.199`
+- LAN gateway: `192.168.88.1`
+- LAN host / iperf3 server: `192.168.88.254`
+- Forward iperf manual baseline: `201 Mbps`
+- Reverse iperf manual baseline: `272 Mbps`
+
+Run examples:
+
+```powershell
+python mikrotik_day12_wireguard_vpn_automation.py --device-name Hex-s-2025-lab01
+```
+
+```powershell
+python mikrotik_day12_wireguard_vpn_automation.py --device-name Hex-s-2025-lab01 --expect-connected
+```
+
+```powershell
+python mikrotik_day12_wireguard_vpn_automation.py --device-name Hex-s-2025-lab01 --run-iperf
+```
+
+```powershell
+python mikrotik_day12_wireguard_vpn_automation.py --device-name Hex-s-2025-lab01 --conf-filename robin-laptop-day12.conf
+```
+
+For repeated runs, save a local non-secret Day12 config:
+
+```powershell
+python mikrotik_day12_wireguard_vpn_automation.py --device-name Hex-s-2025-lab01 --router-host 192.168.0.199 --conf-filename robin-laptop-day12.conf --save-config
+```
+
+Then run:
+
+```powershell
+python mikrotik_day12_wireguard_vpn_automation.py --config Set_WireguardVPN_config.json --run-iperf
+```
+
+Expected export path:
+
+```text
+exports/wireguard/<filename>.conf
+```
+
+Report paths:
+
+```text
+reports/<device_name>/day12_wireguard_vpn_automation_report.json
+reports/<device_name>/day12_wireguard_vpn_automation_report.html
+```
+
+iperf3 examples:
+
+```powershell
+iperf3 -c 192.168.88.254 -t 40 -O 10 -P 4
+```
+
+```powershell
+iperf3 -c 192.168.88.254 -t 40 -O 10 -P 4 -R
+```
+
+Safety notes:
+
+- Do not upload `.conf` files to GitHub.
+- Do not upload QR codes.
+- Do not paste `PrivateKey` into README, reports, issues, PRs, or chat.
+- `.conf` files contain the client `PrivateKey` and must stay local.
+- Reports must show `PrivateKey` as `REDACTED`.
+- Dashboard must not display full `.conf` content.
+- `reports/`, `exports/`, `.conf`, and local secret config files must stay ignored.
+
+Troubleshooting notes:
+
+- If Windows WireGuard shows connected but MikroTik rx/tx is `0`, check the UDP `13231` input firewall rule before the final input drop rule.
+- If `192.168.88.1` is reachable but `192.168.88.254` is not, check the LAN PC firewall and default gateway.
+- If iperf3 TCP `5201` fails, check the LAN PC iperf3 server and Windows firewall.
+- If `Endpoint` has a duplicated port, make sure `client-endpoint` is host only, not `host:port`, when building the MikroTik peer config.
+- If `--run-iperf` fails, first verify:
+
+```powershell
+Test-NetConnection 192.168.88.254 -Port 5201
+```
+
 ## How to Read Reports
 
 Reports are written as structured evidence for each workflow.
@@ -571,6 +678,13 @@ Day 9 router performance regression:
 reports/Hex-s-2025-lab01/day9_performance_regression_report.json
 reports/Hex-s-2025-lab01/day9_performance_regression_report.html
 reports/Hex-s-2025-lab01/day9_performance_regression_report.txt
+```
+
+Day 12 WireGuard VPN automation:
+
+```text
+reports/Hex-s-2025-lab01/day12_wireguard_vpn_automation_report.json
+reports/Hex-s-2025-lab01/day12_wireguard_vpn_automation_report.html
 ```
 
 ## Testing Strategy

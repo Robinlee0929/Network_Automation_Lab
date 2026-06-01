@@ -88,6 +88,13 @@ def test_classify_report_type_recognizes_day8_and_day9():
     )
 
 
+def test_classify_report_type_recognizes_wireguard_vpn():
+    assert (
+        dashboard.classify_report_type("day12_wireguard_vpn_automation_report.json")
+        == "WireGuard VPN automation"
+    )
+
+
 def test_ai_review_checklist_documents_day11_controls():
     checklist = dashboard.ai_review_checklist()
 
@@ -98,6 +105,139 @@ def test_ai_review_checklist_documents_day11_controls():
     assert "Allowlist-only execution" in text
     assert "Day9 performance_regression.py should not run from the dashboard" in text
     assert "local system time" in text
+
+
+def test_ai_review_checklist_contains_wireguard_vpn_safety_items():
+    checklist = dashboard.ai_review_checklist()
+
+    text = " ".join(
+        f"{item['category']} {item['item']} {item['expected']} {item['evidence']}"
+        for item in checklist
+    )
+    assert "Exported config stays local" in text
+    assert "Dashboard does not read exports/wireguard" in text
+    assert "shell=False" in text
+
+
+def day12_report(private_key_line="PrivateKey = REDACTED"):
+    return {
+        "device_name": "Hex-s-2025-lab01",
+        "overall_result": "PASS",
+        "wireguard_summary": {
+            "interface_name": "wg0",
+            "peer_name": "pc-wg-day12",
+            "client_address": "10.10.10.2/32",
+            "exported_config_path": "exports/wireguard/robin-laptop-day12.conf",
+        },
+        "checks": {
+            "handshake_seen": "PASS",
+            "ping_lan_gateway": "PASS",
+            "ping_lan_host": "PASS",
+            "tcp_5201_reachable": "PASS",
+        },
+        "iperf_summary": {
+            "forward_mbps": 192.0,
+            "reverse_mbps": 284.0,
+        },
+        "sanitized_client_config_summary": f"[Interface]\n{private_key_line}\nAddress = 10.10.10.2/32",
+    }
+
+
+def test_day12_dashboard_summary_uses_report_json_only(tmp_path):
+    reports_dir = tmp_path / "reports"
+    write_json(
+        reports_dir / "Hex-s-2025-lab01" / "day12_wireguard_vpn_automation_report.json",
+        day12_report(),
+    )
+    (reports_dir / "Hex-s-2025-lab01" / "day12_wireguard_vpn_automation_report.html").write_text(
+        "<html>WireGuard</html>",
+        encoding="utf-8",
+    )
+    exports_dir = tmp_path / "exports" / "wireguard"
+    exports_dir.mkdir(parents=True)
+    (exports_dir / "robin-laptop-day12.conf").write_text(
+        "PrivateKey = should-never-be-read",
+        encoding="utf-8",
+    )
+
+    summaries = dashboard.build_day12_dashboard_summaries(reports_dir)
+
+    assert summaries[0]["overall_result"] == "PASS"
+    assert summaries[0]["interface_name"] == "wg0"
+    assert summaries[0]["peer_name"] == "pc-wg-vpn"
+    assert summaries[0]["client_address"] == "10.10.10.2/32"
+    assert summaries[0]["exported_config_path"] == "exports/wireguard/robin-laptop-vpn.conf"
+    assert summaries[0]["iperf_forward_mbps"] == "192.0"
+    assert summaries[0]["iperf_reverse_mbps"] == "284.0"
+    assert "should-never-be-read" not in json.dumps(summaries)
+
+
+def test_day12_dashboard_redacts_unredacted_private_key_from_report(tmp_path):
+    reports_dir = tmp_path / "reports"
+    write_json(
+        reports_dir / "Hex-s-2025-lab01" / "day12_wireguard_vpn_automation_report.json",
+        day12_report("PrivateKey = real-secret"),
+    )
+
+    summaries = dashboard.build_day12_dashboard_summaries(reports_dir)
+
+    assert "real-secret" not in json.dumps(summaries)
+    assert summaries[0]["sanitized_client_config_summary"] == "PrivateKey: REDACTED"
+
+
+def test_day12_dashboard_handles_missing_report_gracefully(tmp_path):
+    assert dashboard.build_day12_dashboard_summaries(tmp_path / "missing") == []
+
+
+def test_day12_dashboard_route_shows_fields_without_conf_content(tmp_path):
+    if dashboard.Flask is None:
+        pytest.skip("Flask is not installed in this test environment.")
+
+    reports_dir = tmp_path / "reports"
+    write_json(
+        reports_dir / "Hex-s-2025-lab01" / "day12_wireguard_vpn_automation_report.json",
+        day12_report(),
+    )
+    (reports_dir / "Hex-s-2025-lab01" / "day12_wireguard_vpn_automation_report.html").write_text(
+        "<html>WireGuard</html>",
+        encoding="utf-8",
+    )
+
+    app = dashboard.create_app(
+        reports_dir=reports_dir,
+        execution_logs_dir=tmp_path / "execution_logs",
+    )
+    response = app.test_client().get("/reports")
+
+    assert response.status_code == 200
+    text = response.data.decode("utf-8")
+    assert "WireGuard VPN Automation" in text
+    assert "exports/wireguard/robin-laptop-vpn.conf" in text
+    assert "192.0" in text
+    assert "284.0" in text
+    assert "PrivateKey" not in text
+    assert "[Interface]" not in text
+    assert "Day12" not in text
+    assert "day12_wireguard" not in text
+
+
+def test_home_summary_includes_missing_wireguard_vpn_card():
+    cards = dashboard.build_summary_cards([])
+
+    card = next(card for card in cards if card["title"] == "WireGuard VPN")
+    assert card["missing"] is True
+    assert card["status"] == "UNKNOWN"
+
+
+def test_readme_contains_day12_section_and_safety_notes():
+    readme = Path("README.md").read_text(encoding="utf-8")
+
+    assert "## Day12 WireGuard VPN Automation" in readme
+    assert "exports/wireguard/<filename>.conf" in readme
+    assert "reports/<device_name>/day12_wireguard_vpn_automation_report.json" in readme
+    assert "Reports must show `PrivateKey` as `REDACTED`" in readme
+    assert "Dashboard must not display full `.conf` content" in readme
+
 
 
 def test_flask_routes_are_available(tmp_path):

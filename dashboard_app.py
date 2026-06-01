@@ -1,4 +1,5 @@
 import json
+import re
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
@@ -51,6 +52,39 @@ class ReportEntry:
     relative_path: str
     html_relative_path: Optional[str]
     modified_at: str
+
+
+DAY12_REPORT_JSON = "day12_wireguard_vpn_automation_report.json"
+DAY12_REPORT_HTML = "day12_wireguard_vpn_automation_report.html"
+
+
+def contains_unredacted_private_key(value: Any) -> bool:
+    if isinstance(value, str):
+        for line in value.splitlines():
+            if "PrivateKey" not in line:
+                continue
+            if "PrivateKey = REDACTED" not in line and "PrivateKey=REDACTED" not in line:
+                return True
+        return False
+    if isinstance(value, dict):
+        return any(contains_unredacted_private_key(item) for item in value.values())
+    if isinstance(value, list):
+        return any(contains_unredacted_private_key(item) for item in value)
+    return False
+
+
+def safe_day12_value(value: Any, fallback: str = "Not found") -> str:
+    if value in (None, ""):
+        return fallback
+    text = str(value)
+    if contains_unredacted_private_key(text):
+        return "PrivateKey: REDACTED"
+    return text
+
+
+def dashboard_wireguard_label(value: Any, fallback: str = "Not found") -> str:
+    text = safe_day12_value(value, fallback)
+    return re.sub("day12", "vpn", text, flags=re.IGNORECASE)
 
 
 def normalize_status(value: Any) -> str:
@@ -113,6 +147,8 @@ def classify_report_type(filename_or_path: Any) -> str:
         return "Day8 iperf3 performance"
     if "day9" in name or "performance_regression" in path_text:
         return "Day9 performance regression"
+    if "day12" in name or "wireguard_vpn_automation" in name:
+        return "WireGuard VPN automation"
     return "Unknown report"
 
 
@@ -200,6 +236,7 @@ def build_summary_cards(entries: List[ReportEntry]) -> List[Dict[str, Any]]:
         ("Lab topology summary", ("Day6 lab topology summary",)),
         ("iperf3 performance", ("Day8 iperf3 performance",)),
         ("Performance regression", ("Day9 performance regression",)),
+        ("WireGuard VPN", ("WireGuard VPN automation",)),
     ]
     cards = []
     for title, report_types in categories:
@@ -217,6 +254,65 @@ def build_summary_cards(entries: List[ReportEntry]) -> List[Dict[str, Any]]:
             }
         )
     return cards
+
+
+def build_day12_dashboard_summaries(reports_dir: Path) -> List[Dict[str, Any]]:
+    reports_dir = Path(reports_dir)
+    if not reports_dir.exists():
+        return []
+
+    summaries: List[Dict[str, Any]] = []
+    for json_path in sorted(reports_dir.rglob(DAY12_REPORT_JSON)):
+        if _is_excluded_report_path(json_path, reports_dir):
+            continue
+        try:
+            report = json.loads(json_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        if contains_unredacted_private_key(report):
+            report = dict(report)
+            report["sanitized_client_config_summary"] = "PrivateKey: REDACTED"
+
+        relative_json = _relative_report_path(json_path, reports_dir)
+        html_path = json_path.with_name(DAY12_REPORT_HTML)
+        html_relative_path = (
+            _relative_report_path(html_path, reports_dir) if html_path.exists() else None
+        )
+        checks = report.get("checks", {}) if isinstance(report.get("checks"), dict) else {}
+        wireguard = (
+            report.get("wireguard_summary", {})
+            if isinstance(report.get("wireguard_summary"), dict)
+            else {}
+        )
+        iperf = (
+            report.get("iperf_summary", {})
+            if isinstance(report.get("iperf_summary"), dict)
+            else {}
+        )
+        sanitized_summary = safe_day12_value(
+            report.get("sanitized_client_config_summary", ""), ""
+        )
+        summaries.append(
+            {
+                "device_name": safe_day12_value(report.get("device_name"), _device_name(json_path, reports_dir)),
+                "device_folder": _device_name(json_path, reports_dir),
+                "overall_result": normalize_status(report.get("overall_result")),
+                "interface_name": dashboard_wireguard_label(wireguard.get("interface_name")),
+                "peer_name": dashboard_wireguard_label(wireguard.get("peer_name")),
+                "client_address": dashboard_wireguard_label(wireguard.get("client_address")),
+                "exported_config_path": dashboard_wireguard_label(wireguard.get("exported_config_path")),
+                "handshake_status": dashboard_wireguard_label(checks.get("handshake_seen")),
+                "ping_lan_gateway": dashboard_wireguard_label(checks.get("ping_lan_gateway")),
+                "ping_lan_host": dashboard_wireguard_label(checks.get("ping_lan_host")),
+                "tcp_5201": dashboard_wireguard_label(checks.get("tcp_5201_reachable")),
+                "iperf_forward_mbps": dashboard_wireguard_label(iperf.get("forward_mbps"), "Not run"),
+                "iperf_reverse_mbps": dashboard_wireguard_label(iperf.get("reverse_mbps"), "Not run"),
+                "json_relative_path": relative_json,
+                "html_relative_path": html_relative_path,
+                "sanitized_client_config_summary": sanitized_summary,
+            }
+        )
+    return summaries
 
 
 def command_examples() -> List[Dict[str, str]]:
@@ -319,6 +415,42 @@ def ai_review_checklist() -> List[Dict[str, str]]:
             "expected": "Tests should verify registry behavior, unknown command rejection, log writing, failures, timeouts, and Flask routes.",
             "evidence": "tests/test_dashboard_command_runner.py and tests/test_dashboard_app.py.",
         },
+        {
+            "category": "WireGuard VPN safety",
+            "item": "Exported config stays local",
+            "expected": "Exported .conf files should stay under ignored exports/ and must not be committed.",
+            "evidence": ".gitignore includes exports/ and *.conf; the dashboard shows only the exported path.",
+        },
+        {
+            "category": "WireGuard VPN safety",
+            "item": "Reports and dashboard redact PrivateKey",
+            "expected": "Reports and dashboard must never render a real WireGuard PrivateKey or full .conf content.",
+            "evidence": "WireGuard VPN reports use PrivateKey = REDACTED; dashboard_app.py contains an unredacted PrivateKey guard.",
+        },
+        {
+            "category": "WireGuard VPN safety",
+            "item": "Dashboard does not read exports/wireguard",
+            "expected": "Dashboard should read WireGuard VPN JSON reports only and should not open exported .conf files.",
+            "evidence": "The WireGuard VPN summary builder reads report JSON files only.",
+        },
+        {
+            "category": "WireGuard VPN safety",
+            "item": "Filename and RouterOS command safety",
+            "expected": "Filename is sanitized, RouterOS commands are allowlisted, peer recreation and firewall fixes require explicit confirmation or flags.",
+            "evidence": "WireGuard VPN automation validates filenames, allowlists RouterOS commands, and gates peer/firewall changes.",
+        },
+        {
+            "category": "WireGuard VPN subprocess safety",
+            "item": "Local commands are allowlisted and timed",
+            "expected": "ping, Test-NetConnection, and iperf3 should run with shell=False and timeouts.",
+            "evidence": "Local subprocess builders return argument lists; run_subprocess() uses subprocess.run(..., shell=False, timeout=...).",
+        },
+        {
+            "category": "WireGuard VPN testing",
+            "item": "Secret and lab validation coverage exists",
+            "expected": "Tests should cover PrivateKey leak handling and real lab evidence should validate tunnel, LAN reachability, TCP 5201, and iperf3 throughput.",
+            "evidence": "Automated tests cover PrivateKey safety; lab report evidence shows overall_result PASS.",
+        },
     ]
 
 
@@ -358,10 +490,13 @@ def create_app(
         entries = discover_reports(app.config["REPORTS_DIR"])
         grouped: Dict[str, List[ReportEntry]] = {}
         for entry in entries:
+            if entry.report_type == "WireGuard VPN automation":
+                continue
             grouped.setdefault(entry.device, []).append(entry)
         return render_template(
             "dashboard_reports.html",
             grouped_reports=grouped,
+            day12_summaries=build_day12_dashboard_summaries(app.config["REPORTS_DIR"]),
             reports_exist=app.config["REPORTS_DIR"].exists(),
         )
 
@@ -422,6 +557,18 @@ def create_app(
             abort(404)
         safe_relative_path = requested.relative_to(reports_root).as_posix()
         return send_from_directory(str(reports_root), safe_relative_path)
+
+    @app.route("/reports/wireguard-vpn/<path:device_name>")
+    def open_wireguard_vpn_report(device_name: str):
+        reports_root = app.config["REPORTS_DIR"].resolve()
+        requested = (reports_root / device_name / DAY12_REPORT_HTML).resolve()
+        try:
+            requested.relative_to(reports_root)
+        except ValueError:
+            abort(404)
+        if not requested.is_file():
+            abort(404)
+        return send_from_directory(str(requested.parent), requested.name)
 
     @app.template_filter("status_class")
     def status_class(value: str) -> str:
