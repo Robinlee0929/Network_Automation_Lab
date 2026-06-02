@@ -6,7 +6,7 @@ exports/
 *.conf
 __pycache__/
 .pytest_cache/
-.pytest_tmp/
+.pytest_tmp*/
 .pytest-tmp/
 .venv/
 *.pyc

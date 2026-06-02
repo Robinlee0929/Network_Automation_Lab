@@ -357,6 +357,8 @@ def test_day12_config_file_loads_repeated_values_without_password(tmp_path, monk
                 "client_allowed_ips": "10.10.10.0/24,192.168.88.0/24",
                 "client_keepalive": 25,
                 "conf_filename": "robin-laptop-day12.conf",
+                "wg_router_ip": "10.10.10.1/24",
+                "lan_subnet": "192.168.88.0/24",
                 "lan_gateway_ip": "192.168.88.1",
                 "lan_host_ip": "192.168.88.254",
                 "iperf_server_ip": "192.168.88.254",
@@ -377,8 +379,45 @@ def test_day12_config_file_loads_repeated_values_without_password(tmp_path, monk
     assert config.router_host == "192.168.0.199"
     assert config.router_ssh_port == 2222
     assert config.conf_filename == "robin-laptop-day12.conf"
+    assert config.wg_router_ip == "10.10.10.1/24"
+    assert config.lan_subnet == "192.168.88.0/24"
     assert "router_password" not in saved
     assert "password" not in json.dumps(saved)
+
+
+def test_day12_cli_accepts_lab02_wireguard_router_ip_and_lan_subnet(monkeypatch):
+    monkeypatch.setattr(day12, "load_default_router_config", lambda: {"password": "secret"})
+
+    args = day12.parse_args(
+        [
+            "--device-name",
+            "Hex-s-2025-lab02",
+            "--router-host",
+            "192.168.0.113",
+            "--router-username",
+            "admin",
+            "--client-address",
+            "10.10.20.2/32",
+            "--client-allowed-ips",
+            "10.10.20.0/24,192.168.89.0/24",
+            "--wg-router-ip",
+            "10.10.20.1/24",
+            "--lan-subnet",
+            "192.168.89.0/24",
+            "--lan-gateway-ip",
+            "192.168.89.1",
+            "--lan-host-ip",
+            "192.168.89.200",
+            "--non-interactive",
+        ]
+    )
+    config = day12.build_config_from_args(args)
+    report = day12.make_initial_report(config)
+
+    assert config.wg_router_ip == "10.10.20.1/24"
+    assert config.lan_subnet == "192.168.89.0/24"
+    assert config.lan_gateway_ip == "192.168.89.1"
+    assert report["wireguard_summary"]["interface_ip"] == "10.10.20.1/24"
 
 
 def test_cli_values_override_day12_config_file(tmp_path, monkeypatch):
