@@ -299,7 +299,8 @@ def test_report_visibility_index_finds_partial_reports_and_marks_missing(tmp_pat
     output = capsys.readouterr().out
     assert exit_code == 0
     assert "Day4 Baseline Validation" in output
-    assert "Hex-s-2025-lab01: FOUND" in output
+    assert "[FOUND]" in output
+    assert "Hex-s-2025-lab01" in output
     assert "JSON: reports/Hex-s-2025-lab01/day4_baseline_validation.json" in output
     assert "Day8 iperf3 Performance" in output
     assert "HTML: reports/Hex-s-2025-lab01/day8_iperf3_WAN_TO_LAN_DNAT_report.html" in output

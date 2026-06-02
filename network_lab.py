@@ -717,20 +717,53 @@ def discover_report_visibility(project_root: Path) -> List[Dict[str, Any]]:
 
 def _print_report_visibility(rows: List[Dict[str, Any]]) -> None:
     print(format_heading("Report Index"))
+    counts = _count_report_statuses(rows)
+    status_width = max(22, max(len(str(row.get("status", ""))) + 2 for row in rows))
+    print(
+        "Summary: "
+        f"found={color_text(str(counts['found']), 'green', bold=True)} "
+        f"missing={color_text(str(counts['missing']), 'yellow', bold=True)} "
+        f"disabled={color_text(str(counts['disabled']), 'blue', bold=True)}"
+    )
     current_title = ""
     for row in rows:
         title = str(row["title"])
         if title != current_title:
             current_title = title
             print()
-            print(title)
-        print(f"  - {row['device']}: {row['status']}")
-        if row.get("json"):
-            print(f"    JSON: {row['json']}")
+            print(format_heading(f"{title} ({row['day']})"))
+            print(f"  {'Status':<{status_width}} {'Device':<24} Report paths")
+            print(f"  {'-' * status_width} {'-' * 24} {'-' * 42}")
+        status = _format_report_visibility_status(str(row["status"]))
+        print(f"  {status:<{status_width}} {str(row['device'])[:24]:<24} JSON: {row.get('json') or '-'}")
         if row.get("html"):
-            print(f"    HTML: {row['html']}")
+            print(f"  {'':<{status_width}} {'':<24} HTML: {row['html']}")
         if row.get("notes"):
-            print(f"    Notes: {row['notes']}")
+            print(f"  {'':<{status_width}} {'':<24} Notes: {row['notes']}")
+
+
+def _count_report_statuses(rows: List[Dict[str, Any]]) -> Dict[str, int]:
+    counts = {"found": 0, "missing": 0, "disabled": 0}
+    for row in rows:
+        status = str(row.get("status", "")).upper()
+        if status == "FOUND":
+            counts["found"] += 1
+        elif status == "MISSING":
+            counts["missing"] += 1
+        elif "DISABLED" in status:
+            counts["disabled"] += 1
+    return counts
+
+
+def _format_report_visibility_status(status: str) -> str:
+    normalized = status.upper()
+    if normalized == "FOUND":
+        return color_text("[FOUND]", "green", bold=True)
+    if normalized == "MISSING":
+        return color_text("[MISSING]", "yellow", bold=True)
+    if "DISABLED" in normalized:
+        return color_text(f"[{normalized}]", "blue", bold=True)
+    return color_text(f"[{normalized}]", "gray", bold=True)
 
 
 def _html_link_or_text(output_path: Path, project_root: Path, value: str) -> str:
@@ -743,6 +776,10 @@ def _html_link_or_text(output_path: Path, project_root: Path, value: str) -> str
     return html.escape(value)
 
 
+def _css_token(value: str) -> str:
+    return "".join(char.lower() if char.isalnum() else "-" for char in value).strip("-")
+
+
 def write_report_index_html(
     task_catalog: List[Dict[str, Any]],
     report_rows: List[Dict[str, Any]],
@@ -751,14 +788,15 @@ def write_report_index_html(
 ) -> None:
     output_path.parent.mkdir(parents=True, exist_ok=True)
     generated_at = datetime.now().replace(microsecond=0).isoformat(sep=" ")
+    counts = _count_report_statuses(report_rows)
     task_rows = "\n".join(
         "<tr>"
-        f"<td>{html.escape(str(task['task_id']))}</td>"
-        f"<td>{html.escape(str(task['day']))}</td>"
+        f"<td><code>{html.escape(str(task['task_id']))}</code></td>"
+        f"<td><span class=\"pill pill-day\">{html.escape(str(task['day']))}</span></td>"
         f"<td>{html.escape(str(task['display_name']))}</td>"
         f"<td>{html.escape(str(task['category']))}</td>"
-        f"<td>{html.escape(str(task['safety_level']))}</td>"
-        f"<td>{'yes' if task['enabled'] else 'no'}</td>"
+        f"<td><span class=\"pill safety-{_css_token(str(task['safety_level']))}\">{html.escape(str(task['safety_level']))}</span></td>"
+        f"<td><span class=\"pill {'enabled' if task['enabled'] else 'disabled'}\">{'yes' if task['enabled'] else 'no'}</span></td>"
         f"<td>{html.escape(str(task['execution_mode']))}</td>"
         f"<td>{'yes' if task['requires_live_device'] else 'no'}</td>"
         "</tr>"
@@ -766,10 +804,10 @@ def write_report_index_html(
     )
     report_table_rows = "\n".join(
         "<tr>"
-        f"<td>{html.escape(str(row['day']))}</td>"
+        f"<td><span class=\"pill pill-day\">{html.escape(str(row['day']))}</span></td>"
         f"<td>{html.escape(str(row['title']))}</td>"
         f"<td>{html.escape(str(row['device']))}</td>"
-        f"<td>{html.escape(str(row['status']))}</td>"
+        f"<td><span class=\"pill status-{_css_token(str(row['status']))}\">{html.escape(str(row['status']))}</span></td>"
         f"<td>{_html_link_or_text(output_path, project_root, str(row.get('json', '')))}</td>"
         f"<td>{_html_link_or_text(output_path, project_root, str(row.get('html', '')))}</td>"
         f"<td>{html.escape(str(row.get('notes', '')))}</td>"
@@ -777,7 +815,7 @@ def write_report_index_html(
         for row in report_rows
     )
     safety_rows = "\n".join(
-        f"<tr><td>{html.escape(level)}</td><td>{html.escape(description)}</td></tr>"
+        f"<tr><td><span class=\"pill safety-{_css_token(level)}\">{html.escape(level)}</span></td><td>{html.escape(description)}</td></tr>"
         for level, description in SAFETY_LEVELS.items()
     )
     html_text = f"""<!doctype html>
@@ -786,22 +824,70 @@ def write_report_index_html(
   <meta charset="utf-8">
   <title>Network Automation Lab Report Index</title>
   <style>
-    body {{ margin: 0; font-family: Arial, sans-serif; background: #f6f8fb; color: #172033; }}
-    header {{ background: #263244; color: white; padding: 28px 36px; }}
-    main {{ padding: 24px 36px 44px; }}
-    h1 {{ margin: 0 0 8px; font-size: 28px; }}
-    h2 {{ margin-top: 28px; font-size: 20px; }}
-    table {{ width: 100%; border-collapse: collapse; background: white; border: 1px solid #d8e0ec; }}
-    th, td {{ padding: 9px 10px; border-bottom: 1px solid #d8e0ec; text-align: left; vertical-align: top; }}
+    :root {{
+      --bg: #f4f7fb;
+      --panel: #ffffff;
+      --ink: #182230;
+      --muted: #667085;
+      --line: #d8e0ec;
+      --head: #27364a;
+      --blue: #155bb5;
+      --green-bg: #e7f7ee;
+      --green: #147a3d;
+      --yellow-bg: #fff4d8;
+      --yellow: #8a6100;
+      --red-bg: #fdecec;
+      --red: #b42318;
+      --blue-bg: #e6f0ff;
+      --blue-ink: #1849a9;
+      --gray-bg: #eef2f6;
+      --gray: #475467;
+    }}
+    * {{ box-sizing: border-box; }}
+    body {{ margin: 0; font-family: Arial, sans-serif; background: var(--bg); color: var(--ink); font-size: 14px; }}
+    header {{ background: var(--head); color: white; padding: 30px 38px 26px; }}
+    main {{ padding: 26px 38px 48px; }}
+    h1 {{ margin: 0 0 8px; font-size: 30px; letter-spacing: 0; }}
+    h2 {{ margin: 28px 0 12px; font-size: 19px; }}
+    table {{ width: 100%; border-collapse: collapse; background: var(--panel); border: 1px solid var(--line); box-shadow: 0 10px 24px rgba(16, 24, 40, .06); }}
+    th, td {{ padding: 10px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }}
     th {{ background: #edf2f8; color: #435066; font-size: 12px; text-transform: uppercase; }}
-    a {{ color: #155bb5; font-weight: 700; text-decoration: none; }}
-    .warning {{ background: #fff4d8; border: 1px solid #f0c66a; padding: 12px 14px; margin-top: 16px; }}
+    tr:nth-child(even) td {{ background: #fafcff; }}
+    code {{ font-family: Consolas, "Courier New", monospace; overflow-wrap: anywhere; }}
+    a {{ color: var(--blue); font-weight: 700; text-decoration: none; }}
+    a:hover {{ text-decoration: underline; }}
+    .meta {{ color: #dbe5f3; }}
+    .warning {{ background: var(--yellow-bg); border: 1px solid #f0c66a; border-radius: 8px; padding: 12px 14px; margin: 18px 0 20px; color: var(--yellow); }}
+    .summary {{ display: grid; grid-template-columns: repeat(4, minmax(120px, 1fr)); gap: 12px; margin-top: 18px; }}
+    .metric {{ background: rgba(255, 255, 255, .10); border: 1px solid rgba(255, 255, 255, .20); border-radius: 8px; padding: 13px 14px; }}
+    .metric-label {{ color: #dbe5f3; font-size: 12px; font-weight: 700; text-transform: uppercase; }}
+    .metric-value {{ margin-top: 4px; font-size: 24px; font-weight: 800; }}
+    .pill {{ display: inline-block; border-radius: 999px; padding: 4px 9px; font-size: 12px; font-weight: 800; white-space: nowrap; }}
+    .pill-day {{ background: var(--gray-bg); color: var(--gray); }}
+    .enabled, .status-found {{ background: var(--green-bg); color: var(--green); }}
+    .disabled, .status-disabled-for-day17, .safety-future-reserved {{ background: var(--blue-bg); color: var(--blue-ink); }}
+    .status-missing {{ background: var(--yellow-bg); color: var(--yellow); }}
+    .safety-safe-read-only {{ background: var(--green-bg); color: var(--green); }}
+    .safety-live-read-only {{ background: #e7f0fb; color: #175cd3; }}
+    .safety-live-performance {{ background: #f3e8ff; color: #6941c6; }}
+    .safety-live-config-change {{ background: var(--red-bg); color: var(--red); }}
+    @media (max-width: 820px) {{
+      header, main {{ padding-left: 16px; padding-right: 16px; }}
+      .summary {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }}
+      table {{ display: block; overflow-x: auto; }}
+    }}
   </style>
 </head>
 <body>
   <header>
     <h1>Network Automation Lab Report Index</h1>
-    <div>Generated {html.escape(generated_at)}</div>
+    <div class="meta">Generated {html.escape(generated_at)}</div>
+    <section class="summary">
+      <div class="metric"><div class="metric-label">Tasks</div><div class="metric-value">{len(task_catalog)}</div></div>
+      <div class="metric"><div class="metric-label">Reports Found</div><div class="metric-value">{counts['found']}</div></div>
+      <div class="metric"><div class="metric-label">Missing</div><div class="metric-value">{counts['missing']}</div></div>
+      <div class="metric"><div class="metric-label">Disabled</div><div class="metric-value">{counts['disabled']}</div></div>
+    </section>
   </header>
   <main>
     <div class="warning">WireGuard live execution is not enabled in Day17. WireGuard live runner integration is intentionally disabled and reserved for Day18.</div>
