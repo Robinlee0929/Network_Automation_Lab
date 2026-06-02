@@ -68,6 +68,56 @@ def write_day8_performance_profile(tmp_path: Path) -> Path:
     return profile_path
 
 
+def write_wireguard_runner_config(tmp_path: Path, data=None, filename: str = "Set_WireguardVPN_config.json") -> Path:
+    config_path = tmp_path / filename
+    write_json(
+        config_path,
+        data
+        or {
+            "device_name": "Hex-s-2025-lab01",
+            "router_host": "192.168.0.199",
+            "router_username": "admin",
+            "wg_interface": "wg0",
+            "peer_name": "pc-wg",
+            "lan_gateway_ip": "192.168.88.1",
+            "lan_host_ip": "192.168.88.254",
+            "iperf_server_ip": "192.168.88.254",
+            "client_address": "10.10.10.2/32",
+        },
+    )
+    return config_path
+
+
+def write_delegated_day12_report(tmp_path: Path, device_name: str = "Hex-s-2025-lab02", data=None) -> Path:
+    report_path = tmp_path / "reports" / device_name / "day12_wireguard_vpn_automation_report.json"
+    write_json(
+        report_path,
+        data
+        or {
+            "overall_result": "PASS",
+            "checks": {
+                "wg_interface_exists": "PASS",
+                "peer_exists": "PASS",
+                "initial_handshake_seen": "PASS",
+                "post_connectivity_handshake_seen": "PASS",
+                "final_vpn_connectivity": "PASS",
+                "ping_lan_gateway": "PASS",
+                "ping_lan_host": "PASS",
+                "tcp_5201_reachable": "PASS",
+                "iperf_forward": "PASS",
+                "iperf_reverse": "PASS",
+            },
+            "iperf_summary": {
+                "forward_mbps": 166.0,
+                "reverse_mbps": 225.0,
+            },
+        },
+    )
+    html_path = report_path.with_suffix(".html")
+    html_path.write_text("<html><body>Day12 report</body></html>", encoding="utf-8")
+    return report_path
+
+
 def test_load_lab_runner_profile_loads_valid_profile():
     loaded = network_lab.load_lab_runner_profile(
         Path("topology_profiles/day14_lab_runner_profile.json")
@@ -249,6 +299,7 @@ def test_task_catalog_contains_day17_required_fields():
         "report_index",
         "day4_baseline_validation",
         "day8_iperf3_performance",
+        "wireguard_runner_safety_layer",
         "day13_wireguard_summary_only",
     }
 
@@ -266,7 +317,7 @@ def test_list_tasks_does_not_execute_live_device_commands(monkeypatch, capsys):
     assert "Task Catalog" in output
     assert "LIVE_READ_ONLY" in output
     assert "LIVE_PERFORMANCE" in output
-    assert "FUTURE_RESERVED" in output
+    assert "guarded-live" in output
 
 
 def test_report_visibility_index_works_when_reports_directory_is_missing(tmp_path, capsys):
@@ -280,7 +331,7 @@ def test_report_visibility_index_works_when_reports_directory_is_missing(tmp_pat
     assert "disabled=" in output
     assert "Output: reports/report_index.html" in output
     assert "MISSING" in output
-    assert "WireGuard live runner integration is intentionally disabled in Day17" in output
+    assert "Day18 WireGuard runner integration uses dry-run and explicit confirmation guardrails" in output
     assert (tmp_path / "reports/report_index.html").exists()
 
 
@@ -309,7 +360,7 @@ def test_report_visibility_index_finds_partial_reports_and_marks_missing(tmp_pat
     assert "Day8 iperf3 Performance" in output
     assert "HTML: reports/Hex-s-2025-lab01/day8_iperf3_WAN_TO_LAN_DNAT_report.html" in output
     assert "Day13 WireGuard Live Execution" in output
-    assert "DISABLED FOR DAY17" in output
+    assert "DISABLED FOR DAY18" in output
     assert "Expected Cisco switch report was not found in local reports folder." in output
 
 
@@ -338,19 +389,31 @@ def test_report_visibility_console_compacts_historical_day13_reports(tmp_path, c
     assert "day13_multi_router_wireguard_client_to_site_summary_20260602_0001.json" in output
     assert "day13_multi_router_wireguard_client_to_site_summary_20260602_0004.json" not in output
     assert "Expected Cisco switch report was not found in local reports folder." in output
-    assert "DISABLED FOR DAY17" in output
+    assert "DISABLED FOR DAY18" in output
     html = (tmp_path / "reports/report_index.html").read_text(encoding="utf-8")
     assert "day13_multi_router_wireguard_client_to_site_summary_20260602_0006.json" in html
 
 
-def test_wireguard_catalog_entries_are_disabled_or_future_reserved():
+def test_wireguard_runner_catalog_entry_uses_feature_identity():
     wireguard_tasks = [task for task in network_lab.list_tasks() if task["category"] == "vpn"]
 
     assert wireguard_tasks
-    for task in wireguard_tasks:
-        assert task["enabled"] is False
-        assert task["safety_level"] == "FUTURE_RESERVED"
-        assert "Day18" in task["notes"]
+    runner = next(task for task in wireguard_tasks if task["id"] == "wireguard-runner")
+    assert runner["task_id"] == "wireguard_runner_safety_layer"
+    assert runner["display_name"] == "WireGuard Runner Safety Layer"
+    assert runner["day"] == "Day18"
+    assert runner["enabled"] is True
+    assert runner["safety_level"] == "guarded-live"
+    assert runner["execution_mode"] == "dry-run by default"
+    assert runner["report_output_path"] == "reports/lab-summary/wireguard_runner_safety_layer.json"
+
+
+def test_day13_wireguard_summary_remains_disabled_until_own_safety_layer():
+    day13 = next(task for task in network_lab.list_tasks() if task["id"] == "day13-wireguard-summary")
+
+    assert day13["enabled"] is False
+    assert day13["safety_level"] == "FUTURE_RESERVED"
+    assert "Day13 summary remains report-only in Day18" in day13["notes"]
 
 
 def test_wireguard_placeholder_does_not_call_live_scripts(tmp_path, monkeypatch, capsys):
@@ -363,7 +426,11 @@ def test_wireguard_placeholder_does_not_call_live_scripts(tmp_path, monkeypatch,
 
     output = capsys.readouterr().out
     assert exit_code == 0
-    assert "WireGuard live runner integration is intentionally disabled in Day17" in output
+    assert "Day18 WireGuard runner integration uses dry-run and explicit confirmation guardrails" in output
+    assert "WireGuard Runner Safety Layer" in output
+    assert "reports/lab-summary/wireguard_runner_safety_layer.json" in output
+    assert "day12-wireguard-live-validation" not in output
+    assert "day18-wireguard-runner" not in output
 
 
 def test_html_report_index_generation_contains_catalog_reports_and_legend(tmp_path):
@@ -377,7 +444,10 @@ def test_html_report_index_generation_contains_catalog_reports_and_legend(tmp_pa
     assert "Task Catalog Summary" in html
     assert "Report Visibility" in html
     assert "Safety Level Legend" in html
-    assert "WireGuard live execution is not enabled in Day17" in html
+    assert "Day18 WireGuard runner integration uses a safety layer" in html
+    assert "WireGuard Runner Safety Layer" in html
+    assert "day12-wireguard-live-validation" not in html
+    assert "day18-wireguard-runner" not in html
 
 
 def test_report_index_does_not_print_config_json_secret_content(tmp_path, capsys):
@@ -633,6 +703,493 @@ def test_cli_day8_performance_nonzero_subprocess_return_code_is_returned(
     assert "exit code 9" in output
 
 
+def test_wireguard_runner_command_builder_uses_guarded_args_only():
+    command = network_lab._build_wireguard_runner_command(
+        config_path="Set_WireguardVPN_lab02_config.json",
+        run_iperf=True,
+    )
+
+    assert command == [
+        sys.executable,
+        "mikrotik_day12_wireguard_vpn_automation.py",
+        "--config",
+        "Set_WireguardVPN_lab02_config.json",
+        "--run-iperf",
+        "--expect-connected",
+        "--non-interactive",
+    ]
+    assert "--recreate-peer" not in command
+    assert "--apply-firewall-fixes" not in command
+    network_lab._validate_wireguard_runner_command(command, config_path="Set_WireguardVPN_lab02_config.json")
+
+
+def test_wireguard_runner_command_builder_keeps_default_config_compatible():
+    command = network_lab._build_wireguard_runner_command()
+
+    assert command == [
+        sys.executable,
+        "mikrotik_day12_wireguard_vpn_automation.py",
+        "--config",
+        "Set_WireguardVPN_config.json",
+        "--non-interactive",
+    ]
+    network_lab._validate_wireguard_runner_command(command)
+
+
+def test_wireguard_runner_guard_rejects_write_flags():
+    command = network_lab._build_wireguard_runner_command()
+    command.append("--apply-firewall-fixes")
+
+    with pytest.raises(ValueError, match="forbidden live write flags"):
+        network_lab._validate_wireguard_runner_command(command)
+
+
+def test_cli_wireguard_runner_dry_run_does_not_call_subprocess_and_writes_report(
+    tmp_path,
+    monkeypatch,
+    capsys,
+):
+    profile_path = write_default_profile(tmp_path)
+
+    def fail_run(*_args, **_kwargs):
+        raise AssertionError("subprocess.run should not be called during WireGuard runner dry-run")
+
+    monkeypatch.setattr(network_lab.subprocess, "run", fail_run)
+
+    exit_code = network_lab.main(
+        [
+            "--task",
+            "wireguard-runner",
+            "--profile",
+            str(profile_path),
+            "--wireguard-config",
+            "Set_WireguardVPN_lab02_config.json",
+            "--dry-run",
+        ],
+        project_root=tmp_path,
+    )
+
+    output = capsys.readouterr().out
+    assert exit_code == 0
+    assert "WireGuard Runner Safety Layer" in output
+    assert "Mode: Dry run" in output
+    assert "python network_lab.py --task wireguard-runner --dry-run" in output
+    assert "Selected WireGuard config: Set_WireguardVPN_lab02_config.json" in output
+    assert "does not include --recreate-peer or --apply-firewall-fixes" in output
+    assert (
+        "Live execution requires explicit --allow-live-wireguard. "
+        "Interactive menu execution also requires explicit confirmation."
+    ) in output
+    assert "from CLI or an interactive y confirmation" not in output
+    assert "No live workflow was executed" in output
+    report = json.loads((tmp_path / "reports/lab-summary/wireguard_runner_safety_layer.json").read_text())
+    assert report["task_id"] == "wireguard_runner_safety_layer"
+    assert report["display_name"] == "WireGuard Runner Safety Layer"
+    assert report["day"] == "Day18"
+    assert report["category"] == "vpn"
+    assert report["mode"] == "dry-run"
+    assert report["result"] == "DRY-RUN"
+    assert report["selected_config_path"] == "Set_WireguardVPN_lab02_config.json"
+    assert report["delegated_command_summary"] == (
+        "python mikrotik_day12_wireguard_vpn_automation.py "
+        "--config Set_WireguardVPN_lab02_config.json --non-interactive"
+    )
+
+
+def test_cli_wireguard_runner_without_allow_live_blocks_safely(tmp_path, monkeypatch, capsys):
+    profile_path = write_default_profile(tmp_path)
+
+    def fail_run(*_args, **_kwargs):
+        raise AssertionError("subprocess.run should not be called without --allow-live-wireguard")
+
+    monkeypatch.setattr(network_lab.subprocess, "run", fail_run)
+
+    exit_code = network_lab.main(
+        [
+            "--task",
+            "wireguard-runner",
+            "--profile",
+            str(profile_path),
+            "--wireguard-config",
+            "Set_WireguardVPN_lab02_config.json",
+        ],
+        project_root=tmp_path,
+    )
+
+    output = capsys.readouterr().out
+    assert exit_code == 0
+    assert "Selected WireGuard config: Set_WireguardVPN_lab02_config.json" in output
+    assert "WireGuard live execution requires explicit --allow-live-wireguard" in output
+    report = json.loads((tmp_path / "reports/lab-summary/wireguard_runner_safety_layer.json").read_text())
+    assert report["mode"] == "blocked"
+    assert report["result"] == "BLOCKED"
+    assert report["selected_config_path"] == "Set_WireguardVPN_lab02_config.json"
+    assert report["message"] == "WireGuard live execution requires explicit --allow-live-wireguard"
+
+
+def test_cli_wireguard_runner_default_config_path_remains_compatible(tmp_path, monkeypatch, capsys):
+    profile_path = write_default_profile(tmp_path)
+
+    monkeypatch.setattr(
+        network_lab.subprocess,
+        "run",
+        lambda *_args, **_kwargs: (_ for _ in ()).throw(AssertionError("subprocess.run should not be called")),
+    )
+
+    exit_code = network_lab.main(
+        ["--task", "wireguard-runner", "--profile", str(profile_path), "--dry-run"],
+        project_root=tmp_path,
+    )
+
+    output = capsys.readouterr().out
+    report = json.loads((tmp_path / "reports/lab-summary/wireguard_runner_safety_layer.json").read_text())
+    assert exit_code == 0
+    assert "Selected WireGuard config: Set_WireguardVPN_config.json" in output
+    assert report["selected_config_path"] == "Set_WireguardVPN_config.json"
+
+
+def test_cli_wireguard_runner_allow_live_uses_shell_false_and_timeout(
+    tmp_path,
+    monkeypatch,
+    capsys,
+):
+    profile_path = write_default_profile(tmp_path)
+    write_wireguard_runner_config(tmp_path, filename="Set_WireguardVPN_lab02_config.json")
+    calls = []
+
+    def fake_run(command, cwd, shell, timeout):
+        calls.append((command, cwd, shell, timeout))
+        return SimpleNamespace(returncode=0)
+
+    monkeypatch.setattr(network_lab.subprocess, "run", fake_run)
+
+    exit_code = network_lab.main(
+        [
+            "--task",
+            "wireguard-runner",
+            "--profile",
+            str(profile_path),
+            "--wireguard-config",
+            "Set_WireguardVPN_lab02_config.json",
+            "--allow-live-wireguard",
+            "--wireguard-run-iperf",
+        ],
+        project_root=tmp_path,
+    )
+
+    output = capsys.readouterr().out
+    assert exit_code == 0
+    assert calls == [
+        (
+            [
+                sys.executable,
+                "mikrotik_day12_wireguard_vpn_automation.py",
+                "--config",
+                "Set_WireguardVPN_lab02_config.json",
+                "--run-iperf",
+                "--expect-connected",
+                "--non-interactive",
+            ],
+            tmp_path.resolve(),
+            False,
+            network_lab.DAY12_WIREGUARD_TIMEOUT_SECONDS,
+        )
+    ]
+    assert "--recreate-peer" not in calls[0][0]
+    assert "--apply-firewall-fixes" not in calls[0][0]
+    assert "Selected WireGuard config: Set_WireguardVPN_lab02_config.json" in output
+    assert "WireGuard runner completed successfully" in output
+
+
+def test_cli_wireguard_runner_allow_live_without_iperf_does_not_delegate_iperf(tmp_path, monkeypatch, capsys):
+    profile_path = write_default_profile(tmp_path)
+    write_wireguard_runner_config(tmp_path, filename="Set_WireguardVPN_lab02_config.json")
+    calls = []
+
+    def fake_run(command, cwd, shell, timeout):
+        calls.append(command)
+        return SimpleNamespace(returncode=0)
+
+    monkeypatch.setattr(network_lab.subprocess, "run", fake_run)
+
+    exit_code = network_lab.main(
+        [
+            "--task",
+            "wireguard-runner",
+            "--profile",
+            str(profile_path),
+            "--wireguard-config",
+            "Set_WireguardVPN_lab02_config.json",
+            "--allow-live-wireguard",
+        ],
+        project_root=tmp_path,
+    )
+
+    assert exit_code == 0
+    assert calls == [
+        [
+            sys.executable,
+            "mikrotik_day12_wireguard_vpn_automation.py",
+            "--config",
+            "Set_WireguardVPN_lab02_config.json",
+            "--non-interactive",
+        ]
+    ]
+    assert "--run-iperf" not in calls[0]
+    assert "--expect-connected" not in calls[0]
+
+
+def test_cli_wireguard_runner_report_includes_delegated_day12_summary(tmp_path, monkeypatch, capsys):
+    profile_path = write_default_profile(tmp_path)
+    write_wireguard_runner_config(
+        tmp_path,
+        data={
+            "device_name": "Hex-s-2025-lab02",
+            "router_host": "192.168.0.113",
+            "router_username": "admin",
+            "wg_interface": "wg0",
+            "peer_name": "pc-wg-lab02",
+            "lan_gateway_ip": "192.168.89.1",
+            "lan_host_ip": "192.168.89.200",
+            "iperf_server_ip": "192.168.89.200",
+            "client_address": "10.10.20.2/32",
+        },
+        filename="Set_WireguardVPN_lab02_config.json",
+    )
+
+    def fake_run(command, cwd, shell, timeout):
+        write_delegated_day12_report(tmp_path)
+        return SimpleNamespace(returncode=0)
+
+    monkeypatch.setattr(network_lab.subprocess, "run", fake_run)
+
+    exit_code = network_lab.main(
+        [
+            "--task",
+            "wireguard-runner",
+            "--profile",
+            str(profile_path),
+            "--wireguard-config",
+            "Set_WireguardVPN_lab02_config.json",
+            "--allow-live-wireguard",
+            "--wireguard-run-iperf",
+        ],
+        project_root=tmp_path,
+    )
+
+    capsys.readouterr()
+    report = json.loads((tmp_path / "reports/lab-summary/wireguard_runner_safety_layer.json").read_text())
+    html = (tmp_path / "reports/lab-summary/wireguard_runner_safety_layer.html").read_text()
+    assert exit_code == 0
+    assert report["result"] == "PASS"
+    assert report["delegated_report"] == {
+        "json": "reports/Hex-s-2025-lab02/day12_wireguard_vpn_automation_report.json",
+        "html": "reports/Hex-s-2025-lab02/day12_wireguard_vpn_automation_report.html",
+    }
+    assert report["delegated_result_summary"]["result"] == "PASS"
+    assert report["delegated_result_summary"]["final_vpn_connectivity"] == "PASS"
+    assert report["delegated_result_summary"]["initial_handshake_seen"] == "PASS"
+    assert report["delegated_result_summary"]["post_connectivity_handshake_seen"] == "PASS"
+    assert report["delegated_result_summary"]["iperf_forward_mbps"] == 166.0
+    assert report["delegated_result_summary"]["iperf_reverse_mbps"] == 225.0
+    assert report["delegated_result_summary"]["pass_count"] == 10
+    assert "reports/Hex-s-2025-lab02/day12_wireguard_vpn_automation_report.json" in html
+    assert "reports/Hex-s-2025-lab02/day12_wireguard_vpn_automation_report.html" in html
+    assert "final_vpn_connectivity" in html
+    assert "iperf_forward_mbps" in html
+    assert "166.0" in html
+    assert "iperf_reverse_mbps" in html
+    assert "225.0" in html
+
+
+def test_cli_wireguard_runner_passes_when_delegated_report_parse_fails(tmp_path, monkeypatch, capsys):
+    profile_path = write_default_profile(tmp_path)
+    write_wireguard_runner_config(
+        tmp_path,
+        data={
+            "device_name": "Hex-s-2025-lab02",
+            "router_host": "192.168.0.113",
+            "router_username": "admin",
+            "wg_interface": "wg0",
+            "peer_name": "pc-wg-lab02",
+        },
+        filename="Set_WireguardVPN_lab02_config.json",
+    )
+
+    def fake_run(command, cwd, shell, timeout):
+        report_path = tmp_path / "reports" / "Hex-s-2025-lab02" / "day12_wireguard_vpn_automation_report.json"
+        report_path.parent.mkdir(parents=True, exist_ok=True)
+        report_path.write_text("{not-json", encoding="utf-8")
+        return SimpleNamespace(returncode=0)
+
+    monkeypatch.setattr(network_lab.subprocess, "run", fake_run)
+
+    exit_code = network_lab.main(
+        [
+            "--task",
+            "wireguard-runner",
+            "--profile",
+            str(profile_path),
+            "--wireguard-config",
+            "Set_WireguardVPN_lab02_config.json",
+            "--allow-live-wireguard",
+        ],
+        project_root=tmp_path,
+    )
+
+    capsys.readouterr()
+    report = json.loads((tmp_path / "reports/lab-summary/wireguard_runner_safety_layer.json").read_text())
+    assert exit_code == 0
+    assert report["result"] == "PASS"
+    assert "delegated_report_parse_warning" in report
+    assert "Could not parse delegated Day12 report JSON" in report["delegated_report_parse_warning"]
+    assert any("Could not parse delegated Day12 report JSON" in warning for warning in report["warnings"])
+
+
+def test_cli_wireguard_runner_delegated_summary_does_not_copy_day12_secrets(tmp_path, monkeypatch, capsys):
+    profile_path = write_default_profile(tmp_path)
+    write_wireguard_runner_config(
+        tmp_path,
+        data={
+            "device_name": "Hex-s-2025-lab02",
+            "router_host": "192.168.0.113",
+            "router_username": "admin",
+            "router_password": "router-secret-password",
+            "wg_interface": "wg0",
+            "peer_name": "pc-wg-lab02",
+            "private_key": "CONFIG_PRIVATE",
+            "preshared_key": "CONFIG_PRESHARED",
+            "api_token": "CONFIG_TOKEN",
+        },
+        filename="Set_WireguardVPN_lab02_config.json",
+    )
+
+    def fake_run(command, cwd, shell, timeout):
+        write_delegated_day12_report(
+            tmp_path,
+            data={
+                "overall_result": "PASS",
+                "checks": {
+                    "final_vpn_connectivity": "PASS",
+                    "initial_handshake_seen": "PASS",
+                    "post_connectivity_handshake_seen": "PASS",
+                },
+                "iperf_summary": {"forward_mbps": 166.0, "reverse_mbps": 225.0},
+                "sanitized_client_config_summary": "PrivateKey = super-secret-private-key",
+                "router_password": "day12-router-secret",
+                "nested": {"preshared_key": "day12-preshared", "api_token": "day12-token"},
+            },
+        )
+        return SimpleNamespace(returncode=0)
+
+    monkeypatch.setattr(network_lab.subprocess, "run", fake_run)
+
+    exit_code = network_lab.main(
+        [
+            "--task",
+            "wireguard-runner",
+            "--profile",
+            str(profile_path),
+            "--wireguard-config",
+            "Set_WireguardVPN_lab02_config.json",
+            "--allow-live-wireguard",
+            "--wireguard-run-iperf",
+        ],
+        project_root=tmp_path,
+    )
+
+    output = capsys.readouterr().out
+    report_text = (tmp_path / "reports/lab-summary/wireguard_runner_safety_layer.json").read_text()
+    html = (tmp_path / "reports/lab-summary/wireguard_runner_safety_layer.html").read_text()
+    assert exit_code == 0
+    for secret in (
+        "router-secret-password",
+        "CONFIG_PRIVATE",
+        "CONFIG_PRESHARED",
+        "CONFIG_TOKEN",
+        "super-secret-private-key",
+        "day12-router-secret",
+        "day12-preshared",
+        "day12-token",
+    ):
+        assert secret not in output
+        assert secret not in report_text
+        assert secret not in html
+    assert "sanitized_client_config_summary" not in report_text
+
+
+def test_cli_wireguard_runner_timeout_returns_124(tmp_path, monkeypatch, capsys):
+    profile_path = write_default_profile(tmp_path)
+    write_wireguard_runner_config(tmp_path)
+
+    def timeout_run(command, cwd, shell, timeout):
+        raise network_lab.subprocess.TimeoutExpired(command, timeout)
+
+    monkeypatch.setattr(network_lab.subprocess, "run", timeout_run)
+
+    exit_code = network_lab.main(
+        [
+            "--task",
+            "wireguard-runner",
+            "--profile",
+            str(profile_path),
+            "--allow-live-wireguard",
+        ],
+        project_root=tmp_path,
+    )
+
+    output = capsys.readouterr().out
+    assert exit_code == 124
+    assert "timed out after" in output
+    assert str(network_lab.DAY12_WIREGUARD_TIMEOUT_SECONDS) in output
+
+
+def test_wireguard_runner_reports_mask_secret_like_fields(tmp_path, monkeypatch, capsys):
+    profile_path = write_default_profile(tmp_path)
+    write_wireguard_runner_config(
+        tmp_path,
+        {
+            "device_name": "Hex-s-2025-lab01",
+            "router_host": "192.168.0.199",
+            "router_username": "admin",
+            "router_password": "super-secret-password",
+            "wg_interface": "wg0",
+            "peer_name": "pc-wg",
+            "nested": {
+                "private_key": "PRIVATE",
+                "preshared_key": "PRESHARED",
+                "api_token": "TOKEN",
+            },
+        },
+        filename="Set_WireguardVPN_lab02_config.json",
+    )
+    monkeypatch.setattr(network_lab.subprocess, "run", lambda *_args, **_kwargs: SimpleNamespace(returncode=0))
+
+    exit_code = network_lab.main(
+        [
+            "--task",
+            "wireguard-runner",
+            "--profile",
+            str(profile_path),
+            "--wireguard-config",
+            "Set_WireguardVPN_lab02_config.json",
+            "--dry-run",
+        ],
+        project_root=tmp_path,
+    )
+
+    output = capsys.readouterr().out
+    report_text = (tmp_path / "reports/lab-summary/wireguard_runner_safety_layer.json").read_text()
+    html = (tmp_path / "reports/lab-summary/wireguard_runner_safety_layer.html").read_text()
+    assert exit_code == 0
+    assert "Selected WireGuard config: Set_WireguardVPN_lab02_config.json" in output
+    assert "Set_WireguardVPN_lab02_config.json" in report_text
+    for secret in ("super-secret-password", "PRIVATE", "PRESHARED", "TOKEN"):
+        assert secret not in output
+        assert secret not in report_text
+        assert secret not in html
+
+
 def test_cli_report_index_output_lists_report_items(tmp_path, capsys):
     prof = profile(required=False)
     profile_path = tmp_path / "profile.json"
@@ -688,7 +1245,10 @@ def test_interactive_action_prints_completion_and_reprints_full_menu(tmp_path, m
     assert exit_code == 0
     assert network_lab.INTERACTIVE_ACTION_COMPLETE in output
     assert output.count("Select an option by number") == 2
+    assert output.count("  7. WireGuard Runner Safety Layer") == 2
     assert output.count("  8. Show recommended command for Day13 multi-router WireGuard summary") == 2
+    assert "day12-wireguard-live-validation" not in output
+    assert "day18-wireguard-runner" not in output
 
 
 def test_interactive_dry_run_does_not_create_output_files(tmp_path, monkeypatch, capsys):
@@ -892,7 +1452,6 @@ def test_interactive_day8_option_without_y_cancels_safely(
 @pytest.mark.parametrize(
     ("choice", "expected"),
     [
-        ("7", "mikrotik_day12_wireguard_vpn_automation.py"),
         ("8", "Day13 multi-router WireGuard summary workflow"),
     ],
 )
@@ -920,6 +1479,76 @@ def test_interactive_live_workflow_choices_only_print_recommended_commands(
     assert "no live workflow was executed" in output
     assert network_lab.INTERACTIVE_ACTION_COMPLETE in output
     assert not (tmp_path / "reports/lab-summary/latest_lab_overview.json").exists()
+
+
+def test_interactive_wireguard_runner_option_asks_for_confirmation(
+    tmp_path,
+    monkeypatch,
+    capsys,
+):
+    write_default_profile(tmp_path)
+    choices = iter(["7", "n", "0"])
+    prompts = []
+
+    def fake_input(prompt):
+        prompts.append(prompt)
+        return next(choices)
+
+    monkeypatch.setattr("builtins.input", fake_input)
+    monkeypatch.setattr(
+        network_lab.subprocess,
+        "run",
+        lambda *_args, **_kwargs: (_ for _ in ()).throw(AssertionError("subprocess.run should not be called")),
+    )
+
+    exit_code = network_lab.main(["--interactive"], project_root=tmp_path)
+
+    output = capsys.readouterr().out
+    assert exit_code == 0
+    assert "live WireGuard validation workflow" in output
+    assert "python mikrotik_day12_wireguard_vpn_automation.py --config Set_WireguardVPN_config.json --non-interactive" in output
+    assert "Confirm live WireGuard runner execution" in prompts[1]
+    assert "WireGuard runner cancelled" in output
+    assert "Day12 WireGuard" not in output
+
+
+def test_interactive_wireguard_runner_option_with_y_delegates_to_existing_script(
+    tmp_path,
+    monkeypatch,
+    capsys,
+):
+    write_default_profile(tmp_path)
+    write_wireguard_runner_config(tmp_path)
+    choices = iter(["7", "y", "0"])
+    calls = []
+    monkeypatch.setattr("builtins.input", lambda _prompt: next(choices))
+
+    def fake_run(command, cwd, shell, timeout):
+        calls.append((command, cwd, shell, timeout))
+        return SimpleNamespace(returncode=0)
+
+    monkeypatch.setattr(network_lab.subprocess, "run", fake_run)
+
+    exit_code = network_lab.main(["--interactive"], project_root=tmp_path)
+
+    output = capsys.readouterr().out
+    assert exit_code == 0
+    assert calls == [
+        (
+            [
+                sys.executable,
+                "mikrotik_day12_wireguard_vpn_automation.py",
+                "--config",
+                "Set_WireguardVPN_config.json",
+                "--non-interactive",
+            ],
+            tmp_path.resolve(),
+            False,
+            network_lab.DAY12_WIREGUARD_TIMEOUT_SECONDS,
+        )
+    ]
+    assert "WireGuard runner completed successfully" in output
+    assert network_lab.INTERACTIVE_ACTION_COMPLETE in output
 
 
 def test_interactive_invalid_menu_input_is_handled_safely(tmp_path, monkeypatch, capsys):
