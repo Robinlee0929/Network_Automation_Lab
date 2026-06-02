@@ -92,6 +92,7 @@ REPORT_CATALOG = [
         "title": "Day5 Cisco Switch Topology",
         "json_globs": ["reports/**/*day5*cisco*.json", "reports/**/*cisco*topology*.json"],
         "html_globs": ["reports/**/*day5*cisco*.html", "reports/**/*cisco*topology*.html"],
+        "missing_note": "Expected Cisco switch report was not found in local reports folder.",
     },
     {
         "day": "Day6",
@@ -679,7 +680,7 @@ def discover_report_visibility(project_root: Path) -> List[Dict[str, Any]]:
                     "status": "MISSING",
                     "json": "",
                     "html": "",
-                    "notes": "Expected report was not found.",
+                    "notes": report_type.get("missing_note", "Expected report was not found."),
                 }
             )
             continue
@@ -715,7 +716,7 @@ def discover_report_visibility(project_root: Path) -> List[Dict[str, Any]]:
     return rows
 
 
-def _print_report_visibility(rows: List[Dict[str, Any]]) -> None:
+def _print_report_visibility(rows: List[Dict[str, Any]], output_path: str = "reports/report_index.html") -> None:
     print(format_heading("Report Index"))
     counts = _count_report_statuses(rows)
     status_width = max(22, max(len(str(row.get("status", ""))) + 2 for row in rows))
@@ -725,21 +726,71 @@ def _print_report_visibility(rows: List[Dict[str, Any]]) -> None:
         f"missing={color_text(str(counts['missing']), 'yellow', bold=True)} "
         f"disabled={color_text(str(counts['disabled']), 'blue', bold=True)}"
     )
-    current_title = ""
+    print(f"Output: {output_path}")
+
+    current_key: Optional[Tuple[str, str]] = None
+    group_rows: List[Dict[str, Any]] = []
+
+    def flush_group() -> None:
+        if not group_rows:
+            return
+        first = group_rows[0]
+        print()
+        print(format_heading(f"{first['title']} ({first['day']})"))
+        print(f"  {'Status':<{status_width}} {'Device':<24} Report paths")
+        print(f"  {'-' * status_width} {'-' * 24} {'-' * 42}")
+        visible_rows, hidden_count = _compact_console_report_rows(group_rows)
+        for visible_row in visible_rows:
+            _print_report_visibility_row(visible_row, status_width)
+        if hidden_count:
+            print(
+                f"  ... {hidden_count} more reports hidden in console; "
+                f"open {output_path} for full list"
+            )
+
     for row in rows:
-        title = str(row["title"])
-        if title != current_title:
-            current_title = title
-            print()
-            print(format_heading(f"{title} ({row['day']})"))
-            print(f"  {'Status':<{status_width}} {'Device':<24} Report paths")
-            print(f"  {'-' * status_width} {'-' * 24} {'-' * 42}")
-        status = _format_report_visibility_status(str(row["status"]))
-        print(f"  {status:<{status_width}} {str(row['device'])[:24]:<24} JSON: {row.get('json') or '-'}")
-        if row.get("html"):
-            print(f"  {'':<{status_width}} {'':<24} HTML: {row['html']}")
-        if row.get("notes"):
-            print(f"  {'':<{status_width}} {'':<24} Notes: {row['notes']}")
+        key = (str(row["day"]), str(row["title"]))
+        if current_key is None:
+            current_key = key
+        if key != current_key:
+            flush_group()
+            group_rows = []
+            current_key = key
+        group_rows.append(row)
+    flush_group()
+
+
+def _compact_console_report_rows(
+    rows: List[Dict[str, Any]],
+    max_default_rows: int = 3,
+) -> Tuple[List[Dict[str, Any]], int]:
+    special_rows = [
+        row
+        for row in rows
+        if str(row.get("status", "")).upper() == "MISSING"
+        or "DISABLED" in str(row.get("status", "")).upper()
+    ]
+    visible_ids = {id(row) for row in special_rows}
+    remaining_slots = max(0, max_default_rows - len(special_rows))
+    for row in rows:
+        if id(row) in visible_ids:
+            continue
+        if remaining_slots <= 0:
+            break
+        special_rows.append(row)
+        visible_ids.add(id(row))
+        remaining_slots -= 1
+    hidden_count = len(rows) - len(visible_ids)
+    return special_rows, hidden_count
+
+
+def _print_report_visibility_row(row: Dict[str, Any], status_width: int) -> None:
+    status = _format_report_visibility_status(str(row["status"]))
+    print(f"  {status:<{status_width}} {str(row['device'])[:24]:<24} JSON: {row.get('json') or '-'}")
+    if row.get("html"):
+        print(f"  {'':<{status_width}} {'':<24} HTML: {row['html']}")
+    if row.get("notes"):
+        print(f"  {'':<{status_width}} {'':<24} Notes: {row['notes']}")
 
 
 def _count_report_statuses(rows: List[Dict[str, Any]]) -> Dict[str, int]:
@@ -915,11 +966,12 @@ def write_report_index_html(
 
 def _run_report_visibility_index(project_root: Path) -> int:
     rows = discover_report_visibility(project_root)
-    _print_report_visibility(rows)
     output_path = project_root / DAY17_REPORT_INDEX_HTML
+    output_path_text = _relative_to_project(project_root, output_path)
+    _print_report_visibility(rows, output_path_text)
     write_report_index_html(list_tasks(), rows, output_path, project_root)
     print()
-    print(f"{format_status('PASS')} HTML report index: {_relative_to_project(project_root, output_path)}")
+    print(f"{format_status('PASS')} HTML report index: {output_path_text}")
     print("WireGuard live runner integration is intentionally disabled in Day17 and reserved for Day18.")
     return 0
 

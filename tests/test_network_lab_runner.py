@@ -275,6 +275,10 @@ def test_report_visibility_index_works_when_reports_directory_is_missing(tmp_pat
     output = capsys.readouterr().out
     assert exit_code == 0
     assert "Report Index" in output
+    assert "Summary: found=" in output
+    assert "missing=" in output
+    assert "disabled=" in output
+    assert "Output: reports/report_index.html" in output
     assert "MISSING" in output
     assert "WireGuard live runner integration is intentionally disabled in Day17" in output
     assert (tmp_path / "reports/report_index.html").exists()
@@ -306,6 +310,37 @@ def test_report_visibility_index_finds_partial_reports_and_marks_missing(tmp_pat
     assert "HTML: reports/Hex-s-2025-lab01/day8_iperf3_WAN_TO_LAN_DNAT_report.html" in output
     assert "Day13 WireGuard Live Execution" in output
     assert "DISABLED FOR DAY17" in output
+    assert "Expected Cisco switch report was not found in local reports folder." in output
+
+
+def test_report_visibility_console_compacts_historical_day13_reports(tmp_path, capsys):
+    for index in range(1, 7):
+        write_json(
+            tmp_path
+            / "reports"
+            / "lab-summary"
+            / f"day13_multi_router_wireguard_client_to_site_summary_20260602_000{index}.json",
+            {"result": "PASS"},
+        )
+        (
+            tmp_path
+            / "reports"
+            / "lab-summary"
+            / f"day13_multi_router_wireguard_client_to_site_summary_20260602_000{index}.html"
+        ).write_text("<html>day13</html>", encoding="utf-8")
+
+    exit_code = network_lab.main(["--report-index"], project_root=tmp_path)
+
+    output = capsys.readouterr().out
+    assert exit_code == 0
+    assert "more reports hidden in console" in output
+    assert "open reports/report_index.html for full list" in output
+    assert "day13_multi_router_wireguard_client_to_site_summary_20260602_0001.json" in output
+    assert "day13_multi_router_wireguard_client_to_site_summary_20260602_0004.json" not in output
+    assert "Expected Cisco switch report was not found in local reports folder." in output
+    assert "DISABLED FOR DAY17" in output
+    html = (tmp_path / "reports/report_index.html").read_text(encoding="utf-8")
+    assert "day13_multi_router_wireguard_client_to_site_summary_20260602_0006.json" in html
 
 
 def test_wireguard_catalog_entries_are_disabled_or_future_reserved():
