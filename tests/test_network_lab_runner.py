@@ -52,6 +52,22 @@ def write_default_profile(tmp_path: Path, data=None) -> Path:
     return profile_path
 
 
+def write_day8_performance_profile(tmp_path: Path) -> Path:
+    profile_path = tmp_path / "topology_profiles" / "day8_iperf3_router_performance.json"
+    write_json(
+        profile_path,
+        {
+            "default_lan_server_ip": "192.168.88.254",
+            "default_duration_sec": 40,
+            "default_omit_sec": 10,
+            "default_parallel_streams": 4,
+            "default_threshold_mbps": 800,
+            "default_warn_threshold_mbps": 700,
+        },
+    )
+    return profile_path
+
+
 def test_load_lab_runner_profile_loads_valid_profile():
     loaded = network_lab.load_lab_runner_profile(
         Path("topology_profiles/day14_lab_runner_profile.json")
@@ -318,6 +334,7 @@ def test_cli_day8_performance_dry_run_prints_command_and_safety_notes(
     capsys,
 ):
     profile_path = write_default_profile(tmp_path)
+    write_day8_performance_profile(tmp_path)
 
     def fail_run(*_args, **_kwargs):
         raise AssertionError("subprocess.run should not be called during Day8 dry-run")
@@ -333,11 +350,40 @@ def test_cli_day8_performance_dry_run_prints_command_and_safety_notes(
     assert exit_code == 0
     assert "Day8 iperf3 performance" in output
     assert "Mode: Dry run" in output
-    assert "python performance_test.py --profile topology_profiles/day8_iperf3_router_performance.json" in output
+    assert "python performance_test.py --lan-server-ip 192.168.88.254" in output
+    assert "--duration 40" in output
+    assert "--omit 10" in output
+    assert "--parallel 4" in output
+    assert "--threshold-mbps 800" in output
+    assert "--warn-threshold-mbps 700" in output
+    assert "--profile" not in output
     assert "Safety notes" in output
     assert "No live workflow was executed" in output
     assert not (tmp_path / "reports/lab-summary/latest_lab_overview.json").exists()
     assert not (tmp_path / "reports/lab-summary/latest_lab_overview.html").exists()
+
+
+def test_cli_day8_performance_command_does_not_include_unsupported_profile_argument(tmp_path):
+    write_day8_performance_profile(tmp_path)
+
+    command = network_lab._build_day8_performance_command(tmp_path)
+
+    assert "--profile" not in command
+    assert command[1:] == [
+        "performance_test.py",
+        "--lan-server-ip",
+        "192.168.88.254",
+        "--duration",
+        "40",
+        "--omit",
+        "10",
+        "--parallel",
+        "4",
+        "--threshold-mbps",
+        "800",
+        "--warn-threshold-mbps",
+        "700",
+    ]
 
 
 def test_cli_day8_performance_calls_existing_script_through_subprocess(
@@ -346,6 +392,7 @@ def test_cli_day8_performance_calls_existing_script_through_subprocess(
     capsys,
 ):
     profile_path = write_default_profile(tmp_path)
+    write_day8_performance_profile(tmp_path)
     calls = []
 
     def fake_run(command, cwd):
@@ -366,8 +413,18 @@ def test_cli_day8_performance_calls_existing_script_through_subprocess(
             [
                 sys.executable,
                 "performance_test.py",
-                "--profile",
-                "topology_profiles/day8_iperf3_router_performance.json",
+                "--lan-server-ip",
+                "192.168.88.254",
+                "--duration",
+                "40",
+                "--omit",
+                "10",
+                "--parallel",
+                "4",
+                "--threshold-mbps",
+                "800",
+                "--warn-threshold-mbps",
+                "700",
             ],
             tmp_path.resolve(),
         )
@@ -382,6 +439,7 @@ def test_cli_day8_performance_nonzero_subprocess_return_code_is_returned(
     capsys,
 ):
     profile_path = write_default_profile(tmp_path)
+    write_day8_performance_profile(tmp_path)
 
     monkeypatch.setattr(
         network_lab.subprocess,
@@ -559,6 +617,7 @@ def test_interactive_day4_option_with_y_delegates_to_day4_script(
 
 def test_interactive_day8_option_asks_for_confirmation(tmp_path, monkeypatch, capsys):
     write_default_profile(tmp_path)
+    write_day8_performance_profile(tmp_path)
     choices = iter(["6", "n", "0"])
     prompts = []
 
@@ -578,7 +637,7 @@ def test_interactive_day8_option_asks_for_confirmation(tmp_path, monkeypatch, ca
     output = capsys.readouterr().out
     assert exit_code == 0
     assert "live iperf3 performance workflow" in output
-    assert "python performance_test.py --profile topology_profiles/day8_iperf3_router_performance.json" in output
+    assert "python performance_test.py --lan-server-ip 192.168.88.254" in output
     assert "Confirm live Day8 iperf3 performance run" in prompts[1]
     assert "Day8 iperf3 performance cancelled" in output
 
@@ -589,6 +648,7 @@ def test_interactive_day8_option_with_y_delegates_to_day8_script(
     capsys,
 ):
     write_default_profile(tmp_path)
+    write_day8_performance_profile(tmp_path)
     choices = iter(["6", "y", "0"])
     calls = []
     monkeypatch.setattr("builtins.input", lambda _prompt: next(choices))
@@ -608,8 +668,18 @@ def test_interactive_day8_option_with_y_delegates_to_day8_script(
             [
                 sys.executable,
                 "performance_test.py",
-                "--profile",
-                "topology_profiles/day8_iperf3_router_performance.json",
+                "--lan-server-ip",
+                "192.168.88.254",
+                "--duration",
+                "40",
+                "--omit",
+                "10",
+                "--parallel",
+                "4",
+                "--threshold-mbps",
+                "800",
+                "--warn-threshold-mbps",
+                "700",
             ],
             tmp_path.resolve(),
         )
@@ -626,6 +696,7 @@ def test_interactive_day8_option_without_y_cancels_safely(
     confirmation,
 ):
     write_default_profile(tmp_path)
+    write_day8_performance_profile(tmp_path)
     choices = iter(["6", confirmation, "0"])
     monkeypatch.setattr("builtins.input", lambda _prompt: next(choices))
 

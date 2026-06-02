@@ -16,7 +16,6 @@ DAY4_BASELINE_SCRIPT = "mikrotik_day4_multi_device_baseline.py"
 DAY4_BASELINE_DISPLAY_COMMAND = f"python {DAY4_BASELINE_SCRIPT}"
 DAY8_PERFORMANCE_SCRIPT = "performance_test.py"
 DAY8_PERFORMANCE_PROFILE = Path("topology_profiles") / "day8_iperf3_router_performance.json"
-DAY8_PERFORMANCE_DISPLAY_COMMAND = f"python {DAY8_PERFORMANCE_SCRIPT} --profile {DAY8_PERFORMANCE_PROFILE.as_posix()}"
 RESULTS = {"PASS", "FAIL", "WARN", "MISSING", "INCOMPLETE", "UNKNOWN", "SKIP", "NOT_RUN"}
 INTERACTIVE_ACTION_COMPLETE = (
     "Action complete. Returning to menu. Choose another option or enter 0 to exit."
@@ -633,14 +632,62 @@ def _confirm_and_run_day4_baseline(project_root: Path, input_func: Any) -> int:
     return _run_day4_baseline(project_root, dry_run=False)
 
 
-def _build_day8_performance_command() -> List[str]:
-    return [sys.executable, DAY8_PERFORMANCE_SCRIPT, "--profile", DAY8_PERFORMANCE_PROFILE.as_posix()]
+def _load_day8_performance_profile(project_root: Path) -> Dict[str, Any]:
+    profile_path = project_root / DAY8_PERFORMANCE_PROFILE
+    try:
+        profile = json.loads(profile_path.read_text(encoding="utf-8"))
+    except FileNotFoundError as exc:
+        raise ValueError(f"Day8 performance profile was not found: {profile_path}") from exc
+    except json.JSONDecodeError as exc:
+        raise ValueError(f"Day8 performance profile is not valid JSON: {profile_path}") from exc
+
+    if not isinstance(profile, dict):
+        raise ValueError("Day8 performance profile must contain a JSON object.")
+    return profile
 
 
-def _print_day8_performance_dry_run() -> None:
+def _required_day8_profile_value(profile: Dict[str, Any], key: str) -> str:
+    value = profile.get(key)
+    if value is None or str(value).strip() == "":
+        raise ValueError(f"Day8 performance profile must define {key}.")
+    return str(value)
+
+
+def _build_day8_performance_command(project_root: Path, executable: str = sys.executable) -> List[str]:
+    profile = _load_day8_performance_profile(project_root)
+    return [
+        executable,
+        DAY8_PERFORMANCE_SCRIPT,
+        "--lan-server-ip",
+        _required_day8_profile_value(profile, "default_lan_server_ip"),
+        "--duration",
+        _required_day8_profile_value(profile, "default_duration_sec"),
+        "--omit",
+        _required_day8_profile_value(profile, "default_omit_sec"),
+        "--parallel",
+        _required_day8_profile_value(profile, "default_parallel_streams"),
+        "--threshold-mbps",
+        _required_day8_profile_value(profile, "default_threshold_mbps"),
+        "--warn-threshold-mbps",
+        _required_day8_profile_value(profile, "default_warn_threshold_mbps"),
+    ]
+
+
+def _format_display_command(command: List[str]) -> str:
+    display_parts = ["python" if index == 0 and part == sys.executable else part for index, part in enumerate(command)]
+    return " ".join(display_parts)
+
+
+def _print_day8_performance_dry_run(project_root: Path) -> int:
+    try:
+        command = _build_day8_performance_command(project_root)
+    except ValueError as exc:
+        print(f"ERROR: {exc}", file=sys.stderr)
+        return 2
+
     print(format_heading("Day8 iperf3 performance"))
     print(f"Mode: {color_text('Dry run', 'yellow', bold=True)}")
-    print(f"Command that would be executed: {color_text(DAY8_PERFORMANCE_DISPLAY_COMMAND, 'cyan', bold=True)}")
+    print(f"Command that would be executed: {color_text(_format_display_command(command), 'cyan', bold=True)}")
     print()
     print(format_heading("Safety notes"))
     print("  This is a live iperf3 performance workflow.")
@@ -650,17 +697,23 @@ def _print_day8_performance_dry_run() -> None:
     print("  Dry-run does not write reports.")
     print()
     print(f"{format_status('PASS')} No live workflow was executed.")
+    return 0
 
 
 def _run_day8_performance(project_root: Path, dry_run: bool = False) -> int:
     if dry_run:
-        _print_day8_performance_dry_run()
-        return 0
+        return _print_day8_performance_dry_run(project_root)
+
+    try:
+        command = _build_day8_performance_command(project_root)
+    except ValueError as exc:
+        print(f"ERROR: {exc}", file=sys.stderr)
+        return 2
 
     print(format_heading("Day8 iperf3 performance"))
     print("Live iperf3 performance workflow.")
-    print(f"Executing command: {color_text(DAY8_PERFORMANCE_DISPLAY_COMMAND, 'cyan', bold=True)}")
-    result = subprocess.run(_build_day8_performance_command(), cwd=project_root)
+    print(f"Executing command: {color_text(_format_display_command(command), 'cyan', bold=True)}")
+    result = subprocess.run(command, cwd=project_root)
     if result.returncode == 0:
         print(f"{format_status('PASS')} Day8 iperf3 performance completed successfully.")
         return 0
@@ -670,9 +723,15 @@ def _run_day8_performance(project_root: Path, dry_run: bool = False) -> int:
 
 
 def _confirm_and_run_day8_performance(project_root: Path, input_func: Any) -> int:
+    try:
+        command = _build_day8_performance_command(project_root)
+    except ValueError as exc:
+        print(f"ERROR: {exc}", file=sys.stderr)
+        return 2
+
     print(format_heading("Day8 iperf3 performance"))
     print("This is a live iperf3 performance workflow.")
-    print(f"Command to execute: {color_text(DAY8_PERFORMANCE_DISPLAY_COMMAND, 'cyan', bold=True)}")
+    print(f"Command to execute: {color_text(_format_display_command(command), 'cyan', bold=True)}")
     try:
         confirmation = input_func("Confirm live Day8 iperf3 performance run? [y/N]: ").strip().lower()
     except EOFError:
