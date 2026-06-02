@@ -423,7 +423,7 @@ def list_tasks() -> List[Dict[str, str]]:
         {"id": "day4-baseline", "status": "implemented", "description": "Safely delegates to the existing Day4 baseline workflow."},
         {"id": "day5-cisco", "status": "planned", "description": "Delegates to the existing Day5 Cisco topology workflow."},
         {"id": "day6-topology-summary", "status": "planned", "description": "Delegates to the existing Day6 topology summary workflow."},
-        {"id": "day8-performance", "status": "implemented", "description": "Safely delegates to the existing Day8 iperf3 performance workflow."},
+        {"id": "iperf3-performance", "status": "implemented", "description": "Safely delegates to the existing Day8 iperf3 performance workflow."},
         {"id": "day12-wireguard-live-validation", "status": "planned", "description": "Delegates to the existing Day12 live validation workflow."},
         {"id": "day13-wireguard-summary", "status": "planned", "description": "Reads or delegates to the Day13 WireGuard summary workflow."},
     ]
@@ -438,20 +438,20 @@ def _build_parser() -> argparse.ArgumentParser:
   python network_lab.py --task report-index
   python network_lab.py --task day4-baseline --dry-run
   python network_lab.py --task day4-baseline
-  python network_lab.py --task day8-performance --dry-run
-  python network_lab.py --task day8-performance
+  python network_lab.py --task iperf3-performance --dry-run
+  python network_lab.py --task iperf3-performance
   python network_lab.py --task report-index --profile topology_profiles/day14_lab_runner_profile.json
 
 report-index reads existing JSON reports and does not connect to devices.
 day4-baseline delegates to the existing live SSH validation script.
-day8-performance delegates to the existing live iperf3 performance script."""
+iperf3-performance delegates to the existing live iperf3 performance script."""
     parser = argparse.ArgumentParser(
         description=f"Day14 {DAY14_NAME}.",
         epilog=examples,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument("--list-tasks", action="store_true", help="List available and planned lab tasks.")
-    parser.add_argument("--task", choices=["report-index", "day4-baseline", "day8-performance"], help="Task to run.")
+    parser.add_argument("--task", choices=["report-index", "day4-baseline", "iperf3-performance"], help="Task to run.")
     parser.add_argument("--profile", default=str(DEFAULT_PROFILE), help="Path to the Day14 lab runner profile JSON.")
     parser.add_argument("--dry-run", action="store_true", help="Show report-index inputs and outputs without writing reports.")
     parser.add_argument("--interactive", action="store_true", help="Show the safe interactive Day14 menu.")
@@ -807,7 +807,7 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
         return _run_report_index(profile, root, profile_path, dry_run=args.dry_run)
     if args.task == "day4-baseline":
         return _run_day4_baseline(root, dry_run=args.dry_run)
-    if args.task == "day8-performance":
+    if args.task == "iperf3-performance":
         return _run_day8_performance(root, dry_run=args.dry_run)
 
     return 2

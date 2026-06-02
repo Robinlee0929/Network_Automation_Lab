@@ -202,7 +202,7 @@ def test_list_tasks_prints_report_index_and_planned_tasks(capsys):
     assert exit_code == 0
     assert "report-index" in output
     assert "day4-baseline" in output
-    assert "day8-performance" in output
+    assert "iperf3-performance" in output
     assert "day13-wireguard-summary" in output
 
 
@@ -325,7 +325,7 @@ def test_cli_day8_performance_dry_run_prints_command_and_safety_notes(
     monkeypatch.setattr(network_lab.subprocess, "run", fail_run)
 
     exit_code = network_lab.main(
-        ["--task", "day8-performance", "--profile", str(profile_path), "--dry-run"],
+        ["--task", "iperf3-performance", "--profile", str(profile_path), "--dry-run"],
         project_root=tmp_path,
     )
 
@@ -355,7 +355,7 @@ def test_cli_day8_performance_calls_existing_script_through_subprocess(
     monkeypatch.setattr(network_lab.subprocess, "run", fake_run)
 
     exit_code = network_lab.main(
-        ["--task", "day8-performance", "--profile", str(profile_path)],
+        ["--task", "iperf3-performance", "--profile", str(profile_path)],
         project_root=tmp_path,
     )
 
@@ -390,7 +390,7 @@ def test_cli_day8_performance_nonzero_subprocess_return_code_is_returned(
     )
 
     exit_code = network_lab.main(
-        ["--task", "day8-performance", "--profile", str(profile_path)],
+        ["--task", "iperf3-performance", "--profile", str(profile_path)],
         project_root=tmp_path,
     )
 
