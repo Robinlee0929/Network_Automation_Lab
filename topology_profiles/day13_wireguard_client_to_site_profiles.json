@@ -1,0 +1,114 @@
+{
+  "topology_name": "Day13 Multi-router WireGuard Client-to-Site Validation",
+  "vpn_type": "client_to_site",
+  "devices": [
+    {
+      "enabled": true,
+      "device_name": "Hex-s-2025-lab01",
+      "router_host": "192.168.0.199",
+      "client_endpoint_host": "192.168.0.199",
+      "lan_subnet": "192.168.88.0/24",
+      "lan_gateway": "192.168.88.1",
+      "lan_host_ip": "192.168.88.254",
+      "iperf_server_ip": "192.168.88.254",
+      "lan_host_validation": {
+        "enabled": false,
+        "lan_host_ip": "192.168.88.254",
+        "expected_gateway": "192.168.88.1",
+        "wireguard_client_subnet": "10.10.10.0/24"
+      },
+      "wireguard_subnet": "10.10.10.0/24",
+      "wireguard_router_ip": "10.10.10.1/24",
+      "wireguard_client_ip": "10.10.10.2/32",
+      "peer_name": "pc-wg-lab01",
+      "export_conf_name": "robin-laptop-lab01.conf"
+    },
+    {
+      "enabled": true,
+      "device_name": "Hex-s-2025-lab02",
+      "router_host": "192.168.0.113",
+      "client_endpoint_host": "192.168.0.113",
+      "lan_subnet": "192.168.89.0/24",
+      "lan_gateway": "192.168.89.1",
+      "lan_host_ip": "192.168.89.200",
+      "iperf_server_ip": "192.168.89.200",
+      "lan_host_validation": {
+        "enabled": true,
+        "lan_host_ip": "192.168.89.200",
+        "expected_gateway": "192.168.89.1",
+        "wireguard_client_subnet": "10.10.20.0/24"
+      },
+      "wireguard_subnet": "10.10.20.0/24",
+      "wireguard_router_ip": "10.10.20.1/24",
+      "wireguard_client_ip": "10.10.20.2/32",
+      "peer_name": "pc-wg-lab02",
+      "export_conf_name": "robin-laptop-lab02.conf"
+    },
+    {
+      "enabled": false,
+      "template": true,
+      "device_name": "Hex-s-2025-lab03",
+      "router_host": "",
+      "client_endpoint_host": "",
+      "lan_subnet": "192.168.90.0/24",
+      "lan_gateway": "192.168.90.1",
+      "lan_host_ip": "192.168.90.200",
+      "iperf_server_ip": "192.168.90.200",
+      "lan_host_validation": {
+        "enabled": true,
+        "lan_host_ip": "192.168.90.200",
+        "expected_gateway": "192.168.90.1",
+        "wireguard_client_subnet": "10.10.30.0/24"
+      },
+      "wireguard_subnet": "10.10.30.0/24",
+      "wireguard_router_ip": "10.10.30.1/24",
+      "wireguard_client_ip": "10.10.30.2/32",
+      "peer_name": "pc-wg-lab03",
+      "export_conf_name": "robin-laptop-lab03.conf"
+    },
+    {
+      "enabled": false,
+      "template": true,
+      "device_name": "Hex-s-2025-lab04",
+      "router_host": "",
+      "client_endpoint_host": "",
+      "lan_subnet": "192.168.91.0/24",
+      "lan_gateway": "192.168.91.1",
+      "lan_host_ip": "192.168.91.200",
+      "iperf_server_ip": "192.168.91.200",
+      "lan_host_validation": {
+        "enabled": true,
+        "lan_host_ip": "192.168.91.200",
+        "expected_gateway": "192.168.91.1",
+        "wireguard_client_subnet": "10.10.40.0/24"
+      },
+      "wireguard_subnet": "10.10.40.0/24",
+      "wireguard_router_ip": "10.10.40.1/24",
+      "wireguard_client_ip": "10.10.40.2/32",
+      "peer_name": "pc-wg-lab04",
+      "export_conf_name": "robin-laptop-lab04.conf"
+    },
+    {
+      "enabled": false,
+      "template": true,
+      "device_name": "Hex-s-2025-lab05",
+      "router_host": "",
+      "client_endpoint_host": "",
+      "lan_subnet": "192.168.92.0/24",
+      "lan_gateway": "192.168.92.1",
+      "lan_host_ip": "192.168.92.200",
+      "iperf_server_ip": "192.168.92.200",
+      "lan_host_validation": {
+        "enabled": true,
+        "lan_host_ip": "192.168.92.200",
+        "expected_gateway": "192.168.92.1",
+        "wireguard_client_subnet": "10.10.50.0/24"
+      },
+      "wireguard_subnet": "10.10.50.0/24",
+      "wireguard_router_ip": "10.10.50.1/24",
+      "wireguard_client_ip": "10.10.50.2/32",
+      "peer_name": "pc-wg-lab05",
+      "export_conf_name": "robin-laptop-lab05.conf"
+    }
+  ]
+}
