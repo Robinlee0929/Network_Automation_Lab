@@ -692,7 +692,7 @@ python network_lab.py
 python network_lab.py --interactive
 ```
 
-The interactive menu can run `report-index` directly because it only reads local reports and writes the overview. Day4, Day8, Day12, and Day13 menu choices only print recommended commands and safety reminders in Day14 Phase 2; they do not execute live workflows.
+The interactive menu can run `report-index` directly because it only reads local reports and writes the overview. Day4 and Day8 are guarded live tasks that ask for confirmation before delegation. Day12 and Day13 remain recommended-command or report-only placeholders in the unified runner; WireGuard live execution is reserved for Day18.
 
 ```powershell
 python network_lab.py --list-tasks
@@ -726,6 +726,54 @@ reports/lab-summary/latest_lab_overview.html
 ```
 
 `reports/` is ignored by git, so generated Day14 overview output should remain local and should not be committed.
+
+## Day17 Runner Task Catalog and Report Visibility
+
+Day17 cleans up the unified runner as a safer platform entry point. It improves task catalog visibility, adds safety classification, and generates a local report visibility index without adding WireGuard live execution.
+
+List unified runner tasks:
+
+```powershell
+python network_lab.py --list-tasks
+```
+
+Generate the Day17 report visibility index:
+
+```powershell
+python network_lab.py --report-index
+```
+
+Open the generated HTML index:
+
+```powershell
+start reports\report_index.html
+```
+
+Safety levels:
+
+| Safety level | Meaning |
+| --- | --- |
+| SAFE_READ_ONLY | Local report viewing, summary generation, dry-run, or existing report indexing. |
+| LIVE_READ_ONLY | Live device checks that read state without changing configuration. |
+| LIVE_PERFORMANCE | Live throughput tests that generate traffic but do not modify router configuration. |
+| LIVE_CONFIG_CHANGE | Tasks that may change router, switch, firewall, or VPN configuration and require explicit confirmation. |
+| FUTURE_RESERVED | Placeholder for intentionally disabled future runner integration. |
+
+Day17 report visibility behavior:
+
+- `--list-tasks` prints task ID, day, display name, category, safety level, enabled state, execution mode, live-device requirement, related script, and report paths.
+- `--report-index` scans local report paths and writes `reports/report_index.html`.
+- Missing expected reports are shown as `MISSING` instead of crashing.
+- Existing HTML reports are linked with relative paths when possible.
+- Report visibility does not connect to devices, ask for SSH passwords, read `config.json`, or print secrets.
+- WireGuard live runner integration is intentionally disabled in Day17 and reserved for Day18.
+
+Available guarded runner tasks still include:
+
+```powershell
+python network_lab.py --task day4-baseline
+python network_lab.py --task iperf3-performance
+```
 
 ## How to Read Reports
 
