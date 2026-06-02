@@ -1,4 +1,6 @@
 import json
+import sys
+from types import SimpleNamespace
 from pathlib import Path
 
 import pytest
@@ -233,6 +235,82 @@ def test_cli_task_report_index_creates_json_and_html_using_fake_reports(tmp_path
     assert (tmp_path / "reports/lab-summary/latest_lab_overview.html").exists()
 
 
+def test_cli_day4_baseline_dry_run_prints_command_and_does_not_call_subprocess(
+    tmp_path,
+    monkeypatch,
+    capsys,
+):
+    profile_path = write_default_profile(tmp_path)
+
+    def fail_run(*_args, **_kwargs):
+        raise AssertionError("subprocess.run should not be called during dry-run")
+
+    monkeypatch.setattr(network_lab.subprocess, "run", fail_run)
+
+    exit_code = network_lab.main(
+        ["--task", "day4-baseline", "--profile", str(profile_path), "--dry-run"],
+        project_root=tmp_path,
+    )
+
+    output = capsys.readouterr().out
+    assert exit_code == 0
+    assert "python mikrotik_day4_multi_device_baseline.py" in output
+    assert "Dry-run does not connect to devices" in output
+    assert "No live workflow was executed" in output
+    assert not (tmp_path / "reports/lab-summary/latest_lab_overview.json").exists()
+
+
+def test_cli_day4_baseline_calls_existing_script_through_subprocess(
+    tmp_path,
+    monkeypatch,
+    capsys,
+):
+    profile_path = write_default_profile(tmp_path)
+    calls = []
+
+    def fake_run(command, cwd):
+        calls.append((command, cwd))
+        return SimpleNamespace(returncode=0)
+
+    monkeypatch.setattr(network_lab.subprocess, "run", fake_run)
+
+    exit_code = network_lab.main(
+        ["--task", "day4-baseline", "--profile", str(profile_path)],
+        project_root=tmp_path,
+    )
+
+    output = capsys.readouterr().out
+    assert exit_code == 0
+    assert calls == [([sys.executable, "mikrotik_day4_multi_device_baseline.py"], tmp_path.resolve())]
+    assert "Day4 baseline finished" in output
+    assert "PASS" in output
+
+
+def test_cli_day4_baseline_nonzero_subprocess_return_code_is_returned(
+    tmp_path,
+    monkeypatch,
+    capsys,
+):
+    profile_path = write_default_profile(tmp_path)
+
+    monkeypatch.setattr(
+        network_lab.subprocess,
+        "run",
+        lambda _command, cwd: SimpleNamespace(returncode=7),
+    )
+
+    exit_code = network_lab.main(
+        ["--task", "day4-baseline", "--profile", str(profile_path)],
+        project_root=tmp_path,
+    )
+
+    output = capsys.readouterr().out
+    assert exit_code == 7
+    assert "FAIL" in output
+    assert "exit code 7" in output
+    assert "python network_lab.py --task report-index" in output
+
+
 def test_cli_report_index_output_lists_report_items(tmp_path, capsys):
     prof = profile(required=False)
     profile_path = tmp_path / "profile.json"
@@ -321,10 +399,78 @@ def test_interactive_report_index_writes_overview_files(tmp_path, monkeypatch):
     assert (tmp_path / "reports/lab-summary/latest_lab_overview.html").exists()
 
 
+def test_interactive_day4_option_asks_for_confirmation(tmp_path, monkeypatch, capsys):
+    write_default_profile(tmp_path)
+    choices = iter(["5", "n", "0"])
+    monkeypatch.setattr("builtins.input", lambda _prompt: next(choices))
+    monkeypatch.setattr(
+        network_lab.subprocess,
+        "run",
+        lambda *_args, **_kwargs: (_ for _ in ()).throw(AssertionError("subprocess.run should not be called")),
+    )
+
+    exit_code = network_lab.main(["--interactive"], project_root=tmp_path)
+
+    output = capsys.readouterr().out
+    assert exit_code == 0
+    assert "live SSH validation workflow" in output
+    assert "python mikrotik_day4_multi_device_baseline.py" in output
+    assert "Day4 baseline cancelled" in output
+
+
+@pytest.mark.parametrize("confirmation", ["n", ""])
+def test_interactive_day4_option_without_confirmation_cancels_safely(
+    tmp_path,
+    monkeypatch,
+    capsys,
+    confirmation,
+):
+    write_default_profile(tmp_path)
+    choices = iter(["5", confirmation, "0"])
+    monkeypatch.setattr("builtins.input", lambda _prompt: next(choices))
+
+    def fail_run(*_args, **_kwargs):
+        raise AssertionError("subprocess.run should not be called without confirmation")
+
+    monkeypatch.setattr(network_lab.subprocess, "run", fail_run)
+
+    exit_code = network_lab.main(["--interactive"], project_root=tmp_path)
+
+    output = capsys.readouterr().out
+    assert exit_code == 0
+    assert "Day4 baseline cancelled" in output
+    assert network_lab.INTERACTIVE_ACTION_COMPLETE in output
+    assert not (tmp_path / "reports/lab-summary/latest_lab_overview.json").exists()
+
+
+def test_interactive_day4_option_with_y_delegates_to_day4_script(
+    tmp_path,
+    monkeypatch,
+    capsys,
+):
+    write_default_profile(tmp_path)
+    choices = iter(["5", "y", "0"])
+    calls = []
+    monkeypatch.setattr("builtins.input", lambda _prompt: next(choices))
+
+    def fake_run(command, cwd):
+        calls.append((command, cwd))
+        return SimpleNamespace(returncode=0)
+
+    monkeypatch.setattr(network_lab.subprocess, "run", fake_run)
+
+    exit_code = network_lab.main(["--interactive"], project_root=tmp_path)
+
+    output = capsys.readouterr().out
+    assert exit_code == 0
+    assert calls == [([sys.executable, "mikrotik_day4_multi_device_baseline.py"], tmp_path.resolve())]
+    assert "Day4 baseline finished" in output
+    assert network_lab.INTERACTIVE_ACTION_COMPLETE in output
+
+
 @pytest.mark.parametrize(
     ("choice", "expected"),
     [
-        ("5", "mikrotik_day4_multi_device_baseline.py"),
         ("6", "performance_test.py"),
         ("7", "mikrotik_day12_wireguard_vpn_automation.py"),
         ("8", "Day13 multi-router WireGuard summary workflow"),
@@ -340,6 +486,11 @@ def test_interactive_live_workflow_choices_only_print_recommended_commands(
     write_default_profile(tmp_path)
     choices = iter([choice, "0"])
     monkeypatch.setattr("builtins.input", lambda _prompt: next(choices))
+    monkeypatch.setattr(
+        network_lab.subprocess,
+        "run",
+        lambda *_args, **_kwargs: (_ for _ in ()).throw(AssertionError("subprocess.run should not be called")),
+    )
 
     exit_code = network_lab.main(["--interactive"], project_root=tmp_path)
 
