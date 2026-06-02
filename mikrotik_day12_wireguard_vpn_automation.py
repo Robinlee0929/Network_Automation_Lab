@@ -36,6 +36,8 @@ DEFAULT_CLIENT_ENDPOINT_HOST = "192.168.0.199"
 DEFAULT_CLIENT_ALLOWED_IPS = "10.10.10.0/24,192.168.88.0/24"
 DEFAULT_KEEPALIVE = 25
 DEFAULT_CONF_FILENAME = "wireguard-client.conf"
+DEFAULT_WG_ROUTER_IP = "10.10.10.1/24"
+DEFAULT_LAN_SUBNET = "192.168.88.0/24"
 DEFAULT_LAN_GATEWAY_IP = "192.168.88.1"
 DEFAULT_LAN_HOST_IP = "192.168.88.254"
 DEFAULT_IPERF_PORT = 5201
@@ -72,6 +74,8 @@ class Day12Config:
     client_allowed_ips: str
     client_keepalive: int
     conf_filename: str
+    wg_router_ip: str
+    lan_subnet: str
     lan_gateway_ip: str
     lan_host_ip: str
     iperf_server_ip: str
@@ -562,6 +566,8 @@ def parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
     parser.add_argument("--client-allowed-ips")
     parser.add_argument("--client-keepalive", type=int)
     parser.add_argument("--conf-filename")
+    parser.add_argument("--wg-router-ip")
+    parser.add_argument("--lan-subnet")
     parser.add_argument("--lan-gateway-ip")
     parser.add_argument("--lan-host-ip")
     parser.add_argument("--iperf-server-ip")
@@ -706,6 +712,8 @@ def build_config_from_args(args: argparse.Namespace) -> Day12Config:
         client_allowed_ips=resolve_text("client_allowed_ips", "Client allowed IPs", DEFAULT_CLIENT_ALLOWED_IPS),
         client_keepalive=resolve_int("client_keepalive", "Client keepalive", DEFAULT_KEEPALIVE),
         conf_filename=conf_filename,
+        wg_router_ip=resolve_text("wg_router_ip", "WireGuard router IP", DEFAULT_WG_ROUTER_IP),
+        lan_subnet=resolve_text("lan_subnet", "LAN subnet", DEFAULT_LAN_SUBNET),
         lan_gateway_ip=resolve_text("lan_gateway_ip", "LAN gateway IP", DEFAULT_LAN_GATEWAY_IP),
         lan_host_ip=resolve_text("lan_host_ip", "LAN host IP", DEFAULT_LAN_HOST_IP),
         iperf_server_ip=str(args.iperf_server_ip or saved_value("iperf_server_ip") or args.lan_host_ip or saved_value("lan_host_ip") or DEFAULT_LAN_HOST_IP),
@@ -735,6 +743,8 @@ def day12_config_to_saved_dict(config: Day12Config) -> Dict[str, Any]:
         "client_allowed_ips": config.client_allowed_ips,
         "client_keepalive": config.client_keepalive,
         "conf_filename": config.conf_filename,
+        "wg_router_ip": config.wg_router_ip,
+        "lan_subnet": config.lan_subnet,
         "lan_gateway_ip": config.lan_gateway_ip,
         "lan_host_ip": config.lan_host_ip,
         "iperf_server_ip": config.iperf_server_ip,
@@ -867,7 +877,7 @@ def make_initial_report(config: Day12Config) -> Dict[str, Any]:
         "wireguard_summary": {
             "interface_name": config.wg_interface,
             "listen_port": "",
-            "interface_ip": "10.10.10.1/24",
+            "interface_ip": config.wg_router_ip,
             "peer_name": config.peer_name,
             "client_address": config.client_address,
             "client_dns": config.client_dns,
@@ -943,10 +953,10 @@ def run(config: Day12Config) -> Tuple[Dict[str, Any], Path, Path]:
         report["wireguard_summary"]["listen_port"] = listen_port
         report["checks"]["wg_interface_exists"] = "PASS" if interface else "FAIL"
         report["checks"]["wg_interface_running"] = "PASS" if interface and interface.get("disabled", "no") != "yes" and interface.get("running", "yes") != "no" else "FAIL"
-        report["checks"]["wg_interface_ip_exists"] = "PASS" if output_contains_interface_ip(outputs["addresses"], config.wg_interface, "10.10.10.1/24") else "FAIL"
+        report["checks"]["wg_interface_ip_exists"] = "PASS" if output_contains_interface_ip(outputs["addresses"], config.wg_interface, config.wg_router_ip) else "FAIL"
         console_check(f"WireGuard interface {config.wg_interface} exists", report["checks"]["wg_interface_exists"])
         console_check(f"WireGuard interface {config.wg_interface} running", report["checks"]["wg_interface_running"])
-        console_check("WireGuard interface IP 10.10.10.1/24", report["checks"]["wg_interface_ip_exists"])
+        console_check(f"WireGuard interface IP {config.wg_router_ip}", report["checks"]["wg_interface_ip_exists"])
 
         peer = parse_wireguard_peer_detail(outputs["peers"], config.peer_name)
         if peer["exists"] and config.recreate_peer:
@@ -991,7 +1001,7 @@ def run(config: Day12Config) -> Tuple[Dict[str, Any], Path, Path]:
         console_stage(4, total_steps, "Checking firewall rules")
         udp = detect_firewall_udp_allow_before_drop(outputs["firewall"], listen_port)
         vpn_subnet = config.client_allowed_ips.split(",", 1)[0]
-        lan_subnet = next((part for part in config.client_allowed_ips.split(",") if part.strip().startswith("192.168.88.")), "192.168.88.0/24")
+        lan_subnet = config.lan_subnet
         forward = detect_forward_vpn_to_lan_rule(outputs["firewall"], vpn_subnet.strip(), lan_subnet.strip())
         report["checks"]["firewall_udp_input_allow"] = "PASS" if udp["found"] else "WARN"
         report["checks"]["firewall_forward_vpn_to_lan"] = "PASS" if forward["found"] else "WARN"

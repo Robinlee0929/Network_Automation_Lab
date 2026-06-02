@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Multi-router WireGuard Client-to-Site Validation</title>
+  <style>
+    body { font-family: Segoe UI, Arial, sans-serif; margin: 24px; color: #1f2937; background: #f8fafc; }
+    h1, h2, h3, h4 { margin: 0 0 10px; }
+    h1 { font-size: 28px; }
+    h2 { font-size: 20px; margin-top: 28px; }
+    h3 { font-size: 18px; }
+    h4 { font-size: 14px; margin-top: 18px; color: #374151; }
+    .summary, .card { background: #ffffff; border: 1px solid #d1d5db; border-radius: 8px; padding: 18px; margin: 16px 0; }
+    .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-top: 12px; }
+    .summary-grid div, .detail-grid div { border: 1px solid #e5e7eb; border-radius: 6px; padding: 10px; background: #f9fafb; }
+    .badge { display: inline-block; padding: 4px 10px; border-radius: 999px; font-weight: 700; font-size: 12px; }
+    .pass { color: #047857; background: #d1fae5; }
+    .warn { color: #92400e; background: #fef3c7; }
+    .fail { color: #991b1b; background: #fee2e2; }
+    .skip, .unknown { color: #374151; background: #e5e7eb; }
+    table { border-collapse: collapse; width: 100%; margin-top: 12px; }
+    td, th { border: 1px solid #d1d5db; padding: 10px; text-align: left; vertical-align: top; }
+    th { background: #f3f4f6; }
+    .card-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; border-bottom: 1px solid #e5e7eb; padding-bottom: 10px; margin-bottom: 14px; }
+    .detail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; margin: 0; }
+    dt { font-size: 12px; color: #6b7280; font-weight: 700; text-transform: uppercase; }
+    dd { margin: 4px 0 0; overflow-wrap: anywhere; }
+    .checklist { list-style: none; padding: 0; margin: 0; }
+    .checklist li { display: flex; justify-content: space-between; gap: 12px; border: 1px solid #e5e7eb; border-radius: 6px; padding: 10px; margin-bottom: 8px; background: #f9fafb; }
+    ul { margin-top: 8px; }
+    pre { background: #111827; color: #f9fafb; border-radius: 6px; padding: 12px; overflow-x: auto; white-space: pre-wrap; }
+    code { font-family: Consolas, monospace; }
+    .muted { color: #6b7280; margin: 8px 0; }
+  </style>
+</head>
+<body>
+  <section class="summary">
+    <h1>Multi-router WireGuard Client-to-Site Validation</h1>
+    <div class="summary-grid">
+      <div><dt>VPN type</dt><dd>Client-to-Site</dd></div>
+      <div><dt>Mode</dt><dd>Static profile validation</dd></div>
+      <div><dt>Overall result</dt><dd><span class="badge pass">PASS</span></dd></div>
+      <div><dt>Device count</dt><dd>2</dd></div>
+    </div>
+  </section>
+  <h2>Device Overview</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Device</th>
+        <th>Router SSH host</th>
+        <th>LAN subnet</th>
+        <th>LAN host</th>
+        <th>WireGuard subnet</th>
+        <th>Result</th>
+      </tr>
+    </thead>
+    <tbody><tr><td>Hex-s-2025-lab01</td><td>192.168.0.199</td><td>192.168.88.0/24</td><td>192.168.88.254</td><td>10.10.10.0/24</td><td><span class="badge pass">PASS</span></td></tr>
+<tr><td>Hex-s-2025-lab02</td><td>192.168.0.113</td><td>192.168.89.0/24</td><td>192.168.89.200</td><td>10.10.20.0/24</td><td><span class="badge pass">PASS</span></td></tr></tbody>
+  </table>
+  <h2>Per-Device Diagnosis</h2>
+  
+  <section class="card">
+    <div class="card-header">
+      <h3>Hex-s-2025-lab01</h3>
+      <span class="badge pass">PASS</span>
+    </div>
+    <dl class="detail-grid"><div><dt>Router SSH host</dt><dd>192.168.0.199</dd></div><div><dt>Client endpoint host</dt><dd>192.168.0.199</dd></div><div><dt>LAN subnet</dt><dd>192.168.88.0/24</dd></div><div><dt>LAN gateway</dt><dd>192.168.88.1</dd></div><div><dt>LAN host</dt><dd>192.168.88.254</dd></div><div><dt>iperf server</dt><dd>192.168.88.254</dd></div><div><dt>WireGuard subnet</dt><dd>10.10.10.0/24</dd></div><div><dt>Router WireGuard IP</dt><dd>10.10.10.1/24</dd></div><div><dt>Client WireGuard IP</dt><dd>10.10.10.2/32</dd></div><div><dt>Peer name</dt><dd>pc-wg-lab01</dd></div><div><dt>Expected export path</dt><dd>exports\wireguard\robin-laptop-lab01.conf</dd></div></dl>
+    <h4>Connectivity Checklist</h4>
+    <ul class="checklist"><li><span>WireGuard tunnel status</span><span class="badge unknown">NOT_RUN</span></li>
+<li><span>Router gateway reachability</span><span class="badge unknown">NOT_RUN</span></li>
+<li><span>Router to LAN host reachability</span><span class="badge skip">SKIP</span></li>
+<li><span>LAN host diagnosis</span><strong>LAN host validation disabled</strong></li></ul>
+    <h4>Likely Causes</h4>
+    <p class="muted">None</p>
+    <h4>Remediation Commands</h4>
+    <p class="muted">None</p>
+    <h4>Warnings</h4>
+    <p class="muted">None</p>
+    <h4>Errors</h4>
+    <p class="muted">None</p>
+  </section>
+
+
+  <section class="card">
+    <div class="card-header">
+      <h3>Hex-s-2025-lab02</h3>
+      <span class="badge pass">PASS</span>
+    </div>
+    <dl class="detail-grid"><div><dt>Router SSH host</dt><dd>192.168.0.113</dd></div><div><dt>Client endpoint host</dt><dd>192.168.0.113</dd></div><div><dt>LAN subnet</dt><dd>192.168.89.0/24</dd></div><div><dt>LAN gateway</dt><dd>192.168.89.1</dd></div><div><dt>LAN host</dt><dd>192.168.89.200</dd></div><div><dt>iperf server</dt><dd>192.168.89.200</dd></div><div><dt>WireGuard subnet</dt><dd>10.10.20.0/24</dd></div><div><dt>Router WireGuard IP</dt><dd>10.10.20.1/24</dd></div><div><dt>Client WireGuard IP</dt><dd>10.10.20.2/32</dd></div><div><dt>Peer name</dt><dd>pc-wg-lab02</dd></div><div><dt>Expected export path</dt><dd>exports\wireguard\robin-laptop-lab02.conf</dd></div></dl>
+    <h4>Connectivity Checklist</h4>
+    <ul class="checklist"><li><span>WireGuard tunnel status</span><span class="badge unknown">NOT_RUN</span></li>
+<li><span>Router gateway reachability</span><span class="badge unknown">NOT_RUN</span></li>
+<li><span>Router to LAN host reachability</span><span class="badge unknown">NOT_RUN</span></li>
+<li><span>LAN host diagnosis</span><strong>LAN host validation not run</strong></li></ul>
+    <h4>Likely Causes</h4>
+    <p class="muted">None</p>
+    <h4>Remediation Commands</h4>
+    <p class="muted">None</p>
+    <h4>Warnings</h4>
+    <p class="muted">None</p>
+    <h4>Errors</h4>
+    <p class="muted">None</p>
+  </section>
+
+</body>
+</html>
