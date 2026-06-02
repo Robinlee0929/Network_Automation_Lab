@@ -222,6 +222,145 @@ def test_list_tasks_prints_report_index_and_planned_tasks(capsys):
     assert "day13-wireguard-summary" in output
 
 
+def test_task_catalog_contains_day17_required_fields():
+    required_fields = {
+        "task_id",
+        "display_name",
+        "day",
+        "category",
+        "description",
+        "safety_level",
+        "execution_mode",
+        "enabled",
+        "requires_live_device",
+        "requires_password",
+        "produces_report",
+        "report_paths",
+        "related_script",
+        "notes",
+    }
+
+    tasks = network_lab.list_tasks()
+
+    assert tasks
+    for task in tasks:
+        assert required_fields.issubset(task)
+    assert {task["task_id"] for task in tasks} >= {
+        "report_index",
+        "day4_baseline_validation",
+        "day8_iperf3_performance",
+        "day13_wireguard_summary_only",
+    }
+
+
+def test_list_tasks_does_not_execute_live_device_commands(monkeypatch, capsys):
+    def fail_run(*_args, **_kwargs):
+        raise AssertionError("list-tasks must not execute subprocess")
+
+    monkeypatch.setattr(network_lab.subprocess, "run", fail_run)
+
+    exit_code = network_lab.main(["--list-tasks"])
+
+    output = capsys.readouterr().out
+    assert exit_code == 0
+    assert "Task Catalog" in output
+    assert "LIVE_READ_ONLY" in output
+    assert "LIVE_PERFORMANCE" in output
+    assert "FUTURE_RESERVED" in output
+
+
+def test_report_visibility_index_works_when_reports_directory_is_missing(tmp_path, capsys):
+    exit_code = network_lab.main(["--report-index"], project_root=tmp_path)
+
+    output = capsys.readouterr().out
+    assert exit_code == 0
+    assert "Report Index" in output
+    assert "MISSING" in output
+    assert "WireGuard live runner integration is intentionally disabled in Day17" in output
+    assert (tmp_path / "reports/report_index.html").exists()
+
+
+def test_report_visibility_index_finds_partial_reports_and_marks_missing(tmp_path, capsys):
+    write_json(
+        tmp_path / "reports" / "Hex-s-2025-lab01" / "day4_baseline_validation.json",
+        {"result": "PASS"},
+    )
+    (tmp_path / "reports" / "Hex-s-2025-lab01" / "day8_iperf3_WAN_TO_LAN_DNAT_report.html").parent.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
+    (tmp_path / "reports" / "Hex-s-2025-lab01" / "day8_iperf3_WAN_TO_LAN_DNAT_report.html").write_text(
+        "<html>day8</html>",
+        encoding="utf-8",
+    )
+
+    exit_code = network_lab.main(["--report-index"], project_root=tmp_path)
+
+    output = capsys.readouterr().out
+    assert exit_code == 0
+    assert "Day4 Baseline Validation" in output
+    assert "Hex-s-2025-lab01: FOUND" in output
+    assert "JSON: reports/Hex-s-2025-lab01/day4_baseline_validation.json" in output
+    assert "Day8 iperf3 Performance" in output
+    assert "HTML: reports/Hex-s-2025-lab01/day8_iperf3_WAN_TO_LAN_DNAT_report.html" in output
+    assert "Day13 WireGuard Live Execution" in output
+    assert "DISABLED FOR DAY17" in output
+
+
+def test_wireguard_catalog_entries_are_disabled_or_future_reserved():
+    wireguard_tasks = [task for task in network_lab.list_tasks() if task["category"] == "vpn"]
+
+    assert wireguard_tasks
+    for task in wireguard_tasks:
+        assert task["enabled"] is False
+        assert task["safety_level"] == "FUTURE_RESERVED"
+        assert "Day18" in task["notes"]
+
+
+def test_wireguard_placeholder_does_not_call_live_scripts(tmp_path, monkeypatch, capsys):
+    def fail_run(*_args, **_kwargs):
+        raise AssertionError("WireGuard placeholder/report index must not execute subprocess")
+
+    monkeypatch.setattr(network_lab.subprocess, "run", fail_run)
+
+    exit_code = network_lab.main(["--report-index"], project_root=tmp_path)
+
+    output = capsys.readouterr().out
+    assert exit_code == 0
+    assert "WireGuard live runner integration is intentionally disabled in Day17" in output
+
+
+def test_html_report_index_generation_contains_catalog_reports_and_legend(tmp_path):
+    rows = network_lab.discover_report_visibility(tmp_path)
+    output = tmp_path / "reports" / "report_index.html"
+
+    network_lab.write_report_index_html(network_lab.list_tasks(), rows, output, tmp_path)
+
+    html = output.read_text(encoding="utf-8")
+    assert "Network Automation Lab Report Index" in html
+    assert "Task Catalog Summary" in html
+    assert "Report Visibility" in html
+    assert "Safety Level Legend" in html
+    assert "WireGuard live execution is not enabled in Day17" in html
+
+
+def test_report_index_does_not_print_config_json_secret_content(tmp_path, capsys):
+    write_json(tmp_path / "config.json", {"password": "super-secret-password"})
+    write_json(
+        tmp_path / "reports" / "Hex-s-2025-lab01" / "day4_baseline_validation.json",
+        {"result": "PASS"},
+    )
+
+    exit_code = network_lab.main(["--report-index"], project_root=tmp_path)
+
+    output = capsys.readouterr().out
+    html = (tmp_path / "reports/report_index.html").read_text(encoding="utf-8")
+    assert exit_code == 0
+    assert "super-secret-password" not in output
+    assert "super-secret-password" not in html
+    assert "config.json" not in output
+
+
 def test_cli_task_report_index_dry_run_exits_zero(tmp_path):
     profile_path = tmp_path / "profile.json"
     write_json(profile_path, profile())
