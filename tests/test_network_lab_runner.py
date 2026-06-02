@@ -202,6 +202,7 @@ def test_list_tasks_prints_report_index_and_planned_tasks(capsys):
     assert exit_code == 0
     assert "report-index" in output
     assert "day4-baseline" in output
+    assert "day8-performance" in output
     assert "day13-wireguard-summary" in output
 
 
@@ -309,6 +310,94 @@ def test_cli_day4_baseline_nonzero_subprocess_return_code_is_returned(
     assert "FAIL" in output
     assert "exit code 7" in output
     assert "python network_lab.py --task report-index" in output
+
+
+def test_cli_day8_performance_dry_run_prints_command_and_safety_notes(
+    tmp_path,
+    monkeypatch,
+    capsys,
+):
+    profile_path = write_default_profile(tmp_path)
+
+    def fail_run(*_args, **_kwargs):
+        raise AssertionError("subprocess.run should not be called during Day8 dry-run")
+
+    monkeypatch.setattr(network_lab.subprocess, "run", fail_run)
+
+    exit_code = network_lab.main(
+        ["--task", "day8-performance", "--profile", str(profile_path), "--dry-run"],
+        project_root=tmp_path,
+    )
+
+    output = capsys.readouterr().out
+    assert exit_code == 0
+    assert "Day8 iperf3 performance" in output
+    assert "Mode: Dry run" in output
+    assert "python performance_test.py --profile topology_profiles/day8_iperf3_router_performance.json" in output
+    assert "Safety notes" in output
+    assert "No live workflow was executed" in output
+    assert not (tmp_path / "reports/lab-summary/latest_lab_overview.json").exists()
+    assert not (tmp_path / "reports/lab-summary/latest_lab_overview.html").exists()
+
+
+def test_cli_day8_performance_calls_existing_script_through_subprocess(
+    tmp_path,
+    monkeypatch,
+    capsys,
+):
+    profile_path = write_default_profile(tmp_path)
+    calls = []
+
+    def fake_run(command, cwd):
+        calls.append((command, cwd))
+        return SimpleNamespace(returncode=0)
+
+    monkeypatch.setattr(network_lab.subprocess, "run", fake_run)
+
+    exit_code = network_lab.main(
+        ["--task", "day8-performance", "--profile", str(profile_path)],
+        project_root=tmp_path,
+    )
+
+    output = capsys.readouterr().out
+    assert exit_code == 0
+    assert calls == [
+        (
+            [
+                sys.executable,
+                "performance_test.py",
+                "--profile",
+                "topology_profiles/day8_iperf3_router_performance.json",
+            ],
+            tmp_path.resolve(),
+        )
+    ]
+    assert "Day8 iperf3 performance completed successfully" in output
+    assert "PASS" in output
+
+
+def test_cli_day8_performance_nonzero_subprocess_return_code_is_returned(
+    tmp_path,
+    monkeypatch,
+    capsys,
+):
+    profile_path = write_default_profile(tmp_path)
+
+    monkeypatch.setattr(
+        network_lab.subprocess,
+        "run",
+        lambda _command, cwd: SimpleNamespace(returncode=9),
+    )
+
+    exit_code = network_lab.main(
+        ["--task", "day8-performance", "--profile", str(profile_path)],
+        project_root=tmp_path,
+    )
+
+    output = capsys.readouterr().out
+    assert exit_code == 9
+    assert "FAIL" in output
+    assert "exit code 9" in output
 
 
 def test_cli_report_index_output_lists_report_items(tmp_path, capsys):
@@ -468,10 +557,95 @@ def test_interactive_day4_option_with_y_delegates_to_day4_script(
     assert network_lab.INTERACTIVE_ACTION_COMPLETE in output
 
 
+def test_interactive_day8_option_asks_for_confirmation(tmp_path, monkeypatch, capsys):
+    write_default_profile(tmp_path)
+    choices = iter(["6", "n", "0"])
+    prompts = []
+
+    def fake_input(prompt):
+        prompts.append(prompt)
+        return next(choices)
+
+    monkeypatch.setattr("builtins.input", fake_input)
+    monkeypatch.setattr(
+        network_lab.subprocess,
+        "run",
+        lambda *_args, **_kwargs: (_ for _ in ()).throw(AssertionError("subprocess.run should not be called")),
+    )
+
+    exit_code = network_lab.main(["--interactive"], project_root=tmp_path)
+
+    output = capsys.readouterr().out
+    assert exit_code == 0
+    assert "live iperf3 performance workflow" in output
+    assert "python performance_test.py --profile topology_profiles/day8_iperf3_router_performance.json" in output
+    assert "Confirm live Day8 iperf3 performance run" in prompts[1]
+    assert "Day8 iperf3 performance cancelled" in output
+
+
+def test_interactive_day8_option_with_y_delegates_to_day8_script(
+    tmp_path,
+    monkeypatch,
+    capsys,
+):
+    write_default_profile(tmp_path)
+    choices = iter(["6", "y", "0"])
+    calls = []
+    monkeypatch.setattr("builtins.input", lambda _prompt: next(choices))
+
+    def fake_run(command, cwd):
+        calls.append((command, cwd))
+        return SimpleNamespace(returncode=0)
+
+    monkeypatch.setattr(network_lab.subprocess, "run", fake_run)
+
+    exit_code = network_lab.main(["--interactive"], project_root=tmp_path)
+
+    output = capsys.readouterr().out
+    assert exit_code == 0
+    assert calls == [
+        (
+            [
+                sys.executable,
+                "performance_test.py",
+                "--profile",
+                "topology_profiles/day8_iperf3_router_performance.json",
+            ],
+            tmp_path.resolve(),
+        )
+    ]
+    assert "Day8 iperf3 performance completed successfully" in output
+    assert network_lab.INTERACTIVE_ACTION_COMPLETE in output
+
+
+@pytest.mark.parametrize("confirmation", ["n", "", "yes"])
+def test_interactive_day8_option_without_y_cancels_safely(
+    tmp_path,
+    monkeypatch,
+    capsys,
+    confirmation,
+):
+    write_default_profile(tmp_path)
+    choices = iter(["6", confirmation, "0"])
+    monkeypatch.setattr("builtins.input", lambda _prompt: next(choices))
+
+    def fail_run(*_args, **_kwargs):
+        raise AssertionError("subprocess.run should not be called without Day8 confirmation")
+
+    monkeypatch.setattr(network_lab.subprocess, "run", fail_run)
+
+    exit_code = network_lab.main(["--interactive"], project_root=tmp_path)
+
+    output = capsys.readouterr().out
+    assert exit_code == 0
+    assert "Day8 iperf3 performance cancelled" in output
+    assert network_lab.INTERACTIVE_ACTION_COMPLETE in output
+    assert not (tmp_path / "reports/lab-summary/latest_lab_overview.json").exists()
+
+
 @pytest.mark.parametrize(
     ("choice", "expected"),
     [
-        ("6", "performance_test.py"),
         ("7", "mikrotik_day12_wireguard_vpn_automation.py"),
         ("8", "Day13 multi-router WireGuard summary workflow"),
     ],
