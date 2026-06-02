@@ -654,6 +654,79 @@ Safety notes:
 - Do not commit local config files.
 - Day 13 reports show exported config paths only; they do not read or render WireGuard `.conf` content.
 
+## Day14 Unified Lab Runner and Report Index
+
+Day14 adds a unified entry point for lab-level tasks and a report index that builds a latest overview from existing JSON reports. It is designed as a portfolio-friendly summary layer and as a foundation for future dashboard integration.
+
+Purpose:
+
+- List implemented and planned lab automation tasks from one command.
+- Dry-run the report index so you can see which files will be checked.
+- Generate a latest lab overview JSON and HTML page from existing reports.
+- Keep live device validation in the existing day-specific scripts.
+
+What it does:
+
+- Reads report paths from `topology_profiles/day14_lab_runner_profile.json`.
+- Normalizes common report result fields such as `overall_result`, `result`, `status`, `passed`, and nested summary result fields.
+- Handles missing or malformed report JSON without crashing.
+- Creates a human-readable HTML overview with links to existing HTML reports.
+
+What it does not do:
+
+- Day14 report-index does not connect to routers.
+- It does not run WireGuard validation.
+- It does not run iperf3.
+- It does not replace Day2 through Day13 scripts.
+- Use Day13 `--run-live-validation --run-iperf` first if fresh WireGuard performance data is needed.
+
+Commands:
+
+Interactive safe menu:
+
+```powershell
+python network_lab.py
+```
+
+```powershell
+python network_lab.py --interactive
+```
+
+The interactive menu can run `report-index` directly because it only reads local reports and writes the overview. Day4, Day8, Day12, and Day13 menu choices only print recommended commands and safety reminders in Day14 Phase 2; they do not execute live workflows.
+
+```powershell
+python network_lab.py --list-tasks
+```
+
+```powershell
+python network_lab.py --task report-index --dry-run
+```
+
+```powershell
+python network_lab.py --task report-index
+```
+
+```powershell
+python network_lab.py --task report-index --profile topology_profiles/day14_lab_runner_profile.json
+```
+
+Console output uses colored status labels in supported terminals. Set `NO_COLOR=1` if you need plain text output for logs or copy/paste.
+
+Open the generated HTML overview:
+
+```powershell
+start reports\lab-summary\latest_lab_overview.html
+```
+
+Output files:
+
+```text
+reports/lab-summary/latest_lab_overview.json
+reports/lab-summary/latest_lab_overview.html
+```
+
+`reports/` is ignored by git, so generated Day14 overview output should remain local and should not be committed.
+
 ## How to Read Reports
 
 Reports are written as structured evidence for each workflow.

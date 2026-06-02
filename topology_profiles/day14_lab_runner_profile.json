@@ -1,0 +1,98 @@
+{
+  "lab_name": "Network Automation Lab",
+  "overview_output": {
+    "json": "reports/lab-summary/latest_lab_overview.json",
+    "html": "reports/lab-summary/latest_lab_overview.html"
+  },
+  "devices": [
+    {
+      "name": "Hex-s-2025-lab01",
+      "type": "mikrotik",
+      "required": true,
+      "reports": [
+        {
+          "name": "Day2 Auto Setup",
+          "json": "reports/Hex-s-2025-lab01/day2_auto_setup_report.json",
+          "html": "reports/Hex-s-2025-lab01/day2_auto_setup_report.html",
+          "required": false
+        },
+        {
+          "name": "Day4 Baseline Validation",
+          "json": "reports/Hex-s-2025-lab01/day4_baseline_validation.json",
+          "html": "reports/Hex-s-2025-lab01/day4_baseline_validation.html",
+          "required": true
+        },
+        {
+          "name": "Day8 iperf3 Performance",
+          "json": "reports/Hex-s-2025-lab01/day8_iperf3_performance_report.json",
+          "html": "reports/Hex-s-2025-lab01/day8_iperf3_performance_report.html",
+          "required": false
+        },
+        {
+          "name": "Day12 WireGuard Live Validation",
+          "json": "reports/Hex-s-2025-lab01/day12_wireguard_vpn_automation_report.json",
+          "html": "reports/Hex-s-2025-lab01/day12_wireguard_vpn_automation_report.html",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "Hex-s-2025-lab02",
+      "type": "mikrotik",
+      "required": true,
+      "reports": [
+        {
+          "name": "Day2 Auto Setup",
+          "json": "reports/Hex-s-2025-lab02/day2_auto_setup_report.json",
+          "html": "reports/Hex-s-2025-lab02/day2_auto_setup_report.html",
+          "required": false
+        },
+        {
+          "name": "Day4 Baseline Validation",
+          "json": "reports/Hex-s-2025-lab02/day4_baseline_validation.json",
+          "html": "reports/Hex-s-2025-lab02/day4_baseline_validation.html",
+          "required": true
+        },
+        {
+          "name": "Day8 iperf3 Performance",
+          "json": "reports/Hex-s-2025-lab02/day8_iperf3_performance_report.json",
+          "html": "reports/Hex-s-2025-lab02/day8_iperf3_performance_report.html",
+          "required": false
+        },
+        {
+          "name": "Day12 WireGuard Live Validation",
+          "json": "reports/Hex-s-2025-lab02/day12_wireguard_vpn_automation_report.json",
+          "html": "reports/Hex-s-2025-lab02/day12_wireguard_vpn_automation_report.html",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "cisco-switch",
+      "type": "cisco",
+      "required": false,
+      "reports": [
+        {
+          "name": "Day5 Cisco Switch Topology",
+          "json": "reports/cisco-switch/switch_topology_report.json",
+          "html": "reports/cisco-switch/switch_topology_report.html",
+          "required": false
+        }
+      ]
+    }
+  ],
+  "lab_summary_reports": [
+    {
+      "name": "Day6 Lab Topology Summary",
+      "json": "reports/lab-summary/day6_lab_topology_summary.json",
+      "html": "reports/lab-summary/day6_lab_topology_summary.html",
+      "required": false
+    },
+    {
+      "name": "Day13 Multi-router WireGuard Client-to-Site Summary",
+      "json": "reports/lab-summary/day13_multi_router_wireguard_client_to_site_summary.json",
+      "html": "reports/lab-summary/day13_multi_router_wireguard_client_to_site_summary.html",
+      "required": false
+    }
+  ]
+}
