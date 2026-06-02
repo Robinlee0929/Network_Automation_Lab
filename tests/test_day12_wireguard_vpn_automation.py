@@ -19,6 +19,92 @@ PersistentKeepalive = 25
 """
 
 
+class FakeSshClient:
+    def close(self):
+        pass
+
+
+def day12_config(expect_connected=True, run_iperf=False):
+    return day12.Day12Config(
+        device_name="Hex-s-2025-lab01",
+        router_host="192.168.0.199",
+        router_username="admin",
+        router_password="router-secret-password",
+        router_ssh_port=22,
+        wg_interface="wg0",
+        peer_name="pc-wg-day12",
+        client_address="10.10.10.2/32",
+        client_dns="192.168.88.1",
+        client_endpoint_host="192.168.0.199",
+        client_allowed_ips="10.10.10.0/24,192.168.88.0/24",
+        client_keepalive=25,
+        conf_filename="robin-laptop-day12.conf",
+        wg_router_ip="10.10.10.1/24",
+        lan_subnet="192.168.88.0/24",
+        lan_gateway_ip="192.168.88.1",
+        lan_host_ip="192.168.88.254",
+        iperf_server_ip="192.168.88.254",
+        iperf_port=5201,
+        iperf_duration=40,
+        iperf_omit=10,
+        iperf_parallel=4,
+        run_iperf=run_iperf,
+        recreate_peer=False,
+        apply_firewall_fixes=False,
+        expect_connected=expect_connected,
+        non_interactive=True,
+    )
+
+
+def run_day12_with_fake_state(
+    tmp_path,
+    monkeypatch,
+    initial_peer,
+    refreshed_peer=None,
+    connectivity_ok=True,
+    run_iperf=False,
+):
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr(day12, "connect_ssh_with_auth_retry", lambda _config: FakeSshClient())
+    monkeypatch.setattr(day12, "show_client_config", lambda _client, _peer_name: CLIENT_CONFIG)
+    monkeypatch.setattr(day12.shutil, "which", lambda _name: "iperf3.exe")
+
+    peer_reads = [initial_peer, refreshed_peer if refreshed_peer is not None else initial_peer]
+
+    def fake_read(_client, command):
+        if command == "/interface/wireguard/print detail":
+            return '0 name="wg0" listen-port=13231 disabled=no running=yes'
+        if command == "/interface/wireguard/peers/print detail":
+            return peer_reads.pop(0) if len(peer_reads) > 1 else peer_reads[0]
+        if command == "/ip/address/print detail":
+            return '0 address=10.10.10.1/24 interface="wg0" disabled=no'
+        if command == "/ip/firewall/filter/print detail":
+            return """
+0 chain=input action=accept protocol=udp in-interface-list=WAN dst-port=13231 disabled=no
+1 chain=forward action=accept src-address=10.10.10.0/24 dst-address=192.168.88.0/24 disabled=no
+"""
+        raise AssertionError(f"unexpected read command: {command}")
+
+    def fake_subprocess(command, timeout):
+        if command and command[0] == "ping":
+            return connectivity_ok, "Reply from target" if connectivity_ok else "Request timed out", ""
+        if command and command[0] == "powershell":
+            return True, "True\r\n" if connectivity_ok else "False\r\n", ""
+        raise AssertionError(f"unexpected subprocess command: {command}")
+
+    def fake_iperf(_command, timeout, progress_label, progress_seconds):
+        if connectivity_ok:
+            return True, "[SUM] 0.00-40.00 sec 959 MBytes 201 Mbits/sec receiver", ""
+        return False, "", ""
+
+    monkeypatch.setattr(day12, "run_allowlisted_read", fake_read)
+    monkeypatch.setattr(day12, "run_subprocess", fake_subprocess)
+    monkeypatch.setattr(day12, "run_subprocess_with_countdown", fake_iperf)
+
+    report, json_path, html_path = day12.run(day12_config(expect_connected=True, run_iperf=run_iperf))
+    return report, json_path, html_path
+
+
 def base_checks():
     return {
         "wg_interface_exists": "PASS",
@@ -465,10 +551,107 @@ def test_missing_handshake_is_warn_in_default_mode():
 def test_missing_handshake_is_fail_in_expect_connected_mode():
     checks = base_checks()
     checks["handshake_seen"] = "FAIL"
+    checks["ping_lan_gateway"] = "FAIL"
+    checks["ping_lan_host"] = "FAIL"
+    checks["tcp_5201_reachable"] = "FAIL"
+    checks["iperf_forward"] = "SKIP"
+    checks["iperf_reverse"] = "SKIP"
     result, _warnings, errors = day12.evaluate_day12_result(checks, expect_connected=True)
 
     assert result == "FAIL"
     assert any("handshake" in error for error in errors)
+
+
+def test_initial_missing_handshake_with_later_ping_and_tcp_pass_does_not_fail_summary(tmp_path, monkeypatch):
+    initial_peer = '0 name="pc-wg-day12" allowed-address=10.10.10.2/32 rx=1KiB tx=2KiB'
+
+    report, json_path, html_path = run_day12_with_fake_state(
+        tmp_path,
+        monkeypatch,
+        initial_peer=initial_peer,
+        connectivity_ok=True,
+        run_iperf=True,
+    )
+
+    saved = json.loads(json_path.read_text(encoding="utf-8"))
+    html = html_path.read_text(encoding="utf-8")
+    assert report["overall_result"] != "FAIL"
+    assert report["checks"]["initial_handshake_seen"] == "WARN"
+    assert report["checks"]["post_connectivity_handshake_seen"] == "WARN"
+    assert report["checks"]["final_vpn_connectivity"] == "PASS"
+    assert report["checks"]["ping_lan_gateway"] == "PASS"
+    assert report["checks"]["ping_lan_host"] == "PASS"
+    assert report["checks"]["tcp_5201_reachable"] == "PASS"
+    assert report["checks"]["iperf_forward"] == "PASS"
+    assert report["checks"]["iperf_reverse"] == "PASS"
+    assert "initial_peer_state" in report["wireguard_summary"]
+    assert "post_connectivity_peer_state" in report["wireguard_summary"]
+    for secret in ("super-secret-private-key", "router-secret-password"):
+        assert secret not in json.dumps(saved)
+        assert secret not in html
+
+
+def test_initial_missing_handshake_then_refreshed_peer_handshake_passes_summary(tmp_path, monkeypatch):
+    initial_peer = '0 name="pc-wg-day12" allowed-address=10.10.10.2/32 rx=1KiB tx=2KiB'
+    refreshed_peer = '0 name="pc-wg-day12" allowed-address=10.10.10.2/32 last-handshake=16s rx=2KiB tx=4KiB'
+
+    report, _json_path, _html_path = run_day12_with_fake_state(
+        tmp_path,
+        monkeypatch,
+        initial_peer=initial_peer,
+        refreshed_peer=refreshed_peer,
+        connectivity_ok=True,
+    )
+
+    assert report["overall_result"] == "PASS"
+    assert report["checks"]["initial_handshake_seen"] == "WARN"
+    assert report["checks"]["post_connectivity_handshake_seen"] == "PASS"
+    assert report["checks"]["handshake_seen"] == "PASS"
+    assert report["wireguard_summary"]["post_connectivity_peer_state"]["latest_handshake"] == "16s"
+
+
+def test_peer_missing_still_fails_with_connectivity_checks(tmp_path, monkeypatch):
+    report, _json_path, _html_path = run_day12_with_fake_state(
+        tmp_path,
+        monkeypatch,
+        initial_peer="",
+        connectivity_ok=True,
+    )
+
+    assert report["overall_result"] == "FAIL"
+    assert report["checks"]["peer_exists"] == "FAIL"
+    assert any("peer is missing" in error for error in report["errors"])
+
+
+def test_allowed_address_mismatch_still_fails(tmp_path, monkeypatch):
+    peer = '0 name="pc-wg-day12" allowed-address=10.10.10.99/32 last-handshake=16s rx=1KiB tx=2KiB'
+
+    report, _json_path, _html_path = run_day12_with_fake_state(
+        tmp_path,
+        monkeypatch,
+        initial_peer=peer,
+        connectivity_ok=True,
+    )
+
+    assert report["overall_result"] == "FAIL"
+    assert report["checks"]["peer_allowed_address"] == "FAIL"
+
+
+def test_connectivity_fail_with_no_handshake_still_fails(tmp_path, monkeypatch):
+    peer = '0 name="pc-wg-day12" allowed-address=10.10.10.2/32 rx=0 tx=0'
+
+    report, _json_path, _html_path = run_day12_with_fake_state(
+        tmp_path,
+        monkeypatch,
+        initial_peer=peer,
+        connectivity_ok=False,
+    )
+
+    assert report["overall_result"] == "FAIL"
+    assert report["checks"]["handshake_seen"] == "FAIL"
+    assert report["checks"]["peer_rx_tx_nonzero"] == "FAIL"
+    assert report["checks"]["final_vpn_connectivity"] == "FAIL"
+    assert any("handshake" in error for error in report["errors"])
 
 
 def test_tcp_5201_failure_is_warn_in_default_mode():

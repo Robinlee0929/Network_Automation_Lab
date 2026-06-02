@@ -439,6 +439,7 @@ def evaluate_day12_result(
     fail_always = {
         "wg_interface_exists": "WireGuard interface is missing.",
         "peer_exists": "WireGuard peer is missing.",
+        "peer_allowed_address": "WireGuard peer allowed-address does not match the expected client address.",
         "client_config_generated": "WireGuard client config export failed.",
         "config_file_written": "WireGuard config file was not written.",
         "private_key_redacted_in_report": "PrivateKey was not redacted in report.",
@@ -457,18 +458,30 @@ def evaluate_day12_result(
         "tcp_5201_reachable": "TCP 5201 is not reachable.",
         "iperf_forward": "iperf forward test was not run or did not pass.",
         "iperf_reverse": "iperf reverse test was not run or did not pass.",
+        "initial_handshake_seen": "Initial WireGuard handshake has not been seen yet.",
+        "post_connectivity_handshake_seen": "Post-connectivity WireGuard handshake has not been seen yet.",
+        "final_vpn_connectivity": "No VPN connectivity proof passed.",
     }
     for key, message in warn_default.items():
+        if key in {"initial_handshake_seen", "post_connectivity_handshake_seen"} and checks.get("handshake_seen") == "PASS":
+            continue
         if checks.get(key) == "FAIL":
             warnings.append(message)
         elif checks.get(key) == "WARN":
             warnings.append(message)
 
+    connectivity_is_proven = vpn_connectivity_proven(checks)
     if expect_connected:
-        for key in ("handshake_seen", "peer_rx_tx_nonzero", "ping_lan_gateway", "ping_lan_host"):
+        strict_keys = ["peer_rx_tx_nonzero", "ping_lan_gateway", "ping_lan_host"]
+        if not connectivity_is_proven:
+            strict_keys.append("handshake_seen")
+        for key in strict_keys:
             if checks.get(key) in {"FAIL", "WARN"}:
                 errors.append(warn_default[key])
                 warnings = [warning for warning in warnings if warning != warn_default[key]]
+        if checks.get("final_vpn_connectivity") == "FAIL":
+            errors.append(warn_default["final_vpn_connectivity"])
+            warnings = [warning for warning in warnings if warning != warn_default["final_vpn_connectivity"]]
 
     if run_iperf:
         for key in ("tcp_5201_reachable", "iperf_forward", "iperf_reverse"):
@@ -493,6 +506,42 @@ def check_status(passed: bool, strict: bool = False) -> str:
     if passed:
         return "PASS"
     return "FAIL" if strict else "WARN"
+
+
+CONNECTIVITY_PROOF_CHECKS = (
+    "ping_lan_gateway",
+    "ping_lan_host",
+    "tcp_5201_reachable",
+    "iperf_forward",
+    "iperf_reverse",
+)
+
+
+def vpn_connectivity_proven(checks: Dict[str, str]) -> bool:
+    return any(checks.get(key) == "PASS" for key in CONNECTIVITY_PROOF_CHECKS)
+
+
+def peer_handshake_check_status(peer: Dict[str, Any], strict: bool, connectivity_proven: bool = False) -> str:
+    if peer.get("handshake_seen"):
+        return "PASS"
+    if peer.get("exists") and peer.get("rx_tx_nonzero"):
+        return "WARN"
+    if connectivity_proven:
+        return "WARN"
+    return check_status(False, strict)
+
+
+def peer_state_summary(peer: Dict[str, Any]) -> Dict[str, Any]:
+    return {
+        "exists": bool(peer.get("exists")),
+        "name": peer.get("name", ""),
+        "allowed_address": peer.get("allowed_address", ""),
+        "latest_handshake": peer.get("latest_handshake", ""),
+        "handshake_seen": bool(peer.get("handshake_seen")),
+        "rx_bytes": peer.get("rx_bytes", 0),
+        "tx_bytes": peer.get("tx_bytes", 0),
+        "rx_tx_nonzero": bool(peer.get("rx_tx_nonzero")),
+    }
 
 
 def console_color(text: Any, color_code: str) -> str:
@@ -898,13 +947,16 @@ def make_initial_report(config: Day12Config) -> Dict[str, Any]:
                 "private_key_redacted_in_report",
                 "firewall_udp_input_allow",
                 "firewall_forward_vpn_to_lan",
+                "initial_handshake_seen",
                 "handshake_seen",
+                "post_connectivity_handshake_seen",
                 "peer_rx_tx_nonzero",
                 "ping_lan_gateway",
                 "ping_lan_host",
                 "tcp_5201_reachable",
                 "iperf_forward",
                 "iperf_reverse",
+                "final_vpn_connectivity",
             )
         },
         "iperf_summary": {},
@@ -991,11 +1043,13 @@ def run(config: Day12Config) -> Tuple[Dict[str, Any], Path, Path]:
 
         report["checks"]["peer_exists"] = "PASS" if peer["exists"] else "FAIL"
         report["checks"]["peer_allowed_address"] = "PASS" if address_or_network_matches(peer.get("allowed_address", ""), config.client_address) else "FAIL"
-        report["checks"]["handshake_seen"] = check_status(peer["handshake_seen"], strict_connected)
+        report["wireguard_summary"]["initial_peer_state"] = peer_state_summary(peer)
+        report["checks"]["initial_handshake_seen"] = peer_handshake_check_status(peer, strict_connected)
+        report["checks"]["handshake_seen"] = report["checks"]["initial_handshake_seen"]
         report["checks"]["peer_rx_tx_nonzero"] = check_status(peer["rx_tx_nonzero"], strict_connected)
         console_check(f"WireGuard peer {config.peer_name} exists", report["checks"]["peer_exists"])
         console_check("Peer allowed address", report["checks"]["peer_allowed_address"], config.client_address)
-        console_check("Peer handshake seen", report["checks"]["handshake_seen"])
+        console_check("Initial peer handshake seen", report["checks"]["initial_handshake_seen"])
         console_check("Peer rx/tx nonzero", report["checks"]["peer_rx_tx_nonzero"])
 
         console_stage(4, total_steps, "Checking firewall rules")
@@ -1043,9 +1097,11 @@ def run(config: Day12Config) -> Tuple[Dict[str, Any], Path, Path]:
                     strict_connected = True
                     outputs["peers"] = run_allowlisted_read(client, "/interface/wireguard/peers/print detail")
                     peer = parse_wireguard_peer_detail(outputs["peers"], config.peer_name)
-                    report["checks"]["handshake_seen"] = check_status(peer["handshake_seen"], strict_connected)
+                    report["wireguard_summary"]["initial_peer_state"] = peer_state_summary(peer)
+                    report["checks"]["initial_handshake_seen"] = peer_handshake_check_status(peer, strict_connected)
+                    report["checks"]["handshake_seen"] = report["checks"]["initial_handshake_seen"]
                     report["checks"]["peer_rx_tx_nonzero"] = check_status(peer["rx_tx_nonzero"], strict_connected)
-                    console_check("Peer handshake seen after activation", report["checks"]["handshake_seen"])
+                    console_check("Initial peer handshake seen after activation", report["checks"]["initial_handshake_seen"])
                     console_check("Peer rx/tx nonzero after activation", report["checks"]["peer_rx_tx_nonzero"])
         else:
             console_check("Client config generated", "FAIL", "peer does not exist")
@@ -1084,6 +1140,37 @@ def run(config: Day12Config) -> Tuple[Dict[str, Any], Path, Path]:
             report["checks"]["iperf_reverse"] = "SKIP"
             console_check("iperf3 forward", "SKIP", "not requested")
             console_check("iperf3 reverse", "SKIP", "not requested")
+
+        if strict_connected:
+            connectivity_proven = vpn_connectivity_proven(report["checks"])
+            report["checks"]["final_vpn_connectivity"] = "PASS" if connectivity_proven else "FAIL"
+            console_check("Final VPN connectivity", report["checks"]["final_vpn_connectivity"])
+            if peer["exists"]:
+                try:
+                    outputs["peers"] = run_allowlisted_read(client, "/interface/wireguard/peers/print detail")
+                    peer = parse_wireguard_peer_detail(outputs["peers"], config.peer_name)
+                    report["wireguard_summary"]["post_connectivity_peer_state"] = peer_state_summary(peer)
+                    report["checks"]["post_connectivity_handshake_seen"] = peer_handshake_check_status(
+                        peer,
+                        strict_connected,
+                        connectivity_proven=connectivity_proven,
+                    )
+                    if report["checks"]["post_connectivity_handshake_seen"] == "PASS":
+                        report["checks"]["handshake_seen"] = "PASS"
+                    elif connectivity_proven:
+                        report["checks"]["handshake_seen"] = "WARN"
+                    else:
+                        report["checks"]["handshake_seen"] = report["checks"]["post_connectivity_handshake_seen"]
+                    report["checks"]["peer_rx_tx_nonzero"] = check_status(peer["rx_tx_nonzero"], strict_connected)
+                    console_check("Post-connectivity peer handshake seen", report["checks"]["post_connectivity_handshake_seen"])
+                    console_check("Post-connectivity peer rx/tx nonzero", report["checks"]["peer_rx_tx_nonzero"])
+                except Exception as error:
+                    report["checks"]["post_connectivity_handshake_seen"] = "WARN"
+                    report["warnings"].append(f"Could not refresh WireGuard peer state after connectivity checks: {error}")
+                    console_check("Post-connectivity peer refresh", "WARN", str(error))
+        else:
+            report["checks"]["final_vpn_connectivity"] = "SKIP"
+            report["checks"]["post_connectivity_handshake_seen"] = "SKIP"
 
     except Exception as error:
         print(f"{color_status('FAIL')} stopped before config export: {type(error).__name__}: {error}")

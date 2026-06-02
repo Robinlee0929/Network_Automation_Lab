@@ -692,7 +692,7 @@ python network_lab.py
 python network_lab.py --interactive
 ```
 
-The interactive menu can run `report-index` directly because it only reads local reports and writes the overview. Day4 and Day8 are guarded live tasks that ask for confirmation before delegation. Day12 and Day13 remain recommended-command or report-only placeholders in the unified runner; WireGuard live execution is reserved for Day18.
+The interactive menu can run `report-index` directly because it only reads local reports and writes the overview. Day4 and Day8 are guarded live tasks that ask for confirmation before delegation. The WireGuard runner uses stable feature-based CLI names and is dry-run by default.
 
 ```powershell
 python network_lab.py --list-tasks
@@ -708,6 +708,24 @@ python network_lab.py --task report-index
 
 ```powershell
 python network_lab.py --task report-index --profile topology_profiles/day14_lab_runner_profile.json
+```
+
+WireGuard runner dry-run:
+
+```powershell
+python network_lab.py --task wireguard-runner --dry-run
+```
+
+Blocked WireGuard live example:
+
+```powershell
+python network_lab.py --task wireguard-runner
+```
+
+Guarded WireGuard live flag:
+
+```powershell
+python network_lab.py --task wireguard-runner --allow-live-wireguard
 ```
 
 Console output uses colored status labels in supported terminals. Set `NO_COLOR=1` if you need plain text output for logs or copy/paste.
@@ -757,6 +775,7 @@ Safety levels:
 | LIVE_READ_ONLY | Live device checks that read state without changing configuration. |
 | LIVE_PERFORMANCE | Live throughput tests that generate traffic but do not modify router configuration. |
 | LIVE_CONFIG_CHANGE | Tasks that may change router, switch, firewall, or VPN configuration and require explicit confirmation. |
+| guarded-live | Live WireGuard validation with dry-run default, explicit guard flag, and fixed runner safety checks. |
 | FUTURE_RESERVED | Placeholder for intentionally disabled future runner integration. |
 
 Day17 report visibility behavior:
@@ -766,7 +785,7 @@ Day17 report visibility behavior:
 - Missing expected reports are shown as `MISSING` instead of crashing.
 - Existing HTML reports are linked with relative paths when possible.
 - Report visibility does not connect to devices, ask for SSH passwords, read `config.json`, or print secrets.
-- WireGuard live runner integration is intentionally disabled in Day17 and reserved for Day18.
+- WireGuard runner integration appears under a stable feature-based task name, while Day18 remains metadata and historical context.
 
 Available guarded runner tasks still include:
 
@@ -774,6 +793,62 @@ Available guarded runner tasks still include:
 python network_lab.py --task day4-baseline
 python network_lab.py --task iperf3-performance
 ```
+
+## Day18 WireGuard Runner Safety Layer
+
+Day18 adds the WireGuard Runner Safety Layer to the unified runner. The feature was added in Day18, but the CLI uses stable feature-based names so future users do not need to remember day numbers.
+
+Primary dry-run command:
+
+```powershell
+python network_lab.py --task wireguard-runner --dry-run
+```
+
+Dry-run with an explicit lab02 WireGuard config:
+
+```powershell
+python network_lab.py --task wireguard-runner `
+  --wireguard-config Set_WireguardVPN_lab02_config.json `
+  --dry-run
+```
+
+Blocked live example with an explicit config:
+
+```powershell
+python network_lab.py --task wireguard-runner `
+  --wireguard-config Set_WireguardVPN_lab02_config.json
+```
+
+Guarded live command with an explicit config:
+
+```powershell
+python network_lab.py --task wireguard-runner `
+  --wireguard-config Set_WireguardVPN_lab02_config.json `
+  --allow-live-wireguard
+```
+
+Safety behavior:
+
+- Dry-run does not connect to devices.
+- Dry-run does not start WireGuard.
+- Dry-run does not run ping or iperf.
+- Dry-run does not change config.
+- `--wireguard-config` selects the Day12 WireGuard validation config file.
+- If `--wireguard-config` is omitted, the runner uses the compatibility default `Set_WireguardVPN_config.json`.
+- The selected config path is printed during dry-run, blocked live attempts, and guarded live execution.
+- Live WireGuard execution requires explicit `--allow-live-wireguard`.
+- Reports and console output must not disclose secrets.
+- The runner omits unsafe Day12 flags such as `--recreate-peer` and `--apply-firewall-fixes`.
+- The runner does not run iperf by default; use `--wireguard-run-iperf` with `--allow-live-wireguard` when throughput checks are intentionally requested.
+
+Feature report paths:
+
+```text
+reports/lab-summary/wireguard_runner_safety_layer.json
+reports/lab-summary/wireguard_runner_safety_layer.html
+```
+
+When guarded live execution delegates to Day12, the Day18 runner report stays concise and links back to the Day12 source of truth. It includes the delegated Day12 JSON/HTML report paths, delegated result, final VPN connectivity status, handshake timing status, and iperf forward/reverse Mbps when those fields are available. It does not duplicate the full Day12 report or WireGuard config content.
 
 ## How to Read Reports
 

@@ -16,6 +16,17 @@ DAY4_BASELINE_SCRIPT = "mikrotik_day4_multi_device_baseline.py"
 DAY4_BASELINE_DISPLAY_COMMAND = f"python {DAY4_BASELINE_SCRIPT}"
 DAY8_PERFORMANCE_SCRIPT = "performance_test.py"
 DAY8_PERFORMANCE_PROFILE = Path("topology_profiles") / "day8_iperf3_router_performance.json"
+DAY12_WIREGUARD_SCRIPT = "mikrotik_day12_wireguard_vpn_automation.py"
+DAY12_WIREGUARD_CONFIG = "Set_WireguardVPN_config.json"
+DAY12_WIREGUARD_TIMEOUT_SECONDS = 900
+WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
+WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
+WIREGUARD_RUNNER_DISPLAY_NAME = "WireGuard Runner Safety Layer"
+WIREGUARD_RUNNER_REPORT_JSON = Path("reports") / "lab-summary" / "wireguard_runner_safety_layer.json"
+WIREGUARD_RUNNER_REPORT_HTML = Path("reports") / "lab-summary" / "wireguard_runner_safety_layer.html"
+DAY12_WIREGUARD_REPORT_JSON_NAME = "day12_wireguard_vpn_automation_report.json"
+DAY12_WIREGUARD_REPORT_HTML_NAME = "day12_wireguard_vpn_automation_report.html"
+SECRET_FIELD_MARKERS = ("secret", "password", "private_key", "preshared_key", "token", "key")
 DAY17_REPORT_INDEX_HTML = Path("reports") / "report_index.html"
 RESULTS = {"PASS", "FAIL", "WARN", "MISSING", "INCOMPLETE", "UNKNOWN", "SKIP", "NOT_RUN"}
 INTERACTIVE_ACTION_COMPLETE = (
@@ -54,9 +65,9 @@ LIVE_WORKFLOW_RECOMMENDATIONS = {
         "command": "python performance_test.py --profile topology_profiles/day8_iperf3_router_performance.json",
         "reminder": "This workflow depends on lab reachability and iperf3 readiness. Run it manually with the correct direction/profile.",
     },
-    "day12": {
-        "title": "Day12 WireGuard validation",
-        "command": "python mikrotik_day12_wireguard_vpn_automation.py --config Set_WireguardVPN_config.json --run-iperf",
+    "wireguard_runner": {
+        "title": WIREGUARD_RUNNER_DISPLAY_NAME,
+        "command": "python network_lab.py --task wireguard-runner --dry-run",
         "reminder": "This may validate live WireGuard and iperf3 state. Confirm the client, LAN host, and secrets stay local before running.",
     },
     "day13": {
@@ -71,6 +82,7 @@ SAFETY_LEVELS = {
     "LIVE_READ_ONLY": "Live device checks that read state without changing configuration.",
     "LIVE_PERFORMANCE": "Live throughput tests that generate traffic but do not modify router configuration.",
     "LIVE_CONFIG_CHANGE": "Tasks that may change network configuration and require explicit confirmation.",
+    "guarded-live": "Live WireGuard validation with local config export, explicit confirmation, and no peer/firewall writes from the runner.",
     "FUTURE_RESERVED": "Placeholder for intentionally disabled future runner integration.",
 }
 
@@ -111,6 +123,13 @@ REPORT_CATALOG = [
         "title": "Day13 WireGuard Summary",
         "json_globs": ["summary/**/*day13*wireguard*.json", "reports/**/*day13*wireguard*.json"],
         "html_globs": ["summary/**/*day13*wireguard*.html", "reports/**/*day13*wireguard*.html"],
+    },
+    {
+        "day": "Day18",
+        "title": WIREGUARD_RUNNER_DISPLAY_NAME,
+        "json_globs": [WIREGUARD_RUNNER_REPORT_JSON.as_posix()],
+        "html_globs": [WIREGUARD_RUNNER_REPORT_HTML.as_posix()],
+        "missing_note": f"Expected report path: {WIREGUARD_RUNNER_REPORT_JSON.as_posix()}",
     },
     {
         "day": "Day14-Day16",
@@ -319,7 +338,22 @@ def build_latest_lab_overview(profile: Dict[str, Any], project_root: Path) -> Di
 def write_json_report(data: Dict[str, Any], output_path: Path) -> None:
     path = Path(output_path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(data, indent=2), encoding="utf-8")
+    path.write_text(json.dumps(mask_secret_values(data), indent=2), encoding="utf-8")
+
+
+def mask_secret_values(value: Any) -> Any:
+    if isinstance(value, dict):
+        masked = {}
+        for key, item in value.items():
+            key_text = str(key)
+            if any(marker in key_text.lower() for marker in SECRET_FIELD_MARKERS):
+                masked[key] = "[REDACTED]"
+            else:
+                masked[key] = mask_secret_values(item)
+        return masked
+    if isinstance(value, list):
+        return [mask_secret_values(item) for item in value]
+    return value
 
 
 def supports_color(stream: Any = sys.stdout) -> bool:
@@ -538,22 +572,26 @@ def list_tasks() -> List[Dict[str, Any]]:
             "notes": "Generates iperf3 traffic but does not modify router configuration.",
         },
         {
-            "id": "day12-wireguard-live-validation",
-            "task_id": "day12_wireguard_live_validation",
-            "display_name": "Day12 WireGuard Live Validation",
-            "day": "Day12",
+            "id": WIREGUARD_RUNNER_TASK_ALIAS,
+            "task_id": WIREGUARD_RUNNER_TASK_ID,
+            "display_name": WIREGUARD_RUNNER_DISPLAY_NAME,
+            "day": "Day18",
             "category": "vpn",
-            "description": "WireGuard live validation placeholder.",
-            "safety_level": "FUTURE_RESERVED",
-            "execution_mode": "disabled_placeholder",
-            "enabled": False,
-            "status": "planned",
+            "description": "Feature-named WireGuard runner integration with dry-run and explicit guarded live execution.",
+            "safety_level": "guarded-live",
+            "execution_mode": "dry-run by default",
+            "enabled": True,
+            "status": "implemented",
             "requires_live_device": True,
             "requires_password": True,
             "produces_report": True,
-            "report_paths": ["reports/<device>/day12_wireguard_validation.json"],
-            "related_script": "mikrotik_day12_wireguard_vpn_automation.py",
-            "notes": "WireGuard live runner integration is intentionally disabled in Day17 and reserved for Day18.",
+            "report_output_path": WIREGUARD_RUNNER_REPORT_JSON.as_posix(),
+            "report_paths": [
+                WIREGUARD_RUNNER_REPORT_JSON.as_posix(),
+                WIREGUARD_RUNNER_REPORT_HTML.as_posix(),
+            ],
+            "related_script": DAY12_WIREGUARD_SCRIPT,
+            "notes": "Added in Day18. Primary CLI uses stable feature names; live mode requires --allow-live-wireguard.",
         },
         {
             "id": "day13-wireguard-summary",
@@ -574,7 +612,7 @@ def list_tasks() -> List[Dict[str, Any]]:
                 "summary/day13_multi_router_wireguard_client_to_site_summary_*.html",
             ],
             "related_script": "mikrotik_day13_multi_router_wireguard_validation.py",
-            "notes": "WireGuard live execution is intentionally excluded from Day17. Planned for Day18.",
+            "notes": "Day13 summary remains report-only in Day18 until its own live safety layer is implemented.",
         },
     ]
 
@@ -591,12 +629,16 @@ def _build_parser() -> argparse.ArgumentParser:
   python network_lab.py --task day4-baseline
   python network_lab.py --task iperf3-performance --dry-run
   python network_lab.py --task iperf3-performance
+  python network_lab.py --task wireguard-runner --dry-run
+  python network_lab.py --task wireguard-runner --wireguard-config Set_WireguardVPN_lab02_config.json --dry-run
+  python network_lab.py --task wireguard-runner
+  python network_lab.py --task wireguard-runner --wireguard-config Set_WireguardVPN_lab02_config.json --allow-live-wireguard
   python network_lab.py --task report-index --profile topology_profiles/day14_lab_runner_profile.json
 
 report-index reads existing JSON reports and does not connect to devices.
 day4-baseline delegates to the existing live SSH validation script.
 iperf3-performance delegates to the existing live iperf3 performance script.
-Day17 report-index visibility scans local report paths only and does not run WireGuard live execution."""
+wireguard-runner is dry-run by default and delegates to the existing WireGuard script only after explicit --allow-live-wireguard."""
     parser = argparse.ArgumentParser(
         description=f"Day14 {DAY14_NAME}.",
         epilog=examples,
@@ -604,10 +646,27 @@ Day17 report-index visibility scans local report paths only and does not run Wir
     )
     parser.add_argument("--list-tasks", action="store_true", help="List available and planned lab tasks.")
     parser.add_argument("--report-index", action="store_true", help="Scan local reports and write reports/report_index.html.")
-    parser.add_argument("--task", choices=["report-index", "day4-baseline", "iperf3-performance"], help="Task to run.")
+    parser.add_argument(
+        "--task",
+        choices=["report-index", "day4-baseline", "iperf3-performance", WIREGUARD_RUNNER_TASK_ALIAS],
+        help="Task to run.",
+    )
     parser.add_argument("--profile", default=str(DEFAULT_PROFILE), help="Path to the Day14 lab runner profile JSON.")
     parser.add_argument("--dry-run", action="store_true", help="Show report-index inputs and outputs without writing reports.")
     parser.add_argument("--interactive", action="store_true", help="Show the safe interactive Day14 menu.")
+    parser.add_argument("--allow-live-wireguard", action="store_true", help="Allow guarded live WireGuard execution.")
+    parser.add_argument(
+        "--wireguard-config",
+        default=DAY12_WIREGUARD_CONFIG,
+        help=f"Config path for the delegated Day12 WireGuard validation script. Default: {DAY12_WIREGUARD_CONFIG}.",
+    )
+    parser.add_argument(
+        "--wireguard-run-iperf",
+        "--run-iperf",
+        action="store_true",
+        dest="run_iperf",
+        help="For WireGuard runner live mode, also request iperf3 checks with --expect-connected.",
+    )
     return parser
 
 
@@ -707,10 +766,10 @@ def discover_report_visibility(project_root: Path) -> List[Dict[str, Any]]:
             "day": "Day13",
             "title": "Day13 WireGuard Live Execution",
             "device": "Runner guardrail",
-            "status": "DISABLED FOR DAY17",
+            "status": "DISABLED FOR DAY18",
             "json": "",
             "html": "",
-            "notes": "WireGuard live runner integration is intentionally disabled in Day17 and reserved for Day18.",
+            "notes": "Day13 live WireGuard execution remains disabled until its own runner safety layer is implemented.",
         }
     )
     return rows
@@ -916,12 +975,13 @@ def write_report_index_html(
     .pill {{ display: inline-block; border-radius: 999px; padding: 4px 9px; font-size: 12px; font-weight: 800; white-space: nowrap; }}
     .pill-day {{ background: var(--gray-bg); color: var(--gray); }}
     .enabled, .status-found {{ background: var(--green-bg); color: var(--green); }}
-    .disabled, .status-disabled-for-day17, .safety-future-reserved {{ background: var(--blue-bg); color: var(--blue-ink); }}
+    .disabled, .status-disabled-for-day18, .safety-future-reserved {{ background: var(--blue-bg); color: var(--blue-ink); }}
     .status-missing {{ background: var(--yellow-bg); color: var(--yellow); }}
     .safety-safe-read-only {{ background: var(--green-bg); color: var(--green); }}
     .safety-live-read-only {{ background: #e7f0fb; color: #175cd3; }}
     .safety-live-performance {{ background: #f3e8ff; color: #6941c6; }}
     .safety-live-config-change {{ background: var(--red-bg); color: var(--red); }}
+    .safety-guarded-live {{ background: #ecfdf3; color: #067647; }}
     @media (max-width: 820px) {{
       header, main {{ padding-left: 16px; padding-right: 16px; }}
       .summary {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }}
@@ -941,7 +1001,7 @@ def write_report_index_html(
     </section>
   </header>
   <main>
-    <div class="warning">WireGuard live execution is not enabled in Day17. WireGuard live runner integration is intentionally disabled and reserved for Day18.</div>
+    <div class="warning">Day18 WireGuard runner integration uses a safety layer: dry-run by default, explicit live confirmation, fixed argv execution, and no peer/firewall write flags.</div>
     <h2>Task Catalog Summary</h2>
     <table>
       <thead><tr><th>Task ID</th><th>Day</th><th>Name</th><th>Category</th><th>Safety</th><th>Enabled</th><th>Mode</th><th>Live Device</th></tr></thead>
@@ -972,7 +1032,7 @@ def _run_report_visibility_index(project_root: Path) -> int:
     write_report_index_html(list_tasks(), rows, output_path, project_root)
     print()
     print(f"{format_status('PASS')} HTML report index: {output_path_text}")
-    print("WireGuard live runner integration is intentionally disabled in Day17 and reserved for Day18.")
+    print("Day18 WireGuard runner integration uses dry-run and explicit confirmation guardrails.")
     return 0
 
 
@@ -1246,6 +1306,482 @@ def _confirm_and_run_day8_performance(project_root: Path, input_func: Any) -> in
     return _run_day8_performance(project_root, dry_run=False)
 
 
+def _wireguard_runner_report_path(project_root: Path, html_report: bool = False) -> Path:
+    return project_root / (WIREGUARD_RUNNER_REPORT_HTML if html_report else WIREGUARD_RUNNER_REPORT_JSON)
+
+
+def _wireguard_runner_planned_steps(run_iperf: bool = False) -> List[str]:
+    steps = [
+        "Validate WireGuard runner config file path.",
+        "Validate required non-secret config fields before guarded execution.",
+        "Delegate to the existing WireGuard validation script only when live guard is explicit.",
+        "Keep peer recreation and firewall fix flags disabled in the runner.",
+        "Write local runner safety report with secrets masked.",
+    ]
+    if run_iperf:
+        steps.append("Request iperf3 checks only in guarded live mode.")
+    return steps
+
+
+def _wireguard_config_path(project_root: Path, config_path: str) -> Path:
+    path = Path(config_path)
+    return path if path.is_absolute() else project_root / path
+
+
+def _wireguard_config_display_path(project_root: Path, config_path: str) -> str:
+    return _relative_to_project(project_root, _wireguard_config_path(project_root, config_path))
+
+
+def _wireguard_runner_config_validation(project_root: Path, config_path: str = DAY12_WIREGUARD_CONFIG) -> Dict[str, Any]:
+    selected_path = _wireguard_config_path(project_root, config_path)
+    selected_display_path = _wireguard_config_display_path(project_root, config_path)
+    required_fields = ["device_name", "router_host", "router_username", "wg_interface", "peer_name"]
+    optional_fields = ["lan_gateway_ip", "lan_host_ip", "iperf_server_ip", "client_address"]
+    validation: Dict[str, Any] = {
+        "config_path": selected_display_path,
+        "status": "PASS",
+        "missing_required_fields": [],
+        "missing_optional_fields": [],
+        "warnings": [],
+    }
+    try:
+        data = json.loads(selected_path.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        validation["status"] = "WARN"
+        validation["missing_required_fields"] = ["config_file"]
+        validation["warnings"] = [f"Config file was not found: {selected_display_path}"]
+        return validation
+    except json.JSONDecodeError as exc:
+        validation["status"] = "FAIL"
+        validation["missing_required_fields"] = ["valid_json_config"]
+        validation["warnings"] = [f"Config file is not valid JSON: {exc.msg}"]
+        return validation
+
+    if not isinstance(data, dict):
+        validation["status"] = "FAIL"
+        validation["missing_required_fields"] = ["json_object_config"]
+        validation["warnings"] = ["Config file must contain a JSON object."]
+        return validation
+
+    missing_required = [field for field in required_fields if str(data.get(field, "")).strip() == ""]
+    missing_optional = [field for field in optional_fields if str(data.get(field, "")).strip() == ""]
+    validation["missing_required_fields"] = missing_required
+    validation["missing_optional_fields"] = missing_optional
+    validation["status"] = "PASS" if not missing_required else "FAIL"
+    if missing_optional:
+        validation["warnings"] = [f"Optional fields missing: {', '.join(missing_optional)}"]
+    return validation
+
+
+def _is_safe_report_device_segment(value: str) -> bool:
+    text = str(value).strip()
+    return bool(text) and Path(text).name == text and "/" not in text and "\\" not in text
+
+
+def _count_check_statuses(checks: Dict[str, Any]) -> Dict[str, int]:
+    return {
+        "pass_count": sum(1 for status in checks.values() if status == "PASS"),
+        "warn_count": sum(1 for status in checks.values() if status == "WARN"),
+        "fail_count": sum(1 for status in checks.values() if status == "FAIL"),
+        "skip_count": sum(1 for status in checks.values() if status == "SKIP"),
+    }
+
+
+def _build_delegated_day12_summary(project_root: Path, config_path: str) -> Dict[str, Any]:
+    result: Dict[str, Any] = {
+        "delegated_report": {},
+        "delegated_result_summary": {},
+    }
+    try:
+        config_data = json.loads(_wireguard_config_path(project_root, config_path).read_text(encoding="utf-8"))
+        device_name = str(config_data.get("device_name", "")).strip() if isinstance(config_data, dict) else ""
+    except (OSError, json.JSONDecodeError) as exc:
+        result["delegated_report_parse_warning"] = f"Could not read selected WireGuard config for delegated report discovery: {exc}"
+        return result
+
+    if not _is_safe_report_device_segment(device_name):
+        result["delegated_report_parse_warning"] = "Selected WireGuard config does not contain a safe device_name for report discovery."
+        return result
+
+    json_path = project_root / "reports" / device_name / DAY12_WIREGUARD_REPORT_JSON_NAME
+    html_path = project_root / "reports" / device_name / DAY12_WIREGUARD_REPORT_HTML_NAME
+    result["delegated_report"] = {
+        "json": _relative_to_project(project_root, json_path),
+        "html": _relative_to_project(project_root, html_path),
+    }
+
+    try:
+        report_data = json.loads(json_path.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        result["delegated_report_parse_warning"] = (
+            "Delegated Day12 report JSON was not found after runner completion: "
+            + _relative_to_project(project_root, json_path)
+        )
+        return result
+    except (OSError, json.JSONDecodeError) as exc:
+        result["delegated_report_parse_warning"] = f"Could not parse delegated Day12 report JSON: {exc}"
+        return result
+
+    if not isinstance(report_data, dict):
+        result["delegated_report_parse_warning"] = "Delegated Day12 report JSON did not contain an object."
+        return result
+
+    checks = report_data.get("checks", {})
+    if not isinstance(checks, dict):
+        checks = {}
+    iperf_summary = report_data.get("iperf_summary", {})
+    if not isinstance(iperf_summary, dict):
+        iperf_summary = {}
+
+    summary: Dict[str, Any] = {
+        "result": report_data.get("overall_result", report_data.get("result", "UNKNOWN")),
+        **_count_check_statuses(checks),
+    }
+    for source_key, output_key in (
+        ("final_vpn_connectivity", "final_vpn_connectivity"),
+        ("initial_handshake_seen", "initial_handshake_seen"),
+        ("post_connectivity_handshake_seen", "post_connectivity_handshake_seen"),
+    ):
+        if source_key in checks:
+            summary[output_key] = checks[source_key]
+    for source_key, output_key in (
+        ("forward_mbps", "iperf_forward_mbps"),
+        ("reverse_mbps", "iperf_reverse_mbps"),
+    ):
+        if source_key in iperf_summary:
+            summary[output_key] = iperf_summary[source_key]
+
+    result["delegated_result_summary"] = summary
+    return result
+
+
+def _build_wireguard_runner_report(
+    mode: str,
+    result: str,
+    project_root: Path,
+    config_path: str = DAY12_WIREGUARD_CONFIG,
+    run_iperf: bool = False,
+    message: str = "",
+    delegated_summary: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    validation = _wireguard_runner_config_validation(project_root, config_path)
+    command = _build_wireguard_runner_command(config_path=config_path, run_iperf=run_iperf)
+    selected_config_path = _wireguard_config_display_path(project_root, config_path)
+    delegated_summary = delegated_summary or {}
+    warnings = list(validation["warnings"])
+    if delegated_summary.get("delegated_report_parse_warning"):
+        warnings.append(str(delegated_summary["delegated_report_parse_warning"]))
+    live_guard_status = {
+        "dry-run": "DRY-RUN: no live execution",
+        "blocked": "BLOCKED: missing explicit --allow-live-wireguard",
+        "guarded-live": "PASS: explicit --allow-live-wireguard provided",
+    }.get(mode, "UNKNOWN")
+    guardrails = {
+        "dry_run_default": "PASS",
+        "requires_allow_live_wireguard": "PASS",
+        "subprocess_shell_false": "PASS",
+        "forbidden_write_flags_blocked": "PASS",
+        "secrets_masked": "PASS",
+        "live_device_execution": "ENABLED" if mode == "guarded-live" else "BLOCKED",
+    }
+    return mask_secret_values(
+        {
+            "task_id": WIREGUARD_RUNNER_TASK_ID,
+            "display_name": WIREGUARD_RUNNER_DISPLAY_NAME,
+            "day": "Day18",
+            "category": "vpn",
+            "mode": mode,
+            "result": result,
+            "selected_config_path": selected_config_path,
+            "live_guard_status": live_guard_status,
+            "delegated_command_summary": _format_display_command(command),
+            "validation_status": validation["status"],
+            "safety_guardrail_status": guardrails,
+            "missing_required_fields": validation["missing_required_fields"],
+            "missing_optional_fields": validation["missing_optional_fields"],
+            "warnings": warnings,
+            "planned_steps": _wireguard_runner_planned_steps(run_iperf=run_iperf),
+            "report_output_path": WIREGUARD_RUNNER_REPORT_JSON.as_posix(),
+            "message": message,
+            "timestamp": datetime.now().replace(microsecond=0).isoformat(sep=" "),
+            **delegated_summary,
+        }
+    )
+
+
+def _write_wireguard_runner_html(report: Dict[str, Any], output_path: Path) -> None:
+    safe_report = mask_secret_values(report)
+    rows = "\n".join(
+        f"<tr><td>{html.escape(str(key))}</td><td>{html.escape(str(value))}</td></tr>"
+        for key, value in safe_report.items()
+        if key not in {
+            "safety_guardrail_status",
+            "planned_steps",
+            "warnings",
+            "delegated_report",
+            "delegated_result_summary",
+        }
+    )
+    guardrail_rows = "\n".join(
+        f"<tr><td>{html.escape(str(key))}</td><td>{html.escape(str(value))}</td></tr>"
+        for key, value in safe_report.get("safety_guardrail_status", {}).items()
+    )
+    planned_steps = "".join(f"<li>{html.escape(str(step))}</li>" for step in safe_report.get("planned_steps", []))
+    warnings = "".join(f"<li>{html.escape(str(item))}</li>" for item in safe_report.get("warnings", [])) or "<li>None</li>"
+    delegated_report = safe_report.get("delegated_report", {})
+    if not isinstance(delegated_report, dict):
+        delegated_report = {}
+    delegated_summary = safe_report.get("delegated_result_summary", {})
+    if not isinstance(delegated_summary, dict):
+        delegated_summary = {}
+    delegated_report_rows = "\n".join(
+        f"<tr><td>{html.escape(str(key))}</td><td>{html.escape(str(value))}</td></tr>"
+        for key, value in delegated_report.items()
+    ) or "<tr><td colspan='2'>Not available</td></tr>"
+    delegated_summary_keys = [
+        "result",
+        "final_vpn_connectivity",
+        "initial_handshake_seen",
+        "post_connectivity_handshake_seen",
+        "iperf_forward_mbps",
+        "iperf_reverse_mbps",
+    ]
+    delegated_summary_rows = "\n".join(
+        f"<tr><td>{html.escape(key)}</td><td>{html.escape(str(delegated_summary[key]))}</td></tr>"
+        for key in delegated_summary_keys
+        if key in delegated_summary
+    ) or "<tr><td colspan='2'>Not available</td></tr>"
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(
+        f"""<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>{html.escape(WIREGUARD_RUNNER_DISPLAY_NAME)}</title>
+  <style>
+    body {{ font-family: Arial, sans-serif; margin: 24px; color: #182230; }}
+    table {{ border-collapse: collapse; width: 100%; margin: 12px 0 20px; }}
+    td, th {{ border: 1px solid #d8e0ec; padding: 8px 10px; text-align: left; vertical-align: top; }}
+    th {{ background: #edf2f8; }}
+  </style>
+</head>
+<body>
+  <h1>{html.escape(WIREGUARD_RUNNER_DISPLAY_NAME)}</h1>
+  <table><tbody>{rows}</tbody></table>
+  <h2>Delegated Day12 Reports</h2>
+  <table><tbody>{delegated_report_rows}</tbody></table>
+  <h2>Delegated Day12 Summary</h2>
+  <table><tbody>{delegated_summary_rows}</tbody></table>
+  <h2>Safety Guardrails</h2>
+  <table><tbody>{guardrail_rows}</tbody></table>
+  <h2>Planned Steps</h2>
+  <ol>{planned_steps}</ol>
+  <h2>Warnings</h2>
+  <ul>{warnings}</ul>
+</body>
+</html>
+""",
+        encoding="utf-8",
+    )
+
+
+def _write_wireguard_runner_report(project_root: Path, report: Dict[str, Any]) -> Tuple[Path, Path]:
+    json_path = _wireguard_runner_report_path(project_root)
+    html_path = _wireguard_runner_report_path(project_root, html_report=True)
+    write_json_report(report, json_path)
+    _write_wireguard_runner_html(report, html_path)
+    return json_path, html_path
+
+
+def _build_wireguard_runner_command(
+    config_path: str = DAY12_WIREGUARD_CONFIG,
+    run_iperf: bool = False,
+    executable: str = sys.executable,
+) -> List[str]:
+    command = [
+        executable,
+        DAY12_WIREGUARD_SCRIPT,
+        "--config",
+        str(config_path),
+    ]
+    if run_iperf:
+        command.extend(["--run-iperf", "--expect-connected"])
+    command.append("--non-interactive")
+    return command
+
+
+def _validate_wireguard_runner_command(command: List[str], config_path: str = DAY12_WIREGUARD_CONFIG) -> None:
+    forbidden_flags = {"--recreate-peer", "--apply-firewall-fixes"}
+    if not isinstance(command, list) or not all(isinstance(part, str) for part in command):
+        raise ValueError("WireGuard runner command must be a list of string arguments.")
+    present_forbidden_flags = sorted(forbidden_flags.intersection(command))
+    if present_forbidden_flags:
+        raise ValueError(
+            "WireGuard runner command contains forbidden live write flags: "
+            + ", ".join(present_forbidden_flags)
+        )
+    required_parts = {DAY12_WIREGUARD_SCRIPT, "--config", str(config_path), "--non-interactive"}
+    missing_parts = sorted(part for part in required_parts if part not in command)
+    if missing_parts:
+        raise ValueError("WireGuard runner command is missing required safety args: " + ", ".join(missing_parts))
+
+
+def _print_wireguard_runner_dry_run(
+    project_root: Path,
+    config_path: str = DAY12_WIREGUARD_CONFIG,
+    run_iperf: bool = False,
+) -> int:
+    command = _build_wireguard_runner_command(config_path=config_path, run_iperf=run_iperf)
+    _validate_wireguard_runner_command(command, config_path=config_path)
+    selected_config_path = _wireguard_config_display_path(project_root, config_path)
+    report = _build_wireguard_runner_report("dry-run", "DRY-RUN", project_root, config_path=config_path, run_iperf=run_iperf)
+    json_path, html_path = _write_wireguard_runner_report(project_root, report)
+    print(format_heading(WIREGUARD_RUNNER_DISPLAY_NAME))
+    print(f"Mode: {color_text('Dry run', 'yellow', bold=True)}")
+    print(f"Primary command: {color_text('python network_lab.py --task wireguard-runner --dry-run', 'cyan', bold=True)}")
+    print(f"Selected WireGuard config: {selected_config_path}")
+    print()
+    print(format_heading("Planned validation steps"))
+    for step in report["planned_steps"]:
+        print(f"  - {step}")
+    print()
+    print(format_heading("Safety guardrails"))
+    print("  This is a live WireGuard validation workflow.")
+    print("  Dry-run does not connect to devices.")
+    print("  Dry-run does not start WireGuard, ping, iperf, or device config changes.")
+    print("  Runner command is non-interactive and does not include --recreate-peer or --apply-firewall-fixes.")
+    print("  Live execution requires explicit --allow-live-wireguard. Interactive menu execution also requires explicit confirmation.")
+    print()
+    print(f"JSON report: {_relative_to_project(project_root, json_path)}")
+    print(f"HTML report: {_relative_to_project(project_root, html_path)}")
+    print(f"{format_status('PASS')} No live workflow was executed.")
+    return 0
+
+
+def _run_wireguard_runner(
+    project_root: Path,
+    dry_run: bool = False,
+    allow_live_wireguard: bool = False,
+    config_path: str = DAY12_WIREGUARD_CONFIG,
+    run_iperf: bool = False,
+) -> int:
+    if dry_run:
+        return _print_wireguard_runner_dry_run(project_root, config_path=config_path, run_iperf=run_iperf)
+    selected_config_path = _wireguard_config_display_path(project_root, config_path)
+    if not allow_live_wireguard:
+        message = "WireGuard live execution requires explicit --allow-live-wireguard"
+        report = _build_wireguard_runner_report(
+            "blocked",
+            "BLOCKED",
+            project_root,
+            config_path=config_path,
+            run_iperf=run_iperf,
+            message=message,
+        )
+        _write_wireguard_runner_report(project_root, report)
+        print(format_heading(WIREGUARD_RUNNER_DISPLAY_NAME))
+        print(f"Selected WireGuard config: {selected_config_path}")
+        print(message)
+        return 0
+
+    validation = _wireguard_runner_config_validation(project_root, config_path)
+    if validation["status"] == "FAIL":
+        message = "WireGuard runner config validation failed before live execution."
+        report = _build_wireguard_runner_report(
+            "blocked",
+            "BLOCKED",
+            project_root,
+            config_path=config_path,
+            run_iperf=run_iperf,
+            message=message,
+        )
+        _write_wireguard_runner_report(project_root, report)
+        print(format_heading(WIREGUARD_RUNNER_DISPLAY_NAME))
+        print(f"Selected WireGuard config: {selected_config_path}")
+        print(message)
+        return 2
+
+    command = _build_wireguard_runner_command(config_path=config_path, run_iperf=run_iperf)
+    try:
+        _validate_wireguard_runner_command(command, config_path=config_path)
+    except ValueError as exc:
+        print(f"ERROR: {exc}", file=sys.stderr)
+        return 2
+
+    print(format_heading(WIREGUARD_RUNNER_DISPLAY_NAME))
+    print("Live WireGuard validation workflow.")
+    print(f"Selected WireGuard config: {selected_config_path}")
+    print(f"Executing command: {color_text(_format_display_command(command), 'cyan', bold=True)}")
+    try:
+        result = subprocess.run(
+            command,
+            cwd=project_root,
+            shell=False,
+            timeout=DAY12_WIREGUARD_TIMEOUT_SECONDS,
+        )
+    except subprocess.TimeoutExpired:
+        print(
+            f"{format_status('FAIL')} WireGuard runner timed out after "
+            f"{DAY12_WIREGUARD_TIMEOUT_SECONDS} seconds."
+        )
+        return 124
+    delegated_summary = _build_delegated_day12_summary(project_root, config_path)
+    if result.returncode == 0:
+        report = _build_wireguard_runner_report(
+            "guarded-live",
+            "PASS",
+            project_root,
+            config_path=config_path,
+            run_iperf=run_iperf,
+            delegated_summary=delegated_summary,
+        )
+        _write_wireguard_runner_report(project_root, report)
+        print(f"{format_status('PASS')} WireGuard runner completed successfully.")
+        return 0
+
+    report = _build_wireguard_runner_report(
+        "guarded-live",
+        "FAIL",
+        project_root,
+        config_path=config_path,
+        run_iperf=run_iperf,
+        delegated_summary=delegated_summary,
+    )
+    _write_wireguard_runner_report(project_root, report)
+    print(f"{format_status('FAIL')} WireGuard runner failed with exit code {result.returncode}.")
+    return result.returncode
+
+
+def _confirm_and_run_wireguard_runner(
+    project_root: Path,
+    input_func: Any,
+    config_path: str = DAY12_WIREGUARD_CONFIG,
+) -> int:
+    command = _build_wireguard_runner_command(config_path=config_path, run_iperf=False)
+    try:
+        _validate_wireguard_runner_command(command, config_path=config_path)
+    except ValueError as exc:
+        print(f"ERROR: {exc}", file=sys.stderr)
+        return 2
+
+    selected_config_path = _wireguard_config_display_path(project_root, config_path)
+    print(format_heading(WIREGUARD_RUNNER_DISPLAY_NAME))
+    print("This is a live WireGuard validation workflow.")
+    print(f"Selected WireGuard config: {selected_config_path}")
+    print(f"Command to execute: {color_text(_format_display_command(command), 'cyan', bold=True)}")
+    print("Runner safety layer omits --recreate-peer and --apply-firewall-fixes.")
+    try:
+        confirmation = input_func("Confirm live WireGuard runner execution? [y/N]: ").strip().lower()
+    except EOFError:
+        confirmation = ""
+
+    if confirmation != "y":
+        print(f"{format_status('NOT_RUN')} WireGuard runner cancelled. No live workflow was executed.")
+        return 0
+
+    return _run_wireguard_runner(project_root, allow_live_wireguard=True, config_path=config_path, run_iperf=False)
+
+
 def _print_recommended_live_command(workflow_id: str) -> None:
     recommendation = LIVE_WORKFLOW_RECOMMENDATIONS[workflow_id]
     print(format_heading(recommendation["title"]))
@@ -1283,7 +1819,7 @@ def _print_interactive_menu() -> None:
     print("  4. Open latest overview HTML if it exists")
     print("  5. Run Day4 multi-device baseline")
     print("  6. Run Day8 iperf3 performance workflow")
-    print("  7. Show recommended command for Day12 WireGuard validation")
+    print("  7. WireGuard Runner Safety Layer")
     print("  8. Show recommended command for Day13 multi-router WireGuard summary")
     print("  0. Exit")
 
@@ -1297,6 +1833,7 @@ def run_interactive_menu(
     profile: Dict[str, Any],
     project_root: Path,
     profile_path: Path,
+    wireguard_config: str = DAY12_WIREGUARD_CONFIG,
     input_func: Optional[Any] = None,
 ) -> int:
     read_input = input_func or input
@@ -1335,8 +1872,10 @@ def run_interactive_menu(
             if day8_exit_code != 0:
                 return day8_exit_code
         elif choice == "7":
-            _print_recommended_live_command("day12")
+            wireguard_exit_code = _confirm_and_run_wireguard_runner(project_root, read_input, config_path=wireguard_config)
             _print_interactive_action_complete()
+            if wireguard_exit_code != 0:
+                return wireguard_exit_code
         elif choice == "8":
             _print_recommended_live_command("day13")
             _print_interactive_action_complete()
@@ -1364,7 +1903,7 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
         return 2
 
     if args.interactive or not args.task:
-        return run_interactive_menu(profile, root, profile_path)
+        return run_interactive_menu(profile, root, profile_path, wireguard_config=args.wireguard_config)
 
     if args.task == "report-index":
         return _run_report_index(profile, root, profile_path, dry_run=args.dry_run)
@@ -1372,6 +1911,14 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
         return _run_day4_baseline(root, dry_run=args.dry_run)
     if args.task == "iperf3-performance":
         return _run_day8_performance(root, dry_run=args.dry_run)
+    if args.task == WIREGUARD_RUNNER_TASK_ALIAS:
+        return _run_wireguard_runner(
+            root,
+            dry_run=args.dry_run,
+            allow_live_wireguard=args.allow_live_wireguard,
+            config_path=args.wireguard_config,
+            run_iperf=args.run_iperf,
+        )
 
     return 2
 
