@@ -14,6 +14,8 @@ DAY14_NAME = "Unified Lab Runner and Report Index"
 DEFAULT_PROFILE = Path("topology_profiles") / "day14_lab_runner_profile.json"
 DAY4_BASELINE_SCRIPT = "mikrotik_day4_multi_device_baseline.py"
 DAY4_BASELINE_DISPLAY_COMMAND = f"python {DAY4_BASELINE_SCRIPT}"
+DAY8_PERFORMANCE_SCRIPT = "performance_test.py"
+DAY8_PERFORMANCE_PROFILE = Path("topology_profiles") / "day8_iperf3_router_performance.json"
 RESULTS = {"PASS", "FAIL", "WARN", "MISSING", "INCOMPLETE", "UNKNOWN", "SKIP", "NOT_RUN"}
 INTERACTIVE_ACTION_COMPLETE = (
     "Action complete. Returning to menu. Choose another option or enter 0 to exit."
@@ -420,7 +422,7 @@ def list_tasks() -> List[Dict[str, str]]:
         {"id": "day4-baseline", "status": "implemented", "description": "Safely delegates to the existing Day4 baseline workflow."},
         {"id": "day5-cisco", "status": "planned", "description": "Delegates to the existing Day5 Cisco topology workflow."},
         {"id": "day6-topology-summary", "status": "planned", "description": "Delegates to the existing Day6 topology summary workflow."},
-        {"id": "day8-iperf3", "status": "planned", "description": "Delegates to the existing Day8 iperf3 workflow."},
+        {"id": "iperf3-performance", "status": "implemented", "description": "Safely delegates to the existing Day8 iperf3 performance workflow."},
         {"id": "day12-wireguard-live-validation", "status": "planned", "description": "Delegates to the existing Day12 live validation workflow."},
         {"id": "day13-wireguard-summary", "status": "planned", "description": "Reads or delegates to the Day13 WireGuard summary workflow."},
     ]
@@ -435,17 +437,20 @@ def _build_parser() -> argparse.ArgumentParser:
   python network_lab.py --task report-index
   python network_lab.py --task day4-baseline --dry-run
   python network_lab.py --task day4-baseline
+  python network_lab.py --task iperf3-performance --dry-run
+  python network_lab.py --task iperf3-performance
   python network_lab.py --task report-index --profile topology_profiles/day14_lab_runner_profile.json
 
 report-index reads existing JSON reports and does not connect to devices.
-day4-baseline delegates to the existing live SSH validation script."""
+day4-baseline delegates to the existing live SSH validation script.
+iperf3-performance delegates to the existing live iperf3 performance script."""
     parser = argparse.ArgumentParser(
         description=f"Day14 {DAY14_NAME}.",
         epilog=examples,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument("--list-tasks", action="store_true", help="List available and planned lab tasks.")
-    parser.add_argument("--task", choices=["report-index", "day4-baseline"], help="Task to run.")
+    parser.add_argument("--task", choices=["report-index", "day4-baseline", "iperf3-performance"], help="Task to run.")
     parser.add_argument("--profile", default=str(DEFAULT_PROFILE), help="Path to the Day14 lab runner profile JSON.")
     parser.add_argument("--dry-run", action="store_true", help="Show report-index inputs and outputs without writing reports.")
     parser.add_argument("--interactive", action="store_true", help="Show the safe interactive Day14 menu.")
@@ -627,6 +632,118 @@ def _confirm_and_run_day4_baseline(project_root: Path, input_func: Any) -> int:
     return _run_day4_baseline(project_root, dry_run=False)
 
 
+def _load_day8_performance_profile(project_root: Path) -> Dict[str, Any]:
+    profile_path = project_root / DAY8_PERFORMANCE_PROFILE
+    try:
+        profile = json.loads(profile_path.read_text(encoding="utf-8"))
+    except FileNotFoundError as exc:
+        raise ValueError(f"Day8 performance profile was not found: {profile_path}") from exc
+    except json.JSONDecodeError as exc:
+        raise ValueError(f"Day8 performance profile is not valid JSON: {profile_path}") from exc
+
+    if not isinstance(profile, dict):
+        raise ValueError("Day8 performance profile must contain a JSON object.")
+    return profile
+
+
+def _required_day8_profile_value(profile: Dict[str, Any], key: str) -> str:
+    value = profile.get(key)
+    if value is None or str(value).strip() == "":
+        raise ValueError(f"Day8 performance profile must define {key}.")
+    return str(value)
+
+
+def _build_day8_performance_command(project_root: Path, executable: str = sys.executable) -> List[str]:
+    profile = _load_day8_performance_profile(project_root)
+    return [
+        executable,
+        DAY8_PERFORMANCE_SCRIPT,
+        "--lan-server-ip",
+        _required_day8_profile_value(profile, "default_lan_server_ip"),
+        "--duration",
+        _required_day8_profile_value(profile, "default_duration_sec"),
+        "--omit",
+        _required_day8_profile_value(profile, "default_omit_sec"),
+        "--parallel",
+        _required_day8_profile_value(profile, "default_parallel_streams"),
+        "--threshold-mbps",
+        _required_day8_profile_value(profile, "default_threshold_mbps"),
+        "--warn-threshold-mbps",
+        _required_day8_profile_value(profile, "default_warn_threshold_mbps"),
+    ]
+
+
+def _format_display_command(command: List[str]) -> str:
+    display_parts = ["python" if index == 0 and part == sys.executable else part for index, part in enumerate(command)]
+    return " ".join(display_parts)
+
+
+def _print_day8_performance_dry_run(project_root: Path) -> int:
+    try:
+        command = _build_day8_performance_command(project_root)
+    except ValueError as exc:
+        print(f"ERROR: {exc}", file=sys.stderr)
+        return 2
+
+    print(format_heading("Day8 iperf3 performance"))
+    print(f"Mode: {color_text('Dry run', 'yellow', bold=True)}")
+    print(f"Command that would be executed: {color_text(_format_display_command(command), 'cyan', bold=True)}")
+    print()
+    print(format_heading("Safety notes"))
+    print("  This is a live iperf3 performance workflow.")
+    print("  Dry-run does not connect to devices.")
+    print("  Dry-run does not require real iperf3.")
+    print(f"  Dry-run does not execute {DAY8_PERFORMANCE_SCRIPT}.")
+    print("  Dry-run does not write reports.")
+    print()
+    print(f"{format_status('PASS')} No live workflow was executed.")
+    return 0
+
+
+def _run_day8_performance(project_root: Path, dry_run: bool = False) -> int:
+    if dry_run:
+        return _print_day8_performance_dry_run(project_root)
+
+    try:
+        command = _build_day8_performance_command(project_root)
+    except ValueError as exc:
+        print(f"ERROR: {exc}", file=sys.stderr)
+        return 2
+
+    print(format_heading("Day8 iperf3 performance"))
+    print("Live iperf3 performance workflow.")
+    print(f"Executing command: {color_text(_format_display_command(command), 'cyan', bold=True)}")
+    result = subprocess.run(command, cwd=project_root)
+    if result.returncode == 0:
+        print(f"{format_status('PASS')} Day8 iperf3 performance completed successfully.")
+        return 0
+
+    print(f"{format_status('FAIL')} Day8 iperf3 performance failed with exit code {result.returncode}.")
+    return result.returncode
+
+
+def _confirm_and_run_day8_performance(project_root: Path, input_func: Any) -> int:
+    try:
+        command = _build_day8_performance_command(project_root)
+    except ValueError as exc:
+        print(f"ERROR: {exc}", file=sys.stderr)
+        return 2
+
+    print(format_heading("Day8 iperf3 performance"))
+    print("This is a live iperf3 performance workflow.")
+    print(f"Command to execute: {color_text(_format_display_command(command), 'cyan', bold=True)}")
+    try:
+        confirmation = input_func("Confirm live Day8 iperf3 performance run? [y/N]: ").strip().lower()
+    except EOFError:
+        confirmation = ""
+
+    if confirmation != "y":
+        print(f"{format_status('NOT_RUN')} Day8 iperf3 performance cancelled. No live workflow was executed.")
+        return 0
+
+    return _run_day8_performance(project_root, dry_run=False)
+
+
 def _print_recommended_live_command(workflow_id: str) -> None:
     recommendation = LIVE_WORKFLOW_RECOMMENDATIONS[workflow_id]
     print(format_heading(recommendation["title"]))
@@ -663,7 +780,7 @@ def _print_interactive_menu() -> None:
     print("  3. Dry-run report index")
     print("  4. Open latest overview HTML if it exists")
     print("  5. Run Day4 multi-device baseline")
-    print("  6. Show recommended command for Day8 iperf3 performance workflow")
+    print("  6. Run Day8 iperf3 performance workflow")
     print("  7. Show recommended command for Day12 WireGuard validation")
     print("  8. Show recommended command for Day13 multi-router WireGuard summary")
     print("  0. Exit")
@@ -711,8 +828,10 @@ def run_interactive_menu(
             if day4_exit_code != 0:
                 return day4_exit_code
         elif choice == "6":
-            _print_recommended_live_command("day8")
+            day8_exit_code = _confirm_and_run_day8_performance(project_root, read_input)
             _print_interactive_action_complete()
+            if day8_exit_code != 0:
+                return day8_exit_code
         elif choice == "7":
             _print_recommended_live_command("day12")
             _print_interactive_action_complete()
@@ -747,6 +866,8 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
         return _run_report_index(profile, root, profile_path, dry_run=args.dry_run)
     if args.task == "day4-baseline":
         return _run_day4_baseline(root, dry_run=args.dry_run)
+    if args.task == "iperf3-performance":
+        return _run_day8_performance(root, dry_run=args.dry_run)
 
     return 2
 
