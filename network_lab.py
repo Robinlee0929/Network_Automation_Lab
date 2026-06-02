@@ -2,6 +2,7 @@ import argparse
 import html
 import json
 import os
+import subprocess
 import sys
 import webbrowser
 from datetime import datetime
@@ -11,6 +12,8 @@ from typing import Any, Dict, Iterator, List, Optional, Tuple
 
 DAY14_NAME = "Unified Lab Runner and Report Index"
 DEFAULT_PROFILE = Path("topology_profiles") / "day14_lab_runner_profile.json"
+DAY4_BASELINE_SCRIPT = "mikrotik_day4_multi_device_baseline.py"
+DAY4_BASELINE_DISPLAY_COMMAND = f"python {DAY4_BASELINE_SCRIPT}"
 RESULTS = {"PASS", "FAIL", "WARN", "MISSING", "INCOMPLETE", "UNKNOWN", "SKIP", "NOT_RUN"}
 INTERACTIVE_ACTION_COMPLETE = (
     "Action complete. Returning to menu. Choose another option or enter 0 to exit."
@@ -414,7 +417,7 @@ def write_html_overview(data: Dict[str, Any], output_path: Path, project_root: O
 def list_tasks() -> List[Dict[str, str]]:
     return [
         {"id": "report-index", "status": "implemented", "description": "Read existing reports and build the latest lab overview."},
-        {"id": "day4-baseline", "status": "planned", "description": "Delegates to the existing Day4 baseline workflow."},
+        {"id": "day4-baseline", "status": "implemented", "description": "Safely delegates to the existing Day4 baseline workflow."},
         {"id": "day5-cisco", "status": "planned", "description": "Delegates to the existing Day5 Cisco topology workflow."},
         {"id": "day6-topology-summary", "status": "planned", "description": "Delegates to the existing Day6 topology summary workflow."},
         {"id": "day8-iperf3", "status": "planned", "description": "Delegates to the existing Day8 iperf3 workflow."},
@@ -430,16 +433,19 @@ def _build_parser() -> argparse.ArgumentParser:
   python network_lab.py --list-tasks
   python network_lab.py --task report-index --dry-run
   python network_lab.py --task report-index
+  python network_lab.py --task day4-baseline --dry-run
+  python network_lab.py --task day4-baseline
   python network_lab.py --task report-index --profile topology_profiles/day14_lab_runner_profile.json
 
-report-index reads existing JSON reports and does not connect to devices."""
+report-index reads existing JSON reports and does not connect to devices.
+day4-baseline delegates to the existing live SSH validation script."""
     parser = argparse.ArgumentParser(
         description=f"Day14 {DAY14_NAME}.",
         epilog=examples,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument("--list-tasks", action="store_true", help="List available and planned lab tasks.")
-    parser.add_argument("--task", choices=["report-index"], help="Task to run. Phase 1 implements report-index only.")
+    parser.add_argument("--task", choices=["report-index", "day4-baseline"], help="Task to run.")
     parser.add_argument("--profile", default=str(DEFAULT_PROFILE), help="Path to the Day14 lab runner profile JSON.")
     parser.add_argument("--dry-run", action="store_true", help="Show report-index inputs and outputs without writing reports.")
     parser.add_argument("--interactive", action="store_true", help="Show the safe interactive Day14 menu.")
@@ -563,6 +569,64 @@ def _run_report_index(
     return 0 if overview["overall_result"] in {"PASS", "WARN"} else 1
 
 
+def _build_day4_baseline_command() -> List[str]:
+    return [sys.executable, DAY4_BASELINE_SCRIPT]
+
+
+def _print_day4_baseline_dry_run() -> None:
+    print(format_heading("Day4 multi-device baseline"))
+    print(f"Mode: {color_text('Dry run', 'yellow', bold=True)}")
+    print(f"Command that would be executed: {color_text(DAY4_BASELINE_DISPLAY_COMMAND, 'cyan', bold=True)}")
+    print()
+    print(format_heading("Safety notes"))
+    print("  This is a live SSH validation workflow.")
+    print("  Dry-run does not connect to devices.")
+    print(f"  Dry-run does not execute {DAY4_BASELINE_SCRIPT}.")
+    print("  Dry-run does not write reports.")
+    print()
+    print(f"{format_status('PASS')} No live workflow was executed.")
+
+
+def _print_day4_baseline_follow_up() -> None:
+    print()
+    print("Day4 baseline finished. To refresh the lab overview, run:")
+    print("python network_lab.py --task report-index")
+
+
+def _run_day4_baseline(project_root: Path, dry_run: bool = False) -> int:
+    if dry_run:
+        _print_day4_baseline_dry_run()
+        return 0
+
+    print(format_heading("Day4 multi-device baseline"))
+    print("Live SSH validation workflow.")
+    print(f"Executing command: {color_text(DAY4_BASELINE_DISPLAY_COMMAND, 'cyan', bold=True)}")
+    result = subprocess.run(_build_day4_baseline_command(), cwd=project_root)
+    _print_day4_baseline_follow_up()
+    if result.returncode == 0:
+        print(f"{format_status('PASS')} Day4 baseline completed successfully.")
+        return 0
+
+    print(f"{format_status('FAIL')} Day4 baseline failed with exit code {result.returncode}.")
+    return result.returncode
+
+
+def _confirm_and_run_day4_baseline(project_root: Path, input_func: Any) -> int:
+    print(format_heading("Day4 multi-device baseline"))
+    print("This is a live SSH validation workflow.")
+    print(f"Command to execute: {color_text(DAY4_BASELINE_DISPLAY_COMMAND, 'cyan', bold=True)}")
+    try:
+        confirmation = input_func("Confirm live Day4 baseline run? [y/N]: ").strip().lower()
+    except EOFError:
+        confirmation = ""
+
+    if confirmation not in {"y", "yes"}:
+        print(f"{format_status('NOT_RUN')} Day4 baseline cancelled. No live workflow was executed.")
+        return 0
+
+    return _run_day4_baseline(project_root, dry_run=False)
+
+
 def _print_recommended_live_command(workflow_id: str) -> None:
     recommendation = LIVE_WORKFLOW_RECOMMENDATIONS[workflow_id]
     print(format_heading(recommendation["title"]))
@@ -598,7 +662,7 @@ def _print_interactive_menu() -> None:
     print("  2. Generate latest report index")
     print("  3. Dry-run report index")
     print("  4. Open latest overview HTML if it exists")
-    print("  5. Show recommended command for Day4 multi-device baseline")
+    print("  5. Run Day4 multi-device baseline")
     print("  6. Show recommended command for Day8 iperf3 performance workflow")
     print("  7. Show recommended command for Day12 WireGuard validation")
     print("  8. Show recommended command for Day13 multi-router WireGuard summary")
@@ -642,8 +706,10 @@ def run_interactive_menu(
             _open_latest_overview_html(profile, project_root)
             _print_interactive_action_complete()
         elif choice == "5":
-            _print_recommended_live_command("day4")
+            day4_exit_code = _confirm_and_run_day4_baseline(project_root, read_input)
             _print_interactive_action_complete()
+            if day4_exit_code != 0:
+                return day4_exit_code
         elif choice == "6":
             _print_recommended_live_command("day8")
             _print_interactive_action_complete()
@@ -679,6 +745,8 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
 
     if args.task == "report-index":
         return _run_report_index(profile, root, profile_path, dry_run=args.dry_run)
+    if args.task == "day4-baseline":
+        return _run_day4_baseline(root, dry_run=args.dry_run)
 
     return 2
 
