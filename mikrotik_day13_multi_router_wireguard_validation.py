@@ -16,9 +16,10 @@ import mikrotik_day12_wireguard_vpn_automation as day12
 DAY13_TITLE = "Multi-router WireGuard Client-to-Site Validation"
 VPN_TYPE = "client_to_site"
 DEFAULT_PROFILE_PATH = Path("topology_profiles") / "day13_wireguard_client_to_site_profiles.json"
-REPORT_JSON_PATH = Path("reports") / "day13_multi_router_wireguard_client_to_site_summary.json"
-REPORT_HTML_PATH = Path("reports") / "day13_multi_router_wireguard_client_to_site_summary.html"
-SUMMARY_REPORT_DIR = Path("summary")
+LAB_SUMMARY_REPORT_DIR = Path("reports") / "lab-summary"
+REPORT_JSON_PATH = LAB_SUMMARY_REPORT_DIR / "day13_multi_router_wireguard_client_to_site_summary.json"
+REPORT_HTML_PATH = LAB_SUMMARY_REPORT_DIR / "day13_multi_router_wireguard_client_to_site_summary.html"
+SUMMARY_REPORT_DIR = LAB_SUMMARY_REPORT_DIR
 SUMMARY_REPORT_STEM = "day13_multi_router_wireguard_client_to_site_summary"
 REQUIRED_DEVICE_FIELDS = {
     "device_name",
@@ -64,9 +65,15 @@ class DeviceValidation:
     lan_host_validation: Dict[str, Any]
     wireguard_tunnel_status: str = "NOT_RUN"
     router_gateway_reachability: str = "NOT_RUN"
+    vpn_client_to_lan_host_ping: str = "NOT_RUN"
+    tcp_5201_precheck: str = "NOT_RUN"
     router_to_lan_host_reachability: str = "SKIP"
     router_to_lan_host_ping: str = "SKIP"
     lan_host_diagnosis: str = "LAN host validation disabled"
+    iperf3_forward_status: str = "SKIP"
+    iperf3_forward_mbps: Optional[float] = None
+    iperf3_reverse_status: str = "SKIP"
+    iperf3_reverse_mbps: Optional[float] = None
     remediation_commands: List[str] = None
     day12_report_json: str = ""
     day12_report_html: str = ""
@@ -306,7 +313,11 @@ def validate_device(device: Dict[str, Any]) -> Tuple[DeviceValidation, Dict[str,
     )
 
 
-def validate_profile(profile: Dict[str, Any], device_name: str = "") -> Dict[str, Any]:
+def validate_profile(
+    profile: Dict[str, Any],
+    device_name: str = "",
+    device_names: Optional[Iterable[str]] = None,
+) -> Dict[str, Any]:
     errors: List[str] = []
     warnings: List[str] = []
     forbidden_fields = find_forbidden_profile_fields(profile)
@@ -322,6 +333,12 @@ def validate_profile(profile: Dict[str, Any], device_name: str = "") -> Dict[str
         devices = []
 
     enabled_devices = [device for device in devices if isinstance(device, dict) and device.get("enabled", True)]
+    selected_device_names = [str(name) for name in device_names or [] if str(name)]
+    if selected_device_names:
+        selected_name_set = set(selected_device_names)
+        enabled_devices = [
+            device for device in enabled_devices if str(device.get("device_name", "")) in selected_name_set
+        ]
     if device_name:
         enabled_devices = [device for device in enabled_devices if device.get("device_name") == device_name]
         if not enabled_devices:
@@ -435,6 +452,11 @@ def status_badge(status: str) -> str:
     return color_text(f"[{normalized or 'UNKNOWN'}]", "37")
 
 
+def plain_status_badge(status: str) -> str:
+    normalized = str(status).upper() or "UNKNOWN"
+    return f"[{normalized}]"
+
+
 def color_enabled() -> bool:
     return os.environ.get("NO_COLOR", "").strip() == ""
 
@@ -460,7 +482,7 @@ def status_color(status: str) -> str:
 
 def mode_label(mode: str) -> str:
     if mode == "day12_per_device_validation":
-        return "Day12 per-device validation"
+        return "Live WireGuard validation"
     return "Static profile validation"
 
 
@@ -512,7 +534,7 @@ def build_console_output(
         color_text("Static validation checks:", "36;1"),
     ]
     for label, status in build_static_check_rows(report):
-        lines.append(f"  {status_badge(status)} {label}")
+        lines.append(f"  {plain_status_badge(status)} {label}")
 
     lines.extend(["", color_text("Device profile summary:", "36;1")])
     for device in report.get("devices", []):
@@ -532,8 +554,18 @@ def build_console_output(
                 f"    {export_label}: {device.get('exported_config_path', '')}",
                 f"    WireGuard tunnel status: {status_badge(str(device.get('wireguard_tunnel_status', 'NOT_RUN')))}",
                 f"    Router gateway reachability: {status_badge(str(device.get('router_gateway_reachability', 'NOT_RUN')))}",
+                f"    VPN client to LAN host ping: {status_badge(str(device.get('vpn_client_to_lan_host_ping', 'NOT_RUN')))}",
+                f"    TCP 5201 precheck: {status_badge(str(device.get('tcp_5201_precheck', 'NOT_RUN')))}",
                 f"    Router to LAN host reachability: {status_badge(str(device.get('router_to_lan_host_reachability', 'SKIP')))}",
                 f"    LAN host diagnosis: {device.get('lan_host_diagnosis', '')}",
+                (
+                    "    iperf3 forward: "
+                    f"{console_metric(device.get('iperf3_forward_status', 'SKIP'), device.get('iperf3_forward_mbps'), 'Mbps')}"
+                ),
+                (
+                    "    iperf3 reverse: "
+                    f"{console_metric(device.get('iperf3_reverse_status', 'SKIP'), device.get('iperf3_reverse_mbps'), 'Mbps')}"
+                ),
                 f"    Result: {status_badge(str(device.get('result', 'UNKNOWN')))}",
             ]
         )
@@ -548,17 +580,88 @@ def build_console_output(
         [
             "",
             f"{color_text('Overall result:', '36;1')} {status_badge(str(report.get('overall_result', 'UNKNOWN')))}",
-            f"JSON report: {json_path}",
-            f"HTML report: {html_path}",
+            f"JSON report: {stable_report_path(json_path)}",
+            f"HTML report: {stable_report_path(html_path)}",
         ]
     )
     if summary_json_path and summary_html_path:
         lines.extend(
             [
-                f"Summary JSON report: {summary_json_path}",
-                f"Summary HTML report: {summary_html_path}",
+                f"Summary JSON report: {stable_report_path(summary_json_path)}",
+                f"Summary HTML report: {stable_report_path(summary_html_path)}",
             ]
         )
+    return "\n".join(lines)
+
+
+def console_metric(status: Any, value: Any = None, unit: str = "") -> str:
+    if value is None or value == "":
+        return status_badge(str(status))
+    value_text = f"{value:g}" if isinstance(value, float) and value.is_integer() else str(value)
+    suffix = f" {unit}" if unit else ""
+    return f"{status_badge(str(status))} {value_text}{suffix}"
+
+
+def enabled_profile_device_names(profile: Dict[str, Any]) -> List[str]:
+    devices = profile.get("devices", [])
+    if not isinstance(devices, list):
+        return []
+    return [
+        str(device.get("device_name", ""))
+        for device in devices
+        if isinstance(device, dict) and device.get("enabled", True) and device.get("device_name")
+    ]
+
+
+def unknown_selected_devices(profile: Dict[str, Any], device_names: Iterable[str]) -> List[str]:
+    enabled_names = set(enabled_profile_device_names(profile))
+    return [name for name in device_names if name not in enabled_names]
+
+
+def selected_device_names_from_args(args: argparse.Namespace) -> List[str]:
+    if args.devices:
+        return [str(device_name) for device_name in args.devices if str(device_name)]
+    if args.device_name:
+        return [str(args.device_name)]
+    return []
+
+
+def day12_report_paths_for_device(device_name: str) -> Tuple[Path, Path]:
+    report_dir = day12.REPORT_ROOT / device_name
+    return (
+        report_dir / "day12_wireguard_vpn_automation_report.json",
+        report_dir / "day12_wireguard_vpn_automation_report.html",
+    )
+
+
+def build_dry_run_output(report: Dict[str, Any]) -> str:
+    lines = [
+        color_text(f"Day13 {DAY13_TITLE}", "36;1"),
+        "Mode: Dry run",
+        f"Profile validation result: {status_badge(str(report.get('overall_result', 'UNKNOWN')))}",
+        "",
+        color_text("Selected devices:", "36;1"),
+    ]
+    for device in report.get("devices", []):
+        json_path, html_path = day12_report_paths_for_device(str(device.get("device_name", "")))
+        lines.extend(
+            [
+                f"  {device.get('device_name', '<unnamed>')}",
+                f"    Expected Day12 JSON report: {stable_report_path(json_path)}",
+                f"    Expected Day12 HTML report: {stable_report_path(html_path)}",
+                f"    Expected WireGuard config path: {stable_report_path(Path(str(device.get('exported_config_path', ''))))}",
+            ]
+        )
+    lines.extend(
+        [
+            "",
+            color_text("Expected lab-summary report paths:", "36;1"),
+            f"  JSON report: {stable_report_path(REPORT_JSON_PATH)}",
+            f"  HTML report: {stable_report_path(REPORT_HTML_PATH)}",
+            "",
+            "No SSH, Day12, iperf3, or report writes were run.",
+        ]
+    )
     return "\n".join(lines)
 
 
@@ -641,8 +744,8 @@ def build_lab_setup_guidance(
     lines = [
         color_text(f"Day13 semi-automatic setup guidance: {device['device_name']}", "36;1"),
         "Mode: Show setup guidance only",
-        f"{status_badge('SKIP')} No router changes were applied by this script.",
-        f"{status_badge('PASS')} Client config private key will be generated by private-key=auto on the peer add command.",
+        "[SKIP] No router changes were applied by this script.",
+        "[PASS] Client config private key will be generated by private-key=auto on the peer add command.",
         "",
         color_text(
             "Review these RouterOS commands, then paste them into the MikroTik terminal if they match your lab:",
@@ -738,6 +841,57 @@ def classify_day12_tunnel(device_summary: Dict[str, Any], day12_report: Dict[str
         device_summary["wireguard_tunnel_status"] = "NOT_RUN"
 
 
+def day12_status(checks: Dict[str, Any], key: str, default: str = "NOT_RUN") -> str:
+    return str(checks.get(key) or default).upper()
+
+
+def day12_mbps(iperf_summary: Dict[str, Any], key: str) -> Optional[float]:
+    value = iperf_summary.get(key)
+    if value is None:
+        return None
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def apply_day12_performance_summary(device_summary: Dict[str, Any], day12_report: Dict[str, Any]) -> None:
+    checks = day12_report.get("checks", {})
+    if not isinstance(checks, dict):
+        checks = {}
+    iperf_summary = day12_report.get("iperf_summary", {})
+    if not isinstance(iperf_summary, dict):
+        iperf_summary = {}
+    device_summary["vpn_client_to_lan_host_ping"] = day12_status(checks, "ping_lan_host")
+    device_summary["tcp_5201_precheck"] = day12_status(checks, "tcp_5201_reachable")
+    device_summary["iperf3_forward_status"] = day12_status(checks, "iperf_forward", "SKIP")
+    device_summary["iperf3_forward_mbps"] = day12_mbps(iperf_summary, "forward_mbps")
+    device_summary["iperf3_reverse_status"] = day12_status(checks, "iperf_reverse", "SKIP")
+    device_summary["iperf3_reverse_mbps"] = day12_mbps(iperf_summary, "reverse_mbps")
+
+
+def build_router_switch_reminder(previous_device_name: str, next_device: Dict[str, Any]) -> str:
+    next_name = str(next_device.get("device_name", "<unnamed>"))
+    export_path = day12.EXPORT_ROOT / str(next_device.get("export_conf_name", "<next-device>.conf"))
+    return "\n".join(
+        [
+            "",
+            color_text("Before continuing to the next router:", "36;1"),
+            f"  Completed: {previous_device_name}",
+            f"  Next device: {next_name}",
+            f"  Move the physical router cable to {next_name}.",
+            f"  In WireGuard client software, disconnect the previous tunnel and activate: {stable_report_path(export_path)}",
+        ]
+    )
+
+
+def pause_for_router_switch(previous_device_name: str, next_device: Dict[str, Any], non_interactive: bool) -> None:
+    reminder = build_router_switch_reminder(previous_device_name, next_device)
+    print(reminder)
+    if not non_interactive:
+        input("After switching the router cable and WireGuard client config, press Enter to continue...")
+
+
 def run_router_lan_host_ping(config: day12.Day12Config, validation: Dict[str, Any]) -> str:
     lan_host_ip = str(validation.get("lan_host_ip", "")).strip()
     ipaddress.ip_address(lan_host_ip)
@@ -767,6 +921,7 @@ def run_day12_for_devices(profile: Dict[str, Any], report: Dict[str, Any], args:
         for device in profile.get("devices", [])
         if isinstance(device, dict) and device.get("enabled", True) and device.get("device_name")
     }
+    previous_live_device_name = ""
     for device_summary in report["devices"]:
         if device_summary["result"] == "FAIL":
             continue
@@ -775,14 +930,18 @@ def run_day12_for_devices(profile: Dict[str, Any], report: Dict[str, Any], args:
             device_summary["result"] = "WARN"
             device_summary["warnings"].append("Day12 device validation skipped because router_host was not provided.")
             continue
+        if previous_live_device_name:
+            pause_for_router_switch(previous_live_device_name, profile_device, args.non_interactive)
         day12_config = build_day12_config(profile_device, args)
         day12_report, json_path, html_path = day12.run(day12_config)
+        previous_live_device_name = device_summary["device_name"]
         device_summary["result"] = day12_report.get("overall_result", "FAIL")
         device_summary["warnings"].extend(day12_report.get("warnings", []))
         device_summary["errors"].extend(day12_report.get("errors", []))
         device_summary["day12_report_json"] = str(json_path)
         device_summary["day12_report_html"] = str(html_path)
         classify_day12_tunnel(device_summary, day12_report)
+        apply_day12_performance_summary(device_summary, day12_report)
         if day12_report.get("wireguard_summary", {}).get("exported_config_path"):
             device_summary["exported_config_path"] = day12_report["wireguard_summary"]["exported_config_path"]
         validation = device_summary.get("lan_host_validation", {})
@@ -822,6 +981,21 @@ def report_timestamp_for_filename(report: Dict[str, Any]) -> str:
     return timestamp.strftime("%Y%m%d_%H%M%S")
 
 
+def stable_report_path(path: Path) -> str:
+    return path.as_posix()
+
+
+def next_summary_report_paths(timestamp: str) -> Tuple[Path, Path]:
+    summary_json_path = SUMMARY_REPORT_DIR / f"{SUMMARY_REPORT_STEM}_{timestamp}.json"
+    summary_html_path = SUMMARY_REPORT_DIR / f"{SUMMARY_REPORT_STEM}_{timestamp}.html"
+    suffix = 2
+    while summary_json_path.exists() or summary_html_path.exists():
+        summary_json_path = SUMMARY_REPORT_DIR / f"{SUMMARY_REPORT_STEM}_{timestamp}_{suffix}.json"
+        summary_html_path = SUMMARY_REPORT_DIR / f"{SUMMARY_REPORT_STEM}_{timestamp}_{suffix}.html"
+        suffix += 1
+    return summary_json_path, summary_html_path
+
+
 def write_aggregate_reports(report: Dict[str, Any]) -> Tuple[Path, Path, Path, Path]:
     assert_no_conf_content(report)
     REPORT_JSON_PATH.parent.mkdir(parents=True, exist_ok=True)
@@ -834,8 +1008,7 @@ def write_aggregate_reports(report: Dict[str, Any]) -> Tuple[Path, Path, Path, P
             raise ValueError(f"Day13 HTML report must not contain WireGuard .conf content token: {token}")
     REPORT_HTML_PATH.write_text(html_report, encoding="utf-8")
     timestamp = report_timestamp_for_filename(report)
-    summary_json_path = SUMMARY_REPORT_DIR / f"{SUMMARY_REPORT_STEM}_{timestamp}.json"
-    summary_html_path = SUMMARY_REPORT_DIR / f"{SUMMARY_REPORT_STEM}_{timestamp}.html"
+    summary_json_path, summary_html_path = next_summary_report_paths(timestamp)
     summary_json_path.write_text(json_text, encoding="utf-8")
     summary_html_path.write_text(html_report, encoding="utf-8")
     return REPORT_JSON_PATH, REPORT_HTML_PATH, summary_json_path, summary_html_path
@@ -866,6 +1039,22 @@ def html_detail_grid(items: Iterable[Tuple[str, Any]]) -> str:
         f"<div><dt>{html.escape(label)}</dt><dd>{html.escape(str(value or 'None'))}</dd></div>"
         for label, value in items
     ) + "</dl>"
+
+
+def html_metric_value(status: Any, value: Any = None, unit: str = "") -> str:
+    status_html = html_status_badge(status)
+    if value is None or value == "":
+        return status_html
+    value_text = f"{value:g}" if isinstance(value, float) and value.is_integer() else str(value)
+    suffix = f" {unit}" if unit else ""
+    return f"{status_html} <strong>{html.escape(value_text + suffix)}</strong>"
+
+
+def html_checklist(items: Iterable[Tuple[str, Any, Any, str]]) -> str:
+    return "\n".join(
+        f"<li><span>{html.escape(label)}</span>{html_metric_value(status, value, unit)}</li>"
+        for label, status, value, unit in items
+    )
 
 
 def build_device_overview_rows(devices: Iterable[Dict[str, Any]]) -> str:
@@ -905,12 +1094,44 @@ def build_device_diagnosis_sections(report: Dict[str, Any]) -> str:
                 (export_label, device.get("exported_config_path", "")),
             ]
         )
-        checklist = "\n".join(
+        tunnel_checklist = html_checklist(
             [
-                f"<li><span>WireGuard tunnel status</span>{html_status_badge(device.get('wireguard_tunnel_status', 'NOT_RUN'))}</li>",
-                f"<li><span>Router gateway reachability</span>{html_status_badge(device.get('router_gateway_reachability', 'NOT_RUN'))}</li>",
-                f"<li><span>Router to LAN host reachability</span>{html_status_badge(device.get('router_to_lan_host_reachability', 'SKIP'))}</li>",
-                f"<li><span>LAN host diagnosis</span><strong>{html.escape(str(device.get('lan_host_diagnosis', 'None')))}</strong></li>",
+                ("WireGuard tunnel status", device.get("wireguard_tunnel_status", "NOT_RUN"), None, ""),
+            ]
+        )
+        precheck_checklist = html_checklist(
+            [
+                ("VPN client to LAN gateway", device.get("router_gateway_reachability", "NOT_RUN"), None, ""),
+                ("VPN client to LAN host", device.get("vpn_client_to_lan_host_ping", "NOT_RUN"), None, ""),
+                ("TCP 5201 to iperf server", device.get("tcp_5201_precheck", "NOT_RUN"), None, ""),
+            ]
+        )
+        diagnosis_checklist = "\n".join(
+            [
+                (
+                    f"<li><span>Router to LAN host reachability</span>"
+                    f"{html_status_badge(device.get('router_to_lan_host_reachability', 'SKIP'))}</li>"
+                ),
+                (
+                    f"<li><span>LAN host diagnosis</span>"
+                    f"<strong>{html.escape(str(device.get('lan_host_diagnosis', 'None')))}</strong></li>"
+                ),
+            ]
+        )
+        iperf_checklist = html_checklist(
+            [
+                (
+                    "iperf3 forward",
+                    device.get("iperf3_forward_status", "SKIP"),
+                    device.get("iperf3_forward_mbps"),
+                    "Mbps",
+                ),
+                (
+                    "iperf3 reverse",
+                    device.get("iperf3_reverse_status", "SKIP"),
+                    device.get("iperf3_reverse_mbps"),
+                    "Mbps",
+                ),
             ]
         )
         sections.append(
@@ -922,7 +1143,13 @@ def build_device_diagnosis_sections(report: Dict[str, Any]) -> str:
     </div>
     {details}
     <h4>Connectivity Checklist</h4>
-    <ul class="checklist">{checklist}</ul>
+    <ul class="checklist">{tunnel_checklist}</ul>
+    <h4>LAN Reachability Prechecks</h4>
+    <ul class="checklist">{precheck_checklist}</ul>
+    <h4>Router-to-LAN Diagnosis</h4>
+    <ul class="checklist">{diagnosis_checklist}</ul>
+    <h4>iperf3 Performance</h4>
+    <ul class="checklist">{iperf_checklist}</ul>
     <h4>Likely Causes</h4>
     {html_list(device.get("likely_causes", []))}
     <h4>Remediation Commands</h4>
@@ -1007,8 +1234,12 @@ def build_html_report(report: Dict[str, Any]) -> str:
 """
 
 
-def build_report(profile: Dict[str, Any], device_name: str = "") -> Dict[str, Any]:
-    report = validate_profile(profile, device_name=device_name)
+def build_report(
+    profile: Dict[str, Any],
+    device_name: str = "",
+    device_names: Optional[Iterable[str]] = None,
+) -> Dict[str, Any]:
+    report = validate_profile(profile, device_name=device_name, device_names=device_names)
     report["timestamp"] = datetime.now().isoformat(timespec="seconds")
     report["day"] = 13
     report["mode"] = "static_profile_validation"
@@ -1019,15 +1250,18 @@ def parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=DAY13_TITLE)
     parser.add_argument("--profile", type=Path, default=DEFAULT_PROFILE_PATH)
     parser.add_argument("--device-name", default="", help="Run validation for one enabled device profile.")
+    parser.add_argument("--devices", nargs="+", default=[], help="Run validation for selected enabled device profiles.")
+    parser.add_argument("--dry-run", action="store_true", help="Preview selected devices and expected report paths only.")
     parser.add_argument("--show-setup", help="Print semi-automatic RouterOS setup guidance for one device profile.")
     parser.add_argument("--setup-endpoint-host", default="", help="Client endpoint host to show in --show-setup guidance.")
     parser.add_argument("--setup-router-host", default="", help="Router SSH host to show in the Day12 export command.")
-    parser.add_argument("--run-day12", action="store_true", help="Run Day12 validation for each valid enabled device.")
-    parser.add_argument("--router-host", default="", help="Fallback MikroTik SSH host for --run-day12.")
-    parser.add_argument("--router-username", default="admin", help="Fallback MikroTik SSH username for --run-day12.")
+    parser.add_argument("--run-live-validation", action="store_true", help="Run live WireGuard validation for each valid enabled device.")
+    parser.add_argument("--run-day12", action="store_true", help="Deprecated alias for --run-live-validation.")
+    parser.add_argument("--router-host", default="", help="Fallback MikroTik SSH host for live validation.")
+    parser.add_argument("--router-username", default="admin", help="Fallback MikroTik SSH username for live validation.")
     parser.add_argument("--router-ssh-port", type=int, default=22)
-    parser.add_argument("--lan-host-ip", default="", help="Fallback LAN host ping target for --run-day12.")
-    parser.add_argument("--iperf-server-ip", default="", help="Fallback iperf3 server target for --run-day12.")
+    parser.add_argument("--lan-host-ip", default="", help="Fallback LAN host ping target for live validation.")
+    parser.add_argument("--iperf-server-ip", default="", help="Fallback iperf3 server target for live validation.")
     parser.add_argument("--expect-connected", action="store_true")
     parser.add_argument("--run-iperf", action="store_true")
     parser.add_argument("--non-interactive", action="store_true")
@@ -1038,6 +1272,12 @@ def main(argv: Optional[List[str]] = None) -> int:
     try:
         args = parse_args(argv)
         profile = load_profile(args.profile)
+        selected_device_names = selected_device_names_from_args(args)
+        if args.devices:
+            unknown_devices = unknown_selected_devices(profile, selected_device_names)
+            if unknown_devices:
+                print("Error: unknown enabled device profile(s): " + ", ".join(unknown_devices))
+                return 1
         if args.show_setup:
             report = build_report(profile)
             if report["overall_result"] == "FAIL":
@@ -1053,8 +1293,15 @@ def main(argv: Optional[List[str]] = None) -> int:
                 )
             )
             return 0
-        report = build_report(profile, device_name=args.device_name)
-        if args.run_day12 and report["overall_result"] != "FAIL":
+        report = build_report(
+            profile,
+            device_name="" if args.devices else args.device_name,
+            device_names=selected_device_names if args.devices else None,
+        )
+        if args.dry_run:
+            print(build_dry_run_output(report))
+            return 0
+        if (args.run_day12 or args.run_live_validation) and report["overall_result"] != "FAIL":
             report["mode"] = "day12_per_device_validation"
             run_day12_for_devices(profile, report, args)
         json_path, html_path, summary_json_path, summary_html_path = write_aggregate_reports(report)

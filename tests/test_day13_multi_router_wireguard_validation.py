@@ -1,4 +1,6 @@
 import json
+import json
+from pathlib import Path
 
 import pytest
 
@@ -47,6 +49,41 @@ def valid_profile():
                 "export_conf_name": "robin-laptop-lab02.conf",
             },
         ],
+    }
+
+
+def write_profile(path, profile=None):
+    path.write_text(json.dumps(profile or valid_profile()), encoding="utf-8")
+    return path
+
+
+def live_day12_report(run_iperf=True):
+    return {
+        "overall_result": "PASS",
+        "warnings": [],
+        "errors": [],
+        "wireguard_summary": {
+            "exported_config_path": "exports/wireguard/robin-laptop-lab01.conf",
+        },
+        "checks": {
+            "handshake_seen": "PASS",
+            "peer_rx_tx_nonzero": "PASS",
+            "ping_lan_gateway": "PASS",
+            "ping_lan_host": "PASS",
+            "tcp_5201_reachable": "PASS",
+            "iperf_forward": "PASS" if run_iperf else "SKIP",
+            "iperf_reverse": "PASS" if run_iperf else "SKIP",
+        },
+        "iperf_summary": (
+            {
+                "forward_result": "PASS",
+                "forward_mbps": 200.0,
+                "reverse_result": "PASS",
+                "reverse_mbps": 279.0,
+            }
+            if run_iperf
+            else {}
+        ),
     }
 
 
@@ -228,6 +265,77 @@ def test_lan_host_fail_remediation_appears_in_html_report():
     assert "<pre><code>" in html_report
 
 
+def test_day13_json_summary_includes_day12_iperf_results_when_available():
+    report = day13.validate_profile(valid_profile(), device_name="Hex-s-2025-lab01")
+    device = report["devices"][0]
+
+    day13.classify_day12_tunnel(device, live_day12_report(run_iperf=True))
+    day13.apply_day12_performance_summary(device, live_day12_report(run_iperf=True))
+
+    assert device["wireguard_tunnel_status"] == "PASS"
+    assert device["router_gateway_reachability"] == "PASS"
+    assert device["vpn_client_to_lan_host_ping"] == "PASS"
+    assert device["tcp_5201_precheck"] == "PASS"
+    assert device["iperf3_forward_status"] == "PASS"
+    assert device["iperf3_forward_mbps"] == 200.0
+    assert device["iperf3_reverse_status"] == "PASS"
+    assert device["iperf3_reverse_mbps"] == 279.0
+
+
+def test_html_summary_includes_prechecks_and_iperf_values_when_available():
+    report = day13.validate_profile(valid_profile(), device_name="Hex-s-2025-lab01")
+    device = report["devices"][0]
+    day12_report = live_day12_report(run_iperf=True)
+    day13.classify_day12_tunnel(device, day12_report)
+    day13.apply_day12_performance_summary(device, day12_report)
+
+    html_report = day13.build_html_report(report)
+
+    assert "LAN Reachability Prechecks" in html_report
+    assert "VPN client to LAN host" in html_report
+    assert "TCP 5201 to iperf server" in html_report
+    assert "iperf3 Performance" in html_report
+    assert "iperf3 forward" in html_report
+    assert "200 Mbps" in html_report
+    assert "iperf3 reverse" in html_report
+    assert "279 Mbps" in html_report
+
+
+def test_console_summary_includes_prechecks_and_iperf_values_when_available(monkeypatch):
+    monkeypatch.setenv("NO_COLOR", "1")
+    report = day13.validate_profile(valid_profile(), device_name="Hex-s-2025-lab01")
+    device = report["devices"][0]
+    day12_report = live_day12_report(run_iperf=True)
+    day13.classify_day12_tunnel(device, day12_report)
+    day13.apply_day12_performance_summary(device, day12_report)
+
+    output = day13.build_console_output(report, day13.REPORT_JSON_PATH, day13.REPORT_HTML_PATH)
+
+    assert "VPN client to LAN host ping: [PASS]" in output
+    assert "TCP 5201 precheck: [PASS]" in output
+    assert "iperf3 forward: [PASS] 200 Mbps" in output
+    assert "iperf3 reverse: [PASS] 279 Mbps" in output
+
+
+def test_html_summary_shows_iperf_skip_without_values_when_not_requested():
+    report = day13.validate_profile(valid_profile(), device_name="Hex-s-2025-lab01")
+    device = report["devices"][0]
+    day12_report = live_day12_report(run_iperf=False)
+    day13.classify_day12_tunnel(device, day12_report)
+    day13.apply_day12_performance_summary(device, day12_report)
+
+    html_report = day13.build_html_report(report)
+
+    assert "iperf3 Performance" in html_report
+    assert "iperf3 forward" in html_report
+    assert "iperf3 reverse" in html_report
+    assert "200 Mbps" not in html_report
+    assert device["iperf3_forward_status"] == "SKIP"
+    assert device["iperf3_forward_mbps"] is None
+    assert device["iperf3_reverse_status"] == "SKIP"
+    assert device["iperf3_reverse_mbps"] is None
+
+
 def test_html_report_uses_summary_overview_and_device_cards():
     report = day13.validate_profile(valid_profile())
     html_report = day13.build_html_report(report)
@@ -290,6 +398,32 @@ def test_aggregate_report_write_creates_timestamped_summary_copy(tmp_path, monke
     assert summary_html_path.read_text(encoding="utf-8") == html_path.read_text(encoding="utf-8")
 
 
+def test_aggregate_report_write_keeps_same_second_summary_history(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    report = day13.build_report(valid_profile())
+    report["timestamp"] = "2026-06-02T01:02:03"
+
+    first_paths = day13.write_aggregate_reports(report)
+    second_paths = day13.write_aggregate_reports(report)
+
+    assert first_paths[2] == day13.SUMMARY_REPORT_DIR / (
+        f"{day13.SUMMARY_REPORT_STEM}_20260602_010203.json"
+    )
+    assert first_paths[3] == day13.SUMMARY_REPORT_DIR / (
+        f"{day13.SUMMARY_REPORT_STEM}_20260602_010203.html"
+    )
+    assert second_paths[2] == day13.SUMMARY_REPORT_DIR / (
+        f"{day13.SUMMARY_REPORT_STEM}_20260602_010203_2.json"
+    )
+    assert second_paths[3] == day13.SUMMARY_REPORT_DIR / (
+        f"{day13.SUMMARY_REPORT_STEM}_20260602_010203_2.html"
+    )
+    assert first_paths[2].exists()
+    assert first_paths[3].exists()
+    assert second_paths[2].exists()
+    assert second_paths[3].exists()
+
+
 def test_profile_file_loads_without_passwords_or_conf_content():
     profile = day13.load_profile()
     serialized = json.dumps(profile)
@@ -299,6 +433,214 @@ def test_profile_file_loads_without_passwords_or_conf_content():
     assert len(profile["devices"]) == 5
     assert profile["devices"][2]["template"] is True
     assert day13.validate_profile(profile)["overall_result"] == "PASS"
+
+
+def test_dry_run_is_accepted_and_does_not_create_report_files(tmp_path, monkeypatch, capsys):
+    monkeypatch.chdir(tmp_path)
+    profile_path = write_profile(tmp_path / "profile.json")
+
+    exit_code = day13.main(["--profile", str(profile_path), "--dry-run"])
+    output = capsys.readouterr().out
+
+    assert exit_code == 0
+    assert "Mode: Dry run" in output
+    assert "No SSH, Day12, iperf3, or report writes were run." in output
+    assert not (tmp_path / "reports").exists()
+    assert not (tmp_path / "summary").exists()
+
+
+def test_devices_argument_filters_selected_devices_in_dry_run(tmp_path, monkeypatch, capsys):
+    monkeypatch.chdir(tmp_path)
+    profile_path = write_profile(tmp_path / "profile.json")
+
+    exit_code = day13.main(
+        [
+            "--profile",
+            str(profile_path),
+            "--devices",
+            "Hex-s-2025-lab02",
+            "--dry-run",
+        ]
+    )
+    output = capsys.readouterr().out
+
+    assert exit_code == 0
+    assert "Hex-s-2025-lab02" in output
+    assert "Hex-s-2025-lab01" not in output
+
+
+def test_unknown_devices_argument_exits_with_clear_error(tmp_path, monkeypatch, capsys):
+    monkeypatch.chdir(tmp_path)
+    profile_path = write_profile(tmp_path / "profile.json")
+
+    exit_code = day13.main(
+        [
+            "--profile",
+            str(profile_path),
+            "--devices",
+            "Hex-s-2025-lab99",
+            "--dry-run",
+        ]
+    )
+    output = capsys.readouterr().out
+
+    assert exit_code == 1
+    assert "Error: unknown enabled device profile(s): Hex-s-2025-lab99" in output
+    assert not (tmp_path / "reports").exists()
+
+
+def test_dry_run_console_output_includes_lab_summary_paths(tmp_path, monkeypatch, capsys):
+    monkeypatch.chdir(tmp_path)
+    profile_path = write_profile(tmp_path / "profile.json")
+
+    exit_code = day13.main(["--profile", str(profile_path), "--dry-run"])
+    output = capsys.readouterr().out
+
+    assert exit_code == 0
+    assert "Expected lab-summary report paths:" in output
+    assert "reports/lab-summary/day13_multi_router_wireguard_client_to_site_summary.json" in output
+    assert "reports/lab-summary/day13_multi_router_wireguard_client_to_site_summary.html" in output
+
+
+def test_device_name_compatibility_filters_single_device_in_dry_run(tmp_path, monkeypatch, capsys):
+    monkeypatch.chdir(tmp_path)
+    profile_path = write_profile(tmp_path / "profile.json")
+
+    exit_code = day13.main(
+        [
+            "--profile",
+            str(profile_path),
+            "--device-name",
+            "Hex-s-2025-lab01",
+            "--dry-run",
+        ]
+    )
+    output = capsys.readouterr().out
+
+    assert exit_code == 0
+    assert "Hex-s-2025-lab01" in output
+    assert "Hex-s-2025-lab02" not in output
+
+
+def test_run_live_validation_alias_uses_day12_execution_path(tmp_path, monkeypatch, capsys):
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("MIKROTIK_PASSWORD", "secret")
+    profile_path = write_profile(tmp_path / "profile.json")
+    captured = {}
+
+    def fake_run(config):
+        captured["device_name"] = config.device_name
+        captured["run_iperf"] = config.run_iperf
+        return live_day12_report(run_iperf=False), Path("day12.json"), Path("day12.html")
+
+    monkeypatch.setattr(day13.day12, "run", fake_run)
+
+    exit_code = day13.main(
+        [
+            "--profile",
+            str(profile_path),
+            "--devices",
+            "Hex-s-2025-lab01",
+            "--run-live-validation",
+            "--non-interactive",
+        ]
+    )
+    output = capsys.readouterr().out
+
+    assert exit_code == 0
+    assert captured == {"device_name": "Hex-s-2025-lab01", "run_iperf": False}
+    assert "Mode: Live WireGuard validation" in output
+
+
+def test_run_day12_deprecated_alias_still_uses_live_validation_mode(tmp_path, monkeypatch, capsys):
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("MIKROTIK_PASSWORD", "secret")
+    profile_path = write_profile(tmp_path / "profile.json")
+    calls = []
+
+    def fake_run(config):
+        calls.append(config.device_name)
+        return live_day12_report(run_iperf=False), Path("day12.json"), Path("day12.html")
+
+    monkeypatch.setattr(day13.day12, "run", fake_run)
+
+    exit_code = day13.main(
+        [
+            "--profile",
+            str(profile_path),
+            "--devices",
+            "Hex-s-2025-lab01",
+            "--run-day12",
+            "--non-interactive",
+        ]
+    )
+    output = capsys.readouterr().out
+
+    assert exit_code == 0
+    assert calls == ["Hex-s-2025-lab01"]
+    assert "Mode: Live WireGuard validation" in output
+
+
+def test_run_live_validation_with_run_iperf_passes_iperf_flag(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("MIKROTIK_PASSWORD", "secret")
+    profile_path = write_profile(tmp_path / "profile.json")
+    captured = {}
+
+    def fake_run(config):
+        captured["run_iperf"] = config.run_iperf
+        return live_day12_report(run_iperf=True), Path("day12.json"), Path("day12.html")
+
+    monkeypatch.setattr(day13.day12, "run", fake_run)
+
+    exit_code = day13.main(
+        [
+            "--profile",
+            str(profile_path),
+            "--devices",
+            "Hex-s-2025-lab01",
+            "--run-live-validation",
+            "--run-iperf",
+            "--non-interactive",
+        ]
+    )
+
+    assert exit_code == 0
+    assert captured["run_iperf"] is True
+
+
+def test_multi_device_live_validation_reminds_before_next_router(tmp_path, monkeypatch, capsys):
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("MIKROTIK_PASSWORD", "secret")
+    profile_path = write_profile(tmp_path / "profile.json")
+    calls = []
+
+    def fake_run(config):
+        calls.append(config.device_name)
+        return live_day12_report(run_iperf=False), Path("day12.json"), Path("day12.html")
+
+    monkeypatch.setattr(day13.day12, "run", fake_run)
+
+    exit_code = day13.main(
+        [
+            "--profile",
+            str(profile_path),
+            "--devices",
+            "Hex-s-2025-lab01",
+            "Hex-s-2025-lab02",
+            "--run-live-validation",
+            "--non-interactive",
+        ]
+    )
+    output = capsys.readouterr().out
+
+    assert exit_code == 0
+    assert calls == ["Hex-s-2025-lab01", "Hex-s-2025-lab02"]
+    assert "Before continuing to the next router:" in output
+    assert "Completed: Hex-s-2025-lab01" in output
+    assert "Next device: Hex-s-2025-lab02" in output
+    assert "Move the physical router cable to Hex-s-2025-lab02." in output
+    assert "activate: exports/wireguard/robin-laptop-lab02.conf" in output
 
 
 def test_console_output_lists_static_checks_and_devices():
@@ -329,8 +671,10 @@ def test_console_output_lists_timestamped_summary_paths():
         day13.SUMMARY_REPORT_DIR / "day13_example.html",
     )
 
-    assert "Summary JSON report: summary\\day13_example.json" in output or "Summary JSON report: summary/day13_example.json" in output
-    assert "Summary HTML report: summary\\day13_example.html" in output or "Summary HTML report: summary/day13_example.html" in output
+    assert "JSON report: reports/lab-summary/day13_multi_router_wireguard_client_to_site_summary.json" in output
+    assert "HTML report: reports/lab-summary/day13_multi_router_wireguard_client_to_site_summary.html" in output
+    assert "Summary JSON report: reports/lab-summary/day13_example.json" in output
+    assert "Summary HTML report: reports/lab-summary/day13_example.html" in output
 
 
 def test_console_output_uses_ansi_colors_by_default(monkeypatch):

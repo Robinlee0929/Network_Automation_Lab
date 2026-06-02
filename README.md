@@ -608,6 +608,8 @@ Initial targets:
 - `Hex-s-2025-lab01`: LAN `192.168.88.0/24`, WireGuard `10.10.10.0/24`, client `10.10.10.2/32`.
 - `Hex-s-2025-lab02`: LAN `192.168.89.0/24`, WireGuard `10.10.20.0/24`, client `10.10.20.2/32`.
 
+![Day13 WireGuard VPN and iperf3 topology](docs/assets/day13-wireguard-iperf3-topology.png)
+
 Profile and wrapper:
 
 ```text
@@ -618,8 +620,29 @@ mikrotik_day13_multi_router_wireguard_validation.py
 Run static profile validation and aggregate reporting:
 
 ```powershell
-python mikrotik_day13_multi_router_wireguard_validation.py
+python mikrotik_day13_multi_router_wireguard_validation.py --profile topology_profiles/day13_wireguard_client_to_site_profiles.json
 ```
+
+Run live WireGuard validation:
+
+```powershell
+python mikrotik_day13_multi_router_wireguard_validation.py --profile topology_profiles/day13_wireguard_client_to_site_profiles.json --run-live-validation
+```
+
+Run live WireGuard validation with iperf3:
+
+```powershell
+python mikrotik_day13_multi_router_wireguard_validation.py --profile topology_profiles/day13_wireguard_client_to_site_profiles.json --run-live-validation --run-iperf
+```
+
+Run single-device live validation with iperf3:
+
+```powershell
+python mikrotik_day13_multi_router_wireguard_validation.py --profile topology_profiles/day13_wireguard_client_to_site_profiles.json --devices Hex-s-2025-lab01 --run-live-validation --run-iperf
+```
+
+`--run-day12` remains available as a backward-compatible alias for `--run-live-validation`.
+When multiple devices are selected for live validation, Day 13 reminds you before each next router to move the physical router cable and activate that router's WireGuard client config.
 
 Future lab03/lab04/lab05 profiles should follow the same subnet rule: labNN uses `10.10.(NN*10).0/24`, router WireGuard IP `.1/24`, and Windows client WireGuard IP `.2/32`.
 
@@ -627,7 +650,7 @@ Safety notes:
 
 - Do not commit exported `.conf` files.
 - Do not commit routine generated reports under `reports/`.
-- Day 13 timestamped history reports under `summary/` may be committed when you want GitHub to track validation results over time.
+- Day 13 timestamped history reports under `reports/lab-summary/` may be committed when you want GitHub to track validation results over time.
 - Do not commit local config files.
 - Day 13 reports show exported config paths only; they do not read or render WireGuard `.conf` content.
 
@@ -724,10 +747,10 @@ reports/Hex-s-2025-lab01/day12_wireguard_vpn_automation_report.html
 Day 13 multi-router WireGuard Client-to-Site summary:
 
 ```text
-reports/day13_multi_router_wireguard_client_to_site_summary.json
-reports/day13_multi_router_wireguard_client_to_site_summary.html
-summary/day13_multi_router_wireguard_client_to_site_summary_YYYYMMDD_HHMMSS.json
-summary/day13_multi_router_wireguard_client_to_site_summary_YYYYMMDD_HHMMSS.html
+reports/lab-summary/day13_multi_router_wireguard_client_to_site_summary.json
+reports/lab-summary/day13_multi_router_wireguard_client_to_site_summary.html
+reports/lab-summary/day13_multi_router_wireguard_client_to_site_summary_YYYYMMDD_HHMMSS.json
+reports/lab-summary/day13_multi_router_wireguard_client_to_site_summary_YYYYMMDD_HHMMSS.html
 ```
 
 ## Testing Strategy
