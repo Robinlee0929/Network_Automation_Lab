@@ -3,6 +3,7 @@ import html
 import ipaddress
 import json
 import math
+import os
 import shutil
 import subprocess
 import sys
@@ -29,6 +30,25 @@ REPORT_JSON = "day9_performance_regression_report.json"
 REPORT_HTML = "day9_performance_regression_report.html"
 REPORT_TXT = "day9_performance_regression_report.txt"
 ARCHIVE_DIR_NAME = "performance_regression"
+
+
+def filesystem_path(path: Path) -> Path:
+    if os.name != "nt":
+        return path
+    resolved = str(path.resolve())
+    if resolved.startswith("\\\\?\\"):
+        return path
+    return Path("\\\\?\\" + resolved)
+
+
+def path_exists(path: Path) -> bool:
+    return filesystem_path(path).exists()
+
+
+def copy_file(src: Path, dst: Path) -> None:
+    target = filesystem_path(dst)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(filesystem_path(src), target)
 
 
 @dataclass
@@ -804,10 +824,9 @@ def write_reports(report: Dict[str, Any], output_dir: Path) -> Dict[str, Path]:
         str(report["aggregate"]["overall_result"]),
         archive_timestamp(report),
     )
-    archive_paths["json_archive"].parent.mkdir(parents=True, exist_ok=True)
-    shutil.copyfile(json_path, archive_paths["json_archive"])
-    shutil.copyfile(html_path, archive_paths["html_archive"])
-    shutil.copyfile(txt_path, archive_paths["txt_archive"])
+    copy_file(json_path, archive_paths["json_archive"])
+    copy_file(html_path, archive_paths["html_archive"])
+    copy_file(txt_path, archive_paths["txt_archive"])
     return {
         "json": json_path,
         "html": html_path,

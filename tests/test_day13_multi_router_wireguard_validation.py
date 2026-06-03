@@ -392,10 +392,14 @@ def test_aggregate_report_write_creates_timestamped_summary_copy(tmp_path, monke
     assert summary_html_path == day13.SUMMARY_REPORT_DIR / (
         f"{day13.SUMMARY_REPORT_STEM}_20260602_010203.html"
     )
-    assert summary_json_path.exists()
-    assert summary_html_path.exists()
-    assert summary_json_path.read_text(encoding="utf-8") == json_path.read_text(encoding="utf-8")
-    assert summary_html_path.read_text(encoding="utf-8") == html_path.read_text(encoding="utf-8")
+    assert day13.path_exists(summary_json_path)
+    assert day13.path_exists(summary_html_path)
+    assert day13.filesystem_path(summary_json_path).read_text(
+        encoding="utf-8"
+    ) == day13.filesystem_path(json_path).read_text(encoding="utf-8")
+    assert day13.filesystem_path(summary_html_path).read_text(
+        encoding="utf-8"
+    ) == day13.filesystem_path(html_path).read_text(encoding="utf-8")
 
 
 def test_aggregate_report_write_keeps_same_second_summary_history(tmp_path, monkeypatch):
@@ -418,10 +422,10 @@ def test_aggregate_report_write_keeps_same_second_summary_history(tmp_path, monk
     assert second_paths[3] == day13.SUMMARY_REPORT_DIR / (
         f"{day13.SUMMARY_REPORT_STEM}_20260602_010203_2.html"
     )
-    assert first_paths[2].exists()
-    assert first_paths[3].exists()
-    assert second_paths[2].exists()
-    assert second_paths[3].exists()
+    assert day13.path_exists(first_paths[2])
+    assert day13.path_exists(first_paths[3])
+    assert day13.path_exists(second_paths[2])
+    assert day13.path_exists(second_paths[3])
 
 
 def test_profile_file_loads_without_passwords_or_conf_content():
