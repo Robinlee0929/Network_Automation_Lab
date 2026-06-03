@@ -6,7 +6,7 @@ Network Automation Lab is a Python-based lab automation project for validating n
 
 A Python-based network automation and validation lab for MikroTik RouterOS, Cisco switch topology checks, iperf3 performance testing, regression checks, and local report visualization.
 
-The current implementation covers Day 1 through Day 24:
+The current implementation covers Day 1 through Day 26:
 
 - MikroTik baseline and post-reset validation
 - MikroTik Day 2 setup workflow after reset
@@ -29,6 +29,8 @@ The current implementation covers Day 1 through Day 24:
 - Day 22 WireGuard runner documentation and safety review
 - Day 23 runner safety metadata and RC readiness review
 - Day 24 RC demo flow and portfolio walkthrough polish
+- Day 25 v0.1 RC validation evidence
+- Day 26 v0.1 release packaging and portfolio polish
 
 The project is designed as a practical QA Automation / SDET portfolio project for network infrastructure. It focuses on repeatable validation, structured test evidence, and readable JSON / HTML reports rather than one-off manual checks.
 
@@ -92,6 +94,8 @@ Cisco validation is read-only. It runs show commands for topology evidence and d
 | Day 22 | WireGuard runner documentation and safety review | Complete |
 | Day 23 | Runner safety metadata and RC readiness review | Complete |
 | Day 24 | RC demo flow and portfolio walkthrough polish | Complete |
+| Day 25 | v0.1 RC validation evidence | Complete |
+| Day 26 | v0.1 release packaging and portfolio polish | Complete |
 
 ## Lab Topology
 
@@ -1020,6 +1024,48 @@ Safety behavior:
 - Does not read `config.json`, exported WireGuard `.conf` files, or secrets.
 - Leaves live validation behind the existing read-only, dry-run, guarded-live, or disabled runner controls.
 
+## Day25 v0.1 RC Validation
+
+Day25 records release-candidate validation for v0.1. It is documentation-only evidence that confirms the runner metadata, safety posture, demo-flow output, dashboard/report paths, ignored artifact posture, and full regression suite were ready for v0.1 review.
+
+Evidence document:
+
+```text
+docs/portfolio_evidence/day25_v0.1_rc_validation.md
+```
+
+Recorded validation command:
+
+```powershell
+python -m pytest --basetemp=.pytest-tmp-day25-rc
+```
+
+Recorded result:
+
+```text
+401 passed in 1.94s
+```
+
+Day25 did not add product behavior, runner behavior, dashboard behavior, live VPN behavior, SSH execution behavior, generated reports, exports, real configs, caches, or secrets.
+
+## Day26 v0.1 Release Packaging and Portfolio Polish
+
+Day26 turns the Day25 RC into a v0.1 portfolio release package through documentation-only polish. It adds committed release notes and a concise portfolio checklist so reviewers can follow the existing README, runner metadata, report index, dashboard viewer, RC demo flow, and RC validation evidence without adding runner behavior.
+
+Committed release docs:
+
+```text
+docs/portfolio_evidence/v0.1_release_notes.md
+docs/portfolio_evidence/v0.1_portfolio_checklist.md
+```
+
+Safety behavior:
+
+- Does not connect to routers, switches, WireGuard clients, or iperf3 endpoints.
+- Does not add runner tasks, product features, or report generators.
+- Does not read `config.json`, exported WireGuard `.conf` files, SSH passwords, private keys, or local secrets.
+- Does not commit generated reports, exports, real configs, caches, or secrets.
+
 ## How to Read Reports
 
 Reports are written as structured evidence for each workflow.
@@ -1133,6 +1179,19 @@ reports/portfolio/day24_rc_demo_flow.json
 reports/portfolio/day24_rc_demo_flow.html
 ```
 
+Day 25 v0.1 RC validation:
+
+```text
+docs/portfolio_evidence/day25_v0.1_rc_validation.md
+```
+
+Day 26 v0.1 release package:
+
+```text
+docs/portfolio_evidence/v0.1_release_notes.md
+docs/portfolio_evidence/v0.1_portfolio_checklist.md
+```
+
 ## Testing Strategy
 
 The project separates live-device validation from unit tests.
@@ -1163,6 +1222,7 @@ For this Day 7 documentation pass, tests were intentionally not run.
 - Shows a clear growth path toward VPN, HA, performance, packet analysis, and AI-assisted reporting.
 - Includes a final runner evidence index that ties task safety, report visibility, and portfolio readiness together.
 - Includes a Day24 RC demo flow that gives reviewers a safe, repeatable walkthrough path.
+- Includes v0.1 release notes and a portfolio checklist for documentation-only release review.
 
 ## Roadmap
 
@@ -1174,4 +1234,4 @@ Planned future directions:
 - Syslog / packet capture analysis
 - AI report summary / RAG integration
 
-Day 7 is limited to documentation cleanup and portfolio packaging. No large feature work is planned for this phase.
+v0.1 is packaged through Day26 as a portfolio release. Future work should stay explicit about whether it is report-only, read-only, dry-run, guarded-live, or disabled before adding new live lab behavior.

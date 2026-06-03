@@ -20,6 +20,7 @@ Generated `reports/` output is intentionally ignored by git. Reviewers can regen
 - Day13 WireGuard summary remains report-only in the runner until it has its own safety layer.
 - Dashboard report browsing is read-only. The `/reports` viewer opens grouped evidence cards, redacted JSON preview, and safe HTML links for already-generated evidence only.
 - Day24 demo flow is report-only. It creates a reviewer walkthrough and does not connect to lab devices, start VPN validation, run iperf3, or read local secrets.
+- Day26 release packaging is documentation-only. It adds release notes and a concise portfolio checklist without adding runner tasks, product features, report generators, live workflows, or secret reads.
 
 ## Evidence Locations
 
@@ -29,12 +30,14 @@ Generated `reports/` output is intentionally ignored by git. Reviewers can regen
 - Day21 dashboard evidence viewer: `/reports`
 - Portfolio evidence index: `reports/portfolio/day19_runner_evidence_index.html`
 - Day24 RC demo flow: `reports/portfolio/day24_rc_demo_flow.html`
+- v0.1 release notes: `docs/portfolio_evidence/v0.1_release_notes.md`
+- v0.1 portfolio checklist: `docs/portfolio_evidence/v0.1_portfolio_checklist.md`
 
 The report index marks missing files as unavailable instead of failing. It also includes report type, availability, safety label, description, and links to JSON/HTML evidence when present.
 
 ## Reviewer Evidence Path
 
-Start with `python network_lab.py --task demo-flow` when preparing an RC or portfolio walkthrough. It writes a safe open order and talk track that starts with README context, continues through task safety metadata and report visibility, then closes with the dashboard `/reports` viewer and portfolio evidence.
+Start with `python network_lab.py --task demo-flow` when preparing an RC or portfolio walkthrough. It writes a safe open order and talk track that starts with README context, continues through task safety metadata and report visibility, then closes with the dashboard `/reports` viewer and portfolio evidence. For v0.1 release handoff, review `docs/portfolio_evidence/v0.1_release_notes.md` and `docs/portfolio_evidence/v0.1_portfolio_checklist.md`.
 
 For a deeper review, run `python network_lab.py --list-tasks --verbose` to understand automation scope, safety labels, execution modes, and report outputs. Then use the dashboard `/reports` viewer or `reports/report_index.html` to inspect generated evidence without starting live workflows.
 
@@ -50,6 +53,7 @@ Day25 RC readiness checklist:
 - `/reports` viewer remains functional and read-only.
 - WireGuard tasks remain guarded.
 - Day24 demo flow remains report-only.
+- Day26 release package remains documentation-only.
 - No destructive live behavior was introduced.
 - Full pytest suite passes.
 
