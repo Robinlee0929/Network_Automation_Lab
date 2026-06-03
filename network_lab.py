@@ -28,6 +28,8 @@ DAY12_WIREGUARD_REPORT_JSON_NAME = "day12_wireguard_vpn_automation_report.json"
 DAY12_WIREGUARD_REPORT_HTML_NAME = "day12_wireguard_vpn_automation_report.html"
 SECRET_FIELD_MARKERS = ("secret", "password", "private_key", "preshared_key", "token", "key")
 DAY17_REPORT_INDEX_HTML = Path("reports") / "report_index.html"
+DAY19_EVIDENCE_INDEX_JSON = Path("reports") / "portfolio" / "day19_runner_evidence_index.json"
+DAY19_EVIDENCE_INDEX_HTML = Path("reports") / "portfolio" / "day19_runner_evidence_index.html"
 RESULTS = {"PASS", "FAIL", "WARN", "MISSING", "INCOMPLETE", "UNKNOWN", "SKIP", "NOT_RUN"}
 INTERACTIVE_ACTION_COMPLETE = (
     "Action complete. Returning to menu. Choose another option or enter 0 to exit."
@@ -511,7 +513,7 @@ def list_tasks() -> List[Dict[str, Any]]:
             "id": "report-index",
             "task_id": "report_index",
             "display_name": "Report Index",
-            "day": "Day14-Day17",
+            "day": "Day14-Day19",
             "category": "reports",
             "description": "Read local reports and build lab overview or visibility indexes.",
             "safety_level": "SAFE_READ_ONLY",
@@ -525,9 +527,32 @@ def list_tasks() -> List[Dict[str, Any]]:
                 "reports/lab-summary/latest_lab_overview.json",
                 "reports/lab-summary/latest_lab_overview.html",
                 "reports/report_index.html",
+                DAY19_EVIDENCE_INDEX_JSON.as_posix(),
+                DAY19_EVIDENCE_INDEX_HTML.as_posix(),
             ],
             "related_script": "network_lab.py",
             "notes": "Report indexing reads local report paths only and does not connect to devices or read config.json.",
+        },
+        {
+            "id": "portfolio-finalize",
+            "task_id": "day19_runner_evidence_index",
+            "display_name": "Day19 Runner Evidence Index",
+            "day": "Day19",
+            "category": "portfolio",
+            "description": "Build a portfolio-ready evidence index from the task catalog and local report visibility.",
+            "safety_level": "SAFE_READ_ONLY",
+            "execution_mode": "local_only",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY19_EVIDENCE_INDEX_JSON.as_posix(),
+                DAY19_EVIDENCE_INDEX_HTML.as_posix(),
+            ],
+            "related_script": "network_lab.py",
+            "notes": "Day19 finalization reads local report metadata only; generated output is safe for screenshots and portfolio review.",
         },
         {
             "id": "day4-baseline",
@@ -623,6 +648,7 @@ def _build_parser() -> argparse.ArgumentParser:
   python network_lab.py --interactive
   python network_lab.py --list-tasks
   python network_lab.py --report-index
+  python network_lab.py --portfolio-finalize
   python network_lab.py --task report-index --dry-run
   python network_lab.py --task report-index
   python network_lab.py --task day4-baseline --dry-run
@@ -635,7 +661,7 @@ def _build_parser() -> argparse.ArgumentParser:
   python network_lab.py --task wireguard-runner --wireguard-config Set_WireguardVPN_lab02_config.json --allow-live-wireguard
   python network_lab.py --task report-index --profile topology_profiles/day14_lab_runner_profile.json
 
-report-index reads existing JSON reports and does not connect to devices.
+report-index and portfolio-finalize read existing report metadata and do not connect to devices.
 day4-baseline delegates to the existing live SSH validation script.
 iperf3-performance delegates to the existing live iperf3 performance script.
 wireguard-runner is dry-run by default and delegates to the existing WireGuard script only after explicit --allow-live-wireguard."""
@@ -646,6 +672,11 @@ wireguard-runner is dry-run by default and delegates to the existing WireGuard s
     )
     parser.add_argument("--list-tasks", action="store_true", help="List available and planned lab tasks.")
     parser.add_argument("--report-index", action="store_true", help="Scan local reports and write reports/report_index.html.")
+    parser.add_argument(
+        "--portfolio-finalize",
+        action="store_true",
+        help="Write the Day19 portfolio evidence index JSON and HTML without running live workflows.",
+    )
     parser.add_argument(
         "--task",
         choices=["report-index", "day4-baseline", "iperf3-performance", WIREGUARD_RUNNER_TASK_ALIAS],
@@ -761,6 +792,12 @@ def discover_report_visibility(project_root: Path) -> List[Dict[str, Any]]:
                 }
             )
 
+    day18_evidence = build_day18_runner_evidence(project_root)
+    for row in rows:
+        if row.get("day") == "Day18" and row.get("title") == WIREGUARD_RUNNER_DISPLAY_NAME:
+            row["day18_evidence"] = day18_evidence
+            row["notes"] = _format_day18_console_note(day18_evidence)
+
     rows.append(
         {
             "day": "Day13",
@@ -773,6 +810,71 @@ def discover_report_visibility(project_root: Path) -> List[Dict[str, Any]]:
         }
     )
     return rows
+
+
+def _safe_nested_dict(value: Any) -> Dict[str, Any]:
+    return value if isinstance(value, dict) else {}
+
+
+def build_day18_runner_evidence(project_root: Path) -> Dict[str, Any]:
+    json_path = project_root / WIREGUARD_RUNNER_REPORT_JSON
+    html_path = project_root / WIREGUARD_RUNNER_REPORT_HTML
+    evidence: Dict[str, Any] = {
+        "runner_json": WIREGUARD_RUNNER_REPORT_JSON.as_posix(),
+        "runner_html": WIREGUARD_RUNNER_REPORT_HTML.as_posix(),
+        "runner_json_exists": json_path.exists(),
+        "runner_html_exists": html_path.exists(),
+        "selected_config_path": "Not available",
+        "delegated_day12_json": "Not available",
+        "delegated_day12_html": "Not available",
+        "final_vpn_connectivity": "Not available",
+        "iperf_forward_mbps": "Not available",
+        "iperf_reverse_mbps": "Not available",
+        "runner_safety_guardrail_status": {},
+        "parse_warning": "",
+    }
+    if not json_path.exists():
+        return evidence
+
+    try:
+        report = json.loads(json_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        evidence["parse_warning"] = f"Could not parse Day18 runner report: {exc}"
+        return evidence
+
+    delegated_report = _safe_nested_dict(report.get("delegated_report"))
+    delegated_summary = _safe_nested_dict(report.get("delegated_result_summary"))
+    guardrails = _safe_nested_dict(report.get("safety_guardrail_status"))
+    evidence.update(
+        mask_secret_values(
+            {
+                "selected_config_path": report.get("selected_config_path") or "Not available",
+                "delegated_day12_json": delegated_report.get("json") or "Not available",
+                "delegated_day12_html": delegated_report.get("html") or "Not available",
+                "final_vpn_connectivity": delegated_summary.get("final_vpn_connectivity") or "Not available",
+                "iperf_forward_mbps": delegated_summary.get("iperf_forward_mbps", "Not available"),
+                "iperf_reverse_mbps": delegated_summary.get("iperf_reverse_mbps", "Not available"),
+                "runner_safety_guardrail_status": guardrails,
+            }
+        )
+    )
+    return evidence
+
+
+def _format_day18_console_note(evidence: Dict[str, Any]) -> str:
+    if not evidence.get("runner_json_exists"):
+        return f"Expected Day18 runner report: {evidence['runner_json']}"
+    return (
+        f"config={evidence.get('selected_config_path')}; "
+        f"vpn={evidence.get('final_vpn_connectivity')}; "
+        f"iperf={evidence.get('iperf_forward_mbps')}/{evidence.get('iperf_reverse_mbps')} Mbps"
+    )
+
+
+def _compact_guardrail_status(guardrails: Dict[str, Any]) -> str:
+    if not guardrails:
+        return "Not available"
+    return ", ".join(f"{key}={value}" for key, value in guardrails.items())
 
 
 def _print_report_visibility(rows: List[Dict[str, Any]], output_path: str = "reports/report_index.html") -> None:
@@ -850,6 +952,13 @@ def _print_report_visibility_row(row: Dict[str, Any], status_width: int) -> None
         print(f"  {'':<{status_width}} {'':<24} HTML: {row['html']}")
     if row.get("notes"):
         print(f"  {'':<{status_width}} {'':<24} Notes: {row['notes']}")
+    evidence = row.get("day18_evidence")
+    if isinstance(evidence, dict) and evidence.get("runner_json_exists"):
+        print(f"  {'':<{status_width}} {'':<24} Day12 JSON: {evidence.get('delegated_day12_json')}")
+        print(
+            f"  {'':<{status_width}} {'':<24} Guardrails: "
+            f"{_compact_guardrail_status(_safe_nested_dict(evidence.get('runner_safety_guardrail_status')))}"
+        )
 
 
 def _count_report_statuses(rows: List[Dict[str, Any]]) -> Dict[str, int]:
@@ -890,6 +999,48 @@ def _css_token(value: str) -> str:
     return "".join(char.lower() if char.isalnum() else "-" for char in value).strip("-")
 
 
+def _day18_evidence_for_html(report_rows: List[Dict[str, Any]], project_root: Path) -> Dict[str, Any]:
+    for row in report_rows:
+        evidence = row.get("day18_evidence")
+        if isinstance(evidence, dict):
+            return evidence
+    return build_day18_runner_evidence(project_root)
+
+
+def _render_day18_evidence_html(evidence: Dict[str, Any], output_path: Path, project_root: Path) -> str:
+    guardrails = _safe_nested_dict(evidence.get("runner_safety_guardrail_status"))
+    guardrail_rows = "\n".join(
+        f"<tr><td>{html.escape(str(key))}</td><td>{html.escape(str(value))}</td></tr>"
+        for key, value in guardrails.items()
+    ) or "<tr><td colspan=\"2\">Not available</td></tr>"
+    detail_rows = [
+        ("Day18 runner JSON", _html_link_or_text(output_path, project_root, str(evidence.get("runner_json", "")))),
+        ("Day18 runner HTML", _html_link_or_text(output_path, project_root, str(evidence.get("runner_html", "")))),
+        ("Delegated Day12 JSON", _html_link_or_text(output_path, project_root, str(evidence.get("delegated_day12_json", "")))),
+        ("Delegated Day12 HTML", _html_link_or_text(output_path, project_root, str(evidence.get("delegated_day12_html", "")))),
+        ("Selected WireGuard config", html.escape(str(evidence.get("selected_config_path", "Not available")))),
+        ("Final VPN connectivity", html.escape(str(evidence.get("final_vpn_connectivity", "Not available")))),
+        ("iperf forward Mbps", html.escape(str(evidence.get("iperf_forward_mbps", "Not available")))),
+        ("iperf reverse Mbps", html.escape(str(evidence.get("iperf_reverse_mbps", "Not available")))),
+    ]
+    if evidence.get("parse_warning"):
+        detail_rows.append(("Parse warning", html.escape(str(evidence["parse_warning"]))))
+    rows = "\n".join(f"<tr><td>{html.escape(label)}</td><td>{value}</td></tr>" for label, value in detail_rows)
+    return f"""
+    <h2>Day18 WireGuard Runner Evidence</h2>
+    <div class="warning">Day18 runner evidence is summarized from the runner report. Day12 remains the detailed source of truth for WireGuard validation.</div>
+    <table>
+      <thead><tr><th>Field</th><th>Value</th></tr></thead>
+      <tbody>{rows}</tbody>
+    </table>
+    <h2>Day18 Runner Guardrails</h2>
+    <table>
+      <thead><tr><th>Guardrail</th><th>Status</th></tr></thead>
+      <tbody>{guardrail_rows}</tbody>
+    </table>
+"""
+
+
 def write_report_index_html(
     task_catalog: List[Dict[str, Any]],
     report_rows: List[Dict[str, Any]],
@@ -927,6 +1078,11 @@ def write_report_index_html(
     safety_rows = "\n".join(
         f"<tr><td><span class=\"pill safety-{_css_token(level)}\">{html.escape(level)}</span></td><td>{html.escape(description)}</td></tr>"
         for level, description in SAFETY_LEVELS.items()
+    )
+    day18_evidence_html = _render_day18_evidence_html(
+        _day18_evidence_for_html(report_rows, project_root),
+        output_path,
+        project_root,
     )
     html_text = f"""<!doctype html>
 <html lang="en">
@@ -1002,6 +1158,7 @@ def write_report_index_html(
   </header>
   <main>
     <div class="warning">Day18 WireGuard runner integration uses a safety layer: dry-run by default, explicit live confirmation, fixed argv execution, and no peer/firewall write flags.</div>
+    {day18_evidence_html}
     <h2>Task Catalog Summary</h2>
     <table>
       <thead><tr><th>Task ID</th><th>Day</th><th>Name</th><th>Category</th><th>Safety</th><th>Enabled</th><th>Mode</th><th>Live Device</th></tr></thead>
@@ -1022,6 +1179,218 @@ def write_report_index_html(
 </html>
 """
     output_path.write_text(html_text, encoding="utf-8")
+
+
+def _portfolio_evidence_area(row: Dict[str, Any]) -> str:
+    title = str(row.get("title", "")).lower()
+    day = str(row.get("day", ""))
+    if "wireguard" in title:
+        return "VPN validation"
+    if "iperf" in title or "performance" in title:
+        return "Performance"
+    if "topology" in title:
+        return "Topology"
+    if "baseline" in title or "auto setup" in title:
+        return "Baseline"
+    if "runner" in title or "overview" in title:
+        return "Runner"
+    return day or "Evidence"
+
+
+def _portfolio_evidence_quality(row: Dict[str, Any]) -> str:
+    status = str(row.get("status", "")).upper()
+    json_path = str(row.get("json", ""))
+    html_path = str(row.get("html", ""))
+    if status == "FOUND" and json_path != "MISSING" and html_path != "MISSING":
+        return "READY"
+    if status == "FOUND":
+        return "PARTIAL"
+    if "DISABLED" in status:
+        return "GUARDED"
+    return "MISSING"
+
+
+def build_portfolio_evidence_index(
+    task_catalog: List[Dict[str, Any]],
+    report_rows: List[Dict[str, Any]],
+) -> Dict[str, Any]:
+    counts = _count_report_statuses(report_rows)
+    evidence_items = [
+        {
+            "day": row.get("day", ""),
+            "area": _portfolio_evidence_area(row),
+            "title": row.get("title", ""),
+            "device": row.get("device", ""),
+            "quality": _portfolio_evidence_quality(row),
+            "source_status": row.get("status", ""),
+            "json": row.get("json", ""),
+            "html": row.get("html", ""),
+            "notes": row.get("notes", ""),
+        }
+        for row in report_rows
+    ]
+    local_only_tasks = [
+        task
+        for task in task_catalog
+        if not task.get("requires_live_device") and task.get("safety_level") == "SAFE_READ_ONLY"
+    ]
+    live_guarded_tasks = [
+        task
+        for task in task_catalog
+        if task.get("requires_live_device") or "live" in str(task.get("safety_level", "")).lower()
+    ]
+    readiness = "READY_WITH_GAPS" if counts["found"] else "NEEDS_LOCAL_REPORTS"
+    if counts["found"] and not counts["missing"]:
+        readiness = "READY"
+
+    return mask_secret_values(
+        {
+            "day": "Day19",
+            "name": "Runner Evidence Index and Portfolio Finalization",
+            "generated_at": datetime.now().replace(microsecond=0).isoformat(sep=" "),
+            "portfolio_readiness": readiness,
+            "summary": {
+                "tasks": len(task_catalog),
+                "local_only_tasks": len(local_only_tasks),
+                "live_or_guarded_tasks": len(live_guarded_tasks),
+                "reports_found": counts["found"],
+                "reports_missing": counts["missing"],
+                "disabled_guardrails": counts["disabled"],
+            },
+            "portfolio_highlights": [
+                "Unified runner lists safe local tasks separately from guarded live workflows.",
+                "Evidence index links JSON and HTML reports without reading config.json or exported WireGuard configs.",
+                "WireGuard runner remains dry-run by default and requires explicit live authorization.",
+                "Generated Day19 output is suitable for portfolio screenshots and final review.",
+            ],
+            "evidence_items": evidence_items,
+        }
+    )
+
+
+def write_portfolio_evidence_html(
+    evidence: Dict[str, Any],
+    output_path: Path,
+    project_root: Path,
+) -> None:
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    summary = evidence.get("summary", {})
+    evidence_rows = "\n".join(
+        "<tr>"
+        f"<td><span class=\"pill pill-day\">{html.escape(str(item.get('day', '')))}</span></td>"
+        f"<td>{html.escape(str(item.get('area', '')))}</td>"
+        f"<td>{html.escape(str(item.get('title', '')))}</td>"
+        f"<td>{html.escape(str(item.get('device', '')))}</td>"
+        f"<td><span class=\"pill quality-{_css_token(str(item.get('quality', '')))}\">{html.escape(str(item.get('quality', '')))}</span></td>"
+        f"<td>{_html_link_or_text(output_path, project_root, str(item.get('json', '')))}</td>"
+        f"<td>{_html_link_or_text(output_path, project_root, str(item.get('html', '')))}</td>"
+        f"<td>{html.escape(str(item.get('notes', '')))}</td>"
+        "</tr>"
+        for item in evidence.get("evidence_items", [])
+    )
+    highlights = "".join(
+        f"<li>{html.escape(str(item))}</li>"
+        for item in evidence.get("portfolio_highlights", [])
+    )
+    html_text = f"""<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Day19 Runner Evidence Index</title>
+  <style>
+    :root {{
+      --bg: #f6f8fb;
+      --panel: #ffffff;
+      --ink: #182230;
+      --muted: #667085;
+      --line: #d8e0ec;
+      --head: #243447;
+      --green-bg: #e7f7ee;
+      --green: #147a3d;
+      --yellow-bg: #fff4d8;
+      --yellow: #8a6100;
+      --blue-bg: #e6f0ff;
+      --blue: #1849a9;
+      --gray-bg: #eef2f6;
+      --gray: #475467;
+    }}
+    * {{ box-sizing: border-box; }}
+    body {{ margin: 0; font-family: Arial, sans-serif; background: var(--bg); color: var(--ink); font-size: 14px; }}
+    header {{ background: var(--head); color: white; padding: 30px 38px 26px; }}
+    main {{ padding: 26px 38px 48px; }}
+    h1 {{ margin: 0 0 8px; font-size: 30px; letter-spacing: 0; }}
+    h2 {{ margin: 28px 0 12px; font-size: 19px; }}
+    table {{ width: 100%; border-collapse: collapse; background: var(--panel); border: 1px solid var(--line); }}
+    th, td {{ padding: 10px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }}
+    th {{ background: #edf2f8; color: #435066; font-size: 12px; text-transform: uppercase; }}
+    a {{ color: #155bb5; font-weight: 700; text-decoration: none; }}
+    a:hover {{ text-decoration: underline; }}
+    .meta {{ color: #dbe5f3; }}
+    .summary {{ display: grid; grid-template-columns: repeat(5, minmax(120px, 1fr)); gap: 12px; margin-top: 18px; }}
+    .metric {{ background: rgba(255, 255, 255, .10); border: 1px solid rgba(255, 255, 255, .20); border-radius: 8px; padding: 13px 14px; }}
+    .metric-label {{ color: #dbe5f3; font-size: 12px; font-weight: 700; text-transform: uppercase; }}
+    .metric-value {{ margin-top: 4px; font-size: 24px; font-weight: 800; }}
+    .pill {{ display: inline-block; border-radius: 999px; padding: 4px 9px; font-size: 12px; font-weight: 800; white-space: nowrap; }}
+    .pill-day, .quality-missing {{ background: var(--gray-bg); color: var(--gray); }}
+    .quality-ready {{ background: var(--green-bg); color: var(--green); }}
+    .quality-partial {{ background: var(--yellow-bg); color: var(--yellow); }}
+    .quality-guarded {{ background: var(--blue-bg); color: var(--blue); }}
+    .highlights {{ background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 16px 18px; }}
+    @media (max-width: 900px) {{
+      header, main {{ padding-left: 16px; padding-right: 16px; }}
+      .summary {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }}
+      table {{ display: block; overflow-x: auto; }}
+    }}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Day19 Runner Evidence Index</h1>
+    <div class="meta">{html.escape(str(evidence.get("name", "")))} · Generated {html.escape(str(evidence.get("generated_at", "")))}</div>
+    <section class="summary">
+      <div class="metric"><div class="metric-label">Readiness</div><div class="metric-value">{html.escape(str(evidence.get("portfolio_readiness", "")))}</div></div>
+      <div class="metric"><div class="metric-label">Tasks</div><div class="metric-value">{summary.get("tasks", 0)}</div></div>
+      <div class="metric"><div class="metric-label">Found</div><div class="metric-value">{summary.get("reports_found", 0)}</div></div>
+      <div class="metric"><div class="metric-label">Missing</div><div class="metric-value">{summary.get("reports_missing", 0)}</div></div>
+      <div class="metric"><div class="metric-label">Guardrails</div><div class="metric-value">{summary.get("disabled_guardrails", 0)}</div></div>
+    </section>
+  </header>
+  <main>
+    <h2>Portfolio Highlights</h2>
+    <ul class="highlights">{highlights}</ul>
+    <h2>Evidence Items</h2>
+    <table>
+      <thead><tr><th>Day</th><th>Area</th><th>Evidence</th><th>Device</th><th>Quality</th><th>JSON</th><th>HTML</th><th>Notes</th></tr></thead>
+      <tbody>{evidence_rows}</tbody>
+    </table>
+  </main>
+</body>
+</html>
+"""
+    output_path.write_text(html_text, encoding="utf-8")
+
+
+def _run_portfolio_finalization(project_root: Path) -> int:
+    task_catalog = list_tasks()
+    report_rows = discover_report_visibility(project_root)
+    evidence = build_portfolio_evidence_index(task_catalog, report_rows)
+    json_path = project_root / DAY19_EVIDENCE_INDEX_JSON
+    html_path = project_root / DAY19_EVIDENCE_INDEX_HTML
+    write_json_report(evidence, json_path)
+    write_portfolio_evidence_html(evidence, html_path, project_root)
+    print(format_heading("Day19 Runner Evidence Index"))
+    print(f"Portfolio readiness: {evidence['portfolio_readiness']}")
+    print(
+        "Summary: "
+        f"tasks={evidence['summary']['tasks']} "
+        f"found={evidence['summary']['reports_found']} "
+        f"missing={evidence['summary']['reports_missing']} "
+        f"guardrails={evidence['summary']['disabled_guardrails']}"
+    )
+    print(f"JSON evidence index: {_relative_to_project(project_root, json_path)}")
+    print(f"HTML evidence index: {_relative_to_project(project_root, html_path)}")
+    print(f"{format_status('PASS')} Day19 portfolio finalization completed without live execution.")
+    return 0
 
 
 def _run_report_visibility_index(project_root: Path) -> int:
@@ -1894,6 +2263,8 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
         return 0
     if args.report_index:
         return _run_report_visibility_index(root)
+    if args.portfolio_finalize:
+        return _run_portfolio_finalization(root)
 
     profile_path = _resolve_project_path(root, args.profile)
     try:

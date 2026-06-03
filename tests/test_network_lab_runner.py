@@ -433,6 +433,88 @@ def test_wireguard_placeholder_does_not_call_live_scripts(tmp_path, monkeypatch,
     assert "day18-wireguard-runner" not in output
 
 
+def test_report_index_console_shows_day18_runner_evidence(tmp_path, capsys):
+    write_json(
+        tmp_path / "reports" / "lab-summary" / "wireguard_runner_safety_layer.json",
+        {
+            "selected_config_path": "Set_WireguardVPN_lab02_config.json",
+            "safety_guardrail_status": {
+                "dry_run_default": "PASS",
+                "requires_allow_live_wireguard": "PASS",
+                "subprocess_shell_false": "PASS",
+            },
+            "delegated_report": {
+                "json": "reports/Hex-s-2025-lab02/day12_wireguard_vpn_automation_report.json",
+                "html": "reports/Hex-s-2025-lab02/day12_wireguard_vpn_automation_report.html",
+            },
+            "delegated_result_summary": {
+                "final_vpn_connectivity": "PASS",
+                "iperf_forward_mbps": 181.0,
+                "iperf_reverse_mbps": 231.0,
+            },
+        },
+    )
+    (tmp_path / "reports" / "lab-summary" / "wireguard_runner_safety_layer.html").write_text(
+        "<html>runner</html>",
+        encoding="utf-8",
+    )
+
+    exit_code = network_lab.main(["--report-index"], project_root=tmp_path)
+
+    output = capsys.readouterr().out
+    assert exit_code == 0
+    assert "WireGuard Runner Safety Layer" in output
+    assert "reports/lab-summary/wireguard_runner_safety_layer.json" in output
+    assert "Set_WireguardVPN_lab02_config.json" in output
+    assert "vpn=PASS" in output
+    assert "iperf=181.0/231.0 Mbps" in output
+    assert "reports/Hex-s-2025-lab02/day12_wireguard_vpn_automation_report.json" in output
+    assert "dry_run_default=PASS" in output
+
+
+def test_report_index_html_shows_day18_runner_evidence_details(tmp_path):
+    write_json(
+        tmp_path / "reports" / "lab-summary" / "wireguard_runner_safety_layer.json",
+        {
+            "selected_config_path": "Set_WireguardVPN_lab02_config.json",
+            "safety_guardrail_status": {
+                "dry_run_default": "PASS",
+                "requires_allow_live_wireguard": "PASS",
+                "subprocess_shell_false": "PASS",
+                "forbidden_write_flags_blocked": "PASS",
+            },
+            "delegated_report": {
+                "json": "reports/Hex-s-2025-lab02/day12_wireguard_vpn_automation_report.json",
+                "html": "reports/Hex-s-2025-lab02/day12_wireguard_vpn_automation_report.html",
+            },
+            "delegated_result_summary": {
+                "final_vpn_connectivity": "PASS",
+                "iperf_forward_mbps": 181.0,
+                "iperf_reverse_mbps": 231.0,
+            },
+        },
+    )
+    (tmp_path / "reports" / "lab-summary" / "wireguard_runner_safety_layer.html").write_text(
+        "<html>runner</html>",
+        encoding="utf-8",
+    )
+    rows = network_lab.discover_report_visibility(tmp_path)
+    output = tmp_path / "reports" / "report_index.html"
+
+    network_lab.write_report_index_html(network_lab.list_tasks(), rows, output, tmp_path)
+
+    html = output.read_text(encoding="utf-8")
+    assert "Day18 WireGuard Runner Evidence" in html
+    assert "Day12 remains the detailed source of truth" in html
+    assert "reports/lab-summary/wireguard_runner_safety_layer.json" in html
+    assert "reports/Hex-s-2025-lab02/day12_wireguard_vpn_automation_report.json" in html
+    assert "Set_WireguardVPN_lab02_config.json" in html
+    assert "Final VPN connectivity" in html
+    assert "181.0" in html
+    assert "231.0" in html
+    assert "forbidden_write_flags_blocked" in html
+
+
 def test_html_report_index_generation_contains_catalog_reports_and_legend(tmp_path):
     rows = network_lab.discover_report_visibility(tmp_path)
     output = tmp_path / "reports" / "report_index.html"
@@ -448,6 +530,68 @@ def test_html_report_index_generation_contains_catalog_reports_and_legend(tmp_pa
     assert "WireGuard Runner Safety Layer" in html
     assert "day12-wireguard-live-validation" not in html
     assert "day18-wireguard-runner" not in html
+
+
+def test_portfolio_finalization_writes_day19_evidence_index(tmp_path, capsys):
+    write_json(
+        tmp_path / "reports" / "Hex-s-2025-lab01" / "day4_baseline_validation.json",
+        {"result": "PASS"},
+    )
+    (tmp_path / "reports" / "Hex-s-2025-lab01" / "day4_baseline_validation.html").write_text(
+        "<html>day4</html>",
+        encoding="utf-8",
+    )
+
+    exit_code = network_lab.main(["--portfolio-finalize"], project_root=tmp_path)
+
+    output = capsys.readouterr().out
+    json_path = tmp_path / "reports" / "portfolio" / "day19_runner_evidence_index.json"
+    html_path = tmp_path / "reports" / "portfolio" / "day19_runner_evidence_index.html"
+    data = json.loads(json_path.read_text(encoding="utf-8"))
+    html = html_path.read_text(encoding="utf-8")
+    assert exit_code == 0
+    assert "Day19 Runner Evidence Index" in output
+    assert "without live execution" in output
+    assert data["day"] == "Day19"
+    assert data["portfolio_readiness"] == "READY_WITH_GAPS"
+    assert data["summary"]["reports_found"] >= 1
+    assert any(item["quality"] == "READY" for item in data["evidence_items"])
+    assert "Portfolio Highlights" in html
+    assert "day4_baseline_validation.html" in html
+
+
+def test_portfolio_finalization_does_not_execute_subprocess_or_read_config_secret(
+    tmp_path,
+    monkeypatch,
+    capsys,
+):
+    write_json(tmp_path / "config.json", {"password": "super-secret-password"})
+
+    def fail_run(*_args, **_kwargs):
+        raise AssertionError("portfolio finalization must not execute subprocess")
+
+    monkeypatch.setattr(network_lab.subprocess, "run", fail_run)
+
+    exit_code = network_lab.main(["--portfolio-finalize"], project_root=tmp_path)
+
+    output = capsys.readouterr().out
+    json_text = (tmp_path / "reports/portfolio/day19_runner_evidence_index.json").read_text()
+    html = (tmp_path / "reports/portfolio/day19_runner_evidence_index.html").read_text()
+    assert exit_code == 0
+    assert "super-secret-password" not in output
+    assert "super-secret-password" not in json_text
+    assert "super-secret-password" not in html
+    assert "config.json" not in output
+
+
+def test_task_catalog_contains_day19_portfolio_entry():
+    task = next(item for item in network_lab.list_tasks() if item["id"] == "portfolio-finalize")
+
+    assert task["task_id"] == "day19_runner_evidence_index"
+    assert task["day"] == "Day19"
+    assert task["safety_level"] == "SAFE_READ_ONLY"
+    assert task["requires_live_device"] is False
+    assert "reports/portfolio/day19_runner_evidence_index.html" in task["report_paths"]
 
 
 def test_report_index_does_not_print_config_json_secret_content(tmp_path, capsys):

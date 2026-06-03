@@ -6,7 +6,7 @@ Network Automation Lab is a Python-based lab automation project for validating n
 
 A Python-based network automation and validation lab for MikroTik RouterOS, Cisco switch topology checks, iperf3 performance testing, regression checks, and local report visualization.
 
-The current implementation covers Day 1 through Day 12:
+The current implementation covers Day 1 through Day 19:
 
 - MikroTik baseline and post-reset validation
 - MikroTik Day 2 setup workflow after reset
@@ -20,6 +20,10 @@ The current implementation covers Day 1 through Day 12:
 - Day 11 Dashboard safe command execution and execution log viewer
 - Day 12 WireGuard VPN client config export and throughput baseline automation
 - Day 13 multi-router WireGuard Client-to-Site validation
+- Day 14 unified lab runner and latest lab overview report
+- Day 17 runner task catalog and local report visibility index
+- Day 18 WireGuard runner safety layer
+- Day 19 runner evidence index and portfolio finalization
 
 The project is designed as a practical QA Automation / SDET portfolio project for network infrastructure. It focuses on repeatable validation, structured test evidence, and readable JSON / HTML reports rather than one-off manual checks.
 
@@ -74,6 +78,10 @@ Cisco validation is read-only. It runs show commands for topology evidence and d
 | Day 11 | Dashboard safe command execution and execution log viewer | Complete |
 | Day 12 | WireGuard VPN client config export and throughput baseline automation | Complete |
 | Day 13 | Multi-router WireGuard Client-to-Site validation | Complete |
+| Day 14 | Unified lab runner and latest lab overview report | Complete |
+| Day 17 | Runner task catalog and report visibility index | Complete |
+| Day 18 | WireGuard runner safety layer | Complete |
+| Day 19 | Runner evidence index and portfolio finalization | Complete |
 
 ## Lab Topology
 
@@ -827,6 +835,15 @@ python network_lab.py --task wireguard-runner `
   --allow-live-wireguard
 ```
 
+Guarded live validation with iperf3:
+
+```powershell
+python network_lab.py --task wireguard-runner `
+  --wireguard-config Set_WireguardVPN_lab02_config.json `
+  --allow-live-wireguard `
+  --wireguard-run-iperf
+```
+
 Safety behavior:
 
 - Dry-run does not connect to devices.
@@ -848,7 +865,37 @@ reports/lab-summary/wireguard_runner_safety_layer.json
 reports/lab-summary/wireguard_runner_safety_layer.html
 ```
 
+Day18 is a runner safety and summary layer. It does not replace `mikrotik_day12_wireguard_vpn_automation.py`; Day12 remains the detailed source of truth for WireGuard validation, exported config handling, tunnel checks, TCP 5201 checks, and iperf3 evidence.
+
 When guarded live execution delegates to Day12, the Day18 runner report stays concise and links back to the Day12 source of truth. It includes the delegated Day12 JSON/HTML report paths, delegated result, final VPN connectivity status, handshake timing status, and iperf forward/reverse Mbps when those fields are available. It does not duplicate the full Day12 report or WireGuard config content.
+
+The runner intentionally delegates only the safe Day12 validation path. Unsafe Day12 write flags such as `--recreate-peer` and `--apply-firewall-fixes` are not included in the runner command.
+
+## Day19 Runner Evidence Index and Portfolio Finalization
+
+Day19 closes the runner portfolio story with a local-only evidence index. It reads the task catalog and report visibility metadata, then writes a portfolio-ready JSON and HTML summary for final review, screenshots, and sharing.
+
+Run the Day19 finalization:
+
+```powershell
+python network_lab.py --portfolio-finalize
+```
+
+Output files:
+
+```text
+reports/portfolio/day19_runner_evidence_index.json
+reports/portfolio/day19_runner_evidence_index.html
+```
+
+Safety behavior:
+
+- Does not connect to routers, switches, WireGuard clients, or iperf3 endpoints.
+- Does not execute live workflow subprocesses.
+- Does not read `config.json`, exported WireGuard `.conf` files, or secrets.
+- Reuses report visibility metadata and links existing JSON / HTML evidence when present.
+- Marks evidence quality as `READY`, `PARTIAL`, `GUARDED`, or `MISSING`.
+- Keeps generated portfolio output under ignored `reports/` paths.
 
 ## How to Read Reports
 
@@ -949,6 +996,13 @@ reports/lab-summary/day13_multi_router_wireguard_client_to_site_summary_YYYYMMDD
 reports/lab-summary/day13_multi_router_wireguard_client_to_site_summary_YYYYMMDD_HHMMSS.html
 ```
 
+Day 19 portfolio evidence index:
+
+```text
+reports/portfolio/day19_runner_evidence_index.json
+reports/portfolio/day19_runner_evidence_index.html
+```
+
 ## Testing Strategy
 
 The project separates live-device validation from unit tests.
@@ -977,6 +1031,7 @@ For this Day 7 documentation pass, tests were intentionally not run.
 - Uses password-safe report handling.
 - Provides portfolio-friendly HTML output for demos and screenshots.
 - Shows a clear growth path toward VPN, HA, performance, packet analysis, and AI-assisted reporting.
+- Includes a final runner evidence index that ties task safety, report visibility, and portfolio readiness together.
 
 ## Roadmap
 
