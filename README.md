@@ -853,7 +853,7 @@ Safety behavior:
 - Dry-run does not connect to devices.
 - Dry-run does not start WireGuard.
 - Dry-run does not run ping or iperf.
-- Dry-run does not change config.
+- Dry-run does not enable VPN tunnels, modify firewall rules, reset routers, reboot routers, or apply config.
 - `--wireguard-config` selects the Day12 WireGuard validation config file.
 - If `--wireguard-config` is omitted, the runner uses the compatibility default `Set_WireguardVPN_config.json`.
 - The selected config path is printed during dry-run, blocked live attempts, and guarded live execution.
@@ -933,6 +933,34 @@ Viewer behavior:
 - JSON report links show a readable, redacted preview without assuming every report uses the same schema.
 - Missing reports show a clear not-generated-yet state instead of crashing.
 - The viewer is read-only. It does not run live VPN validation, router resets, reboots, config changes, SSH commands, or iperf3 tests.
+
+## Day22 WireGuard Runner Documentation and Safety Review
+
+Day22 realigns the WireGuard runner story with the validation-first plan. The runner is a safety and evidence layer around the existing Day12 script, not a new VPN activation engine.
+
+What the WireGuard runner can do:
+
+- Produce a dry-run safety report showing the selected Day12 config, planned validation command, guardrail status, and report paths.
+- Block accidental live execution unless `--allow-live-wireguard` is provided from the CLI or a separate interactive confirmation is accepted from the menu.
+- When manually authorized, delegate to the existing Day12 validation script with fixed argv execution and without unsafe Day12 write flags.
+- Summarize related Day12 evidence when the delegated Day12 JSON/HTML reports already exist.
+
+What it intentionally cannot do:
+
+- It does not automatically enable live VPN tunnels.
+- It does not modify router firewall rules.
+- It does not reset or reboot routers.
+- It does not apply destructive configuration.
+- It does not expose WireGuard private keys, `.conf` contents, SSH passwords, or local config secrets.
+
+Evidence relationship:
+
+- Day12 remains the detailed source of truth for WireGuard client config export, tunnel checks, TCP 5201 checks, and iperf3 evidence.
+- Day13 summarizes multi-router WireGuard client-to-site validation and links Day12 report paths when available.
+- Day18 records runner guardrails and delegated Day12 evidence without duplicating the Day12 report or reading exported `.conf` files.
+- Day22 documents the safety boundary so Day25 v0.1 RC review can separate validation evidence from intentionally blocked live automation.
+
+Review WireGuard evidence from the Day21 dashboard at `/reports`. Use grouped evidence cards, redacted JSON preview, and safe HTML report links for already-generated `reports/` or `summary/` evidence. Dashboard evidence browsing is read-only; it must not start live validation, activate VPN clients, apply config, reset routers, reboot routers, or reveal secrets.
 
 ## How to Read Reports
 

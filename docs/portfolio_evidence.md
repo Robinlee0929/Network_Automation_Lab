@@ -17,12 +17,14 @@ Generated `reports/` output is intentionally ignored by git. Reviewers can regen
 - Day4 baseline and Day8 iperf3 workflows are live-device tasks and remain behind explicit runner actions or confirmation.
 - WireGuard runner is dry-run by default. Guarded live validation requires explicit flags and does not delegate unsafe Day12 flags such as peer recreation or firewall fixes.
 - Day13 WireGuard summary remains report-only in the runner until it has its own safety layer.
+- Dashboard report browsing is read-only. The `/reports` viewer opens grouped evidence cards, redacted JSON preview, and safe HTML links for already-generated evidence only.
 
 ## Evidence Locations
 
 - Latest runner overview: `reports/lab-summary/latest_lab_overview.html`
 - Report visibility index: `reports/report_index.html`
 - Day18 WireGuard runner evidence: `reports/lab-summary/wireguard_runner_safety_layer.html`
+- Day21 dashboard evidence viewer: `/reports`
 - Portfolio evidence index: `reports/portfolio/day19_runner_evidence_index.html`
 
 The report index marks missing files as unavailable instead of failing. It also includes report type, availability, safety label, description, and links to JSON/HTML evidence when present.

@@ -631,7 +631,7 @@ def list_tasks() -> List[Dict[str, Any]]:
             "user_display_name": "WireGuard VPN Validation",
             "day": "Day18",
             "category": "vpn",
-            "description": "Feature-named WireGuard runner integration with dry-run and explicit guarded live execution.",
+            "description": "Feature-named WireGuard runner integration for dry-run safety reporting and manually guarded live validation.",
             "safety_level": "guarded-live",
             "execution_mode": "dry-run by default",
             "enabled": True,
@@ -645,7 +645,7 @@ def list_tasks() -> List[Dict[str, Any]]:
                 WIREGUARD_RUNNER_REPORT_HTML.as_posix(),
             ],
             "related_script": DAY12_WIREGUARD_SCRIPT,
-            "notes": "Added in Day18. Primary CLI uses stable feature names; live mode requires --allow-live-wireguard.",
+            "notes": "Added in Day18. Primary CLI uses stable feature names; dry-run is default, and live validation requires manual --allow-live-wireguard authorization.",
         },
         {
             "id": "day13-wireguard-summary",
