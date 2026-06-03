@@ -513,6 +513,7 @@ def list_tasks() -> List[Dict[str, Any]]:
             "id": "report-index",
             "task_id": "report_index",
             "display_name": "Report Index",
+            "user_display_name": "Report Index",
             "day": "Day14-Day19",
             "category": "reports",
             "description": "Read local reports and build lab overview or visibility indexes.",
@@ -537,6 +538,7 @@ def list_tasks() -> List[Dict[str, Any]]:
             "id": "portfolio-finalize",
             "task_id": "day19_runner_evidence_index",
             "display_name": "Day19 Runner Evidence Index",
+            "user_display_name": "Portfolio Evidence Index",
             "day": "Day19",
             "category": "portfolio",
             "description": "Build a portfolio-ready evidence index from the task catalog and local report visibility.",
@@ -558,6 +560,7 @@ def list_tasks() -> List[Dict[str, Any]]:
             "id": "day4-baseline",
             "task_id": "day4_baseline_validation",
             "display_name": "Day4 Multi-device Baseline Validation",
+            "user_display_name": "Multi-device Baseline Validation",
             "day": "Day4",
             "category": "baseline",
             "description": "Existing Day4 multi-device RouterOS baseline validation.",
@@ -579,6 +582,7 @@ def list_tasks() -> List[Dict[str, Any]]:
             "id": "iperf3-performance",
             "task_id": "day8_iperf3_performance",
             "display_name": "Day8 iperf3 Performance",
+            "user_display_name": "iperf3 Performance Test",
             "day": "Day8",
             "category": "performance",
             "description": "Existing Day8 iperf3 performance workflow.",
@@ -600,6 +604,7 @@ def list_tasks() -> List[Dict[str, Any]]:
             "id": WIREGUARD_RUNNER_TASK_ALIAS,
             "task_id": WIREGUARD_RUNNER_TASK_ID,
             "display_name": WIREGUARD_RUNNER_DISPLAY_NAME,
+            "user_display_name": "WireGuard VPN Validation",
             "day": "Day18",
             "category": "vpn",
             "description": "Feature-named WireGuard runner integration with dry-run and explicit guarded live execution.",
@@ -622,6 +627,7 @@ def list_tasks() -> List[Dict[str, Any]]:
             "id": "day13-wireguard-summary",
             "task_id": "day13_wireguard_summary_only",
             "display_name": "Day13 WireGuard Summary Only",
+            "user_display_name": "WireGuard Summary Only",
             "day": "Day13",
             "category": "vpn",
             "description": "Report-only or placeholder visibility for Day13 WireGuard summaries.",
@@ -647,6 +653,7 @@ def _build_parser() -> argparse.ArgumentParser:
   python network_lab.py
   python network_lab.py --interactive
   python network_lab.py --list-tasks
+  python network_lab.py --list-tasks --verbose
   python network_lab.py --report-index
   python network_lab.py --portfolio-finalize
   python network_lab.py --task report-index --dry-run
@@ -671,6 +678,7 @@ wireguard-runner is dry-run by default and delegates to the existing WireGuard s
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument("--list-tasks", action="store_true", help="List available and planned lab tasks.")
+    parser.add_argument("--verbose", action="store_true", help="Show detailed task catalog metadata with --list-tasks.")
     parser.add_argument("--report-index", action="store_true", help="Scan local reports and write reports/report_index.html.")
     parser.add_argument(
         "--portfolio-finalize",
@@ -679,7 +687,13 @@ wireguard-runner is dry-run by default and delegates to the existing WireGuard s
     )
     parser.add_argument(
         "--task",
-        choices=["report-index", "day4-baseline", "iperf3-performance", WIREGUARD_RUNNER_TASK_ALIAS],
+        choices=[
+            "report-index",
+            "portfolio-finalize",
+            "day4-baseline",
+            "iperf3-performance",
+            WIREGUARD_RUNNER_TASK_ALIAS,
+        ],
         help="Task to run.",
     )
     parser.add_argument("--profile", default=str(DEFAULT_PROFILE), help="Path to the Day14 lab runner profile JSON.")
@@ -706,7 +720,27 @@ def _resolve_project_path(project_root: Path, value: str) -> Path:
     return path if path.is_absolute() else project_root / path
 
 
-def _print_task_list() -> None:
+def _task_enabled_label(task: Dict[str, Any]) -> str:
+    return "enabled" if task.get("enabled") else "planned"
+
+
+def _print_compact_task_list() -> None:
+    print(format_heading("Task Catalog"))
+    print("Use: python network_lab.py --task <task-name>")
+    print("For full metadata, run: python network_lab.py --list-tasks --verbose")
+    print()
+    print(f"{'Task':<24} {'Name':<38} {'Safety':<18} Status")
+    print(f"{'-' * 24} {'-' * 38} {'-' * 18} {'-' * 10}")
+    for task in list_tasks():
+        print(
+            f"{task['id']:<24} "
+            f"{str(task.get('user_display_name', task['display_name']))[:38]:<38} "
+            f"{task['safety_level']:<18} "
+            f"{_task_enabled_label(task)}"
+        )
+
+
+def _print_verbose_task_list() -> None:
     print(format_heading("Task Catalog"))
     for task in list_tasks():
         print()
@@ -714,6 +748,7 @@ def _print_task_list() -> None:
         print(f"CLI task: {task['id']}")
         print(f"Day: {task['day']}")
         print(f"Display name: {task['display_name']}")
+        print(f"User-facing name: {task.get('user_display_name', task['display_name'])}")
         print(f"Category: {task['category']}")
         print(f"Safety: {task['safety_level']}")
         print(f"Enabled: {'yes' if task['enabled'] else 'no'}")
@@ -725,6 +760,13 @@ def _print_task_list() -> None:
         for report_path in task.get("report_paths", []):
             print(f"  - {report_path}")
         print(f"Notes: {task['notes']}")
+
+
+def _print_task_list(verbose: bool = False) -> None:
+    if verbose:
+        _print_verbose_task_list()
+        return
+    _print_compact_task_list()
 
 
 def _relative_to_project(project_root: Path, path: Path) -> str:
@@ -2151,6 +2193,53 @@ def _confirm_and_run_wireguard_runner(
     return _run_wireguard_runner(project_root, allow_live_wireguard=True, config_path=config_path, run_iperf=False)
 
 
+def _wireguard_config_suggestions(project_root: Path) -> List[str]:
+    suggestions = []
+    seen = set()
+    for path in sorted(project_root.glob("Set_WireguardVPN*_config.json")):
+        if not path.is_file():
+            continue
+        name = path.name
+        if name in seen:
+            continue
+        suggestions.append(name)
+        seen.add(name)
+    return sorted(suggestions, key=lambda name: (name == DAY12_WIREGUARD_CONFIG, name.lower()))
+
+
+def _prompt_for_wireguard_config(
+    project_root: Path,
+    input_func: Any,
+) -> Optional[str]:
+    suggestions = _wireguard_config_suggestions(project_root)
+    print(format_heading("WireGuard VPN validation"))
+    print("Select a WireGuard config file for this run.")
+    if suggestions:
+        print("Suggestions:")
+        for index, suggestion in enumerate(suggestions, start=1):
+            print(f"  {index}. {suggestion}")
+    else:
+        print("No Set_WireguardVPN*_config.json files were found. Type a config path to continue.")
+
+    try:
+        selection = input_func("WireGuard config path or number [blank to cancel]: ").strip()
+    except EOFError:
+        selection = ""
+
+    if not selection:
+        print(f"{format_status('NOT_RUN')} WireGuard runner cancelled. No config was selected.")
+        return None
+
+    if selection.isdigit() and suggestions:
+        selected_index = int(selection)
+        if 1 <= selected_index <= len(suggestions):
+            return suggestions[selected_index - 1]
+        print(f"{format_status('UNKNOWN')} Invalid WireGuard config selection: {selection}")
+        return None
+
+    return selection
+
+
 def _print_recommended_live_command(workflow_id: str) -> None:
     recommendation = LIVE_WORKFLOW_RECOMMENDATIONS[workflow_id]
     print(format_heading(recommendation["title"]))
@@ -2180,16 +2269,16 @@ def _open_latest_overview_html(profile: Dict[str, Any], project_root: Path) -> b
 
 def _print_interactive_menu() -> None:
     print()
-    print(format_heading(f"Day14 {DAY14_NAME}"))
+    print(format_heading("Network Lab Runner"))
     print("Select an option by number:")
     print("  1. List available tasks")
-    print("  2. Generate latest report index")
+    print("  2. Generate report index")
     print("  3. Dry-run report index")
     print("  4. Open latest overview HTML if it exists")
-    print("  5. Run Day4 multi-device baseline")
-    print("  6. Run Day8 iperf3 performance workflow")
-    print("  7. WireGuard Runner Safety Layer")
-    print("  8. Show recommended command for Day13 multi-router WireGuard summary")
+    print("  5. Run multi-device baseline validation")
+    print("  6. Run iperf3 performance test")
+    print("  7. Run WireGuard VPN validation")
+    print("  8. Show WireGuard summary command")
     print("  0. Exit")
 
 
@@ -2216,7 +2305,7 @@ def run_interactive_menu(
             return 0
 
         if choice in {"0", "q", "quit", "exit"}:
-            print("Exiting Day14 interactive menu.")
+            print("Exiting Network Lab Runner.")
             return 0
         if choice == "1":
             _print_task_list()
@@ -2241,7 +2330,15 @@ def run_interactive_menu(
             if day8_exit_code != 0:
                 return day8_exit_code
         elif choice == "7":
-            wireguard_exit_code = _confirm_and_run_wireguard_runner(project_root, read_input, config_path=wireguard_config)
+            selected_wireguard_config = _prompt_for_wireguard_config(project_root, read_input)
+            if selected_wireguard_config is None:
+                _print_interactive_action_complete()
+                continue
+            wireguard_exit_code = _confirm_and_run_wireguard_runner(
+                project_root,
+                read_input,
+                config_path=selected_wireguard_config,
+            )
             _print_interactive_action_complete()
             if wireguard_exit_code != 0:
                 return wireguard_exit_code
@@ -2259,11 +2356,13 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
     root = Path(project_root or Path.cwd()).resolve()
 
     if args.list_tasks:
-        _print_task_list()
+        _print_task_list(verbose=args.verbose)
         return 0
     if args.report_index:
         return _run_report_visibility_index(root)
     if args.portfolio_finalize:
+        return _run_portfolio_finalization(root)
+    if args.task == "portfolio-finalize":
         return _run_portfolio_finalization(root)
 
     profile_path = _resolve_project_path(root, args.profile)
