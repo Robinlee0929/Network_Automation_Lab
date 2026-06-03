@@ -6,7 +6,7 @@ Network Automation Lab is a Python-based lab automation project for validating n
 
 A Python-based network automation and validation lab for MikroTik RouterOS, Cisco switch topology checks, iperf3 performance testing, regression checks, and local report visualization.
 
-The current implementation covers Day 1 through Day 19:
+The current implementation covers Day 1 through Day 21:
 
 - MikroTik baseline and post-reset validation
 - MikroTik Day 2 setup workflow after reset
@@ -24,6 +24,8 @@ The current implementation covers Day 1 through Day 19:
 - Day 17 runner task catalog and local report visibility index
 - Day 18 WireGuard runner safety layer
 - Day 19 runner evidence index and portfolio finalization
+- Day 20 runner report index and portfolio evidence cleanup
+- Day 21 dashboard report viewer and evidence navigation
 
 The project is designed as a practical QA Automation / SDET portfolio project for network infrastructure. It focuses on repeatable validation, structured test evidence, and readable JSON / HTML reports rather than one-off manual checks.
 
@@ -82,6 +84,8 @@ Cisco validation is read-only. It runs show commands for topology evidence and d
 | Day 17 | Runner task catalog and report visibility index | Complete |
 | Day 18 | WireGuard runner safety layer | Complete |
 | Day 19 | Runner evidence index and portfolio finalization | Complete |
+| Day 20 | Runner report index and portfolio evidence cleanup | Complete |
+| Day 21 | Dashboard report viewer and evidence navigation | Complete |
 
 ## Lab Topology
 
@@ -906,6 +910,29 @@ See the concise portfolio review guide:
 ```text
 docs/portfolio_evidence.md
 ```
+
+## Day21 Dashboard Report Viewer and Evidence Navigation
+
+Day21 extends the local Flask dashboard with a portfolio-friendly report viewer. The `/reports` page reuses the unified runner report visibility metadata, groups evidence by day, and shows report title, device or scope, report type, PASS / FAIL / WARN / UNKNOWN / MISSING status, JSON / HTML paths, and a short description.
+
+Run the dashboard:
+
+```powershell
+python dashboard_app.py
+```
+
+Open the report viewer:
+
+```text
+http://127.0.0.1:5000/reports
+```
+
+Viewer behavior:
+
+- HTML report links open only files under expected local evidence folders such as `reports/` and `summary/`.
+- JSON report links show a readable, redacted preview without assuming every report uses the same schema.
+- Missing reports show a clear not-generated-yet state instead of crashing.
+- The viewer is read-only. It does not run live VPN validation, router resets, reboots, config changes, SSH commands, or iperf3 tests.
 
 ## How to Read Reports
 

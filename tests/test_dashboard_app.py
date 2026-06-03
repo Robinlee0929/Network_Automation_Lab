@@ -66,6 +66,72 @@ def test_discover_reports_handles_missing_directory(tmp_path):
     assert dashboard.discover_reports(tmp_path / "missing") == []
 
 
+def test_dashboard_evidence_handles_empty_reports_directory(tmp_path):
+    reports_dir = tmp_path / "reports"
+    reports_dir.mkdir()
+
+    entries = dashboard.collect_dashboard_evidence(tmp_path, reports_dir)
+
+    assert entries
+    assert any(entry.status == "MISSING" for entry in entries)
+    assert any(entry.title == "Day4 Baseline Validation" for entry in entries)
+
+
+def test_dashboard_evidence_handles_sample_json_and_html_reports(tmp_path):
+    reports_dir = tmp_path / "reports"
+    write_json(
+        reports_dir / "Hex-s-2025-lab01" / "day4_baseline_validation.json",
+        {"overall_result": "PASS", "device_name": "Hex-s-2025-lab01"},
+    )
+    (reports_dir / "Hex-s-2025-lab01" / "day4_baseline_validation.html").write_text(
+        "<html>Day4</html>",
+        encoding="utf-8",
+    )
+
+    entries = dashboard.collect_dashboard_evidence(tmp_path, reports_dir)
+
+    day4 = next(entry for entry in entries if entry.title == "Day4 Baseline Validation")
+    assert day4.day == "Day4"
+    assert day4.device == "Hex-s-2025-lab01"
+    assert day4.report_type == "Multi-device baseline report"
+    assert day4.status == "PASS"
+    assert day4.json_view_path == "reports/Hex-s-2025-lab01/day4_baseline_validation.json"
+    assert day4.html_view_path == "reports/Hex-s-2025-lab01/day4_baseline_validation.html"
+
+
+def test_dashboard_evidence_missing_html_does_not_crash(tmp_path):
+    reports_dir = tmp_path / "reports"
+    write_json(
+        reports_dir / "Hex-s-2025-lab01" / "day4_baseline_validation.json",
+        {"overall_result": "WARN"},
+    )
+
+    entries = dashboard.collect_dashboard_evidence(tmp_path, reports_dir)
+
+    day4 = next(entry for entry in entries if entry.title == "Day4 Baseline Validation")
+    assert day4.status == "WARN"
+    assert day4.html_view_path is None
+    assert day4.html_path == "MISSING"
+
+
+def test_dashboard_rejects_unsafe_report_paths(tmp_path):
+    if dashboard.Flask is None:
+        pytest.skip("Flask is not installed in this test environment.")
+
+    reports_dir = tmp_path / "reports"
+    reports_dir.mkdir()
+    outside = tmp_path / "secret.json"
+    outside.write_text('{"password": "secret"}', encoding="utf-8")
+    app = dashboard.create_app(
+        reports_dir=reports_dir,
+        execution_logs_dir=tmp_path / "execution_logs",
+    )
+    client = app.test_client()
+
+    assert client.get("/reports/json/../secret.json").status_code == 404
+    assert client.get("/reports/open/../secret.html").status_code == 404
+
+
 def test_discover_reports_excludes_backup_folder(tmp_path):
     reports_dir = tmp_path / "reports"
     write_json(reports_dir / "Backup" / "day1" / "report.json", {"result": "FAIL"})
@@ -217,8 +283,38 @@ def test_day12_dashboard_route_shows_fields_without_conf_content(tmp_path):
     assert "284.0" in text
     assert "PrivateKey" not in text
     assert "[Interface]" not in text
-    assert "Day12" not in text
     assert "day12_wireguard" not in text
+
+
+def test_dashboard_json_preview_route_redacts_secrets(tmp_path):
+    if dashboard.Flask is None:
+        pytest.skip("Flask is not installed in this test environment.")
+
+    reports_dir = tmp_path / "reports"
+    write_json(
+        reports_dir / "Hex-s-2025-lab01" / "day4_baseline_validation.json",
+        {
+            "overall_result": "PASS",
+            "password": "super-secret",
+            "client_config": "[Interface]\nPrivateKey = real-secret",
+        },
+    )
+    app = dashboard.create_app(
+        reports_dir=reports_dir,
+        execution_logs_dir=tmp_path / "execution_logs",
+    )
+
+    response = app.test_client().get(
+        "/reports/json/reports/Hex-s-2025-lab01/day4_baseline_validation.json"
+    )
+
+    assert response.status_code == 200
+    text = response.data.decode("utf-8")
+    assert "PASS" in text
+    assert "super-secret" not in text
+    assert "real-secret" not in text
+    assert "[REDACTED]" in text
+    assert "PrivateKey: REDACTED" in text
 
 
 def test_home_summary_includes_missing_wireguard_vpn_card():
@@ -270,3 +366,5 @@ def test_flask_routes_are_available(tmp_path):
     assert client.post("/commands/not_allowed/run").status_code == 404
     html_response = client.get("/reports/open/router1/day9_performance_regression_report.html")
     assert html_response.status_code == 200
+    json_response = client.get("/reports/json/router1/day9_performance_regression_report.json")
+    assert json_response.status_code == 200
