@@ -283,7 +283,7 @@ def test_day12_dashboard_route_shows_fields_without_conf_content(tmp_path):
     assert "284.0" in text
     assert "PrivateKey" not in text
     assert "[Interface]" not in text
-    assert "day12_wireguard" not in text
+    assert "day12_wireguard_vpn_automation_report.json" in text
 
 
 def test_dashboard_json_preview_route_redacts_secrets(tmp_path):

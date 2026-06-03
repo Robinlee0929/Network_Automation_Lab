@@ -29,6 +29,24 @@ Generated `reports/` output is intentionally ignored by git. Reviewers can regen
 
 The report index marks missing files as unavailable instead of failing. It also includes report type, availability, safety label, description, and links to JSON/HTML evidence when present.
 
+## Reviewer Evidence Path
+
+Start with `python network_lab.py --list-tasks --verbose` to understand automation scope, safety labels, execution modes, and report outputs. Then use the dashboard `/reports` viewer or `reports/report_index.html` to inspect generated evidence without starting live workflows.
+
+Use the README to confirm safety boundaries, especially the difference between report-only, read-only, dry-run, guarded-live, and disabled tasks. Not every runner task is live execution, and WireGuard live behavior is intentionally guarded by explicit CLI flags or interactive confirmation.
+
+Run `python -m pytest` to confirm regression safety. The catalog and report visibility tests do not require router access, SSH, iperf3, VPN activation, generated reports, or local secrets.
+
+Day25 RC readiness checklist:
+
+- Runner task metadata is complete.
+- Safety labels are consistent.
+- Report outputs are traceable.
+- `/reports` viewer remains functional and read-only.
+- WireGuard tasks remain guarded.
+- No destructive live behavior was introduced.
+- Full pytest suite passes.
+
 ## Secret Handling
 
 Generated evidence should not include SSH passwords, WireGuard private keys, `.conf` contents, or local config secrets. Config files, exports, backups, and generated reports stay ignored by git.
