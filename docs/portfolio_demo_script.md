@@ -1,8 +1,8 @@
-# Portfolio Demo Script - v0.1 RC
+# Portfolio Demo Script - v0.1
 
 ## Purpose
 
-This document provides a 5 to 10 minute reviewer/interview demo script for the current v0.1 RC state of Network Automation Lab.
+This document provides a 5 to 10 minute reviewer/interview demo script for the current v0.1 state of Network Automation Lab.
 
 The goal is to help a reviewer, interviewer, or technical hiring manager understand what the platform already demonstrates without changing platform behavior, starting live VPN execution, or touching real device configuration.
 
@@ -132,7 +132,7 @@ Suggested evidence order:
 4. iperf3 throughput evidence.
 5. WireGuard VPN validation evidence.
 6. Runner report index or portfolio evidence index.
-7. Day24 RC demo flow and Day25/Day26 release documentation.
+7. Day24 demo flow, Day25 RC validation evidence, Day26 release documentation, and Day28 final review notes.
 
 Useful committed documentation:
 
@@ -188,7 +188,7 @@ Dashboard/report viewer:
 
 Close:
 
-> The v0.1 RC is not trying to be a production NMS. It is a safety-first automation portfolio that shows how I structure network validation, evidence, report visibility, and guardrails as an engineering system.
+> v0.1 is not trying to be a production NMS. It is a safety-first automation portfolio that shows how I structure network validation, evidence, report visibility, and guardrails as an engineering system.
 
 ## Demo Checklist
 

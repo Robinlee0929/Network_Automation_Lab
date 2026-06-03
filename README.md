@@ -6,7 +6,7 @@ Network Automation Lab is a Python-based lab automation project for validating n
 
 A Python-based network automation and validation lab for MikroTik RouterOS, Cisco switch topology checks, iperf3 performance testing, regression checks, and local report visualization.
 
-The current implementation covers Day 1 through Day 26:
+The current v0.1 portfolio package covers Day 1 through Day 28 documentation review:
 
 - MikroTik baseline and post-reset validation
 - MikroTik Day 2 setup workflow after reset
@@ -31,6 +31,7 @@ The current implementation covers Day 1 through Day 26:
 - Day 24 RC demo flow and portfolio walkthrough polish
 - Day 25 v0.1 RC validation evidence
 - Day 26 v0.1 release packaging and portfolio polish
+- Day 28 portfolio evidence final review
 
 The project is designed as a practical QA Automation / SDET portfolio project for network infrastructure. It focuses on repeatable validation, structured test evidence, and readable JSON / HTML reports rather than one-off manual checks.
 
@@ -96,6 +97,7 @@ Cisco validation is read-only. It runs show commands for topology evidence and d
 | Day 24 | RC demo flow and portfolio walkthrough polish | Complete |
 | Day 25 | v0.1 RC validation evidence | Complete |
 | Day 26 | v0.1 release packaging and portfolio polish | Complete |
+| Day 28 | Portfolio evidence final review | Complete |
 
 ## Lab Topology
 
@@ -671,8 +673,8 @@ Future lab03/lab04/lab05 profiles should follow the same subnet rule: labNN uses
 Safety notes:
 
 - Do not commit exported `.conf` files.
-- Do not commit routine generated reports under `reports/`.
-- Day 13 timestamped history reports under `reports/lab-summary/` may be committed when you want GitHub to track validation results over time.
+- Do not commit generated reports under `reports/`.
+- Day 13 timestamped summary snapshots that are intentionally safe to share belong under `summary/`, not `reports/`, when committed as documentation artifacts.
 - Do not commit local config files.
 - Day 13 reports show exported config paths only; they do not read or render WireGuard `.conf` content.
 
@@ -1066,9 +1068,21 @@ Safety behavior:
 - Does not read `config.json`, exported WireGuard `.conf` files, SSH passwords, private keys, or local secrets.
 - Does not commit generated reports, exports, real configs, caches, or secrets.
 
+## Day28 Portfolio Evidence Final Review
+
+Day28 performs a documentation-only final review of the v0.1 portfolio evidence package. It aligns README scope, demo scripts, portfolio evidence notes, release notes, and safety wording so reviewers see one consistent v0.1 story.
+
+Review focus:
+
+- Clarify implemented v0.1 features versus future roadmap items.
+- Keep demo flow centered on project goal, safe runner/task catalog, report visibility, portfolio evidence, and safety boundaries.
+- Treat `reports/` and `exports/` as local generated artifacts that are ignored by Git.
+- Keep real configs, credentials, passwords, private keys, WireGuard `.conf` files, and environment-specific files out of committed evidence.
+- Preserve the existing safe-runner behavior and avoid adding live VPN, HA, VRRP, failover, or new device-control logic.
+
 ## Portfolio Demo
 
-v0.1 includes reviewer/interview demo scripts for presenting the current RC platform safely without adding features, changing runner/dashboard behavior, or running live device-changing workflows:
+v0.1 includes reviewer/interview demo scripts for presenting the current platform safely without adding features, changing runner/dashboard behavior, or running live device-changing workflows:
 
 ```text
 docs/portfolio_demo_script.md
@@ -1217,7 +1231,7 @@ Unit tests:
 - Protect expected behavior as scripts evolve.
 - Avoid depending on real router or switch availability.
 
-For this Day 7 documentation pass, tests were intentionally not run.
+For documentation-only review passes, run `python -m pytest` before sharing the repository unless the local environment cannot provide Python or pytest.
 
 ## Portfolio Highlights
 
@@ -1237,10 +1251,10 @@ For this Day 7 documentation pass, tests were intentionally not run.
 
 Planned future directions:
 
-- VPN validation
-- HA / failover validation
-- Performance testing
+- Expanded VPN validation beyond the current guarded WireGuard evidence path
+- HA / VRRP / failover validation
+- Additional performance scenarios beyond the current iperf3 workflows
 - Syslog / packet capture analysis
 - AI report summary / RAG integration
 
-v0.1 is packaged through Day26 as a portfolio release. Future work should stay explicit about whether it is report-only, read-only, dry-run, guarded-live, or disabled before adding new live lab behavior.
+v0.1 is packaged through Day28 as a portfolio release. Future work should stay explicit about whether it is report-only, read-only, dry-run, guarded-live, or disabled before adding new live lab behavior.

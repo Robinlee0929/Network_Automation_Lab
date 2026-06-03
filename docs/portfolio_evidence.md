@@ -2,6 +2,8 @@
 
 This repository is a network automation lab portfolio. It demonstrates repeatable validation for MikroTik routers, Cisco topology checks, iperf3 performance testing, WireGuard VPN validation, and a unified runner that indexes local evidence.
 
+Day28 final review status: v0.1 evidence is a documentation-aligned portfolio package. Day28 does not add runner behavior, dashboard behavior, live VPN execution, HA, VRRP, failover, or new device-control logic.
+
 ## What To Review
 
 - `python network_lab.py --list-tasks` shows user-facing runner tasks.
@@ -21,6 +23,7 @@ Generated `reports/` output is intentionally ignored by git. Reviewers can regen
 - Dashboard report browsing is read-only. The `/reports` viewer opens grouped evidence cards, redacted JSON preview, and safe HTML links for already-generated evidence only.
 - Day24 demo flow is report-only. It creates a reviewer walkthrough and does not connect to lab devices, start VPN validation, run iperf3, or read local secrets.
 - Day26 release packaging is documentation-only. It adds release notes and a concise portfolio checklist without adding runner tasks, product features, report generators, live workflows, or secret reads.
+- Day28 portfolio evidence final review is documentation-only. It aligns README, demo scripts, evidence navigation, and release notes without changing safe-runner behavior.
 
 ## Evidence Locations
 
@@ -29,7 +32,7 @@ Generated `reports/` output is intentionally ignored by git. Reviewers can regen
 - Day18 WireGuard runner evidence: `reports/lab-summary/wireguard_runner_safety_layer.html`
 - Day21 dashboard evidence viewer: `/reports`
 - Portfolio evidence index: `reports/portfolio/day19_runner_evidence_index.html`
-- Day24 RC demo flow: `reports/portfolio/day24_rc_demo_flow.html`
+- Day24 demo flow: `reports/portfolio/day24_rc_demo_flow.html`
 - v0.1 release notes: `docs/portfolio_evidence/v0.1_release_notes.md`
 - v0.1 portfolio checklist: `docs/portfolio_evidence/v0.1_portfolio_checklist.md`
 
@@ -37,7 +40,7 @@ The report index marks missing files as unavailable instead of failing. It also 
 
 ## Reviewer Evidence Path
 
-Start with `python network_lab.py --task demo-flow` when preparing an RC or portfolio walkthrough. It writes a safe open order and talk track that starts with README context, continues through task safety metadata and report visibility, then closes with the dashboard `/reports` viewer and portfolio evidence. For v0.1 release handoff, review `docs/portfolio_evidence/v0.1_release_notes.md` and `docs/portfolio_evidence/v0.1_portfolio_checklist.md`.
+Start with `python network_lab.py --task demo-flow` when preparing a portfolio walkthrough. It writes a safe open order and talk track that starts with README context, continues through task safety metadata and report visibility, then closes with the dashboard `/reports` viewer and portfolio evidence. For v0.1 release handoff, review `docs/portfolio_evidence/v0.1_release_notes.md` and `docs/portfolio_evidence/v0.1_portfolio_checklist.md`.
 
 For a deeper review, run `python network_lab.py --list-tasks --verbose` to understand automation scope, safety labels, execution modes, and report outputs. Then use the dashboard `/reports` viewer or `reports/report_index.html` to inspect generated evidence without starting live workflows.
 
@@ -54,6 +57,7 @@ Day25 RC readiness checklist:
 - WireGuard tasks remain guarded.
 - Day24 demo flow remains report-only.
 - Day26 release package remains documentation-only.
+- Day28 final review remains documentation-only.
 - No destructive live behavior was introduced.
 - Full pytest suite passes.
 
