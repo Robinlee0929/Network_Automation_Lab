@@ -652,6 +652,67 @@ def test_cli_task_portfolio_finalize_writes_evidence_index(tmp_path, capsys):
     assert (tmp_path / "reports/portfolio/day19_runner_evidence_index.html").exists()
 
 
+def test_cli_task_demo_flow_writes_day24_walkthrough(tmp_path, capsys):
+    write_json(
+        tmp_path / "reports" / "Hex-s-2025-lab01" / "day4_baseline_validation.json",
+        {"result": "PASS"},
+    )
+    (tmp_path / "reports" / "Hex-s-2025-lab01" / "day4_baseline_validation.html").write_text(
+        "<html>day4</html>",
+        encoding="utf-8",
+    )
+
+    exit_code = network_lab.main(["--task", "demo-flow"], project_root=tmp_path)
+
+    output = capsys.readouterr().out
+    json_path = tmp_path / "reports" / "portfolio" / "day24_rc_demo_flow.json"
+    html_path = tmp_path / "reports" / "portfolio" / "day24_rc_demo_flow.html"
+    data = json.loads(json_path.read_text(encoding="utf-8"))
+    html = html_path.read_text(encoding="utf-8")
+    assert exit_code == 0
+    assert "Day24 RC Demo Flow" in output
+    assert "without live execution" in output
+    assert data["day"] == "Day24"
+    assert data["mode"] == "report-only"
+    assert data["result"] == "READY"
+    assert any(step["section"] == "Runner Safety" for step in data["walkthrough_steps"])
+    assert any("python network_lab.py --list-tasks --verbose" in step["command_or_location"] for step in data["walkthrough_steps"])
+    assert "http://127.0.0.1:5000/reports" in data["recommended_open_order"]
+    assert "Walkthrough Steps" in html
+    assert "RC Checklist" in html
+    assert "WireGuard validation is intentionally dry-run by default" in html
+
+
+def test_demo_flow_does_not_execute_subprocess_or_read_config_secret(tmp_path, monkeypatch, capsys):
+    write_json(tmp_path / "config.json", {"password": "super-secret-password"})
+
+    def fail_run(*_args, **_kwargs):
+        raise AssertionError("demo flow must not execute subprocess")
+
+    monkeypatch.setattr(network_lab.subprocess, "run", fail_run)
+
+    exit_code = network_lab.main(["--task", "demo-flow"], project_root=tmp_path)
+
+    output = capsys.readouterr().out
+    json_text = (tmp_path / "reports/portfolio/day24_rc_demo_flow.json").read_text(encoding="utf-8")
+    html = (tmp_path / "reports/portfolio/day24_rc_demo_flow.html").read_text(encoding="utf-8")
+    assert exit_code == 0
+    assert "super-secret-password" not in output
+    assert "super-secret-password" not in json_text
+    assert "super-secret-password" not in html
+    assert "config.json" not in output
+
+
+def test_task_catalog_contains_day24_demo_flow_entry():
+    task = next(item for item in network_lab.list_tasks() if item["id"] == "demo-flow")
+
+    assert task["task_id"] == "day24_rc_demo_flow"
+    assert task["day"] == "Day24"
+    assert task["safety_level"] == "report-only"
+    assert task["requires_live_device"] is False
+    assert "reports/portfolio/day24_rc_demo_flow.html" in task["report_paths"]
+
+
 def test_portfolio_finalization_does_not_execute_subprocess_or_read_config_secret(
     tmp_path,
     monkeypatch,

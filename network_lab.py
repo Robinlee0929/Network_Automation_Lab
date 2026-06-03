@@ -30,6 +30,8 @@ SECRET_FIELD_MARKERS = ("secret", "password", "private_key", "preshared_key", "t
 DAY17_REPORT_INDEX_HTML = Path("reports") / "report_index.html"
 DAY19_EVIDENCE_INDEX_JSON = Path("reports") / "portfolio" / "day19_runner_evidence_index.json"
 DAY19_EVIDENCE_INDEX_HTML = Path("reports") / "portfolio" / "day19_runner_evidence_index.html"
+DAY24_DEMO_FLOW_JSON = Path("reports") / "portfolio" / "day24_rc_demo_flow.json"
+DAY24_DEMO_FLOW_HTML = Path("reports") / "portfolio" / "day24_rc_demo_flow.html"
 RESULTS = {"PASS", "FAIL", "WARN", "MISSING", "INCOMPLETE", "UNKNOWN", "SKIP", "NOT_RUN"}
 INTERACTIVE_ACTION_COMPLETE = (
     "Action complete. Returning to menu. Choose another option or enter 0 to exit."
@@ -170,6 +172,16 @@ REPORT_CATALOG = [
         "description": "Unified runner overview and report index generated from local files for the dashboard /reports evidence viewer.",
         "json_globs": ["reports/lab-summary/latest_lab_overview.json"],
         "html_globs": ["reports/lab-summary/latest_lab_overview.html", "reports/report_index.html"],
+    },
+    {
+        "day": "Day24",
+        "title": "Day24 RC Demo Flow",
+        "report_type": "RC demo walkthrough",
+        "safety_label": "report-only demo guidance",
+        "description": "Local reviewer walkthrough for RC demo and portfolio presentation; generated without live execution.",
+        "json_globs": [DAY24_DEMO_FLOW_JSON.as_posix()],
+        "html_globs": [DAY24_DEMO_FLOW_HTML.as_posix()],
+        "missing_note": f"Generate with: python network_lab.py --task demo-flow",
     },
 ]
 
@@ -598,6 +610,32 @@ def list_tasks() -> List[Dict[str, Any]]:
             "notes": "Report-only task. Day19 finalization reads local report metadata only; generated output is safe for screenshots and portfolio review.",
         },
         {
+            "id": "demo-flow",
+            "task_id": "day24_rc_demo_flow",
+            "display_name": "Day24 RC Demo Flow",
+            "user_display_name": "RC Demo Flow",
+            "day": "Day24",
+            "category": "portfolio",
+            "description": "Build a reviewer-friendly RC demo flow and portfolio walkthrough from local task/report metadata.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY24_DEMO_FLOW_JSON.as_posix(),
+                DAY24_DEMO_FLOW_HTML.as_posix(),
+            ],
+            "report_outputs": [
+                "Day24 RC demo flow JSON",
+                "Day24 RC demo flow HTML",
+            ],
+            "related_script": "network_lab.py",
+            "notes": "Report-only task. Day24 demo flow reads task/report metadata only and gives reviewers a safe click-through order for RC walkthroughs.",
+        },
+        {
             "id": "day4-baseline",
             "task_id": "day4_baseline_validation",
             "display_name": "Day4 Multi-device Baseline Validation",
@@ -711,6 +749,7 @@ def _build_parser() -> argparse.ArgumentParser:
   python network_lab.py --list-tasks --verbose
   python network_lab.py --report-index
   python network_lab.py --portfolio-finalize
+  python network_lab.py --task demo-flow
   python network_lab.py --task report-index --dry-run
   python network_lab.py --task report-index
   python network_lab.py --task day4-baseline --dry-run
@@ -745,6 +784,7 @@ wireguard-runner is dry-run by default and delegates to the existing WireGuard s
         choices=[
             "report-index",
             "portfolio-finalize",
+            "demo-flow",
             "day4-baseline",
             "iperf3-performance",
             WIREGUARD_RUNNER_TASK_ALIAS,
@@ -1484,6 +1524,230 @@ def write_portfolio_evidence_html(
 </html>
 """
     output_path.write_text(html_text, encoding="utf-8")
+
+
+def build_day24_demo_flow(
+    task_catalog: List[Dict[str, Any]],
+    report_rows: List[Dict[str, Any]],
+) -> Dict[str, Any]:
+    task_ids = {str(task.get("id", "")) for task in task_catalog}
+    available_titles = {
+        str(row.get("title", ""))
+        for row in report_rows
+        if str(row.get("status", "")).upper() != "MISSING"
+    }
+    walkthrough_steps = [
+        {
+            "order": 1,
+            "section": "Scope",
+            "demo_action": "Open the README and explain the lab goal, supported devices, and current Day1-Day24 scope.",
+            "command_or_location": "README.md",
+            "talk_track": "This is a QA/SDET network automation lab focused on repeatable validation and readable evidence, not one-off screenshots.",
+            "evidence": "Project overview, progress table, and safety sections.",
+        },
+        {
+            "order": 2,
+            "section": "Runner Safety",
+            "demo_action": "Show the task catalog with verbose metadata.",
+            "command_or_location": "python network_lab.py --list-tasks --verbose",
+            "talk_track": "The runner separates report-only, read-only, dry-run, guarded-live, and disabled workflows before anyone can trigger live lab behavior.",
+            "evidence": "Task IDs, safety levels, execution modes, report paths, and notes.",
+        },
+        {
+            "order": 3,
+            "section": "Evidence Index",
+            "demo_action": "Generate or open the local report visibility index.",
+            "command_or_location": "python network_lab.py --report-index",
+            "talk_track": "Report visibility reads existing JSON/HTML files, marks missing evidence clearly, and does not connect to routers, switches, VPN clients, or iperf3 endpoints.",
+            "evidence": DAY17_REPORT_INDEX_HTML.as_posix(),
+        },
+        {
+            "order": 4,
+            "section": "Dashboard Walkthrough",
+            "demo_action": "Start the dashboard and open the read-only report viewer.",
+            "command_or_location": "python dashboard_app.py -> http://127.0.0.1:5000/reports",
+            "talk_track": "The dashboard is the human review surface: grouped evidence cards, redacted JSON preview, and safe links to already-generated HTML reports.",
+            "evidence": "Day21 dashboard /reports viewer.",
+        },
+        {
+            "order": 5,
+            "section": "WireGuard Safety Boundary",
+            "demo_action": "Run or show the WireGuard runner dry-run.",
+            "command_or_location": "python network_lab.py --task wireguard-runner --dry-run",
+            "talk_track": "WireGuard validation is intentionally dry-run by default, with guarded live delegation only after explicit authorization and without unsafe write flags.",
+            "evidence": WIREGUARD_RUNNER_REPORT_HTML.as_posix(),
+        },
+        {
+            "order": 6,
+            "section": "Portfolio Close",
+            "demo_action": "Open the Day19 portfolio index, then this Day24 walkthrough artifact.",
+            "command_or_location": "python network_lab.py --portfolio-finalize; python network_lab.py --task demo-flow",
+            "talk_track": "The portfolio view ties together evidence quality, missing gaps, guardrails, and the recommended reviewer path for the RC.",
+            "evidence": f"{DAY19_EVIDENCE_INDEX_HTML.as_posix()} and {DAY24_DEMO_FLOW_HTML.as_posix()}",
+        },
+    ]
+    checklist = [
+        {
+            "item": "Task catalog includes report-only demo flow",
+            "status": "PASS" if "demo-flow" in task_ids else "MISSING",
+        },
+        {
+            "item": "Report visibility has at least one local evidence row",
+            "status": "PASS" if available_titles else "MISSING",
+        },
+        {
+            "item": "WireGuard runner remains guarded or dry-run",
+            "status": "PASS"
+            if any(task.get("id") == WIREGUARD_RUNNER_TASK_ALIAS and task.get("execution_mode") == "dry-run" for task in task_catalog)
+            else "MISSING",
+        },
+        {
+            "item": "Day13 live runner path remains disabled",
+            "status": "PASS"
+            if any(task.get("id") == "day13-wireguard-summary" and not task.get("enabled") for task in task_catalog)
+            else "MISSING",
+        },
+        {
+            "item": "Portfolio index task remains local-only",
+            "status": "PASS"
+            if any(task.get("id") == "portfolio-finalize" and not task.get("requires_live_device") for task in task_catalog)
+            else "MISSING",
+        },
+    ]
+    return mask_secret_values(
+        {
+            "day": "Day24",
+            "name": "RC Demo Flow and Portfolio Walkthrough",
+            "generated_at": datetime.now().replace(microsecond=0).isoformat(sep=" "),
+            "mode": "report-only",
+            "result": "READY" if all(item["status"] == "PASS" for item in checklist) else "READY_WITH_GAPS",
+            "safety_summary": [
+                "No live workflows are executed by this demo-flow task.",
+                "No config.json, WireGuard .conf files, SSH passwords, or private keys are read.",
+                "Live validation remains behind existing guarded runner paths.",
+            ],
+            "walkthrough_steps": walkthrough_steps,
+            "rc_checklist": checklist,
+            "recommended_open_order": [
+                "README.md",
+                "docs/portfolio_evidence.md",
+                DAY17_REPORT_INDEX_HTML.as_posix(),
+                "http://127.0.0.1:5000/reports",
+                DAY19_EVIDENCE_INDEX_HTML.as_posix(),
+                DAY24_DEMO_FLOW_HTML.as_posix(),
+            ],
+        }
+    )
+
+
+def write_day24_demo_flow_html(
+    demo_flow: Dict[str, Any],
+    output_path: Path,
+) -> None:
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    steps = "\n".join(
+        "<tr>"
+        f"<td>{html.escape(str(step.get('order', '')))}</td>"
+        f"<td>{html.escape(str(step.get('section', '')))}</td>"
+        f"<td>{html.escape(str(step.get('demo_action', '')))}</td>"
+        f"<td><code>{html.escape(str(step.get('command_or_location', '')))}</code></td>"
+        f"<td>{html.escape(str(step.get('talk_track', '')))}</td>"
+        f"<td>{html.escape(str(step.get('evidence', '')))}</td>"
+        "</tr>"
+        for step in demo_flow.get("walkthrough_steps", [])
+    )
+    checklist = "\n".join(
+        "<tr>"
+        f"<td>{html.escape(str(item.get('item', '')))}</td>"
+        f"<td><span class=\"pill status-{_css_token(str(item.get('status', '')))}\">{html.escape(str(item.get('status', '')))}</span></td>"
+        "</tr>"
+        for item in demo_flow.get("rc_checklist", [])
+    )
+    safety = "".join(f"<li>{html.escape(str(item))}</li>" for item in demo_flow.get("safety_summary", []))
+    open_order = "".join(f"<li><code>{html.escape(str(item))}</code></li>" for item in demo_flow.get("recommended_open_order", []))
+    output_path.write_text(
+        f"""<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Day24 RC Demo Flow</title>
+  <style>
+    :root {{
+      --bg: #f6f8fb;
+      --panel: #ffffff;
+      --ink: #182230;
+      --muted: #667085;
+      --line: #d8e0ec;
+      --head: #243447;
+      --green-bg: #e7f7ee;
+      --green: #147a3d;
+      --yellow-bg: #fff4d8;
+      --yellow: #8a6100;
+    }}
+    * {{ box-sizing: border-box; }}
+    body {{ margin: 0; font-family: Arial, sans-serif; background: var(--bg); color: var(--ink); font-size: 14px; }}
+    header {{ background: var(--head); color: white; padding: 30px 38px 26px; }}
+    main {{ padding: 26px 38px 48px; }}
+    h1 {{ margin: 0 0 8px; font-size: 30px; letter-spacing: 0; }}
+    h2 {{ margin: 28px 0 12px; font-size: 19px; }}
+    table {{ width: 100%; border-collapse: collapse; background: var(--panel); border: 1px solid var(--line); }}
+    th, td {{ padding: 10px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }}
+    th {{ background: #edf2f8; color: #435066; font-size: 12px; text-transform: uppercase; }}
+    code {{ background: #eef2f6; padding: 2px 5px; border-radius: 4px; }}
+    .meta {{ color: #dbe5f3; }}
+    .panel {{ background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 16px 18px; }}
+    .pill {{ display: inline-block; border-radius: 999px; padding: 4px 9px; font-size: 12px; font-weight: 800; white-space: nowrap; }}
+    .status-pass, .status-ready {{ background: var(--green-bg); color: var(--green); }}
+    .status-missing, .status-ready-with-gaps {{ background: var(--yellow-bg); color: var(--yellow); }}
+    @media (max-width: 900px) {{
+      header, main {{ padding-left: 16px; padding-right: 16px; }}
+      table {{ display: block; overflow-x: auto; }}
+    }}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Day24 RC Demo Flow</h1>
+    <div class="meta">{html.escape(str(demo_flow.get("name", "")))} · Generated {html.escape(str(demo_flow.get("generated_at", "")))} · Result {html.escape(str(demo_flow.get("result", "")))}</div>
+  </header>
+  <main>
+    <h2>Walkthrough Steps</h2>
+    <table>
+      <thead><tr><th>#</th><th>Section</th><th>Demo Action</th><th>Command / Location</th><th>Talk Track</th><th>Evidence</th></tr></thead>
+      <tbody>{steps}</tbody>
+    </table>
+    <h2>RC Checklist</h2>
+    <table>
+      <thead><tr><th>Item</th><th>Status</th></tr></thead>
+      <tbody>{checklist}</tbody>
+    </table>
+    <h2>Safety Summary</h2>
+    <ul class="panel">{safety}</ul>
+    <h2>Recommended Open Order</h2>
+    <ol class="panel">{open_order}</ol>
+  </main>
+</body>
+</html>
+""",
+        encoding="utf-8",
+    )
+
+
+def _run_day24_demo_flow(project_root: Path) -> int:
+    task_catalog = list_tasks()
+    report_rows = discover_report_visibility(project_root)
+    demo_flow = build_day24_demo_flow(task_catalog, report_rows)
+    json_path = project_root / DAY24_DEMO_FLOW_JSON
+    html_path = project_root / DAY24_DEMO_FLOW_HTML
+    write_json_report(demo_flow, json_path)
+    write_day24_demo_flow_html(demo_flow, html_path)
+    print(format_heading("Day24 RC Demo Flow"))
+    print(f"Result: {demo_flow['result']}")
+    print(f"Walkthrough steps: {len(demo_flow['walkthrough_steps'])}")
+    print(f"JSON demo flow: {_relative_to_project(project_root, json_path)}")
+    print(f"HTML demo flow: {_relative_to_project(project_root, html_path)}")
+    print(f"{format_status('PASS')} Day24 demo flow completed without live execution.")
+    return 0
 
 
 def _run_portfolio_finalization(project_root: Path) -> int:
@@ -2438,6 +2702,8 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
         return _run_portfolio_finalization(root)
     if args.task == "portfolio-finalize":
         return _run_portfolio_finalization(root)
+    if args.task == "demo-flow":
+        return _run_day24_demo_flow(root)
 
     profile_path = _resolve_project_path(root, args.profile)
     try:
