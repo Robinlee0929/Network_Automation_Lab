@@ -375,6 +375,8 @@ def test_report_visibility_index_works_when_reports_directory_is_missing(tmp_pat
     assert "disabled=" in output
     assert "Output: reports/report_index.html" in output
     assert "MISSING" in output
+    assert "local report index" in output
+    assert "guarded live / dry-run" in output
     assert "Day18 WireGuard runner integration uses dry-run and explicit confirmation guardrails" in output
     assert (tmp_path / "reports/report_index.html").exists()
 
@@ -403,6 +405,7 @@ def test_report_visibility_index_finds_partial_reports_and_marks_missing(tmp_pat
     assert "JSON: reports/Hex-s-2025-lab01/day4_baseline_validation.json" in output
     assert "Day8 iperf3 Performance" in output
     assert "HTML: reports/Hex-s-2025-lab01/day8_iperf3_WAN_TO_LAN_DNAT_report.html" in output
+    assert "live performance evidence" in output
     assert "Day13 WireGuard Live Execution" in output
     assert "DISABLED FOR DAY18" in output
     assert "Expected Cisco switch report was not found in local reports folder." in output
@@ -571,10 +574,25 @@ def test_html_report_index_generation_contains_catalog_reports_and_legend(tmp_pa
     assert "Task Catalog Summary" in html
     assert "Report Visibility" in html
     assert "Safety Level Legend" in html
+    assert "Task Name" in html
+    assert "Report Type" in html
+    assert "Description" in html
+    assert "Multi-device baseline report" in html
+    assert "live read-only evidence" in html
+    assert "Performance test report" in html
+    assert "live performance evidence" in html
+    assert "Unified runner overview" in html
+    assert "local report index" in html
     assert "Day18 WireGuard runner integration uses a safety layer" in html
     assert "WireGuard Runner Safety Layer" in html
     assert "day12-wireguard-live-validation" not in html
     assert "day18-wireguard-runner" not in html
+    lower_html = html.lower()
+    assert "password" not in lower_html
+    assert "private_key" not in lower_html
+    assert "privatekey" not in lower_html
+    assert "[interface]" not in lower_html
+    assert "wireguard private key" not in lower_html
 
 
 def test_portfolio_finalization_writes_day19_evidence_index(tmp_path, capsys):
@@ -601,8 +619,19 @@ def test_portfolio_finalization_writes_day19_evidence_index(tmp_path, capsys):
     assert data["portfolio_readiness"] == "READY_WITH_GAPS"
     assert data["summary"]["reports_found"] >= 1
     assert any(item["quality"] == "READY" for item in data["evidence_items"])
+    assert any(item["report_type"] == "Multi-device baseline report" for item in data["evidence_items"])
+    assert any(item["safety"] == "live read-only evidence" for item in data["evidence_items"])
+    assert any("report index only reads" in item["description"].lower() for item in data["evidence_items"])
     assert "Portfolio Highlights" in html
+    assert "Report Type" in html
+    assert "Safety" in html
+    assert "Description" in html
     assert "day4_baseline_validation.html" in html
+    lower_html = html.lower()
+    assert "password" not in lower_html
+    assert "private_key" not in lower_html
+    assert "privatekey" not in lower_html
+    assert "[interface]" not in lower_html
 
 
 def test_cli_task_portfolio_finalize_writes_evidence_index(tmp_path, capsys):

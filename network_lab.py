@@ -92,18 +92,27 @@ REPORT_CATALOG = [
     {
         "day": "Day2",
         "title": "Day2 Auto Setup",
+        "report_type": "Automation validation report",
+        "safety_label": "live config evidence",
+        "description": "Evidence from MikroTik setup automation; report index only reads generated JSON/HTML.",
         "json_globs": ["reports/**/day2*.json", "reports/**/*day2*auto*setup*.json"],
         "html_globs": ["reports/**/day2*.html", "reports/**/*day2*auto*setup*.html"],
     },
     {
         "day": "Day4",
         "title": "Day4 Baseline Validation",
+        "report_type": "Multi-device baseline report",
+        "safety_label": "live read-only evidence",
+        "description": "RouterOS baseline checks gathered from existing reports; report index does not connect to devices.",
         "json_globs": ["reports/**/day4_baseline_validation.json", "reports/**/*day4*baseline*.json"],
         "html_globs": ["reports/**/day4_baseline_validation.html", "reports/**/*day4*baseline*.html"],
     },
     {
         "day": "Day5",
         "title": "Day5 Cisco Switch Topology",
+        "report_type": "Topology validation report",
+        "safety_label": "read-only evidence",
+        "description": "Cisco switch topology validation evidence when local reports are available.",
         "json_globs": ["reports/**/*day5*cisco*.json", "reports/**/*cisco*topology*.json"],
         "html_globs": ["reports/**/*day5*cisco*.html", "reports/**/*cisco*topology*.html"],
         "missing_note": "Expected Cisco switch report was not found in local reports folder.",
@@ -111,24 +120,36 @@ REPORT_CATALOG = [
     {
         "day": "Day6",
         "title": "Day6 Lab Topology Summary",
+        "report_type": "Lab topology summary",
+        "safety_label": "report-only evidence",
+        "description": "Local topology summary evidence for portfolio review.",
         "json_globs": ["reports/**/*day6*topology*.json", "summary/**/*day6*topology*.json"],
         "html_globs": ["reports/**/*day6*topology*.html", "summary/**/*day6*topology*.html"],
     },
     {
         "day": "Day8",
         "title": "Day8 iperf3 Performance",
+        "report_type": "Performance test report",
+        "safety_label": "live performance evidence",
+        "description": "iperf3 throughput evidence; the index reads reports and does not generate traffic.",
         "json_globs": ["reports/**/day8_iperf3_*_report.json", "reports/**/*iperf3*performance*.json"],
         "html_globs": ["reports/**/day8_iperf3_*_report.html", "reports/**/*iperf3*performance*.html"],
     },
     {
         "day": "Day13",
         "title": "Day13 WireGuard Summary",
+        "report_type": "WireGuard summary report",
+        "safety_label": "report-only evidence",
+        "description": "Multi-router WireGuard summary evidence; Day12 remains source of truth for detailed live validation.",
         "json_globs": ["summary/**/*day13*wireguard*.json", "reports/**/*day13*wireguard*.json"],
         "html_globs": ["summary/**/*day13*wireguard*.html", "reports/**/*day13*wireguard*.html"],
     },
     {
         "day": "Day18",
         "title": WIREGUARD_RUNNER_DISPLAY_NAME,
+        "report_type": "WireGuard runner evidence",
+        "safety_label": "guarded live / dry-run default",
+        "description": "Safety-layer evidence for delegated Day12 validation; unsafe Day12 write flags are not delegated.",
         "json_globs": [WIREGUARD_RUNNER_REPORT_JSON.as_posix()],
         "html_globs": [WIREGUARD_RUNNER_REPORT_HTML.as_posix()],
         "missing_note": f"Expected report path: {WIREGUARD_RUNNER_REPORT_JSON.as_posix()}",
@@ -136,6 +157,9 @@ REPORT_CATALOG = [
     {
         "day": "Day14-Day16",
         "title": "Runner Overview Reports",
+        "report_type": "Unified runner overview",
+        "safety_label": "local report index",
+        "description": "Unified runner overview and report index generated from local files.",
         "json_globs": ["reports/lab-summary/latest_lab_overview.json"],
         "html_globs": ["reports/lab-summary/latest_lab_overview.html", "reports/report_index.html"],
     },
@@ -808,8 +832,11 @@ def discover_report_visibility(project_root: Path) -> List[Dict[str, Any]]:
                 {
                     "day": report_type["day"],
                     "title": report_type["title"],
+                    "report_type": report_type.get("report_type", "Report evidence"),
                     "device": _report_device_label(None, report_type["title"]),
                     "status": "MISSING",
+                    "safety": report_type.get("safety_label", "report-only evidence"),
+                    "description": report_type.get("description", ""),
                     "json": "",
                     "html": "",
                     "notes": report_type.get("missing_note", "Expected report was not found."),
@@ -826,8 +853,11 @@ def discover_report_visibility(project_root: Path) -> List[Dict[str, Any]]:
                 {
                     "day": report_type["day"],
                     "title": report_type["title"],
+                    "report_type": report_type.get("report_type", "Report evidence"),
                     "device": _report_device_label(label_path, report_type["title"]),
                     "status": "FOUND" if json_path or html_path else "MISSING",
+                    "safety": report_type.get("safety_label", "report-only evidence"),
+                    "description": report_type.get("description", ""),
                     "json": _relative_to_project(project_root, json_path) if json_path else "MISSING",
                     "html": _relative_to_project(project_root, html_path) if html_path else "MISSING",
                     "notes": "",
@@ -844,8 +874,11 @@ def discover_report_visibility(project_root: Path) -> List[Dict[str, Any]]:
         {
             "day": "Day13",
             "title": "Day13 WireGuard Live Execution",
+            "report_type": "Disabled live workflow",
             "device": "Runner guardrail",
             "status": "DISABLED FOR DAY18",
+            "safety": "disabled guardrail",
+            "description": "Day13 live execution is intentionally not exposed through the Day18 runner safety layer.",
             "json": "",
             "html": "",
             "notes": "Day13 live WireGuard execution remains disabled until its own runner safety layer is implemented.",
@@ -940,8 +973,8 @@ def _print_report_visibility(rows: List[Dict[str, Any]], output_path: str = "rep
         first = group_rows[0]
         print()
         print(format_heading(f"{first['title']} ({first['day']})"))
-        print(f"  {'Status':<{status_width}} {'Device':<24} Report paths")
-        print(f"  {'-' * status_width} {'-' * 24} {'-' * 42}")
+        print(f"  {'Status':<{status_width}} {'Device':<24} {'Safety':<28} Report paths")
+        print(f"  {'-' * status_width} {'-' * 24} {'-' * 28} {'-' * 42}")
         visible_rows, hidden_count = _compact_console_report_rows(group_rows)
         for visible_row in visible_rows:
             _print_report_visibility_row(visible_row, status_width)
@@ -989,16 +1022,17 @@ def _compact_console_report_rows(
 
 def _print_report_visibility_row(row: Dict[str, Any], status_width: int) -> None:
     status = _format_report_visibility_status(str(row["status"]))
-    print(f"  {status:<{status_width}} {str(row['device'])[:24]:<24} JSON: {row.get('json') or '-'}")
+    safety = str(row.get("safety", ""))[:28]
+    print(f"  {status:<{status_width}} {str(row['device'])[:24]:<24} {safety:<28} JSON: {row.get('json') or '-'}")
     if row.get("html"):
-        print(f"  {'':<{status_width}} {'':<24} HTML: {row['html']}")
+        print(f"  {'':<{status_width}} {'':<24} {'':<28} HTML: {row['html']}")
     if row.get("notes"):
-        print(f"  {'':<{status_width}} {'':<24} Notes: {row['notes']}")
+        print(f"  {'':<{status_width}} {'':<24} {'':<28} Notes: {row['notes']}")
     evidence = row.get("day18_evidence")
     if isinstance(evidence, dict) and evidence.get("runner_json_exists"):
-        print(f"  {'':<{status_width}} {'':<24} Day12 JSON: {evidence.get('delegated_day12_json')}")
+        print(f"  {'':<{status_width}} {'':<24} {'':<28} Day12 JSON: {evidence.get('delegated_day12_json')}")
         print(
-            f"  {'':<{status_width}} {'':<24} Guardrails: "
+            f"  {'':<{status_width}} {'':<24} {'':<28} Guardrails: "
             f"{_compact_guardrail_status(_safe_nested_dict(evidence.get('runner_safety_guardrail_status')))}"
         )
 
@@ -1109,10 +1143,13 @@ def write_report_index_html(
         "<tr>"
         f"<td><span class=\"pill pill-day\">{html.escape(str(row['day']))}</span></td>"
         f"<td>{html.escape(str(row['title']))}</td>"
+        f"<td>{html.escape(str(row.get('report_type', 'Report evidence')))}</td>"
         f"<td>{html.escape(str(row['device']))}</td>"
         f"<td><span class=\"pill status-{_css_token(str(row['status']))}\">{html.escape(str(row['status']))}</span></td>"
+        f"<td><span class=\"pill safety-{_css_token(str(row.get('safety', 'report-only')))}\">{html.escape(str(row.get('safety', 'report-only')))}</span></td>"
         f"<td>{_html_link_or_text(output_path, project_root, str(row.get('json', '')))}</td>"
         f"<td>{_html_link_or_text(output_path, project_root, str(row.get('html', '')))}</td>"
+        f"<td>{html.escape(str(row.get('description', '')))}</td>"
         f"<td>{html.escape(str(row.get('notes', '')))}</td>"
         "</tr>"
         for row in report_rows
@@ -1208,7 +1245,7 @@ def write_report_index_html(
     </table>
     <h2>Report Visibility</h2>
     <table>
-      <thead><tr><th>Day</th><th>Report</th><th>Device</th><th>Status</th><th>JSON</th><th>HTML</th><th>Notes</th></tr></thead>
+      <thead><tr><th>Day</th><th>Task Name</th><th>Report Type</th><th>Device</th><th>Status</th><th>Safety</th><th>JSON</th><th>HTML</th><th>Description</th><th>Notes</th></tr></thead>
       <tbody>{report_table_rows}</tbody>
     </table>
     <h2>Safety Level Legend</h2>
@@ -1262,11 +1299,14 @@ def build_portfolio_evidence_index(
             "day": row.get("day", ""),
             "area": _portfolio_evidence_area(row),
             "title": row.get("title", ""),
+            "report_type": row.get("report_type", ""),
             "device": row.get("device", ""),
             "quality": _portfolio_evidence_quality(row),
             "source_status": row.get("status", ""),
+            "safety": row.get("safety", ""),
             "json": row.get("json", ""),
             "html": row.get("html", ""),
+            "description": row.get("description", ""),
             "notes": row.get("notes", ""),
         }
         for row in report_rows
@@ -1322,10 +1362,13 @@ def write_portfolio_evidence_html(
         f"<td><span class=\"pill pill-day\">{html.escape(str(item.get('day', '')))}</span></td>"
         f"<td>{html.escape(str(item.get('area', '')))}</td>"
         f"<td>{html.escape(str(item.get('title', '')))}</td>"
+        f"<td>{html.escape(str(item.get('report_type', '')))}</td>"
         f"<td>{html.escape(str(item.get('device', '')))}</td>"
         f"<td><span class=\"pill quality-{_css_token(str(item.get('quality', '')))}\">{html.escape(str(item.get('quality', '')))}</span></td>"
+        f"<td>{html.escape(str(item.get('safety', '')))}</td>"
         f"<td>{_html_link_or_text(output_path, project_root, str(item.get('json', '')))}</td>"
         f"<td>{_html_link_or_text(output_path, project_root, str(item.get('html', '')))}</td>"
+        f"<td>{html.escape(str(item.get('description', '')))}</td>"
         f"<td>{html.escape(str(item.get('notes', '')))}</td>"
         "</tr>"
         for item in evidence.get("evidence_items", [])
@@ -1402,7 +1445,7 @@ def write_portfolio_evidence_html(
     <ul class="highlights">{highlights}</ul>
     <h2>Evidence Items</h2>
     <table>
-      <thead><tr><th>Day</th><th>Area</th><th>Evidence</th><th>Device</th><th>Quality</th><th>JSON</th><th>HTML</th><th>Notes</th></tr></thead>
+      <thead><tr><th>Day</th><th>Area</th><th>Evidence</th><th>Report Type</th><th>Device</th><th>Quality</th><th>Safety</th><th>JSON</th><th>HTML</th><th>Description</th><th>Notes</th></tr></thead>
       <tbody>{evidence_rows}</tbody>
     </table>
   </main>

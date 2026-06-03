@@ -897,6 +897,16 @@ Safety behavior:
 - Marks evidence quality as `READY`, `PARTIAL`, `GUARDED`, or `MISSING`.
 - Keeps generated portfolio output under ignored `reports/` paths.
 
+## Day20 Runner Report Index and Portfolio Evidence Cleanup
+
+Day20 improves portfolio review clarity without adding new live actions. The report index now shows each evidence row with day, task name, report type, availability, safety label, report paths, and a short description. Missing files remain visible as unavailable evidence instead of causing failures.
+
+See the concise portfolio review guide:
+
+```text
+docs/portfolio_evidence.md
+```
+
 ## How to Read Reports
 
 Reports are written as structured evidence for each workflow.
