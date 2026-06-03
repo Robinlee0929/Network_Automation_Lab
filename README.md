@@ -6,7 +6,7 @@ Network Automation Lab is a Python-based lab automation project for validating n
 
 A Python-based network automation and validation lab for MikroTik RouterOS, Cisco switch topology checks, iperf3 performance testing, regression checks, and local report visualization.
 
-The current implementation covers Day 1 through Day 23:
+The current implementation covers Day 1 through Day 24:
 
 - MikroTik baseline and post-reset validation
 - MikroTik Day 2 setup workflow after reset
@@ -28,6 +28,7 @@ The current implementation covers Day 1 through Day 23:
 - Day 21 dashboard report viewer and evidence navigation
 - Day 22 WireGuard runner documentation and safety review
 - Day 23 runner safety metadata and RC readiness review
+- Day 24 RC demo flow and portfolio walkthrough polish
 
 The project is designed as a practical QA Automation / SDET portfolio project for network infrastructure. It focuses on repeatable validation, structured test evidence, and readable JSON / HTML reports rather than one-off manual checks.
 
@@ -90,6 +91,7 @@ Cisco validation is read-only. It runs show commands for topology evidence and d
 | Day 21 | Dashboard report viewer and evidence navigation | Complete |
 | Day 22 | WireGuard runner documentation and safety review | Complete |
 | Day 23 | Runner safety metadata and RC readiness review | Complete |
+| Day 24 | RC demo flow and portfolio walkthrough polish | Complete |
 
 ## Lab Topology
 
@@ -983,6 +985,39 @@ Day25 RC readiness checklist:
 - No new destructive live behavior was introduced.
 - Full `python -m pytest` suite passes.
 
+## Day24 RC Demo Flow and Portfolio Walkthrough Polish
+
+Day24 adds a report-only walkthrough artifact for RC review and portfolio demos. It turns the existing runner metadata, report visibility, dashboard viewer, WireGuard safety boundary, and portfolio evidence index into a clear reviewer path.
+
+Generate the Day24 demo flow:
+
+```powershell
+python network_lab.py --task demo-flow
+```
+
+Output files:
+
+```text
+reports/portfolio/day24_rc_demo_flow.json
+reports/portfolio/day24_rc_demo_flow.html
+```
+
+Recommended walkthrough order:
+
+1. Open `README.md` to introduce the lab goal, supported devices, and Day1-Day24 scope.
+2. Run `python network_lab.py --list-tasks --verbose` to show task safety metadata.
+3. Run `python network_lab.py --report-index` and review `reports/report_index.html`.
+4. Run `python dashboard_app.py` and open `http://127.0.0.1:5000/reports`.
+5. Show `python network_lab.py --task wireguard-runner --dry-run` for the WireGuard guardrail boundary.
+6. Open `reports/portfolio/day19_runner_evidence_index.html` and `reports/portfolio/day24_rc_demo_flow.html` for the closeout.
+
+Safety behavior:
+
+- Does not connect to routers, switches, WireGuard clients, or iperf3 endpoints.
+- Does not execute live workflow subprocesses.
+- Does not read `config.json`, exported WireGuard `.conf` files, or secrets.
+- Leaves live validation behind the existing read-only, dry-run, guarded-live, or disabled runner controls.
+
 ## How to Read Reports
 
 Reports are written as structured evidence for each workflow.
@@ -1089,6 +1124,13 @@ reports/portfolio/day19_runner_evidence_index.json
 reports/portfolio/day19_runner_evidence_index.html
 ```
 
+Day 24 RC demo flow:
+
+```text
+reports/portfolio/day24_rc_demo_flow.json
+reports/portfolio/day24_rc_demo_flow.html
+```
+
 ## Testing Strategy
 
 The project separates live-device validation from unit tests.
@@ -1118,6 +1160,7 @@ For this Day 7 documentation pass, tests were intentionally not run.
 - Provides portfolio-friendly HTML output for demos and screenshots.
 - Shows a clear growth path toward VPN, HA, performance, packet analysis, and AI-assisted reporting.
 - Includes a final runner evidence index that ties task safety, report visibility, and portfolio readiness together.
+- Includes a Day24 RC demo flow that gives reviewers a safe, repeatable walkthrough path.
 
 ## Roadmap
 
