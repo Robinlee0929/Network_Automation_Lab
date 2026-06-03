@@ -985,6 +985,8 @@ Day25 RC readiness checklist:
 - No new destructive live behavior was introduced.
 - Full `python -m pytest` suite passes.
 
+Day25 v0.1 RC validation evidence is recorded in `docs/portfolio_evidence/day25_v0.1_rc_validation.md`.
+
 ## Day24 RC Demo Flow and Portfolio Walkthrough Polish
 
 Day24 adds a report-only walkthrough artifact for RC review and portfolio demos. It turns the existing runner metadata, report visibility, dashboard viewer, WireGuard safety boundary, and portfolio evidence index into a clear reviewer path.
