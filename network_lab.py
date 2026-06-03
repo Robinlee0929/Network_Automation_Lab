@@ -80,12 +80,11 @@ LIVE_WORKFLOW_RECOMMENDATIONS = {
 }
 
 SAFETY_LEVELS = {
-    "SAFE_READ_ONLY": "Local report viewing, summary generation, dry-run, or existing report indexing.",
-    "LIVE_READ_ONLY": "Live device checks that read state without changing configuration.",
-    "LIVE_PERFORMANCE": "Live throughput tests that generate traffic but do not modify router configuration.",
-    "LIVE_CONFIG_CHANGE": "Tasks that may change network configuration and require explicit confirmation.",
-    "guarded-live": "Live WireGuard validation with local config export, explicit confirmation, and no peer/firewall writes from the runner.",
-    "FUTURE_RESERVED": "Placeholder for intentionally disabled future runner integration.",
+    "report-only": "Local report viewing, summary generation, dry-run output, or existing report indexing.",
+    "read-only": "Live device checks that read state without changing configuration.",
+    "guarded-live": "Live validation delegated only after explicit runner action, confirmation, or guard flag.",
+    "dry-run": "Planned-action preview that does not connect to devices or start live checks.",
+    "disabled": "Placeholder or blocked workflow that is intentionally not available from the runner.",
 }
 
 REPORT_CATALOG = [
@@ -129,27 +128,36 @@ REPORT_CATALOG = [
     {
         "day": "Day8",
         "title": "Day8 iperf3 Performance",
-        "report_type": "Performance test report",
-        "safety_label": "live performance evidence",
-        "description": "iperf3 throughput evidence; the index reads reports and does not generate traffic.",
+        "report_type": "Day8 performance report",
+        "safety_label": "guarded-live performance evidence",
+        "description": "Day8 iperf3 throughput evidence; report visibility reads existing files and does not generate traffic.",
         "json_globs": ["reports/**/day8_iperf3_*_report.json", "reports/**/*iperf3*performance*.json"],
         "html_globs": ["reports/**/day8_iperf3_*_report.html", "reports/**/*iperf3*performance*.html"],
     },
     {
+        "day": "Day12",
+        "title": "Day12 WireGuard Validation",
+        "report_type": "Day12 WireGuard report / documentation relationship",
+        "safety_label": "guarded-live evidence",
+        "description": "Detailed WireGuard client-to-site validation evidence; Day18 links to these reports when guarded delegation runs.",
+        "json_globs": ["reports/**/day12_wireguard_vpn_automation_report.json"],
+        "html_globs": ["reports/**/day12_wireguard_vpn_automation_report.html"],
+    },
+    {
         "day": "Day13",
         "title": "Day13 WireGuard Summary",
-        "report_type": "WireGuard summary report",
+        "report_type": "Day13 multi-router WireGuard validation report",
         "safety_label": "report-only evidence",
-        "description": "Multi-router WireGuard summary evidence; Day12 remains source of truth for detailed live validation.",
+        "description": "Multi-router WireGuard validation summary evidence; Day12 remains the detailed source of truth for per-router live validation.",
         "json_globs": ["summary/**/*day13*wireguard*.json", "reports/**/*day13*wireguard*.json"],
         "html_globs": ["summary/**/*day13*wireguard*.html", "reports/**/*day13*wireguard*.html"],
     },
     {
         "day": "Day18",
         "title": WIREGUARD_RUNNER_DISPLAY_NAME,
-        "report_type": "WireGuard runner evidence",
-        "safety_label": "guarded live / dry-run default",
-        "description": "Safety-layer evidence for delegated Day12 validation; unsafe Day12 write flags are not delegated.",
+        "report_type": "Day18 WireGuard runner result",
+        "safety_label": "guarded-live / dry-run default",
+        "description": "Safety-layer result for delegated Day12 WireGuard validation; unsafe Day12 write flags are not delegated.",
         "json_globs": [WIREGUARD_RUNNER_REPORT_JSON.as_posix()],
         "html_globs": [WIREGUARD_RUNNER_REPORT_HTML.as_posix()],
         "missing_note": f"Expected report path: {WIREGUARD_RUNNER_REPORT_JSON.as_posix()}",
@@ -157,9 +165,9 @@ REPORT_CATALOG = [
     {
         "day": "Day14-Day16",
         "title": "Runner Overview Reports",
-        "report_type": "Unified runner overview",
+        "report_type": "Day21 report viewer / evidence viewer relationship",
         "safety_label": "local report index",
-        "description": "Unified runner overview and report index generated from local files.",
+        "description": "Unified runner overview and report index generated from local files for the dashboard /reports evidence viewer.",
         "json_globs": ["reports/lab-summary/latest_lab_overview.json"],
         "html_globs": ["reports/lab-summary/latest_lab_overview.html", "reports/report_index.html"],
     },
@@ -541,8 +549,8 @@ def list_tasks() -> List[Dict[str, Any]]:
             "day": "Day14-Day19",
             "category": "reports",
             "description": "Read local reports and build lab overview or visibility indexes.",
-            "safety_level": "SAFE_READ_ONLY",
-            "execution_mode": "local_only",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
             "enabled": True,
             "status": "implemented",
             "requires_live_device": False,
@@ -555,8 +563,13 @@ def list_tasks() -> List[Dict[str, Any]]:
                 DAY19_EVIDENCE_INDEX_JSON.as_posix(),
                 DAY19_EVIDENCE_INDEX_HTML.as_posix(),
             ],
+            "report_outputs": [
+                "Day14 latest lab overview JSON/HTML",
+                "Day17-Day21 report viewer visibility index",
+                "Day19 portfolio evidence index JSON/HTML",
+            ],
             "related_script": "network_lab.py",
-            "notes": "Report indexing reads local report paths only and does not connect to devices or read config.json.",
+            "notes": "Report-only task. Reads local report paths only and does not connect to devices or read config.json.",
         },
         {
             "id": "portfolio-finalize",
@@ -566,8 +579,8 @@ def list_tasks() -> List[Dict[str, Any]]:
             "day": "Day19",
             "category": "portfolio",
             "description": "Build a portfolio-ready evidence index from the task catalog and local report visibility.",
-            "safety_level": "SAFE_READ_ONLY",
-            "execution_mode": "local_only",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
             "enabled": True,
             "status": "implemented",
             "requires_live_device": False,
@@ -577,8 +590,12 @@ def list_tasks() -> List[Dict[str, Any]]:
                 DAY19_EVIDENCE_INDEX_JSON.as_posix(),
                 DAY19_EVIDENCE_INDEX_HTML.as_posix(),
             ],
+            "report_outputs": [
+                "Day19 runner evidence index JSON",
+                "Day19 runner evidence index HTML",
+            ],
             "related_script": "network_lab.py",
-            "notes": "Day19 finalization reads local report metadata only; generated output is safe for screenshots and portfolio review.",
+            "notes": "Report-only task. Day19 finalization reads local report metadata only; generated output is safe for screenshots and portfolio review.",
         },
         {
             "id": "day4-baseline",
@@ -588,8 +605,8 @@ def list_tasks() -> List[Dict[str, Any]]:
             "day": "Day4",
             "category": "baseline",
             "description": "Existing Day4 multi-device RouterOS baseline validation.",
-            "safety_level": "LIVE_READ_ONLY",
-            "execution_mode": "subprocess_with_confirmation",
+            "safety_level": "read-only",
+            "execution_mode": "guarded-live",
             "enabled": True,
             "status": "implemented",
             "requires_live_device": True,
@@ -599,8 +616,11 @@ def list_tasks() -> List[Dict[str, Any]]:
                 "reports/<device>/day4_baseline_validation.json",
                 "reports/<device>/day4_baseline_validation.html",
             ],
+            "report_outputs": [
+                "Day4 per-device baseline validation JSON/HTML",
+            ],
             "related_script": DAY4_BASELINE_SCRIPT,
-            "notes": "Uses the existing Day4 script. Interactive runner asks before live SSH validation.",
+            "notes": "Read-only live SSH validation. Uses the existing Day4 script; interactive runner asks before delegation.",
         },
         {
             "id": "iperf3-performance",
@@ -610,8 +630,8 @@ def list_tasks() -> List[Dict[str, Any]]:
             "day": "Day8",
             "category": "performance",
             "description": "Existing Day8 iperf3 performance workflow.",
-            "safety_level": "LIVE_PERFORMANCE",
-            "execution_mode": "subprocess_with_confirmation",
+            "safety_level": "guarded-live",
+            "execution_mode": "guarded-live",
             "enabled": True,
             "status": "implemented",
             "requires_live_device": True,
@@ -621,8 +641,11 @@ def list_tasks() -> List[Dict[str, Any]]:
                 "reports/<device>/day8_iperf3_performance_report.json",
                 "reports/<device>/day8_iperf3_performance_report.html",
             ],
+            "report_outputs": [
+                "Day8 iperf3 performance report JSON/HTML",
+            ],
             "related_script": DAY8_PERFORMANCE_SCRIPT,
-            "notes": "Generates iperf3 traffic but does not modify router configuration.",
+            "notes": "Guarded-live performance task. Generates iperf3 traffic only after confirmation and does not modify router configuration.",
         },
         {
             "id": WIREGUARD_RUNNER_TASK_ALIAS,
@@ -633,7 +656,7 @@ def list_tasks() -> List[Dict[str, Any]]:
             "category": "vpn",
             "description": "Feature-named WireGuard runner integration for dry-run safety reporting and manually guarded live validation.",
             "safety_level": "guarded-live",
-            "execution_mode": "dry-run by default",
+            "execution_mode": "dry-run",
             "enabled": True,
             "status": "implemented",
             "requires_live_device": True,
@@ -644,8 +667,13 @@ def list_tasks() -> List[Dict[str, Any]]:
                 WIREGUARD_RUNNER_REPORT_JSON.as_posix(),
                 WIREGUARD_RUNNER_REPORT_HTML.as_posix(),
             ],
+            "report_outputs": [
+                "Day18 WireGuard runner safety-layer result JSON/HTML",
+                "Related Day12 WireGuard validation report paths when delegated evidence exists",
+                "Day22 WireGuard documentation relationship for safety review",
+            ],
             "related_script": DAY12_WIREGUARD_SCRIPT,
-            "notes": "Added in Day18. Primary CLI uses stable feature names; dry-run is default, and live validation requires manual --allow-live-wireguard authorization.",
+            "notes": "Dry-run is the default runner posture. Guarded live validation requires manual --allow-live-wireguard authorization and omits firewall apply, peer recreation, reset, reboot, and VPN activation logic.",
         },
         {
             "id": "day13-wireguard-summary",
@@ -655,8 +683,8 @@ def list_tasks() -> List[Dict[str, Any]]:
             "day": "Day13",
             "category": "vpn",
             "description": "Report-only or placeholder visibility for Day13 WireGuard summaries.",
-            "safety_level": "FUTURE_RESERVED",
-            "execution_mode": "report_only_disabled_live",
+            "safety_level": "disabled",
+            "execution_mode": "report-only",
             "enabled": False,
             "status": "planned",
             "requires_live_device": False,
@@ -666,8 +694,11 @@ def list_tasks() -> List[Dict[str, Any]]:
                 "summary/day13_multi_router_wireguard_client_to_site_summary_*.json",
                 "summary/day13_multi_router_wireguard_client_to_site_summary_*.html",
             ],
+            "report_outputs": [
+                "Day13 multi-router WireGuard validation summary JSON/HTML when generated outside the runner",
+            ],
             "related_script": "mikrotik_day13_multi_router_wireguard_validation.py",
-            "notes": "Day13 summary remains report-only in Day18 until its own live safety layer is implemented.",
+            "notes": "Disabled live runner task. Day13 summary remains report-only until its own live safety layer is implemented.",
         },
     ]
 
@@ -1314,7 +1345,7 @@ def build_portfolio_evidence_index(
     local_only_tasks = [
         task
         for task in task_catalog
-        if not task.get("requires_live_device") and task.get("safety_level") == "SAFE_READ_ONLY"
+        if not task.get("requires_live_device") and task.get("safety_level") == "report-only"
     ]
     live_guarded_tasks = [
         task

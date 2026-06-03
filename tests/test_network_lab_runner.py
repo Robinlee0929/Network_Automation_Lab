@@ -329,6 +329,7 @@ def test_task_catalog_contains_day17_required_fields():
         "requires_password",
         "produces_report",
         "report_paths",
+        "report_outputs",
         "related_script",
         "notes",
     }
@@ -358,8 +359,9 @@ def test_list_tasks_does_not_execute_live_device_commands(monkeypatch, capsys):
     output = capsys.readouterr().out
     assert exit_code == 0
     assert "Task Catalog" in output
-    assert "LIVE_READ_ONLY" in output
-    assert "LIVE_PERFORMANCE" in output
+    assert "read-only" in output
+    assert "guarded-live" in output
+    assert "report-only" in output
     assert "guarded-live" in output
     assert "day19_runner_evidence_index" not in output
 
@@ -376,7 +378,7 @@ def test_report_visibility_index_works_when_reports_directory_is_missing(tmp_pat
     assert "Output: reports/report_index.html" in output
     assert "MISSING" in output
     assert "local report index" in output
-    assert "guarded live / dry-run" in output
+    assert "guarded-live / dry-run" in output
     assert "Day18 WireGuard runner integration uses dry-run and explicit confirmation guardrails" in output
     assert (tmp_path / "reports/report_index.html").exists()
 
@@ -405,10 +407,11 @@ def test_report_visibility_index_finds_partial_reports_and_marks_missing(tmp_pat
     assert "JSON: reports/Hex-s-2025-lab01/day4_baseline_validation.json" in output
     assert "Day8 iperf3 Performance" in output
     assert "HTML: reports/Hex-s-2025-lab01/day8_iperf3_WAN_TO_LAN_DNAT_report.html" in output
-    assert "live performance evidence" in output
     assert "Day13 WireGuard Live Execution" in output
     assert "DISABLED FOR DAY18" in output
     assert "Expected Cisco switch report was not found in local reports folder." in output
+    html = (tmp_path / "reports/report_index.html").read_text(encoding="utf-8")
+    assert "guarded-live performance evidence" in html
 
 
 def test_report_visibility_console_compacts_historical_day13_reports(tmp_path, capsys):
@@ -452,7 +455,7 @@ def test_wireguard_runner_catalog_entry_uses_feature_identity():
     assert runner["day"] == "Day18"
     assert runner["enabled"] is True
     assert runner["safety_level"] == "guarded-live"
-    assert runner["execution_mode"] == "dry-run by default"
+    assert runner["execution_mode"] == "dry-run"
     assert runner["report_output_path"] == "reports/lab-summary/wireguard_runner_safety_layer.json"
 
 
@@ -460,8 +463,8 @@ def test_day13_wireguard_summary_remains_disabled_until_own_safety_layer():
     day13 = next(task for task in network_lab.list_tasks() if task["id"] == "day13-wireguard-summary")
 
     assert day13["enabled"] is False
-    assert day13["safety_level"] == "FUTURE_RESERVED"
-    assert "Day13 summary remains report-only in Day18" in day13["notes"]
+    assert day13["safety_level"] == "disabled"
+    assert "Disabled live runner task" in day13["notes"]
 
 
 def test_wireguard_placeholder_does_not_call_live_scripts(tmp_path, monkeypatch, capsys):
@@ -579,9 +582,9 @@ def test_html_report_index_generation_contains_catalog_reports_and_legend(tmp_pa
     assert "Description" in html
     assert "Multi-device baseline report" in html
     assert "live read-only evidence" in html
-    assert "Performance test report" in html
-    assert "live performance evidence" in html
-    assert "Unified runner overview" in html
+    assert "Day8 performance report" in html
+    assert "guarded-live performance evidence" in html
+    assert "Day21 report viewer / evidence viewer relationship" in html
     assert "local report index" in html
     assert "Day18 WireGuard runner integration uses a safety layer" in html
     assert "WireGuard Runner Safety Layer" in html
@@ -678,7 +681,7 @@ def test_task_catalog_contains_day19_portfolio_entry():
 
     assert task["task_id"] == "day19_runner_evidence_index"
     assert task["day"] == "Day19"
-    assert task["safety_level"] == "SAFE_READ_ONLY"
+    assert task["safety_level"] == "report-only"
     assert task["requires_live_device"] is False
     assert "reports/portfolio/day19_runner_evidence_index.html" in task["report_paths"]
 

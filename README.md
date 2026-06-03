@@ -6,7 +6,7 @@ Network Automation Lab is a Python-based lab automation project for validating n
 
 A Python-based network automation and validation lab for MikroTik RouterOS, Cisco switch topology checks, iperf3 performance testing, regression checks, and local report visualization.
 
-The current implementation covers Day 1 through Day 21:
+The current implementation covers Day 1 through Day 23:
 
 - MikroTik baseline and post-reset validation
 - MikroTik Day 2 setup workflow after reset
@@ -26,6 +26,8 @@ The current implementation covers Day 1 through Day 21:
 - Day 19 runner evidence index and portfolio finalization
 - Day 20 runner report index and portfolio evidence cleanup
 - Day 21 dashboard report viewer and evidence navigation
+- Day 22 WireGuard runner documentation and safety review
+- Day 23 runner safety metadata and RC readiness review
 
 The project is designed as a practical QA Automation / SDET portfolio project for network infrastructure. It focuses on repeatable validation, structured test evidence, and readable JSON / HTML reports rather than one-off manual checks.
 
@@ -63,7 +65,7 @@ This project exists to turn a home lab network into an automated testing target:
 
 Cisco validation is read-only. It runs show commands for topology evidence and does not enter configuration mode, change VLANs, change ports, update IP settings, or save configuration.
 
-## Current Day 1-Day 6 Progress Summary
+## Current Progress Summary
 
 | Day | Scope | Status |
 | --- | --- | --- |
@@ -86,6 +88,8 @@ Cisco validation is read-only. It runs show commands for topology evidence and d
 | Day 19 | Runner evidence index and portfolio finalization | Complete |
 | Day 20 | Runner report index and portfolio evidence cleanup | Complete |
 | Day 21 | Dashboard report viewer and evidence navigation | Complete |
+| Day 22 | WireGuard runner documentation and safety review | Complete |
+| Day 23 | Runner safety metadata and RC readiness review | Complete |
 
 ## Lab Topology
 
@@ -783,12 +787,11 @@ Safety levels:
 
 | Safety level | Meaning |
 | --- | --- |
-| SAFE_READ_ONLY | Local report viewing, summary generation, dry-run, or existing report indexing. |
-| LIVE_READ_ONLY | Live device checks that read state without changing configuration. |
-| LIVE_PERFORMANCE | Live throughput tests that generate traffic but do not modify router configuration. |
-| LIVE_CONFIG_CHANGE | Tasks that may change router, switch, firewall, or VPN configuration and require explicit confirmation. |
-| guarded-live | Live WireGuard validation with dry-run default, explicit guard flag, and fixed runner safety checks. |
-| FUTURE_RESERVED | Placeholder for intentionally disabled future runner integration. |
+| report-only | Local report viewing, summary generation, dry-run output, or existing report indexing. |
+| read-only | Live device checks that read state without changing configuration. |
+| guarded-live | Live validation delegated only after explicit runner action, confirmation, or guard flag. |
+| dry-run | Planned-action preview that does not connect to devices or start live checks. |
+| disabled | Placeholder or blocked workflow that is intentionally not available from the runner. |
 
 Day17 report visibility behavior:
 
@@ -961,6 +964,24 @@ Evidence relationship:
 - Day22 documents the safety boundary so Day25 v0.1 RC review can separate validation evidence from intentionally blocked live automation.
 
 Review WireGuard evidence from the Day21 dashboard at `/reports`. Use grouped evidence cards, redacted JSON preview, and safe HTML report links for already-generated `reports/` or `summary/` evidence. Dashboard evidence browsing is read-only; it must not start live validation, activate VPN clients, apply config, reset routers, reboot routers, or reveal secrets.
+
+## Day23 Runner Safety Metadata and RC Readiness Review
+
+Day23 tightens runner metadata before the Day25 v0.1 RC. The task catalog in `network_lab.py` is the source of truth for user-facing task names, descriptions, safety level, execution mode, report outputs, and notes about dry-run, guarded-live, report-only, or disabled behavior.
+
+Safety metadata is used by `--list-tasks`, report visibility, portfolio evidence, and reviewer documentation. `report-only` tasks read existing evidence, `read-only` tasks inspect live device state without config changes, `guarded-live` tasks require explicit action before delegation, `dry-run` tasks preview planned work, and `disabled` tasks are intentionally blocked from runner execution.
+
+WireGuard runner metadata stays conservative: dry-run is the default posture, guarded live validation requires explicit authorization, and the runner does not add VPN activation, firewall apply logic, reset, reboot, or destructive behavior.
+
+Day25 RC readiness checklist:
+
+- Runner task metadata is complete.
+- Safety labels and execution modes are consistent.
+- Report outputs are traceable to Day8, Day12, Day13, Day18, Day21, and Day22 evidence or documentation.
+- `/reports` viewer remains functional and read-only.
+- WireGuard tasks remain dry-run or guarded-live only.
+- No new destructive live behavior was introduced.
+- Full `python -m pytest` suite passes.
 
 ## How to Read Reports
 
