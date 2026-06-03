@@ -1066,6 +1066,15 @@ Safety behavior:
 - Does not read `config.json`, exported WireGuard `.conf` files, SSH passwords, private keys, or local secrets.
 - Does not commit generated reports, exports, real configs, caches, or secrets.
 
+## Portfolio Demo
+
+v0.1 includes reviewer/interview demo scripts for presenting the current RC platform safely without adding features, changing runner/dashboard behavior, or running live device-changing workflows:
+
+```text
+docs/portfolio_demo_script.md
+docs/portfolio_demo_script_zh-TW.md
+```
+
 ## How to Read Reports
 
 Reports are written as structured evidence for each workflow.
