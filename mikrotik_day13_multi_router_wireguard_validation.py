@@ -985,11 +985,30 @@ def stable_report_path(path: Path) -> str:
     return path.as_posix()
 
 
+def filesystem_path(path: Path) -> Path:
+    if os.name != "nt":
+        return path
+    resolved = str(path.resolve())
+    if resolved.startswith("\\\\?\\"):
+        return path
+    return Path("\\\\?\\" + resolved)
+
+
+def path_exists(path: Path) -> bool:
+    return filesystem_path(path).exists()
+
+
+def write_text_file(path: Path, text: str) -> None:
+    target = filesystem_path(path)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(text, encoding="utf-8")
+
+
 def next_summary_report_paths(timestamp: str) -> Tuple[Path, Path]:
     summary_json_path = SUMMARY_REPORT_DIR / f"{SUMMARY_REPORT_STEM}_{timestamp}.json"
     summary_html_path = SUMMARY_REPORT_DIR / f"{SUMMARY_REPORT_STEM}_{timestamp}.html"
     suffix = 2
-    while summary_json_path.exists() or summary_html_path.exists():
+    while path_exists(summary_json_path) or path_exists(summary_html_path):
         summary_json_path = SUMMARY_REPORT_DIR / f"{SUMMARY_REPORT_STEM}_{timestamp}_{suffix}.json"
         summary_html_path = SUMMARY_REPORT_DIR / f"{SUMMARY_REPORT_STEM}_{timestamp}_{suffix}.html"
         suffix += 1
@@ -998,19 +1017,17 @@ def next_summary_report_paths(timestamp: str) -> Tuple[Path, Path]:
 
 def write_aggregate_reports(report: Dict[str, Any]) -> Tuple[Path, Path, Path, Path]:
     assert_no_conf_content(report)
-    REPORT_JSON_PATH.parent.mkdir(parents=True, exist_ok=True)
-    SUMMARY_REPORT_DIR.mkdir(parents=True, exist_ok=True)
     json_text = json.dumps(report, indent=2, sort_keys=True) + "\n"
-    REPORT_JSON_PATH.write_text(json_text, encoding="utf-8")
+    write_text_file(REPORT_JSON_PATH, json_text)
     html_report = build_html_report(report)
     for token in CONF_CONTENT_TOKENS:
         if token in html_report:
             raise ValueError(f"Day13 HTML report must not contain WireGuard .conf content token: {token}")
-    REPORT_HTML_PATH.write_text(html_report, encoding="utf-8")
+    write_text_file(REPORT_HTML_PATH, html_report)
     timestamp = report_timestamp_for_filename(report)
     summary_json_path, summary_html_path = next_summary_report_paths(timestamp)
-    summary_json_path.write_text(json_text, encoding="utf-8")
-    summary_html_path.write_text(html_report, encoding="utf-8")
+    write_text_file(summary_json_path, json_text)
+    write_text_file(summary_html_path, html_report)
     return REPORT_JSON_PATH, REPORT_HTML_PATH, summary_json_path, summary_html_path
 
 

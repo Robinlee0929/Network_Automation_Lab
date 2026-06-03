@@ -286,9 +286,9 @@ def test_write_reports_generates_fixed_latest_and_archives(tmp_path):
     assert paths["json"].exists()
     assert paths["html"].exists()
     assert paths["txt"].exists()
-    assert paths["json_archive"].exists()
-    assert paths["html_archive"].exists()
-    assert paths["txt_archive"].exists()
+    assert day9.path_exists(paths["json_archive"])
+    assert day9.path_exists(paths["html_archive"])
+    assert day9.path_exists(paths["txt_archive"])
     assert paths["json_archive"].parent == config.output_dir / "performance_regression"
     assert paths["json_archive"].parent.parent == config.output_dir
     assert paths["json_archive"].name == "LAN_TO_WAN_DNAT_REPLY_PASS_20260530_013400.json"
@@ -298,9 +298,15 @@ def test_write_reports_generates_fixed_latest_and_archives(tmp_path):
     assert "946" not in paths["json_archive"].name
     assert "946.35" not in paths["json_archive"].name
     assert not (config.output_dir / "performance_regression" / "LAN_TO_WAN_DNAT_REPLY").exists()
-    assert paths["json"].read_text(encoding="utf-8") == paths["json_archive"].read_text(encoding="utf-8")
-    assert paths["html"].read_text(encoding="utf-8") == paths["html_archive"].read_text(encoding="utf-8")
-    assert paths["txt"].read_text(encoding="utf-8") == paths["txt_archive"].read_text(encoding="utf-8")
+    assert day9.filesystem_path(paths["json"]).read_text(encoding="utf-8") == day9.filesystem_path(
+        paths["json_archive"]
+    ).read_text(encoding="utf-8")
+    assert day9.filesystem_path(paths["html"]).read_text(encoding="utf-8") == day9.filesystem_path(
+        paths["html_archive"]
+    ).read_text(encoding="utf-8")
+    assert day9.filesystem_path(paths["txt"]).read_text(encoding="utf-8") == day9.filesystem_path(
+        paths["txt_archive"]
+    ).read_text(encoding="utf-8")
 
 
 def test_help_flags_are_available(capsys):
@@ -332,6 +338,6 @@ def test_no_real_iperf3_execution_in_unit_tests(monkeypatch, tmp_path):
     assert paths["json"].exists()
     assert paths["html"].exists()
     assert paths["txt"].exists()
-    assert paths["json_archive"].exists()
-    assert paths["html_archive"].exists()
-    assert paths["txt_archive"].exists()
+    assert day9.path_exists(paths["json_archive"])
+    assert day9.path_exists(paths["html_archive"])
+    assert day9.path_exists(paths["txt_archive"])
