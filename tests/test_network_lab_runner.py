@@ -1,4 +1,5 @@
 import json
+import os
 import sys
 from types import SimpleNamespace
 from pathlib import Path
@@ -8,9 +9,25 @@ import pytest
 import network_lab
 
 
+def windows_long_path(path: Path) -> Path:
+    if os.name != "nt":
+        return path
+    resolved = str(path.resolve())
+    if resolved.startswith("\\\\?\\"):
+        return path
+    return Path("\\\\?\\" + resolved)
+
+
 def write_json(path: Path, data):
+    path = windows_long_path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(data), encoding="utf-8")
+
+
+def write_text(path: Path, text: str):
+    path = windows_long_path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text, encoding="utf-8")
 
 
 def profile(required=True, output_json="reports/lab-summary/latest_lab_overview.json"):
@@ -267,9 +284,35 @@ def test_list_tasks_prints_report_index_and_planned_tasks(capsys):
     output = capsys.readouterr().out
     assert exit_code == 0
     assert "report-index" in output
+    assert "portfolio-finalize" in output
     assert "day4-baseline" in output
     assert "iperf3-performance" in output
+    assert "wireguard-runner" in output
     assert "day13-wireguard-summary" in output
+    assert "Portfolio Evidence Index" in output
+    assert "Multi-device Baseline Validation" in output
+    assert "iperf3 Performance Test" in output
+    assert "WireGuard VPN Validation" in output
+    assert "WireGuard Summary Only" in output
+    assert "day19_runner_evidence_index" not in output
+    assert "Day19 Runner Evidence Index" not in output
+    assert "Day14-Day19" not in output
+    assert "Related script" not in output
+    assert "Reports:" not in output
+
+
+def test_list_tasks_verbose_prints_internal_metadata(capsys):
+    exit_code = network_lab.main(["--list-tasks", "--verbose"])
+
+    output = capsys.readouterr().out
+    assert exit_code == 0
+    assert "day19_runner_evidence_index" in output
+    assert "Day19 Runner Evidence Index" in output
+    assert "Day14-Day19" in output
+    assert "Related script" in output
+    assert "Reports:" in output
+    assert "Notes:" in output
+    assert "User-facing name: Portfolio Evidence Index" in output
 
 
 def test_task_catalog_contains_day17_required_fields():
@@ -318,6 +361,7 @@ def test_list_tasks_does_not_execute_live_device_commands(monkeypatch, capsys):
     assert "LIVE_READ_ONLY" in output
     assert "LIVE_PERFORMANCE" in output
     assert "guarded-live" in output
+    assert "day19_runner_evidence_index" not in output
 
 
 def test_report_visibility_index_works_when_reports_directory_is_missing(tmp_path, capsys):
@@ -370,15 +414,16 @@ def test_report_visibility_console_compacts_historical_day13_reports(tmp_path, c
             tmp_path
             / "reports"
             / "lab-summary"
-            / f"day13_multi_router_wireguard_client_to_site_summary_20260602_000{index}.json",
+            / f"day13_wireguard_000{index}.json",
             {"result": "PASS"},
         )
-        (
+        write_text(
             tmp_path
             / "reports"
             / "lab-summary"
-            / f"day13_multi_router_wireguard_client_to_site_summary_20260602_000{index}.html"
-        ).write_text("<html>day13</html>", encoding="utf-8")
+            / f"day13_wireguard_000{index}.html",
+            "<html>day13</html>",
+        )
 
     exit_code = network_lab.main(["--report-index"], project_root=tmp_path)
 
@@ -386,12 +431,12 @@ def test_report_visibility_console_compacts_historical_day13_reports(tmp_path, c
     assert exit_code == 0
     assert "more reports hidden in console" in output
     assert "open reports/report_index.html for full list" in output
-    assert "day13_multi_router_wireguard_client_to_site_summary_20260602_0001.json" in output
-    assert "day13_multi_router_wireguard_client_to_site_summary_20260602_0004.json" not in output
+    assert "day13_wireguard_0001.json" in output
+    assert "day13_wireguard_0004.json" not in output
     assert "Expected Cisco switch report was not found in local reports folder." in output
     assert "DISABLED FOR DAY18" in output
     html = (tmp_path / "reports/report_index.html").read_text(encoding="utf-8")
-    assert "day13_multi_router_wireguard_client_to_site_summary_20260602_0006.json" in html
+    assert "day13_wireguard_0006.json" in html
 
 
 def test_wireguard_runner_catalog_entry_uses_feature_identity():
@@ -558,6 +603,21 @@ def test_portfolio_finalization_writes_day19_evidence_index(tmp_path, capsys):
     assert any(item["quality"] == "READY" for item in data["evidence_items"])
     assert "Portfolio Highlights" in html
     assert "day4_baseline_validation.html" in html
+
+
+def test_cli_task_portfolio_finalize_writes_evidence_index(tmp_path, capsys):
+    write_json(
+        tmp_path / "reports" / "Hex-s-2025-lab01" / "day4_baseline_validation.json",
+        {"result": "PASS"},
+    )
+
+    exit_code = network_lab.main(["--task", "portfolio-finalize"], project_root=tmp_path)
+
+    output = capsys.readouterr().out
+    assert exit_code == 0
+    assert "Day19 Runner Evidence Index" in output
+    assert (tmp_path / "reports/portfolio/day19_runner_evidence_index.json").exists()
+    assert (tmp_path / "reports/portfolio/day19_runner_evidence_index.html").exists()
 
 
 def test_portfolio_finalization_does_not_execute_subprocess_or_read_config_secret(
@@ -1362,8 +1422,10 @@ def test_no_argument_main_opens_interactive_menu_with_mocked_input(tmp_path, mon
 
     output = capsys.readouterr().out
     assert exit_code == 0
+    assert "Network Lab Runner" in output
     assert "Select an option by number" in output
-    assert "Exiting Day14 interactive menu" in output
+    assert "Exiting Network Lab Runner." in output
+    assert "Exiting Day14 interactive menu" not in output
 
 
 def test_interactive_exit_does_not_print_completion_message(tmp_path, monkeypatch, capsys):
@@ -1376,6 +1438,29 @@ def test_interactive_exit_does_not_print_completion_message(tmp_path, monkeypatc
     assert exit_code == 0
     assert network_lab.INTERACTIVE_ACTION_COMPLETE not in output
     assert output.count("Select an option by number") == 1
+    assert "Exiting Network Lab Runner." in output
+    assert "Day14 interactive menu" not in output
+
+
+def test_interactive_menu_uses_user_facing_labels(tmp_path, monkeypatch, capsys):
+    write_default_profile(tmp_path)
+    monkeypatch.setattr("builtins.input", lambda _prompt: "0")
+
+    exit_code = network_lab.main(["--interactive"], project_root=tmp_path)
+
+    output = capsys.readouterr().out
+    assert exit_code == 0
+    assert "Network Lab Runner" in output
+    assert "  2. Generate report index" in output
+    assert "  5. Run multi-device baseline validation" in output
+    assert "  6. Run iperf3 performance test" in output
+    assert "  7. Run WireGuard VPN validation" in output
+    assert "  8. Show WireGuard summary command" in output
+    assert "Day14 Unified Lab Runner and Report Index" not in output
+    assert "Run Day4 multi-device baseline" not in output
+    assert "Run Day8 iperf3 performance workflow" not in output
+    assert "WireGuard Runner Safety Layer" not in output
+    assert "Show recommended command for Day13 multi-router WireGuard summary" not in output
 
 
 def test_interactive_action_prints_completion_and_reprints_full_menu(tmp_path, monkeypatch, capsys):
@@ -1389,8 +1474,8 @@ def test_interactive_action_prints_completion_and_reprints_full_menu(tmp_path, m
     assert exit_code == 0
     assert network_lab.INTERACTIVE_ACTION_COMPLETE in output
     assert output.count("Select an option by number") == 2
-    assert output.count("  7. WireGuard Runner Safety Layer") == 2
-    assert output.count("  8. Show recommended command for Day13 multi-router WireGuard summary") == 2
+    assert output.count("  7. Run WireGuard VPN validation") == 2
+    assert output.count("  8. Show WireGuard summary command") == 2
     assert "day12-wireguard-live-validation" not in output
     assert "day18-wireguard-runner" not in output
 
@@ -1631,7 +1716,8 @@ def test_interactive_wireguard_runner_option_asks_for_confirmation(
     capsys,
 ):
     write_default_profile(tmp_path)
-    choices = iter(["7", "n", "0"])
+    write_wireguard_runner_config(tmp_path, filename="Set_WireguardVPN_lab02_config.json")
+    choices = iter(["7", "Set_WireguardVPN_lab02_config.json", "n", "0"])
     prompts = []
 
     def fake_input(prompt):
@@ -1649,11 +1735,113 @@ def test_interactive_wireguard_runner_option_asks_for_confirmation(
 
     output = capsys.readouterr().out
     assert exit_code == 0
+    assert "Select a WireGuard config file for this run" in output
+    assert "Set_WireguardVPN_lab02_config.json" in output
     assert "live WireGuard validation workflow" in output
-    assert "python mikrotik_day12_wireguard_vpn_automation.py --config Set_WireguardVPN_config.json --non-interactive" in output
-    assert "Confirm live WireGuard runner execution" in prompts[1]
+    assert "python mikrotik_day12_wireguard_vpn_automation.py --config Set_WireguardVPN_lab02_config.json --non-interactive" in output
+    assert "WireGuard config path or number" in prompts[1]
+    assert "Confirm live WireGuard runner execution" in prompts[2]
     assert "WireGuard runner cancelled" in output
     assert "Day12 WireGuard" not in output
+
+
+def test_interactive_wireguard_runner_blank_config_cancels_without_default(
+    tmp_path,
+    monkeypatch,
+    capsys,
+):
+    write_default_profile(tmp_path)
+    write_wireguard_runner_config(tmp_path)
+    choices = iter(["7", "", "0"])
+
+    monkeypatch.setattr("builtins.input", lambda _prompt: next(choices))
+    monkeypatch.setattr(
+        network_lab.subprocess,
+        "run",
+        lambda *_args, **_kwargs: (_ for _ in ()).throw(AssertionError("subprocess.run should not be called")),
+    )
+
+    exit_code = network_lab.main(["--interactive"], project_root=tmp_path)
+
+    output = capsys.readouterr().out
+    assert exit_code == 0
+    assert "Set_WireguardVPN_config.json" in output
+    assert "WireGuard runner cancelled. No config was selected." in output
+    assert "Selected WireGuard config: Set_WireguardVPN_config.json" not in output
+    assert "Confirm live WireGuard runner execution" not in output
+
+
+def test_interactive_wireguard_runner_accepts_user_provided_config_path(
+    tmp_path,
+    monkeypatch,
+    capsys,
+):
+    write_default_profile(tmp_path)
+    write_wireguard_runner_config(tmp_path, filename="Set_WireguardVPN_lab02_config.json")
+    choices = iter(["7", "Set_WireguardVPN_lab02_config.json", "y", "0"])
+    calls = []
+    monkeypatch.setattr("builtins.input", lambda _prompt: next(choices))
+
+    def fake_run(command, cwd, shell, timeout):
+        calls.append((command, cwd, shell, timeout))
+        return SimpleNamespace(returncode=0)
+
+    monkeypatch.setattr(network_lab.subprocess, "run", fake_run)
+
+    exit_code = network_lab.main(["--interactive"], project_root=tmp_path)
+
+    output = capsys.readouterr().out
+    assert exit_code == 0
+    assert "Selected WireGuard config: Set_WireguardVPN_lab02_config.json" in output
+    assert calls == [
+        (
+            [
+                sys.executable,
+                "mikrotik_day12_wireguard_vpn_automation.py",
+                "--config",
+                "Set_WireguardVPN_lab02_config.json",
+                "--non-interactive",
+            ],
+            tmp_path.resolve(),
+            False,
+            network_lab.DAY12_WIREGUARD_TIMEOUT_SECONDS,
+        )
+    ]
+    assert "--recreate-peer" not in calls[0][0]
+    assert "--apply-firewall-fixes" not in calls[0][0]
+
+
+def test_interactive_wireguard_runner_accepts_numbered_config_selection(
+    tmp_path,
+    monkeypatch,
+    capsys,
+):
+    write_default_profile(tmp_path)
+    write_wireguard_runner_config(tmp_path, filename="Set_WireguardVPN_lab02_config.json")
+    write_wireguard_runner_config(tmp_path)
+    choices = iter(["7", "1", "y", "0"])
+    calls = []
+    monkeypatch.setattr("builtins.input", lambda _prompt: next(choices))
+
+    def fake_run(command, cwd, shell, timeout):
+        calls.append((command, cwd, shell, timeout))
+        return SimpleNamespace(returncode=0)
+
+    monkeypatch.setattr(network_lab.subprocess, "run", fake_run)
+
+    exit_code = network_lab.main(["--interactive"], project_root=tmp_path)
+
+    output = capsys.readouterr().out
+    assert exit_code == 0
+    assert "1. Set_WireguardVPN_lab02_config.json" in output
+    assert "2. Set_WireguardVPN_config.json" in output
+    assert calls[0][0] == [
+        sys.executable,
+        "mikrotik_day12_wireguard_vpn_automation.py",
+        "--config",
+        "Set_WireguardVPN_lab02_config.json",
+        "--non-interactive",
+    ]
 
 
 def test_interactive_wireguard_runner_option_with_y_delegates_to_existing_script(
@@ -1662,8 +1850,8 @@ def test_interactive_wireguard_runner_option_with_y_delegates_to_existing_script
     capsys,
 ):
     write_default_profile(tmp_path)
-    write_wireguard_runner_config(tmp_path)
-    choices = iter(["7", "y", "0"])
+    write_wireguard_runner_config(tmp_path, filename="Set_WireguardVPN_lab02_config.json")
+    choices = iter(["7", "Set_WireguardVPN_lab02_config.json", "y", "0"])
     calls = []
     monkeypatch.setattr("builtins.input", lambda _prompt: next(choices))
 
@@ -1683,7 +1871,7 @@ def test_interactive_wireguard_runner_option_with_y_delegates_to_existing_script
                 sys.executable,
                 "mikrotik_day12_wireguard_vpn_automation.py",
                 "--config",
-                "Set_WireguardVPN_config.json",
+                "Set_WireguardVPN_lab02_config.json",
                 "--non-interactive",
             ],
             tmp_path.resolve(),
