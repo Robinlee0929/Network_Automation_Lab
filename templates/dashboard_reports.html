@@ -79,6 +79,28 @@
       color: #7a4d00;
       font-weight: 700;
     }
+    .filters {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 12px 0 4px;
+    }
+    .filter-chip {
+      background: #eef7f6;
+      border: 1px solid #b8ddd8;
+      border-radius: 999px;
+      color: #0f5f58;
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 800;
+      padding: 5px 9px;
+    }
+    .actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .muted { color: var(--muted); }
     a { color: #175cd3; }
     @media (max-width: 620px) {
       main { padding: 20px 12px 36px; }
@@ -95,13 +117,13 @@
     <a href="{{ url_for('ai_checklist') }}">AI Checklist</a>
   </nav>
   <h1>Reports</h1>
-  <p>Local JSON and HTML reports discovered under the repository reports folder.</p>
+  <p>Local evidence browser for generated JSON and HTML reports. The dashboard reads report metadata only and never runs router, switch, VPN, or iperf3 workflows from this page.</p>
   <p>UNKNOWN means the dashboard could not find a supported result field in the JSON report, or the HTML report has no matching JSON file to read status from.</p>
 
   {% if not reports_exist %}
   <div class="empty">reports/ folder was not found. The dashboard is ready, but no generated reports are available yet.</div>
-  {% elif not grouped_reports %}
-  <div class="empty">No JSON or HTML reports were found under reports/.</div>
+  {% elif not has_evidence %}
+  <div class="empty">No report evidence was found yet. Run <code>python network_lab.py --report-index</code> or generate day-specific reports, then refresh this page.</div>
   {% endif %}
 
   <section>
@@ -159,36 +181,68 @@
     {% endif %}
   </section>
 
-  {% for device, entries in grouped_reports.items() %}
+  {% for day, entries in grouped_evidence.items() %}
   <section>
-    <h2>{{ device }}</h2>
+    <h2>{{ day }}</h2>
+    <div class="filters">
+      {% for item in entries|map(attribute='device')|unique %}
+      <span class="filter-chip">{{ item }}</span>
+      {% endfor %}
+    </div>
     <div class="table-wrap">
       <table>
         <thead>
           <tr>
-            <th>Device / folder</th>
-            <th>Report filename</th>
+            <th>Title</th>
+            <th>Device / scope</th>
             <th>Report type</th>
             <th>Status</th>
-            <th>HTML</th>
-            <th>Last modified</th>
+            <th>JSON path</th>
+            <th>HTML path</th>
+            <th>Description</th>
+            <th>Open</th>
           </tr>
         </thead>
         <tbody>
           {% for report in entries %}
           <tr>
+            <td>{{ report.title }}</td>
             <td>{{ report.device }}</td>
-            <td><code>{{ report.filename }}</code></td>
             <td>{{ report.report_type }}</td>
             <td><span class="badge {{ report.status|status_class }}">{{ report.status }}</span></td>
             <td>
-              {% if report.html_relative_path %}
-              <a href="{{ report_url(report.html_relative_path) }}">Open HTML</a>
+              {% if report.json_view_path %}
+              <code>{{ report.json_path }}</code>
               {% else %}
-              <span class="badge unknown">MISSING</span>
+              <span class="badge unknown">{{ report.availability }}</span>
               {% endif %}
             </td>
-            <td>{{ report.modified_at }}</td>
+            <td>
+              {% if report.html_view_path %}
+              <code>{{ report.html_path }}</code>
+              {% else %}
+              <span class="badge unknown">{{ report.availability }}</span>
+              {% endif %}
+            </td>
+            <td>
+              {{ report.description }}
+              {% if report.notes %}
+              <div class="muted">{{ report.notes }}</div>
+              {% endif %}
+            </td>
+            <td>
+              <div class="actions">
+                {% if report.json_view_path %}
+                <a href="{{ json_report_url(report.json_view_path) }}">Preview JSON</a>
+                {% endif %}
+                {% if report.html_view_path %}
+                <a href="{{ report_url(report.html_view_path) }}">Open HTML</a>
+                {% endif %}
+                {% if not report.json_view_path and not report.html_view_path %}
+                <span class="badge unknown">Not generated yet</span>
+                {% endif %}
+              </div>
+            </td>
           </tr>
           {% endfor %}
         </tbody>

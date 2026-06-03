@@ -3,7 +3,7 @@ import re
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional
+from typing import Any, Dict, Iterable, List, Optional, Sequence
 
 try:
     from flask import Flask, abort, redirect, render_template, send_from_directory, url_for
@@ -22,6 +22,7 @@ from dashboard_command_runner import (
     list_execution_logs,
     load_execution_log,
 )
+from network_lab import discover_report_visibility, infer_report_result, mask_secret_values
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent
@@ -52,6 +53,22 @@ class ReportEntry:
     relative_path: str
     html_relative_path: Optional[str]
     modified_at: str
+
+
+@dataclass
+class DashboardEvidenceEntry:
+    title: str
+    day: str
+    device: str
+    report_type: str
+    status: str
+    availability: str
+    json_path: str
+    html_path: str
+    description: str
+    notes: str
+    json_view_path: Optional[str]
+    html_view_path: Optional[str]
 
 
 DAY12_REPORT_JSON = "day12_wireguard_vpn_automation_report.json"
@@ -128,6 +145,171 @@ def parse_report_status(json_path: Path) -> str:
         if status != "UNKNOWN":
             return status
     return "UNKNOWN"
+
+
+def normalize_dashboard_status(value: Any) -> str:
+    status = normalize_status(value)
+    if status == "WARNING":
+        return "WARN"
+    return status
+
+
+def _project_root_for_reports_dir(reports_dir: Path) -> Path:
+    reports_dir = Path(reports_dir).resolve()
+    if reports_dir.name.lower() == "reports":
+        return reports_dir.parent
+    return PROJECT_ROOT
+
+
+def safe_evidence_dirs(project_root: Path, reports_dir: Path) -> List[Path]:
+    root = Path(project_root).resolve()
+    configured_reports = Path(reports_dir).resolve()
+    candidates = [configured_reports, root / "reports", root / "summary"]
+    safe_dirs: List[Path] = []
+    seen = set()
+    for candidate in candidates:
+        resolved = candidate.resolve()
+        if resolved in seen:
+            continue
+        seen.add(resolved)
+        safe_dirs.append(resolved)
+    return safe_dirs
+
+
+def _safe_relative_to_any(path: Path, safe_dirs: Sequence[Path]) -> Optional[Path]:
+    resolved = Path(path).resolve()
+    for safe_dir in safe_dirs:
+        try:
+            resolved.relative_to(Path(safe_dir).resolve())
+            return resolved
+        except ValueError:
+            continue
+    return None
+
+
+def _safe_project_relative_path(
+    project_root: Path,
+    relative_path: str,
+    safe_dirs: Sequence[Path],
+) -> Optional[str]:
+    if not relative_path or relative_path == "MISSING":
+        return None
+    requested = (Path(project_root).resolve() / relative_path).resolve()
+    if not _safe_relative_to_any(requested, safe_dirs):
+        return None
+    try:
+        return requested.relative_to(Path(project_root).resolve()).as_posix()
+    except ValueError:
+        return None
+
+
+def safe_report_path(
+    project_root: Path,
+    report_path: str,
+    safe_dirs: Sequence[Path],
+    allowed_suffixes: Sequence[str],
+) -> Optional[Path]:
+    if not report_path:
+        return None
+    candidate_bases = [Path(project_root).resolve(), *[Path(item).resolve() for item in safe_dirs]]
+    seen = set()
+    for base in candidate_bases:
+        requested = (base / report_path).resolve()
+        if requested in seen:
+            continue
+        seen.add(requested)
+        if requested.suffix.lower() not in allowed_suffixes:
+            continue
+        if not _safe_relative_to_any(requested, safe_dirs):
+            continue
+        if requested.is_file():
+            return requested
+    return None
+
+
+def sanitize_json_preview(value: Any) -> Any:
+    masked = mask_secret_values(value)
+    if contains_unredacted_private_key(masked):
+        return _redact_private_key_strings(masked)
+    return masked
+
+
+def _redact_private_key_strings(value: Any) -> Any:
+    if isinstance(value, str):
+        if contains_unredacted_private_key(value):
+            return "PrivateKey: REDACTED"
+        return value
+    if isinstance(value, dict):
+        return {key: _redact_private_key_strings(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [_redact_private_key_strings(item) for item in value]
+    return value
+
+
+def load_json_preview(json_path: Path) -> Dict[str, Any]:
+    try:
+        data = json.loads(Path(json_path).read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        return {
+            "status": "MALFORMED",
+            "summary": {"error": f"Invalid JSON: {exc.msg}"},
+            "pretty": "",
+        }
+    except OSError as exc:
+        return {
+            "status": "UNKNOWN",
+            "summary": {"error": f"Could not read JSON report: {exc}"},
+            "pretty": "",
+        }
+
+    safe_data = sanitize_json_preview(data)
+    summary = safe_data if isinstance(safe_data, dict) else {"value": safe_data}
+    if isinstance(summary, dict) and len(summary) > 12:
+        summary = dict(list(summary.items())[:12])
+        summary["_preview_note"] = "Showing first 12 top-level fields."
+    return {
+        "status": normalize_dashboard_status(infer_report_result(data)),
+        "summary": summary,
+        "pretty": json.dumps(safe_data, indent=2, sort_keys=True),
+    }
+
+
+def collect_dashboard_evidence(
+    project_root: Path,
+    reports_dir: Optional[Path] = None,
+) -> List[DashboardEvidenceEntry]:
+    root = Path(project_root).resolve()
+    reports_root = Path(reports_dir).resolve() if reports_dir else root / "reports"
+    safe_dirs = safe_evidence_dirs(root, reports_root)
+    entries: List[DashboardEvidenceEntry] = []
+
+    for row in discover_report_visibility(root):
+        json_path = _safe_project_relative_path(root, str(row.get("json", "")), safe_dirs)
+        html_path = _safe_project_relative_path(root, str(row.get("html", "")), safe_dirs)
+        json_file = safe_report_path(root, json_path or "", safe_dirs, (".json",))
+        status = "UNKNOWN"
+        if json_file:
+            status = load_json_preview(json_file)["status"]
+        elif str(row.get("status", "")).upper() == "MISSING":
+            status = "MISSING"
+
+        entries.append(
+            DashboardEvidenceEntry(
+                title=str(row.get("title", "Untitled report")),
+                day=str(row.get("day", "Unknown")),
+                device=str(row.get("device", "Unknown scope")),
+                report_type=str(row.get("report_type", "Report evidence")),
+                status=status,
+                availability=str(row.get("status", "UNKNOWN")),
+                json_path=json_path or str(row.get("json", "")),
+                html_path=html_path or str(row.get("html", "")),
+                description=str(row.get("description", "")),
+                notes=str(row.get("notes", "")),
+                json_view_path=json_path,
+                html_view_path=html_path,
+            )
+        )
+    return entries
 
 
 def classify_report_type(filename_or_path: Any) -> str:
@@ -465,6 +647,11 @@ def create_app(
 
     app = Flask(__name__)
     app.config["REPORTS_DIR"] = Path(reports_dir) if reports_dir else DEFAULT_REPORTS_DIR
+    app.config["PROJECT_ROOT"] = _project_root_for_reports_dir(app.config["REPORTS_DIR"])
+    app.config["SAFE_EVIDENCE_DIRS"] = safe_evidence_dirs(
+        app.config["PROJECT_ROOT"],
+        app.config["REPORTS_DIR"],
+    )
     app.config["EXECUTION_LOGS_DIR"] = (
         Path(execution_logs_dir)
         if execution_logs_dir
@@ -487,17 +674,19 @@ def create_app(
 
     @app.route("/reports")
     def reports():
-        entries = discover_reports(app.config["REPORTS_DIR"])
-        grouped: Dict[str, List[ReportEntry]] = {}
-        for entry in entries:
-            if entry.report_type == "WireGuard VPN automation":
-                continue
-            grouped.setdefault(entry.device, []).append(entry)
+        evidence_entries = collect_dashboard_evidence(
+            app.config["PROJECT_ROOT"],
+            app.config["REPORTS_DIR"],
+        )
+        grouped: Dict[str, List[DashboardEvidenceEntry]] = {}
+        for entry in evidence_entries:
+            grouped.setdefault(entry.day, []).append(entry)
         return render_template(
             "dashboard_reports.html",
-            grouped_reports=grouped,
+            grouped_evidence=grouped,
             day12_summaries=build_day12_dashboard_summaries(app.config["REPORTS_DIR"]),
             reports_exist=app.config["REPORTS_DIR"].exists(),
+            has_evidence=bool(evidence_entries),
         )
 
     @app.route("/commands")
@@ -547,16 +736,36 @@ def create_app(
 
     @app.route("/reports/open/<path:report_path>")
     def open_report(report_path: str):
-        reports_root = app.config["REPORTS_DIR"].resolve()
-        requested = (reports_root / report_path).resolve()
+        requested = safe_report_path(
+            app.config["PROJECT_ROOT"],
+            report_path,
+            app.config["SAFE_EVIDENCE_DIRS"],
+            (".html",),
+        )
+        if requested is None:
+            abort(404)
+        return send_from_directory(str(requested.parent), requested.name)
+
+    @app.route("/reports/json/<path:report_path>")
+    def preview_json_report(report_path: str):
+        requested = safe_report_path(
+            app.config["PROJECT_ROOT"],
+            report_path,
+            app.config["SAFE_EVIDENCE_DIRS"],
+            (".json",),
+        )
+        if requested is None:
+            abort(404)
         try:
-            requested.relative_to(reports_root)
+            display_path = requested.relative_to(app.config["PROJECT_ROOT"].resolve()).as_posix()
         except ValueError:
-            abort(404)
-        if requested.suffix.lower() != ".html" or not requested.is_file():
-            abort(404)
-        safe_relative_path = requested.relative_to(reports_root).as_posix()
-        return send_from_directory(str(reports_root), safe_relative_path)
+            display_path = requested.name
+        preview = load_json_preview(requested)
+        return render_template(
+            "dashboard_json_preview.html",
+            report_path=display_path,
+            preview=preview,
+        )
 
     @app.route("/reports/wireguard-vpn/<path:device_name>")
     def open_wireguard_vpn_report(device_name: str):
@@ -572,14 +781,21 @@ def create_app(
 
     @app.template_filter("status_class")
     def status_class(value: str) -> str:
-        normalized = str(value).lower()
+        normalized = str(value).lower().replace(" ", "-")
+        aliases = {"warn": "warning", "missing": "unknown", "found": "pass"}
+        normalized = aliases.get(normalized, normalized)
+        if "disabled" in normalized:
+            return "unknown"
         if normalized in {"pass", "fail", "warning", "malformed", "timeout", "error"}:
             return normalized
         return "unknown"
 
     @app.context_processor
     def inject_helpers():
-        return {"report_url": lambda path: url_for("open_report", report_path=path)}
+        return {
+            "report_url": lambda path: url_for("open_report", report_path=path),
+            "json_report_url": lambda path: url_for("preview_json_report", report_path=path),
+        }
 
     return app
 
