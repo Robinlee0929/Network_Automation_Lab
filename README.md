@@ -6,7 +6,7 @@ Network Automation Lab is a Python-based lab automation project for validating n
 
 A Python-based network automation and validation lab for MikroTik RouterOS, Cisco switch topology checks, iperf3 performance testing, regression checks, and local report visualization.
 
-The current v0.1 portfolio package covers Day 1 through Day 29 release tag preparation:
+The current v0.1 portfolio package covers Day 1 through Day 30 post-tag verification:
 
 - MikroTik baseline and post-reset validation
 - MikroTik Day 2 setup workflow after reset
@@ -33,6 +33,7 @@ The current v0.1 portfolio package covers Day 1 through Day 29 release tag prepa
 - Day 26 v0.1 release packaging and portfolio polish
 - Day 28 portfolio evidence final review
 - Day 29 v0.1 release tag preparation
+- Day 30 v0.1 post-tag verification
 
 The project is designed as a practical QA Automation / SDET portfolio project for network infrastructure. It focuses on repeatable validation, structured test evidence, and readable JSON / HTML reports rather than one-off manual checks.
 
@@ -100,6 +101,7 @@ Cisco validation is read-only. It runs show commands for topology evidence and d
 | Day 26 | v0.1 release packaging and portfolio polish | Complete |
 | Day 28 | Portfolio evidence final review | Complete |
 | Day 29 | v0.1 release tag preparation | Complete |
+| Day 30 | v0.1 post-tag verification | Complete |
 
 ## Lab Topology
 
@@ -1100,6 +1102,30 @@ python -m pytest --basetemp=.pytest-tmp-day29-tag
 
 Day29 does not create the Git tag by itself. Create `v0.1` only after the Day29 documentation commit is complete and validation passes.
 
+## Day30 v0.1 Post-tag Verification
+
+Day30 records the observed local `v0.1` tag state after the Day29 release preparation handoff. It confirms the tag exists and points at the Day29 release preparation merge commit without creating, moving, deleting, or pushing tags.
+
+Evidence document:
+
+```text
+docs/portfolio_evidence/day30_v0.1_post_tag_verification.md
+```
+
+Recorded verification command:
+
+```powershell
+git show --no-patch --format=fuller v0.1
+```
+
+Observed tag target:
+
+```text
+bc3dd01d27aab2ef34506d407a6d9a27da9b03f2
+```
+
+Day30 is documentation-only. It does not create generated reports, add runner or dashboard behavior, execute live workflows, read secrets, or change the `v0.1` tag.
+
 ## Portfolio Demo
 
 v0.1 includes reviewer/interview demo scripts for presenting the current platform safely without adding features, changing runner/dashboard behavior, or running live device-changing workflows:
@@ -1241,6 +1267,12 @@ Day 29 v0.1 release tag preparation:
 docs/portfolio_evidence/day29_v0.1_release_tag_preparation.md
 ```
 
+Day 30 v0.1 post-tag verification:
+
+```text
+docs/portfolio_evidence/day30_v0.1_post_tag_verification.md
+```
+
 ## Testing Strategy
 
 The project separates live-device validation from unit tests.
@@ -1273,6 +1305,7 @@ For documentation-only review passes, run `python -m pytest` before sharing the 
 - Includes a Day24 RC demo flow that gives reviewers a safe, repeatable walkthrough path.
 - Includes v0.1 release notes and a portfolio checklist for documentation-only release review.
 - Includes Day29 release tag preparation notes for final validation and tag handoff.
+- Includes Day30 post-tag verification notes for local v0.1 tag traceability.
 
 ## Roadmap
 
@@ -1284,4 +1317,4 @@ Planned future directions:
 - Syslog / packet capture analysis
 - AI report summary / RAG integration
 
-v0.1 is packaged through Day29 as a portfolio release ready for tagging after validation. Future work should stay explicit about whether it is report-only, read-only, dry-run, guarded-live, or disabled before adding new live lab behavior.
+v0.1 is packaged through Day29 and locally verified through Day30 as a portfolio release. Future work should stay explicit about whether it is report-only, read-only, dry-run, guarded-live, or disabled before adding new live lab behavior.
