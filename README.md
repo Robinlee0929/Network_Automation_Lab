@@ -34,6 +34,7 @@ The current v0.1 portfolio package covers Day 1 through Day 30 post-tag verifica
 - Day 28 portfolio evidence final review
 - Day 29 v0.1 release tag preparation
 - Day 30 v0.1 post-tag verification
+- Day 31 HA / VRRP topology and safety planning
 
 The project is designed as a practical QA Automation / SDET portfolio project for network infrastructure. It focuses on repeatable validation, structured test evidence, and readable JSON / HTML reports rather than one-off manual checks.
 
@@ -102,6 +103,7 @@ Cisco validation is read-only. It runs show commands for topology evidence and d
 | Day 28 | Portfolio evidence final review | Complete |
 | Day 29 | v0.1 release tag preparation | Complete |
 | Day 30 | v0.1 post-tag verification | Complete |
+| Day 31 | HA / VRRP topology and safety planning | Complete |
 
 ## Lab Topology
 
@@ -1126,6 +1128,17 @@ bc3dd01d27aab2ef34506d407a6d9a27da9b03f2
 
 Day30 is documentation-only. It does not create generated reports, add runner or dashboard behavior, execute live workflows, read secrets, or change the `v0.1` tag.
 
+## Day31 HA / VRRP Topology and Safety Planning
+
+Day31 creates the v0.2 HA / VRRP planning foundation without adding VRRP automation, runner behavior, dashboard behavior, live configuration changes, generated reports, or secrets.
+
+Review the planning docs:
+
+```text
+docs/roadmap/ha_vrrp_topology_plan.md
+docs/roadmap/ha_vrrp_safety_model.md
+```
+
 ## Portfolio Demo
 
 v0.1 includes reviewer/interview demo scripts for presenting the current platform safely without adding features, changing runner/dashboard behavior, or running live device-changing workflows:
@@ -1273,6 +1286,13 @@ Day 30 v0.1 post-tag verification:
 docs/portfolio_evidence/day30_v0.1_post_tag_verification.md
 ```
 
+Day31 HA / VRRP planning:
+
+```text
+docs/roadmap/ha_vrrp_topology_plan.md
+docs/roadmap/ha_vrrp_safety_model.md
+```
+
 ## Testing Strategy
 
 The project separates live-device validation from unit tests.
@@ -1306,6 +1326,7 @@ For documentation-only review passes, run `python -m pytest` before sharing the 
 - Includes v0.1 release notes and a portfolio checklist for documentation-only release review.
 - Includes Day29 release tag preparation notes for final validation and tag handoff.
 - Includes Day30 post-tag verification notes for local v0.1 tag traceability.
+- Includes Day31 HA / VRRP planning docs for the v0.2 read-only precheck foundation.
 
 ## Roadmap
 

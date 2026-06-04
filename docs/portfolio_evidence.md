@@ -2,7 +2,7 @@
 
 This repository is a network automation lab portfolio. It demonstrates repeatable validation for MikroTik routers, Cisco topology checks, iperf3 performance testing, WireGuard VPN validation, and a unified runner that indexes local evidence.
 
-Day30 post-tag verification status: v0.1 evidence is a documentation-aligned portfolio package with a locally observed `v0.1` tag pointing at the Day29 release preparation merge commit. Day30 does not add runner behavior, dashboard behavior, live VPN execution, HA, VRRP, failover, generated reports, tag changes, or new device-control logic.
+Day31 HA / VRRP planning status: v0.2 planning has started with documentation-only topology and safety-model notes. Day31 does not add runner behavior, dashboard behavior, live VPN execution, VRRP automation, failover, generated reports, tag changes, or new device-control logic.
 
 ## What To Review
 
@@ -26,6 +26,7 @@ Generated `reports/` output is intentionally ignored by git. Reviewers can regen
 - Day28 portfolio evidence final review is documentation-only. It aligns README, demo scripts, evidence navigation, and release notes without changing safe-runner behavior.
 - Day29 release tag preparation is documentation-only. It records final validation and tag handoff notes without creating a tag, generated reports, runner tasks, live workflows, or secret reads.
 - Day30 post-tag verification is documentation-only. It records the observed local `v0.1` tag target without creating, moving, deleting, or pushing tags.
+- Day31 HA / VRRP planning is documentation-only. It records the target topology and safety model without adding VRRP automation, runner behavior, dashboard behavior, live config changes, failover triggers, generated reports, or secrets.
 
 ## Evidence Locations
 
@@ -39,6 +40,8 @@ Generated `reports/` output is intentionally ignored by git. Reviewers can regen
 - v0.1 portfolio checklist: `docs/portfolio_evidence/v0.1_portfolio_checklist.md`
 - Day29 tag preparation: `docs/portfolio_evidence/day29_v0.1_release_tag_preparation.md`
 - Day30 post-tag verification: `docs/portfolio_evidence/day30_v0.1_post_tag_verification.md`
+- Day31 HA / VRRP topology plan: `docs/roadmap/ha_vrrp_topology_plan.md`
+- Day31 HA / VRRP safety model: `docs/roadmap/ha_vrrp_safety_model.md`
 
 The report index marks missing files as unavailable instead of failing. It also includes report type, availability, safety label, description, and links to JSON/HTML evidence when present.
 
@@ -64,6 +67,7 @@ Day25 RC readiness checklist:
 - Day28 final review remains documentation-only.
 - Day29 release tag preparation remains documentation-only.
 - Day30 post-tag verification remains documentation-only.
+- Day31 HA / VRRP planning remains documentation-only.
 - No destructive live behavior was introduced.
 - Full pytest suite passes.
 
