@@ -175,13 +175,16 @@
       "category": "ha_vrrp",
       "safety_level": "read_only_with_report",
       "device_scope": [
-        "mikrotik",
-        "cisco-switch"
+        "mikrotik"
       ],
       "profile_path": "topology_profiles/day32_vrrp_readonly_precheck.json",
-      "report_paths": [],
-      "allow_live_execution": false,
-      "notes": "Profile foundation only. VRRP live configuration is not allowed, and Day-32-pre does not add a runner script, read config.json, execute SSH, or run RouterOS commands."
+      "report_paths": [
+        "reports/lab-summary/day32_vrrp_readonly_precheck.json",
+        "reports/lab-summary/day32_vrrp_readonly_precheck.html",
+        "reports/lab-summary/day32_vrrp_readonly_precheck.txt"
+      ],
+      "allow_live_execution": true,
+      "notes": "Read-only live SSH precheck. The runner sends only print or /export terse commands and blocks add/set/remove/disable/enable/reboot/reset-configuration before any MikroTik command is sent."
     }
   ]
 }

@@ -35,7 +35,7 @@ The v0.1 portfolio package covers Day 1 through Day 30 post-tag verification. Th
 - Day 29 v0.1 release tag preparation
 - Day 30 v0.1 post-tag verification
 - Day 31 HA / VRRP topology and safety planning
-- Day 32 HA / VRRP profile/catalog foundation
+- Day 32 VRRP Read-only Precheck Runner
 
 The project is designed as a practical QA Automation / SDET portfolio project for network infrastructure. It focuses on repeatable validation, structured test evidence, and readable JSON / HTML reports rather than one-off manual checks.
 
@@ -105,7 +105,7 @@ Cisco validation is read-only. It runs show commands for topology evidence and d
 | Day 29 | v0.1 release tag preparation | Complete |
 | Day 30 | v0.1 post-tag verification | Complete |
 | Day 31 | HA / VRRP topology and safety planning | Complete |
-| Day 32 | HA / VRRP profile/catalog foundation | Pre |
+| Day 32 | VRRP Read-only Precheck Runner | Complete |
 
 ## Lab Topology
 
@@ -1141,26 +1141,34 @@ docs/roadmap/ha_vrrp_topology_plan.md
 docs/roadmap/ha_vrrp_safety_model.md
 ```
 
-## Day32 HA / VRRP Profile/Catalog Foundation
+## Day32 - VRRP Read-only Precheck Runner
 
-Day32-pre adds the minimum metadata foundation for a future HA / VRRP read-only precheck. It does not implement a runner, modify existing Python runner behavior, read `config.json`, connect to devices, run SSH, execute RouterOS commands, or generate reports.
+Purpose: collect current HA/VRRP-related state without changing devices.
 
-Committed foundation files:
+Safety: read-only only; blocks `add`, `set`, `remove`, `disable`, `enable`, `reboot`, and `reset-configuration` before any MikroTik command is sent.
+
+Run the Day32 runner:
+
+```powershell
+python mikrotik_day32_vrrp_readonly_precheck.py
+python network_lab.py --task day32-vrrp-precheck
+```
+
+Reports:
 
 ```text
-config/README.md
-runner_profiles/task_catalog.json
-runner_profiles/safety_levels.json
-topology_profiles/day32_vrrp_readonly_precheck.json
+reports/lab-summary/day32_vrrp_readonly_precheck.json
+reports/lab-summary/day32_vrrp_readonly_precheck.html
+reports/lab-summary/day32_vrrp_readonly_precheck.txt
 ```
 
 Safety behavior:
 
 - Day31 is classified as `documentation_only`.
-- Day32 is classified as `read_only_with_report` in metadata only.
-- The Day32 profile defines future read-only evidence expectations and blocked actions.
-- Blocked actions include adding VRRP interfaces, changing VRRP priority, changing IP addresses, removing firewall rules, disabling interfaces, rebooting devices, and resetting configuration.
-- No Day32 live/read-only device execution script is added in Day32-pre.
+- Day32 is classified as `read_only_with_report`.
+- The Day32 runner sends only read-only MikroTik commands such as `/system identity print`, `/interface vrrp print detail`, `/ip address print detail`, `/ip route print detail`, bridge print commands, and `/export terse`.
+- The runner does not deploy VRRP, change interfaces, change IP addresses, edit routes, edit firewall rules, disable services, reboot, or reset devices.
+- If VRRP is not configured, the report records `VRRP not configured or command returned no entries` and keeps the run as readiness evidence rather than a deployment failure.
 
 ## Portfolio Demo
 
@@ -1316,13 +1324,12 @@ docs/roadmap/ha_vrrp_topology_plan.md
 docs/roadmap/ha_vrrp_safety_model.md
 ```
 
-Day32 HA / VRRP profile/catalog foundation:
+Day32 VRRP read-only precheck:
 
 ```text
-config/README.md
-runner_profiles/task_catalog.json
-runner_profiles/safety_levels.json
-topology_profiles/day32_vrrp_readonly_precheck.json
+reports/lab-summary/day32_vrrp_readonly_precheck.json
+reports/lab-summary/day32_vrrp_readonly_precheck.html
+reports/lab-summary/day32_vrrp_readonly_precheck.txt
 ```
 
 ## Testing Strategy
@@ -1359,7 +1366,7 @@ For documentation-only review passes, run `python -m pytest` before sharing the 
 - Includes Day29 release tag preparation notes for final validation and tag handoff.
 - Includes Day30 post-tag verification notes for local v0.1 tag traceability.
 - Includes Day31 HA / VRRP planning docs for the v0.2 read-only precheck foundation.
-- Includes Day32 HA / VRRP profile/catalog metadata for the future read-only precheck foundation.
+- Includes Day32 VRRP read-only precheck evidence generation with a command safety guard.
 
 ## Roadmap
 

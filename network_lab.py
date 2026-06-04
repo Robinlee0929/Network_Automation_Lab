@@ -19,6 +19,11 @@ DAY8_PERFORMANCE_PROFILE = Path("topology_profiles") / "day8_iperf3_router_perfo
 DAY12_WIREGUARD_SCRIPT = "mikrotik_day12_wireguard_vpn_automation.py"
 DAY12_WIREGUARD_CONFIG = "Set_WireguardVPN_config.json"
 DAY12_WIREGUARD_TIMEOUT_SECONDS = 900
+DAY32_VRRP_PRECHECK_SCRIPT = "mikrotik_day32_vrrp_readonly_precheck.py"
+DAY32_VRRP_PRECHECK_TASK_ID = "day32-vrrp-precheck"
+DAY32_VRRP_PRECHECK_JSON = Path("reports") / "lab-summary" / "day32_vrrp_readonly_precheck.json"
+DAY32_VRRP_PRECHECK_HTML = Path("reports") / "lab-summary" / "day32_vrrp_readonly_precheck.html"
+DAY32_VRRP_PRECHECK_TXT = Path("reports") / "lab-summary" / "day32_vrrp_readonly_precheck.txt"
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
 WIREGUARD_RUNNER_DISPLAY_NAME = "WireGuard Runner Safety Layer"
@@ -182,6 +187,16 @@ REPORT_CATALOG = [
         "json_globs": [DAY24_DEMO_FLOW_JSON.as_posix()],
         "html_globs": [DAY24_DEMO_FLOW_HTML.as_posix()],
         "missing_note": f"Generate with: python network_lab.py --task demo-flow",
+    },
+    {
+        "day": "Day32",
+        "title": "VRRP Read-only Precheck Runner",
+        "report_type": "HA / VRRP read-only precheck report",
+        "safety_label": "read-only evidence",
+        "description": "MikroTik HA/VRRP readiness evidence gathered with read-only print/export terse commands only.",
+        "json_globs": [DAY32_VRRP_PRECHECK_JSON.as_posix()],
+        "html_globs": [DAY32_VRRP_PRECHECK_HTML.as_posix()],
+        "missing_note": f"Generate with: python network_lab.py --task {DAY32_VRRP_PRECHECK_TASK_ID}",
     },
 ]
 
@@ -686,6 +701,34 @@ def list_tasks() -> List[Dict[str, Any]]:
             "notes": "Guarded-live performance task. Generates iperf3 traffic only after confirmation and does not modify router configuration.",
         },
         {
+            "id": DAY32_VRRP_PRECHECK_TASK_ID,
+            "task_id": "day32_vrrp_readonly_precheck",
+            "display_name": "Day32 VRRP Read-only Precheck",
+            "user_display_name": "VRRP Read-only Precheck",
+            "day": "Day32",
+            "category": "ha_vrrp",
+            "description": "Collect HA/VRRP readiness state from MikroTik routers using read-only RouterOS commands only.",
+            "safety_level": "read-only",
+            "execution_mode": "read-only",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": True,
+            "requires_password": True,
+            "produces_report": True,
+            "report_paths": [
+                DAY32_VRRP_PRECHECK_JSON.as_posix(),
+                DAY32_VRRP_PRECHECK_HTML.as_posix(),
+                DAY32_VRRP_PRECHECK_TXT.as_posix(),
+            ],
+            "report_outputs": [
+                "Day32 VRRP read-only precheck JSON",
+                "Day32 VRRP read-only precheck HTML",
+                "Day32 VRRP read-only precheck TXT",
+            ],
+            "related_script": DAY32_VRRP_PRECHECK_SCRIPT,
+            "notes": "Live SSH read-only precheck. The Day32 script blocks add, set, remove, disable, enable, reboot, and reset-configuration before any MikroTik command is sent.",
+        },
+        {
             "id": WIREGUARD_RUNNER_TASK_ALIAS,
             "task_id": WIREGUARD_RUNNER_TASK_ID,
             "display_name": WIREGUARD_RUNNER_DISPLAY_NAME,
@@ -756,6 +799,7 @@ def _build_parser() -> argparse.ArgumentParser:
   python network_lab.py --task day4-baseline
   python network_lab.py --task iperf3-performance --dry-run
   python network_lab.py --task iperf3-performance
+  python network_lab.py --task day32-vrrp-precheck
   python network_lab.py --task wireguard-runner --dry-run
   python network_lab.py --task wireguard-runner --wireguard-config Set_WireguardVPN_lab02_config.json --dry-run
   python network_lab.py --task wireguard-runner
@@ -765,6 +809,7 @@ def _build_parser() -> argparse.ArgumentParser:
 report-index and portfolio-finalize read existing report metadata and do not connect to devices.
 day4-baseline delegates to the existing live SSH validation script.
 iperf3-performance delegates to the existing live iperf3 performance script.
+day32-vrrp-precheck runs read-only MikroTik print/export terse commands with a blocking safety guard.
 wireguard-runner is dry-run by default and delegates to the existing WireGuard script only after explicit --allow-live-wireguard."""
     parser = argparse.ArgumentParser(
         description=f"Day14 {DAY14_NAME}.",
@@ -787,6 +832,7 @@ wireguard-runner is dry-run by default and delegates to the existing WireGuard s
             "demo-flow",
             "day4-baseline",
             "iperf3-performance",
+            DAY32_VRRP_PRECHECK_TASK_ID,
             WIREGUARD_RUNNER_TASK_ALIAS,
         ],
         help="Task to run.",
@@ -2033,6 +2079,36 @@ def _run_day8_performance(project_root: Path, dry_run: bool = False) -> int:
     return result.returncode
 
 
+def _run_day32_vrrp_precheck(project_root: Path, dry_run: bool = False) -> int:
+    command = [sys.executable, DAY32_VRRP_PRECHECK_SCRIPT]
+    display_command = _format_display_command(command)
+    if dry_run:
+        print(format_heading("Day32 VRRP Read-only Precheck"))
+        print(f"Mode: {color_text('Dry run', 'yellow', bold=True)}")
+        print(f"Command that would be executed: {color_text(display_command, 'cyan', bold=True)}")
+        print()
+        print(format_heading("Safety notes"))
+        print("  This is a live SSH read-only precheck workflow.")
+        print("  The Day32 script validates every MikroTik command before sending it.")
+        print("  Allowed operations are print, /export terse, and local report generation.")
+        print("  Blocked keywords are add, set, remove, disable, enable, reboot, and reset-configuration.")
+        print("  Dry-run does not connect to devices and does not write reports.")
+        print()
+        print(f"{format_status('PASS')} No live workflow was executed.")
+        return 0
+
+    print(format_heading("Day32 VRRP Read-only Precheck"))
+    print("Live SSH read-only precheck workflow.")
+    print(f"Executing command: {color_text(display_command, 'cyan', bold=True)}")
+    result = subprocess.run(command, cwd=project_root)
+    if result.returncode == 0:
+        print(f"{format_status('PASS')} Day32 VRRP read-only precheck completed.")
+        return 0
+
+    print(f"{format_status('FAIL')} Day32 VRRP read-only precheck failed with exit code {result.returncode}.")
+    return result.returncode
+
+
 def _confirm_and_run_day8_performance(project_root: Path, input_func: Any) -> int:
     try:
         command = _build_day8_performance_command(project_root)
@@ -2721,6 +2797,8 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
         return _run_day4_baseline(root, dry_run=args.dry_run)
     if args.task == "iperf3-performance":
         return _run_day8_performance(root, dry_run=args.dry_run)
+    if args.task == DAY32_VRRP_PRECHECK_TASK_ID:
+        return _run_day32_vrrp_precheck(root, dry_run=args.dry_run)
     if args.task == WIREGUARD_RUNNER_TASK_ALIAS:
         return _run_wireguard_runner(
             root,
