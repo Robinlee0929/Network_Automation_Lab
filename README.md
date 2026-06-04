@@ -6,7 +6,7 @@ Network Automation Lab is a Python-based lab automation project for validating n
 
 A Python-based network automation and validation lab for MikroTik RouterOS, Cisco switch topology checks, iperf3 performance testing, regression checks, and local report visualization.
 
-The current v0.1 portfolio package covers Day 1 through Day 28 documentation review:
+The current v0.1 portfolio package covers Day 1 through Day 29 release tag preparation:
 
 - MikroTik baseline and post-reset validation
 - MikroTik Day 2 setup workflow after reset
@@ -32,6 +32,7 @@ The current v0.1 portfolio package covers Day 1 through Day 28 documentation rev
 - Day 25 v0.1 RC validation evidence
 - Day 26 v0.1 release packaging and portfolio polish
 - Day 28 portfolio evidence final review
+- Day 29 v0.1 release tag preparation
 
 The project is designed as a practical QA Automation / SDET portfolio project for network infrastructure. It focuses on repeatable validation, structured test evidence, and readable JSON / HTML reports rather than one-off manual checks.
 
@@ -98,6 +99,7 @@ Cisco validation is read-only. It runs show commands for topology evidence and d
 | Day 25 | v0.1 RC validation evidence | Complete |
 | Day 26 | v0.1 release packaging and portfolio polish | Complete |
 | Day 28 | Portfolio evidence final review | Complete |
+| Day 29 | v0.1 release tag preparation | Complete |
 
 ## Lab Topology
 
@@ -1080,6 +1082,24 @@ Review focus:
 - Keep real configs, credentials, passwords, private keys, WireGuard `.conf` files, and environment-specific files out of committed evidence.
 - Preserve the existing safe-runner behavior and avoid adding live VPN, HA, VRRP, failover, or new device-control logic.
 
+## Day29 v0.1 Release Tag Preparation
+
+Day29 prepares the v0.1 repository state for release tagging. It records the final tag checklist, validation command, safety posture, and release-tag handoff notes without creating generated reports or changing runner/dashboard behavior.
+
+Evidence document:
+
+```text
+docs/portfolio_evidence/day29_v0.1_release_tag_preparation.md
+```
+
+Recommended final validation before creating the tag:
+
+```powershell
+python -m pytest --basetemp=.pytest-tmp-day29-tag
+```
+
+Day29 does not create the Git tag by itself. Create `v0.1` only after the Day29 documentation commit is complete and validation passes.
+
 ## Portfolio Demo
 
 v0.1 includes reviewer/interview demo scripts for presenting the current platform safely without adding features, changing runner/dashboard behavior, or running live device-changing workflows:
@@ -1215,6 +1235,12 @@ docs/portfolio_evidence/v0.1_release_notes.md
 docs/portfolio_evidence/v0.1_portfolio_checklist.md
 ```
 
+Day 29 v0.1 release tag preparation:
+
+```text
+docs/portfolio_evidence/day29_v0.1_release_tag_preparation.md
+```
+
 ## Testing Strategy
 
 The project separates live-device validation from unit tests.
@@ -1246,6 +1272,7 @@ For documentation-only review passes, run `python -m pytest` before sharing the 
 - Includes a final runner evidence index that ties task safety, report visibility, and portfolio readiness together.
 - Includes a Day24 RC demo flow that gives reviewers a safe, repeatable walkthrough path.
 - Includes v0.1 release notes and a portfolio checklist for documentation-only release review.
+- Includes Day29 release tag preparation notes for final validation and tag handoff.
 
 ## Roadmap
 
@@ -1257,4 +1284,4 @@ Planned future directions:
 - Syslog / packet capture analysis
 - AI report summary / RAG integration
 
-v0.1 is packaged through Day28 as a portfolio release. Future work should stay explicit about whether it is report-only, read-only, dry-run, guarded-live, or disabled before adding new live lab behavior.
+v0.1 is packaged through Day29 as a portfolio release ready for tagging after validation. Future work should stay explicit about whether it is report-only, read-only, dry-run, guarded-live, or disabled before adding new live lab behavior.
