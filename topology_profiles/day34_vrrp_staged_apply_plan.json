@@ -1,0 +1,57 @@
+{
+  "profile_id": "day34-vrrp-staged-apply-plan",
+  "title": "Day34 VRRP staged apply plan and safety gate",
+  "mode": "staged_apply_plan",
+  "safety_level": "blocked_guarded_live_plan",
+  "shared_lan_subnet": "192.168.88.0/24",
+  "virtual_gateway_ip": "192.168.88.1/32",
+  "parent_interface": "bridge",
+  "vrrp_interface_name": "vrrp-lan",
+  "vrid": 88,
+  "primary_priority": 150,
+  "backup_priority": 100,
+  "required_evidence": [
+    "reports/lab-summary/day32_vrrp_readonly_precheck.json",
+    "reports/lab-summary/day33_vrrp_topology_dry_run.json"
+  ],
+  "devices": [
+    {
+      "name": "Hex-s-2025-lab01",
+      "role": "primary",
+      "lan_bridge_ip": "192.168.88.2/24"
+    },
+    {
+      "name": "Hex-s-2025-lab02",
+      "role": "backup",
+      "lan_bridge_ip": "192.168.88.3/24"
+    },
+    {
+      "name": "cisco-switch",
+      "role": "lan_switch"
+    }
+  ],
+  "stage_order": [
+    "stage_0_evidence_gate",
+    "stage_1_backup_router_preview",
+    "stage_2_primary_router_preview",
+    "stage_3_post_apply_validation_preview"
+  ],
+  "blocked_actions": [
+    "execute_routeros_commands",
+    "connect_ssh",
+    "apply_without_day32_evidence",
+    "apply_without_day33_evidence",
+    "apply_without_manual_confirmation",
+    "apply_without_rollback_plan",
+    "remove_configuration",
+    "disable_interface",
+    "enable_interface",
+    "reboot_device",
+    "reset_configuration"
+  ],
+  "notes": [
+    "Day34 is a staged apply plan and safety gate only. It does not connect to routers and does not execute RouterOS commands.",
+    "The backup router is intentionally staged before the primary router to reduce gateway disruption risk.",
+    "A future guarded live workflow must pass this gate, require explicit operator confirmation, and keep rollback commands visible before execution."
+  ]
+}

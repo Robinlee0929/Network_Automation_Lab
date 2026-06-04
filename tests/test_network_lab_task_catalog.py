@@ -81,3 +81,16 @@ def test_day33_vrrp_dry_run_catalog_entry_is_non_live():
     assert day33["requires_password"] is False
     assert "day33_vrrp_topology_dry_run.json" in day33["report_paths"][0]
     assert "v0.2 VRRP contract" in day33["notes"]
+
+
+def test_day34_vrrp_staged_plan_catalog_entry_is_non_live():
+    day34 = next(task for task in network_lab.list_tasks() if task["id"] == "day34-vrrp-staged-plan")
+
+    assert day34["task_id"] == "day34_vrrp_staged_apply_plan"
+    assert day34["safety_level"] == "dry-run"
+    assert day34["execution_mode"] == "dry-run"
+    assert day34["requires_live_device"] is False
+    assert day34["requires_password"] is False
+    assert "day34_vrrp_staged_apply_plan.json" in day34["report_paths"][0]
+    assert "safety gate" in day34["notes"].lower()
+    assert "never opens SSH" in day34["notes"]

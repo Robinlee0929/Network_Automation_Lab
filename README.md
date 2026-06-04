@@ -36,6 +36,8 @@ The v0.1 portfolio package covers Day 1 through Day 30 post-tag verification. Th
 - Day 30 v0.1 post-tag verification
 - Day 31 HA / VRRP topology and safety planning
 - Day 32 VRRP Read-only Precheck Runner
+- Day 33 VRRP Topology Design + Dry-run Command Preview
+- Day 34 VRRP Staged Apply Plan and Safety Gate
 
 The project is designed as a practical QA Automation / SDET portfolio project for network infrastructure. It focuses on repeatable validation, structured test evidence, and readable JSON / HTML reports rather than one-off manual checks.
 
@@ -106,12 +108,16 @@ Cisco validation is read-only. It runs show commands for topology evidence and d
 | Day 30 | v0.1 post-tag verification | Complete |
 | Day 31 | HA / VRRP topology and safety planning | Complete |
 | Day 32 | VRRP Read-only Precheck Runner | Complete |
+| Day 33 | VRRP Topology Design + Dry-run Command Preview | Complete |
+| Day 34 | VRRP Staged Apply Plan and Safety Gate | Complete |
 
 ## Lab Topology
 
+![MikroTik + Cisco Lab Topology v0.2](docs/assets/mikrotik-cisco-lab-topology-v0.2.png)
+
 ![Lab Topology Day 1-Day 6](docs/assets/lab_topology_day1_day6.png)
 
-This lab uses a Windows Automation PC, a Cisco WS-C2960CG-8TC-L switch, two MikroTik hEX S 2025 routers, and an upstream ISP cable modem or home router. The Automation PC runs the Python validation workflows, connects to devices over SSH, and generates JSON / HTML reports at both device and lab level.
+This lab uses a Windows Automation PC, a Cisco WS-C2960CG-8TC-L switch, two MikroTik hEX S 2025 routers, and an upstream ISP cable modem or home router. The v0.2 topology adds the HA / VRRP lab plan with VRID 88, VIP `192.168.88.1/32`, lab01 as the higher-priority master candidate, and lab02 as the backup candidate. The Automation PC runs the Python validation workflows, connects to devices over SSH only for explicitly read-only or guarded workflows, and generates JSON / HTML reports at both device and lab level.
 
 More details:
 
@@ -1209,6 +1215,43 @@ Safety behavior:
 - The runner blocks destructive preview keywords such as `remove`, `disable`, `enable`, `reboot`, and `reset-configuration`.
 - The runner does not read `config.json`, open SSH, send commands, deploy VRRP, or modify live lab state.
 
+## Day34 - VRRP Staged Apply Plan and Safety Gate
+
+Purpose: convert the Day33 dry-run preview into a staged backup-then-primary apply plan with a safety gate, while still blocking live execution.
+
+Safety: blocked plan-only gate; no SSH, no credentials, no RouterOS command execution, no failover trigger, no reboot, no reset, and no interface state changes.
+
+Run the Day34 staged plan:
+
+```powershell
+python mikrotik_day34_vrrp_staged_apply_plan.py
+python network_lab.py --task day34-vrrp-staged-plan
+```
+
+Profile:
+
+```text
+topology_profiles/day34_vrrp_staged_apply_plan.json
+```
+
+Reports:
+
+```text
+reports/lab-summary/day34_vrrp_staged_apply_plan.json
+reports/lab-summary/day34_vrrp_staged_apply_plan.html
+reports/lab-summary/day34_vrrp_staged_apply_plan.txt
+```
+
+Safety behavior:
+
+- Day34 is classified as `blocked_guarded_live_plan` in the report and `dry-run` in the runner task catalog.
+- The Day34 safety gate checks for Day32 read-only precheck evidence and Day33 dry-run evidence.
+- Missing Day32 or Day33 evidence keeps the overall Day34 result as `BLOCKED`.
+- The staged plan previews backup router VRRP commands before primary router VRRP commands.
+- Rollback commands are rendered as scoped preview text only and are not executed.
+- Manual operator confirmation and live execution remain blocked in the Day34 report.
+- The runner does not read `config.json`, open SSH, send commands, deploy VRRP, or modify live lab state.
+
 ## Portfolio Demo
 
 v0.1 includes reviewer/interview demo scripts for presenting the current platform safely without adding features, changing runner/dashboard behavior, or running live device-changing workflows:
@@ -1379,6 +1422,14 @@ reports/lab-summary/day33_vrrp_topology_dry_run.html
 reports/lab-summary/day33_vrrp_topology_dry_run.txt
 ```
 
+Day34 VRRP staged apply plan:
+
+```text
+reports/lab-summary/day34_vrrp_staged_apply_plan.json
+reports/lab-summary/day34_vrrp_staged_apply_plan.html
+reports/lab-summary/day34_vrrp_staged_apply_plan.txt
+```
+
 ## Testing Strategy
 
 The project separates live-device validation from unit tests.
@@ -1415,6 +1466,7 @@ For documentation-only review passes, run `python -m pytest` before sharing the 
 - Includes Day31 HA / VRRP planning docs for the v0.2 read-only precheck foundation.
 - Includes Day32 VRRP read-only precheck evidence generation with a command safety guard.
 - Includes Day33 VRRP topology design and dry-run command preview evidence without live execution.
+- Includes Day34 VRRP staged apply planning and safety gate evidence without live execution.
 
 ## Roadmap
 
