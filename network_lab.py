@@ -24,6 +24,11 @@ DAY32_VRRP_PRECHECK_TASK_ID = "day32-vrrp-precheck"
 DAY32_VRRP_PRECHECK_JSON = Path("reports") / "lab-summary" / "day32_vrrp_readonly_precheck.json"
 DAY32_VRRP_PRECHECK_HTML = Path("reports") / "lab-summary" / "day32_vrrp_readonly_precheck.html"
 DAY32_VRRP_PRECHECK_TXT = Path("reports") / "lab-summary" / "day32_vrrp_readonly_precheck.txt"
+DAY33_VRRP_DRY_RUN_SCRIPT = "mikrotik_day33_vrrp_topology_dry_run.py"
+DAY33_VRRP_DRY_RUN_TASK_ID = "day33-vrrp-dry-run"
+DAY33_VRRP_DRY_RUN_JSON = Path("reports") / "lab-summary" / "day33_vrrp_topology_dry_run.json"
+DAY33_VRRP_DRY_RUN_HTML = Path("reports") / "lab-summary" / "day33_vrrp_topology_dry_run.html"
+DAY33_VRRP_DRY_RUN_TXT = Path("reports") / "lab-summary" / "day33_vrrp_topology_dry_run.txt"
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
 WIREGUARD_RUNNER_DISPLAY_NAME = "WireGuard Runner Safety Layer"
@@ -197,6 +202,16 @@ REPORT_CATALOG = [
         "json_globs": [DAY32_VRRP_PRECHECK_JSON.as_posix()],
         "html_globs": [DAY32_VRRP_PRECHECK_HTML.as_posix()],
         "missing_note": f"Generate with: python network_lab.py --task {DAY32_VRRP_PRECHECK_TASK_ID}",
+    },
+    {
+        "day": "Day33",
+        "title": "VRRP Topology Design + Dry-run Command Preview",
+        "report_type": "HA / VRRP dry-run topology design report",
+        "safety_label": "dry-run preview",
+        "description": "MikroTik HA/VRRP v0.2 topology design and command preview generated from local dry-run profile data only.",
+        "json_globs": [DAY33_VRRP_DRY_RUN_JSON.as_posix()],
+        "html_globs": [DAY33_VRRP_DRY_RUN_HTML.as_posix()],
+        "missing_note": f"Generate with: python network_lab.py --task {DAY33_VRRP_DRY_RUN_TASK_ID}",
     },
 ]
 
@@ -729,6 +744,34 @@ def list_tasks() -> List[Dict[str, Any]]:
             "notes": "Live SSH read-only precheck. The Day32 script blocks add, set, remove, disable, enable, reboot, and reset-configuration before any MikroTik command is sent.",
         },
         {
+            "id": DAY33_VRRP_DRY_RUN_TASK_ID,
+            "task_id": "day33_vrrp_topology_dry_run",
+            "display_name": "Day33 VRRP Topology Dry-run",
+            "user_display_name": "VRRP Topology Dry-run",
+            "day": "Day33",
+            "category": "ha_vrrp",
+            "description": "Render HA/VRRP v0.2 topology design and RouterOS command previews without connecting to devices.",
+            "safety_level": "dry-run",
+            "execution_mode": "dry-run",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY33_VRRP_DRY_RUN_JSON.as_posix(),
+                DAY33_VRRP_DRY_RUN_HTML.as_posix(),
+                DAY33_VRRP_DRY_RUN_TXT.as_posix(),
+            ],
+            "report_outputs": [
+                "Day33 VRRP topology dry-run JSON",
+                "Day33 VRRP topology dry-run HTML",
+                "Day33 VRRP topology dry-run TXT",
+            ],
+            "related_script": DAY33_VRRP_DRY_RUN_SCRIPT,
+            "notes": "Safe dry-run only. The Day33 script validates the v0.2 VRRP contract, renders RouterOS command previews, and never opens SSH or executes commands.",
+        },
+        {
             "id": WIREGUARD_RUNNER_TASK_ALIAS,
             "task_id": WIREGUARD_RUNNER_TASK_ID,
             "display_name": WIREGUARD_RUNNER_DISPLAY_NAME,
@@ -800,6 +843,7 @@ def _build_parser() -> argparse.ArgumentParser:
   python network_lab.py --task iperf3-performance --dry-run
   python network_lab.py --task iperf3-performance
   python network_lab.py --task day32-vrrp-precheck
+  python network_lab.py --task day33-vrrp-dry-run
   python network_lab.py --task wireguard-runner --dry-run
   python network_lab.py --task wireguard-runner --wireguard-config Set_WireguardVPN_lab02_config.json --dry-run
   python network_lab.py --task wireguard-runner
@@ -810,6 +854,7 @@ report-index and portfolio-finalize read existing report metadata and do not con
 day4-baseline delegates to the existing live SSH validation script.
 iperf3-performance delegates to the existing live iperf3 performance script.
 day32-vrrp-precheck runs read-only MikroTik print/export terse commands with a blocking safety guard.
+day33-vrrp-dry-run generates local VRRP topology and command previews without SSH or RouterOS execution.
 wireguard-runner is dry-run by default and delegates to the existing WireGuard script only after explicit --allow-live-wireguard."""
     parser = argparse.ArgumentParser(
         description=f"Day14 {DAY14_NAME}.",
@@ -833,6 +878,7 @@ wireguard-runner is dry-run by default and delegates to the existing WireGuard s
             "day4-baseline",
             "iperf3-performance",
             DAY32_VRRP_PRECHECK_TASK_ID,
+            DAY33_VRRP_DRY_RUN_TASK_ID,
             WIREGUARD_RUNNER_TASK_ALIAS,
         ],
         help="Task to run.",
@@ -2109,6 +2155,24 @@ def _run_day32_vrrp_precheck(project_root: Path, dry_run: bool = False) -> int:
     return result.returncode
 
 
+def _run_day33_vrrp_dry_run(project_root: Path) -> int:
+    command = [sys.executable, DAY33_VRRP_DRY_RUN_SCRIPT]
+    display_command = _format_display_command(command)
+    print(format_heading("Day33 VRRP Topology Dry-run"))
+    print(f"Executing command: {color_text(display_command, 'cyan', bold=True)}")
+    print("Safety guard: DRY-RUN ONLY and NOT EXECUTED; no SSH connection or RouterOS execution is performed.")
+    sys.stdout.flush()
+    result = subprocess.run(command, cwd=project_root)
+    if result.returncode == 0:
+        print(f"{format_status('PASS')} Day33 VRRP topology dry-run completed.")
+        print(f"JSON report: {DAY33_VRRP_DRY_RUN_JSON.as_posix()}")
+        print(f"HTML report: {DAY33_VRRP_DRY_RUN_HTML.as_posix()}")
+        print(f"TXT report: {DAY33_VRRP_DRY_RUN_TXT.as_posix()}")
+        return 0
+    print(f"{format_status('FAIL')} Day33 VRRP topology dry-run failed with exit code {result.returncode}.")
+    return result.returncode
+
+
 def _confirm_and_run_day8_performance(project_root: Path, input_func: Any) -> int:
     try:
         command = _build_day8_performance_command(project_root)
@@ -2799,6 +2863,8 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
         return _run_day8_performance(root, dry_run=args.dry_run)
     if args.task == DAY32_VRRP_PRECHECK_TASK_ID:
         return _run_day32_vrrp_precheck(root, dry_run=args.dry_run)
+    if args.task == DAY33_VRRP_DRY_RUN_TASK_ID:
+        return _run_day33_vrrp_dry_run(root)
     if args.task == WIREGUARD_RUNNER_TASK_ALIAS:
         return _run_wireguard_runner(
             root,

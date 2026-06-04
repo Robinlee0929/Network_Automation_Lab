@@ -1170,6 +1170,45 @@ Safety behavior:
 - The runner does not deploy VRRP, change interfaces, change IP addresses, edit routes, edit firewall rules, disable services, reboot, or reset devices.
 - If VRRP is not configured, the report records `VRRP not configured or command returned no entries` and keeps the run as readiness evidence rather than a deployment failure.
 
+## Day33 - VRRP Topology Design + Dry-run Command Preview
+
+Purpose: render the intended HA/VRRP topology and the RouterOS commands that a future guarded workflow would review, without connecting to devices.
+
+Safety: safe dry-run only; no SSH, no credentials, no RouterOS command execution, no failover trigger, no reboot, no reset, and no interface state changes.
+
+Run the Day33 dry-run:
+
+```powershell
+python mikrotik_day33_vrrp_topology_dry_run.py
+python network_lab.py --task day33-vrrp-dry-run
+```
+
+Profile:
+
+```text
+topology_profiles/day33_vrrp_topology_dry_run.json
+```
+
+Reports:
+
+```text
+reports/lab-summary/day33_vrrp_topology_dry_run.json
+reports/lab-summary/day33_vrrp_topology_dry_run.html
+reports/lab-summary/day33_vrrp_topology_dry_run.txt
+```
+
+Safety behavior:
+
+- Day33 is classified as `safe_dry_run`.
+- The Day33 runner validates the MikroTik + Cisco Lab Topology v0.2 values before rendering commands.
+- Required VRRP values are VRID `88`, interface `vrrp-lan`, parent interface `bridge`, lab01 priority `150`, lab02 priority `100`, and VIP `192.168.88.1/32`.
+- Physical LAN bridge IPs are lab01 `192.168.88.2/24` and lab02 `192.168.88.3/24`; the VIP must not equal either physical address.
+- Required command preview for lab01 is `DRY-RUN: /interface vrrp add name=vrrp-lan interface=bridge vrid=88 priority=150 preemption-mode=yes` and `DRY-RUN: /ip address add address=192.168.88.1/32 interface=vrrp-lan`.
+- Required command preview for lab02 is `DRY-RUN: /interface vrrp add name=vrrp-lan interface=bridge vrid=88 priority=100 preemption-mode=yes` and `DRY-RUN: /ip address add address=192.168.88.1/32 interface=vrrp-lan`.
+- Previewed RouterOS commands are configuration-changing by nature, but they are text output only.
+- The runner blocks destructive preview keywords such as `remove`, `disable`, `enable`, `reboot`, and `reset-configuration`.
+- The runner does not read `config.json`, open SSH, send commands, deploy VRRP, or modify live lab state.
+
 ## Portfolio Demo
 
 v0.1 includes reviewer/interview demo scripts for presenting the current platform safely without adding features, changing runner/dashboard behavior, or running live device-changing workflows:
@@ -1332,6 +1371,14 @@ reports/lab-summary/day32_vrrp_readonly_precheck.html
 reports/lab-summary/day32_vrrp_readonly_precheck.txt
 ```
 
+Day33 VRRP topology dry-run:
+
+```text
+reports/lab-summary/day33_vrrp_topology_dry_run.json
+reports/lab-summary/day33_vrrp_topology_dry_run.html
+reports/lab-summary/day33_vrrp_topology_dry_run.txt
+```
+
 ## Testing Strategy
 
 The project separates live-device validation from unit tests.
@@ -1367,6 +1414,7 @@ For documentation-only review passes, run `python -m pytest` before sharing the 
 - Includes Day30 post-tag verification notes for local v0.1 tag traceability.
 - Includes Day31 HA / VRRP planning docs for the v0.2 read-only precheck foundation.
 - Includes Day32 VRRP read-only precheck evidence generation with a command safety guard.
+- Includes Day33 VRRP topology design and dry-run command preview evidence without live execution.
 
 ## Roadmap
 

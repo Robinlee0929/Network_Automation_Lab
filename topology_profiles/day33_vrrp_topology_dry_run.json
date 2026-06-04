@@ -1,0 +1,54 @@
+{
+  "profile_id": "day33-vrrp-topology-dry-run",
+  "title": "Day33 VRRP topology design and dry-run command preview",
+  "mode": "safe_dry_run",
+  "safety_level": "safe_dry_run",
+  "shared_lan_subnet": "192.168.88.0/24",
+  "virtual_gateway_ip": "192.168.88.1/32",
+  "parent_interface": "bridge",
+  "vrrp_interface_name": "vrrp-lan",
+  "vrid": 88,
+  "primary_priority": 150,
+  "backup_priority": 100,
+  "devices": [
+    {
+      "name": "Hex-s-2025-lab01",
+      "role": "primary",
+      "lan_bridge_ip": "192.168.88.2/24"
+    },
+    {
+      "name": "Hex-s-2025-lab02",
+      "role": "backup",
+      "lan_bridge_ip": "192.168.88.3/24"
+    },
+    {
+      "name": "cisco-switch",
+      "role": "lan_switch"
+    }
+  ],
+  "planned_links": [
+    "ISP Router / Internet -> WAN-side Switch -> lab01/lab02 WAN",
+    "lab01/lab02 LAN bridge -> LAN-side Switch -> Automation PC / Client"
+  ],
+  "expected_outputs": [
+    "json_report",
+    "html_report",
+    "text_summary",
+    "dry_run_command_preview"
+  ],
+  "blocked_actions": [
+    "execute_routeros_commands",
+    "connect_ssh",
+    "remove_configuration",
+    "disable_interface",
+    "enable_interface",
+    "reboot_device",
+    "reset_configuration"
+  ],
+  "notes": [
+    "This profile matches the intended MikroTik + Cisco Lab Topology v0.2 VRRP dry-run design.",
+    "Day33 renders configuration-changing commands as text only: DRY-RUN ONLY and NOT EXECUTED.",
+    "Day33 does not connect to routers and does not execute RouterOS commands.",
+    "Real device connection information must remain in local private config files and must not be written to the repository."
+  ]
+}

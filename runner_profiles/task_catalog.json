@@ -1,6 +1,6 @@
 {
-  "catalog_version": "day32-pre",
-  "purpose": "Static task catalog metadata for Day-32-pre profile planning. This file does not execute tasks, read config.json, connect to devices, or modify runner behavior.",
+  "catalog_version": "day33-dry-run",
+  "purpose": "Static task catalog metadata for Day33 VRRP v0.2 dry-run planning. This file does not execute tasks, read config.json, connect to devices, or modify runner behavior.",
   "tasks": [
     {
       "id": "day4-mikrotik-multi-device-baseline",
@@ -185,6 +185,24 @@
       ],
       "allow_live_execution": true,
       "notes": "Read-only live SSH precheck. The runner sends only print or /export terse commands and blocks add/set/remove/disable/enable/reboot/reset-configuration before any MikroTik command is sent."
+    },
+    {
+      "id": "day33-vrrp-topology-dry-run",
+      "title": "Day33 VRRP topology design and dry-run command preview",
+      "category": "ha_vrrp",
+      "safety_level": "safe_dry_run",
+      "device_scope": [
+        "mikrotik",
+        "local-profile"
+      ],
+      "profile_path": "topology_profiles/day33_vrrp_topology_dry_run.json",
+      "report_paths": [
+        "reports/lab-summary/day33_vrrp_topology_dry_run.json",
+        "reports/lab-summary/day33_vrrp_topology_dry_run.html",
+        "reports/lab-summary/day33_vrrp_topology_dry_run.txt"
+      ],
+      "allow_live_execution": false,
+      "notes": "Safe dry-run only. Validates the v0.2 VRRP contract and renders RouterOS command previews without SSH, credentials, RouterOS execution, failover, reboot, reset, or interface state changes."
     }
   ]
 }

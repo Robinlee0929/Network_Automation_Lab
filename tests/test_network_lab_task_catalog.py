@@ -69,3 +69,15 @@ def test_report_only_and_disabled_tasks_are_explained():
         if task["safety_level"] == "disabled" or task.get("enabled") is False:
             explanation = " ".join([task.get("notes", ""), task.get("description", "")]).lower()
             assert any(word in explanation for word in ("disabled", "blocked", "placeholder", "report-only"))
+
+
+def test_day33_vrrp_dry_run_catalog_entry_is_non_live():
+    day33 = next(task for task in network_lab.list_tasks() if task["id"] == "day33-vrrp-dry-run")
+
+    assert day33["task_id"] == "day33_vrrp_topology_dry_run"
+    assert day33["safety_level"] == "dry-run"
+    assert day33["execution_mode"] == "dry-run"
+    assert day33["requires_live_device"] is False
+    assert day33["requires_password"] is False
+    assert "day33_vrrp_topology_dry_run.json" in day33["report_paths"][0]
+    assert "v0.2 VRRP contract" in day33["notes"]
