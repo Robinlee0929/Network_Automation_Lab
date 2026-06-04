@@ -2,7 +2,7 @@
 
 This repository is a network automation lab portfolio. It demonstrates repeatable validation for MikroTik routers, Cisco topology checks, iperf3 performance testing, WireGuard VPN validation, and a unified runner that indexes local evidence.
 
-Day28 final review status: v0.1 evidence is a documentation-aligned portfolio package. Day28 does not add runner behavior, dashboard behavior, live VPN execution, HA, VRRP, failover, or new device-control logic.
+Day29 release tag preparation status: v0.1 evidence is a documentation-aligned portfolio package ready for tagging after validation. Day29 does not add runner behavior, dashboard behavior, live VPN execution, HA, VRRP, failover, generated reports, or new device-control logic.
 
 ## What To Review
 
@@ -24,6 +24,7 @@ Generated `reports/` output is intentionally ignored by git. Reviewers can regen
 - Day24 demo flow is report-only. It creates a reviewer walkthrough and does not connect to lab devices, start VPN validation, run iperf3, or read local secrets.
 - Day26 release packaging is documentation-only. It adds release notes and a concise portfolio checklist without adding runner tasks, product features, report generators, live workflows, or secret reads.
 - Day28 portfolio evidence final review is documentation-only. It aligns README, demo scripts, evidence navigation, and release notes without changing safe-runner behavior.
+- Day29 release tag preparation is documentation-only. It records final validation and tag handoff notes without creating a tag, generated reports, runner tasks, live workflows, or secret reads.
 
 ## Evidence Locations
 
@@ -35,12 +36,13 @@ Generated `reports/` output is intentionally ignored by git. Reviewers can regen
 - Day24 demo flow: `reports/portfolio/day24_rc_demo_flow.html`
 - v0.1 release notes: `docs/portfolio_evidence/v0.1_release_notes.md`
 - v0.1 portfolio checklist: `docs/portfolio_evidence/v0.1_portfolio_checklist.md`
+- Day29 tag preparation: `docs/portfolio_evidence/day29_v0.1_release_tag_preparation.md`
 
 The report index marks missing files as unavailable instead of failing. It also includes report type, availability, safety label, description, and links to JSON/HTML evidence when present.
 
 ## Reviewer Evidence Path
 
-Start with `python network_lab.py --task demo-flow` when preparing a portfolio walkthrough. It writes a safe open order and talk track that starts with README context, continues through task safety metadata and report visibility, then closes with the dashboard `/reports` viewer and portfolio evidence. For v0.1 release handoff, review `docs/portfolio_evidence/v0.1_release_notes.md` and `docs/portfolio_evidence/v0.1_portfolio_checklist.md`.
+Start with `python network_lab.py --task demo-flow` when preparing a portfolio walkthrough. It writes a safe open order and talk track that starts with README context, continues through task safety metadata and report visibility, then closes with the dashboard `/reports` viewer and portfolio evidence. For v0.1 release handoff, review `docs/portfolio_evidence/v0.1_release_notes.md`, `docs/portfolio_evidence/v0.1_portfolio_checklist.md`, and `docs/portfolio_evidence/day29_v0.1_release_tag_preparation.md`.
 
 For a deeper review, run `python network_lab.py --list-tasks --verbose` to understand automation scope, safety labels, execution modes, and report outputs. Then use the dashboard `/reports` viewer or `reports/report_index.html` to inspect generated evidence without starting live workflows.
 
@@ -58,6 +60,7 @@ Day25 RC readiness checklist:
 - Day24 demo flow remains report-only.
 - Day26 release package remains documentation-only.
 - Day28 final review remains documentation-only.
+- Day29 release tag preparation remains documentation-only.
 - No destructive live behavior was introduced.
 - Full pytest suite passes.
 
