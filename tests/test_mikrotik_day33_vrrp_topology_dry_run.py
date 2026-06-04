@@ -8,7 +8,7 @@ import mikrotik_day33_vrrp_topology_dry_run as day33
 def profile(**overrides):
     values = {
         "shared_lan_subnet": "192.168.88.0/24",
-        "virtual_gateway_ip": "192.168.88.1/32",
+        "virtual_gateway_ip": "192.168.88.99/32",
         "parent_interface": "bridge",
         "vrrp_interface_name": "vrrp-lan",
         "vrid": 88,
@@ -33,16 +33,16 @@ def test_build_report_generates_primary_and_backup_preview_commands():
     assert report["safety_guardrails"]["not_executed"] == "PASS"
     assert report["devices"][0]["execution_allowed"] is False
     assert report["devices"][0]["execution_status"] == "DRY-RUN ONLY - NOT EXECUTED"
-    assert report["topology"]["virtual_gateway_cidr"] == "192.168.88.1/32"
+    assert report["topology"]["virtual_gateway_cidr"] == "192.168.88.99/32"
     assert report["topology"]["primary_lan_bridge_ip"] == "192.168.88.2/24"
     assert report["topology"]["backup_lan_bridge_ip"] == "192.168.88.3/24"
     assert report["devices"][0]["configuration_preview_commands"] == [
         "/interface vrrp add name=vrrp-lan interface=bridge vrid=88 priority=150 preemption-mode=yes",
-        "/ip address add address=192.168.88.1/32 interface=vrrp-lan",
+        "/ip address add address=192.168.88.99/32 interface=vrrp-lan",
     ]
     assert report["devices"][1]["configuration_preview_commands"][0].endswith("priority=100 preemption-mode=yes")
     assert report["devices"][1]["configuration_preview_commands"][1] == (
-        "/ip address add address=192.168.88.1/32 interface=vrrp-lan"
+        "/ip address add address=192.168.88.99/32 interface=vrrp-lan"
     )
 
 
@@ -50,10 +50,10 @@ def test_build_report_generates_primary_and_backup_preview_commands():
     ("overrides", "message"),
     [
         ({"virtual_gateway_ip": "192.168.89.254"}, "virtual_gateway_ip"),
-        ({"virtual_gateway_ip": "192.168.88.1/24"}, "192.168.88.1/32"),
+        ({"virtual_gateway_ip": "192.168.88.99/24"}, "192.168.88.99/32"),
         (
             {"devices": [
-                {"name": "Hex-s-2025-lab01", "role": "primary", "lan_bridge_ip": "192.168.88.1/24"},
+                {"name": "Hex-s-2025-lab01", "role": "primary", "lan_bridge_ip": "192.168.88.99/24"},
                 {"name": "Hex-s-2025-lab02", "role": "backup", "lan_bridge_ip": "192.168.88.3/24"},
             ]},
             "physical LAN bridge IP",

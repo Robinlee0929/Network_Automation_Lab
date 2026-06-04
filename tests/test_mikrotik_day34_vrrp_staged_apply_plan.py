@@ -6,7 +6,7 @@ import mikrotik_day34_vrrp_staged_apply_plan as day34
 def profile(**overrides):
     values = {
         "shared_lan_subnet": "192.168.88.0/24",
-        "virtual_gateway_ip": "192.168.88.1/32",
+        "virtual_gateway_ip": "192.168.88.99/32",
         "parent_interface": "bridge",
         "vrrp_interface_name": "vrrp-lan",
         "vrid": 88,

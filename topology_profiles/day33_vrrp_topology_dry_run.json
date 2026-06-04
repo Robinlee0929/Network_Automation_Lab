@@ -4,7 +4,7 @@
   "mode": "safe_dry_run",
   "safety_level": "safe_dry_run",
   "shared_lan_subnet": "192.168.88.0/24",
-  "virtual_gateway_ip": "192.168.88.1/32",
+  "virtual_gateway_ip": "192.168.88.99/32",
   "parent_interface": "bridge",
   "vrrp_interface_name": "vrrp-lan",
   "vrid": 88,

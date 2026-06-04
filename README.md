@@ -117,7 +117,7 @@ Cisco validation is read-only. It runs show commands for topology evidence and d
 
 ![Lab Topology Day 1-Day 6](docs/assets/lab_topology_day1_day6.png)
 
-This lab uses a Windows Automation PC, a Cisco WS-C2960CG-8TC-L switch, two MikroTik hEX S 2025 routers, and an upstream ISP cable modem or home router. The v0.2 topology adds the HA / VRRP lab plan with VRID 88, VIP `192.168.88.1/32`, lab01 as the higher-priority master candidate, and lab02 as the backup candidate. The Automation PC runs the Python validation workflows, connects to devices over SSH only for explicitly read-only or guarded workflows, and generates JSON / HTML reports at both device and lab level.
+This lab uses a Windows Automation PC, a Cisco WS-C2960CG-8TC-L switch, two MikroTik hEX S 2025 routers, and an upstream ISP cable modem or home router. The v0.2 topology adds the HA / VRRP lab plan with VRID 88, VIP `192.168.88.99/32`, lab01 as the higher-priority master candidate, and lab02 as the backup candidate. The Automation PC runs the Python validation workflows, connects to devices over SSH only for explicitly read-only or guarded workflows, and generates JSON / HTML reports at both device and lab level.
 
 More details:
 
@@ -1207,10 +1207,10 @@ Safety behavior:
 
 - Day33 is classified as `safe_dry_run`.
 - The Day33 runner validates the MikroTik + Cisco Lab Topology v0.2 values before rendering commands.
-- Required VRRP values are VRID `88`, interface `vrrp-lan`, parent interface `bridge`, lab01 priority `150`, lab02 priority `100`, and VIP `192.168.88.1/32`.
+- Required VRRP values are VRID `88`, interface `vrrp-lan`, parent interface `bridge`, lab01 priority `150`, lab02 priority `100`, and VIP `192.168.88.99/32`.
 - Physical LAN bridge IPs are lab01 `192.168.88.2/24` and lab02 `192.168.88.3/24`; the VIP must not equal either physical address.
-- Required command preview for lab01 is `DRY-RUN: /interface vrrp add name=vrrp-lan interface=bridge vrid=88 priority=150 preemption-mode=yes` and `DRY-RUN: /ip address add address=192.168.88.1/32 interface=vrrp-lan`.
-- Required command preview for lab02 is `DRY-RUN: /interface vrrp add name=vrrp-lan interface=bridge vrid=88 priority=100 preemption-mode=yes` and `DRY-RUN: /ip address add address=192.168.88.1/32 interface=vrrp-lan`.
+- Required command preview for lab01 is `DRY-RUN: /interface vrrp add name=vrrp-lan interface=bridge vrid=88 priority=150 preemption-mode=yes` and `DRY-RUN: /ip address add address=192.168.88.99/32 interface=vrrp-lan`.
+- Required command preview for lab02 is `DRY-RUN: /interface vrrp add name=vrrp-lan interface=bridge vrid=88 priority=100 preemption-mode=yes` and `DRY-RUN: /ip address add address=192.168.88.99/32 interface=vrrp-lan`.
 - Previewed RouterOS commands are configuration-changing by nature, but they are text output only.
 - The runner blocks destructive preview keywords such as `remove`, `disable`, `enable`, `reboot`, and `reset-configuration`.
 - The runner does not read `config.json`, open SSH, send commands, deploy VRRP, or modify live lab state.
