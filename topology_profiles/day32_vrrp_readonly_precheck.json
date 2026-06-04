@@ -1,0 +1,55 @@
+{
+  "profile_id": "day32-vrrp-readonly-precheck",
+  "title": "Day32 VRRP read-only precheck profile",
+  "mode": "profile_only",
+  "safety_level": "read_only_with_report",
+  "devices": [
+    {
+      "name": "Hex-s-2025-lab01",
+      "role": "primary_candidate"
+    },
+    {
+      "name": "Hex-s-2025-lab02",
+      "role": "backup_candidate"
+    },
+    {
+      "name": "cisco-switch",
+      "role": "lan_switch"
+    }
+  ],
+  "checks": [
+    "device_identity",
+    "routeros_version",
+    "interface_status",
+    "bridge_status",
+    "ip_address_summary",
+    "route_summary",
+    "firewall_filter_summary",
+    "firewall_nat_summary",
+    "existing_vrrp_config",
+    "wan_reachability_readonly",
+    "lan_reachability_readonly"
+  ],
+  "blocked_actions": [
+    "add_vrrp_interface",
+    "set_vrrp_priority",
+    "change_ip_address",
+    "remove_firewall_rule",
+    "disable_interface",
+    "reboot_device",
+    "reset_configuration"
+  ],
+  "expected_outputs": [
+    "json_report",
+    "html_report",
+    "text_summary"
+  ],
+  "notes": [
+    "This profile is only the data foundation for a future Day32 read-only precheck.",
+    "This profile does not mean the current runner supports Day32.",
+    "VRRP live configuration is not allowed.",
+    "Firewall, interface, and IP address modification is not allowed.",
+    "Reboot and reset configuration actions are not allowed.",
+    "Real device connection information must be loaded from local private config and must not be written to the repository."
+  ]
+}

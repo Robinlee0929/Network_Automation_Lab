@@ -6,7 +6,7 @@ Network Automation Lab is a Python-based lab automation project for validating n
 
 A Python-based network automation and validation lab for MikroTik RouterOS, Cisco switch topology checks, iperf3 performance testing, regression checks, and local report visualization.
 
-The current v0.1 portfolio package covers Day 1 through Day 30 post-tag verification:
+The v0.1 portfolio package covers Day 1 through Day 30 post-tag verification. The current project timeline also includes the v0.2 HA / VRRP planning and read-only precheck foundation:
 
 - MikroTik baseline and post-reset validation
 - MikroTik Day 2 setup workflow after reset
@@ -35,6 +35,7 @@ The current v0.1 portfolio package covers Day 1 through Day 30 post-tag verifica
 - Day 29 v0.1 release tag preparation
 - Day 30 v0.1 post-tag verification
 - Day 31 HA / VRRP topology and safety planning
+- Day 32 HA / VRRP profile/catalog foundation
 
 The project is designed as a practical QA Automation / SDET portfolio project for network infrastructure. It focuses on repeatable validation, structured test evidence, and readable JSON / HTML reports rather than one-off manual checks.
 
@@ -104,6 +105,7 @@ Cisco validation is read-only. It runs show commands for topology evidence and d
 | Day 29 | v0.1 release tag preparation | Complete |
 | Day 30 | v0.1 post-tag verification | Complete |
 | Day 31 | HA / VRRP topology and safety planning | Complete |
+| Day 32 | HA / VRRP profile/catalog foundation | Pre |
 
 ## Lab Topology
 
@@ -1139,6 +1141,27 @@ docs/roadmap/ha_vrrp_topology_plan.md
 docs/roadmap/ha_vrrp_safety_model.md
 ```
 
+## Day32 HA / VRRP Profile/Catalog Foundation
+
+Day32-pre adds the minimum metadata foundation for a future HA / VRRP read-only precheck. It does not implement a runner, modify existing Python runner behavior, read `config.json`, connect to devices, run SSH, execute RouterOS commands, or generate reports.
+
+Committed foundation files:
+
+```text
+config/README.md
+runner_profiles/task_catalog.json
+runner_profiles/safety_levels.json
+topology_profiles/day32_vrrp_readonly_precheck.json
+```
+
+Safety behavior:
+
+- Day31 is classified as `documentation_only`.
+- Day32 is classified as `read_only_with_report` in metadata only.
+- The Day32 profile defines future read-only evidence expectations and blocked actions.
+- Blocked actions include adding VRRP interfaces, changing VRRP priority, changing IP addresses, removing firewall rules, disabling interfaces, rebooting devices, and resetting configuration.
+- No Day32 live/read-only device execution script is added in Day32-pre.
+
 ## Portfolio Demo
 
 v0.1 includes reviewer/interview demo scripts for presenting the current platform safely without adding features, changing runner/dashboard behavior, or running live device-changing workflows:
@@ -1293,6 +1316,15 @@ docs/roadmap/ha_vrrp_topology_plan.md
 docs/roadmap/ha_vrrp_safety_model.md
 ```
 
+Day32 HA / VRRP profile/catalog foundation:
+
+```text
+config/README.md
+runner_profiles/task_catalog.json
+runner_profiles/safety_levels.json
+topology_profiles/day32_vrrp_readonly_precheck.json
+```
+
 ## Testing Strategy
 
 The project separates live-device validation from unit tests.
@@ -1327,6 +1359,7 @@ For documentation-only review passes, run `python -m pytest` before sharing the 
 - Includes Day29 release tag preparation notes for final validation and tag handoff.
 - Includes Day30 post-tag verification notes for local v0.1 tag traceability.
 - Includes Day31 HA / VRRP planning docs for the v0.2 read-only precheck foundation.
+- Includes Day32 HA / VRRP profile/catalog metadata for the future read-only precheck foundation.
 
 ## Roadmap
 

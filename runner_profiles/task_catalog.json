@@ -1,0 +1,187 @@
+{
+  "catalog_version": "day32-pre",
+  "purpose": "Static task catalog metadata for Day-32-pre profile planning. This file does not execute tasks, read config.json, connect to devices, or modify runner behavior.",
+  "tasks": [
+    {
+      "id": "day4-mikrotik-multi-device-baseline",
+      "title": "Day4 MikroTik multi-device baseline",
+      "category": "mikrotik_baseline",
+      "safety_level": "read_only_with_report",
+      "device_scope": [
+        "mikrotik"
+      ],
+      "profile_path": null,
+      "report_paths": [
+        "reports/Hex-s-2025-lab01/day4_baseline_validation.json",
+        "reports/Hex-s-2025-lab01/day4_baseline_validation.html",
+        "reports/Hex-s-2025-lab02/day4_baseline_validation.json",
+        "reports/Hex-s-2025-lab02/day4_baseline_validation.html",
+        "reports/day4_summary_report.json",
+        "reports/day4_summary_report.html"
+      ],
+      "allow_live_execution": false,
+      "notes": "Catalog metadata only. Existing Day4 scripts are not changed by Day-32-pre."
+    },
+    {
+      "id": "day5-cisco-switch-topology-validation",
+      "title": "Day5 Cisco switch topology validation",
+      "category": "cisco_topology",
+      "safety_level": "read_only_with_report",
+      "device_scope": [
+        "cisco-switch"
+      ],
+      "profile_path": null,
+      "report_paths": [
+        "reports/cisco-switch/switch_topology_report.json",
+        "reports/cisco-switch/switch_topology_report.html"
+      ],
+      "allow_live_execution": false,
+      "notes": "Catalog metadata only. Cisco validation remains read-only in its existing workflow."
+    },
+    {
+      "id": "day6-lab-summary",
+      "title": "Day6 lab summary",
+      "category": "lab_summary",
+      "safety_level": "safe_dry_run",
+      "device_scope": [
+        "lab-summary"
+      ],
+      "profile_path": "topology_profiles/day6_lab_topology.json",
+      "report_paths": [
+        "reports/day6_lab_topology_summary.json",
+        "reports/day6_lab_topology_summary.html"
+      ],
+      "allow_live_execution": false,
+      "notes": "Reads existing local report evidence and produces summary output in the existing workflow."
+    },
+    {
+      "id": "day8-iperf3-router-performance",
+      "title": "Day8 iperf3 router performance",
+      "category": "performance",
+      "safety_level": "read_only_with_report",
+      "device_scope": [
+        "mikrotik",
+        "iperf3-endpoints"
+      ],
+      "profile_path": "topology_profiles/day8_iperf3_router_performance.json",
+      "report_paths": [
+        "reports/Hex-s-2025-lab01/day8_iperf3_WAN_TO_LAN_DNAT_report.json",
+        "reports/Hex-s-2025-lab01/day8_iperf3_WAN_TO_LAN_DNAT_report.html",
+        "reports/Hex-s-2025-lab01/day8_iperf3_LAN_TO_WAN_DNAT_REPLY_report.json",
+        "reports/Hex-s-2025-lab01/day8_iperf3_LAN_TO_WAN_DNAT_REPLY_report.html"
+      ],
+      "allow_live_execution": false,
+      "notes": "Catalog metadata only. Day-32-pre does not start iperf3 or connect to devices."
+    },
+    {
+      "id": "day12-wireguard-client-to-site-docs-or-validation",
+      "title": "Day12 WireGuard client-to-site documentation or validation",
+      "category": "wireguard",
+      "safety_level": "read_only_with_report",
+      "device_scope": [
+        "mikrotik",
+        "wireguard-client"
+      ],
+      "profile_path": null,
+      "report_paths": [
+        "reports/Hex-s-2025-lab01/day12_wireguard_vpn_automation_report.json",
+        "reports/Hex-s-2025-lab01/day12_wireguard_vpn_automation_report.html"
+      ],
+      "allow_live_execution": false,
+      "notes": "Catalog metadata only. WireGuard secrets and live tunnel changes remain out of Day-32-pre scope."
+    },
+    {
+      "id": "day13-multi-router-wireguard-validation",
+      "title": "Day13 multi-router WireGuard validation",
+      "category": "wireguard",
+      "safety_level": "read_only_with_report",
+      "device_scope": [
+        "mikrotik",
+        "wireguard-client"
+      ],
+      "profile_path": "topology_profiles/day13_wireguard_client_to_site_profiles.json",
+      "report_paths": [
+        "reports/lab-summary/day13_multi_router_wireguard_client_to_site_summary.json",
+        "reports/lab-summary/day13_multi_router_wireguard_client_to_site_summary.html"
+      ],
+      "allow_live_execution": false,
+      "notes": "Catalog metadata only. Day-32-pre does not run WireGuard validation or change tunnels."
+    },
+    {
+      "id": "day14-unified-lab-runner",
+      "title": "Day14 unified lab runner",
+      "category": "runner",
+      "safety_level": "safe_dry_run",
+      "device_scope": [
+        "lab"
+      ],
+      "profile_path": "topology_profiles/day14_lab_runner_profile.json",
+      "report_paths": [
+        "reports/lab-summary/latest_lab_overview.json",
+        "reports/lab-summary/latest_lab_overview.html"
+      ],
+      "allow_live_execution": false,
+      "notes": "Catalog metadata only. Day-32-pre does not modify unified runner behavior."
+    },
+    {
+      "id": "day18-wireguard-runner-safe-integration",
+      "title": "Day18 WireGuard runner safe integration",
+      "category": "runner_wireguard",
+      "safety_level": "safe_dry_run",
+      "device_scope": [
+        "mikrotik",
+        "wireguard-client"
+      ],
+      "profile_path": null,
+      "report_paths": [
+        "reports/lab-summary/wireguard_runner_safety_layer.json",
+        "reports/lab-summary/wireguard_runner_safety_layer.html"
+      ],
+      "allow_live_execution": false,
+      "notes": "WireGuard runner metadata must not allow dangerous live execution, unsafe peer recreation, firewall mutation, secret exposure, or tunnel changes."
+    },
+    {
+      "id": "day19-runner-evidence-index",
+      "title": "Day19 runner evidence index",
+      "category": "portfolio_evidence",
+      "safety_level": "safe_dry_run",
+      "device_scope": [
+        "local-reports"
+      ],
+      "profile_path": null,
+      "report_paths": [
+        "reports/portfolio/day19_runner_evidence_index.json",
+        "reports/portfolio/day19_runner_evidence_index.html"
+      ],
+      "allow_live_execution": false,
+      "notes": "Reads local metadata and report paths in the existing workflow. Day-32-pre does not generate portfolio evidence."
+    },
+    {
+      "id": "day31-ha-vrrp-topology-safety-model",
+      "title": "Day31 HA / VRRP topology and safety model",
+      "category": "ha_vrrp",
+      "safety_level": "documentation_only",
+      "device_scope": [
+        "documentation"
+      ],
+      "profile_path": null,
+      "report_paths": [],
+      "allow_live_execution": false,
+      "notes": "Documentation-only planning. No SSH, RouterOS commands, config changes, reports, or live device actions."
+    },
+    {
+      "id": "day32-vrrp-readonly-precheck",
+      "title": "Day32 VRRP read-only precheck",
+      "category": "ha_vrrp",
+      "safety_level": "read_only_with_report",
+      "device_scope": [
+        "mikrotik",
+        "cisco-switch"
+      ],
+      "profile_path": "topology_profiles/day32_vrrp_readonly_precheck.json",
+      "report_paths": [],
+      "allow_live_execution": false,
+      "notes": "Profile foundation only. VRRP live configuration is not allowed, and Day-32-pre does not add a runner script, read config.json, execute SSH, or run RouterOS commands."
+    }
+  ]
+}
