@@ -1,6 +1,6 @@
 {
-  "catalog_version": "day33-dry-run",
-  "purpose": "Static task catalog metadata for Day33 VRRP v0.2 dry-run planning. This file does not execute tasks, read config.json, connect to devices, or modify runner behavior.",
+  "catalog_version": "day34-staged-apply-plan",
+  "purpose": "Static task catalog metadata for Day34 VRRP v0.2 staged apply safety planning. This file does not execute tasks, read config.json, connect to devices, or modify runner behavior.",
   "tasks": [
     {
       "id": "day4-mikrotik-multi-device-baseline",
@@ -203,6 +203,25 @@
       ],
       "allow_live_execution": false,
       "notes": "Safe dry-run only. Validates the v0.2 VRRP contract and renders RouterOS command previews without SSH, credentials, RouterOS execution, failover, reboot, reset, or interface state changes."
+    },
+    {
+      "id": "day34-vrrp-staged-apply-plan",
+      "title": "Day34 VRRP staged apply plan and safety gate",
+      "category": "ha_vrrp",
+      "safety_level": "safe_dry_run",
+      "device_scope": [
+        "mikrotik",
+        "local-profile",
+        "safety-gate"
+      ],
+      "profile_path": "topology_profiles/day34_vrrp_staged_apply_plan.json",
+      "report_paths": [
+        "reports/lab-summary/day34_vrrp_staged_apply_plan.json",
+        "reports/lab-summary/day34_vrrp_staged_apply_plan.html",
+        "reports/lab-summary/day34_vrrp_staged_apply_plan.txt"
+      ],
+      "allow_live_execution": false,
+      "notes": "Plan-only safety gate. Checks Day32/Day33 evidence readiness, renders staged backup-then-primary apply and rollback previews, and blocks SSH, credentials, RouterOS execution, failover, reboot, reset, and interface state changes."
     }
   ]
 }

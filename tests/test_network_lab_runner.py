@@ -2016,6 +2016,26 @@ def test_day33_vrrp_dry_run_delegates_to_preview_script(tmp_path, monkeypatch, c
     assert "--allow-live" not in " ".join(calls[0][0])
 
 
+def test_day34_vrrp_staged_plan_delegates_to_plan_script(tmp_path, monkeypatch, capsys):
+    write_default_profile(tmp_path)
+    calls = []
+
+    def fake_run(command, cwd):
+        calls.append((command, cwd))
+        return SimpleNamespace(returncode=0)
+
+    monkeypatch.setattr(network_lab.subprocess, "run", fake_run)
+
+    exit_code = network_lab.main(["--task", "day34-vrrp-staged-plan"], project_root=tmp_path)
+
+    output = capsys.readouterr().out
+    assert exit_code == 0
+    assert calls == [([sys.executable, "mikrotik_day34_vrrp_staged_apply_plan.py"], tmp_path.resolve())]
+    assert "no SSH connection or RouterOS execution" in output
+    assert "BLOCKED PLAN ONLY and NOT EXECUTED" in output
+    assert "--allow-live" not in " ".join(calls[0][0])
+
+
 def test_console_status_format_respects_no_color(monkeypatch):
     monkeypatch.delenv("NO_COLOR", raising=False)
     monkeypatch.setenv("FORCE_COLOR", "1")
