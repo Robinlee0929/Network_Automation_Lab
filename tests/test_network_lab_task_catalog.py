@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import network_lab
 
 
@@ -147,3 +149,36 @@ def test_day40_demo_readiness_catalog_entry_is_report_only():
     assert "reports/portfolio/day40_v0.2_demo_readiness_review.json" in day40["report_paths"]
     assert "does not run SSH" in day40["notes"]
     assert "configuration changes" in day40["notes"]
+
+
+def test_day41_release_packaging_catalog_entry_is_report_only():
+    day41 = next(task for task in network_lab.list_tasks() if task["id"] == "day41-v0.2-release-packaging")
+
+    assert day41["task_id"] == "day41_v0.2_release_packaging"
+    assert day41["safety_level"] == "report-only"
+    assert day41["execution_mode"] == "report-only"
+    assert day41["requires_live_device"] is False
+    assert day41["requires_password"] is False
+    assert "reports/portfolio/day41_v0.2_release_packaging.json" in day41["report_paths"]
+    assert "does not run SSH" in day41["notes"]
+    assert "live tests" in day41["notes"]
+    assert "voice" in day41["notes"]
+    assert "AI assistant" in day41["notes"]
+    assert "tag creation" in day41["notes"]
+
+
+def test_day41_release_packaging_docs_exist_and_do_not_claim_completed_tag():
+    docs = [
+        Path("docs/releases/v0.2_release_package.md"),
+        Path("docs/releases/v0.2_artifact_checklist.md"),
+        Path("docs/portfolio/v0.2_demo_handoff_guide.md"),
+    ]
+
+    for doc in docs:
+        assert doc.exists()
+        text = doc.read_text(encoding="utf-8")
+        assert "Day41" in text or "v0.2" in text
+        assert "does not create a `v0.2` tag" in text or "tag is reserved for Day42" in text
+        assert "future roadmap only" in text
+        assert "not implemented in v0.2" in text
+        assert "v0.2 tag created" not in text.lower()

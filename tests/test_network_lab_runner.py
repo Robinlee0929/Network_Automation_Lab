@@ -2210,6 +2210,57 @@ def test_day40_demo_readiness_report_generates_without_live_access(tmp_path, mon
     assert day40["html"].endswith("day40_v0.2_demo_readiness_review.html")
 
 
+def test_day41_release_packaging_report_generates_without_live_access(tmp_path, monkeypatch, capsys):
+    def fail_run(*_args, **_kwargs):
+        raise AssertionError("Day41 must not execute live scripts or subprocesses")
+
+    monkeypatch.setattr(network_lab.subprocess, "run", fail_run)
+    write_text(tmp_path / "docs/releases/v0.2_release_package.md", "# package")
+    write_text(tmp_path / "docs/releases/v0.2_artifact_checklist.md", "# checklist")
+    write_text(tmp_path / "docs/portfolio/v0.2_demo_handoff_guide.md", "# handoff")
+
+    exit_code = network_lab.main(
+        ["--task", "day41-v0.2-release-packaging"],
+        project_root=tmp_path,
+    )
+
+    output = capsys.readouterr().out
+    json_path = tmp_path / "reports/portfolio/day41_v0.2_release_packaging.json"
+    html_path = tmp_path / "reports/portfolio/day41_v0.2_release_packaging.html"
+    assert exit_code == 0
+    assert "Day41 v0.2 Release Packaging" in output
+    assert "Safety: report-only" in output
+    assert json_path.exists()
+    assert html_path.exists()
+    report = json.loads(json_path.read_text(encoding="utf-8"))
+    html = html_path.read_text(encoding="utf-8")
+    assert report["day"] == 41
+    assert report["task_name"] == "day41-v0.2-release-packaging"
+    assert report["task_type"] == "report-only"
+    assert report["safety_level"] == "report_only"
+    assert report["live_test"] is False
+    assert report["ssh_used"] is False
+    assert report["device_config_changed"] is False
+    assert report["v0_2_tag_created"] is False
+    assert report["voice_ai_implemented"] is False
+    assert report["safety_status"]["live_execution"] is False
+    assert report["safety_status"]["ssh_required"] is False
+    assert report["safety_status"]["device_config_change"] is False
+    assert report["created_or_updated_docs"]
+    assert all(item["status"] == "FOUND" for item in report["created_or_updated_docs"])
+    assert "Day42" in report["day42_next_action"]
+    assert "roadmap-only" in report["v3_0_roadmap_note"]
+    assert "Day41 v0.2 Release Packaging" in html
+    assert "did not run live tests" in html
+    assert "create a v0.2 tag" in html
+
+    rows = network_lab.discover_report_visibility(tmp_path)
+    day41 = next(row for row in rows if row["day"] == "Day41")
+    assert day41["status"] == "FOUND"
+    assert day41["json"].endswith("day41_v0.2_release_packaging.json")
+    assert day41["html"].endswith("day41_v0.2_release_packaging.html")
+
+
 def test_day39_vrrp_evidence_entries_include_status_fields(tmp_path):
     write_text(tmp_path / "docs/roadmap/ha_vrrp_topology_plan.md", "# plan")
     write_json(
