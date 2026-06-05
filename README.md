@@ -40,6 +40,7 @@ The v0.1 portfolio package covers Day 1 through Day 30 post-tag verification. Th
 - Day 34 VRRP Staged Apply Plan and Safety Gate
 - Day 35 VRRP Failover Validation
 - Day 36 VRRP Failover Evidence Review and Report Hardening
+- Day 37 VRRP Report Regression and Evidence Snapshot Policy
 
 The project is designed as a practical QA Automation / SDET portfolio project for network infrastructure. It focuses on repeatable validation, structured test evidence, and readable JSON / HTML reports rather than one-off manual checks.
 
@@ -114,6 +115,7 @@ Cisco validation is read-only. It runs show commands for topology evidence and d
 | Day 34 | VRRP Staged Apply Plan and Safety Gate | Complete |
 | Day 35 | VRRP Failover Validation | Complete |
 | Day 36 | VRRP Failover Evidence Review and Report Hardening | Complete |
+| Day 37 | VRRP report regression guards and evidence snapshot policy | Complete |
 
 ## Lab Topology
 
@@ -1331,6 +1333,30 @@ Roadmap note:
 docs/roadmap/day36_vrrp_failover_evidence_review_report_hardening.md
 ```
 
+## Day37 - VRRP Report Regression and Evidence Snapshot Policy
+
+Purpose: protect the Day35 and Day36 VRRP evidence chain with offline regression tests and a clear evidence snapshot policy.
+
+Safety: regression and documentation only. Day37 did not perform new VRRP failover testing, did not unplug cables, did not connect to MikroTik routers for new validation, did not modify RouterOS configuration, and did not commit full runtime reports.
+
+Day35-Day37 chain:
+
+- Day35: VRRP live failover validation completed with a manual external failure trigger and read-only evidence collection.
+- Day36: VRRP evidence summary and report hardening completed.
+- Day37: Regression guards and evidence snapshot policy added.
+
+Day37 regression coverage:
+
+- Protects the Day35 report summary contract with fixture/sample JSON.
+- Confirms report-index result detection handles `overall_status`, `status`, and missing or unknown status fields without crashing.
+- Keeps runtime evidence under `reports/` local unless a small sanitized snapshot is intentionally selected for a milestone.
+
+Roadmap note:
+
+```text
+docs/roadmap/day37_vrrp_report_regression_evidence_policy.md
+```
+
 ## Portfolio Demo
 
 v0.1 includes reviewer/interview demo scripts for presenting the current platform safely without adding features, changing runner/dashboard behavior, or running live device-changing workflows:
@@ -1517,6 +1543,12 @@ reports/lab-summary/day35_vrrp_failover_validation.html
 reports/lab-summary/day35_vrrp_failover_validation.txt
 ```
 
+Day37 VRRP evidence policy:
+
+```text
+docs/roadmap/day37_vrrp_report_regression_evidence_policy.md
+```
+
 ## Testing Strategy
 
 The project separates live-device validation from unit tests.
@@ -1555,6 +1587,7 @@ For documentation-only review passes, run `python -m pytest` before sharing the 
 - Includes Day33 VRRP topology design and dry-run command preview evidence without live execution.
 - Includes Day34 VRRP staged apply planning and safety gate evidence without live execution.
 - Includes Day35 VRRP controlled failover validation with manual external failure trigger and read-only evidence collection.
+- Includes Day36 VRRP evidence summary/report hardening and Day37 offline regression guards plus evidence snapshot policy.
 
 ## Roadmap
 

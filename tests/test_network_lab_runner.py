@@ -176,6 +176,30 @@ def test_existing_pass_json_becomes_pass(tmp_path):
     assert record["status"] == "PASS"
 
 
+@pytest.mark.parametrize(
+    ("payload", "expected_status", "expected_message"),
+    [
+        ({"overall_status": "PASS"}, "PASS", ""),
+        ({"status": "WARN"}, "WARN", ""),
+        ({"device": "router1"}, "UNKNOWN", "Could not infer result from supported report fields."),
+        ({"status": "DEFERRED_REVIEW"}, "UNKNOWN", "Could not infer result from supported report fields."),
+    ],
+)
+def test_report_index_status_field_detection_handles_supported_and_unknown_shapes(
+    tmp_path,
+    payload,
+    expected_status,
+    expected_message,
+):
+    item = {"name": "Report", "json": "reports/report.json", "html": "reports/report.html"}
+    write_json(tmp_path / "reports/report.json", payload)
+
+    record = network_lab.check_report_file(item, tmp_path)
+
+    assert record["status"] == expected_status
+    assert record["message"] == expected_message
+
+
 def test_existing_fail_json_becomes_fail(tmp_path):
     item = {"name": "Report", "json": "reports/report.json", "html": "reports/report.html"}
     write_json(tmp_path / "reports/report.json", {"passed": False})
