@@ -44,6 +44,7 @@ The v0.1 portfolio package covers Day 1 through Day 30 post-tag verification. Th
 - Day 38 Post-VRRP Milestone Review and v0.2 Scope Planning
 - Day 39 VRRP Evidence Dashboard Integration
 - Day 40 v0.2 Demo Readiness Review and Scope Lock
+- Day 41 v0.2 Release Packaging
 
 The project is designed as a practical QA Automation / SDET portfolio project for network infrastructure. It focuses on repeatable validation, structured test evidence, and readable JSON / HTML reports rather than one-off manual checks.
 
@@ -122,6 +123,7 @@ Cisco validation is read-only. It runs show commands for topology evidence and d
 | Day 38 | Post-VRRP milestone review and v0.2 scope planning; documentation/report-planning only with no new live test | Complete |
 | Day 39 | VRRP evidence dashboard/report-index integration; report-only with no live test, SSH, or configuration change | Complete |
 | Day 40 | v0.2 demo readiness review and scope lock; report-only with no live test, SSH, or configuration change | Complete |
+| Day 41 | v0.2 release packaging; documentation/report-only with no live test, SSH, configuration change, voice/AI implementation, or tag creation | Complete |
 
 ## Lab Topology
 
@@ -1430,6 +1432,33 @@ Checklist:
 docs/portfolio_v0.2_demo_checklist.md
 ```
 
+## Day41 - v0.2 Release Packaging
+
+Purpose: prepare the v0.2 release package for Day31-Day40 HA / VRRP evidence, safety model, dashboard/report integration, and demo readiness. Day41 is report-only and documentation-only.
+
+Safety: Day41 does not run live tests, open SSH sessions, require credentials, implement voice or AI features, change MikroTik, Cisco, firewall/NAT, IP, VRRP, interface, reboot, reset, or topology settings, or create a `v0.2` tag. The `v0.2` tag is reserved for Day42.
+
+Release package:
+
+```text
+docs/releases/v0.2_release_package.md
+docs/releases/v0.2_artifact_checklist.md
+docs/portfolio/v0.2_demo_handoff_guide.md
+```
+
+Optional report-only packaging command:
+
+```powershell
+python network_lab.py --task day41-v0.2-release-packaging
+```
+
+Reports:
+
+```text
+reports/portfolio/day41_v0.2_release_packaging.json
+reports/portfolio/day41_v0.2_release_packaging.html
+```
+
 ## Portfolio Demo
 
 v0.1 includes reviewer/interview demo scripts for presenting the current platform safely without adding features, changing runner/dashboard behavior, or running live device-changing workflows:
@@ -1644,6 +1673,16 @@ reports/portfolio/day40_v0.2_demo_readiness_review.json
 reports/portfolio/day40_v0.2_demo_readiness_review.html
 ```
 
+Day41 v0.2 release packaging:
+
+```text
+docs/releases/v0.2_release_package.md
+docs/releases/v0.2_artifact_checklist.md
+docs/portfolio/v0.2_demo_handoff_guide.md
+reports/portfolio/day41_v0.2_release_packaging.json
+reports/portfolio/day41_v0.2_release_packaging.html
+```
+
 ## Testing Strategy
 
 The project separates live-device validation from unit tests.
@@ -1686,6 +1725,7 @@ For documentation-only review passes, run `python -m pytest` before sharing the 
 - Includes Day38 post-VRRP milestone review and conservative v0.2 scope planning without adding a new live test.
 - Includes Day39 HA / VRRP evidence dashboard/report-index integration for safer v0.2 demo readiness.
 - Includes Day40 v0.2 demo readiness review and scope lock without adding live tests, SSH, or device configuration changes.
+- Includes Day41 v0.2 release packaging docs and report-only handoff while leaving `v0.2` tag creation for Day42.
 
 ## Roadmap
 
@@ -1695,6 +1735,6 @@ Planned future directions:
 - HA / VRRP report visibility, read-only collection, and portfolio-ready demo packaging
 - Additional performance scenarios beyond the current iperf3 workflows
 - Syslog / packet capture analysis
-- AI report summary / RAG integration
+- v3.0 Voice + AI Network Test Assistant / AI-assisted Network Test Orchestration as future roadmap only
 
-v0.1 is packaged through Day29 and locally verified through Day30 as a portfolio release. Day40 locks the first HA / VRRP milestone into a report-only v0.2 demo readiness package. Future work should stay explicit about whether it is report-only, read-only, dry-run, guarded-live, or disabled before adding new live lab behavior.
+v0.1 is packaged through Day29 and locally verified through Day30 as a portfolio release. Day41 prepares the first HA / VRRP milestone as a report-only v0.2 release package; Day42 owns `v0.2` tag preparation. Future work should stay explicit about whether it is report-only, read-only, dry-run, guarded-live, or disabled before adding new live lab behavior.

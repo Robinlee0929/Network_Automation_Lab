@@ -45,6 +45,12 @@ DAY39_VRRP_EVIDENCE_HTML = Path("reports") / "lab-summary" / "day39_vrrp_evidenc
 DAY40_DEMO_READINESS_TASK_ID = "day40-v0.2-demo-readiness-review"
 DAY40_DEMO_READINESS_JSON = Path("reports") / "portfolio" / "day40_v0.2_demo_readiness_review.json"
 DAY40_DEMO_READINESS_HTML = Path("reports") / "portfolio" / "day40_v0.2_demo_readiness_review.html"
+DAY41_RELEASE_PACKAGING_TASK_ID = "day41-v0.2-release-packaging"
+DAY41_RELEASE_PACKAGE_DOC = Path("docs") / "releases" / "v0.2_release_package.md"
+DAY41_ARTIFACT_CHECKLIST_DOC = Path("docs") / "releases" / "v0.2_artifact_checklist.md"
+DAY41_DEMO_HANDOFF_DOC = Path("docs") / "portfolio" / "v0.2_demo_handoff_guide.md"
+DAY41_RELEASE_PACKAGING_JSON = Path("reports") / "portfolio" / "day41_v0.2_release_packaging.json"
+DAY41_RELEASE_PACKAGING_HTML = Path("reports") / "portfolio" / "day41_v0.2_release_packaging.html"
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
 WIREGUARD_RUNNER_DISPLAY_NAME = "WireGuard Runner Safety Layer"
@@ -270,6 +276,16 @@ REPORT_CATALOG = [
         "json_globs": [DAY40_DEMO_READINESS_JSON.as_posix()],
         "html_globs": [DAY40_DEMO_READINESS_HTML.as_posix()],
         "missing_note": f"Generate with: python network_lab.py --task {DAY40_DEMO_READINESS_TASK_ID}",
+    },
+    {
+        "day": "Day41",
+        "title": "v0.2 Release Packaging",
+        "report_type": "Release packaging report",
+        "safety_label": "report-only release packaging",
+        "description": "Report-only Day41 package for v0.2 docs, checklist, demo handoff, known limitations, and Day42 tag handoff.",
+        "json_globs": [DAY41_RELEASE_PACKAGING_JSON.as_posix()],
+        "html_globs": [DAY41_RELEASE_PACKAGING_HTML.as_posix()],
+        "missing_note": f"Generate with: python network_lab.py --task {DAY41_RELEASE_PACKAGING_TASK_ID}",
     },
 ]
 
@@ -574,6 +590,56 @@ VRRP_EVIDENCE_CATALOG = [
         "description": "Reviewer-facing Day40 demo readiness and scope-lock report.",
         "safety_level": "report-only",
         "demo_relevance": "Acts as the final human-readable handoff before v0.2 packaging.",
+    },
+    {
+        "group": "v0.2 release packaging",
+        "day": "Day41",
+        "title": "v0.2 release package document",
+        "artifact_type": "Markdown doc",
+        "path": DAY41_RELEASE_PACKAGE_DOC.as_posix(),
+        "description": "Packages the Day31-Day40 HA/VRRP milestone, safety model, dashboard/report integration, limitations, Day42 next step, and v3.0 roadmap note.",
+        "safety_level": "report-only",
+        "demo_relevance": "Gives reviewers one canonical v0.2 package summary before tag preparation.",
+    },
+    {
+        "group": "v0.2 release packaging",
+        "day": "Day41",
+        "title": "v0.2 artifact checklist",
+        "artifact_type": "Markdown doc",
+        "path": DAY41_ARTIFACT_CHECKLIST_DOC.as_posix(),
+        "description": "Tracks required, optional, ignored generated, Day42-deferred, and v3.0-deferred release artifacts.",
+        "safety_level": "report-only",
+        "demo_relevance": "Shows release readiness and intentionally deferred work without implying a completed tag.",
+    },
+    {
+        "group": "v0.2 release packaging",
+        "day": "Day41",
+        "title": "v0.2 demo handoff guide",
+        "artifact_type": "Markdown doc",
+        "path": DAY41_DEMO_HANDOFF_DOC.as_posix(),
+        "description": "Defines the interview/demo order and safety-level explanation for the v0.2 portfolio handoff.",
+        "safety_level": "report-only",
+        "demo_relevance": "Provides the recommended reviewer path through README, topology, catalog, dashboard, reports, and roadmap.",
+    },
+    {
+        "group": "v0.2 release packaging",
+        "day": "Day41",
+        "title": "v0.2 release packaging JSON",
+        "artifact_type": "JSON report",
+        "path": DAY41_RELEASE_PACKAGING_JSON.as_posix(),
+        "description": "Machine-readable Day41 release packaging status and safety summary.",
+        "safety_level": "report-only",
+        "demo_relevance": "Lets report index and dashboard discovery surface the Day41 package handoff.",
+    },
+    {
+        "group": "v0.2 release packaging",
+        "day": "Day41",
+        "title": "v0.2 release packaging HTML",
+        "artifact_type": "HTML report",
+        "path": DAY41_RELEASE_PACKAGING_HTML.as_posix(),
+        "description": "Reviewer-facing Day41 release packaging status and safety summary.",
+        "safety_level": "report-only",
+        "demo_relevance": "Closes the v0.2 package story while leaving tag creation for Day42.",
     },
 ]
 
@@ -916,6 +982,73 @@ def build_day40_demo_readiness_report(project_root: Path) -> Dict[str, Any]:
             "outputs": {
                 "json": DAY40_DEMO_READINESS_JSON.as_posix(),
                 "html": DAY40_DEMO_READINESS_HTML.as_posix(),
+            },
+        }
+    )
+
+
+def build_day41_release_packaging_report(project_root: Path) -> Dict[str, Any]:
+    package_docs = [
+        DAY41_RELEASE_PACKAGE_DOC,
+        DAY41_ARTIFACT_CHECKLIST_DOC,
+        DAY41_DEMO_HANDOFF_DOC,
+    ]
+    docs_status = [
+        {
+            "path": doc.as_posix(),
+            "status": "FOUND" if (project_root / doc).exists() else "MISSING",
+            "required": True,
+        }
+        for doc in package_docs
+    ]
+    return mask_secret_values(
+        {
+            "day": 41,
+            "task_name": DAY41_RELEASE_PACKAGING_TASK_ID,
+            "title": "Day41 v0.2 Release Packaging",
+            "generated_at": datetime.now().replace(microsecond=0).isoformat(sep=" "),
+            "overall_status": "PASS" if all(item["status"] == "FOUND" for item in docs_status) else "WARN",
+            "task_type": "report-only",
+            "safety_level": "report_only",
+            "live_test": False,
+            "ssh_used": False,
+            "device_config_changed": False,
+            "v0_2_tag_created": False,
+            "voice_ai_implemented": False,
+            "purpose": "Package Day31-Day40 into a v0.2 release documentation, artifact checklist, demo handoff, and optional local report.",
+            "included_release_scope": [
+                "Day31 HA / VRRP topology and safety model.",
+                "Day32 VRRP read-only precheck.",
+                "Day33 VRRP design and dry-run preview.",
+                "Day34 topology diagrams, staged plan, and demo preparation.",
+                "Day35 controlled VRRP failover validation evidence.",
+                "Day36 final topology and evidence hardening.",
+                "Day37 VRRP report regression and evidence policy.",
+                "Day38 post-milestone v0.2 scope planning.",
+                "Day39 dashboard/report-index evidence integration.",
+                "Day40 demo readiness review and scope lock.",
+            ],
+            "created_or_updated_docs": docs_status,
+            "safety_status": {
+                "live_execution": False,
+                "ssh_required": False,
+                "device_config_change": False,
+                "generated_reports_allowed": True,
+                "notes": "Day41 reads local metadata and documentation only, then writes local package reports under reports/portfolio.",
+            },
+            "known_limitations": [
+                "Some optional reports may be missing.",
+                "Generated reports under reports/ may be ignored by .gitignore.",
+                "Day41 does not create a v0.2 tag.",
+                "Day41 does not prove new live behavior.",
+                "Day41 only packages existing Day31-Day40 evidence.",
+                "Voice + AI is future roadmap only, not implemented in v0.2.",
+            ],
+            "day42_next_action": "Day42: prepare the v0.2 tag and release note after final review; Day41 intentionally leaves the tag uncreated.",
+            "v3_0_roadmap_note": "Voice + AI Network Test Assistant / AI-assisted Network Test Orchestration remains roadmap-only.",
+            "outputs": {
+                "json": DAY41_RELEASE_PACKAGING_JSON.as_posix(),
+                "html": DAY41_RELEASE_PACKAGING_HTML.as_posix(),
             },
         }
     )
@@ -1475,6 +1608,34 @@ def list_tasks() -> List[Dict[str, Any]]:
             "notes": "Report-only scope lock. Day40 does not run SSH, live tests, iperf3, failover, or MikroTik/Cisco/firewall/NAT/IP/VRRP/interface configuration changes.",
         },
         {
+            "id": DAY41_RELEASE_PACKAGING_TASK_ID,
+            "task_id": "day41_v0.2_release_packaging",
+            "display_name": "Day41 v0.2 Release Packaging",
+            "user_display_name": "v0.2 Release Packaging",
+            "day": "Day41",
+            "category": "portfolio",
+            "description": "Generate a report-only v0.2 release package status report and point to release package, artifact checklist, and demo handoff docs.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_output_path": DAY41_RELEASE_PACKAGING_JSON.as_posix(),
+            "report_paths": [
+                DAY41_RELEASE_PACKAGING_JSON.as_posix(),
+                DAY41_RELEASE_PACKAGING_HTML.as_posix(),
+            ],
+            "report_outputs": [
+                "Day41 v0.2 release packaging JSON",
+                "Day41 v0.2 release packaging HTML",
+                "Release package docs, artifact checklist, and demo handoff guide references",
+            ],
+            "related_script": "network_lab.py",
+            "notes": "Report-only release packaging and documentation handoff. Day41 does not run SSH, live tests, iperf3, failover, voice, AI assistant features, v0.2 tag creation, or MikroTik/Cisco/firewall/NAT/IP/VRRP/interface configuration changes.",
+        },
+        {
             "id": WIREGUARD_RUNNER_TASK_ALIAS,
             "task_id": WIREGUARD_RUNNER_TASK_ID,
             "display_name": WIREGUARD_RUNNER_DISPLAY_NAME,
@@ -1551,6 +1712,7 @@ def _build_parser() -> argparse.ArgumentParser:
   python network_lab.py --task day35-vrrp-failover-validation
   python network_lab.py --task day39-vrrp-evidence-dashboard-integration
   python network_lab.py --task day40-v0.2-demo-readiness-review
+  python network_lab.py --task day41-v0.2-release-packaging
   python network_lab.py --task wireguard-runner --dry-run
   python network_lab.py --task wireguard-runner --wireguard-config Set_WireguardVPN_lab02_config.json --dry-run
   python network_lab.py --task wireguard-runner
@@ -1566,6 +1728,7 @@ day34-vrrp-staged-plan generates a blocked staged apply plan and safety gate wit
 day35-vrrp-failover-validation observes manual external VRRP failover with read-only RouterOS commands and source-specific LAN pings.
 day39-vrrp-evidence-dashboard-integration scans local VRRP docs/reports only and writes a summary report.
 day40-v0.2-demo-readiness-review writes a report-only v0.2 demo readiness scope lock without SSH or live tests.
+day41-v0.2-release-packaging writes a report-only v0.2 release packaging summary without SSH, live tests, voice/AI implementation, or tag creation.
 wireguard-runner is dry-run by default and delegates to the existing WireGuard script only after explicit --allow-live-wireguard."""
     parser = argparse.ArgumentParser(
         description=f"Day14 {DAY14_NAME}.",
@@ -1594,6 +1757,7 @@ wireguard-runner is dry-run by default and delegates to the existing WireGuard s
             DAY35_VRRP_FAILOVER_TASK_ID,
             DAY39_VRRP_EVIDENCE_TASK_ID,
             DAY40_DEMO_READINESS_TASK_ID,
+            DAY41_RELEASE_PACKAGING_TASK_ID,
             WIREGUARD_RUNNER_TASK_ALIAS,
         ],
         help="Task to run.",
@@ -2352,6 +2516,87 @@ def write_day40_demo_readiness_html(report: Dict[str, Any], output_path: Path, p
     output_path.write_text(html_text, encoding="utf-8")
 
 
+def write_day41_release_packaging_html(report: Dict[str, Any], output_path: Path, project_root: Path) -> None:
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    scope_rows = "\n".join(
+        f"<li>{html.escape(str(item))}</li>" for item in report.get("included_release_scope", [])
+    )
+    doc_rows = "\n".join(
+        "<tr>"
+        f"<td>{_html_artifact_link_or_text(output_path, project_root, str(item.get('path', '')))}</td>"
+        f"<td><span class=\"pill status-{_css_token(str(item.get('status', '')))}\">{html.escape(str(item.get('status', '')))}</span></td>"
+        f"<td>{'yes' if item.get('required') else 'no'}</td>"
+        "</tr>"
+        for item in report.get("created_or_updated_docs", [])
+    )
+    limitations = "".join(f"<li>{html.escape(str(item))}</li>" for item in report.get("known_limitations", []))
+    safety = report.get("safety_status", {})
+    html_text = f"""<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Day41 v0.2 Release Packaging</title>
+  <style>
+    :root {{ --bg: #f6f8fb; --ink: #182230; --muted: #667085; --line: #d8e0ec; --panel: #ffffff; --head: #263447; --green-bg: #e7f7ee; --green: #147a3d; --yellow-bg: #fff4d8; --yellow: #8a6100; --blue: #175cd3; }}
+    * {{ box-sizing: border-box; }}
+    body {{ margin: 0; font-family: Arial, sans-serif; background: var(--bg); color: var(--ink); font-size: 14px; }}
+    header {{ background: var(--head); color: white; padding: 34px 38px 24px; }}
+    main {{ padding: 28px 38px 46px; }}
+    h1 {{ margin: 0 0 8px; font-size: 30px; letter-spacing: 0; }}
+    h2 {{ margin-top: 30px; font-size: 20px; }}
+    .meta {{ color: #dbe5f3; }}
+    .notice {{ background: var(--yellow-bg); border: 1px solid #f0c66a; border-radius: 8px; padding: 12px 14px; margin: 18px 0 20px; color: var(--yellow); }}
+    .summary {{ display: grid; grid-template-columns: repeat(4, minmax(120px, 1fr)); gap: 12px; margin-top: 18px; }}
+    .metric {{ background: rgba(255, 255, 255, .10); border: 1px solid rgba(255, 255, 255, .20); border-radius: 8px; padding: 13px 14px; }}
+    .metric-label {{ color: #dbe5f3; font-size: 12px; font-weight: 700; text-transform: uppercase; }}
+    .metric-value {{ margin-top: 4px; font-size: 24px; font-weight: 800; }}
+    .panel {{ background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 16px 18px; }}
+    table {{ width: 100%; border-collapse: collapse; background: var(--panel); border: 1px solid var(--line); }}
+    th, td {{ padding: 10px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }}
+    th {{ background: #edf2f8; font-size: 12px; text-transform: uppercase; color: #435066; }}
+    a {{ color: var(--blue); font-weight: 700; text-decoration: none; }}
+    .pill {{ display: inline-block; border-radius: 999px; padding: 4px 9px; font-size: 12px; font-weight: 800; white-space: nowrap; }}
+    .status-pass, .status-found {{ background: var(--green-bg); color: var(--green); }}
+    .status-missing, .status-warn {{ background: var(--yellow-bg); color: var(--yellow); }}
+    @media (max-width: 900px) {{ header, main {{ padding-left: 16px; padding-right: 16px; }} .summary {{ grid-template-columns: 1fr; }} table {{ display: block; overflow-x: auto; }} }}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Day41 v0.2 Release Packaging</h1>
+    <div class="meta">Generated {html.escape(str(report.get("generated_at", "")))} · Overall {html.escape(str(report.get("overall_status", "")))}</div>
+    <section class="summary">
+      <div class="metric"><div class="metric-label">Task Type</div><div class="metric-value">{html.escape(str(report.get("task_type", "")))}</div></div>
+      <div class="metric"><div class="metric-label">Live Test</div><div class="metric-value">{html.escape(str(report.get("live_test", "")))}</div></div>
+      <div class="metric"><div class="metric-label">SSH Used</div><div class="metric-value">{html.escape(str(report.get("ssh_used", "")))}</div></div>
+      <div class="metric"><div class="metric-label">v0.2 Tag</div><div class="metric-value">{html.escape(str(report.get("v0_2_tag_created", "")))}</div></div>
+    </section>
+  </header>
+  <main>
+    <div class="notice">Report-only release packaging. Day41 did not run live tests, open SSH, change device configuration, implement voice/AI features, or create a v0.2 tag.</div>
+    <div class="panel"><h2>Purpose</h2><p>{html.escape(str(report.get("purpose", "")))}</p></div>
+    <h2>Included Day31-Day40 Scope</h2>
+    <div class="panel"><ul>{scope_rows}</ul></div>
+    <h2>Package Documents</h2>
+    <table><thead><tr><th>Path</th><th>Status</th><th>Required</th></tr></thead><tbody>{doc_rows}</tbody></table>
+    <h2>Safety Status</h2>
+    <table><thead><tr><th>Control</th><th>Value</th></tr></thead><tbody>
+      <tr><td>Live execution</td><td>{html.escape(str(safety.get("live_execution", "")))}</td></tr>
+      <tr><td>SSH required</td><td>{html.escape(str(safety.get("ssh_required", "")))}</td></tr>
+      <tr><td>Device config change</td><td>{html.escape(str(safety.get("device_config_change", "")))}</td></tr>
+      <tr><td>Generated reports allowed</td><td>{html.escape(str(safety.get("generated_reports_allowed", "")))}</td></tr>
+    </tbody></table>
+    <h2>Known Limitations</h2>
+    <div class="panel"><ul>{limitations}</ul></div>
+    <h2>Next Steps</h2>
+    <div class="panel"><p><strong>Day42:</strong> {html.escape(str(report.get("day42_next_action", "")))}</p><p><strong>v3.0 roadmap:</strong> {html.escape(str(report.get("v3_0_roadmap_note", "")))}</p></div>
+  </main>
+</body>
+</html>
+"""
+    output_path.write_text(html_text, encoding="utf-8")
+
+
 def _portfolio_evidence_area(row: Dict[str, Any]) -> str:
     title = str(row.get("title", "")).lower()
     day = str(row.get("day", ""))
@@ -2859,6 +3104,27 @@ def _run_day40_demo_readiness_review(project_root: Path) -> int:
         f"device_config_changed={report.get('device_config_changed')}"
     )
     print("Safety: report-only; no live tests, SSH, credentials, or configuration changes.")
+    print(f"JSON report: {_relative_to_project(project_root, json_path)}")
+    print(f"HTML report: {_relative_to_project(project_root, html_path)}")
+    return 0
+
+
+def _run_day41_release_packaging(project_root: Path) -> int:
+    report = build_day41_release_packaging_report(project_root)
+    json_path = project_root / DAY41_RELEASE_PACKAGING_JSON
+    html_path = project_root / DAY41_RELEASE_PACKAGING_HTML
+    write_json_report(report, json_path)
+    write_day41_release_packaging_html(report, html_path, project_root)
+    print(format_heading("Day41 v0.2 Release Packaging"))
+    print(f"Overall status: {format_status(str(report.get('overall_status', 'UNKNOWN')))}")
+    print(
+        "Safety flags: "
+        f"live_test={report.get('live_test')} "
+        f"ssh_used={report.get('ssh_used')} "
+        f"device_config_changed={report.get('device_config_changed')} "
+        f"v0_2_tag_created={report.get('v0_2_tag_created')}"
+    )
+    print("Safety: report-only; no live tests, SSH, credentials, configuration changes, voice/AI implementation, or tag creation.")
     print(f"JSON report: {_relative_to_project(project_root, json_path)}")
     print(f"HTML report: {_relative_to_project(project_root, html_path)}")
     return 0
@@ -3887,6 +4153,8 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
         return _run_day39_vrrp_evidence_dashboard_integration(root)
     if args.task == DAY40_DEMO_READINESS_TASK_ID:
         return _run_day40_demo_readiness_review(root)
+    if args.task == DAY41_RELEASE_PACKAGING_TASK_ID:
+        return _run_day41_release_packaging(root)
 
     profile_path = _resolve_project_path(root, args.profile)
     try:
