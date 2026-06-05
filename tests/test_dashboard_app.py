@@ -325,6 +325,69 @@ def test_home_summary_includes_missing_wireguard_vpn_card():
     assert card["status"] == "UNKNOWN"
 
 
+def test_home_summary_includes_vrrp_evidence_card(tmp_path):
+    reports_dir = tmp_path / "reports"
+    write_json(
+        reports_dir / "lab-summary" / "day35_vrrp_failover_validation.json",
+        {"overall_status": "PASS"},
+    )
+
+    entries = dashboard.discover_reports(reports_dir)
+    cards = dashboard.build_summary_cards(entries)
+
+    card = next(card for card in cards if card["title"] == "HA / VRRP evidence")
+    assert card["missing"] is False
+    assert card["status"] == "PASS"
+
+
+def test_dashboard_reports_route_exposes_vrrp_evidence_group(tmp_path):
+    if dashboard.Flask is None:
+        pytest.skip("Flask is not installed in this test environment.")
+
+    reports_dir = tmp_path / "reports"
+    write_json(
+        reports_dir / "lab-summary" / "day32_vrrp_readonly_precheck.json",
+        {"overall_status": "PASS"},
+    )
+    doc_path = tmp_path / "docs" / "roadmap" / "ha_vrrp_topology_plan.md"
+    doc_path.parent.mkdir(parents=True, exist_ok=True)
+    doc_path.write_text("# VRRP plan", encoding="utf-8")
+
+    app = dashboard.create_app(
+        reports_dir=reports_dir,
+        execution_logs_dir=tmp_path / "execution_logs",
+    )
+    response = app.test_client().get("/reports")
+
+    assert response.status_code == 200
+    text = response.data.decode("utf-8")
+    assert "HA / VRRP Evidence" in text
+    assert "HA / VRRP topology plan" in text
+    assert "VRRP read-only precheck JSON" in text
+    assert "FOUND" in text
+    assert "NOT_GENERATED" in text
+
+
+def test_dashboard_evidence_route_serves_safe_docs_and_rejects_json_raw(tmp_path):
+    if dashboard.Flask is None:
+        pytest.skip("Flask is not installed in this test environment.")
+
+    reports_dir = tmp_path / "reports"
+    doc_path = tmp_path / "docs" / "roadmap" / "ha_vrrp_topology_plan.md"
+    doc_path.parent.mkdir(parents=True, exist_ok=True)
+    doc_path.write_text("# VRRP plan", encoding="utf-8")
+    write_json(tmp_path / "topology_profiles" / "day33_vrrp_topology_dry_run.json", {"password": "secret"})
+
+    app = dashboard.create_app(
+        reports_dir=reports_dir,
+        execution_logs_dir=tmp_path / "execution_logs",
+    )
+    client = app.test_client()
+
+    assert client.get("/reports/evidence/docs/roadmap/ha_vrrp_topology_plan.md").status_code == 200
+    assert client.get("/reports/evidence/topology_profiles/day33_vrrp_topology_dry_run.json").status_code == 404
+
+
 def test_readme_contains_day12_section_and_safety_notes():
     readme = Path("README.md").read_text(encoding="utf-8")
 

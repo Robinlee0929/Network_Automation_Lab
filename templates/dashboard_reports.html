@@ -127,6 +127,49 @@
   {% endif %}
 
   <section>
+    <h2>HA / VRRP Evidence</h2>
+    <p>Day31-Day38 HA / VRRP docs, diagrams, profiles, generated reports, and Day39 dashboard integration status. This section is read-only and does not expose live VRRP execution.</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Group</th>
+            <th>Day</th>
+            <th>Artifact</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th>Safety</th>
+            <th>Path</th>
+            <th>Demo relevance</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in vrrp_evidence %}
+          <tr>
+            <td>{{ item.group }}</td>
+            <td>{{ item.day }}</td>
+            <td>{{ item.title }}</td>
+            <td>{{ item.artifact_type }}</td>
+            <td><span class="badge {{ item.status|status_class }}">{{ item.status }}</span></td>
+            <td>{{ item.safety_level }}</td>
+            <td>
+              {% if item.exists and item.path.endswith('.json') %}
+              <a href="{{ json_report_url(item.path) }}"><code>{{ item.path }}</code></a>
+              {% elif item.exists %}
+              <a href="{{ evidence_url(item.path) }}"><code>{{ item.path }}</code></a>
+              {% else %}
+              <code>{{ item.path }}</code>
+              {% endif %}
+            </td>
+            <td>{{ item.demo_relevance }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
     <h2>WireGuard VPN Automation</h2>
     <p>WireGuard Client Config Export + VPN Throughput Baseline.</p>
     {% if not day12_summaries %}

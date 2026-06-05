@@ -121,3 +121,16 @@ def test_day35_vrrp_failover_catalog_entry_is_controlled_observation():
     assert "day35_vrrp_failover_validation.json" in day35["report_paths"][0]
     assert "disconnect/reconnect lab01 LAN externally" in day35["notes"]
     assert "blocks interface, firewall/NAT, IP, VRRP, reboot, and reset changes" in day35["notes"]
+
+
+def test_day39_vrrp_evidence_dashboard_integration_catalog_entry_is_report_only():
+    day39 = next(task for task in network_lab.list_tasks() if task["id"] == "day39-vrrp-evidence-dashboard-integration")
+
+    assert day39["task_id"] == "day39_vrrp_evidence_dashboard_integration"
+    assert day39["safety_level"] == "report-only"
+    assert day39["execution_mode"] == "report-only"
+    assert day39["requires_live_device"] is False
+    assert day39["requires_password"] is False
+    assert "day39_vrrp_evidence_dashboard_integration.json" in day39["report_paths"][0]
+    assert "does not run SSH" in day39["notes"]
+    assert "configuration changes" in day39["notes"]
