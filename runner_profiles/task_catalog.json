@@ -1,6 +1,6 @@
 {
-  "catalog_version": "day35-vrrp-failover-validation",
-  "purpose": "Static task catalog metadata for Day35 VRRP controlled failover validation. This file does not execute tasks, read config.json, connect to devices, or modify runner behavior.",
+  "catalog_version": "day40-v0.2-demo-readiness-review",
+  "purpose": "Static task catalog metadata through Day40 v0.2 demo readiness review. This file does not execute tasks, read config.json, connect to devices, or modify runner behavior.",
   "tasks": [
     {
       "id": "day4-mikrotik-multi-device-baseline",
@@ -260,6 +260,25 @@
       ],
       "allow_live_execution": false,
       "notes": "Report-only local evidence scan. Integrates Day31-Day38 VRRP docs, diagrams, profiles, and generated report paths into dashboard/report-index visibility without SSH, live tests, iperf3, failover, or device configuration changes."
+    },
+    {
+      "id": "day40-v0.2-demo-readiness-review",
+      "title": "Day40 v0.2 demo readiness review and scope lock",
+      "category": "portfolio",
+      "safety_level": "report_only",
+      "device_scope": [
+        "local-reports",
+        "documentation",
+        "dashboard",
+        "portfolio"
+      ],
+      "profile_path": null,
+      "report_paths": [
+        "reports/portfolio/day40_v0.2_demo_readiness_review.json",
+        "reports/portfolio/day40_v0.2_demo_readiness_review.html"
+      ],
+      "allow_live_execution": false,
+      "notes": "Report-only demo readiness scope lock. Does not run SSH, live tests, iperf3, failover, or MikroTik/Cisco/firewall/NAT/IP/VRRP/interface configuration changes."
     }
   ]
 }

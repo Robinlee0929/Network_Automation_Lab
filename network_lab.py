@@ -42,6 +42,9 @@ DAY35_VRRP_FAILOVER_TXT = Path("reports") / "lab-summary" / "day35_vrrp_failover
 DAY39_VRRP_EVIDENCE_TASK_ID = "day39-vrrp-evidence-dashboard-integration"
 DAY39_VRRP_EVIDENCE_JSON = Path("reports") / "lab-summary" / "day39_vrrp_evidence_dashboard_integration.json"
 DAY39_VRRP_EVIDENCE_HTML = Path("reports") / "lab-summary" / "day39_vrrp_evidence_dashboard_integration.html"
+DAY40_DEMO_READINESS_TASK_ID = "day40-v0.2-demo-readiness-review"
+DAY40_DEMO_READINESS_JSON = Path("reports") / "portfolio" / "day40_v0.2_demo_readiness_review.json"
+DAY40_DEMO_READINESS_HTML = Path("reports") / "portfolio" / "day40_v0.2_demo_readiness_review.html"
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
 WIREGUARD_RUNNER_DISPLAY_NAME = "WireGuard Runner Safety Layer"
@@ -257,6 +260,16 @@ REPORT_CATALOG = [
         "json_globs": [DAY39_VRRP_EVIDENCE_JSON.as_posix()],
         "html_globs": [DAY39_VRRP_EVIDENCE_HTML.as_posix()],
         "missing_note": f"Generate with: python network_lab.py --task {DAY39_VRRP_EVIDENCE_TASK_ID}",
+    },
+    {
+        "day": "Day40",
+        "title": "v0.2 Demo Readiness Review and Scope Lock",
+        "report_type": "Portfolio demo readiness report",
+        "safety_label": "report-only demo readiness",
+        "description": "Report-only Day40 scope lock and demo checklist for v0.2; generated without SSH, live tests, or device configuration changes.",
+        "json_globs": [DAY40_DEMO_READINESS_JSON.as_posix()],
+        "html_globs": [DAY40_DEMO_READINESS_HTML.as_posix()],
+        "missing_note": f"Generate with: python network_lab.py --task {DAY40_DEMO_READINESS_TASK_ID}",
     },
 ]
 
@@ -522,6 +535,46 @@ VRRP_EVIDENCE_CATALOG = [
         "safety_level": "report-only",
         "demo_relevance": "Provides a single HTML handoff for the HA/VRRP evidence chain.",
     },
+    {
+        "group": "v0.2 demo readiness",
+        "day": "Day40",
+        "title": "v0.2 demo readiness review",
+        "artifact_type": "Documentation",
+        "path": "docs/roadmap/day40_v0.2_demo_readiness_review.md",
+        "description": "Locks the v0.2 demo scope and records Day40 as report-only.",
+        "safety_level": "report-only",
+        "demo_relevance": "Gives reviewers the v0.2 scope boundary before release packaging.",
+    },
+    {
+        "group": "v0.2 demo readiness",
+        "day": "Day40",
+        "title": "v0.2 portfolio demo checklist",
+        "artifact_type": "Documentation",
+        "path": "docs/portfolio_v0.2_demo_checklist.md",
+        "description": "Pre-demo, dashboard, report-index, evidence traceability, safety, and go/no-go checklist.",
+        "safety_level": "report-only",
+        "demo_relevance": "Provides the operator checklist for a safe portfolio walkthrough.",
+    },
+    {
+        "group": "v0.2 demo readiness",
+        "day": "Day40",
+        "title": "v0.2 demo readiness JSON",
+        "artifact_type": "JSON report",
+        "path": DAY40_DEMO_READINESS_JSON.as_posix(),
+        "description": "Machine-readable Day40 demo readiness and scope-lock report.",
+        "safety_level": "report-only",
+        "demo_relevance": "Lets report index and dashboard discovery surface the Day40 scope lock.",
+    },
+    {
+        "group": "v0.2 demo readiness",
+        "day": "Day40",
+        "title": "v0.2 demo readiness HTML",
+        "artifact_type": "HTML report",
+        "path": DAY40_DEMO_READINESS_HTML.as_posix(),
+        "description": "Reviewer-facing Day40 demo readiness and scope-lock report.",
+        "safety_level": "report-only",
+        "demo_relevance": "Acts as the final human-readable handoff before v0.2 packaging.",
+    },
 ]
 
 
@@ -768,6 +821,104 @@ def build_day39_vrrp_evidence_report(project_root: Path) -> Dict[str, Any]:
             entry for entry in entries if entry["status"] in {"MISSING", "NOT_GENERATED"}
         ],
     }
+
+
+def build_day40_demo_readiness_report(project_root: Path) -> Dict[str, Any]:
+    evidence_entries = [
+        entry
+        for entry in discover_vrrp_evidence(project_root)
+        if str(entry.get("day", "")) in {f"Day{day}" for day in range(31, 40)}
+    ]
+    traceability = [
+        {
+            "day": entry.get("day", ""),
+            "artifact": entry.get("title", ""),
+            "artifact_type": entry.get("artifact_type", ""),
+            "path": entry.get("path", ""),
+            "status": entry.get("status", "MISSING"),
+            "safety_level": entry.get("safety_level", ""),
+            "demo_relevance": entry.get("demo_relevance", ""),
+        }
+        for entry in evidence_entries
+    ]
+    demo_checklist = [
+        {"category": "Pre-demo", "item": "README opens with v0.2 HA / VRRP context visible.", "status": "PASS"},
+        {"category": "Dashboard", "item": "Dashboard /reports can show local evidence cards without running live workflows.", "status": "PASS"},
+        {"category": "Report Index", "item": "Report index discovers generated JSON/HTML evidence when present.", "status": "PASS"},
+        {"category": "Latest Lab Overview", "item": "Latest overview includes HA / VRRP evidence metadata through local discovery.", "status": "PASS"},
+        {"category": "Safety", "item": "Demo story explicitly separates report-only review from read-only or guarded live tasks.", "status": "PASS"},
+        {"category": "Scope Lock", "item": "v0.2 demo excludes new live tests, SSH, and device configuration changes.", "status": "PASS"},
+    ]
+    return mask_secret_values(
+        {
+            "day": 40,
+            "task_name": DAY40_DEMO_READINESS_TASK_ID,
+            "title": "v0.2 Demo Readiness Review and Scope Lock",
+            "generated_at": datetime.now().replace(microsecond=0).isoformat(sep=" "),
+            "overall_status": "PASS",
+            "demo_readiness_status": "READY_WITH_LIMITATIONS",
+            "task_type": "report-only",
+            "safety_level": "report_only",
+            "live_test": False,
+            "ssh_used": False,
+            "device_config_changed": False,
+            "safety_statement": (
+                "Day40 is report-only. It does not run live tests, does not use SSH, "
+                "and does not change MikroTik, Cisco, firewall, NAT, IP, VRRP, or interface settings."
+            ),
+            "scope_included": [
+                "Day31-Day39 HA / VRRP milestone summary.",
+                "v0.2 demo scope lock for portfolio review.",
+                "Dashboard, report index, latest overview, and evidence traceability checks.",
+                "Generated JSON and HTML portfolio readiness reports.",
+                "Known limitations and next-step planning for v0.2 release packaging.",
+            ],
+            "scope_excluded": [
+                "New live VRRP tests or failover injection.",
+                "Any SSH operation or credential access.",
+                "MikroTik, Cisco, firewall, NAT, IP, VRRP, or interface configuration changes.",
+                "New scripts that perform live network changes.",
+                "Changes to Day31-Day39 evidence semantics.",
+                "CLI tab completion, command tree, and AI report assistant implementation.",
+            ],
+            "day31_to_day39_summary": [
+                {"day": "Day31", "summary": "Created HA / VRRP topology and safety planning docs.", "status": "Complete"},
+                {"day": "Day32", "summary": "Added VRRP read-only precheck with safety guard and reports.", "status": "Complete"},
+                {"day": "Day33", "summary": "Added VRRP topology dry-run and command preview without SSH.", "status": "Complete"},
+                {"day": "Day34", "summary": "Added staged apply plan and safety gate while blocking live execution.", "status": "Complete"},
+                {"day": "Day35", "summary": "Captured controlled failover observation with manual external trigger and read-only evidence.", "status": "Complete"},
+                {"day": "Day36", "summary": "Hardened Day35 evidence readability, report-index visibility, and portfolio traceability.", "status": "Complete"},
+                {"day": "Day37", "summary": "Recorded regression guards and evidence snapshot policy for VRRP reports.", "status": "Complete"},
+                {"day": "Day38", "summary": "Reviewed the post-VRRP milestone and proposed conservative v0.2 scope.", "status": "Complete"},
+                {"day": "Day39", "summary": "Integrated HA / VRRP evidence into dashboard and report-index visibility.", "status": "Complete"},
+            ],
+            "demo_checklist": demo_checklist,
+            "evidence_traceability": traceability,
+            "dashboard_walkthrough": [
+                {"step": 1, "surface": "README", "check": "Confirm v0.2 HA / VRRP project context and safety posture."},
+                {"step": 2, "surface": "Task Catalog", "check": "Run demo navigation command `python network_lab.py --list-tasks --verbose` and point out safety levels."},
+                {"step": 3, "surface": "Report Index", "check": "Run demo navigation command `python network_lab.py --task report-index` and open `reports/report_index.html`."},
+                {"step": 4, "surface": "Dashboard", "check": "Open `/reports` and review HA / VRRP evidence cards without starting live workflows."},
+                {"step": 5, "surface": "Portfolio Reports", "check": "Open Day39 and Day40 HTML reports to close the v0.2 story."},
+            ],
+            "known_limitations": [
+                "The Day35 failover trigger remains manual and physical.",
+                "The v0.2 demo relies on local generated reports being present when screenshots are needed.",
+                "Topology variants beyond the two-router MikroTik HA lab remain future work.",
+                "AI summaries and CLI command tree improvements are intentionally out of Day40 scope.",
+            ],
+            "next_steps": [
+                {"day": "Day41", "item": "v0.2 release package."},
+                {"day": "Day42", "item": "v0.2 tag / release note."},
+                {"day": "Day43 or later", "item": "CLI tab completion / command tree."},
+                {"day": "Day43 or later", "item": "AI report assistant."},
+            ],
+            "outputs": {
+                "json": DAY40_DEMO_READINESS_JSON.as_posix(),
+                "html": DAY40_DEMO_READINESS_HTML.as_posix(),
+            },
+        }
+    )
 
 
 def build_latest_lab_overview(profile: Dict[str, Any], project_root: Path) -> Dict[str, Any]:
@@ -1296,6 +1447,34 @@ def list_tasks() -> List[Dict[str, Any]]:
             "notes": "Report-only local scan of Day31-Day38 docs, diagrams, profiles, and generated report paths. It does not run SSH, live tests, iperf3, failover, or RouterOS/Cisco configuration changes.",
         },
         {
+            "id": DAY40_DEMO_READINESS_TASK_ID,
+            "task_id": "day40_v0.2_demo_readiness_review",
+            "display_name": "Day40 v0.2 Demo Readiness Review",
+            "user_display_name": "v0.2 Demo Readiness Review",
+            "day": "Day40",
+            "category": "portfolio",
+            "description": "Generate a report-only v0.2 demo readiness review, scope lock, checklist, and evidence traceability report.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_output_path": DAY40_DEMO_READINESS_JSON.as_posix(),
+            "report_paths": [
+                DAY40_DEMO_READINESS_JSON.as_posix(),
+                DAY40_DEMO_READINESS_HTML.as_posix(),
+            ],
+            "report_outputs": [
+                "Day40 v0.2 demo readiness JSON",
+                "Day40 v0.2 demo readiness HTML",
+                "Dashboard/report-index portfolio visibility",
+            ],
+            "related_script": "network_lab.py",
+            "notes": "Report-only scope lock. Day40 does not run SSH, live tests, iperf3, failover, or MikroTik/Cisco/firewall/NAT/IP/VRRP/interface configuration changes.",
+        },
+        {
             "id": WIREGUARD_RUNNER_TASK_ALIAS,
             "task_id": WIREGUARD_RUNNER_TASK_ID,
             "display_name": WIREGUARD_RUNNER_DISPLAY_NAME,
@@ -1371,6 +1550,7 @@ def _build_parser() -> argparse.ArgumentParser:
   python network_lab.py --task day34-vrrp-staged-plan
   python network_lab.py --task day35-vrrp-failover-validation
   python network_lab.py --task day39-vrrp-evidence-dashboard-integration
+  python network_lab.py --task day40-v0.2-demo-readiness-review
   python network_lab.py --task wireguard-runner --dry-run
   python network_lab.py --task wireguard-runner --wireguard-config Set_WireguardVPN_lab02_config.json --dry-run
   python network_lab.py --task wireguard-runner
@@ -1385,6 +1565,7 @@ day33-vrrp-dry-run generates local VRRP topology and command previews without SS
 day34-vrrp-staged-plan generates a blocked staged apply plan and safety gate without SSH or RouterOS execution.
 day35-vrrp-failover-validation observes manual external VRRP failover with read-only RouterOS commands and source-specific LAN pings.
 day39-vrrp-evidence-dashboard-integration scans local VRRP docs/reports only and writes a summary report.
+day40-v0.2-demo-readiness-review writes a report-only v0.2 demo readiness scope lock without SSH or live tests.
 wireguard-runner is dry-run by default and delegates to the existing WireGuard script only after explicit --allow-live-wireguard."""
     parser = argparse.ArgumentParser(
         description=f"Day14 {DAY14_NAME}.",
@@ -1412,6 +1593,7 @@ wireguard-runner is dry-run by default and delegates to the existing WireGuard s
             DAY34_VRRP_STAGED_PLAN_TASK_ID,
             DAY35_VRRP_FAILOVER_TASK_ID,
             DAY39_VRRP_EVIDENCE_TASK_ID,
+            DAY40_DEMO_READINESS_TASK_ID,
             WIREGUARD_RUNNER_TASK_ALIAS,
         ],
         help="Task to run.",
@@ -2057,6 +2239,119 @@ def write_day39_vrrp_evidence_html(report: Dict[str, Any], output_path: Path, pr
     output_path.write_text(html_text, encoding="utf-8")
 
 
+def write_day40_demo_readiness_html(report: Dict[str, Any], output_path: Path, project_root: Path) -> None:
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    included = "".join(f"<li>{html.escape(str(item))}</li>" for item in report.get("scope_included", []))
+    excluded = "".join(f"<li>{html.escape(str(item))}</li>" for item in report.get("scope_excluded", []))
+    checklist_rows = "\n".join(
+        "<tr>"
+        f"<td>{html.escape(str(item.get('category', '')))}</td>"
+        f"<td>{html.escape(str(item.get('item', '')))}</td>"
+        f"<td><span class=\"pill status-{_css_token(str(item.get('status', '')))}\">{html.escape(str(item.get('status', '')))}</span></td>"
+        "</tr>"
+        for item in report.get("demo_checklist", [])
+    )
+    milestone_rows = "\n".join(
+        "<tr>"
+        f"<td>{html.escape(str(item.get('day', '')))}</td>"
+        f"<td>{html.escape(str(item.get('summary', '')))}</td>"
+        f"<td>{html.escape(str(item.get('status', '')))}</td>"
+        "</tr>"
+        for item in report.get("day31_to_day39_summary", [])
+    )
+    traceability_rows = "\n".join(
+        "<tr>"
+        f"<td>{html.escape(str(item.get('day', '')))}</td>"
+        f"<td>{html.escape(str(item.get('artifact', '')))}</td>"
+        f"<td>{html.escape(str(item.get('artifact_type', '')))}</td>"
+        f"<td><span class=\"pill status-{_css_token(str(item.get('status', '')))}\">{html.escape(str(item.get('status', '')))}</span></td>"
+        f"<td>{html.escape(str(item.get('safety_level', '')))}</td>"
+        f"<td>{_html_artifact_link_or_text(output_path, project_root, str(item.get('path', '')))}</td>"
+        f"<td>{html.escape(str(item.get('demo_relevance', '')))}</td>"
+        "</tr>"
+        for item in report.get("evidence_traceability", [])
+    )
+    walkthrough_rows = "\n".join(
+        "<tr>"
+        f"<td>{html.escape(str(item.get('step', '')))}</td>"
+        f"<td>{html.escape(str(item.get('surface', '')))}</td>"
+        f"<td>{html.escape(str(item.get('check', '')))}</td>"
+        "</tr>"
+        for item in report.get("dashboard_walkthrough", [])
+    )
+    limitations = "".join(f"<li>{html.escape(str(item))}</li>" for item in report.get("known_limitations", []))
+    next_steps = "".join(
+        f"<li><strong>{html.escape(str(item.get('day', '')))}</strong>: {html.escape(str(item.get('item', '')))}</li>"
+        for item in report.get("next_steps", [])
+    )
+    html_text = f"""<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Day40 v0.2 Demo Readiness Review</title>
+  <style>
+    :root {{ --bg: #f6f8fb; --ink: #182230; --muted: #667085; --line: #d8e0ec; --panel: #ffffff; --head: #243447; --green-bg: #e7f7ee; --green: #147a3d; --yellow-bg: #fff4d8; --yellow: #8a6100; --blue-bg: #e8f1ff; --blue: #175cd3; }}
+    * {{ box-sizing: border-box; }}
+    body {{ margin: 0; font-family: Arial, sans-serif; background: var(--bg); color: var(--ink); font-size: 14px; }}
+    header {{ background: var(--head); color: white; padding: 34px 38px 24px; }}
+    main {{ padding: 28px 38px 46px; }}
+    h1 {{ margin: 0 0 8px; font-size: 30px; letter-spacing: 0; }}
+    h2 {{ margin-top: 30px; font-size: 20px; }}
+    .meta {{ color: #dbe5f3; }}
+    .notice {{ background: var(--yellow-bg); border: 1px solid #f0c66a; border-radius: 8px; padding: 12px 14px; margin: 18px 0 20px; color: var(--yellow); }}
+    .summary {{ display: grid; grid-template-columns: repeat(4, minmax(120px, 1fr)); gap: 12px; margin-top: 18px; }}
+    .metric {{ background: rgba(255, 255, 255, .10); border: 1px solid rgba(255, 255, 255, .20); border-radius: 8px; padding: 13px 14px; }}
+    .metric-label {{ color: #dbe5f3; font-size: 12px; font-weight: 700; text-transform: uppercase; }}
+    .metric-value {{ margin-top: 4px; font-size: 24px; font-weight: 800; }}
+    .split {{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }}
+    .panel {{ background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 16px 18px; }}
+    table {{ width: 100%; border-collapse: collapse; background: var(--panel); border: 1px solid var(--line); }}
+    th, td {{ padding: 10px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }}
+    th {{ background: #edf2f8; font-size: 12px; text-transform: uppercase; color: #435066; }}
+    a {{ color: var(--blue); font-weight: 700; text-decoration: none; }}
+    .pill {{ display: inline-block; border-radius: 999px; padding: 4px 9px; font-size: 12px; font-weight: 800; white-space: nowrap; }}
+    .status-pass, .status-found {{ background: var(--green-bg); color: var(--green); }}
+    .status-missing, .status-not-generated {{ background: var(--yellow-bg); color: var(--yellow); }}
+    .status-not-generated {{ background: var(--blue-bg); color: var(--blue); }}
+    @media (max-width: 900px) {{ header, main {{ padding-left: 16px; padding-right: 16px; }} .summary, .split {{ grid-template-columns: 1fr; }} table {{ display: block; overflow-x: auto; }} }}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Day40 v0.2 Demo Readiness Review and Scope Lock</h1>
+    <div class="meta">Generated {html.escape(str(report.get("generated_at", "")))} · Overall {html.escape(str(report.get("overall_status", "")))}</div>
+    <section class="summary">
+      <div class="metric"><div class="metric-label">Task Type</div><div class="metric-value">{html.escape(str(report.get("task_type", "")))}</div></div>
+      <div class="metric"><div class="metric-label">Readiness</div><div class="metric-value">{html.escape(str(report.get("demo_readiness_status", "")))}</div></div>
+      <div class="metric"><div class="metric-label">Live Test</div><div class="metric-value">{html.escape(str(report.get("live_test", "")))}</div></div>
+      <div class="metric"><div class="metric-label">SSH Used</div><div class="metric-value">{html.escape(str(report.get("ssh_used", "")))}</div></div>
+    </section>
+  </header>
+  <main>
+    <div class="notice">{html.escape(str(report.get("safety_statement", "")))}</div>
+    <section class="split">
+      <div class="panel"><h2>Included Scope</h2><ul>{included}</ul></div>
+      <div class="panel"><h2>Excluded Scope</h2><ul>{excluded}</ul></div>
+    </section>
+    <h2>Day31-Day39 Milestone Summary</h2>
+    <table><thead><tr><th>Day</th><th>Summary</th><th>Status</th></tr></thead><tbody>{milestone_rows}</tbody></table>
+    <h2>Demo Readiness Checklist</h2>
+    <table><thead><tr><th>Category</th><th>Check</th><th>Status</th></tr></thead><tbody>{checklist_rows}</tbody></table>
+    <h2>Evidence Traceability</h2>
+    <table><thead><tr><th>Day</th><th>Artifact</th><th>Type</th><th>Status</th><th>Safety</th><th>Path</th><th>Demo relevance</th></tr></thead><tbody>{traceability_rows}</tbody></table>
+    <h2>Dashboard Walkthrough Checks</h2>
+    <table><thead><tr><th>Step</th><th>Surface</th><th>Check</th></tr></thead><tbody>{walkthrough_rows}</tbody></table>
+    <section class="split">
+      <div class="panel"><h2>Known Limitations</h2><ul>{limitations}</ul></div>
+      <div class="panel"><h2>Recommended Next Steps</h2><ul>{next_steps}</ul></div>
+    </section>
+  </main>
+</body>
+</html>
+"""
+    output_path.write_text(html_text, encoding="utf-8")
+
+
 def _portfolio_evidence_area(row: Dict[str, Any]) -> str:
     title = str(row.get("title", "")).lower()
     day = str(row.get("day", ""))
@@ -2542,6 +2837,27 @@ def _run_day39_vrrp_evidence_dashboard_integration(project_root: Path) -> int:
                 f"{entry.get('day')} / {entry.get('title')} -> {entry.get('path')}"
             )
     print()
+    print("Safety: report-only; no live tests, SSH, credentials, or configuration changes.")
+    print(f"JSON report: {_relative_to_project(project_root, json_path)}")
+    print(f"HTML report: {_relative_to_project(project_root, html_path)}")
+    return 0
+
+
+def _run_day40_demo_readiness_review(project_root: Path) -> int:
+    report = build_day40_demo_readiness_report(project_root)
+    json_path = project_root / DAY40_DEMO_READINESS_JSON
+    html_path = project_root / DAY40_DEMO_READINESS_HTML
+    write_json_report(report, json_path)
+    write_day40_demo_readiness_html(report, html_path, project_root)
+    print(format_heading("Day40 v0.2 Demo Readiness Review and Scope Lock"))
+    print(f"Overall status: {format_status(str(report.get('overall_status', 'UNKNOWN')))}")
+    print(f"Readiness: {report.get('demo_readiness_status')}")
+    print(
+        "Safety flags: "
+        f"live_test={report.get('live_test')} "
+        f"ssh_used={report.get('ssh_used')} "
+        f"device_config_changed={report.get('device_config_changed')}"
+    )
     print("Safety: report-only; no live tests, SSH, credentials, or configuration changes.")
     print(f"JSON report: {_relative_to_project(project_root, json_path)}")
     print(f"HTML report: {_relative_to_project(project_root, html_path)}")
@@ -3569,6 +3885,8 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
         return _run_day24_demo_flow(root)
     if args.task == DAY39_VRRP_EVIDENCE_TASK_ID:
         return _run_day39_vrrp_evidence_dashboard_integration(root)
+    if args.task == DAY40_DEMO_READINESS_TASK_ID:
+        return _run_day40_demo_readiness_review(root)
 
     profile_path = _resolve_project_path(root, args.profile)
     try:

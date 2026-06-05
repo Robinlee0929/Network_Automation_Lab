@@ -134,3 +134,16 @@ def test_day39_vrrp_evidence_dashboard_integration_catalog_entry_is_report_only(
     assert "day39_vrrp_evidence_dashboard_integration.json" in day39["report_paths"][0]
     assert "does not run SSH" in day39["notes"]
     assert "configuration changes" in day39["notes"]
+
+
+def test_day40_demo_readiness_catalog_entry_is_report_only():
+    day40 = next(task for task in network_lab.list_tasks() if task["id"] == "day40-v0.2-demo-readiness-review")
+
+    assert day40["task_id"] == "day40_v0.2_demo_readiness_review"
+    assert day40["safety_level"] == "report-only"
+    assert day40["execution_mode"] == "report-only"
+    assert day40["requires_live_device"] is False
+    assert day40["requires_password"] is False
+    assert "reports/portfolio/day40_v0.2_demo_readiness_review.json" in day40["report_paths"]
+    assert "does not run SSH" in day40["notes"]
+    assert "configuration changes" in day40["notes"]

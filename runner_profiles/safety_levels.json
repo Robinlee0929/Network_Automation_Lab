@@ -13,6 +13,16 @@
       "notes": "Used for planning documents and static catalog/profile files. It must not connect to devices or read private runtime config."
     },
     {
+      "id": "report_only",
+      "description": "Local report generation, report viewing, or evidence indexing without live device access.",
+      "allow_ssh": false,
+      "allow_config_change": false,
+      "allow_reboot": false,
+      "allow_delete": false,
+      "allow_report_generation": true,
+      "notes": "Used for report-only portfolio, dashboard, and demo readiness tasks. It must not connect to devices, read credentials, or run live tests."
+    },
+    {
       "id": "read_only",
       "description": "Read-only inspection against a device or local evidence source.",
       "allow_ssh": true,
