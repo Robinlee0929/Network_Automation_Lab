@@ -2164,6 +2164,52 @@ def test_day39_vrrp_evidence_report_generates_without_live_access(tmp_path, monk
     assert {entry["status"] for entry in report["evidence"]} >= {"MISSING", "NOT_GENERATED"}
 
 
+def test_day40_demo_readiness_report_generates_without_live_access(tmp_path, monkeypatch, capsys):
+    def fail_run(*_args, **_kwargs):
+        raise AssertionError("Day40 must not execute live scripts or subprocesses")
+
+    monkeypatch.setattr(network_lab.subprocess, "run", fail_run)
+
+    exit_code = network_lab.main(
+        ["--task", "day40-v0.2-demo-readiness-review"],
+        project_root=tmp_path,
+    )
+
+    output = capsys.readouterr().out
+    json_path = tmp_path / "reports/portfolio/day40_v0.2_demo_readiness_review.json"
+    html_path = tmp_path / "reports/portfolio/day40_v0.2_demo_readiness_review.html"
+    assert exit_code == 0
+    assert "Day40 v0.2 Demo Readiness Review and Scope Lock" in output
+    assert "Safety: report-only" in output
+    assert json_path.exists()
+    assert html_path.exists()
+    report = json.loads(json_path.read_text(encoding="utf-8"))
+    html = html_path.read_text(encoding="utf-8")
+    assert report["day"] == 40
+    assert report["task_name"] == "day40-v0.2-demo-readiness-review"
+    assert report["task_type"] == "report-only"
+    assert report["safety_level"] == "report_only"
+    assert report["live_test"] is False
+    assert report["ssh_used"] is False
+    assert report["device_config_changed"] is False
+    assert report["scope_included"]
+    assert report["scope_excluded"]
+    assert report["day31_to_day39_summary"]
+    assert report["demo_checklist"]
+    assert report["evidence_traceability"]
+    assert report["dashboard_walkthrough"]
+    assert report["known_limitations"]
+    assert report["next_steps"]
+    assert "Day40 v0.2 Demo Readiness Review and Scope Lock" in html
+    assert "does not run live tests" in html
+
+    rows = network_lab.discover_report_visibility(tmp_path)
+    day40 = next(row for row in rows if row["day"] == "Day40")
+    assert day40["status"] == "FOUND"
+    assert day40["json"].endswith("day40_v0.2_demo_readiness_review.json")
+    assert day40["html"].endswith("day40_v0.2_demo_readiness_review.html")
+
+
 def test_day39_vrrp_evidence_entries_include_status_fields(tmp_path):
     write_text(tmp_path / "docs/roadmap/ha_vrrp_topology_plan.md", "# plan")
     write_json(

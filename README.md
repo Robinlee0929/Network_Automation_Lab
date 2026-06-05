@@ -43,6 +43,7 @@ The v0.1 portfolio package covers Day 1 through Day 30 post-tag verification. Th
 - Day 37 VRRP Report Regression and Evidence Snapshot Policy
 - Day 38 Post-VRRP Milestone Review and v0.2 Scope Planning
 - Day 39 VRRP Evidence Dashboard Integration
+- Day 40 v0.2 Demo Readiness Review and Scope Lock
 
 The project is designed as a practical QA Automation / SDET portfolio project for network infrastructure. It focuses on repeatable validation, structured test evidence, and readable JSON / HTML reports rather than one-off manual checks.
 
@@ -120,6 +121,7 @@ Cisco validation is read-only. It runs show commands for topology evidence and d
 | Day 37 | VRRP report regression guards and evidence snapshot policy | Complete |
 | Day 38 | Post-VRRP milestone review and v0.2 scope planning; documentation/report-planning only with no new live test | Complete |
 | Day 39 | VRRP evidence dashboard/report-index integration; report-only with no live test, SSH, or configuration change | Complete |
+| Day 40 | v0.2 demo readiness review and scope lock; report-only with no live test, SSH, or configuration change | Complete |
 
 ## Lab Topology
 
@@ -1403,6 +1405,31 @@ reports/lab-summary/day39_vrrp_evidence_dashboard_integration.html
 
 v0.2 relevance: Day39 improves demo readiness and evidence traceability by making the HA / VRRP evidence chain visible from the dashboard `/reports` page, the generated report index, and the latest lab overview.
 
+## Day40 - v0.2 Demo Readiness Review and Scope Lock
+
+Purpose: lock the v0.2 demo scope, summarize the Day31-Day39 HA / VRRP milestone, and generate a portfolio-ready demo checklist and readiness report.
+
+Safety: report-only and documentation-focused. Day40 does not run live tests, open SSH sessions, require credentials, start iperf3, trigger failover, or change MikroTik, Cisco, firewall/NAT, IP, VRRP, interface, reboot, reset, or topology settings.
+
+Demo navigation command:
+
+```powershell
+python network_lab.py --task day40-v0.2-demo-readiness-review
+```
+
+Reports:
+
+```text
+reports/portfolio/day40_v0.2_demo_readiness_review.json
+reports/portfolio/day40_v0.2_demo_readiness_review.html
+```
+
+Checklist:
+
+```text
+docs/portfolio_v0.2_demo_checklist.md
+```
+
 ## Portfolio Demo
 
 v0.1 includes reviewer/interview demo scripts for presenting the current platform safely without adding features, changing runner/dashboard behavior, or running live device-changing workflows:
@@ -1608,6 +1635,15 @@ reports/lab-summary/day39_vrrp_evidence_dashboard_integration.json
 reports/lab-summary/day39_vrrp_evidence_dashboard_integration.html
 ```
 
+Day40 v0.2 demo readiness review:
+
+```text
+docs/roadmap/day40_v0.2_demo_readiness_review.md
+docs/portfolio_v0.2_demo_checklist.md
+reports/portfolio/day40_v0.2_demo_readiness_review.json
+reports/portfolio/day40_v0.2_demo_readiness_review.html
+```
+
 ## Testing Strategy
 
 The project separates live-device validation from unit tests.
@@ -1649,6 +1685,7 @@ For documentation-only review passes, run `python -m pytest` before sharing the 
 - Includes Day36 VRRP evidence summary/report hardening and Day37 offline regression guards plus evidence snapshot policy.
 - Includes Day38 post-VRRP milestone review and conservative v0.2 scope planning without adding a new live test.
 - Includes Day39 HA / VRRP evidence dashboard/report-index integration for safer v0.2 demo readiness.
+- Includes Day40 v0.2 demo readiness review and scope lock without adding live tests, SSH, or device configuration changes.
 
 ## Roadmap
 
@@ -1660,4 +1697,4 @@ Planned future directions:
 - Syslog / packet capture analysis
 - AI report summary / RAG integration
 
-v0.1 is packaged through Day29 and locally verified through Day30 as a portfolio release. Day39 turns the first HA / VRRP milestone into dashboard/report-index evidence for v0.2 demos. Future work should stay explicit about whether it is report-only, read-only, dry-run, guarded-live, or disabled before adding new live lab behavior.
+v0.1 is packaged through Day29 and locally verified through Day30 as a portfolio release. Day40 locks the first HA / VRRP milestone into a report-only v0.2 demo readiness package. Future work should stay explicit about whether it is report-only, read-only, dry-run, guarded-live, or disabled before adding new live lab behavior.
