@@ -46,6 +46,7 @@ The v0.1 portfolio package covers Day 1 through Day 30 post-tag verification. Th
 - Day 40 v0.2 Demo Readiness Review and Scope Lock
 - Day 41 v0.2 Release Packaging
 - Day 42 v0.2 Release Tag Preparation
+- Day 43 v0.2 Release Verification and Interview Demo Baseline
 
 The project is designed as a practical QA Automation / SDET portfolio project for network infrastructure. It focuses on repeatable validation, structured test evidence, and readable JSON / HTML reports rather than one-off manual checks.
 
@@ -126,6 +127,7 @@ Cisco validation is read-only. It runs show commands for topology evidence and d
 | Day 40 | v0.2 demo readiness review and scope lock; report-only with no live test, SSH, or configuration change | Complete |
 | Day 41 | v0.2 release packaging; documentation/report-only with no live test, SSH, configuration change, voice/AI implementation, or tag creation | Complete |
 | Day 42 | v0.2 release tag preparation and annotated tag creation; release validation only with no live test, SSH, or device configuration change | Complete |
+| Day 43 | v0.2 release verification and interview demo baseline; tag checkout and offline smoke verification only with no live test, SSH, or device configuration change | Complete with notes |
 
 ## Lab Topology
 
@@ -1477,6 +1479,22 @@ docs/roadmap/day42_v0.2_release_tag_preparation.md
 
 v0.2 represents the demo-ready Network Automation Platform package for the HA / VRRP milestone.
 
+## Day43 - v0.2 Release Verification and Interview Demo Baseline
+
+Purpose: verify that the `v0.2` tag can be checked out and used as a repository-only interview/demo baseline without adding new features or touching devices.
+
+Scope: Day43 is release verification and documentation only. It uses a temporary Git worktree, local Python tests, report-index generation, demo-flow generation, and Flask test-client route checks for `/` and `/reports`.
+
+Safety: Day43 does not run live network tests, open SSH sessions, connect to routers, switches, firewalls, VPN devices, WireGuard peers, or iperf3 endpoints, or change MikroTik, Cisco, firewall/NAT, IP, VRRP, WireGuard, interface, route, reboot, reset, or topology settings.
+
+Verification note:
+
+```text
+docs/roadmap/day43_v0.2_release_verification_interview_demo_baseline.md
+```
+
+Day43 result: the `v0.2` checkout and local dashboard/demo-flow paths are usable for an interview demo with notes, but the fresh tag checkout is not a fully green release verification because one Day12 non-interactive config test fails and the ignored `reports/` evidence is absent.
+
 ## Portfolio Demo
 
 v0.1 includes reviewer/interview demo scripts for presenting the current platform safely without adding features, changing runner/dashboard behavior, or running live device-changing workflows:
@@ -1707,6 +1725,12 @@ Day42 v0.2 release tag preparation:
 docs/roadmap/day42_v0.2_release_tag_preparation.md
 ```
 
+Day43 v0.2 release verification and interview demo baseline:
+
+```text
+docs/roadmap/day43_v0.2_release_verification_interview_demo_baseline.md
+```
+
 ## Testing Strategy
 
 The project separates live-device validation from unit tests.
@@ -1751,6 +1775,7 @@ For documentation-only review passes, run `python -m pytest` before sharing the 
 - Includes Day40 v0.2 demo readiness review and scope lock without adding live tests, SSH, or device configuration changes.
 - Includes Day41 v0.2 release packaging docs and report-only handoff while leaving `v0.2` tag creation for Day42.
 - Includes Day42 v0.2 annotated release tag preparation and creation as release validation only, with no live test, SSH, or device configuration changes.
+- Includes Day43 v0.2 release verification and interview demo baseline notes from a temporary tag checkout, with no live test, SSH, or device configuration changes.
 
 ## Roadmap
 
@@ -1762,4 +1787,4 @@ Planned future directions:
 - Syslog / packet capture analysis
 - v3.0 Voice + AI Network Test Assistant / AI-assisted Network Test Orchestration as future roadmap only
 
-v0.1 is packaged through Day29 and locally verified through Day30 as a portfolio release. Day42 creates the annotated `v0.2` release tag for the demo-ready Network Automation Platform package after Day41 release packaging. Future work should stay explicit about whether it is report-only, read-only, dry-run, guarded-live, or disabled before adding new live lab behavior.
+v0.1 is packaged through Day29 and locally verified through Day30 as a portfolio release. Day42 creates the annotated `v0.2` release tag for the demo-ready Network Automation Platform package after Day41 release packaging, and Day43 records the post-tag interview/demo baseline with notes from a fresh checkout. Future work should stay explicit about whether it is report-only, read-only, dry-run, guarded-live, or disabled before adding new live lab behavior.
