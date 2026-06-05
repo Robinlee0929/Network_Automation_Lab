@@ -45,6 +45,7 @@ The v0.1 portfolio package covers Day 1 through Day 30 post-tag verification. Th
 - Day 39 VRRP Evidence Dashboard Integration
 - Day 40 v0.2 Demo Readiness Review and Scope Lock
 - Day 41 v0.2 Release Packaging
+- Day 42 v0.2 Release Tag Preparation
 
 The project is designed as a practical QA Automation / SDET portfolio project for network infrastructure. It focuses on repeatable validation, structured test evidence, and readable JSON / HTML reports rather than one-off manual checks.
 
@@ -124,6 +125,7 @@ Cisco validation is read-only. It runs show commands for topology evidence and d
 | Day 39 | VRRP evidence dashboard/report-index integration; report-only with no live test, SSH, or configuration change | Complete |
 | Day 40 | v0.2 demo readiness review and scope lock; report-only with no live test, SSH, or configuration change | Complete |
 | Day 41 | v0.2 release packaging; documentation/report-only with no live test, SSH, configuration change, voice/AI implementation, or tag creation | Complete |
+| Day 42 | v0.2 release tag preparation and annotated tag creation; release validation only with no live test, SSH, or device configuration change | Complete |
 
 ## Lab Topology
 
@@ -1459,6 +1461,22 @@ reports/portfolio/day41_v0.2_release_packaging.json
 reports/portfolio/day41_v0.2_release_packaging.html
 ```
 
+## Day42 - v0.2 Release Tag Preparation
+
+Purpose: prepare and create the v0.2 annotated release tag after the Day41 v0.2 release package is merged into `main`.
+
+Scope: Day42 is release validation and tag creation only. It verifies `main`, confirms the Day41 release package materials, runs the local regression suite, records the tag command, and pushes the `v0.2` tag after the Day42 documentation commit is on `main`.
+
+Safety: Day42 does not run live network tests, open SSH sessions, connect to routers, switches, or firewalls, change MikroTik, Cisco, firewall/NAT, IP, VRRP, interface, reboot, reset, or topology settings, run WireGuard live execution, or run iperf3 live performance testing.
+
+Release tag preparation note:
+
+```text
+docs/roadmap/day42_v0.2_release_tag_preparation.md
+```
+
+v0.2 represents the demo-ready Network Automation Platform package for the HA / VRRP milestone.
+
 ## Portfolio Demo
 
 v0.1 includes reviewer/interview demo scripts for presenting the current platform safely without adding features, changing runner/dashboard behavior, or running live device-changing workflows:
@@ -1683,6 +1701,12 @@ reports/portfolio/day41_v0.2_release_packaging.json
 reports/portfolio/day41_v0.2_release_packaging.html
 ```
 
+Day42 v0.2 release tag preparation:
+
+```text
+docs/roadmap/day42_v0.2_release_tag_preparation.md
+```
+
 ## Testing Strategy
 
 The project separates live-device validation from unit tests.
@@ -1726,6 +1750,7 @@ For documentation-only review passes, run `python -m pytest` before sharing the 
 - Includes Day39 HA / VRRP evidence dashboard/report-index integration for safer v0.2 demo readiness.
 - Includes Day40 v0.2 demo readiness review and scope lock without adding live tests, SSH, or device configuration changes.
 - Includes Day41 v0.2 release packaging docs and report-only handoff while leaving `v0.2` tag creation for Day42.
+- Includes Day42 v0.2 annotated release tag preparation and creation as release validation only, with no live test, SSH, or device configuration changes.
 
 ## Roadmap
 
@@ -1737,4 +1762,4 @@ Planned future directions:
 - Syslog / packet capture analysis
 - v3.0 Voice + AI Network Test Assistant / AI-assisted Network Test Orchestration as future roadmap only
 
-v0.1 is packaged through Day29 and locally verified through Day30 as a portfolio release. Day41 prepares the first HA / VRRP milestone as a report-only v0.2 release package; Day42 owns `v0.2` tag preparation. Future work should stay explicit about whether it is report-only, read-only, dry-run, guarded-live, or disabled before adding new live lab behavior.
+v0.1 is packaged through Day29 and locally verified through Day30 as a portfolio release. Day42 creates the annotated `v0.2` release tag for the demo-ready Network Automation Platform package after Day41 release packaging. Future work should stay explicit about whether it is report-only, read-only, dry-run, guarded-live, or disabled before adding new live lab behavior.
