@@ -48,3 +48,15 @@ Day35 is not a configuration day. Its purpose is to safely prove that when lab01
 - Day34 remains a staged apply plan and safety gate; it does not trigger failover.
 - The Windows LAN ping must use `ping -S 192.168.88.100 <target>`.
 - The LAN server Windows firewall must allow ICMPv4 Echo from `192.168.88.0/24`.
+
+## Final Validation Result
+
+- Day35 live VRRP failover validation: `PASS`.
+- Manual lab01 LAN disconnect/reconnect was used as the only failover trigger.
+- Automation remained read-only.
+- RouterOS config modification commands remained blocked.
+- lab01 initial role was `MASTER`.
+- lab02 initial role was `BACKUP`.
+- VRRP VIP remained reachable through failover.
+- Operator guidance was improved with Step 1/2, Step 2/2, countdown, and progress messages.
+- Latest validated commit: `6513bba`.
