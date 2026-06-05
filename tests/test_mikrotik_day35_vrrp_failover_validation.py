@@ -75,6 +75,16 @@ def pings(ok=True):
     ]
 
 
+def routeros_vrrp_detail(flag_line, priority="150"):
+    return f"""Flags: X - DISABLED; I - INVALID; G - GRP-AUTHORITY, g - GRP-MEMBER; R - RUNNING; M - MASTER, B - BACKUP, F - FAILURE
+ {flag_line}
+         name="vrrp-lan" mtu=1500 mac-address=00:00:5E:00:01:58 arp=enabled arp-timeout=auto interface=bridge
+         group-authority="" vrid=88 priority={priority} interval=1s preemption-mode=yes authentication=none on-backup=""
+         on-master="" on-fail="" version=3 v3-protocol=ipv4 sync-connection-tracking=no
+         connection-tracking-mode=passive-active
+"""
+
+
 def test_safety_guard_allows_required_readonly_commands():
     for command in day35.READONLY_COMMANDS.values():
         day35.assert_readonly_observation_command(command)
@@ -131,6 +141,36 @@ def test_build_ping_command_uses_source_specific_windows_ping_shape(monkeypatch)
 
     assert command[:3] == ["ping", "-S", "192.168.88.100"]
     assert "192.168.88.99" in command
+
+
+@pytest.mark.parametrize(
+    ("flag_line", "expected_state"),
+    [
+        ("0    RM ;;; VRRP LAN VIP 192.168.88.99", "MASTER"),
+        ("0     B ;;; VRRP LAN VIP 192.168.88.99", "BACKUP"),
+        ("0    RF ;;; VRRP LAN VIP 192.168.88.99", "FAILURE"),
+        ("0    X ;;; VRRP LAN VIP 192.168.88.99", "DISABLED"),
+        ("0    I ;;; VRRP LAN VIP 192.168.88.99", "INVALID"),
+    ],
+)
+def test_routeros_vrrp_print_detail_flags_return_state(flag_line, expected_state):
+    observation = day35.build_device_observation(
+        make_config(),
+        "primary",
+        True,
+        {
+            "identity": "name: Hex-s-2025-lab01",
+            "vrrp": routeros_vrrp_detail(flag_line),
+            "ip_addresses": "0 address=192.168.88.99/32 interface=vrrp-lan",
+        },
+        [],
+        list(day35.READONLY_COMMANDS.values()),
+    )
+
+    assert observation["vrrp_state"] == expected_state
+    assert observation["vrrp_priority"] == "150"
+    assert observation["vrrp_vrid"] == "88"
+    assert observation["reported_virtual_mac"] == "00:00:5E:00:01:58"
 
 
 def test_report_status_pass_when_baseline_failover_and_recovery_match():

@@ -322,6 +322,25 @@ def _state(value: Any) -> str:
     return str(value or "").strip().upper()
 
 
+def parse_vrrp_state_from_detail(vrrp_output: str) -> str:
+    for raw_line in str(vrrp_output).splitlines():
+        match = re.match(r"^\s*\d+\s+([A-Z]+)\b", raw_line.strip())
+        if not match:
+            continue
+        flags = match.group(1).upper()
+        if "X" in flags:
+            return "DISABLED"
+        if "I" in flags:
+            return "INVALID"
+        if "F" in flags:
+            return "FAILURE"
+        if "M" in flags:
+            return "MASTER"
+        if "B" in flags:
+            return "BACKUP"
+    return ""
+
+
 def _visible_virtual_mac(vrrp_summary: Dict[str, Any]) -> str:
     for entry in vrrp_summary.get("entries", []):
         for key in ("virtual-mac-address", "virtual-mac", "mac-address", "vr-mac-address"):
@@ -344,6 +363,7 @@ def build_device_observation(
     command_errors = command_errors or []
     commands_executed = commands_executed or []
     vrrp_summary = day32.parse_vrrp_summary(outputs.get("vrrp", ""), outputs.get("ip_addresses", ""))
+    vrrp_state = _state(vrrp_summary.get("state")) or parse_vrrp_state_from_detail(outputs.get("vrrp", ""))
     notes: List[str] = []
     if connection_error:
         notes.append(connection_error)
@@ -355,7 +375,7 @@ def build_device_observation(
         "ssh_port": config.port,
         "reachable": reachable,
         "identity": parse_identity(outputs.get("identity", "")) or config.device_name,
-        "vrrp_state": _state(vrrp_summary.get("state")),
+        "vrrp_state": vrrp_state,
         "vrrp_priority": str(vrrp_summary.get("priority", "")),
         "vrrp_vrid": str(vrrp_summary.get("vrid", "")),
         "vrrp_virtual_ip": str(vrrp_summary.get("virtual_ip", "")),
