@@ -39,6 +39,7 @@ The v0.1 portfolio package covers Day 1 through Day 30 post-tag verification. Th
 - Day 33 VRRP Topology Design + Dry-run Command Preview
 - Day 34 VRRP Staged Apply Plan and Safety Gate
 - Day 35 VRRP Failover Validation
+- Day 36 VRRP Failover Evidence Review and Report Hardening
 
 The project is designed as a practical QA Automation / SDET portfolio project for network infrastructure. It focuses on repeatable validation, structured test evidence, and readable JSON / HTML reports rather than one-off manual checks.
 
@@ -112,10 +113,11 @@ Cisco validation is read-only. It runs show commands for topology evidence and d
 | Day 33 | VRRP Topology Design + Dry-run Command Preview | Complete |
 | Day 34 | VRRP Staged Apply Plan and Safety Gate | Complete |
 | Day 35 | VRRP Failover Validation | Complete |
+| Day 36 | VRRP Failover Evidence Review and Report Hardening | Complete |
 
 ## Lab Topology
 
-![MikroTik + Cisco Lab Topology v0.2](docs/assets/mikrotik-cisco-lab-topology-v0.2.png)
+![MikroTik + Cisco Lab Topology v0.2 Final](docs/assets/mikrotik-cisco-lab-topology-v0.2-final.png)
 
 ![Lab Topology Day 1-Day 6](docs/assets/lab_topology_day1_day6.png)
 
@@ -1300,6 +1302,34 @@ Completion summary:
 - VRRP VIP remained reachable through failover.
 - Operator guidance includes Step 1/2, Step 2/2, countdown, and progress messages.
 - Latest validated commit: `6513bba`.
+
+## Day36 - VRRP Failover Evidence Review and Report Hardening
+
+Purpose: review the existing Day35 VRRP live validation evidence and make the generated reports, report index visibility, and portfolio traceability easier to review.
+
+Safety: documentation and report hardening only. Day36 did not run new VRRP failover testing, did not inject a new fault, did not connect to MikroTik routers for live validation, and did not change router configuration.
+
+Reviewed Day35 evidence:
+
+```text
+reports/lab-summary/day35_vrrp_failover_validation.json
+reports/lab-summary/day35_vrrp_failover_validation.html
+reports/lab-summary/day35_vrrp_failover_validation.txt
+```
+
+Day36 hardening:
+
+- Day35 report generation now includes a concise evidence summary for initial master, backup router, failover trigger, observed failover result, recovery result, overall result, and limitations.
+- The report explicitly states that convergence was validated by observed VRRP role transition and connectivity recovery, but exact convergence timing was not measured in Day35.
+- The report index can infer PASS from Day35 `overall_status` metadata.
+- Portfolio evidence documentation links Day35 validation evidence with the Day36 hardening note.
+- No raw generated reports are required for source control; reports remain local generated evidence.
+
+Roadmap note:
+
+```text
+docs/roadmap/day36_vrrp_failover_evidence_review_report_hardening.md
+```
 
 ## Portfolio Demo
 

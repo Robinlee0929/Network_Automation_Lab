@@ -234,6 +234,15 @@ def test_report_status_pass_when_baseline_failover_and_recovery_match():
 
     assert report["overall_status"] == "PASS"
     assert report["safety_mode"] == "controlled_failover_observation"
+    assert report["evidence_summary"]["evidence_source"] == "Day35 live VRRP failover validation output"
+    assert report["evidence_summary"]["initial_master"]["device_name"] == "Hex-s-2025-lab01"
+    assert report["evidence_summary"]["backup_router"]["device_name"] == "Hex-s-2025-lab02"
+    assert report["evidence_summary"]["observed_failover_result"]["result"] == "PASS"
+    assert report["evidence_summary"]["overall_result"] == "PASS"
+    assert (
+        report["evidence_summary"]["convergence_or_role_transition_summary"]
+        == "Convergence was validated by observed VRRP role transition and connectivity recovery. Exact convergence timing was not measured in Day35."
+    )
 
 
 def test_report_status_pass_with_notes_when_recovery_preemption_differs():
@@ -289,6 +298,11 @@ def test_write_reports_redacts_sensitive_command_output(tmp_path):
     assert "abc123" not in html
     assert "hunter2" not in txt
     assert "<REDACTED>" in report_text
+    assert "Evidence Summary" in html
+    assert "Evidence summary:" in txt
+    assert "Exact convergence timing was not measured in Day35." in report_text
+    assert "Exact convergence timing was not measured in Day35." in html
+    assert "Exact convergence timing was not measured in Day35." in txt
 
 
 def test_run_can_generate_reports_with_fakes_without_destructive_commands(tmp_path, monkeypatch):

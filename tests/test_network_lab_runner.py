@@ -414,6 +414,35 @@ def test_report_visibility_index_finds_partial_reports_and_marks_missing(tmp_pat
     assert "guarded-live performance evidence" in html
 
 
+def test_lab_overview_infers_day35_overall_status_as_pass(tmp_path, capsys):
+    prof = profile(required=False)
+    prof["devices"] = []
+    prof["lab_summary_reports"] = [
+        {
+            "name": "Day35 VRRP Failover Validation",
+            "json": "reports/lab-summary/day35_vrrp_failover_validation.json",
+            "html": "reports/lab-summary/day35_vrrp_failover_validation.html",
+            "required": False,
+        }
+    ]
+    profile_path = tmp_path / "profile.json"
+    write_json(profile_path, prof)
+    write_json(
+        tmp_path / "reports" / "lab-summary" / "day35_vrrp_failover_validation.json",
+        {
+            "day": "Day35",
+            "title": "VRRP Failover Validation",
+            "overall_status": "PASS",
+        },
+    )
+
+    exit_code = network_lab.main(["--task", "report-index", "--profile", str(profile_path)], project_root=tmp_path)
+
+    output = capsys.readouterr().out
+    assert exit_code == 0
+    assert "[PASS] Day35 VRRP Failover Validation" in output
+
+
 def test_report_visibility_console_compacts_historical_day13_reports(tmp_path, capsys):
     for index in range(1, 7):
         write_json(

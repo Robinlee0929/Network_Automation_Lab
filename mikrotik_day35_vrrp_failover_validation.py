@@ -570,8 +570,79 @@ def overall_status(phases: List[Dict[str, Any]]) -> str:
     return "PASS"
 
 
+def _phase_by_id(phases: List[Dict[str, Any]], phase_id: str) -> Dict[str, Any]:
+    return next((phase for phase in phases if phase.get("id") == phase_id), {})
+
+
+def _device_summary(device: Dict[str, Any]) -> Dict[str, Any]:
+    return {
+        "device_name": device.get("device_name", ""),
+        "role": device.get("role", ""),
+        "vrrp_state": device.get("vrrp_state", ""),
+        "vrrp_priority": device.get("vrrp_priority", ""),
+        "vrrp_vrid": device.get("vrrp_vrid", ""),
+        "reported_virtual_mac": device.get("reported_virtual_mac", ""),
+        "reachable": device.get("reachable", False),
+    }
+
+
+def _summary_ping_status(phase: Dict[str, Any], label: str) -> str:
+    for ping in phase.get("ping_checks", []):
+        if ping.get("label") == label:
+            return str(ping.get("status", "UNKNOWN"))
+    return "UNKNOWN"
+
+
+def build_evidence_summary(phases: List[Dict[str, Any]], status: str) -> Dict[str, Any]:
+    baseline = _phase_by_id(phases, "baseline")
+    failover = _phase_by_id(phases, "failover")
+    recovery = _phase_by_id(phases, "recovery")
+    initial_master = _device_summary(_device_by_role(baseline.get("devices", []), "primary"))
+    backup_router = _device_summary(_device_by_role(baseline.get("devices", []), "backup"))
+    failover_master = _device_summary(_device_by_role(failover.get("devices", []), "backup"))
+    recovery_primary = _device_summary(_device_by_role(recovery.get("devices", []), "primary"))
+    failover_checks = failover.get("checks", {})
+    recovery_checks = recovery.get("checks", {})
+
+    return {
+        "evidence_source": "Day35 live VRRP failover validation output",
+        "initial_master": initial_master,
+        "backup_router": backup_router,
+        "failover_trigger": MANUAL_FAILOVER_PROMPT,
+        "observed_failover_result": {
+            "result": "PASS" if failover_checks.get("lab02_master_after_failover") == "PASS" else "FAIL",
+            "summary": (
+                "lab02 became VRRP MASTER after the external lab01 LAN disconnect; "
+                f"VIP ping={_summary_ping_status(failover, 'vrrp_virtual_ip')}, "
+                f"LAN server ping={_summary_ping_status(failover, 'lan_server_ip')}."
+            ),
+            "active_router_after_trigger": failover_master,
+        },
+        "recovery_result": {
+            "result": str(recovery_checks.get("lab01_preemption_back_to_master_observed", "UNKNOWN")),
+            "summary": (
+                "lab01 was observed as VRRP MASTER after reconnect; "
+                f"VIP ping={_summary_ping_status(recovery, 'vrrp_virtual_ip')}, "
+                f"LAN server ping={_summary_ping_status(recovery, 'lan_server_ip')}."
+            ),
+            "primary_router_after_reconnect": recovery_primary,
+        },
+        "overall_result": status,
+        "convergence_or_role_transition_summary": (
+            "Convergence was validated by observed VRRP role transition and connectivity recovery. "
+            "Exact convergence timing was not measured in Day35."
+        ),
+        "limitations": [
+            "Exact convergence timing was not measured in Day35.",
+            "Failover was triggered manually and externally by the operator; automation did not inject a fault.",
+            "RouterOS configuration was not changed during Day35 evidence collection.",
+        ],
+    }
+
+
 def build_report(profile: Dict[str, Any], profile_path: Path, phases: List[Dict[str, Any]]) -> Dict[str, Any]:
     topology = validate_profile(profile)
+    status = overall_status(phases)
     return redact_sensitive_data(
         {
             "day": DAY,
@@ -579,7 +650,8 @@ def build_report(profile: Dict[str, Any], profile_path: Path, phases: List[Dict[
             "safety_mode": SAFETY_MODE,
             "profile_path": profile_path.as_posix(),
             "generated_at": datetime.now().isoformat(timespec="seconds"),
-            "overall_status": overall_status(phases),
+            "overall_status": status,
+            "evidence_summary": build_evidence_summary(phases, status),
             "topology": {key: value for key, value in topology.items() if key != "roles"},
             "allowed_operations": ["source-specific Windows ping", "read-only RouterOS print commands", "report generation"],
             "forbidden_operations": FORBIDDEN_OPERATIONS,
@@ -646,6 +718,38 @@ def _render_devices(devices: List[Dict[str, Any]]) -> str:
     return "".join(rows)
 
 
+def _device_summary_text(device: Dict[str, Any]) -> str:
+    if not device:
+        return "Not observed"
+    return (
+        f"{device.get('device_name', '')} ({device.get('role', '')}) "
+        f"state={device.get('vrrp_state', '')} priority={device.get('vrrp_priority', '')} "
+        f"vrid={device.get('vrrp_vrid', '')}"
+    )
+
+
+def _render_evidence_summary(summary: Dict[str, Any]) -> str:
+    observed = summary.get("observed_failover_result", {}) if isinstance(summary.get("observed_failover_result"), dict) else {}
+    recovery = summary.get("recovery_result", {}) if isinstance(summary.get("recovery_result"), dict) else {}
+    rows = [
+        ("Evidence source", summary.get("evidence_source", "")),
+        ("Initial master", _device_summary_text(summary.get("initial_master", {}))),
+        ("Backup router", _device_summary_text(summary.get("backup_router", {}))),
+        ("Failover trigger", summary.get("failover_trigger", "")),
+        ("Observed failover result", observed.get("summary", "")),
+        ("Recovery result", recovery.get("summary", "")),
+        ("Overall result", summary.get("overall_result", "")),
+        ("Limitation", summary.get("convergence_or_role_transition_summary", "")),
+    ]
+    return "".join(
+        "<tr>"
+        f"<th>{html.escape(str(label))}</th>"
+        f"<td>{html.escape(str(value))}</td>"
+        "</tr>"
+        for label, value in rows
+    )
+
+
 def build_html_report(report: Dict[str, Any]) -> str:
     phase_sections = []
     for phase in report.get("phases", []):
@@ -696,6 +800,10 @@ def build_html_report(report: Dict[str, Any]) -> str:
   </header>
   <main>
     <section class="panel">
+      <h2>Evidence Summary</h2>
+      <table><tbody>{_render_evidence_summary(report.get("evidence_summary", {}))}</tbody></table>
+    </section>
+    <section class="panel">
       <h2>Safety Guardrails</h2>
       <table><tbody>{guardrails}</tbody></table>
       <h3>Allowed RouterOS evidence commands</h3>
@@ -709,6 +817,17 @@ def build_html_report(report: Dict[str, Any]) -> str:
 
 
 def build_text_report(report: Dict[str, Any]) -> str:
+    evidence_summary = report.get("evidence_summary", {})
+    observed = (
+        evidence_summary.get("observed_failover_result", {})
+        if isinstance(evidence_summary.get("observed_failover_result"), dict)
+        else {}
+    )
+    recovery = (
+        evidence_summary.get("recovery_result", {})
+        if isinstance(evidence_summary.get("recovery_result"), dict)
+        else {}
+    )
     lines = [
         "=" * 72,
         f"{DAY} - {TITLE}",
@@ -717,6 +836,16 @@ def build_text_report(report: Dict[str, Any]) -> str:
         f"Safety mode: {SAFETY_MODE}",
         f"Overall status: {report.get('overall_status', '')}",
         NO_CONFIG_CHANGE_NOTE,
+        "",
+        "Evidence summary:",
+        f"  - Evidence source: {evidence_summary.get('evidence_source', '')}",
+        f"  - Initial master: {_device_summary_text(evidence_summary.get('initial_master', {}))}",
+        f"  - Backup router: {_device_summary_text(evidence_summary.get('backup_router', {}))}",
+        f"  - Failover trigger: {evidence_summary.get('failover_trigger', '')}",
+        f"  - Observed failover result: {observed.get('summary', '')}",
+        f"  - Recovery result: {recovery.get('summary', '')}",
+        f"  - Overall result: {evidence_summary.get('overall_result', '')}",
+        f"  - Limitation: {evidence_summary.get('convergence_or_role_transition_summary', '')}",
         "-" * 72,
     ]
     for phase in report.get("phases", []):

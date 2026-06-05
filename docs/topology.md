@@ -2,9 +2,25 @@
 
 ## Lab Topology Overview
 
-The lab topology supports Day 1 through Day 6 validation for the Network Automation Testing Platform. It combines one Automation PC, one Cisco access switch, two MikroTik routers, and an upstream ISP cable modem or home router.
+The lab topology supports the Network Automation Testing Platform from the early Day 1-Day 6 baseline through the v0.2 HA / VRRP validation flow. It combines one Automation PC, one Cisco access switch, two MikroTik routers, an unmanaged WAN switch, and an upstream ISP cable modem or home router.
 
-The Automation PC runs the Python workflows. The Cisco switch provides central Layer 2 connectivity. The MikroTik routers act as devices under test. The upstream modem or home router provides WAN and internet reachability for the lab.
+The Automation PC runs the Python workflows. The Cisco switch provides central Layer 2 LAN / VRRP connectivity. The MikroTik routers act as devices under test. The unmanaged WAN switch and upstream modem or home router provide WAN and internet reachability for the lab.
+
+![MikroTik + Cisco Lab Topology v0.2 Final](assets/mikrotik-cisco-lab-topology-v0.2-final.png)
+
+## HA / VRRP v0.2 Topology
+
+The final v0.2 diagram shows the current wiring target for HA / VRRP, WireGuard, and automation validation:
+
+- MikroTik lab01 is the VRRP master candidate with LAN bridge `192.168.88.2/24`, VRID `88`, and priority `150`.
+- MikroTik lab02 is the VRRP backup candidate with LAN bridge `192.168.88.3/24`, VRID `88`, and priority `100`.
+- The shared VRRP VIP is `192.168.88.99/32` on the LAN / VRRP segment.
+- The Cisco WS-C2960CG-8TC-L switch is the managed LAN switch for the shared LAN / VRRP segment and test hosts.
+- The unmanaged WAN switch connects the router WAN ports to the upstream internet / ISP side.
+- The Automation PC uses a LAN NIC for management, SSH/API validation, ping/traceroute, and report generation.
+- The LAN test host / iperf3 server sits on the LAN segment for reachability and throughput evidence.
+
+The legacy Day 1-Day 6 topology image remains below as historical baseline context.
 
 ![Lab Topology Day 1-Day 6](assets/lab_topology_day1_day6.png)
 
@@ -16,6 +32,8 @@ The Automation PC runs the Python workflows. The Cisco switch provides central L
 | Cisco WS-C2960CG-8TC-L | Lab core switch | Read-only topology validation |
 | MikroTik hEX S 2025 lab01 | Device under test 1 | Day 1, Day 2, Day 3, and Day 4 MikroTik validation |
 | MikroTik hEX S 2025 lab02 | Device under test 2 | Day 4 multi-device MikroTik validation |
+| Unmanaged WAN switch | WAN-side fan-out | Connects router WAN ports to upstream internet / ISP side |
+| LAN test host / iperf3 server | LAN validation endpoint | Receives reachability and throughput checks |
 | ISP Cable Modem / Home Router | Internet edge | Provides upstream WAN connectivity |
 
 ## Automation PC Role

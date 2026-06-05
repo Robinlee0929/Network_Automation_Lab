@@ -312,14 +312,14 @@ def infer_report_result(json_data: Any) -> str:
     if not isinstance(json_data, dict):
         return "UNKNOWN"
 
-    for key in ("overall_result", "result", "status", "passed", "validation_result"):
+    for key in ("overall_result", "overall_status", "result", "status", "passed", "validation_result"):
         if key in json_data:
             return normalize_result(json_data.get(key))
 
     for container_key in ("summary", "aggregate", "day13", "Day13 summary"):
         nested = json_data.get(container_key)
         if isinstance(nested, dict):
-            for key in ("overall_result", "result", "status", "passed", "validation_result"):
+            for key in ("overall_result", "overall_status", "result", "status", "passed", "validation_result"):
                 if key in nested:
                     return normalize_result(nested.get(key))
 

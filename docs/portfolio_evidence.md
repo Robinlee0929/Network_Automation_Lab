@@ -4,6 +4,8 @@ This repository is a network automation lab portfolio. It demonstrates repeatabl
 
 Day31 HA / VRRP planning status: v0.2 planning has started with documentation-only topology and safety-model notes. Day31 does not add runner behavior, dashboard behavior, live VPN execution, VRRP automation, failover, generated reports, tag changes, or new device-control logic.
 
+Day36 VRRP evidence hardening status: Day36 reviewed existing Day35 live validation evidence and improved report readability, report-index discovery, and portfolio traceability. Day36 did not perform new failover injection, did not run live SSH validation, and did not change MikroTik configuration.
+
 ## What To Review
 
 - `python network_lab.py --list-tasks` shows user-facing runner tasks.
@@ -27,6 +29,7 @@ Generated `reports/` output is intentionally ignored by git. Reviewers can regen
 - Day29 release tag preparation is documentation-only. It records final validation and tag handoff notes without creating a tag, generated reports, runner tasks, live workflows, or secret reads.
 - Day30 post-tag verification is documentation-only. It records the observed local `v0.1` tag target without creating, moving, deleting, or pushing tags.
 - Day31 HA / VRRP planning is documentation-only. It records the target topology and safety model without adding VRRP automation, runner behavior, dashboard behavior, live config changes, failover triggers, generated reports, or secrets.
+- Day36 VRRP evidence hardening is documentation and report-generator hardening only. It reviews Day35 evidence, improves summary readability and index visibility, and does not perform live failover testing or MikroTik configuration changes.
 
 ## Evidence Locations
 
@@ -42,6 +45,8 @@ Generated `reports/` output is intentionally ignored by git. Reviewers can regen
 - Day30 post-tag verification: `docs/portfolio_evidence/day30_v0.1_post_tag_verification.md`
 - Day31 HA / VRRP topology plan: `docs/roadmap/ha_vrrp_topology_plan.md`
 - Day31 HA / VRRP safety model: `docs/roadmap/ha_vrrp_safety_model.md`
+- Day35 VRRP failover validation: `reports/lab-summary/day35_vrrp_failover_validation.html`
+- Day36 VRRP evidence hardening note: `docs/roadmap/day36_vrrp_failover_evidence_review_report_hardening.md`
 
 The report index marks missing files as unavailable instead of failing. It also includes report type, availability, safety label, description, and links to JSON/HTML evidence when present.
 
@@ -68,6 +73,7 @@ Day25 RC readiness checklist:
 - Day29 release tag preparation remains documentation-only.
 - Day30 post-tag verification remains documentation-only.
 - Day31 HA / VRRP planning remains documentation-only.
+- Day36 VRRP evidence hardening remains documentation and report hardening only.
 - No destructive live behavior was introduced.
 - Full pytest suite passes.
 
