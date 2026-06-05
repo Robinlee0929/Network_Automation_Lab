@@ -75,6 +75,68 @@ def pings(ok=True):
     ]
 
 
+DAY35_SUMMARY_FIXTURE = {
+    "day": "Day35",
+    "title": "VRRP Failover Validation",
+    "safety_mode": "controlled_failover_observation",
+    "profile_path": "topology_profiles/day35_vrrp_failover_validation.json",
+    "generated_at": "2026-06-04T12:00:00",
+    "overall_status": "PASS",
+    "evidence_summary": {
+        "evidence_source": "Day35 live VRRP failover validation output",
+        "initial_master": {
+            "device_name": "Hex-s-2025-lab01",
+            "role": "primary",
+            "vrrp_state": "MASTER",
+            "vrrp_priority": "150",
+            "vrrp_vrid": "88",
+            "reported_virtual_mac": "00:00:5E:00:01:58",
+            "reachable": True,
+        },
+        "backup_router": {
+            "device_name": "Hex-s-2025-lab02",
+            "role": "backup",
+            "vrrp_state": "BACKUP",
+            "vrrp_priority": "100",
+            "vrrp_vrid": "88",
+            "reported_virtual_mac": "00:00:5E:00:01:58",
+            "reachable": True,
+        },
+        "observed_failover_result": {
+            "result": "PASS",
+            "summary": "lab02 became VRRP MASTER after the external lab01 LAN disconnect; VIP ping=PASS, LAN server ping=PASS.",
+            "active_router_after_trigger": {
+                "device_name": "Hex-s-2025-lab02",
+                "role": "backup",
+                "vrrp_state": "MASTER",
+                "vrrp_priority": "100",
+                "vrrp_vrid": "88",
+                "reported_virtual_mac": "00:00:5E:00:01:58",
+                "reachable": True,
+            },
+        },
+        "recovery_result": {
+            "result": "PASS",
+            "summary": "lab01 was observed as VRRP MASTER after reconnect; VIP ping=PASS, LAN server ping=PASS.",
+        },
+        "overall_result": "PASS",
+        "convergence_or_role_transition_summary": (
+            "Convergence was validated by observed VRRP role transition and connectivity recovery. "
+            "Exact convergence timing was not measured in Day35."
+        ),
+        "limitations": [
+            "Exact convergence timing was not measured in Day35.",
+            "Failover was triggered manually and externally by the operator; automation did not inject a fault.",
+        ],
+    },
+    "safety_guardrails": {
+        "routeros_configuration_modification": "BLOCKED",
+        "manual_external_failover_trigger_only": "PASS",
+    },
+    "phases": [],
+}
+
+
 def routeros_vrrp_detail(flag_line, priority="150"):
     return f"""Flags: X - DISABLED; I - INVALID; G - GRP-AUTHORITY, g - GRP-MEMBER; R - RUNNING; M - MASTER, B - BACKUP, F - FAILURE
  {flag_line}
@@ -243,6 +305,37 @@ def test_report_status_pass_when_baseline_failover_and_recovery_match():
         report["evidence_summary"]["convergence_or_role_transition_summary"]
         == "Convergence was validated by observed VRRP role transition and connectivity recovery. Exact convergence timing was not measured in Day35."
     )
+
+
+def test_day35_summary_fixture_preserves_report_contract():
+    report = json.loads(json.dumps(DAY35_SUMMARY_FIXTURE))
+
+    assert report["overall_status"] == "PASS"
+    assert report["profile_path"] == "topology_profiles/day35_vrrp_failover_validation.json"
+    summary = report["evidence_summary"]
+    assert summary["evidence_source"] == "Day35 live VRRP failover validation output"
+    assert summary["initial_master"]["device_name"] == "Hex-s-2025-lab01"
+    assert summary["initial_master"]["role"] == "primary"
+    assert summary["initial_master"]["vrrp_state"] == "MASTER"
+    assert summary["backup_router"]["device_name"] == "Hex-s-2025-lab02"
+    assert summary["backup_router"]["role"] == "backup"
+    assert summary["backup_router"]["vrrp_state"] == "BACKUP"
+    assert summary["observed_failover_result"]["result"] == "PASS"
+    assert summary["observed_failover_result"]["active_router_after_trigger"]["vrrp_state"] == "MASTER"
+    assert summary["recovery_result"]["result"] == "PASS"
+    assert summary["overall_result"] == "PASS"
+    assert "Exact convergence timing was not measured in Day35." in summary["convergence_or_role_transition_summary"]
+
+    html = day35.build_html_report(report)
+    text = day35.build_text_report(report)
+
+    for rendered in (html, text):
+        assert "Day35 live VRRP failover validation output" in rendered
+        assert "Hex-s-2025-lab01 (primary) state=MASTER priority=150 vrid=88" in rendered
+        assert "Hex-s-2025-lab02 (backup) state=BACKUP priority=100 vrid=88" in rendered
+        assert "lab02 became VRRP MASTER after the external lab01 LAN disconnect" in rendered
+        assert "Overall result" in rendered
+        assert "Exact convergence timing was not measured in Day35." in rendered
 
 
 def test_report_status_pass_with_notes_when_recovery_preemption_differs():
