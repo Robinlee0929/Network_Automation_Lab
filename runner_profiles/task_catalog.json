@@ -242,6 +242,24 @@
       ],
       "allow_live_execution": true,
       "notes": "Controlled observation only. Prompts the operator to manually disconnect/reconnect lab01 LAN, uses source-specific ping and read-only RouterOS print commands, and blocks interface, firewall/NAT, IP address, VRRP, reboot, reset, and automatic failure-injection actions."
+    },
+    {
+      "id": "day39-vrrp-evidence-dashboard-integration",
+      "title": "Day39 VRRP evidence dashboard integration",
+      "category": "ha_vrrp",
+      "safety_level": "report_only",
+      "device_scope": [
+        "local-reports",
+        "documentation",
+        "dashboard"
+      ],
+      "profile_path": null,
+      "report_paths": [
+        "reports/lab-summary/day39_vrrp_evidence_dashboard_integration.json",
+        "reports/lab-summary/day39_vrrp_evidence_dashboard_integration.html"
+      ],
+      "allow_live_execution": false,
+      "notes": "Report-only local evidence scan. Integrates Day31-Day38 VRRP docs, diagrams, profiles, and generated report paths into dashboard/report-index visibility without SSH, live tests, iperf3, failover, or device configuration changes."
     }
   ]
 }

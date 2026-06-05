@@ -22,7 +22,7 @@ from dashboard_command_runner import (
     list_execution_logs,
     load_execution_log,
 )
-from network_lab import discover_report_visibility, infer_report_result, mask_secret_values
+from network_lab import discover_report_visibility, discover_vrrp_evidence, infer_report_result, mask_secret_values
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent
@@ -164,7 +164,7 @@ def _project_root_for_reports_dir(reports_dir: Path) -> Path:
 def safe_evidence_dirs(project_root: Path, reports_dir: Path) -> List[Path]:
     root = Path(project_root).resolve()
     configured_reports = Path(reports_dir).resolve()
-    candidates = [configured_reports, root / "reports", root / "summary"]
+    candidates = [configured_reports, root / "reports", root / "summary", root / "docs", root / "topology_profiles"]
     safe_dirs: List[Path] = []
     seen = set()
     for candidate in candidates:
@@ -292,6 +292,8 @@ def collect_dashboard_evidence(
             status = load_json_preview(json_file)["status"]
         elif str(row.get("status", "")).upper() == "MISSING":
             status = "MISSING"
+        elif str(row.get("status", "")).upper() == "FOUND":
+            status = "FOUND"
 
         entries.append(
             DashboardEvidenceEntry(
@@ -315,6 +317,8 @@ def collect_dashboard_evidence(
 def classify_report_type(filename_or_path: Any) -> str:
     name = Path(filename_or_path).name.lower()
     path_text = str(filename_or_path).lower()
+    if "vrrp" in name or any(day in name for day in ("day32", "day33", "day34", "day35", "day39")):
+        return "HA / VRRP evidence"
     if "day2" in name or "auto_setup" in name:
         return "Day2 auto setup"
     if "day3" in name or "post" in name:
@@ -419,6 +423,7 @@ def build_summary_cards(entries: List[ReportEntry]) -> List[Dict[str, Any]]:
         ("iperf3 performance", ("Day8 iperf3 performance",)),
         ("Performance regression", ("Day9 performance regression",)),
         ("WireGuard VPN", ("WireGuard VPN automation",)),
+        ("HA / VRRP evidence", ("HA / VRRP evidence",)),
     ]
     cards = []
     for title, report_types in categories:
@@ -684,6 +689,7 @@ def create_app(
         return render_template(
             "dashboard_reports.html",
             grouped_evidence=grouped,
+            vrrp_evidence=discover_vrrp_evidence(app.config["PROJECT_ROOT"]),
             day12_summaries=build_day12_dashboard_summaries(app.config["REPORTS_DIR"]),
             reports_exist=app.config["REPORTS_DIR"].exists(),
             has_evidence=bool(evidence_entries),
@@ -767,6 +773,18 @@ def create_app(
             preview=preview,
         )
 
+    @app.route("/reports/evidence/<path:report_path>")
+    def open_evidence_artifact(report_path: str):
+        requested = safe_report_path(
+            app.config["PROJECT_ROOT"],
+            report_path,
+            app.config["SAFE_EVIDENCE_DIRS"],
+            (".html", ".txt", ".md", ".png", ".jpg", ".jpeg", ".svg"),
+        )
+        if requested is None:
+            abort(404)
+        return send_from_directory(str(requested.parent), requested.name)
+
     @app.route("/reports/wireguard-vpn/<path:device_name>")
     def open_wireguard_vpn_report(device_name: str):
         reports_root = app.config["REPORTS_DIR"].resolve()
@@ -782,7 +800,7 @@ def create_app(
     @app.template_filter("status_class")
     def status_class(value: str) -> str:
         normalized = str(value).lower().replace(" ", "-")
-        aliases = {"warn": "warning", "missing": "unknown", "found": "pass"}
+        aliases = {"warn": "warning", "missing": "unknown", "found": "pass", "not_generated": "warning"}
         normalized = aliases.get(normalized, normalized)
         if "disabled" in normalized:
             return "unknown"
@@ -795,6 +813,7 @@ def create_app(
         return {
             "report_url": lambda path: url_for("open_report", report_path=path),
             "json_report_url": lambda path: url_for("preview_json_report", report_path=path),
+            "evidence_url": lambda path: url_for("open_evidence_artifact", report_path=path),
         }
 
     return app

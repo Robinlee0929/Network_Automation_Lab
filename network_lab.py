@@ -39,6 +39,9 @@ DAY35_VRRP_FAILOVER_TASK_ID = "day35-vrrp-failover-validation"
 DAY35_VRRP_FAILOVER_JSON = Path("reports") / "lab-summary" / "day35_vrrp_failover_validation.json"
 DAY35_VRRP_FAILOVER_HTML = Path("reports") / "lab-summary" / "day35_vrrp_failover_validation.html"
 DAY35_VRRP_FAILOVER_TXT = Path("reports") / "lab-summary" / "day35_vrrp_failover_validation.txt"
+DAY39_VRRP_EVIDENCE_TASK_ID = "day39-vrrp-evidence-dashboard-integration"
+DAY39_VRRP_EVIDENCE_JSON = Path("reports") / "lab-summary" / "day39_vrrp_evidence_dashboard_integration.json"
+DAY39_VRRP_EVIDENCE_HTML = Path("reports") / "lab-summary" / "day39_vrrp_evidence_dashboard_integration.html"
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
 WIREGUARD_RUNNER_DISPLAY_NAME = "WireGuard Runner Safety Layer"
@@ -52,7 +55,7 @@ DAY19_EVIDENCE_INDEX_JSON = Path("reports") / "portfolio" / "day19_runner_eviden
 DAY19_EVIDENCE_INDEX_HTML = Path("reports") / "portfolio" / "day19_runner_evidence_index.html"
 DAY24_DEMO_FLOW_JSON = Path("reports") / "portfolio" / "day24_rc_demo_flow.json"
 DAY24_DEMO_FLOW_HTML = Path("reports") / "portfolio" / "day24_rc_demo_flow.html"
-RESULTS = {"PASS", "FAIL", "WARN", "MISSING", "INCOMPLETE", "UNKNOWN", "SKIP", "NOT_RUN"}
+RESULTS = {"PASS", "FAIL", "WARN", "MISSING", "INCOMPLETE", "UNKNOWN", "SKIP", "NOT_RUN", "NOT_GENERATED"}
 INTERACTIVE_ACTION_COMPLETE = (
     "Action complete. Returning to menu. Choose another option or enter 0 to exit."
 )
@@ -77,6 +80,7 @@ STATUS_COLORS = {
     "UNKNOWN": "magenta",
     "SKIP": "blue",
     "NOT_RUN": "blue",
+    "NOT_GENERATED": "yellow",
 }
 LIVE_WORKFLOW_RECOMMENDATIONS = {
     "day4": {
@@ -244,6 +248,280 @@ REPORT_CATALOG = [
         "html_globs": [DAY35_VRRP_FAILOVER_HTML.as_posix()],
         "missing_note": f"Generate with: python network_lab.py --task {DAY35_VRRP_FAILOVER_TASK_ID}",
     },
+    {
+        "day": "Day39",
+        "title": "VRRP Evidence Dashboard Integration",
+        "report_type": "HA / VRRP evidence dashboard summary",
+        "safety_label": "report-only evidence",
+        "description": "Report-only Day39 summary that inventories Day31-Day38 HA/VRRP docs, diagrams, reports, and dashboard/index readiness.",
+        "json_globs": [DAY39_VRRP_EVIDENCE_JSON.as_posix()],
+        "html_globs": [DAY39_VRRP_EVIDENCE_HTML.as_posix()],
+        "missing_note": f"Generate with: python network_lab.py --task {DAY39_VRRP_EVIDENCE_TASK_ID}",
+    },
+]
+
+
+VRRP_EVIDENCE_CATALOG = [
+    {
+        "group": "Topology and planning",
+        "day": "Day31",
+        "title": "HA / VRRP topology plan",
+        "artifact_type": "Documentation",
+        "path": "docs/roadmap/ha_vrrp_topology_plan.md",
+        "description": "v0.2 HA/VRRP topology intent, router roles, VIP, VRID, and lab relationship.",
+        "safety_level": "documentation_only",
+        "demo_relevance": "Introduces the HA/VRRP story before showing generated evidence.",
+    },
+    {
+        "group": "Safety model",
+        "day": "Day31",
+        "title": "HA / VRRP safety model",
+        "artifact_type": "Documentation",
+        "path": "docs/roadmap/ha_vrrp_safety_model.md",
+        "description": "Safety vocabulary and boundaries for documentation-only, read-only, dry-run, and guarded workflows.",
+        "safety_level": "documentation_only",
+        "demo_relevance": "Explains why Day39 does not run SSH or change device state.",
+    },
+    {
+        "group": "Topology and planning",
+        "day": "Day31",
+        "title": "MikroTik + Cisco lab topology v0.2 diagram",
+        "artifact_type": "Diagram",
+        "path": "docs/assets/mikrotik-cisco-lab-topology-v0.2.png",
+        "description": "Portfolio diagram for the planned MikroTik + Cisco v0.2 HA topology.",
+        "safety_level": "documentation_only",
+        "demo_relevance": "Gives reviewers a visual anchor for VRRP evidence.",
+    },
+    {
+        "group": "Topology and planning",
+        "day": "Day36",
+        "title": "MikroTik + Cisco lab topology v0.2 final diagram",
+        "artifact_type": "Diagram",
+        "path": "docs/assets/mikrotik-cisco-lab-topology-v0.2-final.png",
+        "description": "Final topology diagram used by the post-failover evidence narrative.",
+        "safety_level": "documentation_only",
+        "demo_relevance": "Supports the final v0.2 topology presentation.",
+    },
+    {
+        "group": "Read-only precheck",
+        "day": "Day32",
+        "title": "VRRP read-only precheck JSON",
+        "artifact_type": "JSON report",
+        "path": DAY32_VRRP_PRECHECK_JSON.as_posix(),
+        "description": "Read-only RouterOS state collection summary for HA/VRRP readiness.",
+        "safety_level": "read-only",
+        "demo_relevance": "Shows pre-failover state evidence without configuration changes.",
+    },
+    {
+        "group": "Read-only precheck",
+        "day": "Day32",
+        "title": "VRRP read-only precheck HTML",
+        "artifact_type": "HTML report",
+        "path": DAY32_VRRP_PRECHECK_HTML.as_posix(),
+        "description": "Human-readable Day32 readiness report.",
+        "safety_level": "read-only",
+        "demo_relevance": "Primary reviewer-facing Day32 report.",
+    },
+    {
+        "group": "Read-only precheck",
+        "day": "Day32",
+        "title": "VRRP read-only precheck TXT",
+        "artifact_type": "TXT report",
+        "path": DAY32_VRRP_PRECHECK_TXT.as_posix(),
+        "description": "Plain-text Day32 report companion.",
+        "safety_level": "read-only",
+        "demo_relevance": "Useful fallback evidence for console-style review.",
+    },
+    {
+        "group": "Topology and planning",
+        "day": "Day33",
+        "title": "VRRP topology dry-run profile",
+        "artifact_type": "Profile",
+        "path": "topology_profiles/day33_vrrp_topology_dry_run.json",
+        "description": "Local profile that defines the intended VRRP topology and command preview inputs.",
+        "safety_level": "dry-run",
+        "demo_relevance": "Shows dry-run inputs without touching devices.",
+    },
+    {
+        "group": "Topology and planning",
+        "day": "Day33",
+        "title": "VRRP topology dry-run JSON",
+        "artifact_type": "JSON report",
+        "path": DAY33_VRRP_DRY_RUN_JSON.as_posix(),
+        "description": "Generated local dry-run evidence for VRRP topology design and command previews.",
+        "safety_level": "dry-run",
+        "demo_relevance": "Demonstrates planned commands as text only.",
+    },
+    {
+        "group": "Topology and planning",
+        "day": "Day33",
+        "title": "VRRP topology dry-run HTML",
+        "artifact_type": "HTML report",
+        "path": DAY33_VRRP_DRY_RUN_HTML.as_posix(),
+        "description": "Human-readable Day33 dry-run topology report.",
+        "safety_level": "dry-run",
+        "demo_relevance": "Primary reviewer-facing Day33 report.",
+    },
+    {
+        "group": "Topology and planning",
+        "day": "Day33",
+        "title": "VRRP topology dry-run TXT",
+        "artifact_type": "TXT report",
+        "path": DAY33_VRRP_DRY_RUN_TXT.as_posix(),
+        "description": "Plain-text Day33 dry-run report companion.",
+        "safety_level": "dry-run",
+        "demo_relevance": "Useful fallback evidence for command preview review.",
+    },
+    {
+        "group": "Topology and planning",
+        "day": "Day34",
+        "title": "VRRP staged apply plan profile",
+        "artifact_type": "Profile",
+        "path": "topology_profiles/day34_vrrp_staged_apply_plan.json",
+        "description": "Local profile for staged backup-then-primary apply planning.",
+        "safety_level": "dry-run",
+        "demo_relevance": "Shows staged planning inputs without live execution.",
+    },
+    {
+        "group": "Topology and planning",
+        "day": "Day34",
+        "title": "VRRP staged apply plan JSON",
+        "artifact_type": "JSON report",
+        "path": DAY34_VRRP_STAGED_PLAN_JSON.as_posix(),
+        "description": "Generated Day34 blocked plan-only safety gate report.",
+        "safety_level": "dry-run",
+        "demo_relevance": "Shows the safety gate and blocked live execution boundary.",
+    },
+    {
+        "group": "Topology and planning",
+        "day": "Day34",
+        "title": "VRRP staged apply plan HTML",
+        "artifact_type": "HTML report",
+        "path": DAY34_VRRP_STAGED_PLAN_HTML.as_posix(),
+        "description": "Human-readable Day34 staged apply plan report.",
+        "safety_level": "dry-run",
+        "demo_relevance": "Primary reviewer-facing Day34 report.",
+    },
+    {
+        "group": "Topology and planning",
+        "day": "Day34",
+        "title": "VRRP staged apply plan TXT",
+        "artifact_type": "TXT report",
+        "path": DAY34_VRRP_STAGED_PLAN_TXT.as_posix(),
+        "description": "Plain-text Day34 report companion.",
+        "safety_level": "dry-run",
+        "demo_relevance": "Useful fallback evidence for staged plan review.",
+    },
+    {
+        "group": "Live validation evidence",
+        "day": "Day35",
+        "title": "VRRP failover validation plan",
+        "artifact_type": "Documentation",
+        "path": "docs/roadmap/day35_vrrp_failover_validation_plan.md",
+        "description": "Plan for controlled manual external VRRP failover observation.",
+        "safety_level": "controlled_failover_observation",
+        "demo_relevance": "Explains the human-in-the-loop failover evidence flow.",
+    },
+    {
+        "group": "Live validation evidence",
+        "day": "Day35",
+        "title": "VRRP failover validation safety note",
+        "artifact_type": "Documentation",
+        "path": "docs/roadmap/day35_vrrp_failover_validation_safety.md",
+        "description": "Safety boundary for Day35 controlled failover observation.",
+        "safety_level": "controlled_failover_observation",
+        "demo_relevance": "Shows that automation observed only and did not trigger destructive changes.",
+    },
+    {
+        "group": "Live validation evidence",
+        "day": "Day35",
+        "title": "VRRP failover validation JSON",
+        "artifact_type": "JSON report",
+        "path": DAY35_VRRP_FAILOVER_JSON.as_posix(),
+        "description": "Structured Day35 failover and recovery evidence.",
+        "safety_level": "controlled_failover_observation",
+        "demo_relevance": "Core proof point for the v0.2 HA/VRRP milestone.",
+    },
+    {
+        "group": "Live validation evidence",
+        "day": "Day35",
+        "title": "VRRP failover validation HTML",
+        "artifact_type": "HTML report",
+        "path": DAY35_VRRP_FAILOVER_HTML.as_posix(),
+        "description": "Human-readable Day35 failover evidence report.",
+        "safety_level": "controlled_failover_observation",
+        "demo_relevance": "Primary reviewer-facing Day35 report.",
+    },
+    {
+        "group": "Live validation evidence",
+        "day": "Day35",
+        "title": "VRRP failover validation TXT",
+        "artifact_type": "TXT report",
+        "path": DAY35_VRRP_FAILOVER_TXT.as_posix(),
+        "description": "Plain-text Day35 report companion.",
+        "safety_level": "controlled_failover_observation",
+        "demo_relevance": "Useful fallback evidence for failover review.",
+    },
+    {
+        "group": "Evidence hardening / regression policy",
+        "day": "Day36",
+        "title": "VRRP evidence review and report hardening",
+        "artifact_type": "Documentation",
+        "path": "docs/roadmap/day36_vrrp_failover_evidence_review_report_hardening.md",
+        "description": "Documents the Day35 evidence review, report summary hardening, and report-index visibility.",
+        "safety_level": "report-only",
+        "demo_relevance": "Shows the evidence chain was reviewed after the live milestone.",
+    },
+    {
+        "group": "Evidence hardening / regression policy",
+        "day": "Day37",
+        "title": "VRRP report regression and evidence snapshot policy",
+        "artifact_type": "Documentation",
+        "path": "docs/roadmap/day37_vrrp_report_regression_evidence_policy.md",
+        "description": "Offline regression guard and generated evidence snapshot policy.",
+        "safety_level": "report-only",
+        "demo_relevance": "Explains why full runtime reports stay local while contracts are tested.",
+    },
+    {
+        "group": "Evidence hardening / regression policy",
+        "day": "Day38",
+        "title": "Post-VRRP milestone review and v0.2 scope planning",
+        "artifact_type": "Documentation",
+        "path": "docs/roadmap/day38_post_vrrp_milestone_review_and_v0_2_scope_planning.md",
+        "description": "Milestone review and conservative next-scope planning after Day31-Day37.",
+        "safety_level": "report-only",
+        "demo_relevance": "Frames Day39 dashboard integration as the next safe v0.2 step.",
+    },
+    {
+        "group": "Dashboard integration status",
+        "day": "Day39",
+        "title": "VRRP evidence dashboard integration note",
+        "artifact_type": "Documentation",
+        "path": "docs/roadmap/day39_vrrp_evidence_dashboard_integration.md",
+        "description": "Documents Day39 report-only scope, safety boundary, outputs, and v0.2 demo relevance.",
+        "safety_level": "report-only",
+        "demo_relevance": "Gives reviewers a concise Day39 scope and safety handoff.",
+    },
+    {
+        "group": "Dashboard integration status",
+        "day": "Day39",
+        "title": "VRRP evidence dashboard integration JSON",
+        "artifact_type": "JSON report",
+        "path": DAY39_VRRP_EVIDENCE_JSON.as_posix(),
+        "description": "Day39 summary generated from local Day31-Day38 evidence only.",
+        "safety_level": "report-only",
+        "demo_relevance": "Provides a single machine-readable VRRP evidence inventory for the dashboard and report index.",
+    },
+    {
+        "group": "Dashboard integration status",
+        "day": "Day39",
+        "title": "VRRP evidence dashboard integration HTML",
+        "artifact_type": "HTML report",
+        "path": DAY39_VRRP_EVIDENCE_HTML.as_posix(),
+        "description": "Day39 reviewer-facing VRRP evidence inventory.",
+        "safety_level": "report-only",
+        "demo_relevance": "Provides a single HTML handoff for the HA/VRRP evidence chain.",
+    },
 ]
 
 
@@ -304,6 +582,8 @@ def normalize_result(value: Any) -> str:
         "NA": "SKIP",
         "NOT_RUN": "NOT_RUN",
         "NOTRUN": "NOT_RUN",
+        "NOT_GENERATED": "NOT_GENERATED",
+        "NOTGENERATED": "NOT_GENERATED",
     }
     return aliases.get(normalized, normalized if normalized in RESULTS else "UNKNOWN")
 
@@ -396,6 +676,100 @@ def _update_counts(counts: Dict[str, int], status: str) -> None:
         counts[key] += 1
 
 
+def _vrrp_artifact_status(project_root: Path, relative_path: str) -> str:
+    path = Path(project_root) / relative_path
+    if path.exists():
+        return "FOUND"
+    if relative_path.startswith("reports/"):
+        return "NOT_GENERATED"
+    return "MISSING"
+
+
+def _vrrp_artifact_modified_at(project_root: Path, relative_path: str) -> str:
+    path = Path(project_root) / relative_path
+    if not path.exists():
+        return ""
+    return datetime.fromtimestamp(path.stat().st_mtime).replace(microsecond=0).isoformat(sep=" ")
+
+
+def discover_vrrp_evidence(project_root: Path) -> List[Dict[str, Any]]:
+    entries = []
+    for item in VRRP_EVIDENCE_CATALOG:
+        relative_path = str(item["path"])
+        status = _vrrp_artifact_status(project_root, relative_path)
+        entries.append(
+            {
+                "group": item["group"],
+                "day": item["day"],
+                "title": item["title"],
+                "artifact_type": item["artifact_type"],
+                "path": relative_path,
+                "status": status,
+                "exists": status == "FOUND",
+                "description": item["description"],
+                "safety_level": item["safety_level"],
+                "demo_relevance": item["demo_relevance"],
+                "modified_at": _vrrp_artifact_modified_at(project_root, relative_path),
+            }
+        )
+    return entries
+
+
+def summarize_vrrp_evidence(entries: List[Dict[str, Any]]) -> Dict[str, Any]:
+    counts = {"total": 0, "found": 0, "missing": 0, "not_generated": 0}
+    by_group: Dict[str, Dict[str, int]] = {}
+    for entry in entries:
+        status = str(entry.get("status", "MISSING"))
+        group = str(entry.get("group", "Ungrouped"))
+        counts["total"] += 1
+        if status == "FOUND":
+            counts["found"] += 1
+        elif status == "NOT_GENERATED":
+            counts["not_generated"] += 1
+        else:
+            counts["missing"] += 1
+        group_counts = by_group.setdefault(group, {"total": 0, "found": 0, "missing": 0, "not_generated": 0})
+        group_counts["total"] += 1
+        if status == "FOUND":
+            group_counts["found"] += 1
+        elif status == "NOT_GENERATED":
+            group_counts["not_generated"] += 1
+        else:
+            group_counts["missing"] += 1
+    return {"counts": counts, "groups": by_group}
+
+
+def build_day39_vrrp_evidence_report(project_root: Path) -> Dict[str, Any]:
+    entries = discover_vrrp_evidence(project_root)
+    summary = summarize_vrrp_evidence(entries)
+    missing_count = summary["counts"]["missing"] + summary["counts"]["not_generated"]
+    readiness_status = "READY" if missing_count == 0 else "NEEDS_REVIEW"
+    overall_status = "PASS" if missing_count == 0 else "WARN"
+    return {
+        "day": "Day39",
+        "title": "VRRP Evidence Dashboard Integration",
+        "generated_at": datetime.now().replace(microsecond=0).isoformat(sep=" "),
+        "overall_status": overall_status,
+        "readiness_status": readiness_status,
+        "purpose": "Integrate Day31-Day38 HA/VRRP evidence into dashboard and report-index visibility.",
+        "safety_scope": {
+            "live_tests_executed": False,
+            "ssh_connections_opened": False,
+            "router_configuration_changed": False,
+            "notes": "Day39 scans local documentation, diagrams, profiles, and generated reports only.",
+        },
+        "outputs": {
+            "json": DAY39_VRRP_EVIDENCE_JSON.as_posix(),
+            "html": DAY39_VRRP_EVIDENCE_HTML.as_posix(),
+        },
+        "summary": summary,
+        "evidence": entries,
+        "missing_optional_artifacts": [
+            entry for entry in entries if entry["status"] in {"MISSING", "NOT_GENERATED"}
+        ],
+    }
+
+
 def build_latest_lab_overview(profile: Dict[str, Any], project_root: Path) -> Dict[str, Any]:
     counts = _empty_counts()
     all_records: List[Dict[str, Any]] = []
@@ -439,6 +813,7 @@ def build_latest_lab_overview(profile: Dict[str, Any], project_root: Path) -> Di
         "counts": counts,
         "devices": devices,
         "lab_summary_reports": lab_summary_reports,
+        "ha_vrrp_evidence": discover_vrrp_evidence(project_root),
     }
 
 
@@ -544,6 +919,34 @@ def _render_summary_rows(data: Dict[str, Any], output_path: Path, project_root: 
     return "\n".join(rows) or '<tr><td colspan="5">No lab summary reports configured.</td></tr>'
 
 
+def _html_artifact_link_or_text(output_path: Path, project_root: Path, value: str) -> str:
+    if not value or value == "MISSING":
+        return html.escape(value or "")
+    target = project_root / value
+    if target.exists():
+        href = build_relative_link(output_path, target)
+        return f'<a href="{html.escape(href)}">{html.escape(value)}</a>'
+    return html.escape(value)
+
+
+def _render_vrrp_evidence_rows(entries: List[Dict[str, Any]], output_path: Path, project_root: Path) -> str:
+    rows = []
+    for entry in entries:
+        rows.append(
+            "<tr>"
+            f"<td>{html.escape(str(entry.get('group', '')))}</td>"
+            f"<td>{html.escape(str(entry.get('day', '')))}</td>"
+            f"<td>{html.escape(str(entry.get('title', '')))}</td>"
+            f"<td>{html.escape(str(entry.get('artifact_type', '')))}</td>"
+            f"<td>{_status_badge(str(entry.get('status', 'MISSING')))}</td>"
+            f"<td>{html.escape(str(entry.get('safety_level', '')))}</td>"
+            f"<td>{_html_artifact_link_or_text(output_path, project_root, str(entry.get('path', '')))}</td>"
+            f"<td>{html.escape(str(entry.get('demo_relevance', '')))}</td>"
+            "</tr>"
+        )
+    return "\n".join(rows) or '<tr><td colspan="8">No HA / VRRP evidence entries configured.</td></tr>'
+
+
 def write_html_overview(data: Dict[str, Any], output_path: Path, project_root: Optional[Path] = None) -> None:
     path = Path(output_path)
     root = Path(project_root or Path.cwd())
@@ -571,9 +974,9 @@ def write_html_overview(data: Dict[str, Any], output_path: Path, project_root: O
     th {{ background: #edf2f8; font-size: 12px; text-transform: uppercase; color: #435066; }}
     a {{ color: #155bb5; font-weight: 700; text-decoration: none; }}
     .badge {{ display: inline-block; min-width: 74px; padding: 4px 8px; border-radius: 999px; font-weight: 800; font-size: 12px; text-align: center; }}
-    .badge-pass {{ background: #dff7e8; color: #136b35; }}
+    .badge-pass, .badge-found {{ background: #dff7e8; color: #136b35; }}
     .badge-fail {{ background: #ffe1e1; color: #9c1d1d; }}
-    .badge-warn, .badge-skip, .badge-not_run {{ background: #fff3cc; color: #856100; }}
+    .badge-warn, .badge-skip, .badge-not_run, .badge-not_generated {{ background: #fff3cc; color: #856100; }}
     .badge-missing, .badge-incomplete {{ background: #eceff5; color: #4d596b; }}
     .badge-unknown {{ background: #e5e7ff; color: #393a8a; }}
   </style>
@@ -604,6 +1007,12 @@ def write_html_overview(data: Dict[str, Any], output_path: Path, project_root: O
     <table>
       <thead><tr><th>Report</th><th>Required</th><th>Status</th><th>JSON</th><th>HTML</th></tr></thead>
       <tbody>{_render_summary_rows(data, path, root)}</tbody>
+    </table>
+
+    <h2>HA / VRRP Evidence</h2>
+    <table>
+      <thead><tr><th>Group</th><th>Day</th><th>Artifact</th><th>Type</th><th>Status</th><th>Safety</th><th>Path</th><th>Demo relevance</th></tr></thead>
+      <tbody>{_render_vrrp_evidence_rows(data.get("ha_vrrp_evidence", []), path, root)}</tbody>
     </table>
   </main>
 </body>
@@ -859,6 +1268,34 @@ def list_tasks() -> List[Dict[str, Any]]:
             "notes": "Controlled live observation. Day35 prompts the operator to disconnect/reconnect lab01 LAN externally, uses source-specific ping, sends only read-only RouterOS print commands, and blocks interface, firewall/NAT, IP, VRRP, reboot, and reset changes.",
         },
         {
+            "id": DAY39_VRRP_EVIDENCE_TASK_ID,
+            "task_id": "day39_vrrp_evidence_dashboard_integration",
+            "display_name": "Day39 VRRP Evidence Dashboard Integration",
+            "user_display_name": "VRRP Evidence Dashboard Integration",
+            "day": "Day39",
+            "category": "ha_vrrp",
+            "description": "Generate a report-only HA/VRRP evidence inventory for dashboard and report-index visibility.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_output_path": DAY39_VRRP_EVIDENCE_JSON.as_posix(),
+            "report_paths": [
+                DAY39_VRRP_EVIDENCE_JSON.as_posix(),
+                DAY39_VRRP_EVIDENCE_HTML.as_posix(),
+            ],
+            "report_outputs": [
+                "Day39 VRRP evidence integration JSON",
+                "Day39 VRRP evidence integration HTML",
+                "Dashboard/report-index HA / VRRP Evidence visibility",
+            ],
+            "related_script": "network_lab.py",
+            "notes": "Report-only local scan of Day31-Day38 docs, diagrams, profiles, and generated report paths. It does not run SSH, live tests, iperf3, failover, or RouterOS/Cisco configuration changes.",
+        },
+        {
             "id": WIREGUARD_RUNNER_TASK_ALIAS,
             "task_id": WIREGUARD_RUNNER_TASK_ID,
             "display_name": WIREGUARD_RUNNER_DISPLAY_NAME,
@@ -933,6 +1370,7 @@ def _build_parser() -> argparse.ArgumentParser:
   python network_lab.py --task day33-vrrp-dry-run
   python network_lab.py --task day34-vrrp-staged-plan
   python network_lab.py --task day35-vrrp-failover-validation
+  python network_lab.py --task day39-vrrp-evidence-dashboard-integration
   python network_lab.py --task wireguard-runner --dry-run
   python network_lab.py --task wireguard-runner --wireguard-config Set_WireguardVPN_lab02_config.json --dry-run
   python network_lab.py --task wireguard-runner
@@ -946,6 +1384,7 @@ day32-vrrp-precheck runs read-only MikroTik print/export terse commands with a b
 day33-vrrp-dry-run generates local VRRP topology and command previews without SSH or RouterOS execution.
 day34-vrrp-staged-plan generates a blocked staged apply plan and safety gate without SSH or RouterOS execution.
 day35-vrrp-failover-validation observes manual external VRRP failover with read-only RouterOS commands and source-specific LAN pings.
+day39-vrrp-evidence-dashboard-integration scans local VRRP docs/reports only and writes a summary report.
 wireguard-runner is dry-run by default and delegates to the existing WireGuard script only after explicit --allow-live-wireguard."""
     parser = argparse.ArgumentParser(
         description=f"Day14 {DAY14_NAME}.",
@@ -972,6 +1411,7 @@ wireguard-runner is dry-run by default and delegates to the existing WireGuard s
             DAY33_VRRP_DRY_RUN_TASK_ID,
             DAY34_VRRP_STAGED_PLAN_TASK_ID,
             DAY35_VRRP_FAILOVER_TASK_ID,
+            DAY39_VRRP_EVIDENCE_TASK_ID,
             WIREGUARD_RUNNER_TASK_ALIAS,
         ],
         help="Task to run.",
@@ -1373,6 +1813,38 @@ def _render_day18_evidence_html(evidence: Dict[str, Any], output_path: Path, pro
 """
 
 
+def _render_vrrp_evidence_index_html(entries: List[Dict[str, Any]], output_path: Path, project_root: Path) -> str:
+    summary = summarize_vrrp_evidence(entries)
+    counts = summary["counts"]
+    rows = "\n".join(
+        "<tr>"
+        f"<td>{html.escape(str(entry.get('group', '')))}</td>"
+        f"<td><span class=\"pill pill-day\">{html.escape(str(entry.get('day', '')))}</span></td>"
+        f"<td>{html.escape(str(entry.get('title', '')))}</td>"
+        f"<td>{html.escape(str(entry.get('artifact_type', '')))}</td>"
+        f"<td><span class=\"pill status-{_css_token(str(entry.get('status', 'MISSING')))}\">{html.escape(str(entry.get('status', 'MISSING')))}</span></td>"
+        f"<td><span class=\"pill safety-{_css_token(str(entry.get('safety_level', 'report-only')))}\">{html.escape(str(entry.get('safety_level', 'report-only')))}</span></td>"
+        f"<td>{_html_artifact_link_or_text(output_path, project_root, str(entry.get('path', '')))}</td>"
+        f"<td>{html.escape(str(entry.get('demo_relevance', '')))}</td>"
+        "</tr>"
+        for entry in entries
+    ) or "<tr><td colspan=\"8\">No HA / VRRP evidence entries configured.</td></tr>"
+    return f"""
+    <h2>HA / VRRP Evidence</h2>
+    <div class="warning">Day39 evidence integration is report-only: it reads Day31-Day38 local docs, diagrams, profiles, and generated reports without SSH, live tests, or configuration changes.</div>
+    <section class="summary light-summary">
+      <div class="metric"><div class="metric-label">VRRP Artifacts</div><div class="metric-value">{counts['total']}</div></div>
+      <div class="metric"><div class="metric-label">Found</div><div class="metric-value">{counts['found']}</div></div>
+      <div class="metric"><div class="metric-label">Missing</div><div class="metric-value">{counts['missing']}</div></div>
+      <div class="metric"><div class="metric-label">Not Generated</div><div class="metric-value">{counts['not_generated']}</div></div>
+    </section>
+    <table>
+      <thead><tr><th>Group</th><th>Day</th><th>Artifact</th><th>Type</th><th>Status</th><th>Safety</th><th>Path</th><th>Demo relevance</th></tr></thead>
+      <tbody>{rows}</tbody>
+    </table>
+"""
+
+
 def write_report_index_html(
     task_catalog: List[Dict[str, Any]],
     report_rows: List[Dict[str, Any]],
@@ -1419,6 +1891,11 @@ def write_report_index_html(
         output_path,
         project_root,
     )
+    vrrp_evidence_html = _render_vrrp_evidence_index_html(
+        discover_vrrp_evidence(project_root),
+        output_path,
+        project_root,
+    )
     html_text = f"""<!doctype html>
 <html lang="en">
 <head>
@@ -1460,6 +1937,10 @@ def write_report_index_html(
     .meta {{ color: #dbe5f3; }}
     .warning {{ background: var(--yellow-bg); border: 1px solid #f0c66a; border-radius: 8px; padding: 12px 14px; margin: 18px 0 20px; color: var(--yellow); }}
     .summary {{ display: grid; grid-template-columns: repeat(4, minmax(120px, 1fr)); gap: 12px; margin-top: 18px; }}
+    .light-summary {{ margin-bottom: 14px; }}
+    .light-summary .metric {{ background: var(--panel); border-color: var(--line); }}
+    .light-summary .metric-label {{ color: var(--muted); }}
+    .light-summary .metric-value {{ color: var(--ink); }}
     .metric {{ background: rgba(255, 255, 255, .10); border: 1px solid rgba(255, 255, 255, .20); border-radius: 8px; padding: 13px 14px; }}
     .metric-label {{ color: #dbe5f3; font-size: 12px; font-weight: 700; text-transform: uppercase; }}
     .metric-value {{ margin-top: 4px; font-size: 24px; font-weight: 800; }}
@@ -1467,7 +1948,7 @@ def write_report_index_html(
     .pill-day {{ background: var(--gray-bg); color: var(--gray); }}
     .enabled, .status-found {{ background: var(--green-bg); color: var(--green); }}
     .disabled, .status-disabled-for-day18, .safety-future-reserved {{ background: var(--blue-bg); color: var(--blue-ink); }}
-    .status-missing {{ background: var(--yellow-bg); color: var(--yellow); }}
+    .status-missing, .status-not-generated {{ background: var(--yellow-bg); color: var(--yellow); }}
     .safety-safe-read-only {{ background: var(--green-bg); color: var(--green); }}
     .safety-live-read-only {{ background: #e7f0fb; color: #175cd3; }}
     .safety-live-performance {{ background: #f3e8ff; color: #6941c6; }}
@@ -1494,6 +1975,7 @@ def write_report_index_html(
   <main>
     <div class="warning">Day18 WireGuard runner integration uses a safety layer: dry-run by default, explicit live confirmation, fixed argv execution, and no peer/firewall write flags.</div>
     {day18_evidence_html}
+    {vrrp_evidence_html}
     <h2>Task Catalog Summary</h2>
     <table>
       <thead><tr><th>Task ID</th><th>Day</th><th>Name</th><th>Category</th><th>Safety</th><th>Enabled</th><th>Mode</th><th>Live Device</th></tr></thead>
@@ -1508,6 +1990,65 @@ def write_report_index_html(
     <table>
       <thead><tr><th>Safety Level</th><th>Description</th></tr></thead>
       <tbody>{safety_rows}</tbody>
+    </table>
+  </main>
+</body>
+</html>
+"""
+    output_path.write_text(html_text, encoding="utf-8")
+
+
+def write_day39_vrrp_evidence_html(report: Dict[str, Any], output_path: Path, project_root: Path) -> None:
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    summary = report.get("summary", {})
+    counts = summary.get("counts", {}) if isinstance(summary, dict) else {}
+    rows = _render_vrrp_evidence_rows(report.get("evidence", []), output_path, project_root)
+    html_text = f"""<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Day39 VRRP Evidence Dashboard Integration</title>
+  <style>
+    :root {{ --bg: #f5f7fb; --ink: #172033; --muted: #617089; --line: #d8e0ec; --panel: #ffffff; --head: #27364a; }}
+    body {{ margin: 0; font-family: Arial, sans-serif; background: var(--bg); color: var(--ink); font-size: 14px; }}
+    header {{ padding: 34px 38px 24px; background: var(--head); color: white; }}
+    main {{ padding: 28px 38px 46px; }}
+    h1 {{ margin: 0 0 8px; font-size: 30px; }}
+    h2 {{ margin-top: 30px; font-size: 20px; }}
+    .meta {{ color: #dbe5f3; }}
+    .notice {{ background: #fff4d8; border: 1px solid #f0c66a; border-radius: 8px; padding: 12px 14px; margin: 18px 0 20px; color: #8a6100; }}
+    .summary {{ display: grid; grid-template-columns: repeat(4, minmax(120px, 1fr)); gap: 12px; margin: 20px 0; }}
+    .metric {{ background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; }}
+    .metric .label {{ color: var(--muted); font-size: 12px; font-weight: 700; text-transform: uppercase; }}
+    .metric .value {{ margin-top: 5px; font-size: 22px; font-weight: 800; }}
+    table {{ width: 100%; border-collapse: collapse; background: var(--panel); border: 1px solid var(--line); }}
+    th, td {{ padding: 10px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }}
+    th {{ background: #edf2f8; font-size: 12px; text-transform: uppercase; color: #435066; }}
+    a {{ color: #155bb5; font-weight: 700; text-decoration: none; }}
+    .badge {{ display: inline-block; min-width: 92px; padding: 4px 8px; border-radius: 999px; font-weight: 800; font-size: 12px; text-align: center; }}
+    .badge-found, .badge-pass {{ background: #dff7e8; color: #136b35; }}
+    .badge-missing, .badge-not_generated, .badge-warn {{ background: #fff3cc; color: #856100; }}
+    .badge-unknown {{ background: #e5e7ff; color: #393a8a; }}
+    @media (max-width: 820px) {{ header, main {{ padding-left: 16px; padding-right: 16px; }} .summary {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }} table {{ display: block; overflow-x: auto; }} }}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Day39 VRRP Evidence Dashboard Integration</h1>
+    <div class="meta">Generated {html.escape(str(report.get("generated_at", "")))} · Overall {_status_badge(str(report.get("overall_status", "UNKNOWN")))}</div>
+  </header>
+  <main>
+    <div class="notice">Report-only integration. Day39 did not run live tests, open SSH, change RouterOS/Cisco/firewall/NAT/IP/VRRP settings, or require lab connectivity.</div>
+    <section class="summary">
+      <div class="metric"><div class="label">Artifacts</div><div class="value">{counts.get("total", 0)}</div></div>
+      <div class="metric"><div class="label">Found</div><div class="value">{counts.get("found", 0)}</div></div>
+      <div class="metric"><div class="label">Missing</div><div class="value">{counts.get("missing", 0)}</div></div>
+      <div class="metric"><div class="label">Not Generated</div><div class="value">{counts.get("not_generated", 0)}</div></div>
+    </section>
+    <h2>HA / VRRP Evidence</h2>
+    <table>
+      <thead><tr><th>Group</th><th>Day</th><th>Artifact</th><th>Type</th><th>Status</th><th>Safety</th><th>Path</th><th>Demo relevance</th></tr></thead>
+      <tbody>{rows}</tbody>
     </table>
   </main>
 </body>
@@ -1967,6 +2508,43 @@ def _run_report_visibility_index(project_root: Path) -> int:
     print()
     print(f"{format_status('PASS')} HTML report index: {output_path_text}")
     print("Day18 WireGuard runner integration uses dry-run and explicit confirmation guardrails.")
+    return 0
+
+
+def _run_day39_vrrp_evidence_dashboard_integration(project_root: Path) -> int:
+    report = build_day39_vrrp_evidence_report(project_root)
+    json_path = project_root / DAY39_VRRP_EVIDENCE_JSON
+    html_path = project_root / DAY39_VRRP_EVIDENCE_HTML
+    write_json_report(report, json_path)
+    report = build_day39_vrrp_evidence_report(project_root)
+    write_json_report(report, json_path)
+    write_day39_vrrp_evidence_html(report, html_path, project_root)
+    report = build_day39_vrrp_evidence_report(project_root)
+    write_json_report(report, json_path)
+    write_day39_vrrp_evidence_html(report, html_path, project_root)
+    counts = report["summary"]["counts"]
+    print(format_heading("Day39 VRRP Evidence Dashboard Integration"))
+    print(f"Overall status: {format_status(str(report.get('overall_status', 'UNKNOWN')))}")
+    print(
+        "Summary: "
+        f"total={counts.get('total', 0)} "
+        f"found={color_text(str(counts.get('found', 0)), 'green')} "
+        f"missing={color_text(str(counts.get('missing', 0)), 'yellow')} "
+        f"not_generated={color_text(str(counts.get('not_generated', 0)), 'yellow')}"
+    )
+    missing = report.get("missing_optional_artifacts", [])
+    if missing:
+        print()
+        print(format_heading("Missing optional VRRP artifacts"))
+        for entry in missing:
+            print(
+                f"  {format_status(str(entry.get('status', 'MISSING')))} "
+                f"{entry.get('day')} / {entry.get('title')} -> {entry.get('path')}"
+            )
+    print()
+    print("Safety: report-only; no live tests, SSH, credentials, or configuration changes.")
+    print(f"JSON report: {_relative_to_project(project_root, json_path)}")
+    print(f"HTML report: {_relative_to_project(project_root, html_path)}")
     return 0
 
 
@@ -2989,6 +3567,8 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
         return _run_portfolio_finalization(root)
     if args.task == "demo-flow":
         return _run_day24_demo_flow(root)
+    if args.task == DAY39_VRRP_EVIDENCE_TASK_ID:
+        return _run_day39_vrrp_evidence_dashboard_integration(root)
 
     profile_path = _resolve_project_path(root, args.profile)
     try:

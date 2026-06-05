@@ -42,6 +42,7 @@ The v0.1 portfolio package covers Day 1 through Day 30 post-tag verification. Th
 - Day 36 VRRP Failover Evidence Review and Report Hardening
 - Day 37 VRRP Report Regression and Evidence Snapshot Policy
 - Day 38 Post-VRRP Milestone Review and v0.2 Scope Planning
+- Day 39 VRRP Evidence Dashboard Integration
 
 The project is designed as a practical QA Automation / SDET portfolio project for network infrastructure. It focuses on repeatable validation, structured test evidence, and readable JSON / HTML reports rather than one-off manual checks.
 
@@ -118,6 +119,7 @@ Cisco validation is read-only. It runs show commands for topology evidence and d
 | Day 36 | VRRP Failover Evidence Review and Report Hardening | Complete |
 | Day 37 | VRRP report regression guards and evidence snapshot policy | Complete |
 | Day 38 | Post-VRRP milestone review and v0.2 scope planning; documentation/report-planning only with no new live test | Complete |
+| Day 39 | VRRP evidence dashboard/report-index integration; report-only with no live test, SSH, or configuration change | Complete |
 
 ## Lab Topology
 
@@ -1379,6 +1381,28 @@ Roadmap note:
 docs/roadmap/day38_post_vrrp_milestone_review_and_v0_2_scope_planning.md
 ```
 
+## Day39 - VRRP Evidence Dashboard Integration
+
+Purpose: integrate Day31-Day38 HA / VRRP docs, diagrams, profiles, generated reports, evidence policy, and milestone planning into the local dashboard and report index.
+
+Safety: report-only and documentation/dashboard integration only. Day39 does not run live tests, open SSH sessions, require router credentials, start iperf3, trigger failover, or change MikroTik, Cisco, firewall/NAT, IP, VRRP, interface, reboot, reset, or topology settings.
+
+Run Day39:
+
+```powershell
+python network_lab.py --task day39-vrrp-evidence-dashboard-integration
+python network_lab.py --task report-index
+```
+
+Reports:
+
+```text
+reports/lab-summary/day39_vrrp_evidence_dashboard_integration.json
+reports/lab-summary/day39_vrrp_evidence_dashboard_integration.html
+```
+
+v0.2 relevance: Day39 improves demo readiness and evidence traceability by making the HA / VRRP evidence chain visible from the dashboard `/reports` page, the generated report index, and the latest lab overview.
+
 ## Portfolio Demo
 
 v0.1 includes reviewer/interview demo scripts for presenting the current platform safely without adding features, changing runner/dashboard behavior, or running live device-changing workflows:
@@ -1577,6 +1601,13 @@ Day38 post-VRRP milestone review and v0.2 scope planning:
 docs/roadmap/day38_post_vrrp_milestone_review_and_v0_2_scope_planning.md
 ```
 
+Day39 VRRP evidence dashboard integration:
+
+```text
+reports/lab-summary/day39_vrrp_evidence_dashboard_integration.json
+reports/lab-summary/day39_vrrp_evidence_dashboard_integration.html
+```
+
 ## Testing Strategy
 
 The project separates live-device validation from unit tests.
@@ -1617,6 +1648,7 @@ For documentation-only review passes, run `python -m pytest` before sharing the 
 - Includes Day35 VRRP controlled failover validation with manual external failure trigger and read-only evidence collection.
 - Includes Day36 VRRP evidence summary/report hardening and Day37 offline regression guards plus evidence snapshot policy.
 - Includes Day38 post-VRRP milestone review and conservative v0.2 scope planning without adding a new live test.
+- Includes Day39 HA / VRRP evidence dashboard/report-index integration for safer v0.2 demo readiness.
 
 ## Roadmap
 
@@ -1628,4 +1660,4 @@ Planned future directions:
 - Syslog / packet capture analysis
 - AI report summary / RAG integration
 
-v0.1 is packaged through Day29 and locally verified through Day30 as a portfolio release. Day38 closes the first HA / VRRP milestone review for v0.2 planning. Future work should stay explicit about whether it is report-only, read-only, dry-run, guarded-live, or disabled before adding new live lab behavior.
+v0.1 is packaged through Day29 and locally verified through Day30 as a portfolio release. Day39 turns the first HA / VRRP milestone into dashboard/report-index evidence for v0.2 demos. Future work should stay explicit about whether it is report-only, read-only, dry-run, guarded-live, or disabled before adding new live lab behavior.

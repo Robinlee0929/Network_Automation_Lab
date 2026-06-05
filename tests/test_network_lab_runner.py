@@ -2137,6 +2137,81 @@ def test_day35_report_paths_are_visible_in_report_catalog():
     assert day35["safety_label"] == "controlled_failover_observation"
 
 
+def test_day39_vrrp_evidence_report_generates_without_live_access(tmp_path, monkeypatch, capsys):
+    def fail_run(*_args, **_kwargs):
+        raise AssertionError("Day39 must not execute live scripts or subprocesses")
+
+    monkeypatch.setattr(network_lab.subprocess, "run", fail_run)
+
+    exit_code = network_lab.main(
+        ["--task", "day39-vrrp-evidence-dashboard-integration"],
+        project_root=tmp_path,
+    )
+
+    output = capsys.readouterr().out
+    assert exit_code == 0
+    assert "Day39 VRRP Evidence Dashboard Integration" in output
+    assert "Safety: report-only" in output
+    json_path = tmp_path / "reports/lab-summary/day39_vrrp_evidence_dashboard_integration.json"
+    html_path = tmp_path / "reports/lab-summary/day39_vrrp_evidence_dashboard_integration.html"
+    assert json_path.exists()
+    assert html_path.exists()
+    report = json.loads(json_path.read_text(encoding="utf-8"))
+    assert report["safety_scope"]["live_tests_executed"] is False
+    assert report["safety_scope"]["ssh_connections_opened"] is False
+    assert report["safety_scope"]["router_configuration_changed"] is False
+    assert report["missing_optional_artifacts"]
+    assert {entry["status"] for entry in report["evidence"]} >= {"MISSING", "NOT_GENERATED"}
+
+
+def test_day39_vrrp_evidence_entries_include_status_fields(tmp_path):
+    write_text(tmp_path / "docs/roadmap/ha_vrrp_topology_plan.md", "# plan")
+    write_json(
+        tmp_path / "reports/lab-summary/day32_vrrp_readonly_precheck.json",
+        {"overall_status": "PASS"},
+    )
+
+    entries = network_lab.discover_vrrp_evidence(tmp_path)
+
+    topology = next(entry for entry in entries if entry["title"] == "HA / VRRP topology plan")
+    day32 = next(entry for entry in entries if entry["title"] == "VRRP read-only precheck JSON")
+    day35 = next(entry for entry in entries if entry["title"] == "VRRP failover validation JSON")
+    assert topology["status"] == "FOUND"
+    assert day32["status"] == "FOUND"
+    assert day35["status"] == "NOT_GENERATED"
+    for entry in entries:
+        assert "status" in entry
+        assert "safety_level" in entry
+        assert "demo_relevance" in entry
+
+
+def test_report_index_html_exposes_vrrp_evidence_group(tmp_path):
+    write_text(tmp_path / "docs/roadmap/ha_vrrp_topology_plan.md", "# plan")
+
+    exit_code = network_lab.main(["--report-index"], project_root=tmp_path)
+
+    assert exit_code == 0
+    html = (tmp_path / "reports/report_index.html").read_text(encoding="utf-8")
+    assert "HA / VRRP Evidence" in html
+    assert "Topology and planning" in html
+    assert "docs/roadmap/ha_vrrp_topology_plan.md" in html
+    assert "NOT_GENERATED" in html
+
+
+def test_latest_lab_overview_html_exposes_vrrp_evidence_group(tmp_path):
+    prof = profile(required=False)
+    write_text(tmp_path / "docs/roadmap/ha_vrrp_topology_plan.md", "# plan")
+    overview = network_lab.build_latest_lab_overview(prof, tmp_path)
+    output = tmp_path / "reports/lab-summary/latest_lab_overview.html"
+
+    network_lab.write_html_overview(overview, output, tmp_path)
+
+    html = output.read_text(encoding="utf-8")
+    assert "HA / VRRP Evidence" in html
+    assert "HA / VRRP topology plan" in html
+    assert "FOUND" in html
+
+
 def test_console_status_format_respects_no_color(monkeypatch):
     monkeypatch.delenv("NO_COLOR", raising=False)
     monkeypatch.setenv("FORCE_COLOR", "1")
