@@ -24,8 +24,22 @@ def test_runner_task_catalog_has_day23_metadata_contract():
 
 
 def test_runner_task_catalog_uses_consistent_day23_safety_labels():
-    allowed_safety_levels = {"dry-run", "guarded-live", "read-only", "report-only", "disabled"}
-    allowed_execution_modes = {"dry-run", "guarded-live", "read-only", "report-only", "disabled"}
+    allowed_safety_levels = {
+        "dry-run",
+        "guarded-live",
+        "read-only",
+        "report-only",
+        "disabled",
+        "controlled_failover_observation",
+    }
+    allowed_execution_modes = {
+        "dry-run",
+        "guarded-live",
+        "read-only",
+        "report-only",
+        "disabled",
+        "controlled_failover_observation",
+    }
 
     for task in network_lab.list_tasks():
         assert task["safety_level"] in allowed_safety_levels
@@ -94,3 +108,16 @@ def test_day34_vrrp_staged_plan_catalog_entry_is_non_live():
     assert "day34_vrrp_staged_apply_plan.json" in day34["report_paths"][0]
     assert "safety gate" in day34["notes"].lower()
     assert "never opens SSH" in day34["notes"]
+
+
+def test_day35_vrrp_failover_catalog_entry_is_controlled_observation():
+    day35 = next(task for task in network_lab.list_tasks() if task["id"] == "day35-vrrp-failover-validation")
+
+    assert day35["task_id"] == "day35_vrrp_failover_validation"
+    assert day35["safety_level"] == "controlled_failover_observation"
+    assert day35["execution_mode"] == "controlled_failover_observation"
+    assert day35["requires_live_device"] is True
+    assert day35["requires_password"] is True
+    assert "day35_vrrp_failover_validation.json" in day35["report_paths"][0]
+    assert "disconnect/reconnect lab01 LAN externally" in day35["notes"]
+    assert "blocks interface, firewall/NAT, IP, VRRP, reboot, and reset changes" in day35["notes"]

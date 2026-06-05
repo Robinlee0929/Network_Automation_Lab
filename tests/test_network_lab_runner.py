@@ -2036,6 +2036,53 @@ def test_day34_vrrp_staged_plan_delegates_to_plan_script(tmp_path, monkeypatch, 
     assert "--allow-live" not in " ".join(calls[0][0])
 
 
+def test_day35_vrrp_failover_delegates_to_validation_script_without_destructive_args(tmp_path, monkeypatch, capsys):
+    write_default_profile(tmp_path)
+    calls = []
+
+    def fake_run(command, cwd):
+        calls.append((command, cwd))
+        return SimpleNamespace(returncode=0)
+
+    monkeypatch.setattr(network_lab.subprocess, "run", fake_run)
+
+    exit_code = network_lab.main(["--task", "day35-vrrp-failover-validation"], project_root=tmp_path)
+
+    output = capsys.readouterr().out
+    command_text = " ".join(calls[0][0])
+    assert exit_code == 0
+    assert calls == [([sys.executable, "mikrotik_day35_vrrp_failover_validation.py"], tmp_path.resolve())]
+    assert "Controlled live observation workflow" in output
+    assert "disconnect/reconnect lab01 LAN cable" in output
+    for blocked in ("disable", "enable", "firewall", "reboot", "reset", "set", "remove"):
+        assert blocked not in command_text
+
+
+def test_day35_vrrp_failover_dry_run_does_not_execute_script(tmp_path, monkeypatch, capsys):
+    write_default_profile(tmp_path)
+
+    def fake_run(_command, _cwd):
+        raise AssertionError("Day35 dry-run must not execute subprocess")
+
+    monkeypatch.setattr(network_lab.subprocess, "run", fake_run)
+
+    exit_code = network_lab.main(["--task", "day35-vrrp-failover-validation", "--dry-run"], project_root=tmp_path)
+
+    output = capsys.readouterr().out
+    assert exit_code == 0
+    assert "No live workflow was executed" in output
+    assert "ping -S 192.168.88.100 <target>" in output
+
+
+def test_day35_report_paths_are_visible_in_report_catalog():
+    day35 = next(item for item in network_lab.REPORT_CATALOG if item["day"] == "Day35")
+
+    assert day35["json_globs"] == ["reports/lab-summary/day35_vrrp_failover_validation.json"]
+    assert day35["html_globs"] == ["reports/lab-summary/day35_vrrp_failover_validation.html"]
+    assert "day35-vrrp-failover-validation" in day35["missing_note"]
+    assert day35["safety_label"] == "controlled_failover_observation"
+
+
 def test_console_status_format_respects_no_color(monkeypatch):
     monkeypatch.delenv("NO_COLOR", raising=False)
     monkeypatch.setenv("FORCE_COLOR", "1")

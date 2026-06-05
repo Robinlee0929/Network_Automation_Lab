@@ -93,6 +93,12 @@
       "json": "reports/lab-summary/day13_multi_router_wireguard_client_to_site_summary.json",
       "html": "reports/lab-summary/day13_multi_router_wireguard_client_to_site_summary.html",
       "required": false
+    },
+    {
+      "name": "Day35 VRRP Failover Validation",
+      "json": "reports/lab-summary/day35_vrrp_failover_validation.json",
+      "html": "reports/lab-summary/day35_vrrp_failover_validation.html",
+      "required": false
     }
   ]
 }

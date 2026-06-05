@@ -1,0 +1,86 @@
+{
+  "profile_id": "day35-vrrp-failover-validation",
+  "title": "Day35 VRRP failover validation",
+  "mode": "manual_failover_observation",
+  "safety_level": "controlled_failover_observation",
+  "shared_lan_subnet": "192.168.88.0/24",
+  "lab01_lan_ip": "192.168.88.2",
+  "lab02_lan_ip": "192.168.88.3",
+  "vrrp_virtual_ip": "192.168.88.99",
+  "automation_pc_lan_ip": "192.168.88.100",
+  "lan_server_ip": "192.168.88.254",
+  "windows_default_route": "192.168.0.114",
+  "vrid": 88,
+  "virtual_mac": "00:00:5E:00:01:58",
+  "lab01_priority": 150,
+  "lab02_priority": 100,
+  "lab01_state_before_failover": "MASTER",
+  "lab02_state_before_failover": "BACKUP",
+  "manual_failover_trigger": "Disconnect lab01 LAN cable from the LAN switch, then press Enter.",
+  "manual_recovery_trigger": "Reconnect lab01 LAN cable, then press Enter.",
+  "required_ping_command": "ping -S 192.168.88.100 <target>",
+  "report_paths": [
+    "reports/lab-summary/day35_vrrp_failover_validation.json",
+    "reports/lab-summary/day35_vrrp_failover_validation.html",
+    "reports/lab-summary/day35_vrrp_failover_validation.txt"
+  ],
+  "devices": [
+    {
+      "name": "Hex-s-2025-lab01",
+      "role": "primary",
+      "lan_bridge_ip": "192.168.88.2/24",
+      "expected_baseline_state": "MASTER",
+      "expected_priority": 150
+    },
+    {
+      "name": "Hex-s-2025-lab02",
+      "role": "backup",
+      "lan_bridge_ip": "192.168.88.3/24",
+      "expected_baseline_state": "BACKUP",
+      "expected_failover_state": "MASTER",
+      "expected_priority": 100
+    },
+    {
+      "name": "cisco-switch",
+      "role": "lan_switch"
+    },
+    {
+      "name": "automation-pc",
+      "role": "observer",
+      "lan_ip": "192.168.88.100"
+    },
+    {
+      "name": "lan-server",
+      "role": "icmp_target",
+      "lan_ip": "192.168.88.254"
+    }
+  ],
+  "readonly_routeros_commands": [
+    "/system identity print",
+    "/ip address print",
+    "/interface vrrp print detail",
+    "/interface print",
+    "/ip route print",
+    "/ip firewall nat print",
+    "/ip firewall filter print"
+  ],
+  "blocked_actions": [
+    "execute_routeros_configuration_commands",
+    "interface_disable",
+    "interface_enable",
+    "firewall_nat_modification",
+    "firewall_filter_modification",
+    "ip_address_modification",
+    "vrrp_priority_change",
+    "vrrp_vrid_change",
+    "vrrp_virtual_ip_change",
+    "reboot_device",
+    "reset_configuration",
+    "automatic_failure_injection"
+  ],
+  "notes": [
+    "Day35 is controlled observation only. The failover trigger is manual and external.",
+    "Automation collects evidence and reports without modifying RouterOS configuration.",
+    "The LAN server Windows firewall must allow ICMPv4 Echo from 192.168.88.0/24."
+  ]
+}

@@ -43,6 +43,16 @@
       "notes": "May render planned checks or local reports, but must not apply configuration, connect to devices, or execute live commands."
     },
     {
+      "id": "controlled_failover_observation",
+      "description": "Controlled live HA observation where failover is triggered manually outside automation.",
+      "allow_ssh": true,
+      "allow_config_change": false,
+      "allow_reboot": false,
+      "allow_delete": false,
+      "allow_report_generation": true,
+      "notes": "Allows read-only SSH evidence collection, source-specific LAN ping, manual operator prompts, and reports. It must not modify RouterOS configuration, interfaces, NAT/firewall, IP addresses, VRRP settings, reboot, reset, or inject failure automatically."
+    },
+    {
       "id": "live_execution_blocked",
       "description": "Live device action is explicitly blocked.",
       "allow_ssh": false,

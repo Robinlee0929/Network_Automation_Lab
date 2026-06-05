@@ -1,6 +1,6 @@
 {
-  "catalog_version": "day34-staged-apply-plan",
-  "purpose": "Static task catalog metadata for Day34 VRRP v0.2 staged apply safety planning. This file does not execute tasks, read config.json, connect to devices, or modify runner behavior.",
+  "catalog_version": "day35-vrrp-failover-validation",
+  "purpose": "Static task catalog metadata for Day35 VRRP controlled failover validation. This file does not execute tasks, read config.json, connect to devices, or modify runner behavior.",
   "tasks": [
     {
       "id": "day4-mikrotik-multi-device-baseline",
@@ -222,6 +222,26 @@
       ],
       "allow_live_execution": false,
       "notes": "Plan-only safety gate. Checks Day32/Day33 evidence readiness, renders staged backup-then-primary apply and rollback previews, and blocks SSH, credentials, RouterOS execution, failover, reboot, reset, and interface state changes."
+    },
+    {
+      "id": "day35-vrrp-failover-validation",
+      "title": "Day35 VRRP failover validation",
+      "category": "ha_vrrp",
+      "safety_level": "controlled_failover_observation",
+      "device_scope": [
+        "mikrotik",
+        "automation-pc",
+        "manual-operator",
+        "lan-server"
+      ],
+      "profile_path": "topology_profiles/day35_vrrp_failover_validation.json",
+      "report_paths": [
+        "reports/lab-summary/day35_vrrp_failover_validation.json",
+        "reports/lab-summary/day35_vrrp_failover_validation.html",
+        "reports/lab-summary/day35_vrrp_failover_validation.txt"
+      ],
+      "allow_live_execution": true,
+      "notes": "Controlled observation only. Prompts the operator to manually disconnect/reconnect lab01 LAN, uses source-specific ping and read-only RouterOS print commands, and blocks interface, firewall/NAT, IP address, VRRP, reboot, reset, and automatic failure-injection actions."
     }
   ]
 }

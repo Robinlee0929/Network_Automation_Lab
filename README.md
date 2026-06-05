@@ -38,6 +38,7 @@ The v0.1 portfolio package covers Day 1 through Day 30 post-tag verification. Th
 - Day 32 VRRP Read-only Precheck Runner
 - Day 33 VRRP Topology Design + Dry-run Command Preview
 - Day 34 VRRP Staged Apply Plan and Safety Gate
+- Day 35 VRRP Failover Validation
 
 The project is designed as a practical QA Automation / SDET portfolio project for network infrastructure. It focuses on repeatable validation, structured test evidence, and readable JSON / HTML reports rather than one-off manual checks.
 
@@ -110,6 +111,7 @@ Cisco validation is read-only. It runs show commands for topology evidence and d
 | Day 32 | VRRP Read-only Precheck Runner | Complete |
 | Day 33 | VRRP Topology Design + Dry-run Command Preview | Complete |
 | Day 34 | VRRP Staged Apply Plan and Safety Gate | Complete |
+| Day 35 | VRRP Failover Validation | Complete |
 
 ## Lab Topology
 
@@ -1252,6 +1254,43 @@ Safety behavior:
 - Manual operator confirmation and live execution remain blocked in the Day34 report.
 - The runner does not read `config.json`, open SSH, send commands, deploy VRRP, or modify live lab state.
 
+## Day35 - VRRP Failover Validation
+
+Purpose: safely prove that lab02 takes over the VRRP VIP when lab01 has a manual LAN-side failure.
+
+Safety: controlled failover observation; automation collects evidence and reports, while the operator manually disconnects/reconnects the lab01 LAN cable from the LAN switch.
+
+Run Day35:
+
+```powershell
+python mikrotik_day35_vrrp_failover_validation.py
+python network_lab.py --task day35-vrrp-failover-validation
+```
+
+Profile:
+
+```text
+topology_profiles/day35_vrrp_failover_validation.json
+```
+
+Reports:
+
+```text
+reports/lab-summary/day35_vrrp_failover_validation.json
+reports/lab-summary/day35_vrrp_failover_validation.html
+reports/lab-summary/day35_vrrp_failover_validation.txt
+```
+
+Safety behavior:
+
+- Day35 is classified as `controlled_failover_observation`.
+- Day35 is not a configuration day and does not modify RouterOS configuration.
+- The failover trigger is manual and external: disconnect lab01 LAN from the switch, then reconnect it when prompted.
+- Automation uses `ping -S 192.168.88.100 <target>` for LAN reachability checks.
+- RouterOS evidence collection is limited to read-only `print` commands.
+- Interface enable/disable, firewall/NAT modification, IP address changes, VRRP changes, reboot, reset, and automatic failure injection are blocked.
+- The LAN server firewall must allow ICMPv4 Echo from `192.168.88.0/24`.
+
 ## Portfolio Demo
 
 v0.1 includes reviewer/interview demo scripts for presenting the current platform safely without adding features, changing runner/dashboard behavior, or running live device-changing workflows:
@@ -1430,6 +1469,14 @@ reports/lab-summary/day34_vrrp_staged_apply_plan.html
 reports/lab-summary/day34_vrrp_staged_apply_plan.txt
 ```
 
+Day35 VRRP failover validation:
+
+```text
+reports/lab-summary/day35_vrrp_failover_validation.json
+reports/lab-summary/day35_vrrp_failover_validation.html
+reports/lab-summary/day35_vrrp_failover_validation.txt
+```
+
 ## Testing Strategy
 
 The project separates live-device validation from unit tests.
@@ -1467,6 +1514,7 @@ For documentation-only review passes, run `python -m pytest` before sharing the 
 - Includes Day32 VRRP read-only precheck evidence generation with a command safety guard.
 - Includes Day33 VRRP topology design and dry-run command preview evidence without live execution.
 - Includes Day34 VRRP staged apply planning and safety gate evidence without live execution.
+- Includes Day35 VRRP controlled failover validation with manual external failure trigger and read-only evidence collection.
 
 ## Roadmap
 

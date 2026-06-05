@@ -34,6 +34,11 @@ DAY34_VRRP_STAGED_PLAN_TASK_ID = "day34-vrrp-staged-plan"
 DAY34_VRRP_STAGED_PLAN_JSON = Path("reports") / "lab-summary" / "day34_vrrp_staged_apply_plan.json"
 DAY34_VRRP_STAGED_PLAN_HTML = Path("reports") / "lab-summary" / "day34_vrrp_staged_apply_plan.html"
 DAY34_VRRP_STAGED_PLAN_TXT = Path("reports") / "lab-summary" / "day34_vrrp_staged_apply_plan.txt"
+DAY35_VRRP_FAILOVER_SCRIPT = "mikrotik_day35_vrrp_failover_validation.py"
+DAY35_VRRP_FAILOVER_TASK_ID = "day35-vrrp-failover-validation"
+DAY35_VRRP_FAILOVER_JSON = Path("reports") / "lab-summary" / "day35_vrrp_failover_validation.json"
+DAY35_VRRP_FAILOVER_HTML = Path("reports") / "lab-summary" / "day35_vrrp_failover_validation.html"
+DAY35_VRRP_FAILOVER_TXT = Path("reports") / "lab-summary" / "day35_vrrp_failover_validation.txt"
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
 WIREGUARD_RUNNER_DISPLAY_NAME = "WireGuard Runner Safety Layer"
@@ -100,6 +105,7 @@ SAFETY_LEVELS = {
     "report-only": "Local report viewing, summary generation, dry-run output, or existing report indexing.",
     "read-only": "Live device checks that read state without changing configuration.",
     "guarded-live": "Live validation delegated only after explicit runner action, confirmation, or guard flag.",
+    "controlled_failover_observation": "Live read-only HA observation where the failure trigger is manual and external.",
     "dry-run": "Planned-action preview that does not connect to devices or start live checks.",
     "disabled": "Placeholder or blocked workflow that is intentionally not available from the runner.",
 }
@@ -227,6 +233,16 @@ REPORT_CATALOG = [
         "json_globs": [DAY34_VRRP_STAGED_PLAN_JSON.as_posix()],
         "html_globs": [DAY34_VRRP_STAGED_PLAN_HTML.as_posix()],
         "missing_note": f"Generate with: python network_lab.py --task {DAY34_VRRP_STAGED_PLAN_TASK_ID}",
+    },
+    {
+        "day": "Day35",
+        "title": "VRRP Failover Validation",
+        "report_type": "HA / VRRP controlled failover validation report",
+        "safety_label": "controlled_failover_observation",
+        "description": "MikroTik HA/VRRP failover evidence gathered after a manual external lab01 LAN disconnect/reconnect; automation only observes and reports.",
+        "json_globs": [DAY35_VRRP_FAILOVER_JSON.as_posix()],
+        "html_globs": [DAY35_VRRP_FAILOVER_HTML.as_posix()],
+        "missing_note": f"Generate with: python network_lab.py --task {DAY35_VRRP_FAILOVER_TASK_ID}",
     },
 ]
 
@@ -815,6 +831,34 @@ def list_tasks() -> List[Dict[str, Any]]:
             "notes": "Plan-only safety gate. Day34 requires Day32/Day33 evidence for review readiness, keeps manual confirmation blocked, and never opens SSH or executes RouterOS commands.",
         },
         {
+            "id": DAY35_VRRP_FAILOVER_TASK_ID,
+            "task_id": "day35_vrrp_failover_validation",
+            "display_name": "Day35 VRRP Failover Validation",
+            "user_display_name": "VRRP Failover Validation",
+            "day": "Day35",
+            "category": "ha_vrrp",
+            "description": "Validate that lab02 takes over the VRRP VIP after a manual external lab01 LAN failure.",
+            "safety_level": "controlled_failover_observation",
+            "execution_mode": "controlled_failover_observation",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": True,
+            "requires_password": True,
+            "produces_report": True,
+            "report_paths": [
+                DAY35_VRRP_FAILOVER_JSON.as_posix(),
+                DAY35_VRRP_FAILOVER_HTML.as_posix(),
+                DAY35_VRRP_FAILOVER_TXT.as_posix(),
+            ],
+            "report_outputs": [
+                "Day35 VRRP failover validation JSON",
+                "Day35 VRRP failover validation HTML",
+                "Day35 VRRP failover validation TXT",
+            ],
+            "related_script": DAY35_VRRP_FAILOVER_SCRIPT,
+            "notes": "Controlled live observation. Day35 prompts the operator to disconnect/reconnect lab01 LAN externally, uses source-specific ping, sends only read-only RouterOS print commands, and blocks interface, firewall/NAT, IP, VRRP, reboot, and reset changes.",
+        },
+        {
             "id": WIREGUARD_RUNNER_TASK_ALIAS,
             "task_id": WIREGUARD_RUNNER_TASK_ID,
             "display_name": WIREGUARD_RUNNER_DISPLAY_NAME,
@@ -888,6 +932,7 @@ def _build_parser() -> argparse.ArgumentParser:
   python network_lab.py --task day32-vrrp-precheck
   python network_lab.py --task day33-vrrp-dry-run
   python network_lab.py --task day34-vrrp-staged-plan
+  python network_lab.py --task day35-vrrp-failover-validation
   python network_lab.py --task wireguard-runner --dry-run
   python network_lab.py --task wireguard-runner --wireguard-config Set_WireguardVPN_lab02_config.json --dry-run
   python network_lab.py --task wireguard-runner
@@ -900,6 +945,7 @@ iperf3-performance delegates to the existing live iperf3 performance script.
 day32-vrrp-precheck runs read-only MikroTik print/export terse commands with a blocking safety guard.
 day33-vrrp-dry-run generates local VRRP topology and command previews without SSH or RouterOS execution.
 day34-vrrp-staged-plan generates a blocked staged apply plan and safety gate without SSH or RouterOS execution.
+day35-vrrp-failover-validation observes manual external VRRP failover with read-only RouterOS commands and source-specific LAN pings.
 wireguard-runner is dry-run by default and delegates to the existing WireGuard script only after explicit --allow-live-wireguard."""
     parser = argparse.ArgumentParser(
         description=f"Day14 {DAY14_NAME}.",
@@ -925,6 +971,7 @@ wireguard-runner is dry-run by default and delegates to the existing WireGuard s
             DAY32_VRRP_PRECHECK_TASK_ID,
             DAY33_VRRP_DRY_RUN_TASK_ID,
             DAY34_VRRP_STAGED_PLAN_TASK_ID,
+            DAY35_VRRP_FAILOVER_TASK_ID,
             WIREGUARD_RUNNER_TASK_ALIAS,
         ],
         help="Task to run.",
@@ -2237,6 +2284,40 @@ def _run_day34_vrrp_staged_plan(project_root: Path) -> int:
     return result.returncode
 
 
+def _run_day35_vrrp_failover_validation(project_root: Path, dry_run: bool = False) -> int:
+    command = [sys.executable, DAY35_VRRP_FAILOVER_SCRIPT]
+    display_command = _format_display_command(command)
+    if dry_run:
+        print(format_heading("Day35 VRRP Failover Validation"))
+        print(f"Mode: {color_text('Dry run', 'yellow', bold=True)}")
+        print(f"Command that would be executed: {color_text(display_command, 'cyan', bold=True)}")
+        print()
+        print(format_heading("Safety notes"))
+        print("  This is a controlled live observation workflow.")
+        print("  The operator manually disconnects/reconnects lab01 LAN from the switch.")
+        print("  Automation uses ping -S 192.168.88.100 <target> and read-only RouterOS print commands.")
+        print("  Blocked actions include interface enable/disable, firewall/NAT changes, IP changes, VRRP changes, reboot, and reset.")
+        print("  Dry-run does not prompt for cable actions, connect to devices, run pings, or write reports.")
+        print()
+        print(f"{format_status('PASS')} No live workflow was executed.")
+        return 0
+
+    print(format_heading("Day35 VRRP Failover Validation"))
+    print("Controlled live observation workflow.")
+    print("Manual trigger: disconnect/reconnect lab01 LAN cable only when prompted.")
+    print(f"Executing command: {color_text(display_command, 'cyan', bold=True)}")
+    sys.stdout.flush()
+    result = subprocess.run(command, cwd=project_root)
+    if result.returncode == 0:
+        print(f"{format_status('PASS')} Day35 VRRP failover validation completed.")
+        print(f"JSON report: {DAY35_VRRP_FAILOVER_JSON.as_posix()}")
+        print(f"HTML report: {DAY35_VRRP_FAILOVER_HTML.as_posix()}")
+        print(f"TXT report: {DAY35_VRRP_FAILOVER_TXT.as_posix()}")
+        return 0
+    print(f"{format_status('FAIL')} Day35 VRRP failover validation failed with exit code {result.returncode}.")
+    return result.returncode
+
+
 def _confirm_and_run_day8_performance(project_root: Path, input_func: Any) -> int:
     try:
         command = _build_day8_performance_command(project_root)
@@ -2931,6 +3012,8 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
         return _run_day33_vrrp_dry_run(root)
     if args.task == DAY34_VRRP_STAGED_PLAN_TASK_ID:
         return _run_day34_vrrp_staged_plan(root)
+    if args.task == DAY35_VRRP_FAILOVER_TASK_ID:
+        return _run_day35_vrrp_failover_validation(root, dry_run=args.dry_run)
     if args.task == WIREGUARD_RUNNER_TASK_ALIAS:
         return _run_wireguard_runner(
             root,
