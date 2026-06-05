@@ -41,6 +41,7 @@ The v0.1 portfolio package covers Day 1 through Day 30 post-tag verification. Th
 - Day 35 VRRP Failover Validation
 - Day 36 VRRP Failover Evidence Review and Report Hardening
 - Day 37 VRRP Report Regression and Evidence Snapshot Policy
+- Day 38 Post-VRRP Milestone Review and v0.2 Scope Planning
 
 The project is designed as a practical QA Automation / SDET portfolio project for network infrastructure. It focuses on repeatable validation, structured test evidence, and readable JSON / HTML reports rather than one-off manual checks.
 
@@ -116,6 +117,7 @@ Cisco validation is read-only. It runs show commands for topology evidence and d
 | Day 35 | VRRP Failover Validation | Complete |
 | Day 36 | VRRP Failover Evidence Review and Report Hardening | Complete |
 | Day 37 | VRRP report regression guards and evidence snapshot policy | Complete |
+| Day 38 | Post-VRRP milestone review and v0.2 scope planning; documentation/report-planning only with no new live test | Complete |
 
 ## Lab Topology
 
@@ -1357,6 +1359,26 @@ Roadmap note:
 docs/roadmap/day37_vrrp_report_regression_evidence_policy.md
 ```
 
+## Day38 - Post-VRRP Milestone Review and v0.2 Scope Planning
+
+Purpose: consolidate the Day31-Day37 HA / VRRP milestone before choosing the next v0.2 direction.
+
+Safety: documentation and report-planning only. Day38 adds no new live test, no RouterOS configuration change, no SSH write command, no interface disable/enable automation, no reboot/reset automation, and no new iperf3 live run requirement.
+
+Day38 review focus:
+
+- Summarizes completed Day31-Day37 VRRP planning, precheck, dry-run, failover validation, report hardening, and regression evidence policy.
+- Inventories committed planning evidence and marks local generated report paths as items to verify.
+- Identifies remaining gaps such as manual physical failover trigger, limited topology variants, and need for a clearer v0.2 feature boundary.
+- Compares candidate v0.2 directions including VRRP dashboard integration, multi-device read-only state collection, portfolio demo packaging, and AI-assisted summaries from existing reports only.
+- Recommends a conservative v0.2 scope centered on read-only collection, report visibility, dashboard integration, and portfolio-ready HA / VRRP demo material.
+
+Roadmap note:
+
+```text
+docs/roadmap/day38_post_vrrp_milestone_review_and_v0_2_scope_planning.md
+```
+
 ## Portfolio Demo
 
 v0.1 includes reviewer/interview demo scripts for presenting the current platform safely without adding features, changing runner/dashboard behavior, or running live device-changing workflows:
@@ -1549,6 +1571,12 @@ Day37 VRRP evidence policy:
 docs/roadmap/day37_vrrp_report_regression_evidence_policy.md
 ```
 
+Day38 post-VRRP milestone review and v0.2 scope planning:
+
+```text
+docs/roadmap/day38_post_vrrp_milestone_review_and_v0_2_scope_planning.md
+```
+
 ## Testing Strategy
 
 The project separates live-device validation from unit tests.
@@ -1588,15 +1616,16 @@ For documentation-only review passes, run `python -m pytest` before sharing the 
 - Includes Day34 VRRP staged apply planning and safety gate evidence without live execution.
 - Includes Day35 VRRP controlled failover validation with manual external failure trigger and read-only evidence collection.
 - Includes Day36 VRRP evidence summary/report hardening and Day37 offline regression guards plus evidence snapshot policy.
+- Includes Day38 post-VRRP milestone review and conservative v0.2 scope planning without adding a new live test.
 
 ## Roadmap
 
 Planned future directions:
 
 - Expanded VPN validation beyond the current guarded WireGuard evidence path
-- HA / VRRP / failover validation
+- HA / VRRP report visibility, read-only collection, and portfolio-ready demo packaging
 - Additional performance scenarios beyond the current iperf3 workflows
 - Syslog / packet capture analysis
 - AI report summary / RAG integration
 
-v0.1 is packaged through Day29 and locally verified through Day30 as a portfolio release. Future work should stay explicit about whether it is report-only, read-only, dry-run, guarded-live, or disabled before adding new live lab behavior.
+v0.1 is packaged through Day29 and locally verified through Day30 as a portfolio release. Day38 closes the first HA / VRRP milestone review for v0.2 planning. Future work should stay explicit about whether it is report-only, read-only, dry-run, guarded-live, or disabled before adding new live lab behavior.
