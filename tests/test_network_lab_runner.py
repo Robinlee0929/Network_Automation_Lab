@@ -2072,6 +2072,7 @@ def test_day35_vrrp_failover_dry_run_does_not_execute_script(tmp_path, monkeypat
     assert exit_code == 0
     assert "No live workflow was executed" in output
     assert "ping -S 192.168.88.100 <target>" in output
+    assert "Dry-run does not prompt for cable actions, wait, connect to devices, run pings, or write reports." in output
 
 
 def test_day35_report_paths_are_visible_in_report_catalog():

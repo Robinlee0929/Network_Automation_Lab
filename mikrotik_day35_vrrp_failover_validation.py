@@ -7,6 +7,7 @@ import re
 import socket
 import subprocess
 import sys
+import time
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple
@@ -40,8 +41,16 @@ REPORT_HTML = REPORT_DIR / f"{REPORT_STEM}.html"
 REPORT_TXT = REPORT_DIR / f"{REPORT_STEM}.txt"
 DEFAULT_PROFILE = Path("topology_profiles") / "day35_vrrp_failover_validation.json"
 
-MANUAL_FAILOVER_PROMPT = "Disconnect lab01 LAN cable from the LAN switch, then press Enter."
-MANUAL_RECOVERY_PROMPT = "Reconnect lab01 LAN cable, then press Enter."
+MANUAL_FAILOVER_PROMPT = (
+    "Step 1/2 - Disconnect lab01 LAN cable from the LAN switch. "
+    "Press Enter only after the cable is disconnected."
+)
+MANUAL_RECOVERY_PROMPT = (
+    "Step 2/2 - Reconnect lab01 LAN cable to the LAN switch. "
+    "Press Enter only after the cable is reconnected."
+)
+FAILOVER_OBSERVATION_WAIT_SECONDS = 8
+RECOVERY_OBSERVATION_WAIT_SECONDS = 8
 NO_CONFIG_CHANGE_NOTE = (
     "Day35 observes manual VRRP failover only. It does not modify RouterOS configuration, "
     "interfaces, NAT/firewall, IP addresses, VRID, virtual IP, priority, reboot, or reset devices."
@@ -81,6 +90,8 @@ SECRET_VALUE_PATTERNS = [
 
 CommandRunner = Callable[[Any, str], str]
 PingRunner = Callable[[List[str]], subprocess.CompletedProcess[str]]
+OutputFunc = Callable[[str], None]
+SleepFunc = Callable[[float], None]
 
 
 def normalize_command(command: str) -> str:
@@ -432,6 +443,42 @@ def collect_router_observations(
     ]
 
 
+def wait_for_observation(
+    label: str,
+    seconds: int,
+    sleep_func: SleepFunc = time.sleep,
+    output_func: OutputFunc = print,
+) -> None:
+    if seconds <= 0:
+        return
+    progress = "...".join(str(value) for value in range(seconds, 0, -1)) + "..."
+    output_func(f"Waiting for VRRP {label}: {progress}")
+    for _remaining in range(seconds, 0, -1):
+        sleep_func(1)
+
+
+def collect_observation_phase(
+    phase_id: str,
+    title: str,
+    topology: Dict[str, Any],
+    configs: List[Day2Config],
+    profile: Dict[str, Any],
+    ping_runner: Optional[PingRunner] = None,
+    wait_label: str = "",
+    wait_seconds: int = 0,
+    operator_action: str = "",
+    sleep_func: SleepFunc = time.sleep,
+    output_func: OutputFunc = print,
+) -> Dict[str, Any]:
+    wait_for_observation(wait_label, wait_seconds, sleep_func=sleep_func, output_func=output_func)
+    output_func("Running source-specific pings...")
+    ping_checks = run_ping_checks(topology, ping_runner=ping_runner)
+    output_func("Collecting read-only RouterOS evidence...")
+    devices = collect_router_observations(configs, profile)
+    output_func("Evaluating VRRP state...")
+    return build_phase(phase_id, title, topology, devices, ping_checks, operator_action=operator_action)
+
+
 def build_phase(
     phase_id: str,
     title: str,
@@ -712,38 +759,52 @@ def run(
     report_dir: Path = REPORT_DIR,
     input_func: Callable[[str], str] = input,
     ping_runner: Optional[PingRunner] = None,
+    sleep_func: SleepFunc = time.sleep,
+    output_func: OutputFunc = print,
 ) -> Tuple[Dict[str, Any], Tuple[Path, Path, Path]]:
     assert_all_observation_commands_readonly(READONLY_COMMANDS)
     profile = load_profile(profile_path)
     topology = validate_profile(profile)
     configs = load_day35_device_configs(config_path, profile_path)
 
-    baseline = build_phase(
+    baseline = collect_observation_phase(
         "baseline",
         "Baseline before manual failure",
         topology,
-        collect_router_observations(configs, profile),
-        run_ping_checks(topology, ping_runner=ping_runner),
+        configs,
+        profile,
+        ping_runner=ping_runner,
+        output_func=output_func,
     )
 
     input_func(MANUAL_FAILOVER_PROMPT)
-    failover = build_phase(
+    failover = collect_observation_phase(
         "failover",
         "Failover observation after lab01 LAN disconnect",
         topology,
-        collect_router_observations(configs, profile),
-        run_ping_checks(topology, ping_runner=ping_runner),
+        configs,
+        profile,
+        ping_runner=ping_runner,
+        wait_label="convergence",
+        wait_seconds=FAILOVER_OBSERVATION_WAIT_SECONDS,
         operator_action=MANUAL_FAILOVER_PROMPT,
+        sleep_func=sleep_func,
+        output_func=output_func,
     )
 
     input_func(MANUAL_RECOVERY_PROMPT)
-    recovery = build_phase(
+    recovery = collect_observation_phase(
         "recovery",
         "Recovery observation after lab01 LAN reconnect",
         topology,
-        collect_router_observations(configs, profile),
-        run_ping_checks(topology, ping_runner=ping_runner),
+        configs,
+        profile,
+        ping_runner=ping_runner,
+        wait_label="recovery",
+        wait_seconds=RECOVERY_OBSERVATION_WAIT_SECONDS,
         operator_action=MANUAL_RECOVERY_PROMPT,
+        sleep_func=sleep_func,
+        output_func=output_func,
     )
 
     phases = [baseline, failover, recovery]

@@ -143,6 +143,54 @@ def test_build_ping_command_uses_source_specific_windows_ping_shape(monkeypatch)
     assert "192.168.88.99" in command
 
 
+def test_operator_prompts_show_clear_disconnect_and_reconnect_steps():
+    assert "Step 1/2" in day35.MANUAL_FAILOVER_PROMPT
+    assert "Disconnect lab01 LAN cable" in day35.MANUAL_FAILOVER_PROMPT
+    assert "Press Enter only after the cable is disconnected" in day35.MANUAL_FAILOVER_PROMPT
+    assert "Step 2/2" in day35.MANUAL_RECOVERY_PROMPT
+    assert "Reconnect lab01 LAN cable" in day35.MANUAL_RECOVERY_PROMPT
+    assert "Press Enter only after the cable is reconnected" in day35.MANUAL_RECOVERY_PROMPT
+
+
+def test_wait_for_observation_countdown_is_testable_without_real_sleep():
+    messages = []
+    sleeps = []
+
+    day35.wait_for_observation(
+        "convergence",
+        3,
+        sleep_func=lambda seconds: sleeps.append(seconds),
+        output_func=messages.append,
+    )
+
+    assert messages == ["Waiting for VRRP convergence: 3...2...1..."]
+    assert sleeps == [1, 1, 1]
+
+
+def test_collect_observation_phase_prints_operator_progress_messages(monkeypatch):
+    prof = profile()
+    topology = day35.validate_profile(prof)
+    messages = []
+    monkeypatch.setattr(day35, "collect_router_observations", lambda *_args, **_kwargs: [device("primary", "MASTER"), device("backup", "BACKUP")])
+
+    phase = day35.collect_observation_phase(
+        "baseline",
+        "Baseline",
+        topology,
+        [make_config("Hex-s-2025-lab01"), make_config("Hex-s-2025-lab02")],
+        prof,
+        ping_runner=lambda _command: SimpleNamespace(returncode=0, stdout="ok", stderr=""),
+        output_func=messages.append,
+    )
+
+    assert phase["id"] == "baseline"
+    assert messages == [
+        "Running source-specific pings...",
+        "Collecting read-only RouterOS evidence...",
+        "Evaluating VRRP state...",
+    ]
+
+
 @pytest.mark.parametrize(
     ("flag_line", "expected_state"),
     [
@@ -281,6 +329,8 @@ def test_run_can_generate_reports_with_fakes_without_destructive_commands(tmp_pa
         tmp_path / "lab-summary",
         input_func=lambda _prompt: "",
         ping_runner=fake_ping,
+        sleep_func=lambda _seconds: None,
+        output_func=lambda _message: None,
     )
 
     assert report["overall_status"] == "PASS"

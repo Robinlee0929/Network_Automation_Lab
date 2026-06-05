@@ -2297,7 +2297,7 @@ def _run_day35_vrrp_failover_validation(project_root: Path, dry_run: bool = Fals
         print("  The operator manually disconnects/reconnects lab01 LAN from the switch.")
         print("  Automation uses ping -S 192.168.88.100 <target> and read-only RouterOS print commands.")
         print("  Blocked actions include interface enable/disable, firewall/NAT changes, IP changes, VRRP changes, reboot, and reset.")
-        print("  Dry-run does not prompt for cable actions, connect to devices, run pings, or write reports.")
+        print("  Dry-run does not prompt for cable actions, wait, connect to devices, run pings, or write reports.")
         print()
         print(f"{format_status('PASS')} No live workflow was executed.")
         return 0
