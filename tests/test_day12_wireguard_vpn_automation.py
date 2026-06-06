@@ -68,6 +68,11 @@ def run_day12_with_fake_state(
     monkeypatch.setattr(day12, "connect_ssh_with_auth_retry", lambda _config: FakeSshClient())
     monkeypatch.setattr(day12, "show_client_config", lambda _client, _peer_name: CLIENT_CONFIG)
     monkeypatch.setattr(day12.shutil, "which", lambda _name: "iperf3.exe")
+    monkeypatch.setattr(
+        day12,
+        "run_allowlisted_write",
+        lambda _client, command: pytest.fail(f"unexpected write command: {command}"),
+    )
 
     peer_reads = [initial_peer, refreshed_peer if refreshed_peer is not None else initial_peer]
 
@@ -419,11 +424,42 @@ def test_existing_peer_is_reused_when_recreate_peer_not_provided():
     assert day12.build_peer_remove_command("other") != day12.build_peer_remove_command("pc-wg-day12")
 
 
-def test_existing_peer_is_not_removed_in_default_mode(monkeypatch):
-    args = day12.parse_args(["--device-name", "Hex-s-2025-lab01", "--non-interactive"])
+def test_existing_peer_is_not_removed_in_default_mode(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+
+    args = day12.parse_args(
+        [
+            "--device-name",
+            "test-device",
+            "--router-host",
+            "192.0.2.10",
+            "--router-username",
+            "test-admin",
+            "--non-interactive",
+        ]
+    )
     config = day12.build_config_from_args(args)
 
+    assert not (tmp_path / "config.json").exists()
+    assert config.device_name == "test-device"
+    assert config.router_host == "192.0.2.10"
+    assert config.router_username == "test-admin"
     assert config.recreate_peer is False
+
+
+def test_existing_peer_default_mode_does_not_execute_remove_command(tmp_path, monkeypatch):
+    peer = '0 name="pc-wg-day12" allowed-address=10.10.10.2/32 last-handshake=16s rx=1KiB tx=2KiB'
+
+    report, _json_path, _html_path = run_day12_with_fake_state(
+        tmp_path,
+        monkeypatch,
+        initial_peer=peer,
+        connectivity_ok=True,
+    )
+
+    assert report["checks"]["peer_exists"] == "PASS"
+    assert report["wireguard_summary"]["initial_peer_state"]["exists"] is True
+    assert report["suggestions"] == []
 
 
 def test_day12_config_file_loads_repeated_values_without_password(tmp_path, monkeypatch):
