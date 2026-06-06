@@ -53,6 +53,12 @@ git rev-parse HEAD
 git log --oneline -3
 git status --short
 git ls-files reports
+git worktree add .tmp/day43_v0_2_failure_probe v0.2
+python -m pytest tests/test_day12_wireguard_vpn_automation.py::test_existing_peer_is_not_removed_in_default_mode -q
+Test-Path -LiteralPath config.json
+Test-Path -LiteralPath golden_day2_config.json
+Test-Path -LiteralPath Set_WireguardVPN_config.json
+rg -n "def load_default_router_config|def load_day12_config|config\.json|router_host|router_username|Missing required non-interactive" mikrotik_day12_wireguard_vpn_automation.py tests\test_day12_wireguard_vpn_automation.py .gitignore
 ```
 
 ## Results
@@ -112,7 +118,51 @@ ValueError: Missing required non-interactive values: --router-host, --router-use
 
 Classification: FAIL.
 
-Reason: a fresh `v0.2` checkout does not include ignored local configuration such as `config.json` or `golden_day2_config.json`. The failing test calls the Day12 config builder in non-interactive mode with only `--device-name`, so the builder rejects the missing router host and username. This is a release verification issue in the tag checkout, not a live-device failure.
+Reason: a fresh `v0.2` checkout does not include ignored local configuration such as `config.json`. The failing test calls the Day12 config builder in non-interactive mode with only `--device-name`, so the builder rejects the missing router host and username. This is a release verification issue in the tag checkout, not a live-device failure.
+
+### Python Test Failure Investigation
+
+The single failing test was recreated from a fresh temporary `v0.2` worktree:
+
+```powershell
+git worktree add .tmp/day43_v0_2_failure_probe v0.2
+python -m pytest tests/test_day12_wireguard_vpn_automation.py::test_existing_peer_is_not_removed_in_default_mode -q
+```
+
+Failing test name:
+
+```text
+tests/test_day12_wireguard_vpn_automation.py::test_existing_peer_is_not_removed_in_default_mode
+```
+
+Captured failure message:
+
+```text
+ValueError: Missing required non-interactive values: --router-host, --router-username
+```
+
+Relevant v0.2 behavior:
+
+- `load_default_router_config()` reads `config.json` from the current working directory.
+- `config.json` is intentionally ignored by `.gitignore`.
+- The failing test passes `--device-name` and `--non-interactive`, but it does not pass `--router-host`, does not pass `--router-username`, does not pass `--config`, and does not monkeypatch the config loader.
+- In a fresh `v0.2` worktree, `config.json`, `golden_day2_config.json`, and `Set_WireguardVPN_config.json` were all absent.
+- In the Day43 working tree, `config.json` and `Set_WireguardVPN_config.json` existed as ignored local files, and the same single test passed.
+
+Root cause classification:
+
+| Possible cause | Applies? | Notes |
+| --- | --- | --- |
+| Missing generated reports | No | The failing test is a Day12 config-builder unit test and does not read `reports/`. |
+| Ignored reports path | No | `reports/` absence explains report-index WARN, not this pytest failure. |
+| Worktree path assumptions | No | The failure is not caused by path layout; it is caused by absent local config values. |
+| Stale v0.2 test expectation | Yes | The v0.2 test assumes host and username are available from local environment/config instead of making the test self-contained. |
+| Environment difference | Yes | The Day43 branch had ignored local `config.json`; the fresh `v0.2` worktree did not. |
+| Real release defect | Partial | This is a real release verification/test hermeticity defect, but not a live-device or interview-demo runtime defect. |
+
+Recommended action: fix on `main` in a later non-live test-only change by making the test self-contained. The lowest-risk fix is to provide `--router-host` and `--router-username` in the test or monkeypatch `load_default_router_config()` so the expected `recreate_peer` default is tested without depending on ignored local files.
+
+`v0.2.1` recommendation: not required for the interview demo baseline. Create `v0.2.1` only if the release policy requires an immutable tag with a fully green fresh-checkout pytest result.
 
 ### Dashboard Readiness
 
@@ -205,7 +255,8 @@ These generated files are not committed. `reports/` is ignored by `.gitignore`, 
 ## Known Limitations
 
 - The `v0.2` fresh checkout does not produce a fully green test suite in this environment.
-- The failing test depends on router host and username values that are not present in a fresh checkout because local config files are intentionally ignored.
+- The failing test depends on router host and username values that are not present in a fresh checkout because `config.json` is intentionally ignored.
+- The failure is caused by a non-hermetic v0.2 test expectation plus a local environment difference, not by missing generated reports, the ignored `reports/` path, worktree path assumptions, or live-device behavior.
 - The report index can be generated, but it reports `INCOMPLETE` without local generated report evidence.
 - The dashboard is ready for local route smoke testing, but generated report content depends on ignored local report artifacts.
 - Day43 did not regenerate live evidence and did not run any live network or device command.
@@ -221,7 +272,8 @@ Use `v0.2` for an interview demo only as a repository-only, safety-first walkthr
 - Show the dashboard `/` and `/reports` route readiness.
 - Run or show `python network_lab.py --task demo-flow`.
 - Explain that live/generated report artifacts are intentionally ignored and may be absent from a fresh checkout.
-- Do not claim that the fresh `v0.2` tag has a fully passing regression suite until the Day12 non-interactive config test gap is resolved in a later change.
+- Do not claim that the fresh `v0.2` tag has a fully passing regression suite until the Day12 non-interactive config test is made self-contained in a later change.
+- Do not create `v0.2.1` solely for the interview demo unless the release standard requires a fresh-checkout all-green test tag.
 
 ## Safety Confirmation
 
