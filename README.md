@@ -47,6 +47,7 @@ The v0.1 portfolio package covers Day 1 through Day 30 post-tag verification. Th
 - Day 41 v0.2 Release Packaging
 - Day 42 v0.2 Release Tag Preparation
 - Day 43 v0.2 Release Verification and Interview Demo Baseline
+- Day 44 Hermetic Test Fix for v0.2 Release Verification
 
 The project is designed as a practical QA Automation / SDET portfolio project for network infrastructure. It focuses on repeatable validation, structured test evidence, and readable JSON / HTML reports rather than one-off manual checks.
 
@@ -128,6 +129,7 @@ Cisco validation is read-only. It runs show commands for topology evidence and d
 | Day 41 | v0.2 release packaging; documentation/report-only with no live test, SSH, configuration change, voice/AI implementation, or tag creation | Complete |
 | Day 42 | v0.2 release tag preparation and annotated tag creation; release validation only with no live test, SSH, or device configuration change | Complete |
 | Day 43 | v0.2 release verification and interview demo baseline; tag checkout and offline smoke verification only with no live test, SSH, or device configuration change | Complete with notes |
+| Day 44 | Hermetic Day12 test fix for the v0.2 release verification issue; removes hidden dependency on ignored local config.json; non-live test-only fix | Complete |
 
 ## Lab Topology
 
@@ -1495,6 +1497,20 @@ docs/roadmap/day43_v0.2_release_verification_interview_demo_baseline.md
 
 Day43 result: the `v0.2` checkout and local dashboard/demo-flow paths are usable for an interview demo with notes, but the fresh tag checkout is not a fully green release verification because one Day12 non-interactive config test fails and the ignored `reports/` evidence is absent.
 
+## Day44 - Hermetic Test Fix for v0.2 Release Verification
+
+Purpose: fix the Day12 hermetic test issue found during Day43 v0.2 release verification.
+
+Scope: Day44 is a non-live test-only fix. It removes the hidden dependency on ignored local `config.json` by supplying explicit fake non-live values in the Day12 regression test and guarding the existing-peer default-mode test path against unexpected write commands.
+
+Safety: Day44 does not run live tests, open SSH sessions, connect to routers, switches, firewalls, VPN devices, WireGuard peers, or iperf3 endpoints, or change MikroTik, Cisco, firewall/NAT, IP, VRRP, WireGuard, interface, route, reboot, reset, or topology settings.
+
+Roadmap note:
+
+```text
+docs/roadmap/day44_hermetic_test_fix_v02_release_verification.md
+```
+
 ## Portfolio Demo
 
 v0.1 includes reviewer/interview demo scripts for presenting the current platform safely without adding features, changing runner/dashboard behavior, or running live device-changing workflows:
@@ -1731,6 +1747,12 @@ Day43 v0.2 release verification and interview demo baseline:
 docs/roadmap/day43_v0.2_release_verification_interview_demo_baseline.md
 ```
 
+Day44 hermetic test fix for v0.2 release verification:
+
+```text
+docs/roadmap/day44_hermetic_test_fix_v02_release_verification.md
+```
+
 ## Testing Strategy
 
 The project separates live-device validation from unit tests.
@@ -1776,6 +1798,7 @@ For documentation-only review passes, run `python -m pytest` before sharing the 
 - Includes Day41 v0.2 release packaging docs and report-only handoff while leaving `v0.2` tag creation for Day42.
 - Includes Day42 v0.2 annotated release tag preparation and creation as release validation only, with no live test, SSH, or device configuration changes.
 - Includes Day43 v0.2 release verification and interview demo baseline notes from a temporary tag checkout, with no live test, SSH, or device configuration changes.
+- Includes Day44 hermetic Day12 test fix for v0.2 release verification, removing the ignored local `config.json` dependency as a non-live test-only fix.
 
 ## Roadmap
 
@@ -1787,4 +1810,4 @@ Planned future directions:
 - Syslog / packet capture analysis
 - v3.0 Voice + AI Network Test Assistant / AI-assisted Network Test Orchestration as future roadmap only
 
-v0.1 is packaged through Day29 and locally verified through Day30 as a portfolio release. Day42 creates the annotated `v0.2` release tag for the demo-ready Network Automation Platform package after Day41 release packaging, and Day43 records the post-tag interview/demo baseline with notes from a fresh checkout. Future work should stay explicit about whether it is report-only, read-only, dry-run, guarded-live, or disabled before adding new live lab behavior.
+v0.1 is packaged through Day29 and locally verified through Day30 as a portfolio release. Day42 creates the annotated `v0.2` release tag for the demo-ready Network Automation Platform package after Day41 release packaging, Day43 records the post-tag interview/demo baseline with notes from a fresh checkout, and Day44 fixes the Day12 hermetic test dependency found during that verification. Future work should stay explicit about whether it is report-only, read-only, dry-run, guarded-live, or disabled before adding new live lab behavior.
