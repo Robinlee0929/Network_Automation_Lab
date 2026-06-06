@@ -53,6 +53,7 @@ The v0.1 portfolio package covers Day 1 through Day 30 post-tag verification. Th
 - Day 47 Interview Demo Baseline Final Check and Demo Operation Runbook
 - Day 48 Demo Asset Packaging and Offline Interview Demo Kit
 - Day 49 Offline Demo Verification and Interview Dry Run
+- Day 50 Dashboard Demo Polish and Interview Landing Page
 
 The project is designed as a practical QA Automation / SDET portfolio project for network infrastructure. It focuses on repeatable validation, structured test evidence, and readable JSON / HTML reports rather than one-off manual checks.
 
@@ -140,6 +141,7 @@ Cisco validation is read-only. It runs show commands for topology evidence and d
 | Day 47 | Interview demo baseline final check and operation runbook; documentation/report-only/local validation with no v0.2.1 tag creation and no v0.3 feature work | Complete |
 | Day 48 | Demo asset packaging and offline interview demo kit; can be shown without GitHub, internet, live devices, SSH, VPN, WireGuard, or lab access | Complete |
 | Day 49 | Offline demo verification and interview dry run; verifies the Day48 kit, dashboard/report paths, safe commands, talk track, and fallbacks with no live device dependency | Ready with notes |
+| Day 50 | Dashboard interview landing page polish; improves `/` with demo status, proof points, quick links, safety boundary, and 3-5 minute flow without live test or runner behavior changes | Ready with notes |
 
 ## Lab Topology
 
@@ -1830,6 +1832,14 @@ docs/roadmap/day49_offline_demo_verification_interview_dry_run.md
 
 Day49 verified the Day48 offline interview demo kit as usable for a 3-5 minute interview walkthrough. It confirms the dashboard/report explanation path, safe offline commands, Traditional Chinese talk track, and fallback explanations without requiring live routers, switches, SSH, VPN, WireGuard, VRRP, iperf3, internet access, or `config.json`.
 
+Day50 dashboard demo polish and interview landing page:
+
+```text
+docs/roadmap/day50_dashboard_demo_polish_interview_landing_page.md
+```
+
+Day50 updates the dashboard `/` route into an interview-friendly landing page for `Network Automation Lab - Interview Demo`. It presents `READY WITH NOTES`, core proof points, a 3-5 minute demo flow, quick links to Reports, Commands, AI Checklist, and the offline demo kit, plus a clear safety boundary: the demo does not require live router access and live tests are separated from report-only and read-only tasks. Day50 does not change runner behavior, create `v0.2.1`, start `v0.3`, run live network tests, use SSH, or depend on `config.json`.
+
 ## Testing Strategy
 
 The project separates live-device validation from unit tests.
@@ -1881,6 +1891,7 @@ For documentation-only review passes, run `python -m pytest` before sharing the 
 - Includes Day47 interview demo baseline runbook for safe local interview operation, with no patch tag creation, no `v0.3` work, and no live device dependency.
 - Includes Day48 offline interview demo kit under `docs/demo/offline_interview_demo_kit/` with no GitHub, internet, live device, SSH, VPN, WireGuard, or lab dependency.
 - Includes Day49 offline demo verification confirming the Day48 kit is interview-ready with notes, while remaining offline-only with no live device dependency.
+- Includes Day50 dashboard interview landing page polish so the project value, demo status, proof points, safe links, and no-live-router boundary are visible as soon as the dashboard opens.
 
 ## Roadmap
 
@@ -1892,4 +1903,4 @@ Planned future directions:
 - Syslog / packet capture analysis
 - v3.0 Voice + AI Network Test Assistant / AI-assisted Network Test Orchestration as future roadmap only
 
-v0.1 is packaged through Day29 and locally verified through Day30 as a portfolio release. Day42 creates the annotated `v0.2` release tag for the demo-ready Network Automation Platform package after Day41 release packaging, Day43 records the post-tag interview/demo baseline with notes from a fresh checkout, Day44 fixes the Day12 hermetic test dependency found during that verification, Day45 confirms the fix from a fresh `origin/main` checkout without ignored local `config.json`, Day46 recommends deferring `v0.2.1` unless a formal corrected patch release is required, Day47 finalizes the current `main` branch as the safe interview demo operation baseline, Day48 packages the offline interview demo kit at `docs/demo/offline_interview_demo_kit/`, and Day49 verifies that kit for an offline-only interview dry run with no live device dependency. Future work should stay explicit about whether it is report-only, read-only, dry-run, guarded-live, or disabled before adding new live lab behavior.
+v0.1 is packaged through Day29 and locally verified through Day30 as a portfolio release. Day42 creates the annotated `v0.2` release tag for the demo-ready Network Automation Platform package after Day41 release packaging, Day43 records the post-tag interview/demo baseline with notes from a fresh checkout, Day44 fixes the Day12 hermetic test dependency found during that verification, Day45 confirms the fix from a fresh `origin/main` checkout without ignored local `config.json`, Day46 recommends deferring `v0.2.1` unless a formal corrected patch release is required, Day47 finalizes the current `main` branch as the safe interview demo operation baseline, Day48 packages the offline interview demo kit at `docs/demo/offline_interview_demo_kit/`, Day49 verifies that kit for an offline-only interview dry run with no live device dependency, and Day50 polishes the dashboard home page into the interview landing page without live tests or runner behavior changes. Future work should stay explicit about whether it is report-only, read-only, dry-run, guarded-live, or disabled before adding new live lab behavior.
