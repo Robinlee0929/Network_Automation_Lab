@@ -717,6 +717,20 @@ def ai_intent_reviewer_references() -> List[AIIntentReviewerReference]:
             roadmap_path="docs/roadmap/day62_ai_intent_reviewer_scenario_pack.md",
             report_paths=(),
         ),
+        AIIntentReviewerReference(
+            day="Day66",
+            title="Offline mock runtime skeleton",
+            summary=(
+                "Models the future runtime record shape with deterministic offline mock "
+                "scenarios while keeping live execution permanently disallowed."
+            ),
+            doc_path="docs/ai/intent_offline_mock_runtime_skeleton.md",
+            roadmap_path="docs/roadmap/day66_offline_mock_runtime_skeleton.md",
+            report_paths=(
+                "reports/portfolio/day66_offline_mock_runtime_skeleton.json",
+                "reports/portfolio/day66_offline_mock_runtime_skeleton.html",
+            ),
+        ),
     ]
 
 
@@ -734,6 +748,7 @@ def ai_intent_safety_boundaries() -> List[str]:
         "No release tag creation.",
         "No real v0.3 runtime execution.",
         "No automatic execution of mapped tasks from scenario examples.",
+        "Day66 mock runtime output is fixed offline evidence only.",
     ]
 
 
