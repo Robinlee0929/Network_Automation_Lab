@@ -2378,3 +2378,100 @@ def test_day57_intent_mapping_cli_never_executes_mapped_tasks(tmp_path, monkeypa
     assert '"execution_mode": "dry_run_only"' in output
     assert '"mapped_task_executed": false' in output
     assert "No mapped task was executed" in output
+
+
+def test_day58_intent_safety_review_task_exists_in_catalog():
+    task = next(task for task in network_lab.list_tasks() if task["id"] == "intent-safety-review")
+
+    assert task["task_id"] == "day58_intent_mapping_safety_review_confirmation_gate"
+    assert task["day"] == "Day58"
+    assert task["safety_level"] == "report-only"
+    assert task["execution_mode"] == "report-only"
+    assert task["requires_live_device"] is False
+    assert task["produces_report"] is True
+
+
+def test_day58_report_only_intent_is_allowed():
+    report = network_lab.build_day58_intent_safety_review("show latest reports")
+
+    assert report["safety_classification"] == "report_only"
+    assert report["mapped_task"] == "report-index"
+    assert report["confirmation_gate_required"] is False
+    assert report["blocked"] is False
+    assert report["mapped_task_executed"] is False
+    assert report["no_live_execution_occurred"] is True
+
+
+def test_day58_vrrp_failover_intent_is_live_capable_and_blocked():
+    report = network_lab.build_day58_intent_safety_review("do VRRP failover test")
+
+    assert report["action_capability"] == "live_capable"
+    assert report["safety_classification"] == "blocked_live_capable"
+    assert report["blocked"] is True
+    assert report["confirmation_gate_required"] is True
+    assert report["blocked_policy_match"] == "VRRP failover execution"
+    assert report["mapped_task_executed"] is False
+
+
+@pytest.mark.parametrize(
+    ("intent_text", "blocked_policy"),
+    [
+        ("change firewall rule", "firewall rule add/remove/change"),
+        ("set IP address on router", "IP address change"),
+        ("remove route from router", "route change"),
+        ("apply device configuration", "direct device configuration apply"),
+    ],
+)
+def test_day58_config_change_intents_are_blocked(intent_text, blocked_policy):
+    report = network_lab.build_day58_intent_safety_review(intent_text)
+
+    assert report["safety_classification"] == "blocked_live_capable"
+    assert report["blocked"] is True
+    assert report["confirmation_gate_required"] is True
+    assert report["blocked_policy_match"] == blocked_policy
+    assert report["device_configuration_changed"] is False
+
+
+def test_day58_unknown_intent_is_blocked():
+    report = network_lab.build_day58_intent_safety_review("make everything better")
+
+    assert report["safety_classification"] == "unknown_blocked"
+    assert report["mapped_task"] is None
+    assert report["blocked"] is True
+    assert report["confirmation_gate_required"] is True
+
+
+def test_day58_cli_generates_redacted_report_without_config_or_network_access(
+    tmp_path,
+    monkeypatch,
+    capsys,
+):
+    def fail_run(*_args, **_kwargs):
+        raise AssertionError("Day58 intent safety review must not execute subprocess")
+
+    monkeypatch.setattr(network_lab.subprocess, "run", fail_run)
+
+    exit_code = network_lab.main(
+        ["--task", "intent-safety-review", "--intent-text", "show latest reports password hunter2"],
+        project_root=tmp_path,
+    )
+
+    output = capsys.readouterr().out
+    json_path = tmp_path / "reports/portfolio/day58_intent_mapping_safety_review.json"
+    html_path = tmp_path / "reports/portfolio/day58_intent_mapping_safety_review.html"
+    assert exit_code == 0
+    assert "No live execution occurred" in output
+    assert json_path.exists()
+    assert html_path.exists()
+    assert not (tmp_path / "config.json").exists()
+    json_text = json_path.read_text(encoding="utf-8")
+    html_text = html_path.read_text(encoding="utf-8")
+    assert "hunter2" not in json_text
+    assert "hunter2" not in html_text
+    report = json.loads(json_text)
+    assert report["final_status"] == "PASS"
+    assert report["openai_api_used"] is False
+    assert report["ssh_used"] is False
+    assert report["device_connection_used"] is False
+    assert report["config_json_read"] is False
+    assert report["mapped_task_executed"] is False
