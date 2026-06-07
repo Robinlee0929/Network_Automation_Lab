@@ -66,6 +66,15 @@ DAY59_INTENT_POLICY_MATRIX_ROADMAP = (
 )
 DAY59_INTENT_POLICY_MATRIX_JSON = Path("reports") / "portfolio" / "day59_intent_policy_matrix.json"
 DAY59_INTENT_POLICY_MATRIX_HTML = Path("reports") / "portfolio" / "day59_intent_policy_matrix.html"
+DAY60_INTENT_WORKFLOW_DEMO_TASK_ID = "intent-workflow-demo"
+DAY60_INTENT_WORKFLOW_DEMO_DOC = (
+    Path("docs") / "ai" / "day60_ai_intent_workflow_demo_reviewer_walkthrough.md"
+)
+DAY60_INTENT_WORKFLOW_DEMO_ROADMAP = (
+    Path("docs") / "roadmap" / "day60_ai_intent_workflow_demo_reviewer_walkthrough.md"
+)
+DAY60_INTENT_WORKFLOW_DEMO_JSON = Path("reports") / "portfolio" / "day60_intent_workflow_demo.json"
+DAY60_INTENT_WORKFLOW_DEMO_HTML = Path("reports") / "portfolio" / "day60_intent_workflow_demo.html"
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
 WIREGUARD_RUNNER_DISPLAY_NAME = "WireGuard Runner Safety Layer"
@@ -327,6 +336,86 @@ DAY59_REVIEWER_EXPLANATION = [
     "Voice input, OpenAI API calls, SSH, live device access, and device control are intentionally out of scope.",
 ]
 
+DAY60_NO_EXECUTION_STATEMENT = (
+    "No mapped task was executed. This is a dry-run reviewer walkthrough only."
+)
+
+DAY60_WORKFLOW_STEPS = [
+    {
+        "step": 1,
+        "name": "Input intent text",
+        "reviewer_view": "Reviewer reads a static example phrase. No microphone, speech API, or AI API is used.",
+    },
+    {
+        "step": 2,
+        "name": "Day57-style dry-run intent mapping",
+        "reviewer_view": "The phrase is mapped to a proposed task or blocked category as report data only.",
+    },
+    {
+        "step": 3,
+        "name": "Day58-style safety review",
+        "reviewer_view": "The mapped proposal is classified before any future execution path can exist.",
+    },
+    {
+        "step": 4,
+        "name": "Day59-style policy explanation",
+        "reviewer_view": "The reviewer sees why report-only examples are allowed and live/configuration examples are blocked.",
+    },
+    {
+        "step": 5,
+        "name": "Reviewer decision",
+        "reviewer_view": "The report records allowed or blocked as a human-readable decision.",
+    },
+    {
+        "step": 6,
+        "name": "No execution performed",
+        "reviewer_view": DAY60_NO_EXECUTION_STATEMENT,
+    },
+]
+
+DAY60_INTENT_WORKFLOW_DEMO_EXAMPLES = [
+    {
+        "input_intent_text": "show latest reports",
+        "expected_classification": "report-only",
+        "candidate_task": "report-index",
+        "reviewer_decision": "allowed",
+        "blocked": False,
+        "policy_explanation": "Local report browsing or report index generation reads/writes local evidence only.",
+    },
+    {
+        "input_intent_text": "explain available runner tasks",
+        "expected_classification": "documentation/report-only",
+        "candidate_task": "--list-tasks",
+        "reviewer_decision": "allowed",
+        "blocked": False,
+        "policy_explanation": "Task catalog explanation uses committed runner metadata and documentation only.",
+    },
+    {
+        "input_intent_text": "do VRRP failover test",
+        "expected_classification": "live-capable",
+        "candidate_task": DAY35_VRRP_FAILOVER_TASK_ID,
+        "reviewer_decision": "blocked by default",
+        "blocked": True,
+        "policy_explanation": "VRRP failover can affect network availability and must not run from intent alone.",
+    },
+    {
+        "input_intent_text": "change router firewall rule",
+        "expected_classification": "configuration-changing",
+        "candidate_task": "blocked-live-capable-action",
+        "reviewer_decision": "blocked",
+        "blocked": True,
+        "policy_explanation": "Firewall and router configuration changes are blocked in the intent workflow.",
+    },
+    {
+        "input_intent_text": "run WireGuard throughput test",
+        "expected_classification": "live-capable",
+        "candidate_task": WIREGUARD_RUNNER_TASK_ALIAS,
+        "reviewer_decision": "blocked unless future guarded-live flow exists",
+        "blocked": True,
+        "policy_explanation": "WireGuard throughput validation may touch live VPN/test endpoints and requires a future explicit guarded-live flow.",
+    },
+]
+
 REPORT_CATALOG = [
     {
         "day": "Day2",
@@ -500,6 +589,16 @@ REPORT_CATALOG = [
         "json_globs": [DAY59_INTENT_POLICY_MATRIX_JSON.as_posix()],
         "html_globs": [DAY59_INTENT_POLICY_MATRIX_HTML.as_posix()],
         "missing_note": f"Generate with: python network_lab.py --task {DAY59_INTENT_POLICY_MATRIX_TASK_ID}",
+    },
+    {
+        "day": "Day60",
+        "title": "AI Intent Workflow Demo",
+        "report_type": "Reviewer walkthrough report",
+        "safety_label": "report-only AI planning evidence",
+        "description": "Day60 reviewer walkthrough connecting Day57 mapping, Day58 safety review, and Day59 policy explanation without live behavior.",
+        "json_globs": [DAY60_INTENT_WORKFLOW_DEMO_JSON.as_posix()],
+        "html_globs": [DAY60_INTENT_WORKFLOW_DEMO_HTML.as_posix()],
+        "missing_note": f"Generate with: python network_lab.py --task {DAY60_INTENT_WORKFLOW_DEMO_TASK_ID}",
     },
 ]
 
@@ -1982,6 +2081,34 @@ def list_tasks() -> List[Dict[str, Any]]:
             "related_script": "network_lab.py",
             "notes": "Report-only matrix generation. Does not call APIs, use voice, execute mapped tasks, open SSH, read config.json, or connect to devices.",
         },
+        {
+            "id": DAY60_INTENT_WORKFLOW_DEMO_TASK_ID,
+            "task_id": "day60_ai_intent_workflow_demo_reviewer_walkthrough",
+            "display_name": "Day60 AI Intent Workflow Demo Reviewer Walkthrough",
+            "user_display_name": "Intent Workflow Demo",
+            "day": "Day60",
+            "category": "ai_planning",
+            "description": "Reviewer-facing walkthrough connecting Day57 intent mapping, Day58 safety review, and Day59 policy explanation.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY60_INTENT_WORKFLOW_DEMO_JSON.as_posix(),
+                DAY60_INTENT_WORKFLOW_DEMO_HTML.as_posix(),
+                DAY60_INTENT_WORKFLOW_DEMO_DOC.as_posix(),
+                DAY60_INTENT_WORKFLOW_DEMO_ROADMAP.as_posix(),
+            ],
+            "report_outputs": [
+                "Day60 reviewer-facing JSON/HTML intent workflow demo",
+                "Day60 AI intent workflow walkthrough documentation",
+            ],
+            "related_script": "network_lab.py",
+            "notes": "Report-only walkthrough. Does not call APIs, use voice, execute mapped tasks, run live tests, open SSH, read config.json, connect to devices, or modify network/device configuration.",
+        },
     ]
 
 
@@ -2010,6 +2137,7 @@ def _build_parser() -> argparse.ArgumentParser:
   python network_lab.py --task intent-mapping-prototype --intent-text "show me the latest reports"
   python network_lab.py --task intent-safety-review --intent-text "do VRRP failover test"
   python network_lab.py --task intent-policy-matrix
+  python network_lab.py --task intent-workflow-demo
   python network_lab.py --task wireguard-runner --dry-run
   python network_lab.py --task wireguard-runner --wireguard-config Set_WireguardVPN_lab02_config.json --dry-run
   python network_lab.py --task wireguard-runner
@@ -2029,6 +2157,7 @@ day41-v0.2-release-packaging writes a report-only v0.2 release packaging summary
 intent-mapping-prototype classifies static text and prints a dry-run-only mapping proposal without API, voice, SSH, device access, or runner delegation.
 intent-safety-review classifies static text through a dry-run confirmation gate and writes a report-only Day58 safety decision.
 intent-policy-matrix writes a reviewer-facing Day59 JSON/HTML safety matrix without API, voice, SSH, device access, config.json, or mapped task execution.
+intent-workflow-demo writes a Day60 reviewer walkthrough connecting Day57-Day59 without API, voice, SSH, device access, config.json, live execution, or mapped task execution.
 wireguard-runner is dry-run by default and delegates to the existing WireGuard script only after explicit --allow-live-wireguard."""
     parser = argparse.ArgumentParser(
         description=f"Day14 {DAY14_NAME}.",
@@ -2061,6 +2190,7 @@ wireguard-runner is dry-run by default and delegates to the existing WireGuard s
             DAY57_INTENT_MAPPING_TASK_ID,
             DAY58_INTENT_SAFETY_REVIEW_TASK_ID,
             DAY59_INTENT_POLICY_MATRIX_TASK_ID,
+            DAY60_INTENT_WORKFLOW_DEMO_TASK_ID,
             WIREGUARD_RUNNER_TASK_ALIAS,
         ],
         help="Task to run.",
@@ -2648,6 +2778,245 @@ def _run_day59_intent_policy_matrix(project_root: Path) -> int:
     print(f"JSON report: {_relative_to_project(project_root, json_path)}")
     print(f"HTML report: {_relative_to_project(project_root, html_path)}")
     print(f"{format_status('PASS')} Day59 policy matrix generated. No mapped task was executed.")
+    return 0
+
+
+def _build_day60_demo_example(example: Dict[str, Any]) -> Dict[str, Any]:
+    intent_text = str(example["input_intent_text"])
+    day57_mapping = build_day57_intent_mapping(intent_text)
+    candidate_task = example.get("candidate_task")
+    mapped_task = candidate_task if candidate_task is not None else day57_mapping.get("mapped_allowlisted_task")
+    blocked = bool(example["blocked"])
+    return {
+        "input_intent_text": intent_text,
+        "workflow": [
+            {
+                "step": 1,
+                "name": "Input intent text",
+                "result": intent_text,
+            },
+            {
+                "step": 2,
+                "name": "Day57-style dry-run intent mapping",
+                "result": {
+                    "detected_intent": day57_mapping.get("detected_intent"),
+                    "mapped_task": mapped_task,
+                    "mapped_task_executed": False,
+                },
+            },
+            {
+                "step": 3,
+                "name": "Day58-style safety review",
+                "result": {
+                    "safety_classification": example["expected_classification"],
+                    "blocked": blocked,
+                    "confirmation_required_for_live_or_config_actions": blocked,
+                },
+            },
+            {
+                "step": 4,
+                "name": "Day59-style policy explanation",
+                "result": example["policy_explanation"],
+            },
+            {
+                "step": 5,
+                "name": "Reviewer decision",
+                "result": example["reviewer_decision"],
+            },
+            {
+                "step": 6,
+                "name": "No execution performed",
+                "result": DAY60_NO_EXECUTION_STATEMENT,
+            },
+        ],
+        "expected_classification": example["expected_classification"],
+        "candidate_task": mapped_task,
+        "reviewer_decision": example["reviewer_decision"],
+        "blocked": blocked,
+        "mapped_task_executed": False,
+        "no_execution_statement": DAY60_NO_EXECUTION_STATEMENT,
+    }
+
+
+def build_day60_intent_workflow_demo() -> Dict[str, Any]:
+    examples = [_build_day60_demo_example(example) for example in DAY60_INTENT_WORKFLOW_DEMO_EXAMPLES]
+    allowed_examples = [example for example in examples if example["blocked"] is False]
+    blocked_examples = [example for example in examples if example["blocked"] is True]
+    return {
+        "day": "Day60",
+        "task_name": DAY60_INTENT_WORKFLOW_DEMO_TASK_ID,
+        "task_id": "day60_ai_intent_workflow_demo_reviewer_walkthrough",
+        "task_type": "report-only",
+        "safety_level": "report_only",
+        "generated_at": datetime.now().replace(microsecond=0).isoformat(sep=" "),
+        "final_status": "PASS",
+        "purpose": (
+            "Connect Day57, Day58, and Day59 into a reviewer-facing local walkthrough "
+            "for the AI intent workflow without real AI, voice, SSH, devices, or live execution."
+        ),
+        "relationship_to_previous_days": [
+            "Day57 provides deterministic dry-run intent mapping.",
+            "Day58 provides safety review and confirmation gate design.",
+            "Day59 provides the reviewer-facing policy matrix and safety explanation.",
+            "Day60 connects those pieces into one local walkthrough report.",
+        ],
+        "workflow_steps": DAY60_WORKFLOW_STEPS,
+        "example_intents": examples,
+        "summary": {
+            "total_examples": len(examples),
+            "allowed_examples": len(allowed_examples),
+            "blocked_examples": len(blocked_examples),
+            "mapped_task_execution_from_intent_allowed": False,
+            "mapped_tasks_executed": False,
+        },
+        "safety_scope": {
+            "documentation_only": True,
+            "report_only": True,
+            "reviewer_walkthrough_only": True,
+            "openai_api_used": False,
+            "voice_control_used": False,
+            "mapped_tasks_executed": False,
+            "live_tests_executed": False,
+            "ssh_connections_opened": False,
+            "device_connections_opened": False,
+            "config_json_read": False,
+            "config_json_required": False,
+            "config_json_modified": False,
+            "router_switch_firewall_vpn_configuration_changed": False,
+            "nat_ip_vrrp_wireguard_interface_route_changed": False,
+            "release_tag_created": False,
+            "v0_3_runtime_started": False,
+        },
+        "safety_boundaries": DAY58_SAFETY_BOUNDARIES
+        + [
+            "No real AI intent runtime implementation.",
+            "No reviewer decision triggers mapped task execution.",
+        ],
+        "intentionally_not_implemented": [
+            "OpenAI API integration",
+            "voice input or speech recognition",
+            "mapped task execution",
+            "live network testing",
+            "SSH or device access",
+            "config.json dependency",
+            "NAT/IP/VRRP/WireGuard/firewall/interface/route/device configuration changes",
+            "release tag creation",
+            "v0.3 runtime implementation",
+        ],
+        "report_paths": {
+            "json": DAY60_INTENT_WORKFLOW_DEMO_JSON.as_posix(),
+            "html": DAY60_INTENT_WORKFLOW_DEMO_HTML.as_posix(),
+        },
+        "openai_api_used": False,
+        "voice_control_used": False,
+        "ssh_used": False,
+        "device_connection_used": False,
+        "config_json_read": False,
+        "config_json_required": False,
+        "mapped_task_executed": False,
+        "device_configuration_changed": False,
+        "no_live_execution_occurred": True,
+        "final_safety_statement": DAY60_NO_EXECUTION_STATEMENT,
+    }
+
+
+def write_day60_intent_workflow_demo_html(report: Dict[str, Any], output_path: Path) -> None:
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    steps = "".join(
+        "<tr>"
+        f"<td>{html.escape(str(step.get('step', '')))}</td>"
+        f"<td>{html.escape(str(step.get('name', '')))}</td>"
+        f"<td>{html.escape(str(step.get('reviewer_view', '')))}</td>"
+        "</tr>"
+        for step in report.get("workflow_steps", [])
+    )
+    examples = "".join(
+        "<tr>"
+        f"<td>{html.escape(str(example.get('input_intent_text', '')))}</td>"
+        f"<td>{html.escape(str(example.get('candidate_task', '')))}</td>"
+        f"<td>{html.escape(str(example.get('expected_classification', '')))}</td>"
+        f"<td>{html.escape(str(example.get('reviewer_decision', '')))}</td>"
+        f"<td>{html.escape(str(example.get('mapped_task_executed', '')))}</td>"
+        f"<td>{html.escape(str(example.get('no_execution_statement', '')))}</td>"
+        "</tr>"
+        for example in report.get("example_intents", [])
+    )
+    scope_rows = "\n".join(
+        f"<tr><td>{html.escape(str(key))}</td><td>{html.escape(str(value))}</td></tr>"
+        for key, value in report.get("safety_scope", {}).items()
+    )
+    boundaries = "".join(f"<li>{html.escape(str(item))}</li>" for item in report.get("safety_boundaries", []))
+    not_implemented = "".join(
+        f"<li>{html.escape(str(item))}</li>" for item in report.get("intentionally_not_implemented", [])
+    )
+    output_path.write_text(
+        f"""<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Day60 AI Intent Workflow Demo</title>
+  <style>
+    body {{ font-family: Arial, sans-serif; margin: 24px; color: #182230; background: #f6f8fb; }}
+    main {{ max-width: 1180px; margin: 0 auto; }}
+    h1 {{ margin: 0 0 8px; font-size: 28px; }}
+    h2 {{ margin: 26px 0 10px; font-size: 18px; }}
+    table {{ width: 100%; border-collapse: collapse; background: #fff; border: 1px solid #d8e0ec; }}
+    td, th {{ border: 1px solid #d8e0ec; padding: 8px 10px; text-align: left; vertical-align: top; }}
+    th {{ background: #edf2f8; }}
+    .notice {{ background: #fff4d8; border: 1px solid #f0c66a; padding: 12px 14px; margin: 16px 0; color: #765200; font-weight: 700; }}
+    .panel {{ background: #fff; border: 1px solid #d8e0ec; padding: 12px 18px; }}
+    .examples {{ font-size: 13px; }}
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Day60 AI Intent Workflow Demo</h1>
+    <div>Generated {html.escape(str(report.get("generated_at", "")))}</div>
+    <div class="notice">{html.escape(str(report.get("final_safety_statement", "")))}</div>
+    <h2>Purpose</h2>
+    <div class="panel">{html.escape(str(report.get("purpose", "")))}</div>
+    <h2>Walkthrough Steps</h2>
+    <table>
+      <thead><tr><th>Step</th><th>Name</th><th>Reviewer view</th></tr></thead>
+      <tbody>{steps}</tbody>
+    </table>
+    <h2>Example Intents</h2>
+    <table class="examples">
+      <thead>
+        <tr><th>Intent</th><th>Candidate task</th><th>Classification</th><th>Reviewer decision</th><th>Mapped task executed?</th><th>Execution statement</th></tr>
+      </thead>
+      <tbody>{examples}</tbody>
+    </table>
+    <h2>Safety Scope</h2>
+    <table><tbody>{scope_rows}</tbody></table>
+    <h2>Safety Boundaries</h2>
+    <ul class="panel">{boundaries}</ul>
+    <h2>Intentionally Not Implemented</h2>
+    <ul class="panel">{not_implemented}</ul>
+  </main>
+</body>
+</html>
+""",
+        encoding="utf-8",
+    )
+
+
+def _run_day60_intent_workflow_demo(project_root: Path) -> int:
+    report = build_day60_intent_workflow_demo()
+    json_path = project_root / DAY60_INTENT_WORKFLOW_DEMO_JSON
+    html_path = project_root / DAY60_INTENT_WORKFLOW_DEMO_HTML
+    write_json_report(report, json_path)
+    write_day60_intent_workflow_demo_html(mask_secret_values(report), html_path)
+
+    print(format_heading("Day60 AI Intent Workflow Demo Reviewer Walkthrough"))
+    print("Safety: report-only reviewer walkthrough")
+    print(f"Workflow steps: {len(report['workflow_steps'])}")
+    print(f"Example intents: {report['summary']['total_examples']}")
+    print(f"Allowed examples: {report['summary']['allowed_examples']}")
+    print(f"Blocked examples: {report['summary']['blocked_examples']}")
+    print(f"JSON report: {_relative_to_project(project_root, json_path)}")
+    print(f"HTML report: {_relative_to_project(project_root, html_path)}")
+    print(f"{format_status('PASS')} {DAY60_NO_EXECUTION_STATEMENT}")
     return 0
 
 
@@ -4977,6 +5346,8 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
         return _run_day58_intent_safety_review(root, args.intent_text)
     if args.task == DAY59_INTENT_POLICY_MATRIX_TASK_ID:
         return _run_day59_intent_policy_matrix(root)
+    if args.task == DAY60_INTENT_WORKFLOW_DEMO_TASK_ID:
+        return _run_day60_intent_workflow_demo(root)
 
     profile_path = _resolve_project_path(root, args.profile)
     try:

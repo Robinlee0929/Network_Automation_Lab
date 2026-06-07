@@ -2564,3 +2564,99 @@ def test_day59_cli_generates_report_only_matrix_without_subprocess(tmp_path, mon
     assert "SSH command request" in html
     assert "Router / switch configuration change request" in html
     assert "Dry-run intent mapping" in html
+
+
+def test_day60_intent_workflow_demo_task_exists_in_catalog():
+    task = next(task for task in network_lab.list_tasks() if task["id"] == "intent-workflow-demo")
+
+    assert task["task_id"] == "day60_ai_intent_workflow_demo_reviewer_walkthrough"
+    assert task["day"] == "Day60"
+    assert task["safety_level"] == "report-only"
+    assert task["execution_mode"] == "report-only"
+    assert task["requires_live_device"] is False
+    assert task["requires_password"] is False
+    assert task["produces_report"] is True
+    assert "reports/portfolio/day60_intent_workflow_demo.json" in task["report_paths"]
+    assert "reports/portfolio/day60_intent_workflow_demo.html" in task["report_paths"]
+
+
+def test_day60_workflow_demo_includes_allowed_and_blocked_examples():
+    report = network_lab.build_day60_intent_workflow_demo()
+    rows = {row["input_intent_text"]: row for row in report["example_intents"]}
+
+    assert report["task_name"] == "intent-workflow-demo"
+    assert report["task_type"] == "report-only"
+    assert report["safety_level"] == "report_only"
+    assert report["final_safety_statement"] == (
+        "No mapped task was executed. This is a dry-run reviewer walkthrough only."
+    )
+    assert report["mapped_task_executed"] is False
+    assert report["openai_api_used"] is False
+    assert report["voice_control_used"] is False
+    assert report["ssh_used"] is False
+    assert report["device_connection_used"] is False
+    assert report["config_json_read"] is False
+    assert report["config_json_required"] is False
+    assert report["summary"]["mapped_tasks_executed"] is False
+
+    assert rows["show latest reports"]["expected_classification"] == "report-only"
+    assert rows["show latest reports"]["reviewer_decision"] == "allowed"
+    assert rows["explain available runner tasks"]["expected_classification"] == "documentation/report-only"
+    assert rows["explain available runner tasks"]["reviewer_decision"] == "allowed"
+
+    for intent_text in [
+        "do VRRP failover test",
+        "change router firewall rule",
+        "run WireGuard throughput test",
+    ]:
+        assert rows[intent_text]["blocked"] is True
+        assert rows[intent_text]["mapped_task_executed"] is False
+
+    assert rows["do VRRP failover test"]["expected_classification"] == "live-capable"
+    assert rows["change router firewall rule"]["expected_classification"] == "configuration-changing"
+    assert rows["run WireGuard throughput test"]["reviewer_decision"] == (
+        "blocked unless future guarded-live flow exists"
+    )
+
+
+def test_day60_cli_generates_json_and_html_without_config_or_device_access(
+    tmp_path,
+    monkeypatch,
+    capsys,
+):
+    def fail_run(*_args, **_kwargs):
+        raise AssertionError("Day60 intent workflow demo must not execute subprocess")
+
+    def fail_profile_load(*_args, **_kwargs):
+        raise AssertionError("Day60 intent workflow demo must not load profile or config data")
+
+    monkeypatch.setattr(network_lab.subprocess, "run", fail_run)
+    monkeypatch.setattr(network_lab, "load_lab_runner_profile", fail_profile_load)
+
+    exit_code = network_lab.main(["--task", "intent-workflow-demo"], project_root=tmp_path)
+
+    output = capsys.readouterr().out
+    json_path = tmp_path / "reports/portfolio/day60_intent_workflow_demo.json"
+    html_path = tmp_path / "reports/portfolio/day60_intent_workflow_demo.html"
+    assert exit_code == 0
+    assert "Day60 AI Intent Workflow Demo" in output
+    assert "No mapped task was executed. This is a dry-run reviewer walkthrough only." in output
+    assert json_path.exists()
+    assert html_path.exists()
+    assert not (tmp_path / "config.json").exists()
+
+    report = json.loads(json_path.read_text(encoding="utf-8"))
+    html = html_path.read_text(encoding="utf-8")
+    assert report["final_status"] == "PASS"
+    assert report["safety_scope"]["mapped_tasks_executed"] is False
+    assert report["safety_scope"]["openai_api_used"] is False
+    assert report["safety_scope"]["voice_control_used"] is False
+    assert report["safety_scope"]["ssh_connections_opened"] is False
+    assert report["safety_scope"]["device_connections_opened"] is False
+    assert report["safety_scope"]["config_json_read"] is False
+    assert report["safety_scope"]["config_json_required"] is False
+    assert "show latest reports" in html
+    assert "do VRRP failover test" in html
+    assert "change router firewall rule" in html
+    assert "run WireGuard throughput test" in html
+    assert "No mapped task was executed. This is a dry-run reviewer walkthrough only." in html
