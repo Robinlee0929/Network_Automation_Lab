@@ -71,6 +71,16 @@ class DashboardEvidenceEntry:
     html_view_path: Optional[str]
 
 
+@dataclass
+class AIIntentReviewerReference:
+    day: str
+    title: str
+    summary: str
+    doc_path: str
+    roadmap_path: str
+    report_paths: Sequence[str]
+
+
 DAY12_REPORT_JSON = "day12_wireguard_vpn_automation_report.json"
 DAY12_REPORT_HTML = "day12_wireguard_vpn_automation_report.html"
 
@@ -641,6 +651,80 @@ def ai_review_checklist() -> List[Dict[str, str]]:
     ]
 
 
+def ai_intent_reviewer_references() -> List[AIIntentReviewerReference]:
+    return [
+        AIIntentReviewerReference(
+            day="Day57",
+            title="AI intent mapping prototype",
+            summary=(
+                "Maps static reviewer text to a proposed allowlisted task and safety label, "
+                "but keeps the mapped task unexecuted."
+            ),
+            doc_path="docs/ai/day57_intent_mapping_prototype.md",
+            roadmap_path="docs/roadmap/day57_ai_assisted_task_intent_mapping_prototype_plan.md",
+            report_paths=(),
+        ),
+        AIIntentReviewerReference(
+            day="Day58",
+            title="Safety review gate",
+            summary=(
+                "Classifies mapped proposals before any future execution path, with "
+                "live-capable or unknown intents blocked by default."
+            ),
+            doc_path="docs/ai/day58_intent_mapping_safety_review_confirmation_gate.md",
+            roadmap_path="docs/roadmap/day58_intent_mapping_safety_review_confirmation_gate.md",
+            report_paths=(
+                "reports/portfolio/day58_intent_mapping_safety_review.json",
+                "reports/portfolio/day58_intent_mapping_safety_review.html",
+            ),
+        ),
+        AIIntentReviewerReference(
+            day="Day59",
+            title="Intent policy matrix",
+            summary=(
+                "Explains allowed report-only intents, dry-run-only proposals, and "
+                "blocked live or configuration-changing requests."
+            ),
+            doc_path="docs/ai/day59_intent_policy_matrix_reviewer_safety_explanation.md",
+            roadmap_path="docs/roadmap/day59_intent_policy_matrix_reviewer_safety_explanation.md",
+            report_paths=(
+                "reports/portfolio/day59_intent_policy_matrix.json",
+                "reports/portfolio/day59_intent_policy_matrix.html",
+            ),
+        ),
+        AIIntentReviewerReference(
+            day="Day60",
+            title="Reviewer walkthrough",
+            summary=(
+                "Connects Day57 mapping, Day58 safety review, and Day59 policy explanation "
+                "into one local report-only demo."
+            ),
+            doc_path="docs/ai/day60_ai_intent_workflow_demo_reviewer_walkthrough.md",
+            roadmap_path="docs/roadmap/day60_ai_intent_workflow_demo_reviewer_walkthrough.md",
+            report_paths=(
+                "reports/portfolio/day60_intent_workflow_demo.json",
+                "reports/portfolio/day60_intent_workflow_demo.html",
+            ),
+        ),
+    ]
+
+
+def ai_intent_safety_boundaries() -> List[str]:
+    return [
+        "Report-only reviewer entry point; this page does not execute anything.",
+        "No OpenAI API calls.",
+        "No voice input or speech API.",
+        "No mapped runner task execution.",
+        "No live network tests.",
+        "No SSH sessions.",
+        "No MikroTik, Cisco, router, switch, firewall, VPN, or real device access.",
+        "No config.json requirement.",
+        "No NAT, IP, VRRP, WireGuard, firewall, interface, route, or device configuration changes.",
+        "No release tag creation.",
+        "No real v0.3 runtime execution.",
+    ]
+
+
 def create_app(
     reports_dir: Optional[Path] = None,
     execution_logs_dir: Optional[Path] = None,
@@ -738,6 +822,14 @@ def create_app(
         return render_template(
             "dashboard_ai_checklist.html",
             checklist=ai_review_checklist(),
+        )
+
+    @app.route("/ai-intent-reviewer")
+    def ai_intent_reviewer():
+        return render_template(
+            "dashboard_ai_intent_reviewer.html",
+            references=ai_intent_reviewer_references(),
+            safety_boundaries=ai_intent_safety_boundaries(),
         )
 
     @app.route("/reports/open/<path:report_path>")

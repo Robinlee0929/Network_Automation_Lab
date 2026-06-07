@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI Intent Reviewer - Network Automation Lab Dashboard</title>
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --panel: #ffffff;
+      --text: #172033;
+      --muted: #667085;
+      --border: #d8e0ec;
+      --accent: #0f766e;
+      --blue: #175cd3;
+      --blue-bg: #eef6ff;
+      --note: #fff8eb;
+      --note-border: #f3d29b;
+      --safe-bg: #ecfdf3;
+      --safe-border: #abefc6;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Segoe UI", Arial, sans-serif;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+    main { max-width: 1180px; margin: 0 auto; padding: 28px 18px 48px; }
+    nav { display: flex; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; }
+    nav a {
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 750;
+      padding: 8px 10px;
+      border-bottom: 2px solid transparent;
+    }
+    nav a.active { border-color: var(--accent); color: var(--accent); }
+    h1 { margin: 0 0 8px; font-size: 30px; line-height: 1.15; }
+    h2 { margin: 0 0 10px; font-size: 18px; }
+    h3 { margin: 0 0 8px; font-size: 15px; }
+    p { margin: 0 0 16px; color: var(--muted); max-width: 920px; }
+    a { color: var(--blue); }
+    code {
+      font-family: Consolas, "Courier New", monospace;
+      overflow-wrap: anywhere;
+    }
+    section, .day-card, .summary-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      box-shadow: 0 10px 24px rgba(16, 24, 40, .07);
+    }
+    section { padding: 16px; margin-top: 14px; }
+    .summary-grid, .day-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 12px;
+    }
+    .summary-card, .day-card { padding: 15px; }
+    .day-badge {
+      display: inline-block;
+      background: var(--blue-bg);
+      border-radius: 999px;
+      color: var(--blue);
+      font-size: 12px;
+      font-weight: 850;
+      margin-bottom: 8px;
+      padding: 4px 9px;
+    }
+    .note {
+      background: var(--note);
+      border: 1px solid var(--note-border);
+      border-radius: 8px;
+      color: #7a4d00;
+      font-weight: 750;
+      margin: 18px 0;
+      padding: 12px;
+    }
+    .safe {
+      background: var(--safe-bg);
+      border: 1px solid var(--safe-border);
+      border-radius: 8px;
+      color: #05603a;
+      font-weight: 750;
+      margin-top: 12px;
+      padding: 12px;
+    }
+    ul, ol { margin: 0; padding-left: 20px; }
+    li { margin: 7px 0; }
+    .refs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .refs a {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--blue);
+      font-weight: 750;
+      padding: 7px 9px;
+      text-decoration: none;
+    }
+    .paths {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-top: 10px;
+      padding: 10px;
+    }
+    @media (max-width: 720px) {
+      main { padding: 20px 12px 36px; }
+      h1 { font-size: 25px; }
+      .summary-grid, .day-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <nav>
+    <a href="{{ url_for('home') }}">Home</a>
+    <a href="{{ url_for('reports') }}">Reports</a>
+    <a href="{{ url_for('commands') }}">Commands</a>
+    <a class="active" href="{{ url_for('ai_intent_reviewer') }}">AI Intent Reviewer</a>
+    <a href="{{ url_for('ai_checklist') }}">AI Checklist</a>
+  </nav>
+
+  <h1>AI Intent Reviewer Entry Point</h1>
+  <p>Reviewer-friendly dashboard view for the Day57-Day60 AI intent workflow. It explains the demo path, links to the committed docs, and keeps the no-execution boundary visible before any future v0.3 runtime work.</p>
+  <div class="note">This page is report-only. It does not call an AI model, listen to voice input, execute mapped tasks, open SSH, connect to devices, or change network configuration.</div>
+
+  <section>
+    <h2>What This Workflow Is</h2>
+    <div class="summary-grid">
+      <article class="summary-card">
+        <h3>Intent Understanding</h3>
+        <p>Natural-language text is treated as a proposal to classify and review, not as permission to run a task.</p>
+      </article>
+      <article class="summary-card">
+        <h3>Safety First</h3>
+        <p>Report-only examples are allowed for review, while live-capable, SSH, device-changing, and ambiguous requests are blocked by default.</p>
+      </article>
+      <article class="summary-card">
+        <h3>Reviewer Evidence</h3>
+        <p>Day57-Day60 docs and optional generated JSON/HTML reports show how the workflow makes allowed and blocked decisions visible.</p>
+      </article>
+      <article class="summary-card">
+        <h3>No Runtime Execution</h3>
+        <p>No mapped task is delegated from this page. The dashboard only presents committed documentation and expected report paths.</p>
+      </article>
+    </div>
+  </section>
+
+  <section>
+    <h2>Day57-Day60 Review Path</h2>
+    <div class="day-grid">
+      {% for item in references %}
+      <article class="day-card">
+        <span class="day-badge">{{ item.day }}</span>
+        <h3>{{ item.title }}</h3>
+        <p>{{ item.summary }}</p>
+        <div class="refs">
+          <a href="{{ evidence_url(item.doc_path) }}">Open AI doc</a>
+          <a href="{{ evidence_url(item.roadmap_path) }}">Open roadmap</a>
+        </div>
+        {% if item.report_paths %}
+        <div class="paths">
+          <strong>Expected generated reports:</strong>
+          <ul>
+            {% for path in item.report_paths %}
+            <li><code>{{ path }}</code></li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section>
+    <h2>Reviewer Workflow</h2>
+    <ol>
+      <li>Read Day57 to see how static text maps to a proposed task without running it.</li>
+      <li>Read Day58 to confirm the safety review gate and blocked-by-default policy.</li>
+      <li>Read Day59 to review the allowed, blocked, and clarification-required policy matrix.</li>
+      <li>Read or generate Day60 to inspect the end-to-end walkthrough report.</li>
+      <li>Use <a href="{{ url_for('reports') }}">Reports</a> for generated local evidence when available.</li>
+    </ol>
+    <div class="safe">Expected Day60 statement: <code>No mapped task was executed. This is a dry-run reviewer walkthrough only.</code></div>
+  </section>
+
+  <section>
+    <h2>Safety Boundaries</h2>
+    <ul>
+      {% for item in safety_boundaries %}
+      <li>{{ item }}</li>
+      {% endfor %}
+    </ul>
+  </section>
+</main>
+</body>
+</html>
