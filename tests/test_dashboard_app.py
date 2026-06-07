@@ -398,7 +398,7 @@ def test_dashboard_home_is_portfolio_demo_landing_page(tmp_path):
     assert "/ai-intent-reviewer" in text
 
 
-def test_ai_intent_reviewer_route_exposes_day57_to_day62_without_execution(tmp_path):
+def test_ai_intent_reviewer_route_exposes_day57_to_day63_without_execution(tmp_path):
     if dashboard.Flask is None:
         pytest.skip("Flask is not installed in this test environment.")
 
@@ -417,12 +417,17 @@ def test_ai_intent_reviewer_route_exposes_day57_to_day62_without_execution(tmp_p
     assert "Day59" in text
     assert "Day60" in text
     assert "Day62" in text
+    assert "Day63 Traceability Evidence Map" in text
     assert "docs/ai/day57_intent_mapping_prototype.md" in text
     assert "reports/portfolio/day60_intent_workflow_demo.html" in text
     assert "docs/ai/intent_reviewer_scenario_pack.md" in text
     assert "docs/roadmap/day62_ai_intent_reviewer_scenario_pack.md" in text
+    assert "docs/ai/intent_reviewer_traceability_evidence_map.md" in text
+    assert "docs/roadmap/day63_ai_intent_reviewer_traceability_evidence_map.md" in text
     assert "Scenario Pack" in text
+    assert "trace each AI intent review concept back to Day57-Day62 evidence" in text
     assert "This page is report-only" in text
+    assert "This page remains static and report-only" in text
     assert "No OpenAI API calls" in text
     assert "No voice input" in text
     assert "No mapped runner task execution" in text
@@ -430,8 +435,16 @@ def test_ai_intent_reviewer_route_exposes_day57_to_day62_without_execution(tmp_p
     assert "No config.json requirement" in text
     assert "No automatic execution of mapped tasks from scenario examples" in text
     assert "No mapped task was executed. This is a dry-run reviewer walkthrough only." in text
-    assert "<form" not in text
-    assert "action runner" not in text.lower()
+    html = text.lower()
+    assert "<form" not in html
+    assert "<button" not in html
+    assert "method=\"post\"" not in html
+    assert "action=" not in html
+    assert "run task" not in html
+    assert "execute intent" not in html
+    assert "submit intent" not in html
+    assert "post /" not in html
+    assert "action runner" not in html
 
 
 def test_dashboard_reports_route_exposes_vrrp_evidence_group(tmp_path):
