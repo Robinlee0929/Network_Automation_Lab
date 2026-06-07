@@ -706,6 +706,17 @@ def ai_intent_reviewer_references() -> List[AIIntentReviewerReference]:
                 "reports/portfolio/day60_intent_workflow_demo.html",
             ),
         ),
+        AIIntentReviewerReference(
+            day="Day62",
+            title="Scenario pack / sample cases",
+            summary=(
+                "Adds static reviewer sample cases for report-only, dry-run, blocked, "
+                "and clarification-required intents without adding any execution path."
+            ),
+            doc_path="docs/ai/intent_reviewer_scenario_pack.md",
+            roadmap_path="docs/roadmap/day62_ai_intent_reviewer_scenario_pack.md",
+            report_paths=(),
+        ),
     ]
 
 
@@ -722,6 +733,7 @@ def ai_intent_safety_boundaries() -> List[str]:
         "No NAT, IP, VRRP, WireGuard, firewall, interface, route, or device configuration changes.",
         "No release tag creation.",
         "No real v0.3 runtime execution.",
+        "No automatic execution of mapped tasks from scenario examples.",
     ]
 
 
