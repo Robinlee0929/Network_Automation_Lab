@@ -1,28 +1,28 @@
-# Day50 - Dashboard Demo Polish / Interview Landing Page
+# Day50 - Dashboard Demo Polish / Portfolio Demo Landing Page
 
 ## Objective
 
-Polish the dashboard home page into an interview-friendly landing page that quickly explains what Network Automation Lab solves, what evidence it can show, how the safe demo flow works, and why the project can be demonstrated without live lab access.
+Polish the dashboard home page into a portfolio-review-friendly landing page that quickly explains what Network Automation Lab solves, what evidence it can show, how the safe demo flow works, and why the project can be demonstrated without live lab access.
 
 Day50 is documentation, dashboard UI, and test coverage only. It does not start a new release line, create `v0.2.1`, or begin `v0.3` work.
 
 ## Scope
 
-- Improve the dashboard `/` route as the primary interview landing page.
+- Improve the dashboard `/` route as the primary portfolio demo landing page.
 - Keep existing dashboard routes available: `/reports`, `/commands`, and `/ai-checklist`.
-- Add quick links to report evidence, safe command execution, AI checklist, and the offline interview demo kit.
-- Document the 3-5 minute interview demo flow and safety boundary.
+- Add quick links to report evidence, safe command execution, AI checklist, and the offline portfolio demo kit.
+- Document the 3-5 minute portfolio demo flow and safety boundary.
 - Add route coverage so the landing page remains available from a clean local checkout.
 
 ## What Changed
 
-- Reworked `templates/dashboard_home.html` into `Network Automation Lab - Interview Demo`.
+- Reworked `templates/dashboard_home.html` into `Network Automation Lab - Portfolio Demo`.
 - Added a demo status card showing `READY WITH NOTES`.
-- Added proof-point cards for Unified Runner, Safety Guard / AI Checklist, VRRP evidence and topology planning, WireGuard automation safety, report index/dashboard viewer, and the offline interview demo kit.
-- Added a recommended 3-5 minute interview flow.
+- Added proof-point cards for Unified Runner, Safety Guard / AI Checklist, VRRP evidence and topology planning, WireGuard automation safety, report index/dashboard viewer, and the offline portfolio demo kit.
+- Added a recommended 3-5 minute portfolio demo flow.
 - Added a clear safety boundary: `This demo does not require live router access. Live tests are separated from report-only and read-only tasks.`
 - Kept the existing report readiness cards so generated local report availability remains visible.
-- Added a Flask test that verifies `/` returns HTTP 200 and contains the key interview demo text.
+- Added a Flask test that verifies `/` returns HTTP 200 and contains the key portfolio demo text.
 
 ## Demo Flow
 

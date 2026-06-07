@@ -1,10 +1,10 @@
-# Day49 - Offline Demo Verification / Interview Dry Run
+# Day49 - Offline Demo Verification / Portfolio Demo Dry Run
 
 ## Objective
 
-Verify that the Day48 offline interview demo kit is usable for a 3-5 minute interview walkthrough without live network devices, internet access, GitHub access, SSH, WireGuard peers, VRRP failover, iperf3 endpoints, or generated local screenshots.
+Verify that the Day48 offline portfolio demo kit is usable for a 3-5 minute portfolio walkthrough without live network devices, internet access, GitHub access, SSH, WireGuard peers, VRRP failover, iperf3 endpoints, or generated local screenshots.
 
-Day49 is a documentation/report-only/offline-only dry run. It checks the interview flow, safe command list, dashboard/report explanation path, Traditional Chinese talk track, and fallback story for missing local artifacts.
+Day49 is a documentation/report-only/offline-only dry run. It checks the portfolio demo flow, safe command list, dashboard/report explanation path, Traditional Chinese talk track, and fallback story for missing local artifacts.
 
 ## Scope
 
@@ -34,18 +34,18 @@ Reviewed:
 - `docs/demo/offline_interview_demo_kit/no_live_dependency_statement.md`
 - `docs/demo/offline_interview_demo_kit/screenshots/README.md`
 
-Note: the Day49 brief referred to `interview_talk_track_zh.md`, but the committed Day48 kit stores the Traditional Chinese 3-5 minute talk track at `interview_talk_track_3_to_5_min.md`. The README and Day48 roadmap document both point to the committed path, so the talk track is available for the interview flow.
+Note: the Day49 brief referred to `interview_talk_track_zh.md`, but the committed Day48 kit stores the Traditional Chinese 3-5 minute talk track at `interview_talk_track_3_to_5_min.md`. The README and Day48 roadmap document both point to the committed path, so the talk track is available for the portfolio demo flow.
 
 ## Offline Demo Dry-run Checklist
 
 | Check | Result | Notes |
 | --- | --- | --- |
-| 3-5 minute interview flow has enough material | PASS | README open order, checklist, commands, talk track, troubleshooting guide, and no-live-dependency statement form a complete walkthrough. |
-| Demo can be explained without live routers or switches | PASS | The kit explicitly separates interview demo behavior from live-device validation. |
+| 3-5 minute portfolio demo flow has enough material | PASS | README open order, checklist, commands, talk track, troubleshooting guide, and no-live-dependency statement form a complete walkthrough. |
+| Demo can be explained without live routers or switches | PASS | The kit explicitly separates portfolio demo behavior from live-device validation. |
 | Dashboard demo path is clear | PASS | `python dashboard_app.py`, `/`, and `/reports` are documented; route behavior is covered by local tests. |
 | Reports/report-index path is clear | PASS WITH NOTES | `report-index` completed with acceptable optional missing-report WARN and `fail=0`. |
 | Safe commands are listed | PASS | Commands are local/report-only and the kit warns against SSH, live VRRP, live WireGuard, iperf3, and configuration changes. |
-| Traditional Chinese talk track is usable | PASS WITH NOTES | The talk track is present and interview-ready under `interview_talk_track_3_to_5_min.md`; only the alternate filename from the Day49 brief is absent. |
+| Traditional Chinese talk track is usable | PASS WITH NOTES | The talk track is present and portfolio-ready under `interview_talk_track_3_to_5_min.md`; only the alternate filename from the Day49 brief is absent. |
 | Fallback explanations are present | PASS | Troubleshooting guide covers dashboard, reports, pytest, WARN, generated reports, browser, internet, and device access limits. |
 | No live dependency is required | PASS | The no-live-dependency statement is explicit and aligned with the checklist and commands. |
 
@@ -115,7 +115,7 @@ Day49 did not require browser automation or a live Flask launch. Readiness was v
 
 Reports readiness: READY WITH NOTES.
 
-The report-index path is usable for an offline demo. The observed WARN is acceptable because it has `fail=0` and is caused by optional generated local reports that may be absent from a clean checkout or interview machine.
+The report-index path is usable for an offline demo. The observed WARN is acceptable because it has `fail=0` and is caused by optional generated local reports that may be absent from a clean checkout or review machine.
 
 The demo explanation should state that generated reports are local evidence and may be intentionally uncommitted, while committed docs, source, task metadata, and tests still demonstrate the architecture and safety model.
 
@@ -123,7 +123,7 @@ The demo explanation should state that generated reports are local evidence and 
 
 Commands readiness: PASS.
 
-The safe command list is interview-ready and focuses on:
+The safe command list is portfolio-ready and focuses on:
 
 - Git/Python environment checks.
 - `python -m pytest`.
@@ -132,13 +132,13 @@ The safe command list is interview-ready and focuses on:
 - Local dashboard startup and local browser opening only after Flask is running.
 - Local documentation viewing.
 
-The command list also explicitly warns not to run live-device workflows during the offline interview demo.
+The command list also explicitly warns not to run live-device workflows during the offline portfolio demo.
 
 ## Talk Track Readiness Result
 
 Talk track readiness: READY WITH NOTES.
 
-The Traditional Chinese talk track is usable for a 3-5 minute interview presentation. It explains:
+The Traditional Chinese talk track is usable for a 3-5 minute portfolio presentation. It explains:
 
 - The project problem and why manual SSH checks are hard to repeat.
 - Safety levels and demo boundaries.
@@ -147,7 +147,7 @@ The Traditional Chinese talk track is usable for a 3-5 minute interview presenta
 - VRRP evidence chain.
 - WireGuard direction.
 - Why the demo can run without live devices.
-- What interviewers should notice.
+- What demo reviewers should notice.
 
 The only note is filename alignment: the committed talk-track file is `interview_talk_track_3_to_5_min.md`, while the Day49 brief mentioned `interview_talk_track_zh.md`.
 
@@ -162,26 +162,26 @@ The troubleshooting guide includes usable explanations for:
 - Screenshots are not available.
 - No live network devices are connected.
 - Browser cannot open a local page.
-- Interview site has no internet.
+- Demo site has no internet.
 - Generated reports are absent.
 - Local Python/pytest environment is incomplete.
 
-For interviewer requests to run live VRRP or WireGuard execution, the fallback explanation is covered by the command safety warnings and no-live-dependency statement: live testing is intentionally separated from the interview demo and should only be run in a controlled lab with explicit operator intent.
+For demo reviewer requests to run live VRRP or WireGuard execution, the fallback explanation is covered by the command safety warnings and no-live-dependency statement: live testing is intentionally separated from the portfolio demo and should only be run in a controlled lab with explicit operator intent.
 
 ## Known Limitations
 
-- Optional generated local reports can be missing from the interview machine, causing acceptable report-index WARN output with `fail=0`.
+- Optional generated local reports can be missing from the review machine, causing acceptable report-index WARN output with `fail=0`.
 - Optional screenshot binaries are not required and may be absent.
-- The dashboard may not launch if the interview machine lacks dependencies or cannot open localhost; the docs and tests remain sufficient for the offline walkthrough.
+- The dashboard may not launch if the review machine lacks dependencies or cannot open localhost; the docs and tests remain sufficient for the offline walkthrough.
 - The Day49 brief names `interview_talk_track_zh.md`, but the committed Day48 kit uses `interview_talk_track_3_to_5_min.md` for the Traditional Chinese talk track.
 - Day49 does not prove live VRRP, WireGuard, iperf3, SSH, or device configuration behavior.
 
-## Final Interview Demo Status
+## Final Portfolio Demo Status
 
 Overall status: READY WITH NOTES
 
-Reason: Offline interview demo flow is usable, but optional generated local reports/screenshots may still depend on local artifacts that are intentionally not committed.
+Reason: Offline portfolio demo flow is usable, but optional generated local reports/screenshots may still depend on local artifacts that are intentionally not committed.
 
 ## Recommended Next Step
 
-Use the Day48 kit as the interview entry point and keep Day49 as the verification note. If more polish is needed, the next small offline task should align the talk-track filename referenced by future briefs and optionally add curated non-sensitive screenshots, without adding live-device dependencies.
+Use the Day48 kit as the portfolio demo entry point and keep Day49 as the verification note. If more polish is needed, the next small offline task should align the talk-track filename referenced by future briefs and optionally add curated non-sensitive screenshots, without adding live-device dependencies.

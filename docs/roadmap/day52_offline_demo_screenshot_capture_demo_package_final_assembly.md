@@ -2,7 +2,7 @@
 
 ## Objective
 
-Finalize the offline interview demo package by capturing real local dashboard screenshots and documenting how to use the Day52 demo folder during an interview.
+Finalize the offline portfolio demo package by capturing real local dashboard screenshots and documenting how to use the Day52 demo folder during a portfolio review or offline demo.
 
 ## Scope
 
@@ -12,7 +12,7 @@ Included:
 
 - Capture dashboard screenshots for `/`, `/reports`, `/commands`, and `/ai-checklist`.
 - Add a Day52 offline demo package folder.
-- Add an interview demo folder usage guide.
+- Add a portfolio demo folder usage guide.
 - Link the Day52 package from `README.md`.
 - Run local validation commands.
 

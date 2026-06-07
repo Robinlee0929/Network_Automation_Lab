@@ -1,10 +1,10 @@
-# Day47 - Interview Demo Baseline Final Check / Demo Operation Runbook
+# Day47 - Portfolio Demo Baseline Final Check / Demo Operation Runbook
 
 ## Purpose
 
-Day47 finalizes the current `main` branch as the interview demo baseline.
+Day47 finalizes the current `main` branch as the portfolio demo baseline.
 
-The goal is stable local demo operation: clear navigation, clear safety boundaries, and a predictable explanation path for interviews. Day47 is not a release-tagging task and does not start new feature development.
+The goal is stable local demo operation: clear navigation, clear safety boundaries, and a predictable explanation path for portfolio reviews. Day47 is not a release-tagging task and does not start new feature development.
 
 ## Scope
 
@@ -13,7 +13,7 @@ The goal is stable local demo operation: clear navigation, clear safety boundari
 - Report index readiness
 - Runner task catalog visibility
 - Portfolio evidence visibility
-- Safe explanation flow for an interview
+- Safe explanation flow for a portfolio review
 - No live device dependency
 
 ## Explicit Non-goals
@@ -28,14 +28,14 @@ The goal is stable local demo operation: clear navigation, clear safety boundari
 
 ## Demo Baseline Assumptions
 
-- The interview demo baseline should work from `main`.
+- The portfolio demo baseline should work from `main`.
 - The demo should rely on committed source code and committed documentation.
 - The demo must not require ignored local files such as `config.json`.
 - Existing generated reports under ignored local report folders are optional demo evidence, not required test inputs.
 - Missing local historical reports may produce warnings in dashboard or report-index views; that behavior is explainable and expected because generated evidence is intentionally not committed.
-- The safe baseline demo should remain useful on an interview computer without access to MikroTik, Cisco, router, switch, firewall, VPN, WireGuard, or iperf3 endpoints.
+- The safe baseline demo should remain useful on an review computer without access to MikroTik, Cisco, router, switch, firewall, VPN, WireGuard, or iperf3 endpoints.
 
-## Interview Demo Operation Runbook
+## Portfolio Demo Operation Runbook
 
 ### 1. Check Repository Status
 
@@ -46,7 +46,7 @@ git status --short --branch
 git log --oneline -1
 ```
 
-Expected story: current `main` is the corrected interview demo baseline after Day44-Day46. Day47 documents how to operate that baseline safely.
+Expected story: current `main` is the corrected portfolio demo baseline after Day44-Day46. Day47 documents how to operate that baseline safely.
 
 ### 2. Run Full Local Regression Tests
 
@@ -73,7 +73,7 @@ http://127.0.0.1:5000/
 http://127.0.0.1:5000/reports
 ```
 
-If starting a server is not desirable during the interview, explain that the dashboard is the local human review surface for generated JSON / HTML evidence and that route behavior is covered by the test suite.
+If starting a server is not desirable during a portfolio review or offline demo, explain that the dashboard is the local human review surface for generated JSON / HTML evidence and that route behavior is covered by the test suite.
 
 ### 4. Show the Reports Page or Report Index
 
@@ -115,7 +115,7 @@ runner_profiles/safety_levels.json
 README.md
 ```
 
-Expected story: the project deliberately separates report-only, read-only, dry-run, guarded-live, and disabled behavior. Live operations are intentionally guarded and should not be triggered during the interview baseline demo.
+Expected story: the project deliberately separates report-only, read-only, dry-run, guarded-live, and disabled behavior. Live operations are intentionally guarded and should not be triggered during the portfolio demo baseline demo.
 
 ### 7. Show VRRP Evidence as Portfolio Material
 
@@ -131,7 +131,7 @@ docs/portfolio_v0.2_demo_checklist.md
 docs/portfolio/v0.2_demo_handoff_guide.md
 ```
 
-Expected story: VRRP validation is presented as documented, safety-scoped portfolio evidence. The interview demo does not run a live failover.
+Expected story: VRRP validation is presented as documented, safety-scoped portfolio evidence. The portfolio demo does not run a live failover.
 
 ### 8. Show WireGuard Evidence as Portfolio Material
 
@@ -146,13 +146,13 @@ summary/day13_multi_router_wireguard_client_to_site_summary_20260602_022950.html
 summary/day13_multi_router_wireguard_client_to_site_summary_20260602_022950.json
 ```
 
-Expected story: WireGuard work is visible as guarded runner and portfolio evidence. The interview baseline demo does not run a live WireGuard test or export secrets.
+Expected story: WireGuard work is visible as guarded runner and portfolio evidence. The portfolio demo baseline demo does not run a live WireGuard test or export secrets.
 
 ### 9. Explain Guarded Live Operations
 
 Close the demo by explaining that live network actions exist only behind explicit task selection, profile requirements, prompts, and safety levels. Day47 intentionally uses documentation, local tests, local dashboard/report visibility, and committed evidence paths instead of connecting to devices.
 
-## Recommended Interview Narrative
+## Recommended Portfolio Demo Narrative
 
 Problem: manual network validation is repetitive, hard to compare, and risky when every check depends on ad hoc SSH sessions and copied command output.
 
@@ -173,16 +173,16 @@ Future direction: v2.0 platform completion, followed later by v3.0 Voice + AI Ne
 | Missing ignored reports | Explain that generated reports are intentionally local and optional; committed docs and tests are the baseline. |
 | Dashboard report WARN | Explain that optional historical reports may be absent on a clean machine and that warnings preserve evidence honesty. |
 | Live device not available | Use the local documentation, dashboard/report-only explanation, task catalog, and committed portfolio evidence. |
-| Interview computer network unavailable | The core demo still works locally from committed code and docs; live network access is not required. |
+| Review computer network unavailable | The core demo still works locally from committed code and docs; live network access is not required. |
 | User accidentally triggers live task | Explain guarded flags, task metadata, prompts, safety levels, and the Day47 non-live scope before running anything. |
 
 ## Final Day47 Decision
 
-- Current `main` remains the interview demo baseline.
+- Current `main` remains the portfolio demo baseline.
 - `v0.2.1` tag creation is still deferred.
 - `v0.3` is not started in Day47.
 - Recommended next step after Day47 is either:
-  - Day48 - Demo Asset Packaging / Offline Interview Demo Kit
+  - Day48 - Demo Asset Packaging / Offline Portfolio Demo Kit
   - Day48 - Dashboard Demo Polish and Local Launch Guide
 
 ## Validation Commands and Results
@@ -193,7 +193,7 @@ Day47 start-state commands:
 git status --short --branch
 git pull origin main
 git log --oneline -1
-git switch -c day47-interview-demo-baseline-runbook
+git switch -c day47-portfolio-demo-baseline-runbook
 ```
 
 Observed start-state result:
@@ -201,7 +201,7 @@ Observed start-state result:
 ```text
 main was clean and already up to date with origin/main.
 Latest main commit: e07a747 Merge pull request #33 from Robinlee0929/day46-v021-rc-decision-release-strategy
-Created branch: day47-interview-demo-baseline-runbook
+Created branch: day47-portfolio-demo-baseline-runbook
 ```
 
 Day47 local validation command:
@@ -226,7 +226,7 @@ python network_lab.py --list-tasks
 python dashboard_app.py
 ```
 
-These optional demo commands are local-only from the Day47 perspective. They should not be replaced by live VRRP, live WireGuard, SSH, iperf3, or device configuration workflows during the interview baseline demo.
+These optional demo commands are local-only from the Day47 perspective. They should not be replaced by live VRRP, live WireGuard, SSH, iperf3, or device configuration workflows during the portfolio demo baseline demo.
 
 ## Safety Confirmation
 

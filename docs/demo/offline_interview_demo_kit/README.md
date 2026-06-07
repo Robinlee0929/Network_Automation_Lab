@@ -1,8 +1,8 @@
-# Offline Interview Demo Kit
+# Offline Portfolio Demo Kit
 
-This folder is the Day48 offline interview demo kit for Network Automation Lab.
+This folder is the Day48 offline portfolio demo kit for Network Automation Lab.
 
-Open this file first during an interview. It tells you which documents to show, which local commands are safe, and how to explain the project if GitHub, internet access, routers, switches, VPN, WireGuard peers, iperf3 endpoints, or lab devices are unavailable.
+Open this file first during a portfolio review or offline demo. It tells you which documents to show, which local commands are safe, and how to explain the project if GitHub, internet access, routers, switches, VPN, WireGuard peers, iperf3 endpoints, or lab devices are unavailable.
 
 ## What To Open First
 
@@ -17,7 +17,7 @@ Recommended open order:
 
 ## Offline Demo Boundary
 
-The interview demo can run without:
+The portfolio demo can run without:
 
 - GitHub.
 - Internet access.
@@ -34,4 +34,4 @@ The demo is based on committed source code, committed documentation, local tests
 - Day47 runbook: `docs/roadmap/day47_interview_demo_baseline_final_check_runbook.md`
 - Day48 roadmap: `docs/roadmap/day48_demo_asset_packaging_offline_interview_demo_kit.md`
 
-Day47 defines the safe interview baseline. Day48 packages that baseline into an offline demo kit.
+Day47 defines the safe portfolio demo baseline. Day48 packages that baseline into an offline demo kit.

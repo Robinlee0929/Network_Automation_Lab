@@ -2,14 +2,14 @@
 
 ## Purpose
 
-This document provides a 5 to 10 minute reviewer/interview demo script for the current v0.1 state of Network Automation Lab.
+This document provides a 5 to 10 minute reviewer/portfolio demo script for the current v0.1 state of Network Automation Lab.
 
-The goal is to help a reviewer, interviewer, or technical hiring manager understand what the platform already demonstrates without changing platform behavior, starting live VPN execution, or touching real device configuration.
+The goal is to help a reviewer, demo reviewer, or technical hiring manager understand what the platform already demonstrates without changing platform behavior, starting live VPN execution, or touching real device configuration.
 
 ## Audience
 
 - Reviewer
-- Interviewer
+- Demo reviewer
 - Technical hiring manager
 
 ## Demo Duration
@@ -46,7 +46,7 @@ Keep the demo focused on repository structure, existing report evidence, safe me
 Use these boundaries during the demo:
 
 - Prefer `--list-tasks`, `--report-index`, portfolio docs, and existing report viewer pages.
-- Treat live-device scripts as evidence sources, not as commands to run during an interview unless the lab is prepared and explicit consent is given.
+- Treat live-device scripts as evidence sources, not as commands to run during a portfolio review or offline demo unless the lab is prepared and explicit consent is given.
 - Do not show or open real secret files, exported WireGuard `.conf` files, private keys, or local password-bearing configs.
 - Do not paste secrets into the terminal, README, docs, chat, PRs, screenshots, or reports.
 - Keep generated `reports/`, `exports/`, caches, local configs, and WireGuard config files out of Git.
@@ -168,7 +168,7 @@ Opening:
 
 Safety positioning:
 
-> The important design choice is that the platform separates evidence browsing from live execution. For a portfolio or interview demo, I can show the task catalog, report index, dashboard viewer, and generated evidence without applying device-changing commands or exposing secrets.
+> The important design choice is that the platform separates evidence browsing from live execution. For a portfolio or portfolio demo, I can show the task catalog, report index, dashboard viewer, and generated evidence without applying device-changing commands or exposing secrets.
 
 Runner walkthrough:
 

@@ -340,7 +340,7 @@ def test_home_summary_includes_vrrp_evidence_card(tmp_path):
     assert card["status"] == "PASS"
 
 
-def test_dashboard_home_is_interview_landing_page(tmp_path):
+def test_dashboard_home_is_portfolio_demo_landing_page(tmp_path):
     if dashboard.Flask is None:
         pytest.skip("Flask is not installed in this test environment.")
 
@@ -353,7 +353,7 @@ def test_dashboard_home_is_interview_landing_page(tmp_path):
 
     assert response.status_code == 200
     text = response.data.decode("utf-8")
-    assert "Network Automation Lab - Interview Demo" in text
+    assert "Network Automation Lab - Portfolio Demo" in text
     assert "READY WITH NOTES" in text
     assert "This demo does not require live router access" in text
     assert "Unified Runner" in text
