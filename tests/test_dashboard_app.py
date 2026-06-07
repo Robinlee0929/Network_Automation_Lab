@@ -185,10 +185,10 @@ def test_ai_review_checklist_contains_wireguard_vpn_safety_items():
     assert "shell=False" in text
 
 
-def test_ai_intent_reviewer_references_day57_to_day60():
+def test_ai_intent_reviewer_references_day57_to_day62():
     references = dashboard.ai_intent_reviewer_references()
 
-    assert [item.day for item in references] == ["Day57", "Day58", "Day59", "Day60"]
+    assert [item.day for item in references] == ["Day57", "Day58", "Day59", "Day60", "Day62"]
     text = " ".join(
         f"{item.title} {item.summary} {item.doc_path} {item.roadmap_path} "
         f"{' '.join(item.report_paths)}"
@@ -198,8 +198,11 @@ def test_ai_intent_reviewer_references_day57_to_day60():
     assert "Safety review gate" in text
     assert "Intent policy matrix" in text
     assert "Reviewer walkthrough" in text
+    assert "Scenario pack / sample cases" in text
     assert "docs/ai/day57_intent_mapping_prototype.md" in text
     assert "reports/portfolio/day60_intent_workflow_demo.html" in text
+    assert "docs/ai/intent_reviewer_scenario_pack.md" in text
+    assert "docs/roadmap/day62_ai_intent_reviewer_scenario_pack.md" in text
 
 
 def test_ai_intent_reviewer_safety_boundaries_are_report_only():
@@ -212,6 +215,7 @@ def test_ai_intent_reviewer_safety_boundaries_are_report_only():
     assert "No SSH sessions" in text
     assert "No config.json requirement" in text
     assert "No NAT, IP, VRRP, WireGuard, firewall, interface, route, or device configuration changes" in text
+    assert "No automatic execution of mapped tasks from scenario examples" in text
 
 
 def day12_report(private_key_line="PrivateKey = REDACTED"):
@@ -394,7 +398,7 @@ def test_dashboard_home_is_portfolio_demo_landing_page(tmp_path):
     assert "/ai-intent-reviewer" in text
 
 
-def test_ai_intent_reviewer_route_exposes_day57_to_day60_without_execution(tmp_path):
+def test_ai_intent_reviewer_route_exposes_day57_to_day62_without_execution(tmp_path):
     if dashboard.Flask is None:
         pytest.skip("Flask is not installed in this test environment.")
 
@@ -412,15 +416,22 @@ def test_ai_intent_reviewer_route_exposes_day57_to_day60_without_execution(tmp_p
     assert "Day58" in text
     assert "Day59" in text
     assert "Day60" in text
+    assert "Day62" in text
     assert "docs/ai/day57_intent_mapping_prototype.md" in text
     assert "reports/portfolio/day60_intent_workflow_demo.html" in text
+    assert "docs/ai/intent_reviewer_scenario_pack.md" in text
+    assert "docs/roadmap/day62_ai_intent_reviewer_scenario_pack.md" in text
+    assert "Scenario Pack" in text
     assert "This page is report-only" in text
     assert "No OpenAI API calls" in text
     assert "No voice input" in text
     assert "No mapped runner task execution" in text
     assert "No SSH sessions" in text
     assert "No config.json requirement" in text
+    assert "No automatic execution of mapped tasks from scenario examples" in text
     assert "No mapped task was executed. This is a dry-run reviewer walkthrough only." in text
+    assert "<form" not in text
+    assert "action runner" not in text.lower()
 
 
 def test_dashboard_reports_route_exposes_vrrp_evidence_group(tmp_path):
