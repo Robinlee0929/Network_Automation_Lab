@@ -14,7 +14,7 @@ The `v0.2` tag already exists at commit:
 f4fd4d5a33d6847d40baac87ae4ed285e56dea6a
 ```
 
-Day43 verified the `v0.2` tag as an interview/demo baseline and found one pytest failure from a fresh checkout:
+Day43 verified the `v0.2` tag as a portfolio demo baseline and found one pytest failure from a fresh checkout:
 
 ```text
 tests/test_day12_wireguard_vpn_automation.py::test_existing_peer_is_not_removed_in_default_mode
@@ -50,7 +50,7 @@ Day44 and Day45 are patch/release-verification work. They do not add a new featu
 
 ### Do Not Create v0.2.1 Now
 
-This option keeps current `main` as the interview demo baseline and defers the patch tag unless a formal corrected release artifact is required.
+This option keeps current `main` as the portfolio demo baseline and defers the patch tag unless a formal corrected release artifact is required.
 
 This is the recommended option because Day44 fixed the hermetic test issue and Day45 verified the corrected state from a fresh checkout. A new tag is useful only if the project needs to formally publish a fresh-checkout-corrected replacement for the `v0.2` verification result.
 
@@ -58,7 +58,7 @@ This is the recommended option because Day44 fixed the hermetic test issue and D
 
 This option creates a corrected patch release tag after Day44 and Day45.
 
-This is conditional. It is useful if the release process requires an immutable tag that explicitly says the `v0.2` fresh-checkout issue has been corrected. It is not required for normal interview demo use because `main` is already suitable as the corrected baseline.
+This is conditional. It is useful if the release process requires an immutable tag that explicitly says the `v0.2` fresh-checkout issue has been corrected. It is not required for normal portfolio demo use because `main` is already suitable as the corrected baseline.
 
 ### Move Directly to v0.3
 
@@ -78,7 +78,7 @@ This is not recommended. Day44 and Day45 fixed and verified a test hermeticity i
 
 Day46 decision: Defer `v0.2.1` tag creation.
 
-Keep current `main` as the interview demo baseline. Create `v0.2.1` later only if the project needs a formal corrected patch release that clearly communicates the fresh-checkout Day12 issue found after `v0.2` has been fixed.
+Keep current `main` as the portfolio demo baseline. Create `v0.2.1` later only if the project needs a formal corrected patch release that clearly communicates the fresh-checkout Day12 issue found after `v0.2` has been fixed.
 
 Do not move directly to `v0.3` from this work. Day44 and Day45 improve release correctness and verification confidence, but they do not introduce a new feature milestone.
 
@@ -94,7 +94,7 @@ Do not move directly to `v0.3` from this work. Day44 and Day45 improve release c
 ## Version Strategy
 
 - `v0.2` remains the existing HA / VRRP demo-ready release tag at `f4fd4d5`.
-- Current `main` after Day45 is the corrected interview demo baseline.
+- Current `main` after Day45 is the corrected portfolio demo baseline.
 - `v0.2.1` should be created only if a formal patch release is needed to publish a clean fresh-checkout-corrected tag.
 - `v0.3` should wait for a feature-level milestone, not a patch verification chain.
 - Release notes should distinguish immutable historical tags from the current corrected branch state.
@@ -131,4 +131,4 @@ Recommended Day47 direction: define the next feature-level `v0.3` candidate scop
 
 Day46 decision: Defer `v0.2.1` tag creation.
 
-Current `main` is suitable as the interview demo baseline. `v0.2.1` should be created only if the project needs to formally announce that the `v0.2` fresh-checkout test issue has been corrected. Day44 and Day45 are patch-level fixes and verification work, so they do not justify moving directly to `v0.3`.
+Current `main` is suitable as the portfolio demo baseline. `v0.2.1` should be created only if the project needs to formally announce that the `v0.2` fresh-checkout test issue has been corrected. Day44 and Day45 are patch-level fixes and verification work, so they do not justify moving directly to `v0.3`.

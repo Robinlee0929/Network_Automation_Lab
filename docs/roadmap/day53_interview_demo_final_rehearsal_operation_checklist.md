@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Day53 prepares a public-facing portfolio demo workflow for Network Automation Lab. The goal is not to add capability; the goal is to make the existing offline demo easy to run, explain, pause, recover, and close for portfolio reviewers, evaluators, or interview use cases.
+Day53 prepares a public-facing portfolio demo workflow for Network Automation Lab. The goal is not to add capability; the goal is to make the existing offline demo easy to run, explain, pause, recover, and close for portfolio reviewers, evaluators, or portfolio review use cases.
 
 ## Scope
 

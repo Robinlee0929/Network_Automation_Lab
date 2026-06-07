@@ -1,8 +1,8 @@
-# Day43 - v0.2 Release Verification and Interview Demo Baseline
+# Day43 - v0.2 Release Verification and Portfolio Demo Baseline
 
 ## Purpose
 
-Day43 verifies the checked-out `v0.2` release tag as an interview/demo baseline.
+Day43 verifies the checked-out `v0.2` release tag as a portfolio demo baseline.
 
 This is verification and documentation only. Day43 does not add product features, runner tasks, dashboard behavior, live workflows, generated evidence fixtures, or device configuration changes.
 
@@ -16,10 +16,10 @@ This is verification and documentation only. Day43 does not add product features
 | Dashboard demo readiness | PASS |
 | Reports index readiness | WARN |
 | Demo flow readiness | PASS |
-| Interview demo baseline | READY WITH NOTES |
+| Portfolio demo baseline | READY WITH NOTES |
 | Safety result | PASS |
 
-Day43 confirms that the `v0.2` tag can be checked out and the local dashboard/demo-flow surfaces are usable for a repository-only interview walkthrough. It does not confirm a fully green release verification run from a fresh tag checkout because the Python regression suite has one failing test and the report index is incomplete when ignored report artifacts are absent.
+Day43 confirms that the `v0.2` tag can be checked out and the local dashboard/demo-flow surfaces are usable for a repository-only portfolio walkthrough. It does not confirm a fully green release verification run from a fresh tag checkout because the Python regression suite has one failing test and the report index is incomplete when ignored report artifacts are absent.
 
 ## Source Tag
 
@@ -158,11 +158,11 @@ Root cause classification:
 | Worktree path assumptions | No | The failure is not caused by path layout; it is caused by absent local config values. |
 | Stale v0.2 test expectation | Yes | The v0.2 test assumes host and username are available from local environment/config instead of making the test self-contained. |
 | Environment difference | Yes | The Day43 branch had ignored local `config.json`; the fresh `v0.2` worktree did not. |
-| Real release defect | Partial | This is a real release verification/test hermeticity defect, but not a live-device or interview-demo runtime defect. |
+| Real release defect | Partial | This is a real release verification/test hermeticity defect, but not a live-device or portfolio-demo runtime defect. |
 
 Recommended action: fix on `main` in a later non-live test-only change by making the test self-contained. The lowest-risk fix is to provide `--router-host` and `--router-username` in the test or monkeypatch `load_default_router_config()` so the expected `recreate_peer` default is tested without depending on ignored local files.
 
-`v0.2.1` recommendation: not required for the interview demo baseline. Create `v0.2.1` only if the release policy requires an immutable tag with a fully green fresh-checkout pytest result.
+`v0.2.1` recommendation: not required for the portfolio demo baseline. Create `v0.2.1` only if the release policy requires an immutable tag with a fully green fresh-checkout pytest result.
 
 ### Dashboard Readiness
 
@@ -216,7 +216,7 @@ Classification: WARN.
 
 Reason: the command runs locally and writes the expected latest overview paths, but the fresh tag checkout has no committed `reports/` evidence. `reports/` is ignored by `.gitignore`, and `git ls-files reports` returned no tracked report files. The index therefore reports missing evidence, including required Day4 baseline reports.
 
-This is explainable for an interview demo if the presenter states that live/generated evidence is intentionally ignored and must be regenerated or supplied from the local lab evidence archive. It is not a clean all-green release verification result.
+This is explainable for a portfolio demo if the presenter states that live/generated evidence is intentionally ignored and must be regenerated or supplied from the local lab evidence archive. It is not a clean all-green release verification result.
 
 ### Demo Flow Readiness
 
@@ -261,11 +261,11 @@ These generated files are not committed. `reports/` is ignored by `.gitignore`, 
 - The dashboard is ready for local route smoke testing, but generated report content depends on ignored local report artifacts.
 - Day43 did not regenerate live evidence and did not run any live network or device command.
 
-## Interview Demo Baseline Recommendation
+## Portfolio Demo Baseline Recommendation
 
 Recommendation: READY WITH NOTES.
 
-Use `v0.2` for an interview demo only as a repository-only, safety-first walkthrough:
+Use `v0.2` for a portfolio demo only as a repository-only, safety-first walkthrough:
 
 - Open README and v0.2 release docs.
 - Show the HA / VRRP topology and safety model.
@@ -273,7 +273,7 @@ Use `v0.2` for an interview demo only as a repository-only, safety-first walkthr
 - Run or show `python network_lab.py --task demo-flow`.
 - Explain that live/generated report artifacts are intentionally ignored and may be absent from a fresh checkout.
 - Do not claim that the fresh `v0.2` tag has a fully passing regression suite until the Day12 non-interactive config test is made self-contained in a later change.
-- Do not create `v0.2.1` solely for the interview demo unless the release standard requires a fresh-checkout all-green test tag.
+- Do not create `v0.2.1` solely for the portfolio demo unless the release standard requires a fresh-checkout all-green test tag.
 
 ## Safety Confirmation
 

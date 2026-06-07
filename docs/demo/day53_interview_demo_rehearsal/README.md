@@ -1,6 +1,6 @@
 # Day53 Portfolio Demo Rehearsal
 
-This folder contains the final Day53 portfolio demo rehearsal materials for Network Automation Lab. Use it before a public project review, portfolio walkthrough, or interview to keep the demo short, safe, and repeatable.
+This folder contains the final Day53 portfolio demo rehearsal materials for Network Automation Lab. Use it before a public project review, portfolio walkthrough, or optional interview setting to keep the demo short, safe, and repeatable.
 
 ## Files
 

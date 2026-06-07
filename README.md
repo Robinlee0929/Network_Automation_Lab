@@ -46,17 +46,18 @@ The v0.1 portfolio package covers Day 1 through Day 30 post-tag verification. Th
 - Day 40 v0.2 Demo Readiness Review and Scope Lock
 - Day 41 v0.2 Release Packaging
 - Day 42 v0.2 Release Tag Preparation
-- Day 43 v0.2 Release Verification and Interview Demo Baseline
+- Day 43 v0.2 Release Verification and Portfolio Demo Baseline
 - Day 44 Hermetic Test Fix for v0.2 Release Verification
 - Day 45 Post-Day44 Fresh Checkout Verification
 - Day 46 v0.2.1 Release Candidate Decision and Post-Fix Release Strategy
-- Day 47 Interview Demo Baseline Final Check and Demo Operation Runbook
-- Day 48 Demo Asset Packaging and Offline Interview Demo Kit
-- Day 49 Offline Demo Verification and Interview Dry Run
-- Day 50 Dashboard Demo Polish and Interview Landing Page
-- Day 51 Interview Demo Visual QA and Screenshot Capture
+- Day 47 Portfolio Demo Baseline Final Check and Demo Operation Runbook
+- Day 48 Demo Asset Packaging and Offline Portfolio Demo Kit
+- Day 49 Offline Demo Verification and Portfolio Demo Dry Run
+- Day 50 Dashboard Demo Polish and Portfolio Demo Landing Page
+- Day 51 Portfolio Demo Visual QA and Screenshot Capture
 - Day 52 Offline Demo Screenshot Capture and Demo Package Final Assembly
 - Day 53 Portfolio Demo Final Rehearsal and Operation Checklist
+- Day 54 Public-Facing Portfolio Demo Wording Audit
 
 The project is designed as a practical QA Automation / SDET portfolio project for network infrastructure. It focuses on repeatable validation, structured test evidence, and readable JSON / HTML reports rather than one-off manual checks.
 
@@ -137,17 +138,18 @@ Cisco validation is read-only. It runs show commands for topology evidence and d
 | Day 40 | v0.2 demo readiness review and scope lock; report-only with no live test, SSH, or configuration change | Complete |
 | Day 41 | v0.2 release packaging; documentation/report-only with no live test, SSH, configuration change, voice/AI implementation, or tag creation | Complete |
 | Day 42 | v0.2 release tag preparation and annotated tag creation; release validation only with no live test, SSH, or device configuration change | Complete |
-| Day 43 | v0.2 release verification and interview demo baseline; tag checkout and offline smoke verification only with no live test, SSH, or device configuration change | Complete with notes |
+| Day 43 | v0.2 release verification and portfolio demo baseline; tag checkout and offline smoke verification only with no live test, SSH, or device configuration change | Complete with notes |
 | Day 44 | Hermetic Day12 test fix for the v0.2 release verification issue; removes hidden dependency on ignored local config.json; non-live test-only fix | Complete |
 | Day 45 | Post-Day44 fresh checkout verification of remote main; confirms Day12 hermetic fix and full pytest pass without ignored local config.json; non-live verification only | Complete |
-| Day 46 | v0.2.1 release candidate decision and post-fix release strategy; recommends deferring patch tag creation while using main as the interview demo baseline | Complete |
-| Day 47 | Interview demo baseline final check and operation runbook; documentation/report-only/local validation with no v0.2.1 tag creation and no v0.3 feature work | Complete |
-| Day 48 | Demo asset packaging and offline interview demo kit; can be shown without GitHub, internet, live devices, SSH, VPN, WireGuard, or lab access | Complete |
-| Day 49 | Offline demo verification and interview dry run; verifies the Day48 kit, dashboard/report paths, safe commands, talk track, and fallbacks with no live device dependency | Ready with notes |
-| Day 50 | Dashboard interview landing page polish; improves `/` with demo status, proof points, quick links, safety boundary, and 3-5 minute flow without live test or runner behavior changes | Ready with notes |
-| Day 51 | Interview demo visual QA and screenshot capture planning; checks `/`, `/reports`, `/commands`, and `/ai-checklist`, documents screenshot guidance and demo sequence, and confirms safety boundaries without live device access | Ready with notes |
-| Day 52 | Offline demo screenshot capture and demo package final assembly; captures local dashboard screenshots and packages interview usage guidance with no live device dependency | Ready with notes |
+| Day 46 | v0.2.1 release candidate decision and post-fix release strategy; recommends deferring patch tag creation while using main as the portfolio demo baseline | Complete |
+| Day 47 | Portfolio demo baseline final check and operation runbook; documentation/report-only/local validation with no v0.2.1 tag creation and no v0.3 feature work | Complete |
+| Day 48 | Demo asset packaging and offline portfolio demo kit; can be shown without GitHub, internet, live devices, SSH, VPN, WireGuard, or lab access | Complete |
+| Day 49 | Offline demo verification and portfolio demo dry run; verifies the Day48 kit, dashboard/report paths, safe commands, talk track, and fallbacks with no live device dependency | Ready with notes |
+| Day 50 | Dashboard portfolio demo landing page polish; improves `/` with demo status, proof points, quick links, safety boundary, and 3-5 minute flow without live test or runner behavior changes | Ready with notes |
+| Day 51 | Portfolio demo visual QA and screenshot capture planning; checks `/`, `/reports`, `/commands`, and `/ai-checklist`, documents screenshot guidance and demo sequence, and confirms safety boundaries without live device access | Ready with notes |
+| Day 52 | Offline demo screenshot capture and demo package final assembly; captures local dashboard screenshots and packages portfolio review usage guidance with no live device dependency | Ready with notes |
 | Day 53 | Portfolio demo final rehearsal and operation checklist; documentation-only and rehearsal-only with no new features, no live tests, and no `v0.3` work | Ready with notes |
+| Day 54 | Public-facing portfolio demo wording audit; updates README, docs, and templates so public review language leads with portfolio/offline/project demo framing while preserving historical paths | Ready with notes |
 
 ## Lab Topology
 
@@ -1499,9 +1501,9 @@ docs/roadmap/day42_v0.2_release_tag_preparation.md
 
 v0.2 represents the demo-ready Network Automation Platform package for the HA / VRRP milestone.
 
-## Day43 - v0.2 Release Verification and Interview Demo Baseline
+## Day43 - v0.2 Release Verification and Portfolio Demo Baseline
 
-Purpose: verify that the `v0.2` tag can be checked out and used as a repository-only interview/demo baseline without adding new features or touching devices.
+Purpose: verify that the `v0.2` tag can be checked out and used as a repository-only portfolio demo baseline without adding new features or touching devices.
 
 Scope: Day43 is release verification and documentation only. It uses a temporary Git worktree, local Python tests, report-index generation, demo-flow generation, and Flask test-client route checks for `/` and `/reports`.
 
@@ -1513,7 +1515,7 @@ Verification note:
 docs/roadmap/day43_v0.2_release_verification_interview_demo_baseline.md
 ```
 
-Day43 result: the `v0.2` checkout and local dashboard/demo-flow paths are usable for an interview demo with notes, but the fresh tag checkout is not a fully green release verification because one Day12 non-interactive config test fails and the ignored `reports/` evidence is absent.
+Day43 result: the `v0.2` checkout and local dashboard/demo-flow paths are usable for a portfolio demo with notes, but the fresh tag checkout is not a fully green release verification because one Day12 non-interactive config test fails and the ignored `reports/` evidence is absent.
 
 ## Day44 - Hermetic Test Fix for v0.2 Release Verification
 
@@ -1551,7 +1553,7 @@ Purpose: decide whether to create a `v0.2.1` tag after the Day44 hermetic test f
 
 Scope: Day46 is documentation-only release strategy work. It creates no tag, no GitHub release, no live test, no SSH session, no `config.json`, and no router, switch, firewall, NAT, IP, VRRP, WireGuard, interface, or route configuration change.
 
-Decision: defer `v0.2.1` tag creation. Current `main` is suitable as the interview demo baseline, and `v0.2.1` should be created later only if a formal corrected patch release is required. Moving directly to `v0.3` is not recommended because Day44 and Day45 were patch-level fixes and verification work, not feature-level scope.
+Decision: defer `v0.2.1` tag creation. Current `main` is suitable as the portfolio demo baseline, and `v0.2.1` should be created later only if a formal corrected patch release is required. Moving directly to `v0.3` is not recommended because Day44 and Day45 were patch-level fixes and verification work, not feature-level scope.
 
 Roadmap note:
 
@@ -1561,7 +1563,7 @@ docs/roadmap/day46_v021_release_candidate_decision_post_fix_release_strategy.md
 
 ## Portfolio Demo
 
-v0.1 includes reviewer/interview demo scripts for presenting the current platform safely without adding features, changing runner/dashboard behavior, or running live device-changing workflows:
+v0.1 includes reviewer/portfolio demo scripts for presenting the current platform safely without adding features, changing runner/dashboard behavior, or running live device-changing workflows:
 
 ```text
 docs/portfolio_demo_script.md
@@ -1789,7 +1791,7 @@ Day42 v0.2 release tag preparation:
 docs/roadmap/day42_v0.2_release_tag_preparation.md
 ```
 
-Day43 v0.2 release verification and interview demo baseline:
+Day43 v0.2 release verification and portfolio demo baseline:
 
 ```text
 docs/roadmap/day43_v0.2_release_verification_interview_demo_baseline.md
@@ -1813,47 +1815,47 @@ Day46 v0.2.1 release candidate decision and post-fix release strategy:
 docs/roadmap/day46_v021_release_candidate_decision_post_fix_release_strategy.md
 ```
 
-Day47 interview demo baseline final check and operation runbook:
+Day47 portfolio demo baseline final check and operation runbook:
 
 ```text
 docs/roadmap/day47_interview_demo_baseline_final_check_runbook.md
 ```
 
-Day47 result: current `main` remains the interview demo baseline. No `v0.2.1` tag was created, no `v0.3` feature work was started, and Day47 stayed documentation/report-only/local-validation only. Validation result: `python -m pytest` completed with `487 passed, 1 warning`.
+Day47 result: current `main` remains the portfolio demo baseline. No `v0.2.1` tag was created, no `v0.3` feature work was started, and Day47 stayed documentation/report-only/local-validation only. Validation result: `python -m pytest` completed with `487 passed, 1 warning`.
 
-Day48 offline interview demo kit:
+Day48 offline portfolio demo kit:
 
 ```text
 docs/demo/offline_interview_demo_kit/
 docs/roadmap/day48_demo_asset_packaging_offline_interview_demo_kit.md
 ```
 
-Day48 created a portable offline interview demo kit that can be shown without GitHub, internet access, live routers, switches, VPN, WireGuard peers, SSH, or lab devices. It includes a README, checklist, PowerShell-friendly safe commands, troubleshooting guide, Traditional Chinese talk track, no-live-dependency statement, and optional screenshot backup plan.
+Day48 created a portable offline portfolio demo kit that can be shown without GitHub, internet access, live routers, switches, VPN, WireGuard peers, SSH, or lab devices. It includes a README, checklist, PowerShell-friendly safe commands, troubleshooting guide, Traditional Chinese talk track, no-live-dependency statement, and optional screenshot backup plan.
 
-Day49 offline demo verification and interview dry run:
+Day49 offline demo verification and portfolio demo dry run:
 
 ```text
 docs/roadmap/day49_offline_demo_verification_interview_dry_run.md
 ```
 
-Day49 verified the Day48 offline interview demo kit as usable for a 3-5 minute interview walkthrough. It confirms the dashboard/report explanation path, safe offline commands, Traditional Chinese talk track, and fallback explanations without requiring live routers, switches, SSH, VPN, WireGuard, VRRP, iperf3, internet access, or `config.json`.
+Day49 verified the Day48 offline portfolio demo kit as usable for a 3-5 minute portfolio walkthrough. It confirms the dashboard/report explanation path, safe offline commands, Traditional Chinese talk track, and fallback explanations without requiring live routers, switches, SSH, VPN, WireGuard, VRRP, iperf3, internet access, or `config.json`.
 
-Day50 dashboard demo polish and interview landing page:
+Day50 dashboard demo polish and portfolio demo landing page:
 
 ```text
 docs/roadmap/day50_dashboard_demo_polish_interview_landing_page.md
 ```
 
-Day50 updates the dashboard `/` route into an interview-friendly landing page for `Network Automation Lab - Interview Demo`. It presents `READY WITH NOTES`, core proof points, a 3-5 minute demo flow, quick links to Reports, Commands, AI Checklist, and the offline demo kit, plus a clear safety boundary: the demo does not require live router access and live tests are separated from report-only and read-only tasks. Day50 does not change runner behavior, create `v0.2.1`, start `v0.3`, run live network tests, use SSH, or depend on `config.json`.
+Day50 updates the dashboard `/` route into a portfolio-review-friendly landing page for `Network Automation Lab - Portfolio Demo`. It presents `READY WITH NOTES`, core proof points, a 3-5 minute demo flow, quick links to Reports, Commands, AI Checklist, and the offline demo kit, plus a clear safety boundary: the demo does not require live router access and live tests are separated from report-only and read-only tasks. Day50 does not change runner behavior, create `v0.2.1`, start `v0.3`, run live network tests, use SSH, or depend on `config.json`.
 
-Day51 interview demo visual QA and screenshot capture planning:
+Day51 portfolio demo visual QA and screenshot capture planning:
 
 ```text
 docs/roadmap/day51_interview_demo_visual_qa_screenshot_capture.md
 docs/demo/day51_visual_qa_screenshots/README.md
 ```
 
-Day51 checks the dashboard pages `/`, `/reports`, `/commands`, and `/ai-checklist` from an interview-demo UX perspective. It records a page-by-page visual QA checklist, screenshot capture checklist, suggested file names, interview demo sequence, and page-level talk track. Validation result: `python -m pytest` completed with `488 passed, 1 warning`; `report-index` returned WARN with `fail=0` because optional local generated reports were missing; localhost route smoke checks passed for `/`, `/reports`, `/commands`, and `/ai-checklist`. Safety result: no live tests, no SSH, no device connections, no `config.json` changes, no NAT/IP/VRRP/WireGuard/firewall/interface/route/device configuration changes, no `v0.2.1` tag, and no `v0.3` work.
+Day51 checks the dashboard pages `/`, `/reports`, `/commands`, and `/ai-checklist` from a portfolio-demo UX perspective. It records a page-by-page visual QA checklist, screenshot capture checklist, suggested file names, portfolio demo sequence, and page-level talk track. Validation result: `python -m pytest` completed with `488 passed, 1 warning`; `report-index` returned WARN with `fail=0` because optional local generated reports were missing; localhost route smoke checks passed for `/`, `/reports`, `/commands`, and `/ai-checklist`. Safety result: no live tests, no SSH, no device connections, no `config.json` changes, no NAT/IP/VRRP/WireGuard/firewall/interface/route/device configuration changes, no `v0.2.1` tag, and no `v0.3` work.
 
 Day52 offline demo screenshot package:
 
@@ -1864,7 +1866,7 @@ docs/demo/day52_offline_demo_package/interview_demo_folder_usage_guide.md
 docs/demo/day52_offline_demo_package/screenshots/
 ```
 
-Day52 captures real local dashboard screenshots for `/`, `/reports`, `/commands`, and `/ai-checklist`, then packages them with an interview demo folder usage guide. It remains offline-demo only: no live tests, no SSH, no device access, no `config.json` dependency or modification, no NAT/IP/VRRP/WireGuard/firewall/interface/route/device configuration changes, no `v0.3` work, and no release tag.
+Day52 captures real local dashboard screenshots for `/`, `/reports`, `/commands`, and `/ai-checklist`, then packages them with a portfolio demo folder usage guide. It remains offline-demo only: no live tests, no SSH, no device access, no `config.json` dependency or modification, no NAT/IP/VRRP/WireGuard/firewall/interface/route/device configuration changes, no `v0.3` work, and no release tag.
 
 Day53 portfolio demo final rehearsal and operation checklist:
 
@@ -1874,6 +1876,14 @@ docs/demo/day53_interview_demo_rehearsal/
 ```
 
 Day53 prepares a public-facing portfolio demo workflow for Network Automation Lab with a Traditional Chinese opening script, 3-5 minute operation sequence, reviewer Q&A, and final checklist. It is documentation-only and rehearsal-only: no new features, no live tests, no SSH, no device access, no `config.json` dependency or modification, no NAT/IP/VRRP/WireGuard/firewall/interface/route/device configuration changes, no release tag, and no `v0.3` work.
+
+Day54 public-facing portfolio demo wording audit:
+
+```text
+docs/roadmap/day54_public_facing_portfolio_demo_wording_audit.md
+```
+
+Day54 audits `README.md`, `docs/`, and `templates/` for older private interview-oriented wording and updates public-facing prose toward portfolio demo, offline demo, project demo, public project review, demo reviewer, evaluator, demo-ready, and portfolio-ready language. It preserves historical file paths and folder names, performs documentation/template wording cleanup only, and does not change runtime behavior, runner behavior, Flask route logic, network scripts, `config.json`, release tags, or device configuration.
 
 ## Testing Strategy
 
@@ -1919,17 +1929,18 @@ For documentation-only review passes, run `python -m pytest` before sharing the 
 - Includes Day40 v0.2 demo readiness review and scope lock without adding live tests, SSH, or device configuration changes.
 - Includes Day41 v0.2 release packaging docs and report-only handoff while leaving `v0.2` tag creation for Day42.
 - Includes Day42 v0.2 annotated release tag preparation and creation as release validation only, with no live test, SSH, or device configuration changes.
-- Includes Day43 v0.2 release verification and interview demo baseline notes from a temporary tag checkout, with no live test, SSH, or device configuration changes.
+- Includes Day43 v0.2 release verification and portfolio demo baseline notes from a temporary tag checkout, with no live test, SSH, or device configuration changes.
 - Includes Day44 hermetic Day12 test fix for v0.2 release verification, removing the ignored local `config.json` dependency as a non-live test-only fix.
 - Includes Day45 post-Day44 fresh checkout verification showing Day12 and the full suite pass on remote `main` without ignored local `config.json`.
-- Includes Day46 release strategy notes recommending deferred `v0.2.1` tag creation while keeping current `main` as the interview demo baseline.
-- Includes Day47 interview demo baseline runbook for safe local interview operation, with no patch tag creation, no `v0.3` work, and no live device dependency.
-- Includes Day48 offline interview demo kit under `docs/demo/offline_interview_demo_kit/` with no GitHub, internet, live device, SSH, VPN, WireGuard, or lab dependency.
-- Includes Day49 offline demo verification confirming the Day48 kit is interview-ready with notes, while remaining offline-only with no live device dependency.
-- Includes Day50 dashboard interview landing page polish so the project value, demo status, proof points, safe links, and no-live-router boundary are visible as soon as the dashboard opens.
-- Includes Day51 dashboard visual QA and screenshot capture planning for `/`, `/reports`, `/commands`, and `/ai-checklist`, with interview talk track and no-live-device safety confirmation.
-- Includes Day52 offline demo screenshot package with committed dashboard PNGs, package README, and interview usage guide for safe offline review.
+- Includes Day46 release strategy notes recommending deferred `v0.2.1` tag creation while keeping current `main` as the portfolio demo baseline.
+- Includes Day47 portfolio demo baseline runbook for safe local portfolio demo operation, with no patch tag creation, no `v0.3` work, and no live device dependency.
+- Includes Day48 offline portfolio demo kit under `docs/demo/offline_interview_demo_kit/` with no GitHub, internet, live device, SSH, VPN, WireGuard, or lab dependency.
+- Includes Day49 offline demo verification confirming the Day48 kit is portfolio-ready with notes, while remaining offline-only with no live device dependency.
+- Includes Day50 dashboard portfolio demo landing page polish so the project value, demo status, proof points, safe links, and no-live-router boundary are visible as soon as the dashboard opens.
+- Includes Day51 dashboard visual QA and screenshot capture planning for `/`, `/reports`, `/commands`, and `/ai-checklist`, with portfolio demo talk track and no-live-device safety confirmation.
+- Includes Day52 offline demo screenshot package with committed dashboard PNGs, package README, and portfolio review usage guide for safe offline review.
 - Includes Day53 final portfolio demo rehearsal materials with a Traditional Chinese opening script, 3-5 minute operation sequence, reviewer Q&A, and safety-focused operation checklist.
+- Includes Day54 public-facing wording cleanup so README, docs, and templates lead with portfolio/offline/project demo review language while preserving historical paths.
 
 ## Roadmap
 
@@ -1941,4 +1952,4 @@ Planned future directions:
 - Syslog / packet capture analysis
 - v3.0 Voice + AI Network Test Assistant / AI-assisted Network Test Orchestration as future roadmap only
 
-v0.1 is packaged through Day29 and locally verified through Day30 as a portfolio release. Day42 creates the annotated `v0.2` release tag for the demo-ready Network Automation Platform package after Day41 release packaging, Day43 records the post-tag interview/demo baseline with notes from a fresh checkout, Day44 fixes the Day12 hermetic test dependency found during that verification, Day45 confirms the fix from a fresh `origin/main` checkout without ignored local `config.json`, Day46 recommends deferring `v0.2.1` unless a formal corrected patch release is required, Day47 finalizes the current `main` branch as the safe interview demo operation baseline, Day48 packages the offline interview demo kit at `docs/demo/offline_interview_demo_kit/`, Day49 verifies that kit for an offline-only interview dry run with no live device dependency, Day50 polishes the dashboard home page into the interview landing page without live tests or runner behavior changes, Day51 records dashboard visual QA plus screenshot capture planning for interview use, Day52 commits the offline dashboard screenshot package and interview usage guide, and Day53 documents the final public-facing portfolio demo rehearsal and operation checklist without adding features or starting `v0.3`. Future work should stay explicit about whether it is report-only, read-only, dry-run, guarded-live, or disabled before adding new live lab behavior.
+v0.1 is packaged through Day29 and locally verified through Day30 as a portfolio release. Day42 creates the annotated `v0.2` release tag for the demo-ready Network Automation Platform package after Day41 release packaging, Day43 records the post-tag portfolio demo baseline with notes from a fresh checkout, Day44 fixes the Day12 hermetic test dependency found during that verification, Day45 confirms the fix from a fresh `origin/main` checkout without ignored local `config.json`, Day46 recommends deferring `v0.2.1` unless a formal corrected patch release is required, Day47 finalizes the current `main` branch as the safe portfolio demo operation baseline, Day48 packages the offline portfolio demo kit at `docs/demo/offline_interview_demo_kit/`, Day49 verifies that kit for an offline-only portfolio demo dry run with no live device dependency, Day50 polishes the dashboard home page into the portfolio demo landing page without live tests or runner behavior changes, Day51 records dashboard visual QA plus screenshot capture planning for portfolio review use, Day52 commits the offline dashboard screenshot package and portfolio review usage guide, Day53 documents the final public-facing portfolio demo rehearsal and operation checklist, and Day54 audits public-facing wording so portfolio/offline/project demo language is primary without renaming historical paths or starting `v0.3`. Future work should stay explicit about whether it is report-only, read-only, dry-run, guarded-live, or disabled before adding new live lab behavior.

@@ -79,7 +79,7 @@ Treat these as planning evidence for v0.2:
 | Read-only network state collector | Add a broader read-only collector for device identity, interfaces, VRRP, routes, bridges, and health signals | Strong operational value without configuration changes | Low to medium, depending on command allowlist design | High |
 | Safer semi-automated failover workflow | Improve operator-guided failover steps, prompts, countdowns, and evidence capture without automatic destructive actions | Better repeatability for future demos | Medium, because it touches live observation workflows | Medium |
 | Portfolio demo package for v0.2 | Package HA / VRRP topology, safety model, report screenshots, evidence notes, and demo script into a reviewer path | High portfolio value and low device risk | Low | High |
-| AI-assisted report summary using existing reports only | Summarize existing JSON/HTML reports without running new tests or collecting new device state | Useful for narrative reporting and interview demos | Medium, because summaries must avoid inventing evidence | Medium |
+| AI-assisted report summary using existing reports only | Summarize existing JSON/HTML reports without running new tests or collecting new device state | Useful for narrative reporting and portfolio demos | Medium, because summaries must avoid inventing evidence | Medium |
 
 ## Recommended v0.2 Scope
 

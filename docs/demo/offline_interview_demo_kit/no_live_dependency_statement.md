@@ -1,6 +1,6 @@
 # No Live Dependency Statement
 
-The Day48 offline interview demo does not require live router or switch access.
+The Day48 offline portfolio demo does not require live router or switch access.
 
 No SSH is required.
 
@@ -12,4 +12,4 @@ The demo does not require GitHub, internet access, VPN, WireGuard peers, iperf3 
 
 Existing committed source code, committed documentation, local tests, local report-index behavior, local dashboard routes, and existing evidence references are enough to demonstrate the architecture and workflow.
 
-Live testing is intentionally separated from the interview demo flow for safety. Live VRRP validation, live WireGuard execution, SSH-based validation, iperf3 performance testing, and device-changing workflows should only be run in a controlled lab environment with explicit operator intent.
+Live testing is intentionally separated from the portfolio demo flow for safety. Live VRRP validation, live WireGuard execution, SSH-based validation, iperf3 performance testing, and device-changing workflows should only be run in a controlled lab environment with explicit operator intent.

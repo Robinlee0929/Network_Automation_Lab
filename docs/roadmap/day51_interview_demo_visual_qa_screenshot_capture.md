@@ -1,8 +1,8 @@
-# Day51 - Interview Demo Visual QA / Screenshot Capture
+# Day51 - Portfolio Demo Visual QA / Screenshot Capture
 
 ## Purpose
 
-Day51 checks the dashboard from the point of view of an interviewer seeing the project for the first time. The goal is to make sure the demo pages explain the project quickly, keep the safety boundary visible, and give a practical screenshot plan for interview prep.
+Day51 checks the dashboard from the point of view of a demo reviewer seeing the project for the first time. The goal is to make sure the demo pages explain the project quickly, keep the safety boundary visible, and give a practical screenshot plan for portfolio demo prep.
 
 Day51 is documentation, visual QA, and local route verification only.
 
@@ -11,9 +11,9 @@ Day51 is documentation, visual QA, and local route verification only.
 - Review the dashboard pages at `/`, `/reports`, `/commands`, and `/ai-checklist`.
 - Confirm the first screen of each page has a clear title and a useful next click.
 - Confirm the wording does not imply that the dashboard directly changes real routers, switches, firewalls, VPN devices, WireGuard peers, or lab topology.
-- Confirm warnings and missing local report notes are explainable in an interview.
+- Confirm warnings and missing local report notes are explainable in a portfolio review.
 - Add screenshot capture guidance for the dashboard pages.
-- Add an interview demo sequence and page-level talk track.
+- Add a portfolio demo sequence and page-level talk track.
 
 ## Non-goals
 
@@ -29,16 +29,16 @@ Day51 is documentation, visual QA, and local route verification only.
 
 ## Page-by-page Visual QA Checklist
 
-| Page | Interview use | Visual QA result |
+| Page | Portfolio review use | Visual QA result |
 | --- | --- | --- |
-| `/` | Use this page to open the demo. It shows the project name, status, proof points, 3-5 minute flow, quick links, and no-live-router boundary. | PASS WITH NOTES. The first screen clearly says `Network Automation Lab - Interview Demo`, shows `READY WITH NOTES`, and explains that optional generated reports can be missing when `fail=0`. |
+| `/` | Use this page to open the demo. It shows the project name, status, proof points, 3-5 minute flow, quick links, and no-live-router boundary. | PASS WITH NOTES. The first screen clearly says `Network Automation Lab - Portfolio Demo`, shows `READY WITH NOTES`, and explains that optional generated reports can be missing when `fail=0`. |
 | `/reports` | Show this page after explaining the safety boundary. It is the evidence browser for generated JSON/HTML reports, VRRP artifacts, and WireGuard summaries. | PASS WITH NOTES. The title is clear, the page says it reads metadata and does not run router/switch/VPN/iperf workflows, and missing local evidence is framed as generated report availability. |
-| `/commands` | Use this page to explain allowlisted local commands and disabled lab workflows. It is useful when the interviewer asks how command safety works. | PASS. The page title says `Safe Command Execution`, states that arbitrary shell input is not accepted, and shows enabled/disabled command state plus recent logs. |
+| `/commands` | Use this page to explain allowlisted local commands and disabled lab workflows. It is useful when the demo reviewer asks how command safety works. | PASS. The page title says `Safe Command Execution`, states that arbitrary shell input is not accepted, and shows enabled/disabled command state plus recent logs. |
 | `/ai-checklist` | Show this page when discussing AI readiness and safety review. This page is optional if time is short. | PASS. The checklist reads like review evidence, not raw AI output, and points to code/dashboard evidence for each safety control. |
 
 ## Screenshot Capture Checklist
 
-Before an interview, retake screenshots from a fresh local dashboard session if possible:
+Before a portfolio review, retake screenshots from a fresh local dashboard session if possible:
 
 1. Start the dashboard locally with `python dashboard_app.py`.
 2. Open `http://127.0.0.1:5000/`.
@@ -52,29 +52,29 @@ Suggested screenshot files:
 
 | File | Route | Use |
 | --- | --- | --- |
-| `01_dashboard_home.png` | `/` | Main interview landing page. Use it to open the demo and establish the safety boundary. |
+| `01_dashboard_home.png` | `/` | Main portfolio demo landing page. Use it to open the demo and establish the safety boundary. |
 | `02_reports_page.png` | `/reports` | Report evidence overview. Use it to show generated evidence and optional missing-report notes. |
 | `03_commands_page.png` | `/commands` | Safe command/reference page. Use it to show allowlisted commands and disabled lab workflows. |
 | `04_ai_checklist_page.png` | `/ai-checklist` | Safety and AI readiness checklist. Use it when discussing guardrails. |
 
-## Suggested Interview Demo Sequence
+## Suggested Portfolio Demo Sequence
 
 1. Open `/` and spend 30-45 seconds on the project purpose, demo status, and no-live-router boundary.
 2. Open `/reports` and show how generated evidence is discoverable without starting live workflows.
 3. Open `/commands` and point out that commands are allowlisted, logged, timed, and not arbitrary shell input.
-4. Open `/ai-checklist` if the interviewer asks about AI, safety, or command review.
-5. Close by explaining that live lab work exists in guarded/read-only/dry-run lanes, but this interview path is safe to run without lab access.
+4. Open `/ai-checklist` if the demo reviewer asks about AI, safety, or command review.
+5. Close by explaining that live lab work exists in guarded/read-only/dry-run lanes, but this portfolio demo path is safe to run without lab access.
 
 ## UX Notes From A User Perspective
 
-- The home page gives a good first impression for an interview because it names the project and tells the viewer what to click next.
+- The home page gives a good first impression for a portfolio review because it names the project and tells the viewer what to click next.
 - The `READY WITH NOTES` status is useful because it prevents optional missing local reports from sounding like a broken demo.
 - The Reports page is dense, but the safety sentence near the top helps: it says the page reads report metadata and does not run device workflows.
 - The Commands page is the strongest safety proof for the dashboard because it shows allowlisted command cards, disabled commands, timeouts, and execution logs.
-- The AI Checklist page works best as supporting evidence. Use it when the interviewer asks how AI assistance is kept away from direct device changes.
+- The AI Checklist page works best as supporting evidence. Use it when the demo reviewer asks how AI assistance is kept away from direct device changes.
 - Missing local reports should be explained as generated evidence that is intentionally not always committed.
 
-## What To Say During The Interview
+## What To Say During The Portfolio Demo
 
 ### Home
 
@@ -86,7 +86,7 @@ Suggested screenshot files:
 
 ### Commands
 
-"This page shows the command safety model. The dashboard does not accept arbitrary shell text. Enabled commands are registered, timed, and logged. Lab workflows that need real parameters or devices are not one-click interview actions."
+"This page shows the command safety model. The dashboard does not accept arbitrary shell text. Enabled commands are registered, timed, and logged. Lab workflows that need real parameters or devices are not one-click portfolio demo actions."
 
 ### AI Checklist
 
@@ -121,7 +121,7 @@ Browser note:
 
 Expected route checks:
 
-- `/`: HTTP 200 and contains `Network Automation Lab - Interview Demo`, `READY WITH NOTES`, `Reports`, `Commands`, and `AI Checklist`.
+- `/`: HTTP 200 and contains `Network Automation Lab - Portfolio Demo`, `READY WITH NOTES`, `Reports`, `Commands`, and `AI Checklist`.
 - `/reports`: HTTP 200 and contains `Reports`, `Local evidence browser`, `HA / VRRP Evidence`, and safe read-only wording.
 - `/commands`: HTTP 200 and contains `Safe Command Execution`, `allowlist`, `arbitrary shell input`, and `Execution Logs`.
 - `/ai-checklist`: HTTP 200 and contains `AI Review Checklist`, `Use this page as review evidence`, and command safety evidence.

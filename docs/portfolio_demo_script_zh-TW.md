@@ -2,14 +2,14 @@
 
 ## Purpose
 
-這份文件提供目前 Network Automation Lab v0.1 狀態的 5 到 10 分鐘 reviewer / interview demo script。
+這份文件提供目前 Network Automation Lab v0.1 狀態的 5 到 10 分鐘 reviewer / portfolio demo script。
 
-目標是協助 reviewer、interviewer 或 technical hiring manager 理解這個平台目前已經能展示的能力，同時不改變平台行為、不啟動 live VPN execution，也不碰觸真實設備設定。
+目標是協助 reviewer、demo reviewer 或 technical hiring manager 理解這個平台目前已經能展示的能力，同時不改變平台行為、不啟動 live VPN execution，也不碰觸真實設備設定。
 
 ## Audience
 
 - reviewer
-- interviewer
+- demo reviewer
 - technical hiring manager
 
 ## Demo Duration
@@ -46,7 +46,7 @@
 Demo 時請維持以下 boundaries：
 
 - 優先使用 `--list-tasks`、`--report-index`、portfolio docs，以及既有 report viewer pages。
-- 把 live-device scripts 視為 evidence sources，而不是 interview 中要直接執行的 commands；除非 lab 已準備好，而且已取得明確同意。
+- 把 live-device scripts 視為 evidence sources，而不是 portfolio review 中要直接執行的 commands；除非 lab 已準備好，而且已取得明確同意。
 - 不展示或開啟真實 secret files、exported WireGuard `.conf` files、private keys，或包含本機密碼的 configs。
 - 不把 secrets 貼到 terminal、README、docs、chat、PRs、screenshots 或 reports。
 - 讓 generated `reports/`、`exports/`、caches、local configs 與 WireGuard config files 保持在 Git 之外。
@@ -168,7 +168,7 @@ Opening：
 
 Safety positioning：
 
-> The important design choice is that the platform separates evidence browsing from live execution. For a portfolio or interview demo, I can show the task catalog, report index, dashboard viewer, and generated evidence without applying device-changing commands or exposing secrets.
+> The important design choice is that the platform separates evidence browsing from live execution. For a portfolio or portfolio demo, I can show the task catalog, report index, dashboard viewer, and generated evidence without applying device-changing commands or exposing secrets.
 
 Runner walkthrough：
 

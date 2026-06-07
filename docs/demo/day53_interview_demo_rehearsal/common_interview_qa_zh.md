@@ -2,7 +2,7 @@
 
 ## 為什麼 demo 要 offline？
 
-因為一般作品集展示、專案審查或面試環境不是受控 change window。這個 demo 的目標是展示架構、測試、報告證據、dashboard 和安全邊界，不是現場修改真實設備。Offline/report-only demo 可以避免網路、設備、VPN、SSH、VRRP 或 WireGuard 狀態影響展示，也能避免不必要的 live configuration 風險。
+因為一般作品集展示、專案審查或作品集展示或專案審查環境不是受控 change window。這個 demo 的目標是展示架構、測試、報告證據、dashboard 和安全邊界，不是現場修改真實設備。Offline/report-only demo 可以避免網路、設備、VPN、SSH、VRRP 或 WireGuard 狀態影響展示，也能避免不必要的 live configuration 風險。
 
 ## 為什麼不在 public demo 中做 live VRRP failover？
 

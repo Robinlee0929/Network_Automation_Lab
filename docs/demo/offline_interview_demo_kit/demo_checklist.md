@@ -1,8 +1,8 @@
 # Offline Demo Checklist
 
-Use this checklist before an interview. All commands are local and non-live.
+Use this checklist before a portfolio review. All commands are local and non-live.
 
-## Pre-interview Checks
+## Pre-demo Checks
 
 ```powershell
 git status --short --branch
@@ -46,7 +46,7 @@ Get-ChildItem docs\roadmap\day48_demo_asset_packaging_offline_interview_demo_kit
 Get-Content docs\demo\offline_interview_demo_kit\no_live_dependency_statement.md
 ```
 
-## Interview Go/No-go
+## Portfolio Demo Go/No-go
 
 | Check | Ready condition |
 | --- | --- |

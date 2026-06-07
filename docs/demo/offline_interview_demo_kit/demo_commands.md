@@ -1,6 +1,6 @@
 # Offline Demo Commands
 
-These commands are PowerShell-friendly and safe for an offline interview demo. They are local/report-only commands and must not be replaced with live VRRP, WireGuard, SSH, iperf3, or device configuration workflows.
+These commands are PowerShell-friendly and safe for an offline portfolio demo. They are local/report-only commands and must not be replaced with live VRRP, WireGuard, SSH, iperf3, or device configuration workflows.
 
 ## Check Repository State
 
@@ -85,9 +85,9 @@ Get-ChildItem docs\demo\offline_interview_demo_kit
 Get-ChildItem docs\demo\offline_interview_demo_kit\screenshots
 ```
 
-## Commands Not To Run During Offline Interview Demo
+## Commands Not To Run During Offline Portfolio Demo
 
-Do not run live-device tasks during the offline interview demo.
+Do not run live-device tasks during the offline portfolio demo.
 
 Avoid commands that:
 

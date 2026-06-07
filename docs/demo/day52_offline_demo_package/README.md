@@ -1,14 +1,14 @@
 # Day52 Offline Demo Package
 
-This folder is the final Day52 offline interview demo package for Network Automation Lab. It combines real local dashboard screenshots with a short usage guide so the demo can be shown even when GitHub, internet access, live devices, SSH, VPN, WireGuard, VRRP, or lab access are unavailable.
+This folder is the final Day52 offline portfolio demo package for Network Automation Lab. It combines real local dashboard screenshots with a short usage guide so the demo can be shown even when GitHub, internet access, live devices, SSH, VPN, WireGuard, VRRP, or lab access are unavailable.
 
 ## Purpose
 
-Use this package to present the dashboard pages as stable interview evidence without running live network workflows. The screenshots were captured from the local Flask dashboard at `http://127.0.0.1:5000/`.
+Use this package to present the dashboard pages as stable portfolio demo evidence without running live network workflows. The screenshots were captured from the local Flask dashboard at `http://127.0.0.1:5000/`.
 
 ## Screenshot List
 
-| Screenshot | Dashboard route | Interview use |
+| Screenshot | Dashboard route | Portfolio review use |
 | --- | --- | --- |
 | `screenshots/dashboard_home.png` | `/` | Open the demo and explain project purpose, status, proof points, and safety boundary. |
 | `screenshots/dashboard_reports.png` | `/reports` | Show generated evidence visibility and explain optional missing local reports. |
@@ -40,7 +40,7 @@ python network_lab.py --task report-index
 
 A `WARN` result is acceptable for this package when `fail=0` and the missing items are optional generated local reports.
 
-## Interview Use
+## Portfolio Review Use
 
 Start with `screenshots/dashboard_home.png` if the dashboard cannot be opened live. If the dashboard is available, open the live home page first and keep these screenshots as backup evidence.
 
