@@ -185,6 +185,35 @@ def test_ai_review_checklist_contains_wireguard_vpn_safety_items():
     assert "shell=False" in text
 
 
+def test_ai_intent_reviewer_references_day57_to_day60():
+    references = dashboard.ai_intent_reviewer_references()
+
+    assert [item.day for item in references] == ["Day57", "Day58", "Day59", "Day60"]
+    text = " ".join(
+        f"{item.title} {item.summary} {item.doc_path} {item.roadmap_path} "
+        f"{' '.join(item.report_paths)}"
+        for item in references
+    )
+    assert "AI intent mapping prototype" in text
+    assert "Safety review gate" in text
+    assert "Intent policy matrix" in text
+    assert "Reviewer walkthrough" in text
+    assert "docs/ai/day57_intent_mapping_prototype.md" in text
+    assert "reports/portfolio/day60_intent_workflow_demo.html" in text
+
+
+def test_ai_intent_reviewer_safety_boundaries_are_report_only():
+    text = " ".join(dashboard.ai_intent_safety_boundaries())
+
+    assert "Report-only reviewer entry point" in text
+    assert "No OpenAI API calls" in text
+    assert "No voice input" in text
+    assert "No mapped runner task execution" in text
+    assert "No SSH sessions" in text
+    assert "No config.json requirement" in text
+    assert "No NAT, IP, VRRP, WireGuard, firewall, interface, route, or device configuration changes" in text
+
+
 def day12_report(private_key_line="PrivateKey = REDACTED"):
     return {
         "device_name": "Hex-s-2025-lab01",
@@ -362,6 +391,36 @@ def test_dashboard_home_is_portfolio_demo_landing_page(tmp_path):
     assert "/reports" in text
     assert "/commands" in text
     assert "/ai-checklist" in text
+    assert "/ai-intent-reviewer" in text
+
+
+def test_ai_intent_reviewer_route_exposes_day57_to_day60_without_execution(tmp_path):
+    if dashboard.Flask is None:
+        pytest.skip("Flask is not installed in this test environment.")
+
+    app = dashboard.create_app(
+        reports_dir=tmp_path / "reports",
+        execution_logs_dir=tmp_path / "execution_logs",
+    )
+
+    response = app.test_client().get("/ai-intent-reviewer")
+
+    assert response.status_code == 200
+    text = response.data.decode("utf-8")
+    assert "AI Intent Reviewer Entry Point" in text
+    assert "Day57" in text
+    assert "Day58" in text
+    assert "Day59" in text
+    assert "Day60" in text
+    assert "docs/ai/day57_intent_mapping_prototype.md" in text
+    assert "reports/portfolio/day60_intent_workflow_demo.html" in text
+    assert "This page is report-only" in text
+    assert "No OpenAI API calls" in text
+    assert "No voice input" in text
+    assert "No mapped runner task execution" in text
+    assert "No SSH sessions" in text
+    assert "No config.json requirement" in text
+    assert "No mapped task was executed. This is a dry-run reviewer walkthrough only." in text
 
 
 def test_dashboard_reports_route_exposes_vrrp_evidence_group(tmp_path):
@@ -447,6 +506,9 @@ def test_flask_routes_are_available(tmp_path):
     assert client.get("/reports").status_code == 200
     assert client.get("/commands").status_code == 200
     assert client.get("/commands/logs").status_code == 200
+    intent_reviewer_response = client.get("/ai-intent-reviewer")
+    assert intent_reviewer_response.status_code == 200
+    assert b"AI Intent Reviewer Entry Point" in intent_reviewer_response.data
     checklist_response = client.get("/ai-checklist")
     assert checklist_response.status_code == 200
     assert b"AI Review Checklist" in checklist_response.data
