@@ -70,6 +70,7 @@ The v0.1 portfolio package covers Day 1 through Day 30 post-tag verification. Th
 - Day64 - AI Intent Reviewer Acceptance Runbook
 - Day65 - AI Intent Reviewer Acceptance Sign-off Package
 - Day66 - Offline Mock Runtime Skeleton
+- Day67 - Offline Mock Runtime Contract & Safety Invariant Validation
 
 The project is designed as a practical QA Automation / SDET portfolio project for network infrastructure. It focuses on repeatable validation, structured test evidence, and readable JSON / HTML reports rather than one-off manual checks.
 
@@ -94,7 +95,7 @@ Recommended quick path:
 7. Use `docs/roadmap/day57_ai_assisted_task_intent_mapping_prototype_plan.md` for the dry-run-only intent mapping prototype plan.
 8. Use `docs/roadmap/day58_intent_mapping_safety_review_confirmation_gate.md` for the dry-run intent safety review and blocked-by-default confirmation gate design.
 9. Use `docs/ai/day59_intent_policy_matrix_reviewer_safety_explanation.md` for the reviewer-facing intent policy matrix.
-10. If running the dashboard locally, open `/ai-intent-reviewer` for the Day57-Day66 reviewer UI entry point, Day62 scenario pack link, Day63 traceability evidence map link, Day64 acceptance runbook link, Day65 sign-off package link, and Day66 offline mock runtime skeleton link.
+10. If running the dashboard locally, open `/ai-intent-reviewer` for the Day57-Day67 reviewer UI entry point, Day62 scenario pack link, Day63 traceability evidence map link, Day64 acceptance runbook link, Day65 sign-off package link, Day66 offline mock runtime skeleton link, and Day67 contract validation link.
 
 ## Why This Project Exists
 
@@ -197,6 +198,7 @@ Cisco validation is read-only. It runs show commands for topology evidence and d
 | Day 64 | AI Intent Reviewer Acceptance Runbook; provides reviewer acceptance steps for the dashboard entry, scenario pack, traceability map, validation commands, and safety boundary confirmation while remaining documentation/static dashboard/report-only | Ready with notes |
 | Day 65 | AI Intent Reviewer Acceptance Sign-off Package; summarizes Day57-Day64 reviewer evidence, defines accepted/deferred/rejected scope, and prepares for a future offline mock runtime skeleton without implementing runtime AI execution | Ready with notes |
 | Day 66 | Offline Mock Runtime Skeleton; adds a deterministic offline mock / dry-run-only runtime shape for AI Intent Reviewer evidence without OpenAI API, voice, SSH, device access, live execution, config.json dependency, or network configuration changes | Ready with notes |
+| Day 67 | Offline Mock Runtime Contract & Safety Invariant Validation; validates Day66 mock runtime output without enabling OpenAI API, voice, SSH, device access, live execution, mapped task execution, or network configuration changes | Ready with notes |
 
 ## Lab Topology
 
@@ -2047,6 +2049,18 @@ reports/portfolio/day66_offline_mock_runtime_skeleton.html
 
 Day66 adds a deterministic offline mock / dry-run-only runtime skeleton for the AI Intent Reviewer flow. It models the future runtime shape with fixed mock scenarios, safety categories, mock plans, mock execution records, reviewer evidence references, and an optional fixed report task. It does not add OpenAI API integration, voice integration, SSH, device access, live execution, mapped task execution, `config.json` dependency, credentials, secrets, POST forms, action endpoints, arbitrary command execution, or router/switch/firewall/VPN/VRRP/network configuration changes. Reviewer-facing purpose: show the future runtime shape without enabling real execution.
 
+Day67 - Offline Mock Runtime Contract & Safety Invariant Validation:
+
+```text
+docs/roadmap/day67_offline_mock_runtime_contract_safety_invariants.md
+docs/ai/intent_offline_mock_runtime_contract.md
+intent_runtime_contract.py
+reports/portfolio/day67_offline_mock_runtime_contract.json
+reports/portfolio/day67_offline_mock_runtime_contract.html
+```
+
+Day67 added an offline mock runtime contract and safety invariant validation layer. It validates Day66 mock runtime output without enabling OpenAI API, voice, SSH, device access, live execution, mapped task execution, or network configuration changes.
+
 ## Testing Strategy
 
 The project separates live-device validation from unit tests.
@@ -2114,6 +2128,7 @@ For documentation-only review passes, run `python -m pytest` before sharing the 
 - Includes Day63 AI Intent Reviewer Traceability Evidence Map, a reviewer-facing evidence map that connects Day57-Day62 AI intent review artifacts into a traceable, report-only audit path without runtime AI behavior.
 - Includes Day64 AI Intent Reviewer Acceptance Runbook, a reviewer operation guide for accepting the dashboard entry, scenario pack, traceability map, validation commands, and safety boundary while staying documentation/static dashboard/report-only.
 - Includes Day65 AI Intent Reviewer Acceptance Sign-off Package, the formal reviewer acceptance summary for Day57-Day64 evidence and the boundary before any future offline mock runtime skeleton work.
+- Includes Day67 Offline Mock Runtime Contract & Safety Invariant Validation, a standard-library-only validator for Day66 mock output fields, blocked action handling, reviewer evidence, and no-live-execution invariants.
 
 ## Roadmap
 

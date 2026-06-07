@@ -2,6 +2,7 @@ import ast
 from pathlib import Path
 
 import intent_offline_mock_runtime as runtime
+import intent_runtime_contract as contract
 
 
 UNSAFE_IMPORTS = {
@@ -59,6 +60,24 @@ def test_blocked_live_action_scenarios_remain_blocked():
     assert len(blocked) >= 2
     assert any("VRRP" in scenario["input_text"] for scenario in blocked)
     assert all(scenario["live_execution_allowed"] is False for scenario in blocked)
+    assert all(scenario["blocked"] is True for scenario in blocked)
+    assert all(scenario["reviewer_warning"] for scenario in blocked)
+    assert all(scenario["evidence_references"] for scenario in blocked)
+
+
+def test_day66_mock_runtime_output_satisfies_day67_contract_fields():
+    report = runtime.build_mock_runtime_report()
+
+    assert contract.validate_runtime_results(report["mock_scenarios"]) == []
+    for scenario in report["mock_scenarios"]:
+        assert scenario["scenario_id"]
+        assert scenario["scenario_name"]
+        assert scenario["intent_category"]
+        assert scenario["decision"]
+        assert scenario["mapped_task_executed"] is False
+        assert isinstance(scenario["blocked"], bool)
+        assert isinstance(scenario["reviewer_warning"], str)
+        assert isinstance(scenario["evidence_references"], list)
 
 
 def test_mock_runtime_module_has_no_unsafe_imports_or_config_dependency():

@@ -731,6 +731,20 @@ def ai_intent_reviewer_references() -> List[AIIntentReviewerReference]:
                 "reports/portfolio/day66_offline_mock_runtime_skeleton.html",
             ),
         ),
+        AIIntentReviewerReference(
+            day="Day67",
+            title="Offline mock runtime contract",
+            summary=(
+                "Validates Day66 mock runtime output fields and safety invariants before "
+                "any future AI, voice, SSH, or live execution integration."
+            ),
+            doc_path="docs/ai/intent_offline_mock_runtime_contract.md",
+            roadmap_path="docs/roadmap/day67_offline_mock_runtime_contract_safety_invariants.md",
+            report_paths=(
+                "reports/portfolio/day67_offline_mock_runtime_contract.json",
+                "reports/portfolio/day67_offline_mock_runtime_contract.html",
+            ),
+        ),
     ]
 
 
@@ -749,6 +763,7 @@ def ai_intent_safety_boundaries() -> List[str]:
         "No real v0.3 runtime execution.",
         "No automatic execution of mapped tasks from scenario examples.",
         "Day66 mock runtime output is fixed offline evidence only.",
+        "Day67 validates contract and safety invariants without enabling runtime behavior.",
     ]
 
 

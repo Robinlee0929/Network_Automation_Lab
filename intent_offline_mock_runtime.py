@@ -25,6 +25,13 @@ EVIDENCE_DOC_REFS = [
     "docs/roadmap/day66_offline_mock_runtime_skeleton.md",
 ]
 
+DECISIONS_BY_SAFETY_CATEGORY = {
+    "documentation_only": "allowed_documentation_only",
+    "report_only": "allowed_report_only",
+    "blocked_live_action": "blocked",
+    "needs_manual_review": "manual_review_required",
+}
+
 SAMPLE_MOCK_INTENTS = [
     {
         "id": "documentation-only-runbook",
@@ -95,23 +102,39 @@ def _mock_execution_record(sample: Dict[str, Any]) -> Dict[str, Any]:
         "mock_record_type": "reviewer_evidence_only",
         "real_command_executed": False,
         "mapped_task_executed": False,
+        "openai_api_used": False,
+        "voice_integration_used": False,
         "ssh_used": False,
         "device_access_used": False,
+        "device_connection_used": False,
         "network_change_made": False,
+        "device_configuration_changed": False,
         "source_sample_id": sample["id"],
     }
 
 
 def review_mock_intent(sample: Dict[str, Any]) -> Dict[str, Any]:
     """Return one deterministic offline mock reviewer record."""
+    safety_category = sample["safety_category"]
+    blocked = safety_category == "blocked_live_action"
+    decision = DECISIONS_BY_SAFETY_CATEGORY[safety_category]
+    reviewer_warning = sample["reviewer_note"] if blocked else ""
     return {
+        "scenario_id": sample["id"],
+        "scenario_name": sample["id"].replace("-", " ").title(),
+        "intent_category": sample["normalized_intent"],
         "input_text": sample["input_text"],
         "normalized_intent": sample["normalized_intent"],
-        "safety_category": sample["safety_category"],
+        "safety_category": safety_category,
         "mock_plan": list(sample["mock_plan"]),
         "execution_mode": EXECUTION_MODE,
         "live_execution_allowed": LIVE_EXECUTION_ALLOWED,
+        "mapped_task_executed": False,
+        "blocked": blocked,
+        "decision": decision,
+        "reviewer_warning": reviewer_warning,
         "reviewer_note": sample["reviewer_note"],
+        "evidence_references": list(EVIDENCE_DOC_REFS),
         "evidence_links_or_doc_refs": list(EVIDENCE_DOC_REFS),
         "mock_execution_record": _mock_execution_record(sample),
     }
