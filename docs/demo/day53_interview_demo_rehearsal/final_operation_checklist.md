@@ -1,4 +1,4 @@
-# Day53 Final Operation Checklist
+# Day53 Demo Readiness Checklist
 
 ## Pre-rehearsal Gate
 
@@ -82,7 +82,7 @@ http://127.0.0.1:5000/ai-checklist
 - [ ] Commit created with message:
 
 ```text
-Document Day53 interview demo rehearsal checklist
+Polish Day53 portfolio demo wording
 ```
 
 - [ ] No push performed unless explicitly instructed.

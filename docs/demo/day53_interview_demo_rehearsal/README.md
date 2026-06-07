@@ -1,6 +1,6 @@
-# Day53 Interview Demo Rehearsal
+# Day53 Portfolio Demo Rehearsal
 
-This folder contains the final Day53 interview demo rehearsal materials for Network Automation Lab. Use it before an interview to keep the demo short, safe, and repeatable.
+This folder contains the final Day53 portfolio demo rehearsal materials for Network Automation Lab. Use it before a public project review, portfolio walkthrough, or interview to keep the demo short, safe, and repeatable.
 
 ## Files
 
@@ -8,7 +8,7 @@ This folder contains the final Day53 interview demo rehearsal materials for Netw
 | --- | --- |
 | `demo_opening_script_zh.md` | Traditional Chinese opening script for framing the project and safety boundary. |
 | `three_to_five_minute_demo_sequence_zh.md` | Ordered 3-5 minute demo sequence. |
-| `common_interview_qa_zh.md` | Prepared answers for likely interview questions. |
+| `common_interview_qa_zh.md` | Prepared answers for likely reviewer or evaluator questions. |
 | `final_operation_checklist.md` | Final rehearsal and operation checklist. |
 
 ## Demo Path

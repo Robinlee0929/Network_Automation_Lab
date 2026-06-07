@@ -1,20 +1,20 @@
-# Day53 Common Interview Q&A
+# Day53 Common Reviewer Q&A
 
 ## 為什麼 demo 要 offline？
 
-因為面試環境不是受控 change window。這個 demo 的目標是展示架構、測試、報告證據、dashboard 和安全邊界，不是現場修改真實設備。Offline/report-only demo 可以避免網路、設備、VPN、SSH、VRRP 或 WireGuard 狀態影響展示，也能避免不必要的 live configuration 風險。
+因為一般作品集展示、專案審查或面試環境不是受控 change window。這個 demo 的目標是展示架構、測試、報告證據、dashboard 和安全邊界，不是現場修改真實設備。Offline/report-only demo 可以避免網路、設備、VPN、SSH、VRRP 或 WireGuard 狀態影響展示，也能避免不必要的 live configuration 風險。
 
-## 為什麼不在面試中做 live VRRP failover？
+## 為什麼不在 public demo 中做 live VRRP failover？
 
-VRRP failover 會影響 gateway/availability behavior，應該在受控 lab、明確 rollback plan、可觀測性完整的條件下執行。面試中我會展示 VRRP topology plan、read-only precheck、dry-run preview、staged apply plan、failover evidence review 和 dashboard/report-index integration，但不把現場面試當成 live failover 測試。
+VRRP failover 會影響 gateway/availability behavior，應該在受控 lab、明確 rollback plan、可觀測性完整的條件下執行。Public demo 中會展示 VRRP topology plan、read-only precheck、dry-run preview、staged apply plan、failover evidence review 和 dashboard/report-index integration，但不把一般 demo 當成 live failover 測試。
 
 ## 這個專案的 safety model 是什麼？
 
-核心是把 task 分層：documentation-only、report-only、read-only、dry-run、guarded-live、disabled。面試 demo 只使用 documentation-only/report-only/local dashboard path。任何可能連線設備、使用 SSH、修改 NAT/IP/VRRP/WireGuard/firewall/interface/route 的工作，都必須明確標示安全等級並離開面試 demo path。
+核心是把 task 分層：documentation-only、report-only、read-only、dry-run、guarded-live、disabled。Portfolio/offline demo 只使用 documentation-only/report-only/local dashboard path。任何可能連線設備、使用 SSH、修改 NAT/IP/VRRP/WireGuard/firewall/interface/route 的工作，都必須明確標示安全等級並離開 public demo path。
 
 ## 這個 project prove 了什麼？
 
-它證明網路自動化可以被做成 QA/SDET 風格的平台：有 repeatable tests、有 expected/actual/result、有 JSON/HTML evidence、有 report index、有 dashboard、有 runner metadata、有 safety controls，也有 interview-ready demo package。它不是只把 CLI 指令包成 script，而是把驗證、報告、風險控管和展示路徑一起工程化。
+它證明網路自動化可以被做成 QA/SDET 風格的平台：有 repeatable tests、有 expected/actual/result、有 JSON/HTML evidence、有 report index、有 dashboard、有 runner metadata、有 safety controls，也有 portfolio-ready demo package。它不是只把 CLI 指令包成 script，而是把驗證、報告、風險控管和展示路徑一起工程化。
 
 ## 這和真實 network automation work 有什麼關係？
 
@@ -30,7 +30,7 @@ AI 應該是 reviewer、explainer、planner 和 evidence summarizer，不應該�
 
 ## 如何防止 AI 直接修改 router settings？
 
-第一，AI 不直接拿任意 shell 或 SSH 權限。第二，task catalog 要有 safety level、device scope、command boundary 和 disabled/live 標記。第三，live 變更必須走 allowlisted workflow、dry-run preview、human approval、audit log 和 rollback thinking。第四，面試 demo 完全不給 AI live device path。
+第一，AI 不直接拿任意 shell 或 SSH 權限。第二，task catalog 要有 safety level、device scope、command boundary 和 disabled/live 標記。第三，live 變更必須走 allowlisted workflow、dry-run preview、human approval、audit log 和 rollback thinking。第四，portfolio/offline demo 完全不給 AI live device path。
 
 ## report-only、read-only、dry-run、guarded-live 有什麼差異？
 
@@ -38,4 +38,4 @@ Report-only 只讀本機已存在的報告或 metadata，不連設備。Read-onl
 
 ## 目前限制是什麼？
 
-目前 demo 依賴本機環境能跑 Python、pytest 和 dashboard；部分 generated reports 是 local/ignored evidence，所以 fresh checkout 可能有 optional missing reports。Live device workflows 需要受控 lab、正確 config 和設備連線，不屬於面試 demo。AI/voice assistant 仍是 roadmap，不是假裝已經完成的功能。
+目前 demo 依賴本機環境能跑 Python、pytest 和 dashboard；部分 generated reports 是 local/ignored evidence，所以 fresh checkout 可能有 optional missing reports。Live device workflows 需要受控 lab、正確 config 和設備連線，不屬於 portfolio/offline demo。AI/voice assistant 仍是 roadmap，不是假裝已經完成的功能。

@@ -5,7 +5,7 @@
 打開專案資料夾，說明：
 
 - 這是 Network Automation Lab。
-- 目標是展示安全網路自動化、報告證據、dashboard evidence 和面試可操作流程。
+- 目標是展示安全網路自動化、報告證據、dashboard evidence 和作品集 demo 可操作流程。
 - 今天 demo 是 offline/report-only，不碰 live device。
 
 ## 0:30-1:00 Repository Status
@@ -57,7 +57,7 @@ docs/demo/day52_offline_demo_package/
 
 依序展示：
 
-1. Home page: interview landing page、project purpose、demo status、proof points、safety boundary。
+1. Home page: portfolio demo landing page、project purpose、demo status、proof points、safety boundary。
 2. Reports page: report index、evidence navigation、optional missing local reports 的說明方式。
 3. Commands page: allowlisted local commands、disabled live tasks、command log visibility。
 4. AI Checklist page: AI 輔助時的 safety controls、code-level guard、不能直接改 router settings。
@@ -68,8 +68,8 @@ docs/demo/day52_offline_demo_package/
 
 - Evidence: JSON/HTML reports、dashboard、roadmap、release/demo docs。
 - Safety guard: documentation-only、report-only、read-only、dry-run、guarded-live 分層。
-- 面試 demo 只走 local/report-only 路徑。
-- Live VRRP、WireGuard、router、firewall、interface 變更不在面試路徑內。
+- Portfolio/offline demo 只走 local/report-only 路徑。
+- Live VRRP、WireGuard、router、firewall、interface 變更不在 public demo 路徑內。
 
 ## 4:30-5:00 Close
 

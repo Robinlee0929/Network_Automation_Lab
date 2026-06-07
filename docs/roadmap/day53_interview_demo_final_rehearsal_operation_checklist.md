@@ -1,17 +1,17 @@
-# Day53 - Interview Demo Final Rehearsal / Demo Operation Checklist
+# Day53 - Portfolio Demo Final Rehearsal / Demo Operation Checklist
 
 ## Purpose
 
-Day53 converts the interview demo into a rehearsal-ready operating flow. The goal is not to add capability; the goal is to make the existing Network Automation Lab demo easy to run, explain, pause, recover, and close during an interview.
+Day53 prepares a public-facing portfolio demo workflow for Network Automation Lab. The goal is not to add capability; the goal is to make the existing offline demo easy to run, explain, pause, recover, and close for portfolio reviewers, evaluators, or interview use cases.
 
 ## Scope
 
 Included:
 
-- Final interview demo rehearsal flow.
+- Final portfolio demo rehearsal flow.
 - Traditional Chinese demo opening script.
 - 3-5 minute operation sequence.
-- Common interview Q&A preparation.
+- Common reviewer Q&A preparation.
 - Final operation checklist.
 - Local validation result documentation.
 
@@ -35,20 +35,20 @@ Included:
 
 Day53 is documentation-only and rehearsal-only. It does not execute live network tests, does not use SSH, does not connect to network devices, does not modify router, switch, firewall, VPN, WireGuard, VRRP, NAT, IP, interface, route, or device configuration, does not create or edit `config.json`, does not create release tags, and does not start `v0.3`.
 
-The interview path is limited to local repository review, local tests, report-only commands, local dashboard review, committed screenshots, and prepared explanation.
+The offline demo path is limited to local repository review, local tests, report-only commands, local dashboard review, committed screenshots, and prepared explanation.
 
-## Final Interview Demo Rehearsal Flow
+## Final Portfolio Demo Rehearsal Flow
 
 1. Open the project folder.
 2. Confirm current branch and working tree status.
 3. Reference the latest local validation result, or run local validation only.
 4. Start the local dashboard only if the local environment is available.
 5. Open the dashboard home page.
-6. Show the interview landing page.
+6. Show the portfolio demo landing page.
 7. Show the report index.
 8. Show the commands and safety page.
 9. Show the AI checklist.
-10. Explain the evidence model, safety guard, and report-only interview workflow.
+10. Explain the evidence model, safety guard, and report-only demo workflow.
 11. Close with the future evolution path: richer report intelligence, stronger guarded-live orchestration, and future AI assistance after safety controls are explicit.
 
 ## Demo Opening Script
@@ -62,7 +62,7 @@ docs/demo/day53_interview_demo_rehearsal/demo_opening_script_zh.md
 Short version:
 
 ```text
-這個專案是 Network Automation Lab。它展示的是安全的網路自動化、可追溯的報告證據、本機 dashboard evidence，以及可以在面試中穩定操作的 demo 流程。這次 demo 刻意採用 offline/report-only 路徑，不做 live VRRP、WireGuard、router、firewall 或 interface 變更，因為面試重點是展示工程設計、測試證據與安全邊界，而不是在不受控環境中修改真實設備。
+這個專案是 Network Automation Lab。它展示的是安全的網路自動化、可追溯的報告證據、本機 dashboard evidence，以及可以在作品集展示或專案審查中穩定操作的 demo 流程。這次 demo 刻意採用 offline/report-only 路徑，不做 live VRRP、WireGuard、router、firewall 或 interface 變更，因為 demo 重點是展示工程設計、測試證據與安全邊界，而不是在不受控環境中修改真實設備。
 ```
 
 ## 3-5 Minute Operation Sequence
@@ -80,7 +80,7 @@ Required sequence:
 3. Run local tests or reference latest validation result.
 4. Start dashboard locally if applicable.
 5. Open dashboard home page.
-6. Show interview landing page.
+6. Show portfolio demo landing page.
 7. Show report index.
 8. Show commands and safety page.
 9. Show AI checklist.
@@ -98,7 +98,7 @@ docs/demo/day53_interview_demo_rehearsal/common_interview_qa_zh.md
 Covered questions:
 
 - Why is the demo offline?
-- Why not perform live VRRP failover during the interview?
+- Why not perform live VRRP failover during the demo?
 - What is the safety model?
 - What did the project prove?
 - How does this connect to real network automation work?
