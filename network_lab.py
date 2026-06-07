@@ -51,6 +51,8 @@ DAY41_ARTIFACT_CHECKLIST_DOC = Path("docs") / "releases" / "v0.2_artifact_checkl
 DAY41_DEMO_HANDOFF_DOC = Path("docs") / "portfolio" / "v0.2_demo_handoff_guide.md"
 DAY41_RELEASE_PACKAGING_JSON = Path("reports") / "portfolio" / "day41_v0.2_release_packaging.json"
 DAY41_RELEASE_PACKAGING_HTML = Path("reports") / "portfolio" / "day41_v0.2_release_packaging.html"
+DAY57_INTENT_MAPPING_TASK_ID = "intent-mapping-prototype"
+DAY57_INTENT_MAPPING_DOC = Path("docs") / "ai" / "day57_intent_mapping_prototype.md"
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
 WIREGUARD_RUNNER_DISPLAY_NAME = "WireGuard Runner Safety Layer"
@@ -1688,6 +1690,30 @@ def list_tasks() -> List[Dict[str, Any]]:
             "related_script": "mikrotik_day13_multi_router_wireguard_validation.py",
             "notes": "Disabled live runner task. Day13 summary remains report-only until its own live safety layer is implemented.",
         },
+        {
+            "id": DAY57_INTENT_MAPPING_TASK_ID,
+            "task_id": "day57_ai_assisted_task_intent_mapping_prototype",
+            "display_name": "Day57 AI-assisted Task Intent Mapping Prototype",
+            "user_display_name": "Intent Mapping Prototype",
+            "day": "Day57",
+            "category": "ai_planning",
+            "description": "Deterministic text intent classification prototype that maps user requests to allowlisted runner task proposals.",
+            "safety_level": "dry-run",
+            "execution_mode": "dry-run",
+            "enabled": True,
+            "status": "prototype",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": False,
+            "report_paths": [
+                DAY57_INTENT_MAPPING_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Day57 static intent mapping prototype documentation",
+            ],
+            "related_script": "network_lab.py",
+            "notes": "Dry-run mapping only. Does not call OpenAI APIs, speech APIs, SSH, live runners, devices, config.json, or mapped task execution.",
+        },
     ]
 
 
@@ -1713,6 +1739,7 @@ def _build_parser() -> argparse.ArgumentParser:
   python network_lab.py --task day39-vrrp-evidence-dashboard-integration
   python network_lab.py --task day40-v0.2-demo-readiness-review
   python network_lab.py --task day41-v0.2-release-packaging
+  python network_lab.py --task intent-mapping-prototype --intent-text "show me the latest reports"
   python network_lab.py --task wireguard-runner --dry-run
   python network_lab.py --task wireguard-runner --wireguard-config Set_WireguardVPN_lab02_config.json --dry-run
   python network_lab.py --task wireguard-runner
@@ -1729,6 +1756,7 @@ day35-vrrp-failover-validation observes manual external VRRP failover with read-
 day39-vrrp-evidence-dashboard-integration scans local VRRP docs/reports only and writes a summary report.
 day40-v0.2-demo-readiness-review writes a report-only v0.2 demo readiness scope lock without SSH or live tests.
 day41-v0.2-release-packaging writes a report-only v0.2 release packaging summary without SSH, live tests, voice/AI implementation, or tag creation.
+intent-mapping-prototype classifies static text and prints a dry-run-only mapping proposal without API, voice, SSH, device access, or runner delegation.
 wireguard-runner is dry-run by default and delegates to the existing WireGuard script only after explicit --allow-live-wireguard."""
     parser = argparse.ArgumentParser(
         description=f"Day14 {DAY14_NAME}.",
@@ -1758,12 +1786,18 @@ wireguard-runner is dry-run by default and delegates to the existing WireGuard s
             DAY39_VRRP_EVIDENCE_TASK_ID,
             DAY40_DEMO_READINESS_TASK_ID,
             DAY41_RELEASE_PACKAGING_TASK_ID,
+            DAY57_INTENT_MAPPING_TASK_ID,
             WIREGUARD_RUNNER_TASK_ALIAS,
         ],
         help="Task to run.",
     )
     parser.add_argument("--profile", default=str(DEFAULT_PROFILE), help="Path to the Day14 lab runner profile JSON.")
     parser.add_argument("--dry-run", action="store_true", help="Show report-index inputs and outputs without writing reports.")
+    parser.add_argument(
+        "--intent-text",
+        default="",
+        help="User text to classify for the Day57 intent-mapping-prototype dry-run.",
+    )
     parser.add_argument("--interactive", action="store_true", help="Show the safe interactive Day14 menu.")
     parser.add_argument("--allow-live-wireguard", action="store_true", help="Allow guarded live WireGuard execution.")
     parser.add_argument(
@@ -1833,6 +1867,122 @@ def _print_task_list(verbose: bool = False) -> None:
         _print_verbose_task_list()
         return
     _print_compact_task_list()
+
+
+def _normalize_intent_text(text: str) -> str:
+    return " ".join(str(text or "").strip().lower().split())
+
+
+def _text_contains_any(text: str, keywords: List[str]) -> bool:
+    return any(keyword in text for keyword in keywords)
+
+
+def build_day57_intent_mapping(user_input: str) -> Dict[str, Any]:
+    normalized = _normalize_intent_text(user_input)
+    base_mapping: Dict[str, Any] = {
+        "day": "Day57",
+        "prototype": "AI-assisted Task Intent Mapping Prototype",
+        "normalized_user_input": normalized,
+        "execution_mode": "dry_run_only",
+        "mapped_task_executed": False,
+        "openai_api_used": False,
+        "voice_control_used": False,
+        "ssh_used": False,
+        "device_connection_used": False,
+        "config_json_read": False,
+        "blocked_actions": [
+            "OpenAI API calls",
+            "speech or voice control",
+            "SSH sessions",
+            "live runner delegation",
+            "MikroTik/Cisco/router/switch/firewall/VPN/device connections",
+            "NAT/IP/VRRP/WireGuard/firewall/interface/route/device configuration changes",
+        ],
+    }
+
+    if _text_contains_any(normalized, ["vrrp", "failover", "fail over"]) and _text_contains_any(
+        normalized,
+        ["run", "do", "test", "start", "trigger", "validate", "check"],
+    ):
+        base_mapping.update(
+            {
+                "detected_intent": "vrrp_failover_test_request",
+                "mapped_allowlisted_task": f"{DAY35_VRRP_FAILOVER_TASK_ID} (blocked in Day57)",
+                "safety_level": "guarded_live_candidate",
+                "confirmation_requirement": "mandatory_before_any_future_live_capable_path",
+                "day57_result": "blocked_in_day57_dry_run_mapping_only",
+                "human_review_required": True,
+                "rationale": "VRRP failover can affect lab availability, so Day57 only records the proposed mapping and blocks execution.",
+            }
+        )
+        return base_mapping
+
+    if _text_contains_any(normalized, ["wireguard", "wire guard", "wg"]) and _text_contains_any(
+        normalized,
+        ["run", "check", "validate", "validation", "status", "test"],
+    ):
+        base_mapping.update(
+            {
+                "detected_intent": "wireguard_status_or_validation_request",
+                "mapped_allowlisted_task": WIREGUARD_RUNNER_TASK_ALIAS,
+                "safety_level": "guarded_dry_run",
+                "confirmation_requirement": "required_before_any_future_live_capable_path",
+                "day57_result": "dry_run_mapping_only",
+                "human_review_required": True,
+                "rationale": "WireGuard validation may become guarded-live later, but Day57 never delegates to the runner.",
+            }
+        )
+        return base_mapping
+
+    if _text_contains_any(normalized, ["dashboard", "open dashboard", "dashboard page"]):
+        base_mapping.update(
+            {
+                "detected_intent": "open_dashboard_or_report_view",
+                "mapped_allowlisted_task": "dashboard / report viewer",
+                "safety_level": "local_ui_only",
+                "confirmation_requirement": "not_required",
+                "day57_result": "dry_run_mapping_only",
+                "human_review_required": False,
+                "rationale": "Opening local UI/report views is low risk, but Day57 still returns only the mapping proposal.",
+            }
+        )
+        return base_mapping
+
+    if _text_contains_any(normalized, ["report", "reports", "latest report", "latest reports", "evidence"]):
+        base_mapping.update(
+            {
+                "detected_intent": "view_reports",
+                "mapped_allowlisted_task": "report-index",
+                "safety_level": "report_only",
+                "confirmation_requirement": "not_required_or_low_risk_confirmation_only",
+                "day57_result": "dry_run_mapping_only",
+                "human_review_required": False,
+                "rationale": "Report viewing maps to the local report index path, but Day57 does not execute report-index.",
+            }
+        )
+        return base_mapping
+
+    base_mapping.update(
+        {
+            "detected_intent": "unknown_or_ambiguous",
+            "mapped_allowlisted_task": None,
+            "safety_level": "needs_manual_review",
+            "confirmation_requirement": "manual_review_required",
+            "day57_result": "no_task_mapped_dry_run_only",
+            "human_review_required": True,
+            "rationale": "Unknown or ambiguous requests must not map to execution.",
+        }
+    )
+    return base_mapping
+
+
+def _run_day57_intent_mapping_prototype(intent_text: str) -> int:
+    mapping = build_day57_intent_mapping(intent_text)
+    print(format_heading("Day57 AI-assisted Task Intent Mapping Prototype"))
+    print(json.dumps(mapping, indent=2, sort_keys=True))
+    print()
+    print(f"{format_status('PASS')} Dry-run mapping only. No mapped task was executed.")
+    return 0
 
 
 def _relative_to_project(project_root: Path, path: Path) -> str:
@@ -4155,6 +4305,8 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
         return _run_day40_demo_readiness_review(root)
     if args.task == DAY41_RELEASE_PACKAGING_TASK_ID:
         return _run_day41_release_packaging(root)
+    if args.task == DAY57_INTENT_MAPPING_TASK_ID:
+        return _run_day57_intent_mapping_prototype(args.intent_text)
 
     profile_path = _resolve_project_path(root, args.profile)
     try:
