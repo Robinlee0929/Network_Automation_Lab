@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Any, Dict, Iterator, List, Optional, Tuple
 
 from intent_offline_mock_runtime import build_mock_runtime_report
+from intent_runtime_contract import validate_runtime_results
 
 
 DAY14_NAME = "Unified Lab Runner and Report Index"
@@ -82,6 +83,17 @@ DAY66_OFFLINE_MOCK_RUNTIME_DOC = Path("docs") / "ai" / "intent_offline_mock_runt
 DAY66_OFFLINE_MOCK_RUNTIME_ROADMAP = Path("docs") / "roadmap" / "day66_offline_mock_runtime_skeleton.md"
 DAY66_OFFLINE_MOCK_RUNTIME_JSON = Path("reports") / "portfolio" / "day66_offline_mock_runtime_skeleton.json"
 DAY66_OFFLINE_MOCK_RUNTIME_HTML = Path("reports") / "portfolio" / "day66_offline_mock_runtime_skeleton.html"
+DAY67_OFFLINE_MOCK_RUNTIME_CONTRACT_TASK_ID = "offline-mock-runtime-contract"
+DAY67_OFFLINE_MOCK_RUNTIME_CONTRACT_DOC = Path("docs") / "ai" / "intent_offline_mock_runtime_contract.md"
+DAY67_OFFLINE_MOCK_RUNTIME_CONTRACT_ROADMAP = (
+    Path("docs") / "roadmap" / "day67_offline_mock_runtime_contract_safety_invariants.md"
+)
+DAY67_OFFLINE_MOCK_RUNTIME_CONTRACT_JSON = (
+    Path("reports") / "portfolio" / "day67_offline_mock_runtime_contract.json"
+)
+DAY67_OFFLINE_MOCK_RUNTIME_CONTRACT_HTML = (
+    Path("reports") / "portfolio" / "day67_offline_mock_runtime_contract.html"
+)
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
 WIREGUARD_RUNNER_DISPLAY_NAME = "WireGuard Runner Safety Layer"
@@ -616,6 +628,19 @@ REPORT_CATALOG = [
         "json_globs": [DAY66_OFFLINE_MOCK_RUNTIME_JSON.as_posix()],
         "html_globs": [DAY66_OFFLINE_MOCK_RUNTIME_HTML.as_posix()],
         "missing_note": f"Generate with: python network_lab.py --task {DAY66_OFFLINE_MOCK_RUNTIME_TASK_ID}",
+    },
+    {
+        "day": "Day67",
+        "title": "Offline Mock Runtime Contract",
+        "report_type": "Reviewer contract validation report",
+        "safety_label": "offline mock contract / safety invariant validation",
+        "description": "Day67 validates Day66 mock runtime output contracts and safety invariants without live behavior.",
+        "json_globs": [DAY67_OFFLINE_MOCK_RUNTIME_CONTRACT_JSON.as_posix()],
+        "html_globs": [DAY67_OFFLINE_MOCK_RUNTIME_CONTRACT_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY67_OFFLINE_MOCK_RUNTIME_CONTRACT_TASK_ID}"
+        ),
     },
 ]
 
@@ -2154,6 +2179,34 @@ def list_tasks() -> List[Dict[str, Any]]:
             "related_script": "network_lab.py",
             "notes": "Fixed mock report only. Does not call APIs, use voice, execute mapped tasks, run live tests, open SSH, read config.json, connect to devices, or modify network/device configuration.",
         },
+        {
+            "id": DAY67_OFFLINE_MOCK_RUNTIME_CONTRACT_TASK_ID,
+            "task_id": "day67_offline_mock_runtime_contract",
+            "display_name": "Day67 Offline Mock Runtime Contract & Safety Invariants",
+            "user_display_name": "Offline Mock Runtime Contract",
+            "day": "Day67",
+            "category": "ai_planning",
+            "description": "Validates the Day66 offline mock runtime output contract and safety invariants.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY67_OFFLINE_MOCK_RUNTIME_CONTRACT_JSON.as_posix(),
+                DAY67_OFFLINE_MOCK_RUNTIME_CONTRACT_HTML.as_posix(),
+                DAY67_OFFLINE_MOCK_RUNTIME_CONTRACT_DOC.as_posix(),
+                DAY67_OFFLINE_MOCK_RUNTIME_CONTRACT_ROADMAP.as_posix(),
+            ],
+            "report_outputs": [
+                "Day67 JSON/HTML offline mock runtime contract validation report",
+                "Day67 offline mock runtime contract documentation",
+            ],
+            "related_script": "network_lab.py",
+            "notes": "Contract validation report only. Validates in-memory mock results and does not call APIs, use voice, execute mapped tasks, run live tests, open SSH, read config.json, connect to devices, or modify network/device configuration.",
+        },
     ]
 
 
@@ -2239,6 +2292,7 @@ wireguard-runner is dry-run by default and delegates to the existing WireGuard s
             DAY59_INTENT_POLICY_MATRIX_TASK_ID,
             DAY60_INTENT_WORKFLOW_DEMO_TASK_ID,
             DAY66_OFFLINE_MOCK_RUNTIME_TASK_ID,
+            DAY67_OFFLINE_MOCK_RUNTIME_CONTRACT_TASK_ID,
             WIREGUARD_RUNNER_TASK_ALIAS,
         ],
         help="Task to run.",
@@ -3163,6 +3217,173 @@ def _run_day66_offline_mock_runtime(project_root: Path) -> int:
     print(f"HTML report: {_relative_to_project(project_root, html_path)}")
     print(f"{format_status('PASS')} No live execution, API, voice, SSH, device access, or network change occurred.")
     return 0
+
+
+def build_day67_offline_mock_runtime_contract_report() -> Dict[str, Any]:
+    day66_report = build_mock_runtime_report()
+    scenarios = day66_report.get("mock_scenarios", [])
+    validation_errors = validate_runtime_results(scenarios)
+    scenario_validations = []
+    for scenario in scenarios:
+        scenario_errors = validate_runtime_results([scenario])
+        scenario_validations.append(
+            {
+                "scenario_id": scenario.get("scenario_id"),
+                "scenario_name": scenario.get("scenario_name"),
+                "safety_category": scenario.get("safety_category"),
+                "decision": scenario.get("decision"),
+                "contract_status": "PASS" if not scenario_errors else "FAIL",
+                "errors": scenario_errors,
+            }
+        )
+
+    overall_status = "PASS" if not validation_errors else "FAIL"
+    return {
+        "day": "Day67",
+        "title": "Offline Mock Runtime Contract & Safety Invariant Validation",
+        "task_name": DAY67_OFFLINE_MOCK_RUNTIME_CONTRACT_TASK_ID,
+        "overall_status": overall_status,
+        "reviewer_status": "REVIEW_READY" if overall_status == "PASS" else "REVIEW_REQUIRED",
+        "source_runtime_day": day66_report.get("day"),
+        "source_runtime_title": day66_report.get("title"),
+        "validated_scenarios": len(scenarios),
+        "validation_errors": validation_errors,
+        "scenario_validations": scenario_validations,
+        "allowed_execution_modes": ["dry_run_only", "offline_mock"],
+        "allowed_safety_categories": [
+            "blocked_live_action",
+            "documentation_only",
+            "needs_manual_review",
+            "report_only",
+        ],
+        "safety_invariants": {
+            "live_execution_allowed_always_false": all(
+                scenario.get("live_execution_allowed") is False for scenario in scenarios
+            ),
+            "mapped_task_executed_always_false": all(
+                scenario.get("mapped_task_executed") is False for scenario in scenarios
+            ),
+            "blocked_live_actions_have_warning_and_evidence": all(
+                scenario.get("blocked") is True
+                and isinstance(scenario.get("reviewer_warning"), str)
+                and bool(scenario.get("reviewer_warning", "").strip())
+                and isinstance(scenario.get("evidence_references"), list)
+                and bool(scenario.get("evidence_references"))
+                for scenario in scenarios
+                if scenario.get("safety_category") == "blocked_live_action"
+            ),
+        },
+        "safety_boundary": [
+            "No OpenAI API.",
+            "No voice integration.",
+            "No SSH.",
+            "No device access.",
+            "No live execution.",
+            "No mapped task execution.",
+            "No arbitrary command execution.",
+            "No config.json dependency.",
+            "No router, switch, firewall, VPN, VRRP, or network configuration changes.",
+            "No release tag.",
+        ],
+        "report_only_statement": (
+            "Day67 validates in-memory Day66 mock runtime dictionaries only. "
+            "It does not enable AI, voice, SSH, device access, live execution, "
+            "mapped task execution, or network configuration changes."
+        ),
+    }
+
+
+def write_day67_offline_mock_runtime_contract_html(report: Dict[str, Any], output_path: Path) -> None:
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    scenario_rows = "".join(
+        "<tr>"
+        f"<td>{html.escape(str(item.get('scenario_id', '')))}</td>"
+        f"<td>{html.escape(str(item.get('safety_category', '')))}</td>"
+        f"<td>{html.escape(str(item.get('decision', '')))}</td>"
+        f"<td>{html.escape(str(item.get('contract_status', '')))}</td>"
+        f"<td>{html.escape('; '.join(str(error) for error in item.get('errors', [])))}</td>"
+        "</tr>"
+        for item in report.get("scenario_validations", [])
+    )
+    invariant_rows = "".join(
+        "<tr>"
+        f"<th>{html.escape(str(label).replace('_', ' ').title())}</th>"
+        f"<td>{html.escape(str(value))}</td>"
+        "</tr>"
+        for label, value in report.get("safety_invariants", {}).items()
+    )
+    boundary_items = "".join(
+        f"<li>{html.escape(str(item))}</li>" for item in report.get("safety_boundary", [])
+    )
+    error_items = "".join(
+        f"<li>{html.escape(str(error))}</li>" for error in report.get("validation_errors", [])
+    ) or "<li>None</li>"
+    output_path.write_text(
+        f"""<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Day67 Offline Mock Runtime Contract</title>
+  <style>
+    body {{ font-family: Arial, sans-serif; margin: 24px; color: #182230; }}
+    table {{ border-collapse: collapse; width: 100%; margin: 12px 0 20px; }}
+    td, th {{ border: 1px solid #d8e0ec; padding: 8px 10px; text-align: left; vertical-align: top; }}
+    th {{ background: #edf2f8; }}
+    .safe {{ background: #ecfdf3; border: 1px solid #abefc6; color: #05603a; padding: 12px; }}
+    code {{ overflow-wrap: anywhere; }}
+  </style>
+</head>
+<body>
+  <h1>Day67 Offline Mock Runtime Contract &amp; Safety Invariant Validation</h1>
+  <p class="safe">{html.escape(str(report.get("report_only_statement", "")))}</p>
+  <h2>Summary</h2>
+  <table>
+    <tbody>
+      <tr><th>Overall status</th><td>{html.escape(str(report.get("overall_status", "")))}</td></tr>
+      <tr><th>Reviewer status</th><td>{html.escape(str(report.get("reviewer_status", "")))}</td></tr>
+      <tr><th>Validated scenarios</th><td>{html.escape(str(report.get("validated_scenarios", "")))}</td></tr>
+      <tr><th>Source runtime</th><td>{html.escape(str(report.get("source_runtime_title", "")))}</td></tr>
+    </tbody>
+  </table>
+  <h2>Safety Invariants</h2>
+  <table><tbody>{invariant_rows}</tbody></table>
+  <h2>Scenario Contract Results</h2>
+  <table>
+    <thead><tr><th>Scenario ID</th><th>Safety category</th><th>Decision</th><th>Status</th><th>Errors</th></tr></thead>
+    <tbody>{scenario_rows}</tbody>
+  </table>
+  <h2>Validation Errors</h2>
+  <ul>{error_items}</ul>
+  <h2>Safety Boundary</h2>
+  <ul>{boundary_items}</ul>
+</body>
+</html>
+""",
+        encoding="utf-8",
+    )
+
+
+def _run_day67_offline_mock_runtime_contract(project_root: Path) -> int:
+    report = build_day67_offline_mock_runtime_contract_report()
+    json_path = project_root / DAY67_OFFLINE_MOCK_RUNTIME_CONTRACT_JSON
+    html_path = project_root / DAY67_OFFLINE_MOCK_RUNTIME_CONTRACT_HTML
+    write_json_report(report, json_path)
+    write_day67_offline_mock_runtime_contract_html(mask_secret_values(report), html_path)
+
+    print(format_heading("Day67 Offline Mock Runtime Contract & Safety Invariant Validation"))
+    print("Safety: offline mock contract validation / report-only")
+    print(f"Overall status: {report['overall_status']} / {report['reviewer_status']}")
+    print(f"Validated scenarios: {report['validated_scenarios']}")
+    print(f"Validation errors: {len(report['validation_errors'])}")
+    print(f"JSON report: {_relative_to_project(project_root, json_path)}")
+    print(f"HTML report: {_relative_to_project(project_root, html_path)}")
+    if report["overall_status"] == "PASS":
+        print(f"{format_status('PASS')} REVIEW_READY")
+        print("No live execution, API, voice, SSH, device access, mapped task execution, or network change occurred.")
+        return 0
+
+    print(f"{format_status('FAIL')} REVIEW_REQUIRED")
+    return 2
 
 
 def _relative_to_project(project_root: Path, path: Path) -> str:
@@ -5495,6 +5716,8 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
         return _run_day60_intent_workflow_demo(root)
     if args.task == DAY66_OFFLINE_MOCK_RUNTIME_TASK_ID:
         return _run_day66_offline_mock_runtime(root)
+    if args.task == DAY67_OFFLINE_MOCK_RUNTIME_CONTRACT_TASK_ID:
+        return _run_day67_offline_mock_runtime_contract(root)
 
     profile_path = _resolve_project_path(root, args.profile)
     try:

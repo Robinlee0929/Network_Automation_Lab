@@ -2720,3 +2720,56 @@ def test_day66_cli_generates_fixed_mock_report_without_config_or_device_access(
     assert "request_vrrp_failover_live_action" in html
     assert "live_execution_allowed" not in html
     assert "Live execution allowed" in html
+
+
+def test_day67_offline_mock_runtime_contract_task_exists_in_catalog():
+    task = next(task for task in network_lab.list_tasks() if task["id"] == "offline-mock-runtime-contract")
+
+    assert task["task_id"] == "day67_offline_mock_runtime_contract"
+    assert task["day"] == "Day67"
+    assert task["safety_level"] == "report-only"
+    assert task["execution_mode"] == "report-only"
+    assert task["requires_live_device"] is False
+    assert task["requires_password"] is False
+    assert task["produces_report"] is True
+    assert "reports/portfolio/day67_offline_mock_runtime_contract.json" in task["report_paths"]
+    assert "reports/portfolio/day67_offline_mock_runtime_contract.html" in task["report_paths"]
+    assert "docs/ai/intent_offline_mock_runtime_contract.md" in task["report_paths"]
+
+
+def test_day67_cli_validates_contract_without_config_or_device_access(
+    tmp_path,
+    monkeypatch,
+    capsys,
+):
+    def fail_run(*_args, **_kwargs):
+        raise AssertionError("Day67 contract validation must not execute subprocess")
+
+    def fail_profile_load(*_args, **_kwargs):
+        raise AssertionError("Day67 contract validation must not load profile or config data")
+
+    monkeypatch.setattr(network_lab.subprocess, "run", fail_run)
+    monkeypatch.setattr(network_lab, "load_lab_runner_profile", fail_profile_load)
+
+    exit_code = network_lab.main(["--task", "offline-mock-runtime-contract"], project_root=tmp_path)
+
+    output = capsys.readouterr().out
+    json_path = tmp_path / "reports/portfolio/day67_offline_mock_runtime_contract.json"
+    html_path = tmp_path / "reports/portfolio/day67_offline_mock_runtime_contract.html"
+    assert exit_code == 0
+    assert "Day67 Offline Mock Runtime Contract" in output
+    assert "REVIEW_READY" in output
+    assert json_path.exists()
+    assert html_path.exists()
+    assert not (tmp_path / "config.json").exists()
+
+    report = json.loads(json_path.read_text(encoding="utf-8"))
+    html = html_path.read_text(encoding="utf-8")
+    assert report["overall_status"] == "PASS"
+    assert report["reviewer_status"] == "REVIEW_READY"
+    assert report["validated_scenarios"] >= 4
+    assert report["validation_errors"] == []
+    assert report["safety_invariants"]["live_execution_allowed_always_false"] is True
+    assert report["safety_invariants"]["mapped_task_executed_always_false"] is True
+    assert "Day67 Offline Mock Runtime Contract" in html
+    assert "No live execution" in html
