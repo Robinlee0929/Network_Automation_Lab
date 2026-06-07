@@ -745,6 +745,20 @@ def ai_intent_reviewer_references() -> List[AIIntentReviewerReference]:
                 "reports/portfolio/day67_offline_mock_runtime_contract.html",
             ),
         ),
+        AIIntentReviewerReference(
+            day="Day68",
+            title="Reviewer report quality and evidence trace",
+            summary=(
+                "Reviews Day66-Day67 report quality, evidence traceability, contract "
+                "validation proof, and no-execution evidence for human reviewers."
+            ),
+            doc_path="docs/ai/intent_offline_mock_runtime_reviewer_report_quality.md",
+            roadmap_path="docs/roadmap/day68_offline_mock_runtime_reviewer_report_quality.md",
+            report_paths=(
+                "reports/lab-summary/day68_offline_mock_runtime_reviewer_report_quality.json",
+                "reports/lab-summary/day68_offline_mock_runtime_reviewer_report_quality.html",
+            ),
+        ),
     ]
 
 
@@ -764,6 +778,7 @@ def ai_intent_safety_boundaries() -> List[str]:
         "No automatic execution of mapped tasks from scenario examples.",
         "Day66 mock runtime output is fixed offline evidence only.",
         "Day67 validates contract and safety invariants without enabling runtime behavior.",
+        "Day68 reviews report quality and evidence traceability without enabling runtime behavior.",
     ]
 
 

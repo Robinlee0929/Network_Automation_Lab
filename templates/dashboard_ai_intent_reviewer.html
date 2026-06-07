@@ -131,7 +131,7 @@
   </nav>
 
   <h1>AI Intent Reviewer Entry Point</h1>
-  <p>Reviewer-friendly dashboard view for the Day57-Day67 AI intent workflow. It explains the demo path, links to the committed docs, scenario pack, traceability map, acceptance runbook, sign-off package, offline mock runtime skeleton, and contract validation layer, and keeps the no-execution boundary visible.</p>
+  <p>Reviewer-friendly dashboard view for the Day57-Day68 AI intent workflow. It explains the demo path, links to the committed docs, scenario pack, traceability map, acceptance runbook, sign-off package, offline mock runtime skeleton, contract validation layer, and reviewer quality trace, and keeps the no-execution boundary visible.</p>
   <div class="note">This page is report-only. It does not call an AI model, listen to voice input, execute mapped tasks, open SSH, connect to devices, or change network configuration.</div>
 
   <section>
@@ -157,7 +157,7 @@
   </section>
 
   <section>
-    <h2>Day57-Day67 Review Path</h2>
+    <h2>Day57-Day68 Review Path</h2>
     <div class="day-grid">
       {% for item in references %}
       <article class="day-card">
@@ -196,6 +196,7 @@
       <li>Read Day65 to review the final acceptance summary and sign-off package before the offline mock runtime skeleton.</li>
       <li>Read Day66 to inspect the fixed offline mock runtime skeleton and confirm live execution remains disallowed.</li>
       <li>Read Day67 to inspect the fixed runtime output contract and safety invariant validation layer.</li>
+      <li>Read Day68 to confirm reviewer-visible report quality, evidence traceability, contract validation proof, and no-execution evidence.</li>
       <li>Use <a href="{{ url_for('reports') }}">Reports</a> for generated local evidence when available.</li>
     </ol>
     <div class="safe">Expected Day60 statement: <code>No mapped task was executed. This is a dry-run reviewer walkthrough only.</code></div>
@@ -291,6 +292,29 @@
       </ul>
     </div>
     <div class="safe">Day67 safety boundary: no API, no voice, no SSH, no device access, no live execution, no mapped task execution, and no network configuration changes.</div>
+  </section>
+
+  <section>
+    <h2>Day68 - Reviewer Report Quality &amp; Evidence Trace Review</h2>
+    <p>Day68 reviews whether the Day66-Day67 offline mock runtime reports are readable, traceable, contract-validated, and sufficient for a human reviewer to confirm that no live action occurred.</p>
+    <ul>
+      <li>Each scenario is checked for visible input intent, decision result, and safety classification.</li>
+      <li>Blocked live-action scenarios must show reviewer-visible blocked reasons and evidence references.</li>
+      <li>Contract validation proof is included for each scenario and for the full mock result set.</li>
+      <li>No-live-action, no-mapped-task, and no-device/network-change evidence is surfaced explicitly.</li>
+    </ul>
+    <div class="refs">
+      <a href="{{ evidence_url('docs/ai/intent_offline_mock_runtime_reviewer_report_quality.md') }}">Open reviewer quality doc</a>
+      <a href="{{ evidence_url('docs/roadmap/day68_offline_mock_runtime_reviewer_report_quality.md') }}">Open Day68 roadmap</a>
+    </div>
+    <div class="paths">
+      <strong>Optional generated reports:</strong>
+      <ul>
+        <li><code>reports/lab-summary/day68_offline_mock_runtime_reviewer_report_quality.json</code></li>
+        <li><code>reports/lab-summary/day68_offline_mock_runtime_reviewer_report_quality.html</code></li>
+      </ul>
+    </div>
+    <div class="safe">Day68 is offline mock/report-only. It adds no API, no voice, no SSH, no device access, no live execution, no mapped task execution, no dashboard action surface, and no network configuration changes.</div>
   </section>
 
   <section>

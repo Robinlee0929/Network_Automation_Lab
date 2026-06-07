@@ -188,7 +188,7 @@ def test_ai_review_checklist_contains_wireguard_vpn_safety_items():
 def test_ai_intent_reviewer_references_day57_to_day62():
     references = dashboard.ai_intent_reviewer_references()
 
-    assert [item.day for item in references] == ["Day57", "Day58", "Day59", "Day60", "Day62", "Day66", "Day67"]
+    assert [item.day for item in references] == ["Day57", "Day58", "Day59", "Day60", "Day62", "Day66", "Day67", "Day68"]
     text = " ".join(
         f"{item.title} {item.summary} {item.doc_path} {item.roadmap_path} "
         f"{' '.join(item.report_paths)}"
@@ -210,6 +210,10 @@ def test_ai_intent_reviewer_references_day57_to_day62():
     assert "docs/ai/intent_offline_mock_runtime_contract.md" in text
     assert "docs/roadmap/day67_offline_mock_runtime_contract_safety_invariants.md" in text
     assert "reports/portfolio/day67_offline_mock_runtime_contract.html" in text
+    assert "Reviewer report quality and evidence trace" in text
+    assert "docs/ai/intent_offline_mock_runtime_reviewer_report_quality.md" in text
+    assert "docs/roadmap/day68_offline_mock_runtime_reviewer_report_quality.md" in text
+    assert "reports/lab-summary/day68_offline_mock_runtime_reviewer_report_quality.html" in text
 
 
 def test_ai_intent_reviewer_safety_boundaries_are_report_only():
@@ -225,6 +229,7 @@ def test_ai_intent_reviewer_safety_boundaries_are_report_only():
     assert "No automatic execution of mapped tasks from scenario examples" in text
     assert "Day66 mock runtime output is fixed offline evidence only" in text
     assert "Day67 validates contract and safety invariants" in text
+    assert "Day68 reviews report quality and evidence traceability" in text
 
 
 def day12_report(private_key_line="PrivateKey = REDACTED"):
@@ -428,11 +433,13 @@ def test_ai_intent_reviewer_route_exposes_day57_to_day65_without_execution(tmp_p
     assert "Day62" in text
     assert "Day66" in text
     assert "Day67" in text
+    assert "Day68" in text
     assert "Day63 Traceability Evidence Map" in text
     assert "Day64 Reviewer Acceptance Runbook" in text
     assert "Day65 Acceptance Sign-off Package" in text
     assert "Day66 Offline Mock Runtime Skeleton" in text
     assert "Day67 - Offline Mock Runtime Contract &amp; Safety Invariant Validation" in text
+    assert "Day68 - Reviewer Report Quality &amp; Evidence Trace Review" in text
     assert "docs/ai/day57_intent_mapping_prototype.md" in text
     assert "reports/portfolio/day60_intent_workflow_demo.html" in text
     assert "docs/ai/intent_reviewer_scenario_pack.md" in text
@@ -464,6 +471,12 @@ def test_ai_intent_reviewer_route_exposes_day57_to_day65_without_execution(tmp_p
     assert "Day67 safety boundary: no API, no voice, no SSH, no device access, no live execution, no mapped task execution, and no network configuration changes" in text
     assert "docs/ai/intent_offline_mock_runtime_contract.md" in text
     assert "reports/portfolio/day67_offline_mock_runtime_contract.html" in text
+    assert "docs/ai/intent_offline_mock_runtime_reviewer_report_quality.md" in text
+    assert "reports/lab-summary/day68_offline_mock_runtime_reviewer_report_quality.html" in text
+    assert "reviewer-visible report quality" in text
+    assert "contract validation proof" in text
+    assert "no-device/network-change evidence" in text
+    assert "Day68 is offline mock/report-only" in text
     assert "No OpenAI API calls" in text
     assert "No voice input" in text
     assert "No mapped runner task execution" in text
