@@ -398,7 +398,7 @@ def test_dashboard_home_is_portfolio_demo_landing_page(tmp_path):
     assert "/ai-intent-reviewer" in text
 
 
-def test_ai_intent_reviewer_route_exposes_day57_to_day64_without_execution(tmp_path):
+def test_ai_intent_reviewer_route_exposes_day57_to_day65_without_execution(tmp_path):
     if dashboard.Flask is None:
         pytest.skip("Flask is not installed in this test environment.")
 
@@ -419,6 +419,7 @@ def test_ai_intent_reviewer_route_exposes_day57_to_day64_without_execution(tmp_p
     assert "Day62" in text
     assert "Day63 Traceability Evidence Map" in text
     assert "Day64 Reviewer Acceptance Runbook" in text
+    assert "Day65 Acceptance Sign-off Package" in text
     assert "docs/ai/day57_intent_mapping_prototype.md" in text
     assert "reports/portfolio/day60_intent_workflow_demo.html" in text
     assert "docs/ai/intent_reviewer_scenario_pack.md" in text
@@ -427,13 +428,21 @@ def test_ai_intent_reviewer_route_exposes_day57_to_day64_without_execution(tmp_p
     assert "docs/roadmap/day63_ai_intent_reviewer_traceability_evidence_map.md" in text
     assert "docs/ai/intent_reviewer_acceptance_runbook.md" in text
     assert "docs/roadmap/day64_ai_intent_reviewer_acceptance_runbook.md" in text
+    assert "docs/ai/intent_reviewer_acceptance_signoff_package.md" in text
+    assert "docs/roadmap/day65_ai_intent_reviewer_acceptance_signoff_package.md" in text
     assert "Scenario Pack" in text
     assert "trace each AI intent review concept back to Day57-Day62 evidence" in text
     assert "static, report-only runbook" in text
     assert "validation commands, and safety boundaries" in text
+    assert "the current system is not a runtime AI executor" in text
+    assert "Accepted with notes" in text
+    assert "Deferred" in text
+    assert "Rejected" in text
+    assert "future offline mock runtime skeleton planning remains Day66+ scope" in text
     assert "No action is executed from this page" in text
     assert "This page is report-only" in text
     assert "This page remains static and report-only" in text
+    assert "Day65 is documentation/report-only/static dashboard work" in text
     assert "No OpenAI API calls" in text
     assert "No voice input" in text
     assert "No mapped runner task execution" in text
@@ -452,6 +461,8 @@ def test_ai_intent_reviewer_route_exposes_day57_to_day64_without_execution(tmp_p
     assert "submit intent" not in html
     assert "post /" not in html
     assert "action runner" not in html
+    assert "task runner endpoint" not in html
+    assert "start task runner" not in html
 
 
 def test_dashboard_reports_route_exposes_vrrp_evidence_group(tmp_path):
