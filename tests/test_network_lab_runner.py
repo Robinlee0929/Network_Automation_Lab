@@ -2475,3 +2475,92 @@ def test_day58_cli_generates_redacted_report_without_config_or_network_access(
     assert report["device_connection_used"] is False
     assert report["config_json_read"] is False
     assert report["mapped_task_executed"] is False
+
+
+def test_day59_intent_policy_matrix_task_exists_in_catalog():
+    task = next(task for task in network_lab.list_tasks() if task["id"] == "intent-policy-matrix")
+
+    assert task["task_id"] == "day59_intent_policy_matrix_reviewer_safety_explanation"
+    assert task["day"] == "Day59"
+    assert task["safety_level"] == "report-only"
+    assert task["execution_mode"] == "report-only"
+    assert task["requires_live_device"] is False
+    assert task["produces_report"] is True
+    assert "reports/portfolio/day59_intent_policy_matrix.json" in task["report_paths"]
+    assert "reports/portfolio/day59_intent_policy_matrix.html" in task["report_paths"]
+
+
+def test_day59_policy_matrix_includes_allowed_and_blocked_examples():
+    report = network_lab.build_day59_intent_policy_matrix()
+    rows = {row["intent_category"]: row for row in report["policy_matrix"]}
+
+    assert report["task_name"] == "intent-policy-matrix"
+    assert report["task_type"] == "report-only"
+    assert report["safety_level"] == "report_only"
+    assert report["mapped_task_executed"] is False
+    assert report["openai_api_used"] is False
+    assert report["voice_control_used"] is False
+    assert report["ssh_used"] is False
+    assert report["device_connection_used"] is False
+    assert report["config_json_read"] is False
+
+    for category in [
+        "Open dashboard / latest reports",
+        "Show task catalog",
+        "Generate report index",
+        "Dry-run intent mapping",
+        "Read-only safety review",
+    ]:
+        assert rows[category]["allowed_to_execute_automatically"] is True
+        assert rows[category]["default_decision"].startswith("allowed")
+
+    assert rows["Dry-run intent mapping"]["mapped_task_execution_allowed"] is False
+
+    for category in [
+        "VRRP failover request",
+        "WireGuard live validation request",
+        "SSH command request",
+        "Router / switch configuration change request",
+        "Unknown or ambiguous request",
+    ]:
+        assert rows[category]["allowed_to_execute_automatically"] is False
+        assert rows[category]["mapped_task_execution_allowed"] is False
+        assert rows[category]["requires_confirmation"] is True
+
+    assert rows["VRRP failover request"]["safety_classification"] == "blocked_live_capable"
+    assert rows["SSH command request"]["safety_classification"] == "blocked_live_capable"
+    assert rows["Router / switch configuration change request"]["safety_classification"] == "blocked_live_capable"
+    assert rows["Unknown or ambiguous request"]["safety_classification"] == "unknown_blocked"
+
+
+def test_day59_cli_generates_report_only_matrix_without_subprocess(tmp_path, monkeypatch, capsys):
+    def fail_run(*_args, **_kwargs):
+        raise AssertionError("Day59 intent policy matrix must not execute subprocess")
+
+    monkeypatch.setattr(network_lab.subprocess, "run", fail_run)
+
+    exit_code = network_lab.main(["--task", "intent-policy-matrix"], project_root=tmp_path)
+
+    output = capsys.readouterr().out
+    json_path = tmp_path / "reports/portfolio/day59_intent_policy_matrix.json"
+    html_path = tmp_path / "reports/portfolio/day59_intent_policy_matrix.html"
+    assert exit_code == 0
+    assert "Day59 Intent Policy Matrix" in output
+    assert "Safety: report-only" in output
+    assert "No mapped task was executed" in output
+    assert json_path.exists()
+    assert html_path.exists()
+
+    report = json.loads(json_path.read_text(encoding="utf-8"))
+    html = html_path.read_text(encoding="utf-8")
+    assert report["final_status"] == "PASS"
+    assert report["safety_scope"]["mapped_tasks_executed"] is False
+    assert report["safety_scope"]["openai_api_used"] is False
+    assert report["safety_scope"]["voice_control_used"] is False
+    assert report["safety_scope"]["ssh_connections_opened"] is False
+    assert report["safety_scope"]["device_connections_opened"] is False
+    assert report["safety_scope"]["config_json_read"] is False
+    assert "VRRP failover request" in html
+    assert "SSH command request" in html
+    assert "Router / switch configuration change request" in html
+    assert "Dry-run intent mapping" in html

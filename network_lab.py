@@ -59,6 +59,13 @@ DAY58_INTENT_SAFETY_REVIEW_DOC = Path("docs") / "ai" / "day58_intent_mapping_saf
 DAY58_INTENT_SAFETY_REVIEW_ROADMAP = Path("docs") / "roadmap" / "day58_intent_mapping_safety_review_confirmation_gate.md"
 DAY58_INTENT_SAFETY_REVIEW_JSON = Path("reports") / "portfolio" / "day58_intent_mapping_safety_review.json"
 DAY58_INTENT_SAFETY_REVIEW_HTML = Path("reports") / "portfolio" / "day58_intent_mapping_safety_review.html"
+DAY59_INTENT_POLICY_MATRIX_TASK_ID = "intent-policy-matrix"
+DAY59_INTENT_POLICY_MATRIX_DOC = Path("docs") / "ai" / "day59_intent_policy_matrix_reviewer_safety_explanation.md"
+DAY59_INTENT_POLICY_MATRIX_ROADMAP = (
+    Path("docs") / "roadmap" / "day59_intent_policy_matrix_reviewer_safety_explanation.md"
+)
+DAY59_INTENT_POLICY_MATRIX_JSON = Path("reports") / "portfolio" / "day59_intent_policy_matrix.json"
+DAY59_INTENT_POLICY_MATRIX_HTML = Path("reports") / "portfolio" / "day59_intent_policy_matrix.html"
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
 WIREGUARD_RUNNER_DISPLAY_NAME = "WireGuard Runner Safety Layer"
@@ -166,6 +173,158 @@ DAY58_CONFIRMATION_GATE_RULES = [
     "Any task capable of changing device or network state is blocked by default.",
     "Future live-capable execution requires explicit user confirmation, visible task preview, safety classification, blocked action check, non-default live flag, and a human-readable warning.",
     "Unknown intent is blocked.",
+]
+
+DAY59_INTENT_POLICY_MATRIX_ROWS = [
+    {
+        "intent_category": "Open dashboard / latest reports",
+        "example_user_phrase": "Open the dashboard and show the latest reports",
+        "mapped_task_type": "local UI / report-only",
+        "candidate_task": "dashboard/report viewer or report-index",
+        "safety_classification": "report_only",
+        "default_decision": "allowed",
+        "requires_confirmation": False,
+        "allowed_to_execute_automatically": True,
+        "mapped_task_execution_allowed": True,
+        "reviewer_explanation": (
+            "Opening local dashboard or report views reads existing local artifacts and does not touch live devices."
+        ),
+        "evidence_report_output": "Dashboard /reports page, reports/report_index.html, local report JSON/HTML files",
+    },
+    {
+        "intent_category": "Show task catalog",
+        "example_user_phrase": "Show me the available runner tasks",
+        "mapped_task_type": "local metadata / report-only",
+        "candidate_task": "--list-tasks",
+        "safety_classification": "report_only",
+        "default_decision": "allowed",
+        "requires_confirmation": False,
+        "allowed_to_execute_automatically": True,
+        "mapped_task_execution_allowed": True,
+        "reviewer_explanation": "Listing the task catalog prints committed runner metadata only.",
+        "evidence_report_output": "network_lab.py --list-tasks output and task catalog metadata",
+    },
+    {
+        "intent_category": "Generate report index",
+        "example_user_phrase": "Generate the report index",
+        "mapped_task_type": "report-only",
+        "candidate_task": "report-index",
+        "safety_classification": "report_only",
+        "default_decision": "allowed",
+        "requires_confirmation": False,
+        "allowed_to_execute_automatically": True,
+        "mapped_task_execution_allowed": True,
+        "reviewer_explanation": "Report index generation scans local report metadata and writes summary JSON/HTML.",
+        "evidence_report_output": "reports/report_index.json and reports/report_index.html",
+    },
+    {
+        "intent_category": "Dry-run intent mapping",
+        "example_user_phrase": "Map this request to a runner task, but dry-run only",
+        "mapped_task_type": "dry-run proposal",
+        "candidate_task": DAY57_INTENT_MAPPING_TASK_ID,
+        "safety_classification": "dry_run",
+        "default_decision": "allowed_dry_run_only",
+        "requires_confirmation": False,
+        "allowed_to_execute_automatically": True,
+        "mapped_task_execution_allowed": False,
+        "reviewer_explanation": (
+            "Day57 may classify intent and propose an allowlisted task, but the proposed task is never executed."
+        ),
+        "evidence_report_output": "Day57 CLI JSON output and docs/ai/day57_intent_mapping_prototype.md",
+    },
+    {
+        "intent_category": "Read-only safety review",
+        "example_user_phrase": "Review whether this intent is safe",
+        "mapped_task_type": "report-only safety explanation",
+        "candidate_task": DAY58_INTENT_SAFETY_REVIEW_TASK_ID,
+        "safety_classification": "report_only",
+        "default_decision": "allowed",
+        "requires_confirmation": False,
+        "allowed_to_execute_automatically": True,
+        "mapped_task_execution_allowed": True,
+        "reviewer_explanation": "Day58 writes a local safety decision report and does not delegate to mapped tasks.",
+        "evidence_report_output": DAY58_INTENT_SAFETY_REVIEW_JSON.as_posix(),
+    },
+    {
+        "intent_category": "VRRP failover request",
+        "example_user_phrase": "Do the VRRP failover test",
+        "mapped_task_type": "live-capable network test",
+        "candidate_task": DAY35_VRRP_FAILOVER_TASK_ID,
+        "safety_classification": "blocked_live_capable",
+        "default_decision": "blocked_by_default",
+        "requires_confirmation": True,
+        "allowed_to_execute_automatically": False,
+        "mapped_task_execution_allowed": False,
+        "reviewer_explanation": (
+            "VRRP failover can affect network availability, so intent mapping may only identify it as a candidate."
+        ),
+        "evidence_report_output": "Day58 blocked policy match: VRRP failover execution",
+    },
+    {
+        "intent_category": "WireGuard live validation request",
+        "example_user_phrase": "Run the WireGuard validation",
+        "mapped_task_type": "guarded-live capable validation",
+        "candidate_task": WIREGUARD_RUNNER_TASK_ALIAS,
+        "safety_classification": "blocked_live_capable",
+        "default_decision": "blocked_by_default",
+        "requires_confirmation": True,
+        "allowed_to_execute_automatically": False,
+        "mapped_task_execution_allowed": False,
+        "reviewer_explanation": (
+            "WireGuard validation may touch live VPN state or test endpoints, so it must not run from intent alone."
+        ),
+        "evidence_report_output": "Day57/Day58 dry-run mapping and safety review output",
+    },
+    {
+        "intent_category": "SSH command request",
+        "example_user_phrase": "SSH to the router and run this command",
+        "mapped_task_type": "direct device access",
+        "candidate_task": "blocked-live-capable-action",
+        "safety_classification": "blocked_live_capable",
+        "default_decision": "blocked_by_default",
+        "requires_confirmation": True,
+        "allowed_to_execute_automatically": False,
+        "mapped_task_execution_allowed": False,
+        "reviewer_explanation": "SSH and RouterOS command execution are outside Day59 scope and blocked by default.",
+        "evidence_report_output": "Day58 blocked policy match: SSH command execution",
+    },
+    {
+        "intent_category": "Router / switch configuration change request",
+        "example_user_phrase": "Apply this router configuration change",
+        "mapped_task_type": "device-changing action",
+        "candidate_task": "blocked-live-capable-action",
+        "safety_classification": "blocked_live_capable",
+        "default_decision": "blocked_by_default",
+        "requires_confirmation": True,
+        "allowed_to_execute_automatically": False,
+        "mapped_task_execution_allowed": False,
+        "reviewer_explanation": (
+            "Router, switch, firewall, VPN, NAT, IP, VRRP, WireGuard, interface, and route changes are blocked."
+        ),
+        "evidence_report_output": "Day58 blocked live-capable action policy",
+    },
+    {
+        "intent_category": "Unknown or ambiguous request",
+        "example_user_phrase": "Make everything better",
+        "mapped_task_type": "no safe task mapped",
+        "candidate_task": None,
+        "safety_classification": "unknown_blocked",
+        "default_decision": "blocked_or_requires_clarification",
+        "requires_confirmation": True,
+        "allowed_to_execute_automatically": False,
+        "mapped_task_execution_allowed": False,
+        "reviewer_explanation": "Ambiguous requests must stop for human clarification and must not execute any task.",
+        "evidence_report_output": "Day57 unknown_or_ambiguous / Day58 unknown_blocked output",
+    },
+]
+
+DAY59_REVIEWER_EXPLANATION = [
+    "The system separates understanding intent from executing a task.",
+    "Intent mapping is not permission to run the mapped task.",
+    "Safety review happens before any future execution path.",
+    "Report-only and documentation-only tasks may be allowed because they only read or write local evidence.",
+    "Live-capable tasks require explicit human confirmation in future design and are blocked by default now.",
+    "Voice input, OpenAI API calls, SSH, live device access, and device control are intentionally out of scope.",
 ]
 
 REPORT_CATALOG = [
@@ -331,6 +490,16 @@ REPORT_CATALOG = [
         "json_globs": [DAY41_RELEASE_PACKAGING_JSON.as_posix()],
         "html_globs": [DAY41_RELEASE_PACKAGING_HTML.as_posix()],
         "missing_note": f"Generate with: python network_lab.py --task {DAY41_RELEASE_PACKAGING_TASK_ID}",
+    },
+    {
+        "day": "Day59",
+        "title": "Intent Policy Matrix",
+        "report_type": "Reviewer-facing safety matrix",
+        "safety_label": "report-only AI planning evidence",
+        "description": "Day59 policy matrix explaining Day57/Day58 intent mapping safety decisions without live behavior.",
+        "json_globs": [DAY59_INTENT_POLICY_MATRIX_JSON.as_posix()],
+        "html_globs": [DAY59_INTENT_POLICY_MATRIX_HTML.as_posix()],
+        "missing_note": f"Generate with: python network_lab.py --task {DAY59_INTENT_POLICY_MATRIX_TASK_ID}",
     },
 ]
 
@@ -1785,6 +1954,34 @@ def list_tasks() -> List[Dict[str, Any]]:
             "related_script": "network_lab.py",
             "notes": "Report-only confirmation gate design. Blocks live-capable and unknown intents by default and never executes mapped tasks.",
         },
+        {
+            "id": DAY59_INTENT_POLICY_MATRIX_TASK_ID,
+            "task_id": "day59_intent_policy_matrix_reviewer_safety_explanation",
+            "display_name": "Day59 Intent Policy Matrix and Reviewer Safety Explanation",
+            "user_display_name": "Intent Policy Matrix",
+            "day": "Day59",
+            "category": "ai_planning",
+            "description": "Reviewer-facing policy matrix for Day57/Day58 intent mapping and safety decisions.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY59_INTENT_POLICY_MATRIX_JSON.as_posix(),
+                DAY59_INTENT_POLICY_MATRIX_HTML.as_posix(),
+                DAY59_INTENT_POLICY_MATRIX_DOC.as_posix(),
+                DAY59_INTENT_POLICY_MATRIX_ROADMAP.as_posix(),
+            ],
+            "report_outputs": [
+                "Day59 reviewer-facing JSON/HTML intent policy matrix",
+                "Day59 policy matrix and roadmap documentation",
+            ],
+            "related_script": "network_lab.py",
+            "notes": "Report-only matrix generation. Does not call APIs, use voice, execute mapped tasks, open SSH, read config.json, or connect to devices.",
+        },
     ]
 
 
@@ -1812,6 +2009,7 @@ def _build_parser() -> argparse.ArgumentParser:
   python network_lab.py --task day41-v0.2-release-packaging
   python network_lab.py --task intent-mapping-prototype --intent-text "show me the latest reports"
   python network_lab.py --task intent-safety-review --intent-text "do VRRP failover test"
+  python network_lab.py --task intent-policy-matrix
   python network_lab.py --task wireguard-runner --dry-run
   python network_lab.py --task wireguard-runner --wireguard-config Set_WireguardVPN_lab02_config.json --dry-run
   python network_lab.py --task wireguard-runner
@@ -1830,6 +2028,7 @@ day40-v0.2-demo-readiness-review writes a report-only v0.2 demo readiness scope 
 day41-v0.2-release-packaging writes a report-only v0.2 release packaging summary without SSH, live tests, voice/AI implementation, or tag creation.
 intent-mapping-prototype classifies static text and prints a dry-run-only mapping proposal without API, voice, SSH, device access, or runner delegation.
 intent-safety-review classifies static text through a dry-run confirmation gate and writes a report-only Day58 safety decision.
+intent-policy-matrix writes a reviewer-facing Day59 JSON/HTML safety matrix without API, voice, SSH, device access, config.json, or mapped task execution.
 wireguard-runner is dry-run by default and delegates to the existing WireGuard script only after explicit --allow-live-wireguard."""
     parser = argparse.ArgumentParser(
         description=f"Day14 {DAY14_NAME}.",
@@ -1861,6 +2060,7 @@ wireguard-runner is dry-run by default and delegates to the existing WireGuard s
             DAY41_RELEASE_PACKAGING_TASK_ID,
             DAY57_INTENT_MAPPING_TASK_ID,
             DAY58_INTENT_SAFETY_REVIEW_TASK_ID,
+            DAY59_INTENT_POLICY_MATRIX_TASK_ID,
             WIREGUARD_RUNNER_TASK_ALIAS,
         ],
         help="Task to run.",
@@ -2279,6 +2479,175 @@ def _run_day58_intent_safety_review(project_root: Path, intent_text: str) -> int
     print(f"JSON report: {_relative_to_project(project_root, json_path)}")
     print(f"HTML report: {_relative_to_project(project_root, html_path)}")
     print(f"{format_status('PASS')} Day58 safety review completed. No live execution occurred.")
+    return 0
+
+
+def build_day59_intent_policy_matrix() -> Dict[str, Any]:
+    matrix_rows = [dict(row) for row in DAY59_INTENT_POLICY_MATRIX_ROWS]
+    allowed_rows = [
+        row
+        for row in matrix_rows
+        if str(row.get("default_decision", "")).startswith("allowed")
+        and row.get("allowed_to_execute_automatically") is True
+    ]
+    blocked_rows = [
+        row
+        for row in matrix_rows
+        if str(row.get("default_decision", "")).startswith("blocked")
+        or row.get("allowed_to_execute_automatically") is False
+    ]
+    return {
+        "day": "Day59",
+        "task_name": DAY59_INTENT_POLICY_MATRIX_TASK_ID,
+        "task_id": "day59_intent_policy_matrix_reviewer_safety_explanation",
+        "task_type": "report-only",
+        "safety_level": "report_only",
+        "generated_at": datetime.now().replace(microsecond=0).isoformat(sep=" "),
+        "final_status": "PASS",
+        "matrix_columns": [
+            "intent_category",
+            "example_user_phrase",
+            "mapped_task_type",
+            "safety_classification",
+            "default_decision",
+            "requires_confirmation",
+            "allowed_to_execute_automatically",
+            "reviewer_explanation",
+            "evidence_report_output",
+        ],
+        "policy_matrix": matrix_rows,
+        "summary": {
+            "total_categories": len(matrix_rows),
+            "allowed_category_count": len(allowed_rows),
+            "blocked_category_count": len(blocked_rows),
+            "mapped_task_execution_from_intent_allowed": False,
+        },
+        "reviewer_facing_explanation": DAY59_REVIEWER_EXPLANATION,
+        "safety_scope": {
+            "documentation_only": True,
+            "report_only": True,
+            "explanation_only": True,
+            "mapped_tasks_executed": False,
+            "live_tests_executed": False,
+            "openai_api_used": False,
+            "voice_control_used": False,
+            "ssh_connections_opened": False,
+            "device_connections_opened": False,
+            "config_json_read": False,
+            "config_json_modified": False,
+            "router_switch_firewall_vpn_configuration_changed": False,
+            "nat_ip_vrrp_wireguard_interface_route_changed": False,
+            "release_tag_created": False,
+        },
+        "safety_boundaries": DAY58_SAFETY_BOUNDARIES,
+        "confirmation_gate_model": DAY58_CONFIRMATION_GATE_RULES,
+        "blocked_live_capable_action_policy": DAY58_BLOCKED_LIVE_CAPABLE_ACTIONS,
+        "report_paths": {
+            "json": DAY59_INTENT_POLICY_MATRIX_JSON.as_posix(),
+            "html": DAY59_INTENT_POLICY_MATRIX_HTML.as_posix(),
+        },
+        "openai_api_used": False,
+        "voice_control_used": False,
+        "ssh_used": False,
+        "device_connection_used": False,
+        "config_json_read": False,
+        "mapped_task_executed": False,
+        "device_configuration_changed": False,
+        "no_live_execution_occurred": True,
+    }
+
+
+def write_day59_intent_policy_matrix_html(report: Dict[str, Any], output_path: Path) -> None:
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    rows = "\n".join(
+        "<tr>"
+        f"<td>{html.escape(str(row.get('intent_category', '')))}</td>"
+        f"<td>{html.escape(str(row.get('example_user_phrase', '')))}</td>"
+        f"<td>{html.escape(str(row.get('mapped_task_type', '')))}</td>"
+        f"<td>{html.escape(str(row.get('safety_classification', '')))}</td>"
+        f"<td>{html.escape(str(row.get('default_decision', '')))}</td>"
+        f"<td>{html.escape(str(row.get('requires_confirmation', '')))}</td>"
+        f"<td>{html.escape(str(row.get('allowed_to_execute_automatically', '')))}</td>"
+        f"<td>{html.escape(str(row.get('reviewer_explanation', '')))}</td>"
+        f"<td>{html.escape(str(row.get('evidence_report_output', '')))}</td>"
+        "</tr>"
+        for row in report.get("policy_matrix", [])
+    )
+    explanation = "".join(
+        f"<li>{html.escape(str(item))}</li>" for item in report.get("reviewer_facing_explanation", [])
+    )
+    scope_rows = "\n".join(
+        f"<tr><td>{html.escape(str(key))}</td><td>{html.escape(str(value))}</td></tr>"
+        for key, value in report.get("safety_scope", {}).items()
+    )
+    output_path.write_text(
+        f"""<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Day59 Intent Policy Matrix</title>
+  <style>
+    body {{ font-family: Arial, sans-serif; margin: 24px; color: #182230; background: #f6f8fb; }}
+    main {{ max-width: 1180px; margin: 0 auto; }}
+    h1 {{ margin: 0 0 8px; font-size: 28px; }}
+    h2 {{ margin: 26px 0 10px; font-size: 18px; }}
+    table {{ width: 100%; border-collapse: collapse; background: #fff; border: 1px solid #d8e0ec; }}
+    td, th {{ border: 1px solid #d8e0ec; padding: 8px 10px; text-align: left; vertical-align: top; }}
+    th {{ background: #edf2f8; }}
+    .notice {{ background: #e9f7ef; border: 1px solid #8bd3a8; padding: 12px 14px; margin: 16px 0; color: #245b38; }}
+    .panel {{ background: #fff; border: 1px solid #d8e0ec; padding: 12px 18px; }}
+    .matrix {{ font-size: 13px; }}
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Day59 Intent Policy Matrix</h1>
+    <div>Generated {html.escape(str(report.get("generated_at", "")))}</div>
+    <div class="notice">Safety: report-only. This report explains policy decisions only; it does not call APIs, use voice, open SSH, connect to devices, read config.json, or execute mapped tasks.</div>
+    <h2>Reviewer Explanation</h2>
+    <ul class="panel">{explanation}</ul>
+    <h2>Policy Matrix</h2>
+    <table class="matrix">
+      <thead>
+        <tr>
+          <th>Intent category</th>
+          <th>Example user phrase</th>
+          <th>Mapped task type</th>
+          <th>Safety classification</th>
+          <th>Default decision</th>
+          <th>Requires confirmation?</th>
+          <th>Allowed to execute automatically?</th>
+          <th>Reviewer explanation</th>
+          <th>Evidence / report output</th>
+        </tr>
+      </thead>
+      <tbody>{rows}</tbody>
+    </table>
+    <h2>Safety Scope</h2>
+    <table><tbody>{scope_rows}</tbody></table>
+  </main>
+</body>
+</html>
+""",
+        encoding="utf-8",
+    )
+
+
+def _run_day59_intent_policy_matrix(project_root: Path) -> int:
+    report = build_day59_intent_policy_matrix()
+    json_path = project_root / DAY59_INTENT_POLICY_MATRIX_JSON
+    html_path = project_root / DAY59_INTENT_POLICY_MATRIX_HTML
+    write_json_report(report, json_path)
+    write_day59_intent_policy_matrix_html(mask_secret_values(report), html_path)
+
+    print(format_heading("Day59 Intent Policy Matrix and Reviewer Safety Explanation"))
+    print("Safety: report-only")
+    print(f"Policy categories: {report['summary']['total_categories']}")
+    print(f"Allowed categories: {report['summary']['allowed_category_count']}")
+    print(f"Blocked categories: {report['summary']['blocked_category_count']}")
+    print(f"JSON report: {_relative_to_project(project_root, json_path)}")
+    print(f"HTML report: {_relative_to_project(project_root, html_path)}")
+    print(f"{format_status('PASS')} Day59 policy matrix generated. No mapped task was executed.")
     return 0
 
 
@@ -4606,6 +4975,8 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
         return _run_day57_intent_mapping_prototype(args.intent_text)
     if args.task == DAY58_INTENT_SAFETY_REVIEW_TASK_ID:
         return _run_day58_intent_safety_review(root, args.intent_text)
+    if args.task == DAY59_INTENT_POLICY_MATRIX_TASK_ID:
+        return _run_day59_intent_policy_matrix(root)
 
     profile_path = _resolve_project_path(root, args.profile)
     try:
