@@ -188,7 +188,7 @@ def test_ai_review_checklist_contains_wireguard_vpn_safety_items():
 def test_ai_intent_reviewer_references_day57_to_day62():
     references = dashboard.ai_intent_reviewer_references()
 
-    assert [item.day for item in references] == ["Day57", "Day58", "Day59", "Day60", "Day62"]
+    assert [item.day for item in references] == ["Day57", "Day58", "Day59", "Day60", "Day62", "Day66"]
     text = " ".join(
         f"{item.title} {item.summary} {item.doc_path} {item.roadmap_path} "
         f"{' '.join(item.report_paths)}"
@@ -203,6 +203,10 @@ def test_ai_intent_reviewer_references_day57_to_day62():
     assert "reports/portfolio/day60_intent_workflow_demo.html" in text
     assert "docs/ai/intent_reviewer_scenario_pack.md" in text
     assert "docs/roadmap/day62_ai_intent_reviewer_scenario_pack.md" in text
+    assert "Offline mock runtime skeleton" in text
+    assert "docs/ai/intent_offline_mock_runtime_skeleton.md" in text
+    assert "docs/roadmap/day66_offline_mock_runtime_skeleton.md" in text
+    assert "reports/portfolio/day66_offline_mock_runtime_skeleton.html" in text
 
 
 def test_ai_intent_reviewer_safety_boundaries_are_report_only():
@@ -216,6 +220,7 @@ def test_ai_intent_reviewer_safety_boundaries_are_report_only():
     assert "No config.json requirement" in text
     assert "No NAT, IP, VRRP, WireGuard, firewall, interface, route, or device configuration changes" in text
     assert "No automatic execution of mapped tasks from scenario examples" in text
+    assert "Day66 mock runtime output is fixed offline evidence only" in text
 
 
 def day12_report(private_key_line="PrivateKey = REDACTED"):
@@ -417,9 +422,11 @@ def test_ai_intent_reviewer_route_exposes_day57_to_day65_without_execution(tmp_p
     assert "Day59" in text
     assert "Day60" in text
     assert "Day62" in text
+    assert "Day66" in text
     assert "Day63 Traceability Evidence Map" in text
     assert "Day64 Reviewer Acceptance Runbook" in text
     assert "Day65 Acceptance Sign-off Package" in text
+    assert "Day66 Offline Mock Runtime Skeleton" in text
     assert "docs/ai/day57_intent_mapping_prototype.md" in text
     assert "reports/portfolio/day60_intent_workflow_demo.html" in text
     assert "docs/ai/intent_reviewer_scenario_pack.md" in text
@@ -430,6 +437,9 @@ def test_ai_intent_reviewer_route_exposes_day57_to_day65_without_execution(tmp_p
     assert "docs/roadmap/day64_ai_intent_reviewer_acceptance_runbook.md" in text
     assert "docs/ai/intent_reviewer_acceptance_signoff_package.md" in text
     assert "docs/roadmap/day65_ai_intent_reviewer_acceptance_signoff_package.md" in text
+    assert "docs/ai/intent_offline_mock_runtime_skeleton.md" in text
+    assert "docs/roadmap/day66_offline_mock_runtime_skeleton.md" in text
+    assert "reports/portfolio/day66_offline_mock_runtime_skeleton.json" in text
     assert "Scenario Pack" in text
     assert "trace each AI intent review concept back to Day57-Day62 evidence" in text
     assert "static, report-only runbook" in text
@@ -438,17 +448,20 @@ def test_ai_intent_reviewer_route_exposes_day57_to_day65_without_execution(tmp_p
     assert "Accepted with notes" in text
     assert "Deferred" in text
     assert "Rejected" in text
-    assert "future offline mock runtime skeleton planning remains Day66+ scope" in text
+    assert "fixed offline mock runtime skeleton" in text
     assert "No action is executed from this page" in text
     assert "This page is report-only" in text
     assert "This page remains static and report-only" in text
     assert "Day65 is documentation/report-only/static dashboard work" in text
+    assert "Day66 is offline mock / dry-run-only" in text
+    assert "Mock execution means no real command" in text
     assert "No OpenAI API calls" in text
     assert "No voice input" in text
     assert "No mapped runner task execution" in text
     assert "No SSH sessions" in text
     assert "No config.json requirement" in text
     assert "No automatic execution of mapped tasks from scenario examples" in text
+    assert "Day66 mock runtime output is fixed offline evidence only" in text
     assert "No mapped task was executed. This is a dry-run reviewer walkthrough only." in text
     html = text.lower()
     assert "<form" not in html

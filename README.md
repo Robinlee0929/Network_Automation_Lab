@@ -69,6 +69,7 @@ The v0.1 portfolio package covers Day 1 through Day 30 post-tag verification. Th
 - Day63 - AI Intent Reviewer Traceability Evidence Map
 - Day64 - AI Intent Reviewer Acceptance Runbook
 - Day65 - AI Intent Reviewer Acceptance Sign-off Package
+- Day66 - Offline Mock Runtime Skeleton
 
 The project is designed as a practical QA Automation / SDET portfolio project for network infrastructure. It focuses on repeatable validation, structured test evidence, and readable JSON / HTML reports rather than one-off manual checks.
 
@@ -93,7 +94,7 @@ Recommended quick path:
 7. Use `docs/roadmap/day57_ai_assisted_task_intent_mapping_prototype_plan.md` for the dry-run-only intent mapping prototype plan.
 8. Use `docs/roadmap/day58_intent_mapping_safety_review_confirmation_gate.md` for the dry-run intent safety review and blocked-by-default confirmation gate design.
 9. Use `docs/ai/day59_intent_policy_matrix_reviewer_safety_explanation.md` for the reviewer-facing intent policy matrix.
-10. If running the dashboard locally, open `/ai-intent-reviewer` for the Day57-Day65 reviewer UI entry point, Day62 scenario pack link, Day63 traceability evidence map link, Day64 acceptance runbook link, and Day65 sign-off package link.
+10. If running the dashboard locally, open `/ai-intent-reviewer` for the Day57-Day66 reviewer UI entry point, Day62 scenario pack link, Day63 traceability evidence map link, Day64 acceptance runbook link, Day65 sign-off package link, and Day66 offline mock runtime skeleton link.
 
 ## Why This Project Exists
 
@@ -195,6 +196,7 @@ Cisco validation is read-only. It runs show commands for topology evidence and d
 | Day 63 | AI Intent Reviewer Traceability Evidence Map; a reviewer-facing evidence map that connects Day57-Day62 AI intent review artifacts into a traceable, report-only audit path without adding runtime AI behavior | Ready with notes |
 | Day 64 | AI Intent Reviewer Acceptance Runbook; provides reviewer acceptance steps for the dashboard entry, scenario pack, traceability map, validation commands, and safety boundary confirmation while remaining documentation/static dashboard/report-only | Ready with notes |
 | Day 65 | AI Intent Reviewer Acceptance Sign-off Package; summarizes Day57-Day64 reviewer evidence, defines accepted/deferred/rejected scope, and prepares for a future offline mock runtime skeleton without implementing runtime AI execution | Ready with notes |
+| Day 66 | Offline Mock Runtime Skeleton; adds a deterministic offline mock / dry-run-only runtime shape for AI Intent Reviewer evidence without OpenAI API, voice, SSH, device access, live execution, config.json dependency, or network configuration changes | Ready with notes |
 
 ## Lab Topology
 
@@ -2032,6 +2034,18 @@ docs/ai/intent_reviewer_acceptance_signoff_package.md
 ```
 
 Day65 adds the formal reviewer sign-off package for the AI Intent Reviewer chain. It summarizes Day57-Day64 acceptance evidence, defines accepted, accepted-with-notes, deferred, and rejected outcomes, and confirms that the current system is not a runtime AI executor. It is still documentation/report-only/static dashboard work. Day65 prepares the project for a future offline mock runtime skeleton, but does not implement that skeleton, connect OpenAI API, add voice integration, execute mapped tasks, use SSH, access devices, add forms, add POST actions, add action endpoints, add task runners, create a release tag, require `config.json`, add credentials, or change router/switch/firewall/VPN/VRRP settings.
+
+Day66 - Offline Mock Runtime Skeleton:
+
+```text
+docs/roadmap/day66_offline_mock_runtime_skeleton.md
+docs/ai/intent_offline_mock_runtime_skeleton.md
+intent_offline_mock_runtime.py
+reports/portfolio/day66_offline_mock_runtime_skeleton.json
+reports/portfolio/day66_offline_mock_runtime_skeleton.html
+```
+
+Day66 adds a deterministic offline mock / dry-run-only runtime skeleton for the AI Intent Reviewer flow. It models the future runtime shape with fixed mock scenarios, safety categories, mock plans, mock execution records, reviewer evidence references, and an optional fixed report task. It does not add OpenAI API integration, voice integration, SSH, device access, live execution, mapped task execution, `config.json` dependency, credentials, secrets, POST forms, action endpoints, arbitrary command execution, or router/switch/firewall/VPN/VRRP/network configuration changes. Reviewer-facing purpose: show the future runtime shape without enabling real execution.
 
 ## Testing Strategy
 

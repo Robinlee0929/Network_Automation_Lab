@@ -2660,3 +2660,63 @@ def test_day60_cli_generates_json_and_html_without_config_or_device_access(
     assert "change router firewall rule" in html
     assert "run WireGuard throughput test" in html
     assert "No mapped task was executed. This is a dry-run reviewer walkthrough only." in html
+
+
+def test_day66_offline_mock_runtime_task_exists_in_catalog():
+    task = next(task for task in network_lab.list_tasks() if task["id"] == "offline-mock-runtime")
+
+    assert task["task_id"] == "day66_offline_mock_runtime_skeleton"
+    assert task["day"] == "Day66"
+    assert task["safety_level"] == "report-only"
+    assert task["execution_mode"] == "report-only"
+    assert task["requires_live_device"] is False
+    assert task["requires_password"] is False
+    assert task["produces_report"] is True
+    assert "reports/portfolio/day66_offline_mock_runtime_skeleton.json" in task["report_paths"]
+    assert "reports/portfolio/day66_offline_mock_runtime_skeleton.html" in task["report_paths"]
+    assert "docs/ai/intent_offline_mock_runtime_skeleton.md" in task["report_paths"]
+
+
+def test_day66_cli_generates_fixed_mock_report_without_config_or_device_access(
+    tmp_path,
+    monkeypatch,
+    capsys,
+):
+    def fail_run(*_args, **_kwargs):
+        raise AssertionError("Day66 offline mock runtime must not execute subprocess")
+
+    def fail_profile_load(*_args, **_kwargs):
+        raise AssertionError("Day66 offline mock runtime must not load profile or config data")
+
+    monkeypatch.setattr(network_lab.subprocess, "run", fail_run)
+    monkeypatch.setattr(network_lab, "load_lab_runner_profile", fail_profile_load)
+
+    exit_code = network_lab.main(["--task", "offline-mock-runtime"], project_root=tmp_path)
+
+    output = capsys.readouterr().out
+    json_path = tmp_path / "reports/portfolio/day66_offline_mock_runtime_skeleton.json"
+    html_path = tmp_path / "reports/portfolio/day66_offline_mock_runtime_skeleton.html"
+    assert exit_code == 0
+    assert "Day66 Offline Mock Runtime Skeleton" in output
+    assert "No live execution, API, voice, SSH, device access, or network change occurred" in output
+    assert json_path.exists()
+    assert html_path.exists()
+    assert not (tmp_path / "config.json").exists()
+
+    report = json.loads(json_path.read_text(encoding="utf-8"))
+    html = html_path.read_text(encoding="utf-8")
+    assert report["overall_status"] == "PASS"
+    assert report["reviewer_status"] == "REVIEW_READY"
+    assert report["execution_mode"] == "offline_mock"
+    assert report["live_execution_allowed"] is False
+    assert report["summary"]["mock_scenarios"] >= 4
+    assert report["summary"]["blocked_live_action_scenarios"] >= 1
+    assert report["no_live_execution_occurred"] is True
+    assert report["openai_api_used"] is False
+    assert report["voice_integration_used"] is False
+    assert report["ssh_used"] is False
+    assert report["config_json_read"] is False
+    assert report["mapped_task_executed"] is False
+    assert "request_vrrp_failover_live_action" in html
+    assert "live_execution_allowed" not in html
+    assert "Live execution allowed" in html

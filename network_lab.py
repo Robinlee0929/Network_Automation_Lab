@@ -10,6 +10,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, Iterator, List, Optional, Tuple
 
+from intent_offline_mock_runtime import build_mock_runtime_report
+
 
 DAY14_NAME = "Unified Lab Runner and Report Index"
 DEFAULT_PROFILE = Path("topology_profiles") / "day14_lab_runner_profile.json"
@@ -75,6 +77,11 @@ DAY60_INTENT_WORKFLOW_DEMO_ROADMAP = (
 )
 DAY60_INTENT_WORKFLOW_DEMO_JSON = Path("reports") / "portfolio" / "day60_intent_workflow_demo.json"
 DAY60_INTENT_WORKFLOW_DEMO_HTML = Path("reports") / "portfolio" / "day60_intent_workflow_demo.html"
+DAY66_OFFLINE_MOCK_RUNTIME_TASK_ID = "offline-mock-runtime"
+DAY66_OFFLINE_MOCK_RUNTIME_DOC = Path("docs") / "ai" / "intent_offline_mock_runtime_skeleton.md"
+DAY66_OFFLINE_MOCK_RUNTIME_ROADMAP = Path("docs") / "roadmap" / "day66_offline_mock_runtime_skeleton.md"
+DAY66_OFFLINE_MOCK_RUNTIME_JSON = Path("reports") / "portfolio" / "day66_offline_mock_runtime_skeleton.json"
+DAY66_OFFLINE_MOCK_RUNTIME_HTML = Path("reports") / "portfolio" / "day66_offline_mock_runtime_skeleton.html"
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
 WIREGUARD_RUNNER_DISPLAY_NAME = "WireGuard Runner Safety Layer"
@@ -599,6 +606,16 @@ REPORT_CATALOG = [
         "json_globs": [DAY60_INTENT_WORKFLOW_DEMO_JSON.as_posix()],
         "html_globs": [DAY60_INTENT_WORKFLOW_DEMO_HTML.as_posix()],
         "missing_note": f"Generate with: python network_lab.py --task {DAY60_INTENT_WORKFLOW_DEMO_TASK_ID}",
+    },
+    {
+        "day": "Day66",
+        "title": "Offline Mock Runtime Skeleton",
+        "report_type": "Reviewer mock runtime report",
+        "safety_label": "offline mock / dry-run-only AI planning evidence",
+        "description": "Day66 fixed mock runtime skeleton report for AI Intent Reviewer architecture shape without live behavior.",
+        "json_globs": [DAY66_OFFLINE_MOCK_RUNTIME_JSON.as_posix()],
+        "html_globs": [DAY66_OFFLINE_MOCK_RUNTIME_HTML.as_posix()],
+        "missing_note": f"Generate with: python network_lab.py --task {DAY66_OFFLINE_MOCK_RUNTIME_TASK_ID}",
     },
 ]
 
@@ -2109,6 +2126,34 @@ def list_tasks() -> List[Dict[str, Any]]:
             "related_script": "network_lab.py",
             "notes": "Report-only walkthrough. Does not call APIs, use voice, execute mapped tasks, run live tests, open SSH, read config.json, connect to devices, or modify network/device configuration.",
         },
+        {
+            "id": DAY66_OFFLINE_MOCK_RUNTIME_TASK_ID,
+            "task_id": "day66_offline_mock_runtime_skeleton",
+            "display_name": "Day66 Offline Mock Runtime Skeleton",
+            "user_display_name": "Offline Mock Runtime",
+            "day": "Day66",
+            "category": "ai_planning",
+            "description": "Fixed offline mock runtime skeleton report for AI Intent Reviewer architecture shape.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY66_OFFLINE_MOCK_RUNTIME_JSON.as_posix(),
+                DAY66_OFFLINE_MOCK_RUNTIME_HTML.as_posix(),
+                DAY66_OFFLINE_MOCK_RUNTIME_DOC.as_posix(),
+                DAY66_OFFLINE_MOCK_RUNTIME_ROADMAP.as_posix(),
+            ],
+            "report_outputs": [
+                "Day66 fixed JSON/HTML offline mock runtime report",
+                "Day66 offline mock runtime skeleton documentation",
+            ],
+            "related_script": "network_lab.py",
+            "notes": "Fixed mock report only. Does not call APIs, use voice, execute mapped tasks, run live tests, open SSH, read config.json, connect to devices, or modify network/device configuration.",
+        },
     ]
 
 
@@ -2138,6 +2183,7 @@ def _build_parser() -> argparse.ArgumentParser:
   python network_lab.py --task intent-safety-review --intent-text "do VRRP failover test"
   python network_lab.py --task intent-policy-matrix
   python network_lab.py --task intent-workflow-demo
+  python network_lab.py --task offline-mock-runtime
   python network_lab.py --task wireguard-runner --dry-run
   python network_lab.py --task wireguard-runner --wireguard-config Set_WireguardVPN_lab02_config.json --dry-run
   python network_lab.py --task wireguard-runner
@@ -2158,6 +2204,7 @@ intent-mapping-prototype classifies static text and prints a dry-run-only mappin
 intent-safety-review classifies static text through a dry-run confirmation gate and writes a report-only Day58 safety decision.
 intent-policy-matrix writes a reviewer-facing Day59 JSON/HTML safety matrix without API, voice, SSH, device access, config.json, or mapped task execution.
 intent-workflow-demo writes a Day60 reviewer walkthrough connecting Day57-Day59 without API, voice, SSH, device access, config.json, live execution, or mapped task execution.
+offline-mock-runtime writes a fixed Day66 offline mock runtime skeleton report without API, voice, SSH, device access, config.json, live execution, or mapped task execution.
 wireguard-runner is dry-run by default and delegates to the existing WireGuard script only after explicit --allow-live-wireguard."""
     parser = argparse.ArgumentParser(
         description=f"Day14 {DAY14_NAME}.",
@@ -2191,6 +2238,7 @@ wireguard-runner is dry-run by default and delegates to the existing WireGuard s
             DAY58_INTENT_SAFETY_REVIEW_TASK_ID,
             DAY59_INTENT_POLICY_MATRIX_TASK_ID,
             DAY60_INTENT_WORKFLOW_DEMO_TASK_ID,
+            DAY66_OFFLINE_MOCK_RUNTIME_TASK_ID,
             WIREGUARD_RUNNER_TASK_ALIAS,
         ],
         help="Task to run.",
@@ -3017,6 +3065,103 @@ def _run_day60_intent_workflow_demo(project_root: Path) -> int:
     print(f"JSON report: {_relative_to_project(project_root, json_path)}")
     print(f"HTML report: {_relative_to_project(project_root, html_path)}")
     print(f"{format_status('PASS')} {DAY60_NO_EXECUTION_STATEMENT}")
+    return 0
+
+
+def write_day66_offline_mock_runtime_html(report: Dict[str, Any], output_path: Path) -> None:
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    scenarios = "".join(
+        "<tr>"
+        f"<td>{html.escape(str(item.get('input_text', '')))}</td>"
+        f"<td>{html.escape(str(item.get('normalized_intent', '')))}</td>"
+        f"<td>{html.escape(str(item.get('safety_category', '')))}</td>"
+        f"<td>{html.escape(str(item.get('execution_mode', '')))}</td>"
+        f"<td>{html.escape(str(item.get('live_execution_allowed', '')))}</td>"
+        f"<td>{html.escape(str(item.get('reviewer_note', '')))}</td>"
+        "</tr>"
+        for item in report.get("mock_scenarios", [])
+    )
+    scope_rows = "".join(
+        "<tr>"
+        f"<th>{html.escape(label)}</th>"
+        f"<td>{html.escape(str(value))}</td>"
+        "</tr>"
+        for label, value in [
+            ("Overall status", report.get("overall_status")),
+            ("Reviewer status", report.get("reviewer_status")),
+            ("Execution mode", report.get("execution_mode")),
+            ("Live execution allowed", report.get("live_execution_allowed")),
+            ("OpenAI API used", report.get("openai_api_used")),
+            ("Voice integration used", report.get("voice_integration_used")),
+            ("SSH used", report.get("ssh_used")),
+            ("Device access occurred", not bool(report.get("no_device_access_occurred"))),
+            ("Network change occurred", not bool(report.get("no_network_change_occurred"))),
+            ("config.json read", report.get("config_json_read")),
+            ("Mapped task executed", report.get("mapped_task_executed")),
+        ]
+    )
+    stages = "".join(
+        f"<li>{html.escape(str(stage))}</li>" for stage in report.get("runtime_stages", [])
+    )
+    refs = "".join(
+        f"<li><code>{html.escape(str(ref))}</code></li>"
+        for ref in report.get("evidence_links_or_doc_refs", [])
+    )
+    output_path.write_text(
+        f"""<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Day66 Offline Mock Runtime Skeleton</title>
+  <style>
+    body {{ font-family: Arial, sans-serif; margin: 24px; color: #182230; }}
+    table {{ border-collapse: collapse; width: 100%; margin: 12px 0 20px; }}
+    td, th {{ border: 1px solid #d8e0ec; padding: 8px 10px; text-align: left; vertical-align: top; }}
+    th {{ background: #edf2f8; }}
+    .safe {{ background: #ecfdf3; border: 1px solid #abefc6; color: #05603a; padding: 12px; }}
+    code {{ overflow-wrap: anywhere; }}
+  </style>
+</head>
+<body>
+  <h1>Day66 Offline Mock Runtime Skeleton</h1>
+  <p class="safe">{html.escape(str(report.get("final_safety_statement", "")))}</p>
+  <h2>Summary</h2>
+  <table><tbody>{scope_rows}</tbody></table>
+  <h2>Runtime Stages</h2>
+  <ol>{stages}</ol>
+  <h2>Mock Scenarios</h2>
+  <table>
+    <thead>
+      <tr><th>Input text</th><th>Normalized intent</th><th>Safety category</th><th>Execution mode</th><th>Live execution allowed?</th><th>Reviewer note</th></tr>
+    </thead>
+    <tbody>{scenarios}</tbody>
+  </table>
+  <h2>Evidence References</h2>
+  <ul>{refs}</ul>
+</body>
+</html>
+""",
+        encoding="utf-8",
+    )
+
+
+def _run_day66_offline_mock_runtime(project_root: Path) -> int:
+    report = build_mock_runtime_report()
+    json_path = project_root / DAY66_OFFLINE_MOCK_RUNTIME_JSON
+    html_path = project_root / DAY66_OFFLINE_MOCK_RUNTIME_HTML
+    write_json_report(report, json_path)
+    write_day66_offline_mock_runtime_html(mask_secret_values(report), html_path)
+
+    print(format_heading("Day66 Offline Mock Runtime Skeleton"))
+    print("Safety: offline mock / dry-run-only report")
+    print(f"Overall status: {report['overall_status']} / {report['reviewer_status']}")
+    print(f"Mock scenarios: {report['summary']['mock_scenarios']}")
+    print(f"Blocked live-action scenarios: {report['summary']['blocked_live_action_scenarios']}")
+    print(f"Execution mode: {report['execution_mode']}")
+    print(f"Live execution allowed: {report['live_execution_allowed']}")
+    print(f"JSON report: {_relative_to_project(project_root, json_path)}")
+    print(f"HTML report: {_relative_to_project(project_root, html_path)}")
+    print(f"{format_status('PASS')} No live execution, API, voice, SSH, device access, or network change occurred.")
     return 0
 
 
@@ -5348,6 +5493,8 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
         return _run_day59_intent_policy_matrix(root)
     if args.task == DAY60_INTENT_WORKFLOW_DEMO_TASK_ID:
         return _run_day60_intent_workflow_demo(root)
+    if args.task == DAY66_OFFLINE_MOCK_RUNTIME_TASK_ID:
+        return _run_day66_offline_mock_runtime(root)
 
     profile_path = _resolve_project_path(root, args.profile)
     try:

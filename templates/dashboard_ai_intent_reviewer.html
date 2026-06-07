@@ -131,7 +131,7 @@
   </nav>
 
   <h1>AI Intent Reviewer Entry Point</h1>
-  <p>Reviewer-friendly dashboard view for the Day57-Day65 AI intent workflow. It explains the demo path, links to the committed docs, scenario pack, traceability map, acceptance runbook, and sign-off package, and keeps the no-execution boundary visible before any future offline mock runtime skeleton work.</p>
+  <p>Reviewer-friendly dashboard view for the Day57-Day66 AI intent workflow. It explains the demo path, links to the committed docs, scenario pack, traceability map, acceptance runbook, sign-off package, and offline mock runtime skeleton, and keeps the no-execution boundary visible.</p>
   <div class="note">This page is report-only. It does not call an AI model, listen to voice input, execute mapped tasks, open SSH, connect to devices, or change network configuration.</div>
 
   <section>
@@ -147,7 +147,7 @@
       </article>
       <article class="summary-card">
         <h3>Reviewer Evidence</h3>
-        <p>Day57-Day65 docs and optional generated JSON/HTML reports show how the workflow makes allowed and blocked decisions visible.</p>
+        <p>Day57-Day66 docs and optional generated JSON/HTML reports show how the workflow makes allowed and blocked decisions visible.</p>
       </article>
       <article class="summary-card">
         <h3>No Runtime Execution</h3>
@@ -157,7 +157,7 @@
   </section>
 
   <section>
-    <h2>Day57-Day65 Review Path</h2>
+    <h2>Day57-Day66 Review Path</h2>
     <div class="day-grid">
       {% for item in references %}
       <article class="day-card">
@@ -193,7 +193,8 @@
       <li>Read Day62 to compare sample intents against the expected reviewer decisions.</li>
       <li>Read Day63 to trace each AI intent review concept back to Day57-Day62 evidence.</li>
       <li>Read Day64 to follow the reviewer acceptance steps, validation commands, and safety boundary confirmation.</li>
-      <li>Read Day65 to review the final acceptance summary and sign-off package before any future offline mock runtime skeleton work.</li>
+      <li>Read Day65 to review the final acceptance summary and sign-off package before the offline mock runtime skeleton.</li>
+      <li>Read Day66 to inspect the fixed offline mock runtime skeleton and confirm live execution remains disallowed.</li>
       <li>Use <a href="{{ url_for('reports') }}">Reports</a> for generated local evidence when available.</li>
     </ol>
     <div class="safe">Expected Day60 statement: <code>No mapped task was executed. This is a dry-run reviewer walkthrough only.</code></div>
@@ -243,6 +244,29 @@
       <a href="{{ evidence_url('docs/roadmap/day65_ai_intent_reviewer_acceptance_signoff_package.md') }}">Open Day65 roadmap</a>
     </div>
     <div class="safe">Day65 is documentation/report-only/static dashboard work. It prepares the project for future offline mock runtime skeleton planning, but does not implement that skeleton, connect APIs, add voice input, execute mapped tasks, use SSH, access devices, or change network configuration.</div>
+  </section>
+
+  <section>
+    <h2>Day66 Offline Mock Runtime Skeleton</h2>
+    <p>Day66 adds a deterministic offline mock runtime skeleton for the AI Intent Reviewer flow. It models user request input, intent normalization, safety classification, mock plan generation, mock execution record, reviewer evidence output, and final dry-run summary.</p>
+    <ul>
+      <li>Execution mode is fixed as <code>offline_mock</code>.</li>
+      <li><code>live_execution_allowed</code> remains <code>False</code> for every mock scenario.</li>
+      <li>Blocked live-action examples stay blocked and are recorded as reviewer evidence only.</li>
+      <li>The optional report is generated from fixed mock data and does not delegate to live runner tasks.</li>
+    </ul>
+    <div class="refs">
+      <a href="{{ evidence_url('docs/ai/intent_offline_mock_runtime_skeleton.md') }}">Open mock runtime skeleton doc</a>
+      <a href="{{ evidence_url('docs/roadmap/day66_offline_mock_runtime_skeleton.md') }}">Open Day66 roadmap</a>
+    </div>
+    <div class="paths">
+      <strong>Optional generated reports:</strong>
+      <ul>
+        <li><code>reports/portfolio/day66_offline_mock_runtime_skeleton.json</code></li>
+        <li><code>reports/portfolio/day66_offline_mock_runtime_skeleton.html</code></li>
+      </ul>
+    </div>
+    <div class="safe">Day66 is offline mock / dry-run-only. Mock execution means no real command, no live task, no SSH, no device access, no AI API, no voice integration, no config.json read, and no network change.</div>
   </section>
 
   <section>
