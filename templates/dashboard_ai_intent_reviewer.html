@@ -54,13 +54,48 @@
       box-shadow: 0 10px 24px rgba(16, 24, 40, .07);
     }
     section { padding: 16px; margin-top: 14px; }
-    .summary-grid, .day-grid {
+    .summary-grid, .day-grid, .chain-grid, .scenario-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 14px;
       margin-top: 12px;
     }
     .summary-card, .day-card { padding: 15px; }
+    .chain-card, .scenario-card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px;
+    }
+    .chain-card {
+      background: #f8fafc;
+    }
+    .scenario-card {
+      background: #ffffff;
+    }
+    .status-row {
+      display: grid;
+      gap: 8px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      margin: 12px 0;
+    }
+    .status-pill {
+      background: var(--safe-bg);
+      border: 1px solid var(--safe-border);
+      border-radius: 8px;
+      color: #05603a;
+      font-size: 13px;
+      font-weight: 800;
+      padding: 8px;
+    }
+    .chain-path {
+      background: var(--blue-bg);
+      border: 1px solid #bfdbfe;
+      border-radius: 8px;
+      color: var(--blue);
+      font-weight: 850;
+      margin-top: 12px;
+      padding: 10px;
+    }
     .day-badge {
       display: inline-block;
       background: var(--blue-bg);
@@ -116,7 +151,7 @@
     @media (max-width: 720px) {
       main { padding: 20px 12px 36px; }
       h1 { font-size: 25px; }
-      .summary-grid, .day-grid { grid-template-columns: 1fr; }
+      .summary-grid, .day-grid, .chain-grid, .scenario-grid, .status-row { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -131,7 +166,7 @@
   </nav>
 
   <h1>AI Intent Reviewer Entry Point</h1>
-  <p>Reviewer-friendly dashboard view for the Day57-Day68 AI intent workflow. It explains the demo path, links to the committed docs, scenario pack, traceability map, acceptance runbook, sign-off package, offline mock runtime skeleton, contract validation layer, and reviewer quality trace, and keeps the no-execution boundary visible.</p>
+  <p>Reviewer-friendly dashboard view for the Day57-Day69 AI intent workflow. It explains the demo path, links to the committed docs, scenario pack, traceability map, acceptance runbook, sign-off package, offline mock runtime skeleton, contract validation layer, reviewer quality trace, and Day69 evidence drilldown while keeping the no-execution boundary visible.</p>
   <div class="note">This page is report-only. It does not call an AI model, listen to voice input, execute mapped tasks, open SSH, connect to devices, or change network configuration.</div>
 
   <section>
@@ -147,7 +182,7 @@
       </article>
       <article class="summary-card">
         <h3>Reviewer Evidence</h3>
-        <p>Day57-Day67 docs and optional generated JSON/HTML reports show how the workflow makes allowed and blocked decisions visible.</p>
+        <p>Day57-Day69 docs and optional generated JSON/HTML reports show how the workflow makes allowed and blocked decisions visible.</p>
       </article>
       <article class="summary-card">
         <h3>No Runtime Execution</h3>
@@ -157,7 +192,7 @@
   </section>
 
   <section>
-    <h2>Day57-Day68 Review Path</h2>
+    <h2>Day57-Day69 Review Path</h2>
     <div class="day-grid">
       {% for item in references %}
       <article class="day-card">
@@ -197,6 +232,7 @@
       <li>Read Day66 to inspect the fixed offline mock runtime skeleton and confirm live execution remains disallowed.</li>
       <li>Read Day67 to inspect the fixed runtime output contract and safety invariant validation layer.</li>
       <li>Read Day68 to confirm reviewer-visible report quality, evidence traceability, contract validation proof, and no-execution evidence.</li>
+      <li>Read Day69 to drill into each offline mock scenario from the dashboard without submitting, executing, or delegating anything.</li>
       <li>Use <a href="{{ url_for('reports') }}">Reports</a> for generated local evidence when available.</li>
     </ol>
     <div class="safe">Expected Day60 statement: <code>No mapped task was executed. This is a dry-run reviewer walkthrough only.</code></div>
@@ -219,7 +255,7 @@
       <a href="{{ evidence_url('docs/ai/intent_reviewer_traceability_evidence_map.md') }}">Open traceability evidence map</a>
       <a href="{{ evidence_url('docs/roadmap/day63_ai_intent_reviewer_traceability_evidence_map.md') }}">Open Day63 roadmap</a>
     </div>
-    <div class="safe">Day63 is a traceability evidence index only. It adds no policy layer, decision matrix, sample cases, form submission surface, action endpoint, task runner, or live execution path.</div>
+    <div class="safe">Day63 is a traceability evidence index only. It adds no policy layer, decision matrix, sample cases, submission surface, command surface, or live execution path.</div>
   </section>
 
   <section>
@@ -229,7 +265,7 @@
       <a href="{{ evidence_url('docs/ai/intent_reviewer_acceptance_runbook.md') }}">Open acceptance runbook</a>
       <a href="{{ evidence_url('docs/roadmap/day64_ai_intent_reviewer_acceptance_runbook.md') }}">Open Day64 roadmap</a>
     </div>
-    <div class="safe">Day64 records reviewer acceptance evidence only. It adds no OpenAI API integration, voice input, live execution, SSH, device access, configuration changes, form submission surface, POST action, action endpoint, or task runner.</div>
+    <div class="safe">Day64 records reviewer acceptance evidence only. It adds no OpenAI API integration, voice input, live execution, SSH, device access, configuration changes, form submission surface, POST route, command surface, or task runner.</div>
   </section>
 
   <section>
@@ -314,7 +350,68 @@
         <li><code>reports/lab-summary/day68_offline_mock_runtime_reviewer_report_quality.html</code></li>
       </ul>
     </div>
-    <div class="safe">Day68 is offline mock/report-only. It adds no API, no voice, no SSH, no device access, no live execution, no mapped task execution, no dashboard action surface, and no network configuration changes.</div>
+    <div class="safe">Day68 is offline mock/report-only. It adds no API, no voice, no SSH, no device access, no live execution, no mapped task execution, no dashboard command surface, and no network configuration changes.</div>
+  </section>
+
+  <section>
+    <h2>Day69 Reviewer Evidence Drilldown</h2>
+    <p>Day69 makes the Day66-Day68 offline mock runtime evidence chain readable from this static dashboard. It does not add a runtime, form, POST route, API call, voice input, SSH session, device access, or live lab behavior.</p>
+    <div class="chain-path">Evidence chain: Day66 Offline Mock Runtime &rarr; Day67 Contract Validation / Safety Invariants &rarr; Day68 Reviewer Report Quality &rarr; Day69 Dashboard Evidence Drilldown</div>
+    <div class="chain-grid">
+      {% for item in day69_evidence_chain %}
+      <article class="chain-card">
+        <span class="day-badge">{{ item.day }}</span>
+        <h3>{{ item.title }}</h3>
+        <p><strong>Status:</strong> {{ item.status }}</p>
+        <p>{{ item.evidence }}</p>
+        <div class="refs">
+          <a href="{{ evidence_url(item.doc_path) }}">Open evidence doc</a>
+        </div>
+        {% if item.report_paths %}
+        <div class="paths">
+          <strong>Related report paths:</strong>
+          <ul>
+            {% for path in item.report_paths %}
+            <li><code>{{ path }}</code></li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section>
+    <h2>Scenario Evidence Drilldown</h2>
+    <p>Each offline mock scenario below shows the expected reviewer decision, Day67 contract status, Day68 review quality status, evidence source, and safety note.</p>
+    <div class="scenario-grid">
+      {% for scenario in day69_scenario_drilldown %}
+      <article class="scenario-card">
+        <h3>{{ scenario.scenario_name }}</h3>
+        <p><code>{{ scenario.scenario_id }}</code> / <code>{{ scenario.safety_category }}</code></p>
+        <div class="status-row">
+          <div class="status-pill">Decision: {{ scenario.expected_decision }}</div>
+          <div class="status-pill">Contract: {{ scenario.contract_status }}</div>
+          <div class="status-pill">Review quality: {{ scenario.review_quality_status }}</div>
+        </div>
+        <p><strong>Evidence source:</strong> {{ scenario.evidence_source }}</p>
+        <p><strong>Safety note:</strong> {{ scenario.safety_note }}</p>
+        <div class="refs">
+          <a href="{{ evidence_url(scenario.doc_path) }}">Open Day69 doc</a>
+        </div>
+        <div class="paths">
+          <strong>Related static reports:</strong>
+          <ul>
+            {% for path in scenario.report_paths %}
+            <li><code>{{ path }}</code></li>
+            {% endfor %}
+          </ul>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+    <div class="safe">Day69 is static/read-only/report-only. The drilldown is generated from deterministic local evidence helpers and does not start AI runtime, call OpenAI APIs, add voice, open SSH, access devices, perform live execution, or execute mapped tasks.</div>
   </section>
 
   <section>

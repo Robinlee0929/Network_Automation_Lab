@@ -22,6 +22,8 @@ from dashboard_command_runner import (
     list_execution_logs,
     load_execution_log,
 )
+from intent_offline_mock_runtime import build_mock_runtime_report
+from intent_reviewer_report_quality import build_reviewer_quality_report
 from network_lab import discover_report_visibility, discover_vrrp_evidence, infer_report_result, mask_secret_values
 
 
@@ -78,6 +80,30 @@ class AIIntentReviewerReference:
     summary: str
     doc_path: str
     roadmap_path: str
+    report_paths: Sequence[str]
+
+
+@dataclass
+class Day69EvidenceChainItem:
+    day: str
+    title: str
+    status: str
+    evidence: str
+    doc_path: str
+    report_paths: Sequence[str]
+
+
+@dataclass
+class Day69ScenarioEvidence:
+    scenario_name: str
+    scenario_id: str
+    expected_decision: str
+    safety_category: str
+    evidence_source: str
+    contract_status: str
+    review_quality_status: str
+    safety_note: str
+    doc_path: str
     report_paths: Sequence[str]
 
 
@@ -759,7 +785,131 @@ def ai_intent_reviewer_references() -> List[AIIntentReviewerReference]:
                 "reports/lab-summary/day68_offline_mock_runtime_reviewer_report_quality.html",
             ),
         ),
+        AIIntentReviewerReference(
+            day="Day69",
+            title="Reviewer dashboard evidence drilldown",
+            summary=(
+                "Makes the Day66-Day68 offline mock runtime evidence chain visible "
+                "scenario by scenario on the static reviewer dashboard."
+            ),
+            doc_path="docs/ai/intent_offline_mock_runtime_reviewer_dashboard_evidence_drilldown.md",
+            roadmap_path="docs/roadmap/day69_offline_mock_runtime_reviewer_dashboard_evidence_drilldown.md",
+            report_paths=(),
+        ),
     ]
+
+
+def day69_evidence_chain() -> List[Day69EvidenceChainItem]:
+    runtime_report = build_mock_runtime_report()
+    quality_report = build_reviewer_quality_report(runtime_report)
+    contract_evidence = quality_report["contract_validation_evidence"]
+    quality_summary = quality_report["quality_gate_summary"]
+    return [
+        Day69EvidenceChainItem(
+            day="Day66",
+            title="Offline Mock Runtime",
+            status=runtime_report["reviewer_status"],
+            evidence=(
+                f"{runtime_report['summary']['mock_scenarios']} deterministic offline "
+                "mock scenarios expose intent, safety category, mock plan, and "
+                "no-execution record fields."
+            ),
+            doc_path="docs/ai/intent_offline_mock_runtime_skeleton.md",
+            report_paths=(
+                "reports/portfolio/day66_offline_mock_runtime_skeleton.json",
+                "reports/portfolio/day66_offline_mock_runtime_skeleton.html",
+            ),
+        ),
+        Day69EvidenceChainItem(
+            day="Day67",
+            title="Contract Validation / Safety Invariants",
+            status=contract_evidence["contract_status"],
+            evidence=(
+                f"{contract_evidence['validated_scenario_count']} scenarios validate "
+                "against required output fields, blocked handling, and no-live "
+                "safety invariants."
+            ),
+            doc_path="docs/ai/intent_offline_mock_runtime_contract.md",
+            report_paths=(
+                "reports/portfolio/day67_offline_mock_runtime_contract.json",
+                "reports/portfolio/day67_offline_mock_runtime_contract.html",
+            ),
+        ),
+        Day69EvidenceChainItem(
+            day="Day68",
+            title="Reviewer Report Quality",
+            status=quality_report["review_status"],
+            evidence=(
+                f"{quality_summary['review_ready_count']} of "
+                f"{quality_summary['total_scenarios']} scenario reviews are "
+                "review-ready with visible decision, evidence, contract, and "
+                "no-execution proof."
+            ),
+            doc_path="docs/ai/intent_offline_mock_runtime_reviewer_report_quality.md",
+            report_paths=(
+                "reports/lab-summary/day68_offline_mock_runtime_reviewer_report_quality.json",
+                "reports/lab-summary/day68_offline_mock_runtime_reviewer_report_quality.html",
+            ),
+        ),
+        Day69EvidenceChainItem(
+            day="Day69",
+            title="Dashboard Evidence Drilldown",
+            status="STATIC_REVIEW_READY",
+            evidence=(
+                "The reviewer dashboard presents the Day66-Day68 chain and each "
+                "mock scenario as read-only evidence cards."
+            ),
+            doc_path="docs/ai/intent_offline_mock_runtime_reviewer_dashboard_evidence_drilldown.md",
+            report_paths=(),
+        ),
+    ]
+
+
+def day69_scenario_evidence_drilldown() -> List[Day69ScenarioEvidence]:
+    runtime_report = build_mock_runtime_report()
+    quality_report = build_reviewer_quality_report(runtime_report)
+    reviews_by_id = {
+        item["scenario_id"]: item
+        for item in quality_report["scenario_reviews"]
+        if isinstance(item, dict)
+    }
+    scenario_cards: List[Day69ScenarioEvidence] = []
+    for scenario in runtime_report["mock_scenarios"]:
+        review = reviews_by_id.get(scenario["scenario_id"], {})
+        contract_status = review.get("contract_validation_status", "UNKNOWN")
+        review_status = review.get("reviewer_verdict", "UNKNOWN")
+        evidence_source = (
+            "Day66 mock_scenarios -> Day67 contract validator -> "
+            "Day68 scenario_reviews"
+        )
+        safety_note = (
+            "Static reviewer evidence only: live_execution_allowed=False, "
+            "mapped_task_executed=False, No API, no voice, no SSH, no device "
+            "access, and no network change."
+        )
+        if scenario["safety_category"] == "blocked_live_action":
+            safety_note = f"{scenario['reviewer_note']} {safety_note}"
+        elif scenario["safety_category"] == "needs_manual_review":
+            safety_note = f"{scenario['reviewer_note']} {safety_note}"
+        scenario_cards.append(
+            Day69ScenarioEvidence(
+                scenario_name=scenario["scenario_name"],
+                scenario_id=scenario["scenario_id"],
+                expected_decision=scenario["decision"],
+                safety_category=scenario["safety_category"],
+                evidence_source=evidence_source,
+                contract_status=contract_status,
+                review_quality_status=review_status,
+                safety_note=safety_note,
+                doc_path="docs/ai/intent_offline_mock_runtime_reviewer_dashboard_evidence_drilldown.md",
+                report_paths=(
+                    "reports/portfolio/day66_offline_mock_runtime_skeleton.json",
+                    "reports/portfolio/day67_offline_mock_runtime_contract.json",
+                    "reports/lab-summary/day68_offline_mock_runtime_reviewer_report_quality.json",
+                ),
+            )
+        )
+    return scenario_cards
 
 
 def ai_intent_safety_boundaries() -> List[str]:
@@ -779,6 +929,7 @@ def ai_intent_safety_boundaries() -> List[str]:
         "Day66 mock runtime output is fixed offline evidence only.",
         "Day67 validates contract and safety invariants without enabling runtime behavior.",
         "Day68 reviews report quality and evidence traceability without enabling runtime behavior.",
+        "Day69 presents reviewer evidence drilldown only; it is static, read-only, and report-only.",
     ]
 
 
@@ -886,6 +1037,8 @@ def create_app(
         return render_template(
             "dashboard_ai_intent_reviewer.html",
             references=ai_intent_reviewer_references(),
+            day69_evidence_chain=day69_evidence_chain(),
+            day69_scenario_drilldown=day69_scenario_evidence_drilldown(),
             safety_boundaries=ai_intent_safety_boundaries(),
         )
 
