@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Any, Dict, Iterator, List, Optional, Tuple
 
 from intent_offline_mock_runtime import build_mock_runtime_report
+from intent_reviewer_report_quality import build_reviewer_quality_report
 from intent_runtime_contract import validate_runtime_results
 
 
@@ -93,6 +94,19 @@ DAY67_OFFLINE_MOCK_RUNTIME_CONTRACT_JSON = (
 )
 DAY67_OFFLINE_MOCK_RUNTIME_CONTRACT_HTML = (
     Path("reports") / "portfolio" / "day67_offline_mock_runtime_contract.html"
+)
+DAY68_OFFLINE_MOCK_RUNTIME_REVIEW_TASK_ID = "offline-mock-runtime-review"
+DAY68_OFFLINE_MOCK_RUNTIME_REVIEW_DOC = (
+    Path("docs") / "ai" / "intent_offline_mock_runtime_reviewer_report_quality.md"
+)
+DAY68_OFFLINE_MOCK_RUNTIME_REVIEW_ROADMAP = (
+    Path("docs") / "roadmap" / "day68_offline_mock_runtime_reviewer_report_quality.md"
+)
+DAY68_OFFLINE_MOCK_RUNTIME_REVIEW_JSON = (
+    Path("reports") / "lab-summary" / "day68_offline_mock_runtime_reviewer_report_quality.json"
+)
+DAY68_OFFLINE_MOCK_RUNTIME_REVIEW_HTML = (
+    Path("reports") / "lab-summary" / "day68_offline_mock_runtime_reviewer_report_quality.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -640,6 +654,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY67_OFFLINE_MOCK_RUNTIME_CONTRACT_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day68",
+        "title": "Offline Mock Runtime Reviewer Report Quality",
+        "report_type": "Reviewer quality and evidence trace report",
+        "safety_label": "offline mock reviewer quality / evidence trace review",
+        "description": "Day68 reviews Day66-Day67 report quality, evidence traceability, and no-execution proof without live behavior.",
+        "json_globs": [DAY68_OFFLINE_MOCK_RUNTIME_REVIEW_JSON.as_posix()],
+        "html_globs": [DAY68_OFFLINE_MOCK_RUNTIME_REVIEW_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY68_OFFLINE_MOCK_RUNTIME_REVIEW_TASK_ID}"
         ),
     },
 ]
@@ -2207,6 +2234,34 @@ def list_tasks() -> List[Dict[str, Any]]:
             "related_script": "network_lab.py",
             "notes": "Contract validation report only. Validates in-memory mock results and does not call APIs, use voice, execute mapped tasks, run live tests, open SSH, read config.json, connect to devices, or modify network/device configuration.",
         },
+        {
+            "id": DAY68_OFFLINE_MOCK_RUNTIME_REVIEW_TASK_ID,
+            "task_id": "day68_offline_mock_runtime_reviewer_report_quality",
+            "display_name": "Day68 Offline Mock Runtime Reviewer Report Quality & Evidence Trace Review",
+            "user_display_name": "Offline Mock Runtime Review",
+            "day": "Day68",
+            "category": "ai_planning",
+            "description": "Reviews Day66-Day67 offline mock runtime report quality, evidence traceability, and no-execution proof.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY68_OFFLINE_MOCK_RUNTIME_REVIEW_JSON.as_posix(),
+                DAY68_OFFLINE_MOCK_RUNTIME_REVIEW_HTML.as_posix(),
+                DAY68_OFFLINE_MOCK_RUNTIME_REVIEW_DOC.as_posix(),
+                DAY68_OFFLINE_MOCK_RUNTIME_REVIEW_ROADMAP.as_posix(),
+            ],
+            "report_outputs": [
+                "Day68 JSON/HTML reviewer quality and evidence trace report",
+                "Day68 offline mock runtime reviewer quality documentation",
+            ],
+            "related_script": "network_lab.py",
+            "notes": "Reviewer quality report only. Reviews deterministic mock data and Day67 validation evidence without APIs, voice, mapped task execution, live tests, SSH, config.json, device access, or network/device configuration changes.",
+        },
     ]
 
 
@@ -2237,6 +2292,8 @@ def _build_parser() -> argparse.ArgumentParser:
   python network_lab.py --task intent-policy-matrix
   python network_lab.py --task intent-workflow-demo
   python network_lab.py --task offline-mock-runtime
+  python network_lab.py --task offline-mock-runtime-contract
+  python network_lab.py --task offline-mock-runtime-review
   python network_lab.py --task wireguard-runner --dry-run
   python network_lab.py --task wireguard-runner --wireguard-config Set_WireguardVPN_lab02_config.json --dry-run
   python network_lab.py --task wireguard-runner
@@ -2258,6 +2315,8 @@ intent-safety-review classifies static text through a dry-run confirmation gate 
 intent-policy-matrix writes a reviewer-facing Day59 JSON/HTML safety matrix without API, voice, SSH, device access, config.json, or mapped task execution.
 intent-workflow-demo writes a Day60 reviewer walkthrough connecting Day57-Day59 without API, voice, SSH, device access, config.json, live execution, or mapped task execution.
 offline-mock-runtime writes a fixed Day66 offline mock runtime skeleton report without API, voice, SSH, device access, config.json, live execution, or mapped task execution.
+offline-mock-runtime-contract validates Day66 mock output fields and safety invariants without API, voice, SSH, device access, config.json, live execution, or mapped task execution.
+offline-mock-runtime-review reviews Day66-Day67 report quality and evidence traceability without API, voice, SSH, device access, config.json, live execution, or mapped task execution.
 wireguard-runner is dry-run by default and delegates to the existing WireGuard script only after explicit --allow-live-wireguard."""
     parser = argparse.ArgumentParser(
         description=f"Day14 {DAY14_NAME}.",
@@ -2293,6 +2352,7 @@ wireguard-runner is dry-run by default and delegates to the existing WireGuard s
             DAY60_INTENT_WORKFLOW_DEMO_TASK_ID,
             DAY66_OFFLINE_MOCK_RUNTIME_TASK_ID,
             DAY67_OFFLINE_MOCK_RUNTIME_CONTRACT_TASK_ID,
+            DAY68_OFFLINE_MOCK_RUNTIME_REVIEW_TASK_ID,
             WIREGUARD_RUNNER_TASK_ALIAS,
         ],
         help="Task to run.",
@@ -3384,6 +3444,146 @@ def _run_day67_offline_mock_runtime_contract(project_root: Path) -> int:
 
     print(f"{format_status('FAIL')} REVIEW_REQUIRED")
     return 2
+
+
+def write_day68_offline_mock_runtime_review_html(report: Dict[str, Any], output_path: Path) -> None:
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    scenario_rows = "".join(
+        "<tr>"
+        f"<td>{html.escape(str(item.get('scenario_id', '')))}</td>"
+        f"<td>{html.escape(str(item.get('input_intent_present', '')))}</td>"
+        f"<td>{html.escape(str(item.get('decision_result_present', '')))}</td>"
+        f"<td>{html.escape(str(item.get('safety_classification_present', '')))}</td>"
+        f"<td>{html.escape(str(item.get('blocked_reason_present_when_applicable', '')))}</td>"
+        f"<td>{html.escape(str(item.get('evidence_reference_present', '')))}</td>"
+        f"<td>{html.escape(str(item.get('contract_validation_status', '')))}</td>"
+        f"<td>{html.escape(str(item.get('no_live_execution_evidence_present', '')))}</td>"
+        f"<td>{html.escape(str(item.get('no_mapped_task_execution_evidence_present', '')))}</td>"
+        f"<td>{html.escape(str(item.get('no_device_network_change_evidence_present', '')))}</td>"
+        f"<td>{html.escape('; '.join(str(missing) for missing in item.get('missing_evidence', []))) or 'None'}</td>"
+        f"<td>{html.escape(str(item.get('reviewer_verdict', '')))}</td>"
+        "</tr>"
+        for item in report.get("scenario_reviews", [])
+    )
+    quality = report.get("quality_gate_summary", {})
+    quality_rows = "".join(
+        "<tr>"
+        f"<th>{html.escape(str(label).replace('_', ' ').title())}</th>"
+        f"<td>{html.escape(str(value))}</td>"
+        "</tr>"
+        for label, value in [
+            ("scenario_count", report.get("scenario_count")),
+            ("review_status", report.get("review_status")),
+            ("review_ready_count", quality.get("review_ready_count")),
+            ("needs_review_count", quality.get("needs_review_count")),
+            ("all_scenarios_review_ready", quality.get("all_scenarios_review_ready")),
+        ]
+    )
+    non_execution_rows = "".join(
+        "<tr>"
+        f"<th>{html.escape(str(label).replace('_', ' ').title())}</th>"
+        f"<td>{html.escape(str(value))}</td>"
+        "</tr>"
+        for label, value in report.get("non_execution_evidence", {}).items()
+    )
+    contract = report.get("contract_validation_evidence", {})
+    contract_rows = "".join(
+        "<tr>"
+        f"<th>{html.escape(str(label).replace('_', ' ').title())}</th>"
+        f"<td>{html.escape(str(value))}</td>"
+        "</tr>"
+        for label, value in [
+            ("validator", contract.get("validator")),
+            ("validation_performed", contract.get("validation_performed")),
+            ("contract_status", contract.get("contract_status")),
+            ("validated_scenario_count", contract.get("validated_scenario_count")),
+            ("validation_errors", "; ".join(str(error) for error in contract.get("validation_errors", [])) or "None"),
+        ]
+    )
+    boundary_items = "".join(
+        f"<li>{html.escape(str(item))}</li>" for item in report.get("safety_boundary", [])
+    )
+    note_items = "".join(
+        f"<li>{html.escape(str(item))}</li>" for item in report.get("validation_notes", [])
+    )
+    missing_items = [
+        f"{item.get('scenario_id')}: {', '.join(str(missing) for missing in item.get('missing_evidence', []))}"
+        for item in report.get("scenario_reviews", [])
+        if item.get("missing_evidence")
+    ]
+    missing_list = "".join(f"<li>{html.escape(item)}</li>" for item in missing_items) or "<li>None</li>"
+    output_path.write_text(
+        f"""<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Day68 Offline Mock Runtime Reviewer Report Quality</title>
+  <style>
+    body {{ font-family: Arial, sans-serif; margin: 24px; color: #182230; }}
+    table {{ border-collapse: collapse; width: 100%; margin: 12px 0 20px; }}
+    td, th {{ border: 1px solid #d8e0ec; padding: 8px 10px; text-align: left; vertical-align: top; }}
+    th {{ background: #edf2f8; }}
+    .safe {{ background: #ecfdf3; border: 1px solid #abefc6; color: #05603a; padding: 12px; }}
+    .warn {{ background: #fff4d8; border: 1px solid #f0c66a; color: #765200; padding: 12px; }}
+    code {{ overflow-wrap: anywhere; }}
+  </style>
+</head>
+<body>
+  <h1>Day68 Offline Mock Runtime Reviewer Report Quality &amp; Evidence Trace Review</h1>
+  <p class="safe">Day68 is offline mock/report-only. It reviews Day66-Day67 evidence quality and does not execute live actions, mapped tasks, APIs, voice, SSH, device access, or network configuration changes.</p>
+  <h2>Overall Review Result</h2>
+  <table><tbody>{quality_rows}</tbody></table>
+  <h2>Scenario Evidence Trace Table</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Scenario ID</th><th>Input intent</th><th>Decision</th><th>Safety</th><th>Blocked reason</th>
+        <th>Evidence ref</th><th>Contract</th><th>No live action</th><th>No mapped task</th>
+        <th>No device/network change</th><th>Missing evidence</th><th>Verdict</th>
+      </tr>
+    </thead>
+    <tbody>{scenario_rows}</tbody>
+  </table>
+  <h2>Missing Evidence</h2>
+  <ul class="warn">{missing_list}</ul>
+  <h2>Non-Execution Evidence</h2>
+  <table><tbody>{non_execution_rows}</tbody></table>
+  <h2>Contract Validation Confirmation</h2>
+  <table><tbody>{contract_rows}</tbody></table>
+  <h2>Safety Boundary Confirmation</h2>
+  <ul>{boundary_items}</ul>
+  <h2>Validation Notes</h2>
+  <ul>{note_items}</ul>
+</body>
+</html>
+""",
+        encoding="utf-8",
+    )
+
+
+def _run_day68_offline_mock_runtime_review(project_root: Path) -> int:
+    report = build_reviewer_quality_report()
+    json_path = project_root / DAY68_OFFLINE_MOCK_RUNTIME_REVIEW_JSON
+    html_path = project_root / DAY68_OFFLINE_MOCK_RUNTIME_REVIEW_HTML
+    write_json_report(report, json_path)
+    write_day68_offline_mock_runtime_review_html(mask_secret_values(report), html_path)
+
+    print(format_heading("Day68 Offline Mock Runtime Reviewer Report Quality & Evidence Trace Review"))
+    print("Safety: offline mock reviewer quality / report-only")
+    print(f"Review status: {report['overall_status']} / {report['review_status']}")
+    print(f"Reviewed scenarios: {report['scenario_count']}")
+    print(f"Reviewer-ready scenarios: {report['quality_gate_summary']['review_ready_count']}")
+    print(f"Needs-review scenarios: {report['quality_gate_summary']['needs_review_count']}")
+    print(f"Contract validation: {report['contract_validation_evidence']['contract_status']}")
+    print(f"JSON report: {_relative_to_project(project_root, json_path)}")
+    print(f"HTML report: {_relative_to_project(project_root, html_path)}")
+    if report["review_status"] == "REVIEW_READY":
+        print(f"{format_status('PASS')} REVIEW_READY")
+        print("No live action, mapped task execution, API, voice, SSH, device access, or network configuration change occurred.")
+        return 0
+
+    print(f"{format_status('WARN')} NEEDS_REVIEW")
+    return 1
 
 
 def _relative_to_project(project_root: Path, path: Path) -> str:
@@ -5718,6 +5918,8 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
         return _run_day66_offline_mock_runtime(root)
     if args.task == DAY67_OFFLINE_MOCK_RUNTIME_CONTRACT_TASK_ID:
         return _run_day67_offline_mock_runtime_contract(root)
+    if args.task == DAY68_OFFLINE_MOCK_RUNTIME_REVIEW_TASK_ID:
+        return _run_day68_offline_mock_runtime_review(root)
 
     profile_path = _resolve_project_path(root, args.profile)
     try:

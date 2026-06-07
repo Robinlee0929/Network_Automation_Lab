@@ -2773,3 +2773,60 @@ def test_day67_cli_validates_contract_without_config_or_device_access(
     assert report["safety_invariants"]["mapped_task_executed_always_false"] is True
     assert "Day67 Offline Mock Runtime Contract" in html
     assert "No live execution" in html
+
+
+def test_day68_offline_mock_runtime_review_task_exists_in_catalog():
+    task = next(task for task in network_lab.list_tasks() if task["id"] == "offline-mock-runtime-review")
+
+    assert task["task_id"] == "day68_offline_mock_runtime_reviewer_report_quality"
+    assert task["day"] == "Day68"
+    assert task["safety_level"] == "report-only"
+    assert task["execution_mode"] == "report-only"
+    assert task["requires_live_device"] is False
+    assert task["requires_password"] is False
+    assert task["produces_report"] is True
+    assert "reports/lab-summary/day68_offline_mock_runtime_reviewer_report_quality.json" in task["report_paths"]
+    assert "reports/lab-summary/day68_offline_mock_runtime_reviewer_report_quality.html" in task["report_paths"]
+    assert "docs/ai/intent_offline_mock_runtime_reviewer_report_quality.md" in task["report_paths"]
+
+
+def test_day68_cli_reviews_report_quality_without_config_or_device_access(
+    tmp_path,
+    monkeypatch,
+    capsys,
+):
+    def fail_run(*_args, **_kwargs):
+        raise AssertionError("Day68 reviewer quality review must not execute subprocess")
+
+    def fail_profile_load(*_args, **_kwargs):
+        raise AssertionError("Day68 reviewer quality review must not load profile or config data")
+
+    monkeypatch.setattr(network_lab.subprocess, "run", fail_run)
+    monkeypatch.setattr(network_lab, "load_lab_runner_profile", fail_profile_load)
+
+    exit_code = network_lab.main(["--task", "offline-mock-runtime-review"], project_root=tmp_path)
+
+    output = capsys.readouterr().out
+    json_path = tmp_path / "reports/lab-summary/day68_offline_mock_runtime_reviewer_report_quality.json"
+    html_path = tmp_path / "reports/lab-summary/day68_offline_mock_runtime_reviewer_report_quality.html"
+    assert exit_code == 0
+    assert "Day68 Offline Mock Runtime Reviewer Report Quality" in output
+    assert "REVIEW_READY" in output
+    assert "No live action, mapped task execution" in output
+    assert json_path.exists()
+    assert html_path.exists()
+    assert not (tmp_path / "config.json").exists()
+
+    report = json.loads(json_path.read_text(encoding="utf-8"))
+    html = html_path.read_text(encoding="utf-8")
+    assert report["day"] == "Day68"
+    assert report["review_status"] == "REVIEW_READY"
+    assert report["scenario_count"] >= 4
+    assert report["quality_gate_summary"]["all_scenarios_review_ready"] is True
+    assert report["non_execution_evidence"]["no_live_action_executed"] is True
+    assert report["non_execution_evidence"]["no_mapped_task_executed"] is True
+    assert report["non_execution_evidence"]["no_device_network_configuration_changed"] is True
+    assert report["contract_validation_evidence"]["contract_status"] == "PASS"
+    assert "No live action" in html
+    assert "No mapped task" in html
+    assert "Contract Validation Confirmation" in html
