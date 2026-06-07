@@ -2319,3 +2319,62 @@ def test_console_status_format_respects_no_color(monkeypatch):
 
     assert "\033[" in colored
     assert plain == "[PASS]"
+
+
+def test_day57_report_request_maps_to_report_index_without_execution():
+    mapping = network_lab.build_day57_intent_mapping("Show me the latest reports")
+
+    assert mapping["detected_intent"] == "view_reports"
+    assert mapping["mapped_allowlisted_task"] == "report-index"
+    assert mapping["safety_level"] == "report_only"
+    assert mapping["execution_mode"] == "dry_run_only"
+    assert mapping["mapped_task_executed"] is False
+    assert mapping["openai_api_used"] is False
+    assert mapping["voice_control_used"] is False
+    assert mapping["ssh_used"] is False
+    assert mapping["device_connection_used"] is False
+    assert mapping["config_json_read"] is False
+
+
+def test_day57_vrrp_failover_request_is_blocked_dry_run_and_requires_confirmation():
+    mapping = network_lab.build_day57_intent_mapping("Do VRRP failover test")
+
+    assert mapping["detected_intent"] == "vrrp_failover_test_request"
+    assert "day35-vrrp-failover-validation" in mapping["mapped_allowlisted_task"]
+    assert mapping["safety_level"] == "guarded_live_candidate"
+    assert mapping["confirmation_requirement"] == "mandatory_before_any_future_live_capable_path"
+    assert mapping["day57_result"] == "blocked_in_day57_dry_run_mapping_only"
+    assert mapping["human_review_required"] is True
+    assert mapping["mapped_task_executed"] is False
+
+
+def test_day57_unknown_intent_maps_to_manual_review_with_no_task():
+    mapping = network_lab.build_day57_intent_mapping("make everything better")
+
+    assert mapping["detected_intent"] == "unknown_or_ambiguous"
+    assert mapping["mapped_allowlisted_task"] is None
+    assert mapping["safety_level"] == "needs_manual_review"
+    assert mapping["confirmation_requirement"] == "manual_review_required"
+    assert mapping["human_review_required"] is True
+    assert mapping["mapped_task_executed"] is False
+
+
+def test_day57_intent_mapping_cli_never_executes_mapped_tasks(tmp_path, monkeypatch, capsys):
+    def fail_run(*_args, **_kwargs):
+        raise AssertionError("Day57 intent mapping prototype must not execute subprocess")
+
+    monkeypatch.setattr(network_lab.subprocess, "run", fail_run)
+
+    exit_code = network_lab.main(
+        ["--task", "intent-mapping-prototype", "--intent-text", "Run the WireGuard check"],
+        project_root=tmp_path,
+    )
+
+    output = capsys.readouterr().out
+    assert exit_code == 0
+    assert "Day57 AI-assisted Task Intent Mapping Prototype" in output
+    assert '"detected_intent": "wireguard_status_or_validation_request"' in output
+    assert '"mapped_allowlisted_task": "wireguard-runner"' in output
+    assert '"execution_mode": "dry_run_only"' in output
+    assert '"mapped_task_executed": false' in output
+    assert "No mapped task was executed" in output

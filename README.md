@@ -60,6 +60,7 @@ The v0.1 portfolio package covers Day 1 through Day 30 post-tag verification. Th
 - Day 54 Public-Facing Portfolio Demo Wording Audit
 - Day 55 Public Repository Readiness Review and External Reviewer Walkthrough
 - Day 56 v0.3 Scope Planning / Voice + AI Direction Review
+- Day 57 AI-assisted Task Intent Mapping Prototype Plan
 
 The project is designed as a practical QA Automation / SDET portfolio project for network infrastructure. It focuses on repeatable validation, structured test evidence, and readable JSON / HTML reports rather than one-off manual checks.
 
@@ -81,6 +82,7 @@ Recommended quick path:
 4. If running locally, start the dashboard with `python dashboard_app.py` and open `/`, `/reports`, `/commands`, and `/ai-checklist`.
 5. Use `docs/roadmap/day55_public_repository_readiness_review.md` for the Day55 readiness result and validation notes.
 6. Use `docs/roadmap/day56_v0_3_scope_planning_voice_ai_direction_review.md` for the conservative v0.3 planning start, including Voice/AI safety boundaries.
+7. Use `docs/roadmap/day57_ai_assisted_task_intent_mapping_prototype_plan.md` for the dry-run-only intent mapping prototype plan.
 
 ## Why This Project Exists
 
@@ -173,6 +175,7 @@ Cisco validation is read-only. It runs show commands for topology evidence and d
 | Day 54 | Public-facing portfolio demo wording audit; updates README, docs, and templates so public review language leads with portfolio/offline/project demo framing while preserving historical paths | Ready with notes |
 | Day 55 | Public repository readiness review and external reviewer walkthrough; adds a reviewer-first entry point, report-index WARN explanation, dashboard page map, offline demo package pointers, and no-live-device review statement without runtime changes | Ready with notes |
 | Day 56 | v0.3 scope planning and Voice + AI direction review; defines conservative intent mapping, future interface boundaries, safety gates, and demo flow without implementing Voice Control, AI Agent behavior, runner changes, dashboard routes, or live tests | Ready with notes |
+| Day 57 | AI-assisted task intent mapping prototype plan; maps static text to allowlisted runner task proposals with safety level and confirmation policy while remaining dry-run-only with no OpenAI API, voice control, live runner execution, SSH, or device access | Ready with notes |
 
 ## Lab Topology
 
@@ -1925,6 +1928,15 @@ docs/roadmap/day56_v0_3_scope_planning_voice_ai_direction_review.md
 
 Day56 starts the v0.3 planning line conservatively. Voice is kept as a future interface layer, AI is limited to planned intent mapping and evidence explanation, the runner/runtime remains unchanged, and AI is explicitly prohibited from directly executing shell commands or modifying routers, switches, firewalls, VPN, WireGuard, VRRP, NAT, IP, interface, route, or device configuration. Day56 defines a future demo flow only; it does not implement Voice Control, an AI Agent, API integration, dashboard routes, live tests, SSH, or device changes.
 
+Day57 AI-assisted task intent mapping prototype plan:
+
+```text
+docs/roadmap/day57_ai_assisted_task_intent_mapping_prototype_plan.md
+docs/ai/day57_intent_mapping_prototype.md
+```
+
+Day57 adds a dry-run-only intent mapping prototype for the future v0.3 Voice + AI assistant direction. Static user text is normalized, classified into a reviewed intent, mapped to an allowlisted runner task proposal, labeled with a safety level, and paired with a human confirmation policy. The prototype does not call OpenAI APIs, does not implement voice control, does not execute mapped runner tasks, does not use SSH, does not connect to devices, does not read or modify `config.json`, and does not change NAT, IP, VRRP, WireGuard, firewall, route, interface, or device configuration.
+
 ## Testing Strategy
 
 The project separates live-device validation from unit tests.
@@ -1983,6 +1995,7 @@ For documentation-only review passes, run `python -m pytest` before sharing the 
 - Includes Day54 public-facing wording cleanup so README, docs, and templates lead with portfolio/offline/project demo review language while preserving historical paths.
 - Includes Day55 public repository readiness review with a reviewer-first walkthrough, dashboard page map, offline demo entry points, report-index WARN explanation, and no-live-device review statement.
 - Includes Day56 conservative v0.3 scope planning for Voice + AI direction, with intent mapping, safety gates, future demo flow, and no runner/runtime or live-device changes.
+- Includes Day57 dry-run-only AI-assisted task intent mapping prototype planning, with deterministic text classification, allowlisted task proposals, safety level display, human confirmation policy, and no OpenAI API, voice control, live runner execution, SSH, or device access.
 
 ## Roadmap
 
@@ -1994,4 +2007,4 @@ Planned future directions:
 - Syslog / packet capture analysis
 - v3.0 Voice + AI Network Test Assistant / AI-assisted Network Test Orchestration as future roadmap only
 
-v0.1 is packaged through Day29 and locally verified through Day30 as a portfolio release. Day42 creates the annotated `v0.2` release tag for the demo-ready Network Automation Platform package after Day41 release packaging, Day43 records the post-tag portfolio demo baseline with notes from a fresh checkout, Day44 fixes the Day12 hermetic test dependency found during that verification, Day45 confirms the fix from a fresh `origin/main` checkout without ignored local `config.json`, Day46 recommends deferring `v0.2.1` unless a formal corrected patch release is required, Day47 finalizes the current `main` branch as the safe portfolio demo operation baseline, Day48 packages the offline portfolio demo kit at `docs/demo/offline_interview_demo_kit/`, Day49 verifies that kit for an offline-only portfolio demo dry run with no live device dependency, Day50 polishes the dashboard home page into the portfolio demo landing page without live tests or runner behavior changes, Day51 records dashboard visual QA plus screenshot capture planning for portfolio review use, Day52 commits the offline dashboard screenshot package and portfolio review usage guide, Day53 documents the final public-facing portfolio demo rehearsal and operation checklist, Day54 audits public-facing wording so portfolio/offline/project demo language is primary without renaming historical paths or starting `v0.3`, Day55 adds the public reviewer walkthrough and readiness review path, and Day56 starts conservative v0.3 scope planning for Voice + AI direction without implementation. Future work should stay explicit about whether it is report-only, read-only, dry-run, guarded-live, or disabled before adding new live lab behavior.
+v0.1 is packaged through Day29 and locally verified through Day30 as a portfolio release. Day42 creates the annotated `v0.2` release tag for the demo-ready Network Automation Platform package after Day41 release packaging, Day43 records the post-tag portfolio demo baseline with notes from a fresh checkout, Day44 fixes the Day12 hermetic test dependency found during that verification, Day45 confirms the fix from a fresh `origin/main` checkout without ignored local `config.json`, Day46 recommends deferring `v0.2.1` unless a formal corrected patch release is required, Day47 finalizes the current `main` branch as the safe portfolio demo operation baseline, Day48 packages the offline portfolio demo kit at `docs/demo/offline_interview_demo_kit/`, Day49 verifies that kit for an offline-only portfolio demo dry run with no live device dependency, Day50 polishes the dashboard home page into the portfolio demo landing page without live tests or runner behavior changes, Day51 records dashboard visual QA plus screenshot capture planning for portfolio review use, Day52 commits the offline dashboard screenshot package and portfolio review usage guide, Day53 documents the final public-facing portfolio demo rehearsal and operation checklist, Day54 audits public-facing wording so portfolio/offline/project demo language is primary without renaming historical paths or starting `v0.3`, Day55 adds the public reviewer walkthrough and readiness review path, Day56 starts conservative v0.3 scope planning for Voice + AI direction without implementation, and Day57 adds a dry-run-only text intent mapping prototype that prepares the future assistant layer without OpenAI API, voice control, live runner execution, SSH, or device access. Future work should stay explicit about whether it is report-only, read-only, dry-run, guarded-live, or disabled before adding new live lab behavior.
