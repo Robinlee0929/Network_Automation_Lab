@@ -896,6 +896,21 @@ def ai_intent_reviewer_references() -> List[AIIntentReviewerReference]:
                 "reports/lab-summary/day76_runtime_audit_trail.html",
             ),
         ),
+        AIIntentReviewerReference(
+            day="Day77",
+            title="Runtime safety gate",
+            summary=(
+                "Links Day73 decisions, Day74 dry-run plans, Day75 approval "
+                "envelopes, and Day76 audit records into deterministic locked "
+                "runtime gate records that prove execution remains unavailable."
+            ),
+            doc_path="docs/ai/intent_runtime_safety_gate.md",
+            roadmap_path="docs/roadmap/day77_runtime_safety_gate.md",
+            report_paths=(
+                "reports/lab-summary/day77_runtime_safety_gate.json",
+                "reports/lab-summary/day77_runtime_safety_gate.html",
+            ),
+        ),
     ]
 
 
@@ -1103,6 +1118,8 @@ def ai_intent_safety_boundaries() -> List[str]:
         "Day75 adds no OpenAI API, AI SDK, real AI runtime, SSH, device access, live execution, mapped task execution, dashboard form, POST route, approval surface, execution control, approval unlock, or network configuration change.",
         "Day76 links Day73 decisions, Day74 dry-run plans, and Day75 approval envelopes into reviewer audit evidence only; allowed_to_execute remains false, dry_run_only remains true, and execution_unlock_supported remains false.",
         "Day76 adds no OpenAI API, AI SDK, real AI runtime, SSH, device access, live execution, mapped task execution, dashboard form, POST route, approve button, execute button, action endpoint, approval unlock, or network configuration change.",
+        "Day77 links Day73 decisions, Day74 dry-run plans, Day75 approval envelopes, and Day76 audit records into locked runtime safety gate evidence only; allowed_to_execute remains false, dry_run_only remains true, execution_unlock_supported remains false, and runtime_gate_state remains LOCKED.",
+        "Day77 adds no OpenAI API, AI SDK, real AI runtime, SSH, device access, live execution, mapped task execution, dashboard form, POST route, approve button, execute button, action endpoint, approval unlock, execution control, or network configuration change.",
     ]
 
 
