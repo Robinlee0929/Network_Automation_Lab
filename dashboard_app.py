@@ -972,6 +972,22 @@ def ai_intent_reviewer_references() -> List[AIIntentReviewerReference]:
                 "reports/lab-summary/day81_broker_review_queue.html",
             ),
         ),
+        AIIntentReviewerReference(
+            day="Day82",
+            title="Reviewer decision audit summary and queue evidence export",
+            summary=(
+                "Summarizes Day81 queue decisions and exports reviewer audit "
+                "evidence while keeping all execution, SSH, device access, live "
+                "command, AI runtime, mapped task, and dashboard action surfaces "
+                "disabled."
+            ),
+            doc_path="docs/ai/intent_reviewer_decision_audit_summary.md",
+            roadmap_path="docs/roadmap/day82_reviewer_decision_audit_summary.md",
+            report_paths=(
+                "reports/lab-summary/day82_reviewer_decision_audit_summary.json",
+                "reports/lab-summary/day82_reviewer_decision_audit_summary.html",
+            ),
+        ),
     ]
 
 
@@ -1190,6 +1206,9 @@ def ai_intent_safety_boundaries() -> List[str]:
         "Day81 defines the read-only broker review queue and decision state report after Day80; it is review-only, dry-run-only, report-only, and has no execution unlock.",
         "Day81 keeps allowed_to_execute false, dry_run_only true, execution_unlock_supported false, ssh_allowed false, device_connection_allowed false, live_command_allowed false, mapped_task_execution_allowed false, and dashboard_action_allowed false.",
         "Day81 adds no OpenAI API, AI SDK, real AI runtime, voice, SSH, device access, live command execution, mapped task execution, dashboard form, POST route, action endpoint, approval unlock, execution control, or network configuration change.",
+        "Day82 summarizes Day81 queue decisions into reviewer audit evidence exports only; it is review-only, mock/deterministic, dry-run-only, report-only, and has no execution unlock.",
+        "Day82 keeps allowed_to_execute false, dry_run_only true, execution_unlock_supported false, device_connection_allowed false, ssh_allowed false, live_command_allowed false, network_change_allowed false, ai_runtime_allowed false, and dashboard_action_allowed false.",
+        "Day82 adds no OpenAI API, AI SDK runtime, real AI runtime, voice, SSH, device access, live execution, live command execution, mapped task execution, dashboard form, POST route, action endpoint, approval unlock, execution control, or network configuration change.",
     ]
 
 

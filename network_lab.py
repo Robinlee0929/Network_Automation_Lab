@@ -31,6 +31,10 @@ from intent_broker_review_queue import (
     build_broker_review_queue_report,
     write_broker_review_queue_reports,
 )
+from intent_reviewer_decision_audit_summary import (
+    build_reviewer_decision_audit_summary_report,
+    write_reviewer_decision_audit_summary_reports,
+)
 from intent_runtime_safety_case import build_runtime_safety_case_report
 from intent_runtime_safety_gate import build_runtime_safety_gate_report
 
@@ -179,10 +183,22 @@ DAY80_READONLY_EXECUTION_BROKER_ROADMAP = (
 DAY80_READONLY_EXECUTION_BROKER_JSON = Path("reports") / "lab-summary" / "day80_readonly_execution_broker.json"
 DAY80_READONLY_EXECUTION_BROKER_HTML = Path("reports") / "lab-summary" / "day80_readonly_execution_broker.html"
 DAY81_BROKER_REVIEW_QUEUE_TASK_ID = "broker-review-queue"
+DAY81_BROKER_REVIEW_QUEUE_DECISION_STATE_TASK_ALIAS = "broker-review-queue-decision-state"
 DAY81_BROKER_REVIEW_QUEUE_DOC = Path("docs") / "ai" / "intent_broker_review_queue.md"
 DAY81_BROKER_REVIEW_QUEUE_ROADMAP = Path("docs") / "roadmap" / "day81_broker_review_queue.md"
 DAY81_BROKER_REVIEW_QUEUE_JSON = Path("reports") / "lab-summary" / "day81_broker_review_queue.json"
 DAY81_BROKER_REVIEW_QUEUE_HTML = Path("reports") / "lab-summary" / "day81_broker_review_queue.html"
+DAY82_REVIEWER_DECISION_AUDIT_TASK_ID = "reviewer-decision-audit-summary"
+DAY82_REVIEWER_DECISION_AUDIT_DOC = Path("docs") / "ai" / "intent_reviewer_decision_audit_summary.md"
+DAY82_REVIEWER_DECISION_AUDIT_ROADMAP = (
+    Path("docs") / "roadmap" / "day82_reviewer_decision_audit_summary.md"
+)
+DAY82_REVIEWER_DECISION_AUDIT_JSON = (
+    Path("reports") / "lab-summary" / "day82_reviewer_decision_audit_summary.json"
+)
+DAY82_REVIEWER_DECISION_AUDIT_HTML = (
+    Path("reports") / "lab-summary" / "day82_reviewer_decision_audit_summary.html"
+)
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
 WIREGUARD_RUNNER_DISPLAY_NAME = "WireGuard Runner Safety Layer"
@@ -859,6 +875,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY81_BROKER_REVIEW_QUEUE_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day82",
+        "title": "Reviewer Decision Audit Summary / Queue Evidence Export",
+        "report_type": "Reviewer decision audit summary",
+        "safety_label": "deterministic mock-only / dry-run-only audit evidence export",
+        "description": "Day82 summarizes Day81 broker review queue decisions and exports reviewer evidence while preserving no execution unlock, no SSH, no device access, no live command execution, no AI runtime, no mapped task execution, and no dashboard action endpoint.",
+        "json_globs": [DAY82_REVIEWER_DECISION_AUDIT_JSON.as_posix()],
+        "html_globs": [DAY82_REVIEWER_DECISION_AUDIT_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY82_REVIEWER_DECISION_AUDIT_TASK_ID}"
         ),
     },
 ]
@@ -2706,6 +2735,34 @@ def list_tasks() -> List[Dict[str, Any]]:
             "related_script": "network_lab.py",
             "notes": "Deterministic mock-only dry-run broker review queue. It transforms Day80 broker records into review and decision state records only; it does not call APIs, use AI SDKs, execute mapped tasks, run live tests, open SSH, read config.json, connect to devices, add dashboard forms, POST routes, action endpoints, execution unlocks, arbitrary command execution, or modify network/device configuration.",
         },
+        {
+            "id": DAY82_REVIEWER_DECISION_AUDIT_TASK_ID,
+            "task_id": "day82_reviewer_decision_audit_summary",
+            "display_name": "Day82 Reviewer Decision Audit Summary / Queue Evidence Export",
+            "user_display_name": "Reviewer Decision Audit Summary / Queue Evidence Export",
+            "day": "Day82",
+            "category": "ai_planning",
+            "description": "Summarizes Day81 broker review queue decisions and exports deterministic reviewer evidence without executing anything.",
+            "safety_level": "dry-run",
+            "execution_mode": "dry-run",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY82_REVIEWER_DECISION_AUDIT_JSON.as_posix(),
+                DAY82_REVIEWER_DECISION_AUDIT_HTML.as_posix(),
+                DAY82_REVIEWER_DECISION_AUDIT_DOC.as_posix(),
+                DAY82_REVIEWER_DECISION_AUDIT_ROADMAP.as_posix(),
+            ],
+            "report_outputs": [
+                "Day82 JSON/HTML reviewer decision audit summary",
+                "Day82 queue evidence export documentation",
+            ],
+            "related_script": "network_lab.py",
+            "notes": "Deterministic mock-only dry-run reviewer decision audit summary. It summarizes and exports Day81 queue evidence only; it does not call APIs, use AI SDKs, execute mapped tasks, run live tests, open SSH, read config.json, connect to devices, add dashboard forms, POST routes, action endpoints, execution unlocks, arbitrary command execution, or modify network/device configuration.",
+        },
     ]
 
 
@@ -2770,6 +2827,8 @@ runtime-safety-case links Day72 input validation, Day73 decisions, Day74 dry-run
 readonly-task-contract defines deterministic Day79 read-only task candidates, blocked write actions, destructive actions, unknown tasks, and manual classification cases without AI API, SSH, device access, config.json, live execution, mapped task execution, approval unlocks, execution controls, or dashboard actions.
 readonly-execution-broker defines deterministic Day80 read-only broker request records, contract checks, rejection records, review queue records, and mock execution request data without AI API, SSH, device access, config.json, live execution, mapped task execution, approval unlocks, execution controls, or dashboard actions.
 broker-review-queue transforms Day80 broker records into deterministic Day81 reviewer queue and decision state records without AI API, SSH, device access, config.json, live execution, mapped task execution, execution unlocks, dashboard forms, POST routes, or action endpoints.
+broker-review-queue-decision-state is a compatibility alias for broker-review-queue.
+reviewer-decision-audit-summary summarizes Day81 queue decisions into deterministic Day82 reviewer audit evidence without AI API, AI SDK runtime, SSH, device access, config.json, live execution, mapped task execution, execution unlocks, dashboard forms, POST routes, or action endpoints.
 wireguard-runner is dry-run by default and delegates to the existing WireGuard script only after explicit --allow-live-wireguard."""
     parser = argparse.ArgumentParser(
         description=f"Day14 {DAY14_NAME}.",
@@ -2815,6 +2874,8 @@ wireguard-runner is dry-run by default and delegates to the existing WireGuard s
             DAY79_READONLY_TASK_CONTRACT_TASK_ID,
             DAY80_READONLY_EXECUTION_BROKER_TASK_ID,
             DAY81_BROKER_REVIEW_QUEUE_TASK_ID,
+            DAY81_BROKER_REVIEW_QUEUE_DECISION_STATE_TASK_ALIAS,
+            DAY82_REVIEWER_DECISION_AUDIT_TASK_ID,
             WIREGUARD_RUNNER_TASK_ALIAS,
         ],
         help="Task to run.",
@@ -4976,6 +5037,44 @@ def _run_day81_broker_review_queue(project_root: Path) -> int:
         return 0
 
     print(f"{format_status('FAIL')} Day81 broker review queue invariants failed.")
+    return 1
+
+
+def _run_day82_reviewer_decision_audit_summary(project_root: Path) -> int:
+    report = build_reviewer_decision_audit_summary_report()
+    json_path, html_path = write_reviewer_decision_audit_summary_reports(project_root, report)
+    summary = report["decision_summary"]
+
+    print(format_heading("Day82 Reviewer Decision Audit Summary / Queue Evidence Export"))
+    print("Task name: reviewer-decision-audit-summary")
+    print("Safety: deterministic mock-only / dry-run-only reviewer audit evidence export")
+    print(f"Result: {report['overall_status']} / {report['status']}")
+    print(f"Queue records summarized: {summary['queue_record_count']}")
+    print(f"Evidence exports count: {summary['evidence_export_count']}")
+    print(f"Review state counts: {summary['review_state_counts']}")
+    print(f"Decision state counts: {summary['decision_state_counts']}")
+    print(f"allowed_to_execute: {summary['allowed_to_execute_values']}")
+    print(f"dry_run_only: {summary['dry_run_only_values']}")
+    print(f"execution_unlock_supported: {summary['execution_unlock_supported_values']}")
+    print(f"device_connection_allowed: {summary['device_connection_allowed_values']}")
+    print(f"ssh_allowed: {summary['ssh_allowed_values']}")
+    print(f"live_command_allowed: {summary['live_command_allowed_values']}")
+    print(f"network_change_allowed: {summary['network_change_allowed_values']}")
+    print(f"ai_runtime_allowed: {summary['ai_runtime_allowed_values']}")
+    print(f"dashboard_action_allowed: {summary['dashboard_action_allowed_values']}")
+    print(f"JSON report: {_relative_to_project(project_root, json_path)}")
+    print(f"HTML report: {_relative_to_project(project_root, html_path)}")
+
+    if report["overall_status"] == "PASS" and report["status"] == "REVIEW_READY":
+        print(
+            f"{format_status('PASS')} REVIEW_READY. Reviewer decision audit summary "
+            "is review-only; no live execution, no SSH, no device access, no AI "
+            "runtime, no mapped task execution, and no dashboard action endpoint "
+            "was added."
+        )
+        return 0
+
+    print(f"{format_status('FAIL')} Day82 reviewer decision audit summary invariants failed.")
     return 1
 
 
@@ -7331,6 +7430,10 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
         return _run_day80_readonly_execution_broker(root)
     if args.task == DAY81_BROKER_REVIEW_QUEUE_TASK_ID:
         return _run_day81_broker_review_queue(root)
+    if args.task == DAY81_BROKER_REVIEW_QUEUE_DECISION_STATE_TASK_ALIAS:
+        return _run_day81_broker_review_queue(root)
+    if args.task == DAY82_REVIEWER_DECISION_AUDIT_TASK_ID:
+        return _run_day82_reviewer_decision_audit_summary(root)
 
     profile_path = _resolve_project_path(root, args.profile)
     try:

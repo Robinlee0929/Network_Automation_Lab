@@ -3587,3 +3587,109 @@ def test_day81_broker_review_queue_runner_outputs_reports_without_live_access(
     assert "Day81 Read-only Broker Review Queue" in html
     assert "REVIEW_BLOCKED_BY_POLICY" in html
     assert "Dashboard action allowed values" in html
+
+
+def test_day81_broker_review_queue_decision_state_alias_works(tmp_path):
+    exit_code = network_lab.main(["--task", "broker-review-queue-decision-state"], project_root=tmp_path)
+
+    assert exit_code == 0
+    assert (tmp_path / "reports/lab-summary/day81_broker_review_queue.json").exists()
+    assert (tmp_path / "reports/lab-summary/day81_broker_review_queue.html").exists()
+
+
+def test_day82_reviewer_decision_audit_summary_task_exists_in_catalog():
+    task = next(
+        task for task in network_lab.list_tasks() if task["id"] == "reviewer-decision-audit-summary"
+    )
+
+    assert task["task_id"] == "day82_reviewer_decision_audit_summary"
+    assert task["day"] == "Day82"
+    assert task["safety_level"] == "dry-run"
+    assert task["execution_mode"] == "dry-run"
+    assert task["requires_live_device"] is False
+    assert task["requires_password"] is False
+    assert task["produces_report"] is True
+    assert "reports/lab-summary/day82_reviewer_decision_audit_summary.json" in task["report_paths"]
+    assert "reports/lab-summary/day82_reviewer_decision_audit_summary.html" in task["report_paths"]
+    assert "docs/ai/intent_reviewer_decision_audit_summary.md" in task["report_paths"]
+    assert "docs/roadmap/day82_reviewer_decision_audit_summary.md" in task["report_paths"]
+    assert "Day81 queue evidence" in task["notes"]
+    assert "does not call APIs" in task["notes"]
+
+
+def test_day82_reviewer_decision_audit_summary_runner_outputs_reports_without_live_access(
+    tmp_path, monkeypatch, capsys
+):
+    def fail_run(*_args, **_kwargs):
+        raise AssertionError("Day82 reviewer decision audit summary must not execute subprocess")
+
+    def fail_profile_load(*_args, **_kwargs):
+        raise AssertionError("Day82 reviewer decision audit summary must not load profile or config data")
+
+    monkeypatch.setattr(network_lab.subprocess, "run", fail_run)
+    monkeypatch.setattr(network_lab, "load_lab_runner_profile", fail_profile_load)
+
+    exit_code = network_lab.main(
+        ["--task", "reviewer-decision-audit-summary"], project_root=tmp_path
+    )
+
+    output = capsys.readouterr().out
+    json_path = tmp_path / "reports/lab-summary/day82_reviewer_decision_audit_summary.json"
+    html_path = tmp_path / "reports/lab-summary/day82_reviewer_decision_audit_summary.html"
+    assert exit_code == 0
+    assert "Day82 Reviewer Decision Audit Summary / Queue Evidence Export" in output
+    assert "Task name: reviewer-decision-audit-summary" in output
+    assert "Result: PASS / REVIEW_READY" in output
+    assert "Queue records summarized: 5" in output
+    assert "Evidence exports count: 5" in output
+    assert "allowed_to_execute: [False]" in output
+    assert "dry_run_only: [True]" in output
+    assert "execution_unlock_supported: [False]" in output
+    assert "device_connection_allowed: [False]" in output
+    assert "ssh_allowed: [False]" in output
+    assert "live_command_allowed: [False]" in output
+    assert "network_change_allowed: [False]" in output
+    assert "ai_runtime_allowed: [False]" in output
+    assert "dashboard_action_allowed: [False]" in output
+    assert "JSON report: reports/lab-summary/day82_reviewer_decision_audit_summary.json" in output
+    assert "HTML report: reports/lab-summary/day82_reviewer_decision_audit_summary.html" in output
+    assert "[PASS] REVIEW_READY. Reviewer decision audit summary is review-only" in output
+    assert "no live execution" in output
+    assert "no dashboard action endpoint was added" in output
+    assert json_path.exists()
+    assert html_path.exists()
+    assert not (tmp_path / "config.json").exists()
+
+    report = json.loads(json_path.read_text(encoding="utf-8"))
+    html = html_path.read_text(encoding="utf-8")
+    assert report["day"] == "Day82"
+    assert report["status"] == "REVIEW_READY"
+    assert report["overall_status"] == "PASS"
+    assert report["decision_summary"]["queue_record_count"] == 5
+    assert report["decision_summary"]["evidence_export_count"] == 5
+    assert report["decision_summary"]["allowed_to_execute_values"] == [False]
+    assert report["decision_summary"]["dry_run_only_values"] == [True]
+    assert report["decision_summary"]["execution_unlock_supported_values"] == [False]
+    assert report["decision_summary"]["device_connection_allowed_values"] == [False]
+    assert report["decision_summary"]["ssh_allowed_values"] == [False]
+    assert report["decision_summary"]["live_command_allowed_values"] == [False]
+    assert report["decision_summary"]["network_change_allowed_values"] == [False]
+    assert report["decision_summary"]["ai_runtime_allowed_values"] == [False]
+    assert report["decision_summary"]["dashboard_action_allowed_values"] == [False]
+    assert report["safety_invariants"]["allowed_to_execute"] is False
+    assert report["safety_invariants"]["dry_run_only"] is True
+    assert report["safety_invariants"]["execution_unlock_supported"] is False
+    assert report["safety_invariants"]["device_connection_allowed"] is False
+    assert report["safety_invariants"]["ssh_allowed"] is False
+    assert report["safety_invariants"]["live_command_allowed"] is False
+    assert report["safety_invariants"]["network_change_allowed"] is False
+    assert report["safety_invariants"]["ai_runtime_allowed"] is False
+    assert report["safety_invariants"]["dashboard_action_allowed"] is False
+    assert all(item["allowed_to_execute"] is False for item in report["evidence_exports"])
+    assert all(item["dry_run_only"] is True for item in report["evidence_exports"])
+    assert all(item["execution_unlock_supported"] is False for item in report["evidence_exports"])
+    traceability_text = json.dumps(report["traceability_map"], sort_keys=True)
+    for day in ("Day79", "Day80", "Day81", "Day82"):
+        assert day in traceability_text
+    assert "Reviewer Decision Audit Summary / Queue Evidence Export" in html
+    assert "AI runtime allowed values" in html
