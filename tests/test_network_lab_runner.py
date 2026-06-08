@@ -3481,3 +3481,109 @@ def test_day80_readonly_execution_broker_runner_outputs_reports_without_live_acc
     assert "Day80 Read-only Execution Broker Skeleton" in html
     assert "MOCK_EXECUTION_REQUEST_PREPARED" in html
     assert "Live command allowed values" in html
+
+
+def test_day81_broker_review_queue_task_exists_in_catalog():
+    task = next(task for task in network_lab.list_tasks() if task["id"] == "broker-review-queue")
+
+    assert task["task_id"] == "day81_broker_review_queue"
+    assert task["day"] == "Day81"
+    assert task["safety_level"] == "dry-run"
+    assert task["execution_mode"] == "dry-run"
+    assert task["requires_live_device"] is False
+    assert task["requires_password"] is False
+    assert task["produces_report"] is True
+    assert "reports/lab-summary/day81_broker_review_queue.json" in task["report_paths"]
+    assert "reports/lab-summary/day81_broker_review_queue.html" in task["report_paths"]
+    assert "docs/ai/intent_broker_review_queue.md" in task["report_paths"]
+    assert "docs/roadmap/day81_broker_review_queue.md" in task["report_paths"]
+    assert "Day80 broker records" in task["notes"]
+    assert "does not call APIs" in task["notes"]
+
+
+def test_day81_broker_review_queue_runner_outputs_reports_without_live_access(
+    tmp_path, monkeypatch, capsys
+):
+    def fail_run(*_args, **_kwargs):
+        raise AssertionError("Day81 broker review queue must not execute subprocess")
+
+    def fail_profile_load(*_args, **_kwargs):
+        raise AssertionError("Day81 broker review queue must not load profile or config data")
+
+    monkeypatch.setattr(network_lab.subprocess, "run", fail_run)
+    monkeypatch.setattr(network_lab, "load_lab_runner_profile", fail_profile_load)
+
+    exit_code = network_lab.main(["--task", "broker-review-queue"], project_root=tmp_path)
+
+    output = capsys.readouterr().out
+    json_path = tmp_path / "reports/lab-summary/day81_broker_review_queue.json"
+    html_path = tmp_path / "reports/lab-summary/day81_broker_review_queue.html"
+    assert exit_code == 0
+    assert "Day81 Read-only Broker Review Queue & Decision State Report" in output
+    assert "Task name: broker-review-queue" in output
+    assert "Result: PASS / REVIEW_READY" in output
+    assert "Queue records count: 5" in output
+    assert "Review states list:" in output
+    assert "REJECTED_BY_BROKER" in output
+    assert "QUEUED_FOR_HUMAN_REVIEW" in output
+    assert "MOCK_EXECUTION_REQUEST_PREPARED" in output
+    assert "REVIEW_BLOCKED_BY_POLICY" in output
+    assert "REVIEW_READY_NO_EXECUTION" in output
+    assert "Decision states list:" in output
+    assert "HOLD_FOR_REVIEW" in output
+    assert "MOCK_ONLY" in output
+    assert "POLICY_BLOCKED" in output
+    assert "REVIEW_ONLY" in output
+    assert "Allowed to execute values: [False]" in output
+    assert "Dry-run-only values: [True]" in output
+    assert "Execution unlock supported values: [False]" in output
+    assert "Device connection allowed values: [False]" in output
+    assert "SSH allowed values: [False]" in output
+    assert "Live command allowed values: [False]" in output
+    assert "Mapped task execution allowed values: [False]" in output
+    assert "Dashboard action allowed values: [False]" in output
+    assert "JSON report: reports/lab-summary/day81_broker_review_queue.json" in output
+    assert "HTML report: reports/lab-summary/day81_broker_review_queue.html" in output
+    assert "[PASS] REVIEW_READY. Broker review queue is report-only" in output
+    assert "no request is allowed to execute" in output
+    assert "no mapped task was executed" in output
+    assert "no dashboard action endpoint was added" in output
+    assert "approve execution" not in output.lower()
+    assert json_path.exists()
+    assert html_path.exists()
+    assert not (tmp_path / "config.json").exists()
+
+    report = json.loads(json_path.read_text(encoding="utf-8"))
+    html = html_path.read_text(encoding="utf-8")
+    assert report["day"] == "Day81"
+    assert report["overall_status"] == "PASS"
+    assert report["reviewer_status"] == "REVIEW_READY"
+    assert report["summary"]["queue_record_count"] == 5
+    assert report["summary"]["allowed_to_execute_values"] == [False]
+    assert report["summary"]["dry_run_only_values"] == [True]
+    assert report["summary"]["execution_unlock_supported_values"] == [False]
+    assert report["summary"]["device_connection_allowed_values"] == [False]
+    assert report["summary"]["ssh_allowed_values"] == [False]
+    assert report["summary"]["live_command_allowed_values"] == [False]
+    assert report["summary"]["mapped_task_execution_allowed_values"] == [False]
+    assert report["summary"]["dashboard_action_allowed_values"] == [False]
+    assert report["safety_invariants"]["allowed_to_execute_always_false"] is True
+    assert report["safety_invariants"]["dry_run_only_always_true"] is True
+    assert report["safety_invariants"]["execution_unlock_supported_always_false"] is True
+    assert report["safety_invariants"]["device_connection_allowed_always_false"] is True
+    assert report["safety_invariants"]["ssh_allowed_always_false"] is True
+    assert report["safety_invariants"]["live_command_allowed_always_false"] is True
+    assert report["safety_invariants"]["mapped_task_execution_allowed_always_false"] is True
+    assert report["safety_invariants"]["dashboard_action_allowed_always_false"] is True
+    assert report["safety_invariants"]["mapped_task_executed"] is False
+    assert report["safety_invariants"]["device_access_used"] is False
+    assert all(item["allowed_to_execute"] is False for item in report["queue_records"])
+    assert all(item["dry_run_only"] is True for item in report["queue_records"])
+    assert all(item["execution_unlock_supported"] is False for item in report["queue_records"])
+    assert all(item["ssh_allowed"] is False for item in report["queue_records"])
+    assert all(item["live_command_allowed"] is False for item in report["queue_records"])
+    assert all(item["mapped_task_execution_allowed"] is False for item in report["queue_records"])
+    assert all(item["dashboard_action_allowed"] is False for item in report["queue_records"])
+    assert "Day81 Read-only Broker Review Queue" in html
+    assert "REVIEW_BLOCKED_BY_POLICY" in html
+    assert "Dashboard action allowed values" in html
