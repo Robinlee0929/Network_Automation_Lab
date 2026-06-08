@@ -3040,3 +3040,83 @@ def test_day75_cli_generates_approval_envelope_report_without_config_or_device_a
     assert "approved_for_record_only" in html
     assert "blocked_live_action" in html
     assert "Execution unlock supported?" in html
+
+
+def test_day76_runtime_audit_trail_task_exists_in_catalog():
+    task = next(task for task in network_lab.list_tasks() if task["id"] == "runtime-audit-trail")
+
+    assert task["task_id"] == "day76_runtime_audit_trail"
+    assert task["day"] == "Day76"
+    assert task["safety_level"] == "dry-run"
+    assert task["execution_mode"] == "dry-run"
+    assert task["requires_live_device"] is False
+    assert task["requires_password"] is False
+    assert task["produces_report"] is True
+    assert "reports/lab-summary/day76_runtime_audit_trail.json" in task["report_paths"]
+    assert "reports/lab-summary/day76_runtime_audit_trail.html" in task["report_paths"]
+    assert "docs/ai/intent_runtime_audit_trail.md" in task["report_paths"]
+    assert "docs/roadmap/day76_runtime_audit_trail.md" in task["report_paths"]
+    assert "does not call APIs" in task["notes"]
+    assert "execution unlocks" in task["notes"]
+
+
+def test_day76_cli_generates_runtime_audit_trail_without_config_or_device_access(
+    tmp_path,
+    monkeypatch,
+    capsys,
+):
+    def fail_run(*_args, **_kwargs):
+        raise AssertionError("Day76 runtime audit trail must not execute subprocess")
+
+    def fail_profile_load(*_args, **_kwargs):
+        raise AssertionError("Day76 runtime audit trail must not load profile or config data")
+
+    monkeypatch.setattr(network_lab.subprocess, "run", fail_run)
+    monkeypatch.setattr(network_lab, "load_lab_runner_profile", fail_profile_load)
+
+    exit_code = network_lab.main(["--task", "runtime-audit-trail"], project_root=tmp_path)
+
+    output = capsys.readouterr().out
+    json_path = tmp_path / "reports/lab-summary/day76_runtime_audit_trail.json"
+    html_path = tmp_path / "reports/lab-summary/day76_runtime_audit_trail.html"
+    assert exit_code == 0
+    assert "Day76 Controlled Runtime Audit Trail" in output
+    assert "PASS" in output
+    assert "REVIEW_READY" in output
+    assert "Audit records: 5" in output
+    assert "Evidence chain complete values: [True]" in output
+    assert "Allowed to execute values: [False]" in output
+    assert "Dry-run-only values: [True]" in output
+    assert "Execution unlock supported values: [False]" in output
+    assert json_path.exists()
+    assert html_path.exists()
+    assert not (tmp_path / "config.json").exists()
+
+    report = json.loads(json_path.read_text(encoding="utf-8"))
+    html = html_path.read_text(encoding="utf-8")
+    assert report["day"] == "Day76"
+    assert report["overall_status"] == "PASS"
+    assert report["reviewer_status"] == "REVIEW_READY"
+    assert report["summary"]["audit_record_count"] == 5
+    assert report["summary"]["evidence_chain_complete_values"] == [True]
+    assert report["summary"]["allowed_to_execute_values"] == [False]
+    assert report["summary"]["dry_run_only_values"] == [True]
+    assert report["summary"]["execution_unlock_supported_values"] == [False]
+    assert report["safety_invariants"]["allowed_to_execute_always_false"] is True
+    assert report["safety_invariants"]["dry_run_only_always_true"] is True
+    assert report["safety_invariants"]["execution_unlock_supported_always_false"] is True
+    assert report["safety_invariants"]["audit_results_do_not_unlock_execution"] is True
+    assert report["safety_invariants"]["mapped_task_executed"] is False
+    assert report["safety_invariants"]["openai_api_used"] is False
+    assert report["safety_invariants"]["ssh_used"] is False
+    assert report["safety_invariants"]["device_access_used"] is False
+    assert report["safety_invariants"]["config_json_read"] is False
+    assert all(item["evidence_chain_complete"] is True for item in report["audit_records"])
+    assert all(item["allowed_to_execute"] is False for item in report["audit_records"])
+    assert all(item["dry_run_only"] is True for item in report["audit_records"])
+    assert all(
+        item["execution_unlock_supported"] is False for item in report["audit_records"]
+    )
+    assert "Day76 Controlled Runtime Audit Trail" in html
+    assert "Evidence chain complete?" in html
+    assert "Execution unlock supported?" in html

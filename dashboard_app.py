@@ -881,6 +881,21 @@ def ai_intent_reviewer_references() -> List[AIIntentReviewerReference]:
                 "reports/lab-summary/day75_manual_review_approval_envelope.html",
             ),
         ),
+        AIIntentReviewerReference(
+            day="Day76",
+            title="Controlled runtime audit trail",
+            summary=(
+                "Links Day73 decisions, Day74 dry-run plans, and Day75 approval "
+                "envelopes into deterministic reviewer evidence packages while "
+                "preserving no execution unlock."
+            ),
+            doc_path="docs/ai/intent_runtime_audit_trail.md",
+            roadmap_path="docs/roadmap/day76_runtime_audit_trail.md",
+            report_paths=(
+                "reports/lab-summary/day76_runtime_audit_trail.json",
+                "reports/lab-summary/day76_runtime_audit_trail.html",
+            ),
+        ),
     ]
 
 
@@ -1086,6 +1101,8 @@ def ai_intent_safety_boundaries() -> List[str]:
         "Day74 adds no OpenAI API, AI SDK, real AI runtime, SSH, device access, live execution, mapped task execution, dashboard form, POST route, action endpoint, approval unlock, or network configuration change.",
         "Day75 wraps Day74 dry-run plans in record-only reviewer sign-off envelopes; allowed_to_execute remains false, dry_run_only remains true, and execution_unlock_supported remains false.",
         "Day75 adds no OpenAI API, AI SDK, real AI runtime, SSH, device access, live execution, mapped task execution, dashboard form, POST route, approval surface, execution control, approval unlock, or network configuration change.",
+        "Day76 links Day73 decisions, Day74 dry-run plans, and Day75 approval envelopes into reviewer audit evidence only; allowed_to_execute remains false, dry_run_only remains true, and execution_unlock_supported remains false.",
+        "Day76 adds no OpenAI API, AI SDK, real AI runtime, SSH, device access, live execution, mapped task execution, dashboard form, POST route, approve button, execute button, action endpoint, approval unlock, or network configuration change.",
     ]
 
 
