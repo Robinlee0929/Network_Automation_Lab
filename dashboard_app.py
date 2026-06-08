@@ -839,6 +839,20 @@ def ai_intent_reviewer_references() -> List[AIIntentReviewerReference]:
             roadmap_path="docs/roadmap/day72_controlled_ai_runtime_input_contract_validator.md",
             report_paths=(),
         ),
+        AIIntentReviewerReference(
+            day="Day73",
+            title="Mock AI decision pipeline",
+            summary=(
+                "Runs deterministic mock decisions after Day72 validation and "
+                "records reviewer-ready labels while keeping execution disabled."
+            ),
+            doc_path="docs/ai/intent_mock_ai_decision_pipeline.md",
+            roadmap_path="docs/roadmap/day73_mock_ai_decision_pipeline.md",
+            report_paths=(
+                "reports/lab-summary/day73_mock_ai_decision_pipeline.json",
+                "reports/lab-summary/day73_mock_ai_decision_pipeline.html",
+            ),
+        ),
     ]
 
 
@@ -1038,6 +1052,8 @@ def ai_intent_safety_boundaries() -> List[str]:
         "Day71 keeps API integration, voice, device access, live execution, mapped task execution, and dashboard action surfaces disabled.",
         "Day72 validates controlled AI runtime input payloads only; execution_allowed remains false.",
         "Day72 adds no OpenAI API, voice, SSH, device access, live execution, mapped task execution, config changes, forms, POST routes, or action endpoints.",
+        "Day73 runs deterministic mock decisions after Day72 validation only; allowed_to_execute remains false.",
+        "Day73 adds no OpenAI API, AI SDK, real AI runtime, SSH, device access, live execution, mapped task execution, dashboard POST/action endpoint, or network configuration change.",
     ]
 
 

@@ -185,7 +185,7 @@ def test_ai_review_checklist_contains_wireguard_vpn_safety_items():
     assert "shell=False" in text
 
 
-def test_ai_intent_reviewer_references_day57_to_day72():
+def test_ai_intent_reviewer_references_day57_to_day73():
     references = dashboard.ai_intent_reviewer_references()
 
     assert [item.day for item in references] == [
@@ -201,6 +201,7 @@ def test_ai_intent_reviewer_references_day57_to_day72():
         "Day70",
         "Day71",
         "Day72",
+        "Day73",
     ]
     text = " ".join(
         f"{item.title} {item.summary} {item.doc_path} {item.roadmap_path} "
@@ -239,6 +240,10 @@ def test_ai_intent_reviewer_references_day57_to_day72():
     assert "Controlled AI runtime input contract validator" in text
     assert "docs/ai/intent_controlled_ai_runtime_input_validator.md" in text
     assert "docs/roadmap/day72_controlled_ai_runtime_input_contract_validator.md" in text
+    assert "Mock AI decision pipeline" in text
+    assert "docs/ai/intent_mock_ai_decision_pipeline.md" in text
+    assert "docs/roadmap/day73_mock_ai_decision_pipeline.md" in text
+    assert "reports/lab-summary/day73_mock_ai_decision_pipeline.html" in text
 
 
 def test_ai_intent_reviewer_safety_boundaries_are_report_only():
@@ -260,6 +265,8 @@ def test_ai_intent_reviewer_safety_boundaries_are_report_only():
     assert "no dashboard forms, no POST routes for AI intent review, and no action endpoints" in text
     assert "Day72 validates controlled AI runtime input payloads only" in text
     assert "Day72 adds no OpenAI API, voice, SSH, device access, live execution, mapped task execution, config changes, forms, POST routes, or action endpoints" in text
+    assert "Day73 runs deterministic mock decisions after Day72 validation only" in text
+    assert "Day73 adds no OpenAI API, AI SDK, real AI runtime, SSH, device access, live execution, mapped task execution, dashboard POST/action endpoint, or network configuration change" in text
 
 
 def test_day69_reviewer_evidence_drilldown_is_static_and_complete():
@@ -527,7 +534,7 @@ def test_dashboard_home_is_portfolio_demo_landing_page(tmp_path):
     assert "/ai-intent-reviewer" in text
 
 
-def test_ai_intent_reviewer_route_exposes_day57_to_day72_without_execution(tmp_path):
+def test_ai_intent_reviewer_route_exposes_day57_to_day73_without_execution(tmp_path):
     if dashboard.Flask is None:
         pytest.skip("Flask is not installed in this test environment.")
 
@@ -553,6 +560,7 @@ def test_ai_intent_reviewer_route_exposes_day57_to_day72_without_execution(tmp_p
     assert "Day70" in text
     assert "Day71" in text
     assert "Day72" in text
+    assert "Day73" in text
     assert "Day63 Traceability Evidence Map" in text
     assert "Day64 Reviewer Acceptance Runbook" in text
     assert "Day65 Acceptance Sign-off Package" in text
@@ -632,6 +640,18 @@ def test_ai_intent_reviewer_route_exposes_day57_to_day72_without_execution(tmp_p
     assert "Proposed Future Output Contract" in text
     assert "Safety Gate Sequence" in text
     assert "Reviewer Evidence Mapping" in text
+    assert "Day73 Mock AI Decision Pipeline" in text
+    assert "deterministic mock decision stage after the Day72 validator" in text
+    assert "DOCUMENTATION_ONLY" in text
+    assert "REPORT_ONLY" in text
+    assert "REVIEW_REQUIRED" in text
+    assert "BLOCKED_LIVE_ACTION" in text
+    assert "INVALID_INPUT_BLOCKED" in text
+    assert "allowed_to_execute</code> remains <code>false</code>" in text
+    assert "docs/ai/intent_mock_ai_decision_pipeline.md" in text
+    assert "docs/roadmap/day73_mock_ai_decision_pipeline.md" in text
+    assert "reports/lab-summary/day73_mock_ai_decision_pipeline.json" in text
+    assert "reports/lab-summary/day73_mock_ai_decision_pipeline.html" in text
     assert "ai_intent_reviewer_controlled_runtime_entry" in text
     assert "execution_allowed=false" in text
     assert "api_integration_allowed=false" in text
@@ -687,6 +707,8 @@ def test_ai_intent_reviewer_route_exposes_day57_to_day72_without_execution(tmp_p
     assert "Day69 presents reviewer evidence drilldown only" in text
     assert "Day72 validates controlled AI runtime input payloads only" in text
     assert "Day72 adds no OpenAI API, voice, SSH, device access, live execution, mapped task execution, config changes, forms, POST routes, or action endpoints" in text
+    assert "Day73 runs deterministic mock decisions after Day72 validation only" in text
+    assert "Day73 adds no OpenAI API, AI SDK, real AI runtime, SSH, device access, live execution, mapped task execution, dashboard POST/action endpoint, or network configuration change" in text
     assert "No mapped task was executed. This is a dry-run reviewer walkthrough only." in text
     html = text.lower()
     assert "<form" not in html
