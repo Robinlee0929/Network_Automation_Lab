@@ -2212,6 +2212,21 @@ reports/lab-summary/day78_runtime_safety_case.html
 
 Day78 adds `runtime-safety-case`, a deterministic mock-only and dry-run-only end-to-end reviewer safety case after the Day77 locked gate. It links Day72 input validation, Day73 mock AI decisions, Day74 dry-run plans, Day75 approval envelopes, Day76 audit records, and Day77 runtime safety gates into final safety case records with `case_id`, `input_validation_id`, `decision_id`, `dry_run_plan_id`, `approval_envelope_id`, `audit_id`, `gate_id`, `evidence_chain_complete`, `runtime_gate_state`, compliance checks, reviewer findings, safety invariants, `final_recommendation`, and `safety_case_result`. Every safety case record keeps `runtime_gate_state` set to `LOCKED`, `final_recommendation` set to `REVIEW_ONLY`, `allowed_to_execute` set to `False`, `dry_run_only` set to `True`, and `execution_unlock_supported` set to `False`; no safety case result, gate result, audit result, reviewer decision, approval state, OpenAI API, AI SDK, real AI runtime, SSH, device access, live execution, mapped task execution, arbitrary command execution, `config.json` dependency, dashboard form, POST route, approve button, execute button, action endpoint, approval unlock, execution control, release tag, or router/switch/firewall/VPN/VRRP/network configuration change is added.
 
+Day79 - Controlled Read-only Task Contract & Allowlist:
+
+```text
+docs/roadmap/day79_readonly_task_contract.md
+docs/ai/intent_readonly_task_contract.md
+intent_readonly_task_contract.py
+reports/lab-summary/day79_readonly_task_contract.json
+reports/lab-summary/day79_readonly_task_contract.html
+/ai-intent-reviewer
+```
+
+Day79 adds `readonly-task-contract`, a deterministic mock-only and dry-run-only read-only task allowlist / capability definition layer after the Day72-Day78 AI runtime safety chain. It does not repeat Day72-Day78: Day72-Day78 prove the controlled runtime remains REVIEW_ONLY and locked, while Day79 defines which future AI-requested tasks may be considered read-only candidates, which write actions are blocked, which destructive actions are always forbidden, and which unknown tasks need manual classification. Every contract record keeps `allowed_to_execute` set to `False`, `dry_run_only` set to `True`, and `execution_unlock_supported` set to `False`; no read-only eligibility result unlocks real AI execution, real SSH, device control, mapped task execution, approval unlock, dashboard action surface, `config.json` dependency, or network configuration change.
+
+Future AI path remains staged and review-gated: Day80 Read-only Execution Broker Skeleton, Day81 Mock Read-only Execution Result Package, Day82 Read-only SSH Precheck Readiness Review, Day83 real read-only SSH precheck for lab devices only after explicit review, and Day84+ human-approved low-risk apply prototype only after later review.
+
 Validation commands:
 
 ```text
@@ -2227,6 +2242,7 @@ python network_lab.py --task manual-review-approval-envelope
 python network_lab.py --task runtime-audit-trail
 python network_lab.py --task runtime-safety-gate
 python network_lab.py --task runtime-safety-case
+python network_lab.py --task readonly-task-contract
 ```
 
 ## Testing Strategy

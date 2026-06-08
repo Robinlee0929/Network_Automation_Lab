@@ -3298,3 +3298,88 @@ def test_day78_cli_generates_runtime_safety_case_without_config_or_device_access
     assert "Day78 Controlled Runtime Safety Case" in html
     assert "Final recommendation" in html
     assert "Execution unlock supported?" in html
+
+
+def test_day79_readonly_task_contract_task_exists_in_catalog():
+    task = next(task for task in network_lab.list_tasks() if task["id"] == "readonly-task-contract")
+
+    assert task["task_id"] == "day79_readonly_task_contract"
+    assert task["day"] == "Day79"
+    assert task["safety_level"] == "dry-run"
+    assert task["execution_mode"] == "dry-run"
+    assert task["requires_live_device"] is False
+    assert task["requires_password"] is False
+    assert task["produces_report"] is True
+    assert "reports/lab-summary/day79_readonly_task_contract.json" in task["report_paths"]
+    assert "reports/lab-summary/day79_readonly_task_contract.html" in task["report_paths"]
+    assert "docs/ai/intent_readonly_task_contract.md" in task["report_paths"]
+    assert "docs/roadmap/day79_readonly_task_contract.md" in task["report_paths"]
+    assert "read-only candidates" in task["notes"]
+    assert "does not call APIs" in task["notes"]
+
+
+def test_day79_readonly_task_contract_runner_outputs_reports_without_live_access(
+    tmp_path, monkeypatch, capsys
+):
+    def fail_run(*_args, **_kwargs):
+        raise AssertionError("Day79 read-only task contract must not execute subprocess")
+
+    def fail_profile_load(*_args, **_kwargs):
+        raise AssertionError("Day79 read-only task contract must not load profile or config data")
+
+    monkeypatch.setattr(network_lab.subprocess, "run", fail_run)
+    monkeypatch.setattr(network_lab, "load_lab_runner_profile", fail_profile_load)
+
+    exit_code = network_lab.main(["--task", "readonly-task-contract"], project_root=tmp_path)
+
+    output = capsys.readouterr().out
+    json_path = tmp_path / "reports/lab-summary/day79_readonly_task_contract.json"
+    html_path = tmp_path / "reports/lab-summary/day79_readonly_task_contract.html"
+    assert exit_code == 0
+    assert "Day79 Controlled Read-only Task Contract & Allowlist" in output
+    assert "Safety: deterministic mock-only / dry-run-only task eligibility contract" in output
+    assert "Overall status: PASS / REVIEW_READY" in output
+    assert "Contract records: 5" in output
+    assert "Read-only eligible values: [False, True]" in output
+    assert "Execution candidate values: [False, True]" in output
+    assert "Allowed to execute values: [False]" in output
+    assert "Dry-run-only values: [True]" in output
+    assert "Execution unlock supported values: [False]" in output
+    assert "JSON report: reports/lab-summary/day79_readonly_task_contract.json" in output
+    assert "HTML report: reports/lab-summary/day79_readonly_task_contract.html" in output
+    assert "[PASS] REVIEW_READY. Read-only task contract is defined" in output
+    assert json_path.exists()
+    assert html_path.exists()
+    assert not (tmp_path / "config.json").exists()
+
+    report = json.loads(json_path.read_text(encoding="utf-8"))
+    html = html_path.read_text(encoding="utf-8")
+    assert report["day"] == "Day79"
+    assert report["overall_status"] == "PASS"
+    assert report["reviewer_status"] == "REVIEW_READY"
+    assert report["summary"]["contract_record_count"] == 5
+    assert report["summary"]["readonly_eligible_values"] == [False, True]
+    assert report["summary"]["execution_candidate_values"] == [False, True]
+    assert report["summary"]["allowed_to_execute_values"] == [False]
+    assert report["summary"]["dry_run_only_values"] == [True]
+    assert report["summary"]["execution_unlock_supported_values"] == [False]
+    assert report["safety_invariants"]["allowed_to_execute_always_false"] is True
+    assert report["safety_invariants"]["dry_run_only_always_true"] is True
+    assert report["safety_invariants"]["execution_unlock_supported_always_false"] is True
+    assert report["safety_invariants"]["openai_api_used"] is False
+    assert report["safety_invariants"]["ssh_used"] is False
+    assert report["safety_invariants"]["device_access_used"] is False
+    assert report["safety_invariants"]["config_json_read"] is False
+    assert all(item["allowed_to_execute"] is False for item in report["contract_records"])
+    assert all(item["dry_run_only"] is True for item in report["contract_records"])
+    assert all(
+        item["execution_unlock_supported"] is False
+        for item in report["contract_records"]
+    )
+    assert any(
+        item["readonly_eligible"] is True and item["execution_candidate"] is True
+        for item in report["contract_records"]
+    )
+    assert "Day79 Controlled Read-only Task Contract" in html
+    assert "READONLY_CONTRACT_READY" in html
+    assert "Execution unlock supported values" in html
