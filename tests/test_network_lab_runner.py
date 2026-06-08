@@ -2830,3 +2830,66 @@ def test_day68_cli_reviews_report_quality_without_config_or_device_access(
     assert "No live action" in html
     assert "No mapped task" in html
     assert "Contract Validation Confirmation" in html
+
+
+def test_day73_mock_ai_decision_pipeline_task_exists_in_catalog():
+    task = next(task for task in network_lab.list_tasks() if task["id"] == "mock-ai-decision-pipeline")
+
+    assert task["task_id"] == "day73_mock_ai_decision_pipeline"
+    assert task["day"] == "Day73"
+    assert task["safety_level"] == "report-only"
+    assert task["execution_mode"] == "report-only"
+    assert task["requires_live_device"] is False
+    assert task["requires_password"] is False
+    assert task["produces_report"] is True
+    assert "reports/lab-summary/day73_mock_ai_decision_pipeline.json" in task["report_paths"]
+    assert "reports/lab-summary/day73_mock_ai_decision_pipeline.html" in task["report_paths"]
+    assert "docs/ai/intent_mock_ai_decision_pipeline.md" in task["report_paths"]
+    assert "docs/roadmap/day73_mock_ai_decision_pipeline.md" in task["report_paths"]
+    assert "does not call APIs" in task["notes"]
+    assert "execute mapped tasks" in task["notes"]
+
+
+def test_day73_cli_generates_mock_decision_report_without_config_or_device_access(
+    tmp_path,
+    monkeypatch,
+    capsys,
+):
+    def fail_run(*_args, **_kwargs):
+        raise AssertionError("Day73 mock decision pipeline must not execute subprocess")
+
+    def fail_profile_load(*_args, **_kwargs):
+        raise AssertionError("Day73 mock decision pipeline must not load profile or config data")
+
+    monkeypatch.setattr(network_lab.subprocess, "run", fail_run)
+    monkeypatch.setattr(network_lab, "load_lab_runner_profile", fail_profile_load)
+
+    exit_code = network_lab.main(["--task", "mock-ai-decision-pipeline"], project_root=tmp_path)
+
+    output = capsys.readouterr().out
+    json_path = tmp_path / "reports/lab-summary/day73_mock_ai_decision_pipeline.json"
+    html_path = tmp_path / "reports/lab-summary/day73_mock_ai_decision_pipeline.html"
+    assert exit_code == 0
+    assert "Day73 Mock AI Decision Pipeline" in output
+    assert "No AI API, SSH, device access, live execution, mapped task execution" in output
+    assert json_path.exists()
+    assert html_path.exists()
+    assert not (tmp_path / "config.json").exists()
+
+    report = json.loads(json_path.read_text(encoding="utf-8"))
+    html = html_path.read_text(encoding="utf-8")
+    assert report["day"] == "Day73"
+    assert report["overall_status"] == "PASS"
+    assert report["reviewer_status"] == "REVIEW_READY"
+    assert report["summary"]["scenario_count"] == 5
+    assert report["summary"]["allowed_to_execute_values"] == [False]
+    assert report["safety_invariants"]["allowed_to_execute_always_false"] is True
+    assert report["safety_invariants"]["mapped_task_executed"] is False
+    assert report["safety_invariants"]["openai_api_used"] is False
+    assert report["safety_invariants"]["ssh_used"] is False
+    assert report["safety_invariants"]["device_access_used"] is False
+    assert report["safety_invariants"]["config_json_read"] is False
+    assert all(record["allowed_to_execute"] is False for record in report["decision_records"])
+    assert "BLOCKED_LIVE_ACTION" in html
+    assert "INVALID_INPUT_BLOCKED" in html
+    assert "Allowed to execute?" in html

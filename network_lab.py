@@ -10,6 +10,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, Iterator, List, Optional, Tuple
 
+from intent_mock_ai_decision_pipeline import build_mock_ai_decision_pipeline_report
 from intent_offline_mock_runtime import build_mock_runtime_report
 from intent_reviewer_report_quality import build_reviewer_quality_report
 from intent_runtime_contract import validate_runtime_results
@@ -108,6 +109,11 @@ DAY68_OFFLINE_MOCK_RUNTIME_REVIEW_JSON = (
 DAY68_OFFLINE_MOCK_RUNTIME_REVIEW_HTML = (
     Path("reports") / "lab-summary" / "day68_offline_mock_runtime_reviewer_report_quality.html"
 )
+DAY73_MOCK_AI_DECISION_PIPELINE_TASK_ID = "mock-ai-decision-pipeline"
+DAY73_MOCK_AI_DECISION_PIPELINE_DOC = Path("docs") / "ai" / "intent_mock_ai_decision_pipeline.md"
+DAY73_MOCK_AI_DECISION_PIPELINE_ROADMAP = Path("docs") / "roadmap" / "day73_mock_ai_decision_pipeline.md"
+DAY73_MOCK_AI_DECISION_PIPELINE_JSON = Path("reports") / "lab-summary" / "day73_mock_ai_decision_pipeline.json"
+DAY73_MOCK_AI_DECISION_PIPELINE_HTML = Path("reports") / "lab-summary" / "day73_mock_ai_decision_pipeline.html"
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
 WIREGUARD_RUNNER_DISPLAY_NAME = "WireGuard Runner Safety Layer"
@@ -667,6 +673,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY68_OFFLINE_MOCK_RUNTIME_REVIEW_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day73",
+        "title": "Mock AI Decision Pipeline",
+        "report_type": "Reviewer mock AI decision pipeline report",
+        "safety_label": "mock-only / report-only AI planning evidence",
+        "description": "Day73 runs deterministic mock decisions after Day72 validation without AI API, SSH, device access, live execution, or mapped task execution.",
+        "json_globs": [DAY73_MOCK_AI_DECISION_PIPELINE_JSON.as_posix()],
+        "html_globs": [DAY73_MOCK_AI_DECISION_PIPELINE_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY73_MOCK_AI_DECISION_PIPELINE_TASK_ID}"
         ),
     },
 ]
@@ -2262,6 +2281,34 @@ def list_tasks() -> List[Dict[str, Any]]:
             "related_script": "network_lab.py",
             "notes": "Reviewer quality report only. Reviews deterministic mock data and Day67 validation evidence without APIs, voice, mapped task execution, live tests, SSH, config.json, device access, or network/device configuration changes.",
         },
+        {
+            "id": DAY73_MOCK_AI_DECISION_PIPELINE_TASK_ID,
+            "task_id": "day73_mock_ai_decision_pipeline",
+            "display_name": "Day73 Mock AI Decision Pipeline",
+            "user_display_name": "Mock AI Decision Pipeline",
+            "day": "Day73",
+            "category": "ai_planning",
+            "description": "Runs deterministic mock AI decision records after Day72 input validation.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY73_MOCK_AI_DECISION_PIPELINE_JSON.as_posix(),
+                DAY73_MOCK_AI_DECISION_PIPELINE_HTML.as_posix(),
+                DAY73_MOCK_AI_DECISION_PIPELINE_DOC.as_posix(),
+                DAY73_MOCK_AI_DECISION_PIPELINE_ROADMAP.as_posix(),
+            ],
+            "report_outputs": [
+                "Day73 JSON/HTML mock AI decision pipeline report",
+                "Day73 mock AI decision pipeline documentation",
+            ],
+            "related_script": "network_lab.py",
+            "notes": "Mock-only report generation. Uses Day72 validation output but does not call APIs, use AI SDKs, execute mapped tasks, run live tests, open SSH, read config.json, connect to devices, add dashboard action surfaces, or modify network/device configuration.",
+        },
     ]
 
 
@@ -2317,6 +2364,7 @@ intent-workflow-demo writes a Day60 reviewer walkthrough connecting Day57-Day59 
 offline-mock-runtime writes a fixed Day66 offline mock runtime skeleton report without API, voice, SSH, device access, config.json, live execution, or mapped task execution.
 offline-mock-runtime-contract validates Day66 mock output fields and safety invariants without API, voice, SSH, device access, config.json, live execution, or mapped task execution.
 offline-mock-runtime-review reviews Day66-Day67 report quality and evidence traceability without API, voice, SSH, device access, config.json, live execution, or mapped task execution.
+mock-ai-decision-pipeline runs deterministic Day73 mock decisions after Day72 validation without AI API, SSH, device access, config.json, live execution, mapped task execution, or dashboard actions.
 wireguard-runner is dry-run by default and delegates to the existing WireGuard script only after explicit --allow-live-wireguard."""
     parser = argparse.ArgumentParser(
         description=f"Day14 {DAY14_NAME}.",
@@ -2353,6 +2401,7 @@ wireguard-runner is dry-run by default and delegates to the existing WireGuard s
             DAY66_OFFLINE_MOCK_RUNTIME_TASK_ID,
             DAY67_OFFLINE_MOCK_RUNTIME_CONTRACT_TASK_ID,
             DAY68_OFFLINE_MOCK_RUNTIME_REVIEW_TASK_ID,
+            DAY73_MOCK_AI_DECISION_PIPELINE_TASK_ID,
             WIREGUARD_RUNNER_TASK_ALIAS,
         ],
         help="Task to run.",
@@ -3583,6 +3632,128 @@ def _run_day68_offline_mock_runtime_review(project_root: Path) -> int:
         return 0
 
     print(f"{format_status('WARN')} NEEDS_REVIEW")
+    return 1
+
+
+def write_day73_mock_ai_decision_pipeline_html(report: Dict[str, Any], output_path: Path) -> None:
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    decision_rows = "".join(
+        "<tr>"
+        f"<td>{html.escape(str(item.get('scenario_id', '')))}</td>"
+        f"<td>{html.escape(str(item.get('validator_status', '')))}</td>"
+        f"<td>{html.escape(str(item.get('decision_label', '')))}</td>"
+        f"<td>{html.escape(str(item.get('allowed_to_execute', '')))}</td>"
+        f"<td>{html.escape(str(item.get('requires_manual_review', '')))}</td>"
+        f"<td>{html.escape(str(item.get('blocked_reason', '')) or 'None')}</td>"
+        f"<td>{html.escape(str(item.get('next_reviewer_action', '')))}</td>"
+        "</tr>"
+        for item in report.get("decision_records", [])
+    )
+    invariant_rows = "".join(
+        "<tr>"
+        f"<th>{html.escape(str(label).replace('_', ' ').title())}</th>"
+        f"<td>{html.escape(str(value))}</td>"
+        "</tr>"
+        for label, value in report.get("safety_invariants", {}).items()
+    )
+    summary_rows = "".join(
+        "<tr>"
+        f"<th>{html.escape(str(label))}</th>"
+        f"<td>{html.escape(str(value))}</td>"
+        "</tr>"
+        for label, value in [
+            ("Overall status", report.get("overall_status")),
+            ("Reviewer status", report.get("reviewer_status")),
+            ("Execution mode", report.get("execution_mode")),
+            ("Scenario count", report.get("summary", {}).get("scenario_count")),
+            ("Allowed to execute values", report.get("summary", {}).get("allowed_to_execute_values")),
+        ]
+    )
+    label_rows = "".join(
+        "<tr>"
+        f"<th>{html.escape(str(label))}</th>"
+        f"<td>{html.escape(str(value))}</td>"
+        "</tr>"
+        for label, value in report.get("summary", {}).get("decision_label_counts", {}).items()
+    )
+    boundary_items = "".join(
+        f"<li>{html.escape(str(item))}</li>" for item in report.get("safety_boundary", [])
+    )
+    refs = "".join(
+        f"<li><code>{html.escape(str(ref))}</code></li>"
+        for ref in report.get("evidence_links_or_doc_refs", [])
+    )
+    validation_errors = "".join(
+        f"<li>{html.escape(str(error))}</li>" for error in report.get("validation_errors", [])
+    ) or "<li>None</li>"
+    output_path.write_text(
+        f"""<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Day73 Mock AI Decision Pipeline</title>
+  <style>
+    body {{ font-family: Arial, sans-serif; margin: 24px; color: #182230; }}
+    table {{ border-collapse: collapse; width: 100%; margin: 12px 0 20px; }}
+    td, th {{ border: 1px solid #d8e0ec; padding: 8px 10px; text-align: left; vertical-align: top; }}
+    th {{ background: #edf2f8; }}
+    .safe {{ background: #ecfdf3; border: 1px solid #abefc6; color: #05603a; padding: 12px; }}
+    .warn {{ background: #fff4d8; border: 1px solid #f0c66a; color: #765200; padding: 12px; }}
+    code {{ overflow-wrap: anywhere; }}
+  </style>
+</head>
+<body>
+  <h1>Day73 Mock AI Decision Pipeline</h1>
+  <p class="safe">{html.escape(str(report.get("final_safety_statement", "")))}</p>
+  <h2>Summary</h2>
+  <table><tbody>{summary_rows}</tbody></table>
+  <h2>Decision Label Counts</h2>
+  <table><tbody>{label_rows}</tbody></table>
+  <h2>Mock Decision Records</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Scenario ID</th><th>Day72 validator status</th><th>Decision label</th>
+        <th>Allowed to execute?</th><th>Manual review?</th><th>Blocked reason</th>
+        <th>Next reviewer action</th>
+      </tr>
+    </thead>
+    <tbody>{decision_rows}</tbody>
+  </table>
+  <h2>Safety Invariants</h2>
+  <table><tbody>{invariant_rows}</tbody></table>
+  <h2>Validation Errors</h2>
+  <ul class="warn">{validation_errors}</ul>
+  <h2>Safety Boundary</h2>
+  <ul>{boundary_items}</ul>
+  <h2>Evidence References</h2>
+  <ul>{refs}</ul>
+</body>
+</html>
+""",
+        encoding="utf-8",
+    )
+
+
+def _run_day73_mock_ai_decision_pipeline(project_root: Path) -> int:
+    report = build_mock_ai_decision_pipeline_report()
+    json_path = project_root / DAY73_MOCK_AI_DECISION_PIPELINE_JSON
+    html_path = project_root / DAY73_MOCK_AI_DECISION_PIPELINE_HTML
+    write_json_report(report, json_path)
+    write_day73_mock_ai_decision_pipeline_html(mask_secret_values(report), html_path)
+
+    print(format_heading("Day73 Mock AI Decision Pipeline"))
+    print("Safety: deterministic mock-only decision report")
+    print(f"Overall status: {report['overall_status']} / {report['reviewer_status']}")
+    print(f"Decision records: {report['summary']['scenario_count']}")
+    print(f"Allowed to execute values: {report['summary']['allowed_to_execute_values']}")
+    print(f"JSON report: {_relative_to_project(project_root, json_path)}")
+    print(f"HTML report: {_relative_to_project(project_root, html_path)}")
+    if report["overall_status"] == "PASS":
+        print(f"{format_status('PASS')} No AI API, SSH, device access, live execution, mapped task execution, config.json dependency, or network change occurred.")
+        return 0
+
+    print(f"{format_status('FAIL')} Day73 safety invariants failed.")
     return 1
 
 
@@ -5920,6 +6091,8 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
         return _run_day67_offline_mock_runtime_contract(root)
     if args.task == DAY68_OFFLINE_MOCK_RUNTIME_REVIEW_TASK_ID:
         return _run_day68_offline_mock_runtime_review(root)
+    if args.task == DAY73_MOCK_AI_DECISION_PIPELINE_TASK_ID:
+        return _run_day73_mock_ai_decision_pipeline(root)
 
     profile_path = _resolve_project_path(root, args.profile)
     try:
