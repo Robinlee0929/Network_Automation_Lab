@@ -193,7 +193,7 @@
   </nav>
 
   <h1>AI Intent Reviewer Entry Point</h1>
-  <p>Reviewer-friendly dashboard view for the Day57-Day76 AI intent workflow. It explains the demo path, links to the committed docs, scenario pack, traceability map, acceptance runbook, sign-off package, offline mock runtime skeleton, contract validation layer, reviewer quality trace, Day69 evidence drilldown, Day70 AI runtime readiness gate, Day71 controlled entry design, Day72 input contract validator, Day73 mock AI decision pipeline, Day74 dry-run plan builder, Day75 manual review approval envelope, and Day76 controlled runtime audit trail while keeping the no-execution boundary visible.</p>
+  <p>Reviewer-friendly dashboard view for the Day57-Day77 AI intent workflow. It explains the demo path, links to the committed docs, scenario pack, traceability map, acceptance runbook, sign-off package, offline mock runtime skeleton, contract validation layer, reviewer quality trace, Day69 evidence drilldown, Day70 AI runtime readiness gate, Day71 controlled entry design, Day72 input contract validator, Day73 mock AI decision pipeline, Day74 dry-run plan builder, Day75 manual review approval envelope, Day76 controlled runtime audit trail, and Day77 runtime safety gate while keeping the no-execution boundary visible.</p>
   <div class="note">This page is report-only. It does not call an AI model, listen to voice input, execute mapped tasks, open SSH, connect to devices, or change network configuration.</div>
 
   <section>
@@ -209,7 +209,7 @@
       </article>
       <article class="summary-card">
         <h3>Reviewer Evidence</h3>
-        <p>Day57-Day76 docs and optional generated JSON/HTML reports show how the workflow makes allowed and blocked decisions visible.</p>
+        <p>Day57-Day77 docs and optional generated JSON/HTML reports show how the workflow makes allowed and blocked decisions visible.</p>
       </article>
       <article class="summary-card">
         <h3>No Runtime Execution</h3>
@@ -219,7 +219,7 @@
   </section>
 
   <section>
-    <h2>Day57-Day76 Review Path</h2>
+    <h2>Day57-Day77 Review Path</h2>
     <div class="day-grid">
       {% for item in references %}
       <article class="day-card">
@@ -682,6 +682,32 @@
       </ul>
     </div>
     <div class="safe">Day76 is mock-only, dry-run-only, evidence-only, and read-only from this dashboard. It adds no OpenAI API, no AI SDK, no real AI runtime, no SSH, no device access, no live execution, no mapped task execution, no dashboard form, no POST route, no approval surface, no execution control, no approval unlock, and no router, switch, firewall, VPN, VRRP, or network configuration change.</div>
+  </section>
+
+  <section>
+    <h2>Day77 Runtime Safety Gate</h2>
+    <p>Day77 connects deterministic Day73 mock AI decision records, Day74 dry-run plans, Day75 approval envelopes, and Day76 audit records into final locked runtime gate evidence. The gate proves that even review-ready chains remain dry-run-only and cannot execute.</p>
+    <ul>
+      <li>Each gate record links a <code>decision_id</code>, <code>dry_run_plan_id</code>, <code>approval_envelope_id</code>, and <code>audit_id</code>.</li>
+      <li><code>evidence_chain_complete</code> is <code>true</code> only when all four references are present.</li>
+      <li><code>runtime_gate_state</code> remains <code>LOCKED</code> for every gate record.</li>
+      <li><code>allowed_to_execute</code> remains <code>false</code> for every gate record.</li>
+      <li><code>dry_run_only</code> remains <code>true</code> for every gate record.</li>
+      <li><code>execution_unlock_supported</code> remains <code>false</code> for every gate record.</li>
+      <li>Gate results such as <code>REVIEW_READY</code>, <code>LOCKED_BY_POLICY</code>, <code>BLOCKED_FOR_REVIEW</code>, and <code>EVIDENCE_GAP</code> are no-execution labels only.</li>
+    </ul>
+    <div class="refs">
+      <a href="{{ evidence_url('docs/ai/intent_runtime_safety_gate.md') }}">Open Day77 AI doc</a>
+      <a href="{{ evidence_url('docs/roadmap/day77_runtime_safety_gate.md') }}">Open Day77 roadmap</a>
+    </div>
+    <div class="paths">
+      <strong>Generated runtime safety gate reports:</strong>
+      <ul>
+        <li><code>reports/lab-summary/day77_runtime_safety_gate.json</code></li>
+        <li><code>reports/lab-summary/day77_runtime_safety_gate.html</code></li>
+      </ul>
+    </div>
+    <div class="safe">Day77 is mock-only, dry-run-only, no-execution, and read-only from this dashboard. It adds no OpenAI API, no AI SDK, no real AI runtime, no SSH, no device access, no live execution, no mapped task execution, no dashboard form, no POST route, no approval surface, no execution control, no approval unlock, no approve button, no execute button, and no router, switch, firewall, VPN, VRRP, or network configuration change.</div>
   </section>
 
   <section>

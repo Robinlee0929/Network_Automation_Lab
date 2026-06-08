@@ -19,6 +19,7 @@ from intent_offline_mock_runtime import build_mock_runtime_report
 from intent_reviewer_report_quality import build_reviewer_quality_report
 from intent_runtime_contract import validate_runtime_results
 from intent_runtime_audit_trail import build_runtime_audit_trail_report
+from intent_runtime_safety_gate import build_runtime_safety_gate_report
 
 
 DAY14_NAME = "Unified Lab Runner and Report Index"
@@ -142,6 +143,11 @@ DAY76_RUNTIME_AUDIT_TRAIL_DOC = Path("docs") / "ai" / "intent_runtime_audit_trai
 DAY76_RUNTIME_AUDIT_TRAIL_ROADMAP = Path("docs") / "roadmap" / "day76_runtime_audit_trail.md"
 DAY76_RUNTIME_AUDIT_TRAIL_JSON = Path("reports") / "lab-summary" / "day76_runtime_audit_trail.json"
 DAY76_RUNTIME_AUDIT_TRAIL_HTML = Path("reports") / "lab-summary" / "day76_runtime_audit_trail.html"
+DAY77_RUNTIME_SAFETY_GATE_TASK_ID = "runtime-safety-gate"
+DAY77_RUNTIME_SAFETY_GATE_DOC = Path("docs") / "ai" / "intent_runtime_safety_gate.md"
+DAY77_RUNTIME_SAFETY_GATE_ROADMAP = Path("docs") / "roadmap" / "day77_runtime_safety_gate.md"
+DAY77_RUNTIME_SAFETY_GATE_JSON = Path("reports") / "lab-summary" / "day77_runtime_safety_gate.json"
+DAY77_RUNTIME_SAFETY_GATE_HTML = Path("reports") / "lab-summary" / "day77_runtime_safety_gate.html"
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
 WIREGUARD_RUNNER_DISPLAY_NAME = "WireGuard Runner Safety Layer"
@@ -753,6 +759,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY76_RUNTIME_AUDIT_TRAIL_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day77",
+        "title": "Runtime Safety Gate / No-Execution Enforcement Report",
+        "report_type": "Runtime safety gate enforcement report",
+        "safety_label": "deterministic mock-only / dry-run-only no-execution gate",
+        "description": "Day77 links Day73 decisions, Day74 plans, Day75 approval envelopes, and Day76 audit records into locked runtime safety gate records without execution unlocks, AI API, SSH, device access, live execution, or mapped task execution.",
+        "json_globs": [DAY77_RUNTIME_SAFETY_GATE_JSON.as_posix()],
+        "html_globs": [DAY77_RUNTIME_SAFETY_GATE_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY77_RUNTIME_SAFETY_GATE_TASK_ID}"
         ),
     },
 ]
@@ -2460,6 +2479,34 @@ def list_tasks() -> List[Dict[str, Any]]:
             "related_script": "network_lab.py",
             "notes": "Mock-only dry-run audit evidence. Uses Day73, Day74, and Day75 deterministic records but does not call APIs, use AI SDKs, execute mapped tasks, run live tests, open SSH, read config.json, connect to devices, add dashboard forms, POST routes, approve/execute action endpoints, execution unlocks, or modify network/device configuration.",
         },
+        {
+            "id": DAY77_RUNTIME_SAFETY_GATE_TASK_ID,
+            "task_id": "day77_runtime_safety_gate",
+            "display_name": "Day77 Runtime Safety Gate",
+            "user_display_name": "Runtime Safety Gate",
+            "day": "Day77",
+            "category": "ai_planning",
+            "description": "Links Day73 decisions, Day74 dry-run plans, Day75 approval envelopes, and Day76 audit records into deterministic locked runtime safety gate records.",
+            "safety_level": "dry-run",
+            "execution_mode": "dry-run",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY77_RUNTIME_SAFETY_GATE_JSON.as_posix(),
+                DAY77_RUNTIME_SAFETY_GATE_HTML.as_posix(),
+                DAY77_RUNTIME_SAFETY_GATE_DOC.as_posix(),
+                DAY77_RUNTIME_SAFETY_GATE_ROADMAP.as_posix(),
+            ],
+            "report_outputs": [
+                "Day77 JSON/HTML runtime safety gate report",
+                "Day77 runtime safety gate documentation",
+            ],
+            "related_script": "network_lab.py",
+            "notes": "Deterministic mock-only dry-run no-execution gate. Uses Day73, Day74, Day75, and Day76 deterministic records but does not call APIs, use AI SDKs, execute mapped tasks, run live tests, open SSH, read config.json, connect to devices, add dashboard forms, POST routes, approve/execute action endpoints, execution unlocks, arbitrary command execution, or modify network/device configuration.",
+        },
     ]
 
 
@@ -2519,6 +2566,7 @@ mock-ai-decision-pipeline runs deterministic Day73 mock decisions after Day72 va
 dry-run-plan-builder converts Day73 mock decisions into deterministic Day74 dry-run plan previews without AI API, SSH, device access, config.json, live execution, mapped task execution, or dashboard actions.
 manual-review-approval-envelope wraps Day74 dry-run plans in deterministic Day75 reviewer sign-off envelopes without AI API, SSH, device access, config.json, live execution, mapped task execution, approval unlocks, or dashboard actions.
 runtime-audit-trail links Day73 decisions, Day74 dry-run plans, and Day75 approval envelopes into deterministic Day76 reviewer audit evidence without AI API, SSH, device access, config.json, live execution, mapped task execution, approval unlocks, or dashboard actions.
+runtime-safety-gate links Day73 decisions, Day74 dry-run plans, Day75 approval envelopes, and Day76 audit records into deterministic Day77 locked runtime safety gates without AI API, SSH, device access, config.json, live execution, mapped task execution, approval unlocks, execution controls, or dashboard actions.
 wireguard-runner is dry-run by default and delegates to the existing WireGuard script only after explicit --allow-live-wireguard."""
     parser = argparse.ArgumentParser(
         description=f"Day14 {DAY14_NAME}.",
@@ -2559,6 +2607,7 @@ wireguard-runner is dry-run by default and delegates to the existing WireGuard s
             DAY74_DRY_RUN_PLAN_BUILDER_TASK_ID,
             DAY75_MANUAL_REVIEW_APPROVAL_ENVELOPE_TASK_ID,
             DAY76_RUNTIME_AUDIT_TRAIL_TASK_ID,
+            DAY77_RUNTIME_SAFETY_GATE_TASK_ID,
             WIREGUARD_RUNNER_TASK_ALIAS,
         ],
         help="Task to run.",
@@ -4317,6 +4366,143 @@ def _run_day76_runtime_audit_trail(project_root: Path) -> int:
         return 0
 
     print(f"{format_status('FAIL')} Day76 safety invariants failed.")
+    return 1
+
+
+def write_day77_runtime_safety_gate_html(report: Dict[str, Any], output_path: Path) -> None:
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    gate_rows = "".join(
+        "<tr>"
+        f"<td>{html.escape(str(item.get('gate_id', '')))}</td>"
+        f"<td>{html.escape(str(item.get('scenario_id', '')))}</td>"
+        f"<td>{html.escape(str(item.get('decision_id', '')))}</td>"
+        f"<td>{html.escape(str(item.get('dry_run_plan_id', '')))}</td>"
+        f"<td>{html.escape(str(item.get('approval_envelope_id', '')))}</td>"
+        f"<td>{html.escape(str(item.get('audit_id', '')))}</td>"
+        f"<td>{html.escape(str(item.get('evidence_chain_complete', '')))}</td>"
+        f"<td>{html.escape(str(item.get('runtime_gate_state', '')))}</td>"
+        f"<td>{html.escape(str(item.get('gate_result', '')))}</td>"
+        f"<td>{html.escape(str(item.get('allowed_to_execute', '')))}</td>"
+        f"<td>{html.escape(str(item.get('dry_run_only', '')))}</td>"
+        f"<td>{html.escape(str(item.get('execution_unlock_supported', '')))}</td>"
+        f"<td>{html.escape('; '.join(str(step) for step in item.get('blocked_conditions', [])))}</td>"
+        "</tr>"
+        for item in report.get("safety_gate_records", [])
+    )
+    invariant_rows = "".join(
+        "<tr>"
+        f"<th>{html.escape(str(label).replace('_', ' ').title())}</th>"
+        f"<td>{html.escape(str(value))}</td>"
+        "</tr>"
+        for label, value in report.get("safety_invariants", {}).items()
+    )
+    summary_rows = "".join(
+        "<tr>"
+        f"<th>{html.escape(str(label))}</th>"
+        f"<td>{html.escape(str(value))}</td>"
+        "</tr>"
+        for label, value in report.get("summary", {}).items()
+    )
+    result_rows = "".join(
+        "<tr>"
+        f"<th>{html.escape(str(label))}</th>"
+        f"<td>{html.escape(str(value))}</td>"
+        "</tr>"
+        for label, value in report.get("summary", {}).get("gate_result_counts", {}).items()
+    )
+    validation_errors = "".join(
+        f"<li>{html.escape(str(item))}</li>" for item in report.get("validation_errors", [])
+    ) or "<li>None</li>"
+    boundary_items = "".join(
+        f"<li>{html.escape(str(item))}</li>" for item in report.get("safety_boundary", [])
+    )
+    refs = "".join(
+        f"<li><code>{html.escape(str(item))}</code></li>"
+        for item in report.get("evidence_links_or_doc_refs", [])
+    )
+    output_path.write_text(
+        f"""<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Day77 Runtime Safety Gate</title>
+  <style>
+    body {{ font-family: Arial, sans-serif; margin: 24px; color: #182230; }}
+    table {{ border-collapse: collapse; width: 100%; margin: 12px 0 20px; }}
+    td, th {{ border: 1px solid #d8e0ec; padding: 8px 10px; text-align: left; vertical-align: top; }}
+    th {{ background: #edf2f8; }}
+    .safe {{ background: #ecfdf3; border: 1px solid #abefc6; color: #05603a; padding: 12px; }}
+    .warn {{ color: #7a4d00; }}
+    code {{ overflow-wrap: anywhere; }}
+  </style>
+</head>
+<body>
+  <h1>Day77 Runtime Safety Gate</h1>
+  <p class="safe">{html.escape(str(report.get("final_safety_statement", "")))}</p>
+  <h2>Summary</h2>
+  <table><tbody>{summary_rows}</tbody></table>
+  <h2>Gate Result Counts</h2>
+  <table><tbody>{result_rows}</tbody></table>
+  <h2>No-Execution Gate Records</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Gate ID</th><th>Scenario</th><th>Decision ID</th><th>Dry-run plan</th>
+        <th>Approval envelope</th><th>Audit ID</th><th>Evidence chain complete?</th>
+        <th>Runtime gate state</th><th>Gate result</th><th>Allowed to execute?</th>
+        <th>Dry-run only?</th><th>Execution unlock supported?</th><th>Blocked conditions</th>
+      </tr>
+    </thead>
+    <tbody>{gate_rows}</tbody>
+  </table>
+  <h2>Safety Invariants</h2>
+  <table><tbody>{invariant_rows}</tbody></table>
+  <h2>Validation Errors</h2>
+  <ul class="warn">{validation_errors}</ul>
+  <h2>Safety Boundary</h2>
+  <ul>{boundary_items}</ul>
+  <h2>Evidence References</h2>
+  <ul>{refs}</ul>
+</body>
+</html>
+""",
+        encoding="utf-8",
+    )
+
+
+def _run_day77_runtime_safety_gate(project_root: Path) -> int:
+    report = build_runtime_safety_gate_report()
+    json_path = project_root / DAY77_RUNTIME_SAFETY_GATE_JSON
+    html_path = project_root / DAY77_RUNTIME_SAFETY_GATE_HTML
+    write_json_report(report, json_path)
+    write_day77_runtime_safety_gate_html(mask_secret_values(report), html_path)
+
+    print(format_heading("Day77 Runtime Safety Gate"))
+    print("Safety: deterministic mock-only / no-execution enforcement report")
+    print(f"Overall status: {report['overall_status']} / {report['reviewer_status']}")
+    print(f"Gate records: {report['summary']['gate_record_count']}")
+    print(f"Runtime gate state values: {report['summary']['runtime_gate_state_values']}")
+    print(
+        "Evidence chain complete values: "
+        f"{report['summary']['evidence_chain_complete_values']}"
+    )
+    print(f"Allowed to execute values: {report['summary']['allowed_to_execute_values']}")
+    print(f"Dry-run-only values: {report['summary']['dry_run_only_values']}")
+    print(
+        "Execution unlock supported values: "
+        f"{report['summary']['execution_unlock_supported_values']}"
+    )
+    print(f"JSON report: {_relative_to_project(project_root, json_path)}")
+    print(f"HTML report: {_relative_to_project(project_root, html_path)}")
+    if report["overall_status"] == "PASS" and report["reviewer_status"] == "REVIEW_READY":
+        print(
+            f"{format_status('PASS')} REVIEW_READY. Runtime gate remains LOCKED; no AI API, "
+            "SSH, device access, live execution, mapped task execution, config.json "
+            "dependency, approval unlock, dashboard action surface, or network change occurred."
+        )
+        return 0
+
+    print(f"{format_status('FAIL')} Day77 safety invariants failed.")
     return 1
 
 
@@ -6662,6 +6848,8 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
         return _run_day75_manual_review_approval_envelope(root)
     if args.task == DAY76_RUNTIME_AUDIT_TRAIL_TASK_ID:
         return _run_day76_runtime_audit_trail(root)
+    if args.task == DAY77_RUNTIME_SAFETY_GATE_TASK_ID:
+        return _run_day77_runtime_safety_gate(root)
 
     profile_path = _resolve_project_path(root, args.profile)
     try:
