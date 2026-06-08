@@ -941,6 +941,21 @@ def ai_intent_reviewer_references() -> List[AIIntentReviewerReference]:
                 "reports/lab-summary/day79_readonly_task_contract.html",
             ),
         ),
+        AIIntentReviewerReference(
+            day="Day80",
+            title="Read-only execution broker skeleton",
+            summary=(
+                "Receives fixed mock read-only task requests, checks the Day79 "
+                "contract, rejects unsafe requests, queues review-only requests, "
+                "and prepares mock execution request data without executing anything."
+            ),
+            doc_path="docs/ai/intent_readonly_execution_broker.md",
+            roadmap_path="docs/roadmap/day80_readonly_execution_broker_skeleton.md",
+            report_paths=(
+                "reports/lab-summary/day80_readonly_execution_broker.json",
+                "reports/lab-summary/day80_readonly_execution_broker.html",
+            ),
+        ),
     ]
 
 
@@ -1154,6 +1169,8 @@ def ai_intent_safety_boundaries() -> List[str]:
         "Day78 adds no OpenAI API, AI SDK, real AI runtime, SSH, device access, live execution, mapped task execution, dashboard form, POST route, approve button, execute button, action endpoint, approval unlock, execution control, or network configuration change.",
         "Day79 defines the read-only task allowlist and capability definition layer after the Day72-Day78 runtime safety chain; allowed_to_execute remains false, dry_run_only remains true, and execution_unlock_supported remains false.",
         "Day79 adds no OpenAI API, AI SDK, real AI runtime, SSH, device access, live execution, mapped task execution, dashboard form, POST route, approve button, execute button, action endpoint, approval unlock, execution control, or network configuration change.",
+        "Day80 defines the read-only execution broker skeleton after the Day79 allowlist; allowed_to_execute remains false, dry_run_only remains true, execution_unlock_supported remains false, ssh_allowed remains false, and live_command_allowed remains false.",
+        "Day80 adds no OpenAI API, AI SDK, real AI runtime, SSH, device access, live command execution, mapped task execution, dashboard form, POST route, approve button, execute button, action endpoint, approval unlock, execution control, or network configuration change.",
     ]
 
 

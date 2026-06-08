@@ -193,7 +193,7 @@
   </nav>
 
   <h1>AI Intent Reviewer Entry Point</h1>
-  <p>Reviewer-friendly dashboard view for the Day57-Day79 AI intent workflow. It explains the demo path, links to the committed docs, scenario pack, traceability map, acceptance runbook, sign-off package, offline mock runtime skeleton, contract validation layer, reviewer quality trace, Day69 evidence drilldown, Day70 AI runtime readiness gate, Day71 controlled entry design, Day72 input contract validator, Day73 mock AI decision pipeline, Day74 dry-run plan builder, Day75 manual review approval envelope, Day76 controlled runtime audit trail, Day77 runtime safety gate, Day78 controlled runtime safety case, and Day79 read-only task contract while keeping the no-execution boundary visible.</p>
+  <p>Reviewer-friendly dashboard view for the Day57-Day80 AI intent workflow. It explains the demo path, links to the committed docs, scenario pack, traceability map, acceptance runbook, sign-off package, offline mock runtime skeleton, contract validation layer, reviewer quality trace, Day69 evidence drilldown, Day70 AI runtime readiness gate, Day71 controlled entry design, Day72 input contract validator, Day73 mock AI decision pipeline, Day74 dry-run plan builder, Day75 manual review approval envelope, Day76 controlled runtime audit trail, Day77 runtime safety gate, Day78 controlled runtime safety case, Day79 read-only task contract, and Day80 read-only broker skeleton while keeping the no-execution boundary visible.</p>
   <div class="note">This page is report-only. It does not call an AI model, listen to voice input, execute mapped tasks, open SSH, connect to devices, or change network configuration.</div>
 
   <section>
@@ -209,7 +209,7 @@
       </article>
       <article class="summary-card">
         <h3>Reviewer Evidence</h3>
-        <p>Day57-Day79 docs and optional generated JSON/HTML reports show how the workflow makes allowed and blocked decisions visible.</p>
+        <p>Day57-Day80 docs and optional generated JSON/HTML reports show how the workflow makes allowed and blocked decisions visible.</p>
       </article>
       <article class="summary-card">
         <h3>No Runtime Execution</h3>
@@ -219,7 +219,7 @@
   </section>
 
   <section>
-    <h2>Day57-Day79 Review Path</h2>
+    <h2>Day57-Day80 Review Path</h2>
     <div class="day-grid">
       {% for item in references %}
       <article class="day-card">
@@ -267,6 +267,8 @@
       <li>Read Day74 to review deterministic dry-run plan previews built from Day73 decisions without executing mapped tasks.</li>
       <li>Read Day75 to review deterministic record-only approval envelopes built from Day74 plans without unlocking execution.</li>
       <li>Read Day76 to review the deterministic audit trail that links Day73 decisions, Day74 plans, and Day75 approval envelopes into evidence packages without unlocking execution.</li>
+      <li>Read Day79 to review the read-only task contract and allowlist before any broker-shaped request handling is considered.</li>
+      <li>Read Day80 to review the deterministic broker skeleton that rejects unsafe requests, queues review-only requests, or prepares mock execution request data without executing anything.</li>
       <li>Use <a href="{{ url_for('reports') }}">Reports</a> for generated local evidence when available.</li>
     </ol>
     <div class="safe">Expected Day60 statement: <code>No mapped task was executed. This is a dry-run reviewer walkthrough only.</code></div>
@@ -761,6 +763,32 @@
       </ul>
     </div>
     <div class="safe">Day79 is deterministic, mock-only, dry-run-only, and static from this dashboard. It adds no SSH, no device access, no execution unlock, and no dashboard action surface.</div>
+  </section>
+
+  <section>
+    <h2>Day80 Read-only Execution Broker Skeleton</h2>
+    <p>Day80 follows the Day79 allowlist with a deterministic broker-shaped evidence layer. It receives fixed mock read-only requests, validates each task against the Day79 contract, rejects unsafe requests, queues review-only requests, or prepares mock execution request data.</p>
+    <ul>
+      <li><code>RECEIVED</code> appears in the broker lifecycle for each fixed mock request.</li>
+      <li><code>REJECTED</code> covers unsupported, write/config-changing, and unsafe requests.</li>
+      <li><code>QUEUED_FOR_REVIEW</code> covers valid read-only requests that require manual review and ambiguous natural-language requests.</li>
+      <li><code>MOCK_EXECUTION_REQUEST_PREPARED</code> is a data object only, not a runnable path.</li>
+      <li><code>allowed_to_execute</code> remains <code>false</code> for every broker record.</li>
+      <li><code>dry_run_only</code> remains <code>true</code> for every broker record.</li>
+      <li><code>execution_unlock_supported</code>, <code>ssh_allowed</code>, and <code>live_command_allowed</code> remain <code>false</code> for every broker record.</li>
+    </ul>
+    <div class="refs">
+      <a href="{{ evidence_url('docs/ai/intent_readonly_execution_broker.md') }}">Open Day80 AI doc</a>
+      <a href="{{ evidence_url('docs/roadmap/day80_readonly_execution_broker_skeleton.md') }}">Open Day80 roadmap</a>
+    </div>
+    <div class="paths">
+      <strong>Generated read-only broker skeleton reports:</strong>
+      <ul>
+        <li><code>reports/lab-summary/day80_readonly_execution_broker.json</code></li>
+        <li><code>reports/lab-summary/day80_readonly_execution_broker.html</code></li>
+      </ul>
+    </div>
+    <div class="safe">Day80 is deterministic, mock-only, dry-run-only, and static from this dashboard. It adds no SSH, no device access, no live command execution, no execution unlock, and no dashboard action surface.</div>
   </section>
 
   <section>
