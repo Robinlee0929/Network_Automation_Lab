@@ -853,6 +853,20 @@ def ai_intent_reviewer_references() -> List[AIIntentReviewerReference]:
                 "reports/lab-summary/day73_mock_ai_decision_pipeline.html",
             ),
         ),
+        AIIntentReviewerReference(
+            day="Day74",
+            title="Controlled dry-run plan builder",
+            summary=(
+                "Converts Day73 mock decision records into reviewer dry-run plan "
+                "previews while keeping execution disabled."
+            ),
+            doc_path="docs/ai/intent_dry_run_plan_builder.md",
+            roadmap_path="docs/roadmap/day74_dry_run_plan_builder.md",
+            report_paths=(
+                "reports/lab-summary/day74_dry_run_plan_builder.json",
+                "reports/lab-summary/day74_dry_run_plan_builder.html",
+            ),
+        ),
     ]
 
 
@@ -1054,6 +1068,8 @@ def ai_intent_safety_boundaries() -> List[str]:
         "Day72 adds no OpenAI API, voice, SSH, device access, live execution, mapped task execution, config changes, forms, POST routes, or action endpoints.",
         "Day73 runs deterministic mock decisions after Day72 validation only; allowed_to_execute remains false.",
         "Day73 adds no OpenAI API, AI SDK, real AI runtime, SSH, device access, live execution, mapped task execution, dashboard POST/action endpoint, or network configuration change.",
+        "Day74 converts Day73 mock decisions into dry-run plan previews only; allowed_to_execute remains false and dry_run_only remains true.",
+        "Day74 adds no OpenAI API, AI SDK, real AI runtime, SSH, device access, live execution, mapped task execution, dashboard form, POST route, action endpoint, approval unlock, or network configuration change.",
     ]
 
 

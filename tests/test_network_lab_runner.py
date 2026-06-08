@@ -2893,3 +2893,69 @@ def test_day73_cli_generates_mock_decision_report_without_config_or_device_acces
     assert "BLOCKED_LIVE_ACTION" in html
     assert "INVALID_INPUT_BLOCKED" in html
     assert "Allowed to execute?" in html
+
+
+def test_day74_dry_run_plan_builder_task_exists_in_catalog():
+    task = next(task for task in network_lab.list_tasks() if task["id"] == "dry-run-plan-builder")
+
+    assert task["task_id"] == "day74_dry_run_plan_builder"
+    assert task["day"] == "Day74"
+    assert task["safety_level"] == "dry-run"
+    assert task["execution_mode"] == "dry-run"
+    assert task["requires_live_device"] is False
+    assert task["requires_password"] is False
+    assert task["produces_report"] is True
+    assert "reports/lab-summary/day74_dry_run_plan_builder.json" in task["report_paths"]
+    assert "reports/lab-summary/day74_dry_run_plan_builder.html" in task["report_paths"]
+    assert "docs/ai/intent_dry_run_plan_builder.md" in task["report_paths"]
+    assert "docs/roadmap/day74_dry_run_plan_builder.md" in task["report_paths"]
+    assert "does not call APIs" in task["notes"]
+    assert "execute mapped tasks" in task["notes"]
+
+
+def test_day74_cli_generates_dry_run_plan_report_without_config_or_device_access(
+    tmp_path,
+    monkeypatch,
+    capsys,
+):
+    def fail_run(*_args, **_kwargs):
+        raise AssertionError("Day74 dry-run plan builder must not execute subprocess")
+
+    def fail_profile_load(*_args, **_kwargs):
+        raise AssertionError("Day74 dry-run plan builder must not load profile or config data")
+
+    monkeypatch.setattr(network_lab.subprocess, "run", fail_run)
+    monkeypatch.setattr(network_lab, "load_lab_runner_profile", fail_profile_load)
+
+    exit_code = network_lab.main(["--task", "dry-run-plan-builder"], project_root=tmp_path)
+
+    output = capsys.readouterr().out
+    json_path = tmp_path / "reports/lab-summary/day74_dry_run_plan_builder.json"
+    html_path = tmp_path / "reports/lab-summary/day74_dry_run_plan_builder.html"
+    assert exit_code == 0
+    assert "Day74 Controlled Dry-run Plan Builder" in output
+    assert "No AI API, SSH, device access, live execution, mapped task execution" in output
+    assert json_path.exists()
+    assert html_path.exists()
+    assert not (tmp_path / "config.json").exists()
+
+    report = json.loads(json_path.read_text(encoding="utf-8"))
+    html = html_path.read_text(encoding="utf-8")
+    assert report["day"] == "Day74"
+    assert report["overall_status"] == "PASS"
+    assert report["reviewer_status"] == "REVIEW_READY"
+    assert report["summary"]["plan_count"] == 5
+    assert report["summary"]["allowed_to_execute_values"] == [False]
+    assert report["summary"]["dry_run_only_values"] == [True]
+    assert report["safety_invariants"]["allowed_to_execute_always_false"] is True
+    assert report["safety_invariants"]["dry_run_only_always_true"] is True
+    assert report["safety_invariants"]["mapped_task_executed"] is False
+    assert report["safety_invariants"]["openai_api_used"] is False
+    assert report["safety_invariants"]["ssh_used"] is False
+    assert report["safety_invariants"]["device_access_used"] is False
+    assert report["safety_invariants"]["config_json_read"] is False
+    assert all(plan["allowed_to_execute"] is False for plan in report["dry_run_plans"])
+    assert all(plan["dry_run_only"] is True for plan in report["dry_run_plans"])
+    assert "DRY_RUN_READY" in html
+    assert "INVALID_INPUT_BLOCKED" in html
+    assert "Dry-run only?" in html
