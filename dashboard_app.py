@@ -828,6 +828,17 @@ def ai_intent_reviewer_references() -> List[AIIntentReviewerReference]:
             roadmap_path="docs/roadmap/day71_controlled_ai_runtime_prototype_entry_design.md",
             report_paths=(),
         ),
+        AIIntentReviewerReference(
+            day="Day72",
+            title="Controlled AI runtime input contract validator",
+            summary=(
+                "Validates future controlled AI runtime intent payloads before any "
+                "runtime decision path while keeping execution disabled."
+            ),
+            doc_path="docs/ai/intent_controlled_ai_runtime_input_validator.md",
+            roadmap_path="docs/roadmap/day72_controlled_ai_runtime_input_contract_validator.md",
+            report_paths=(),
+        ),
     ]
 
 
@@ -1025,6 +1036,8 @@ def ai_intent_safety_boundaries() -> List[str]:
         "Day70 preserves no dashboard forms, no POST routes for AI intent review, and no action endpoints.",
         "Day71 defines a controlled AI runtime entry design only; execution_allowed remains false.",
         "Day71 keeps API integration, voice, device access, live execution, mapped task execution, and dashboard action surfaces disabled.",
+        "Day72 validates controlled AI runtime input payloads only; execution_allowed remains false.",
+        "Day72 adds no OpenAI API, voice, SSH, device access, live execution, mapped task execution, config changes, forms, POST routes, or action endpoints.",
     ]
 
 
