@@ -84,6 +84,7 @@ The v0.1 portfolio package covers Day 1 through Day 30 post-tag verification. Th
 - Day78 - Controlled Runtime Safety Case
 - Day79 - Controlled Read-only Task Contract & Allowlist
 - Day80 - Read-only Execution Broker Skeleton
+- Day81 - Read-only Broker Review Queue & Decision State Report
 
 The project is designed as a practical QA Automation / SDET portfolio project for network infrastructure. It focuses on repeatable validation, structured test evidence, and readable JSON / HTML reports rather than one-off manual checks.
 
@@ -108,7 +109,7 @@ Recommended quick path:
 7. Use `docs/roadmap/day57_ai_assisted_task_intent_mapping_prototype_plan.md` for the dry-run-only intent mapping prototype plan.
 8. Use `docs/roadmap/day58_intent_mapping_safety_review_confirmation_gate.md` for the dry-run intent safety review and blocked-by-default confirmation gate design.
 9. Use `docs/ai/day59_intent_policy_matrix_reviewer_safety_explanation.md` for the reviewer-facing intent policy matrix.
-10. If running the dashboard locally, open `/ai-intent-reviewer` for the Day57-Day80 reviewer UI entry point, Day62 scenario pack link, Day63 traceability evidence map link, Day64 acceptance runbook link, Day65 sign-off package link, Day66 offline mock runtime skeleton link, Day67 contract validation link, Day68 reviewer quality status, Day69 scenario evidence drilldown, Day70 AI runtime readiness gate, Day71 controlled AI runtime entry design, Day72 controlled AI runtime input contract validator, Day73 mock AI decision pipeline, Day74 controlled dry-run plan builder, Day75 manual review approval envelope, Day76 controlled runtime audit trail, Day77 runtime safety gate, Day78 controlled runtime safety case, Day79 read-only task contract, and Day80 read-only broker skeleton.
+10. If running the dashboard locally, open `/ai-intent-reviewer` for the Day57-Day81 reviewer UI entry point, Day62 scenario pack link, Day63 traceability evidence map link, Day64 acceptance runbook link, Day65 sign-off package link, Day66 offline mock runtime skeleton link, Day67 contract validation link, Day68 reviewer quality status, Day69 scenario evidence drilldown, Day70 AI runtime readiness gate, Day71 controlled AI runtime entry design, Day72 controlled AI runtime input contract validator, Day73 mock AI decision pipeline, Day74 controlled dry-run plan builder, Day75 manual review approval envelope, Day76 controlled runtime audit trail, Day77 runtime safety gate, Day78 controlled runtime safety case, Day79 read-only task contract, Day80 read-only broker skeleton, and Day81 broker review queue.
 
 ## Why This Project Exists
 
@@ -2244,7 +2245,20 @@ reports/lab-summary/day80_readonly_execution_broker.html
 
 Day80 adds `readonly-execution-broker`, a deterministic mock-only and dry-run-only broker skeleton after the Day79 allowlist. It receives fixed mock read-only task requests, validates them against the Day79 contract, rejects unsupported and write/config-changing requests, queues manual-review requests, and prepares mock execution request data for one valid read-only request. Every broker record keeps `allowed_to_execute` set to `False`, `dry_run_only` set to `True`, `execution_unlock_supported` set to `False`, `device_connection_allowed` set to `False`, `ssh_allowed` set to `False`, and `live_command_allowed` set to `False`; no broker status unlocks real AI execution, real SSH, device control, live command execution, mapped task execution, approval unlock, dashboard action surface, `config.json` dependency, or network configuration change.
 
-Future AI path remains staged and review-gated: Day81 Mock Read-only Execution Result Package, Day82 Read-only SSH Precheck Readiness Review, Day83 real read-only SSH precheck for lab devices only after explicit review, and Day84+ human-approved low-risk apply prototype only after later review.
+Day81 - Read-only Broker Review Queue & Decision State Report:
+
+```text
+docs/roadmap/day81_broker_review_queue.md
+docs/ai/intent_broker_review_queue.md
+intent_broker_review_queue.py
+reports/lab-summary/day81_broker_review_queue.json
+reports/lab-summary/day81_broker_review_queue.html
+/ai-intent-reviewer
+```
+
+Day81 adds `broker-review-queue`, a deterministic mock-only and dry-run-only review queue after the Day80 broker skeleton. It transforms the 5 Day80 broker records into reviewer-facing queue records with stable review states and decision states. The broker queue is report-only: all execution flags remain false, `dry_run_only` remains true, and there is no SSH, device access, live command execution, mapped task execution, dashboard form, POST route, action endpoint, execution unlock, `config.json` dependency, or network configuration change.
+
+Future AI path remains staged and review-gated: Day82 Reviewer Decision Audit Summary / Queue Evidence Export should remain review-only unless explicitly instructed otherwise.
 
 Validation commands:
 
@@ -2263,6 +2277,7 @@ python network_lab.py --task runtime-safety-gate
 python network_lab.py --task runtime-safety-case
 python network_lab.py --task readonly-task-contract
 python network_lab.py --task readonly-execution-broker
+python network_lab.py --task broker-review-queue
 ```
 
 ## Testing Strategy
@@ -2344,6 +2359,7 @@ For documentation-only review passes, run `python -m pytest` before sharing the 
 - Includes Day76 Controlled Runtime Audit Trail, a deterministic mock-only and dry-run-only evidence package after Day75 that links decisions, plans, and approval envelopes while keeping OpenAI API, AI SDKs, real AI runtime, SSH/device access, live execution, mapped task execution, dashboard forms, POST routes, action endpoints, approval unlocks, execution controls, and network configuration changes disabled.
 - Includes Day77 Runtime Safety Gate, a deterministic mock-only and dry-run-only no-execution enforcement report after Day76 that links decisions, plans, approval envelopes, and audit records into LOCKED gate records while keeping OpenAI API, AI SDKs, real AI runtime, SSH/device access, live execution, mapped task execution, arbitrary command execution, dashboard forms, POST routes, action endpoints, approval unlocks, execution controls, and network configuration changes disabled.
 - Includes Day80 Read-only Execution Broker Skeleton, a deterministic mock-only and dry-run-only broker evidence layer after Day79 that rejects unsafe requests, queues review-only requests, and prepares mock execution request data while keeping OpenAI API, AI SDKs, real AI runtime, SSH/device access, live command execution, mapped task execution, dashboard forms, POST routes, action endpoints, approval unlocks, execution controls, and network configuration changes disabled.
+- Includes Day81 Read-only Broker Review Queue & Decision State Report, a deterministic mock-only and dry-run-only queue evidence layer after Day80 that reports review states and decision states while keeping OpenAI API, AI SDKs, voice, real AI runtime, SSH/device access, live command execution, mapped task execution, dashboard forms, POST routes, action endpoints, approval unlocks, execution controls, and network configuration changes disabled.
 
 ## Roadmap
 
