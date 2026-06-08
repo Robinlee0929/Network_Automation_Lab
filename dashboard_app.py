@@ -911,6 +911,21 @@ def ai_intent_reviewer_references() -> List[AIIntentReviewerReference]:
                 "reports/lab-summary/day77_runtime_safety_gate.html",
             ),
         ),
+        AIIntentReviewerReference(
+            day="Day78",
+            title="Controlled runtime safety case",
+            summary=(
+                "Links Day72 input validation, Day73 mock decisions, Day74 dry-run "
+                "plans, Day75 approval envelopes, Day76 audit records, and Day77 "
+                "locked gates into final REVIEW_ONLY safety case records."
+            ),
+            doc_path="docs/ai/intent_runtime_safety_case.md",
+            roadmap_path="docs/roadmap/day78_runtime_safety_case.md",
+            report_paths=(
+                "reports/lab-summary/day78_runtime_safety_case.json",
+                "reports/lab-summary/day78_runtime_safety_case.html",
+            ),
+        ),
     ]
 
 
@@ -1120,6 +1135,8 @@ def ai_intent_safety_boundaries() -> List[str]:
         "Day76 adds no OpenAI API, AI SDK, real AI runtime, SSH, device access, live execution, mapped task execution, dashboard form, POST route, approve button, execute button, action endpoint, approval unlock, or network configuration change.",
         "Day77 links Day73 decisions, Day74 dry-run plans, Day75 approval envelopes, and Day76 audit records into locked runtime safety gate evidence only; allowed_to_execute remains false, dry_run_only remains true, execution_unlock_supported remains false, and runtime_gate_state remains LOCKED.",
         "Day77 adds no OpenAI API, AI SDK, real AI runtime, SSH, device access, live execution, mapped task execution, dashboard form, POST route, approve button, execute button, action endpoint, approval unlock, execution control, or network configuration change.",
+        "Day78 links Day72 input validation, Day73 decisions, Day74 dry-run plans, Day75 approval envelopes, Day76 audit records, and Day77 locked gates into end-to-end reviewer safety case evidence only; final_recommendation remains REVIEW_ONLY.",
+        "Day78 adds no OpenAI API, AI SDK, real AI runtime, SSH, device access, live execution, mapped task execution, dashboard form, POST route, approve button, execute button, action endpoint, approval unlock, execution control, or network configuration change.",
     ]
 
 

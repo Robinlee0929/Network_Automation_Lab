@@ -185,7 +185,7 @@ def test_ai_review_checklist_contains_wireguard_vpn_safety_items():
     assert "shell=False" in text
 
 
-def test_ai_intent_reviewer_references_day57_to_day77():
+def test_ai_intent_reviewer_references_day57_to_day78():
     references = dashboard.ai_intent_reviewer_references()
 
     assert [item.day for item in references] == [
@@ -206,6 +206,7 @@ def test_ai_intent_reviewer_references_day57_to_day77():
         "Day75",
         "Day76",
         "Day77",
+        "Day78",
     ]
     text = " ".join(
         f"{item.title} {item.summary} {item.doc_path} {item.roadmap_path} "
@@ -264,6 +265,10 @@ def test_ai_intent_reviewer_references_day57_to_day77():
     assert "docs/ai/intent_runtime_safety_gate.md" in text
     assert "docs/roadmap/day77_runtime_safety_gate.md" in text
     assert "reports/lab-summary/day77_runtime_safety_gate.html" in text
+    assert "Controlled runtime safety case" in text
+    assert "docs/ai/intent_runtime_safety_case.md" in text
+    assert "docs/roadmap/day78_runtime_safety_case.md" in text
+    assert "reports/lab-summary/day78_runtime_safety_case.html" in text
 
 
 def test_ai_intent_reviewer_safety_boundaries_are_report_only():
@@ -297,6 +302,9 @@ def test_ai_intent_reviewer_safety_boundaries_are_report_only():
     assert "Day77 links Day73 decisions, Day74 dry-run plans, Day75 approval envelopes, and Day76 audit records into locked runtime safety gate evidence only" in text
     assert "runtime_gate_state remains LOCKED" in text
     assert "Day77 adds no OpenAI API, AI SDK, real AI runtime, SSH, device access, live execution, mapped task execution, dashboard form, POST route, approve button, execute button, action endpoint, approval unlock, execution control, or network configuration change" in text
+    assert "Day78 links Day72 input validation, Day73 decisions, Day74 dry-run plans, Day75 approval envelopes, Day76 audit records, and Day77 locked gates into end-to-end reviewer safety case evidence only" in text
+    assert "final_recommendation remains REVIEW_ONLY" in text
+    assert "Day78 adds no OpenAI API, AI SDK, real AI runtime, SSH, device access, live execution, mapped task execution, dashboard form, POST route, approve button, execute button, action endpoint, approval unlock, execution control, or network configuration change" in text
 
 
 def test_day69_reviewer_evidence_drilldown_is_static_and_complete():
@@ -564,7 +572,7 @@ def test_dashboard_home_is_portfolio_demo_landing_page(tmp_path):
     assert "/ai-intent-reviewer" in text
 
 
-def test_ai_intent_reviewer_route_exposes_day57_to_day77_without_execution(tmp_path):
+def test_ai_intent_reviewer_route_exposes_day57_to_day78_without_execution(tmp_path):
     if dashboard.Flask is None:
         pytest.skip("Flask is not installed in this test environment.")
 
@@ -595,6 +603,7 @@ def test_ai_intent_reviewer_route_exposes_day57_to_day77_without_execution(tmp_p
     assert "Day75" in text
     assert "Day76" in text
     assert "Day77" in text
+    assert "Day78" in text
     assert "Day63 Traceability Evidence Map" in text
     assert "Day64 Reviewer Acceptance Runbook" in text
     assert "Day65 Acceptance Sign-off Package" in text
@@ -723,6 +732,13 @@ def test_ai_intent_reviewer_route_exposes_day57_to_day77_without_execution(tmp_p
     assert "docs/roadmap/day77_runtime_safety_gate.md" in text
     assert "reports/lab-summary/day77_runtime_safety_gate.json" in text
     assert "reports/lab-summary/day77_runtime_safety_gate.html" in text
+    assert "Day78 Controlled Runtime Safety Case" in text
+    assert "controlled runtime safety case" in text
+    assert "REVIEW_ONLY" in text
+    assert "docs/ai/intent_runtime_safety_case.md" in text
+    assert "docs/roadmap/day78_runtime_safety_case.md" in text
+    assert "reports/lab-summary/day78_runtime_safety_case.json" in text
+    assert "reports/lab-summary/day78_runtime_safety_case.html" in text
     assert "ai_intent_reviewer_controlled_runtime_entry" in text
     assert "execution_allowed=false" in text
     assert "api_integration_allowed=false" in text
@@ -788,6 +804,8 @@ def test_ai_intent_reviewer_route_exposes_day57_to_day77_without_execution(tmp_p
     assert "Day76 adds no OpenAI API, AI SDK, real AI runtime, SSH, device access, live execution, mapped task execution, dashboard form, POST route, approve button, execute button, action endpoint, approval unlock, or network configuration change" in text
     assert "Day77 links Day73 decisions, Day74 dry-run plans, Day75 approval envelopes, and Day76 audit records into locked runtime safety gate evidence only" in text
     assert "Day77 adds no OpenAI API, AI SDK, real AI runtime, SSH, device access, live execution, mapped task execution, dashboard form, POST route, approve button, execute button, action endpoint, approval unlock, execution control, or network configuration change" in text
+    assert "Day78 links Day72 input validation, Day73 decisions, Day74 dry-run plans, Day75 approval envelopes, Day76 audit records, and Day77 locked gates into end-to-end reviewer safety case evidence only" in text
+    assert "Day78 adds no OpenAI API, AI SDK, real AI runtime, SSH, device access, live execution, mapped task execution, dashboard form, POST route, approve button, execute button, action endpoint, approval unlock, execution control, or network configuration change" in text
     assert "No mapped task was executed. This is a dry-run reviewer walkthrough only." in text
     html = text.lower()
     assert "<form" not in html
