@@ -202,6 +202,7 @@ def test_ai_intent_reviewer_references_day57_to_day73():
         "Day71",
         "Day72",
         "Day73",
+        "Day74",
     ]
     text = " ".join(
         f"{item.title} {item.summary} {item.doc_path} {item.roadmap_path} "
@@ -244,6 +245,10 @@ def test_ai_intent_reviewer_references_day57_to_day73():
     assert "docs/ai/intent_mock_ai_decision_pipeline.md" in text
     assert "docs/roadmap/day73_mock_ai_decision_pipeline.md" in text
     assert "reports/lab-summary/day73_mock_ai_decision_pipeline.html" in text
+    assert "Controlled dry-run plan builder" in text
+    assert "docs/ai/intent_dry_run_plan_builder.md" in text
+    assert "docs/roadmap/day74_dry_run_plan_builder.md" in text
+    assert "reports/lab-summary/day74_dry_run_plan_builder.html" in text
 
 
 def test_ai_intent_reviewer_safety_boundaries_are_report_only():
@@ -267,6 +272,8 @@ def test_ai_intent_reviewer_safety_boundaries_are_report_only():
     assert "Day72 adds no OpenAI API, voice, SSH, device access, live execution, mapped task execution, config changes, forms, POST routes, or action endpoints" in text
     assert "Day73 runs deterministic mock decisions after Day72 validation only" in text
     assert "Day73 adds no OpenAI API, AI SDK, real AI runtime, SSH, device access, live execution, mapped task execution, dashboard POST/action endpoint, or network configuration change" in text
+    assert "Day74 converts Day73 mock decisions into dry-run plan previews only" in text
+    assert "Day74 adds no OpenAI API, AI SDK, real AI runtime, SSH, device access, live execution, mapped task execution, dashboard form, POST route, action endpoint, approval unlock, or network configuration change" in text
 
 
 def test_day69_reviewer_evidence_drilldown_is_static_and_complete():
@@ -561,6 +568,7 @@ def test_ai_intent_reviewer_route_exposes_day57_to_day73_without_execution(tmp_p
     assert "Day71" in text
     assert "Day72" in text
     assert "Day73" in text
+    assert "Day74" in text
     assert "Day63 Traceability Evidence Map" in text
     assert "Day64 Reviewer Acceptance Runbook" in text
     assert "Day65 Acceptance Sign-off Package" in text
@@ -652,6 +660,14 @@ def test_ai_intent_reviewer_route_exposes_day57_to_day73_without_execution(tmp_p
     assert "docs/roadmap/day73_mock_ai_decision_pipeline.md" in text
     assert "reports/lab-summary/day73_mock_ai_decision_pipeline.json" in text
     assert "reports/lab-summary/day73_mock_ai_decision_pipeline.html" in text
+    assert "Day74 Controlled Dry-run Plan Builder" in text
+    assert "dry-run plan previews" in text
+    assert "DRY_RUN_READY" in text
+    assert "dry_run_only</code> remains <code>true</code>" in text
+    assert "docs/ai/intent_dry_run_plan_builder.md" in text
+    assert "docs/roadmap/day74_dry_run_plan_builder.md" in text
+    assert "reports/lab-summary/day74_dry_run_plan_builder.json" in text
+    assert "reports/lab-summary/day74_dry_run_plan_builder.html" in text
     assert "ai_intent_reviewer_controlled_runtime_entry" in text
     assert "execution_allowed=false" in text
     assert "api_integration_allowed=false" in text
@@ -709,6 +725,8 @@ def test_ai_intent_reviewer_route_exposes_day57_to_day73_without_execution(tmp_p
     assert "Day72 adds no OpenAI API, voice, SSH, device access, live execution, mapped task execution, config changes, forms, POST routes, or action endpoints" in text
     assert "Day73 runs deterministic mock decisions after Day72 validation only" in text
     assert "Day73 adds no OpenAI API, AI SDK, real AI runtime, SSH, device access, live execution, mapped task execution, dashboard POST/action endpoint, or network configuration change" in text
+    assert "Day74 converts Day73 mock decisions into dry-run plan previews only" in text
+    assert "Day74 adds no OpenAI API, AI SDK, real AI runtime, SSH, device access, live execution, mapped task execution, dashboard form, POST route, action endpoint, approval unlock, or network configuration change" in text
     assert "No mapped task was executed. This is a dry-run reviewer walkthrough only." in text
     html = text.lower()
     assert "<form" not in html

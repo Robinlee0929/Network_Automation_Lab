@@ -10,6 +10,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, Iterator, List, Optional, Tuple
 
+from intent_dry_run_plan_builder import build_dry_run_plan_builder_report
 from intent_mock_ai_decision_pipeline import build_mock_ai_decision_pipeline_report
 from intent_offline_mock_runtime import build_mock_runtime_report
 from intent_reviewer_report_quality import build_reviewer_quality_report
@@ -114,6 +115,11 @@ DAY73_MOCK_AI_DECISION_PIPELINE_DOC = Path("docs") / "ai" / "intent_mock_ai_deci
 DAY73_MOCK_AI_DECISION_PIPELINE_ROADMAP = Path("docs") / "roadmap" / "day73_mock_ai_decision_pipeline.md"
 DAY73_MOCK_AI_DECISION_PIPELINE_JSON = Path("reports") / "lab-summary" / "day73_mock_ai_decision_pipeline.json"
 DAY73_MOCK_AI_DECISION_PIPELINE_HTML = Path("reports") / "lab-summary" / "day73_mock_ai_decision_pipeline.html"
+DAY74_DRY_RUN_PLAN_BUILDER_TASK_ID = "dry-run-plan-builder"
+DAY74_DRY_RUN_PLAN_BUILDER_DOC = Path("docs") / "ai" / "intent_dry_run_plan_builder.md"
+DAY74_DRY_RUN_PLAN_BUILDER_ROADMAP = Path("docs") / "roadmap" / "day74_dry_run_plan_builder.md"
+DAY74_DRY_RUN_PLAN_BUILDER_JSON = Path("reports") / "lab-summary" / "day74_dry_run_plan_builder.json"
+DAY74_DRY_RUN_PLAN_BUILDER_HTML = Path("reports") / "lab-summary" / "day74_dry_run_plan_builder.html"
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
 WIREGUARD_RUNNER_DISPLAY_NAME = "WireGuard Runner Safety Layer"
@@ -686,6 +692,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY73_MOCK_AI_DECISION_PIPELINE_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day74",
+        "title": "Controlled Dry-run Plan Builder",
+        "report_type": "Reviewer dry-run plan builder report",
+        "safety_label": "mock-only / dry-run-only AI planning evidence",
+        "description": "Day74 converts deterministic Day73 mock decisions into reviewer dry-run plan previews without AI API, SSH, device access, live execution, or mapped task execution.",
+        "json_globs": [DAY74_DRY_RUN_PLAN_BUILDER_JSON.as_posix()],
+        "html_globs": [DAY74_DRY_RUN_PLAN_BUILDER_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY74_DRY_RUN_PLAN_BUILDER_TASK_ID}"
         ),
     },
 ]
@@ -2309,6 +2328,34 @@ def list_tasks() -> List[Dict[str, Any]]:
             "related_script": "network_lab.py",
             "notes": "Mock-only report generation. Uses Day72 validation output but does not call APIs, use AI SDKs, execute mapped tasks, run live tests, open SSH, read config.json, connect to devices, add dashboard action surfaces, or modify network/device configuration.",
         },
+        {
+            "id": DAY74_DRY_RUN_PLAN_BUILDER_TASK_ID,
+            "task_id": "day74_dry_run_plan_builder",
+            "display_name": "Day74 Controlled Dry-run Plan Builder",
+            "user_display_name": "Controlled Dry-run Plan Builder",
+            "day": "Day74",
+            "category": "ai_planning",
+            "description": "Converts Day73 mock decision records into deterministic reviewer dry-run plan previews.",
+            "safety_level": "dry-run",
+            "execution_mode": "dry-run",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY74_DRY_RUN_PLAN_BUILDER_JSON.as_posix(),
+                DAY74_DRY_RUN_PLAN_BUILDER_HTML.as_posix(),
+                DAY74_DRY_RUN_PLAN_BUILDER_DOC.as_posix(),
+                DAY74_DRY_RUN_PLAN_BUILDER_ROADMAP.as_posix(),
+            ],
+            "report_outputs": [
+                "Day74 JSON/HTML controlled dry-run plan report",
+                "Day74 controlled dry-run plan builder documentation",
+            ],
+            "related_script": "network_lab.py",
+            "notes": "Dry-run-only report generation. Uses Day73 mock decisions but does not call APIs, use AI SDKs, execute mapped tasks, run live tests, open SSH, read config.json, connect to devices, add dashboard action surfaces, approval unlocks, or modify network/device configuration.",
+        },
     ]
 
 
@@ -2365,6 +2412,7 @@ offline-mock-runtime writes a fixed Day66 offline mock runtime skeleton report w
 offline-mock-runtime-contract validates Day66 mock output fields and safety invariants without API, voice, SSH, device access, config.json, live execution, or mapped task execution.
 offline-mock-runtime-review reviews Day66-Day67 report quality and evidence traceability without API, voice, SSH, device access, config.json, live execution, or mapped task execution.
 mock-ai-decision-pipeline runs deterministic Day73 mock decisions after Day72 validation without AI API, SSH, device access, config.json, live execution, mapped task execution, or dashboard actions.
+dry-run-plan-builder converts Day73 mock decisions into deterministic Day74 dry-run plan previews without AI API, SSH, device access, config.json, live execution, mapped task execution, or dashboard actions.
 wireguard-runner is dry-run by default and delegates to the existing WireGuard script only after explicit --allow-live-wireguard."""
     parser = argparse.ArgumentParser(
         description=f"Day14 {DAY14_NAME}.",
@@ -2402,6 +2450,7 @@ wireguard-runner is dry-run by default and delegates to the existing WireGuard s
             DAY67_OFFLINE_MOCK_RUNTIME_CONTRACT_TASK_ID,
             DAY68_OFFLINE_MOCK_RUNTIME_REVIEW_TASK_ID,
             DAY73_MOCK_AI_DECISION_PIPELINE_TASK_ID,
+            DAY74_DRY_RUN_PLAN_BUILDER_TASK_ID,
             WIREGUARD_RUNNER_TASK_ALIAS,
         ],
         help="Task to run.",
@@ -3754,6 +3803,132 @@ def _run_day73_mock_ai_decision_pipeline(project_root: Path) -> int:
         return 0
 
     print(f"{format_status('FAIL')} Day73 safety invariants failed.")
+    return 1
+
+
+def write_day74_dry_run_plan_builder_html(report: Dict[str, Any], output_path: Path) -> None:
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    plan_rows = "".join(
+        "<tr>"
+        f"<td>{html.escape(str(item.get('plan_id', '')))}</td>"
+        f"<td>{html.escape(str(item.get('source_scenario_id', '')))}</td>"
+        f"<td>{html.escape(str(item.get('decision_label', '')))}</td>"
+        f"<td>{html.escape(str(item.get('plan_status', '')))}</td>"
+        f"<td>{html.escape(str(item.get('allowed_to_execute', '')))}</td>"
+        f"<td>{html.escape(str(item.get('dry_run_only', '')))}</td>"
+        f"<td>{html.escape('; '.join(str(step) for step in item.get('planned_steps', [])))}</td>"
+        f"<td>{html.escape('; '.join(str(step) for step in item.get('blocked_steps', [])))}</td>"
+        f"<td>{html.escape(str(item.get('next_reviewer_action', '')))}</td>"
+        "</tr>"
+        for item in report.get("dry_run_plans", [])
+    )
+    invariant_rows = "".join(
+        "<tr>"
+        f"<th>{html.escape(str(label).replace('_', ' ').title())}</th>"
+        f"<td>{html.escape(str(value))}</td>"
+        "</tr>"
+        for label, value in report.get("safety_invariants", {}).items()
+    )
+    summary_rows = "".join(
+        "<tr>"
+        f"<th>{html.escape(str(label))}</th>"
+        f"<td>{html.escape(str(value))}</td>"
+        "</tr>"
+        for label, value in [
+            ("Overall status", report.get("overall_status")),
+            ("Reviewer status", report.get("reviewer_status")),
+            ("Execution mode", report.get("execution_mode")),
+            ("Plan count", report.get("summary", {}).get("plan_count")),
+            ("Allowed to execute values", report.get("summary", {}).get("allowed_to_execute_values")),
+            ("Dry-run-only values", report.get("summary", {}).get("dry_run_only_values")),
+        ]
+    )
+    status_rows = "".join(
+        "<tr>"
+        f"<th>{html.escape(str(label))}</th>"
+        f"<td>{html.escape(str(count))}</td>"
+        "</tr>"
+        for label, count in report.get("summary", {}).get("plan_status_counts", {}).items()
+    )
+    boundary_items = "".join(
+        f"<li>{html.escape(str(item))}</li>" for item in report.get("safety_boundary", [])
+    )
+    refs = "".join(
+        f"<li><code>{html.escape(str(ref))}</code></li>"
+        for ref in report.get("evidence_links_or_doc_refs", [])
+    )
+    validation_errors = "".join(
+        f"<li>{html.escape(str(error))}</li>" for error in report.get("validation_errors", [])
+    ) or "<li>None</li>"
+    output_path.write_text(
+        f"""<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Day74 Controlled Dry-run Plan Builder</title>
+  <style>
+    body {{ font-family: Arial, sans-serif; margin: 24px; color: #182230; }}
+    table {{ border-collapse: collapse; width: 100%; margin: 12px 0 20px; }}
+    td, th {{ border: 1px solid #d8e0ec; padding: 8px 10px; text-align: left; vertical-align: top; }}
+    th {{ background: #edf2f8; }}
+    .safe {{ background: #ecfdf3; border: 1px solid #abefc6; color: #05603a; padding: 12px; }}
+    .warn {{ background: #fff4d8; border: 1px solid #f0c66a; color: #765200; padding: 12px; }}
+    code {{ overflow-wrap: anywhere; }}
+  </style>
+</head>
+<body>
+  <h1>Day74 Controlled Dry-run Plan Builder</h1>
+  <p class="safe">{html.escape(str(report.get("final_safety_statement", "")))}</p>
+  <h2>Summary</h2>
+  <table><tbody>{summary_rows}</tbody></table>
+  <h2>Plan Status Counts</h2>
+  <table><tbody>{status_rows}</tbody></table>
+  <h2>Dry-run Plans</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Plan ID</th><th>Source scenario</th><th>Decision label</th><th>Plan status</th>
+        <th>Allowed to execute?</th><th>Dry-run only?</th><th>Planned preview steps</th>
+        <th>Blocked steps</th><th>Next reviewer action</th>
+      </tr>
+    </thead>
+    <tbody>{plan_rows}</tbody>
+  </table>
+  <h2>Safety Invariants</h2>
+  <table><tbody>{invariant_rows}</tbody></table>
+  <h2>Validation Errors</h2>
+  <ul class="warn">{validation_errors}</ul>
+  <h2>Safety Boundary</h2>
+  <ul>{boundary_items}</ul>
+  <h2>Evidence References</h2>
+  <ul>{refs}</ul>
+</body>
+</html>
+""",
+        encoding="utf-8",
+    )
+
+
+def _run_day74_dry_run_plan_builder(project_root: Path) -> int:
+    report = build_dry_run_plan_builder_report()
+    json_path = project_root / DAY74_DRY_RUN_PLAN_BUILDER_JSON
+    html_path = project_root / DAY74_DRY_RUN_PLAN_BUILDER_HTML
+    write_json_report(report, json_path)
+    write_day74_dry_run_plan_builder_html(mask_secret_values(report), html_path)
+
+    print(format_heading("Day74 Controlled Dry-run Plan Builder"))
+    print("Safety: deterministic mock-only / dry-run-only plan report")
+    print(f"Overall status: {report['overall_status']} / {report['reviewer_status']}")
+    print(f"Dry-run plans: {report['summary']['plan_count']}")
+    print(f"Allowed to execute values: {report['summary']['allowed_to_execute_values']}")
+    print(f"Dry-run-only values: {report['summary']['dry_run_only_values']}")
+    print(f"JSON report: {_relative_to_project(project_root, json_path)}")
+    print(f"HTML report: {_relative_to_project(project_root, html_path)}")
+    if report["overall_status"] == "PASS":
+        print(f"{format_status('PASS')} No AI API, SSH, device access, live execution, mapped task execution, config.json dependency, approval unlock, or network change occurred.")
+        return 0
+
+    print(f"{format_status('FAIL')} Day74 safety invariants failed.")
     return 1
 
 
@@ -6093,6 +6268,8 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
         return _run_day68_offline_mock_runtime_review(root)
     if args.task == DAY73_MOCK_AI_DECISION_PIPELINE_TASK_ID:
         return _run_day73_mock_ai_decision_pipeline(root)
+    if args.task == DAY74_DRY_RUN_PLAN_BUILDER_TASK_ID:
+        return _run_day74_dry_run_plan_builder(root)
 
     profile_path = _resolve_project_path(root, args.profile)
     try:

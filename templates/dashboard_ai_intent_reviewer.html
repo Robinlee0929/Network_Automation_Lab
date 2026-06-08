@@ -193,7 +193,7 @@
   </nav>
 
   <h1>AI Intent Reviewer Entry Point</h1>
-  <p>Reviewer-friendly dashboard view for the Day57-Day73 AI intent workflow. It explains the demo path, links to the committed docs, scenario pack, traceability map, acceptance runbook, sign-off package, offline mock runtime skeleton, contract validation layer, reviewer quality trace, Day69 evidence drilldown, Day70 AI runtime readiness gate, Day71 controlled entry design, Day72 input contract validator, and Day73 mock AI decision pipeline while keeping the no-execution boundary visible.</p>
+  <p>Reviewer-friendly dashboard view for the Day57-Day74 AI intent workflow. It explains the demo path, links to the committed docs, scenario pack, traceability map, acceptance runbook, sign-off package, offline mock runtime skeleton, contract validation layer, reviewer quality trace, Day69 evidence drilldown, Day70 AI runtime readiness gate, Day71 controlled entry design, Day72 input contract validator, Day73 mock AI decision pipeline, and Day74 dry-run plan builder while keeping the no-execution boundary visible.</p>
   <div class="note">This page is report-only. It does not call an AI model, listen to voice input, execute mapped tasks, open SSH, connect to devices, or change network configuration.</div>
 
   <section>
@@ -209,7 +209,7 @@
       </article>
       <article class="summary-card">
         <h3>Reviewer Evidence</h3>
-        <p>Day57-Day73 docs and optional generated JSON/HTML reports show how the workflow makes allowed and blocked decisions visible.</p>
+        <p>Day57-Day74 docs and optional generated JSON/HTML reports show how the workflow makes allowed and blocked decisions visible.</p>
       </article>
       <article class="summary-card">
         <h3>No Runtime Execution</h3>
@@ -219,7 +219,7 @@
   </section>
 
   <section>
-    <h2>Day57-Day73 Review Path</h2>
+    <h2>Day57-Day74 Review Path</h2>
     <div class="day-grid">
       {% for item in references %}
       <article class="day-card">
@@ -264,6 +264,7 @@
       <li>Read Day71 to review the controlled future AI runtime entry design, accepted input fields, expected output fields, safety gate order, and still-blocked surfaces.</li>
       <li>Read Day72 to review the controlled input contract validator that checks payload shape and blocked intent text before any future runtime decision path.</li>
       <li>Read Day73 to review deterministic mock decision labels produced after Day72 validation without executing mapped tasks.</li>
+      <li>Read Day74 to review deterministic dry-run plan previews built from Day73 decisions without executing mapped tasks.</li>
       <li>Use <a href="{{ url_for('reports') }}">Reports</a> for generated local evidence when available.</li>
     </ol>
     <div class="safe">Expected Day60 statement: <code>No mapped task was executed. This is a dry-run reviewer walkthrough only.</code></div>
@@ -606,6 +607,30 @@
       </ul>
     </div>
     <div class="safe">Day73 is mock-only and read-only from this dashboard. It adds no OpenAI API, no AI SDK, no real AI runtime, no SSH, no device access, no live execution, no mapped task execution, no dashboard POST/action endpoint, and no router, switch, firewall, VPN, VRRP, or network configuration change.</div>
+  </section>
+
+  <section>
+    <h2>Day74 Controlled Dry-run Plan Builder</h2>
+    <p>Day74 converts deterministic Day73 mock decision records into reviewer-friendly dry-run plan previews. A dry-run plan is a structured inspection artifact only; it is not an execution flow and cannot unlock execution.</p>
+    <ul>
+      <li>Plan statuses include <code>DRY_RUN_READY</code>, <code>REVIEW_REQUIRED</code>, <code>BLOCKED</code>, and <code>INVALID_INPUT_BLOCKED</code>.</li>
+      <li><code>allowed_to_execute</code> remains <code>false</code> for every dry-run plan.</li>
+      <li><code>dry_run_only</code> remains <code>true</code> for every dry-run plan.</li>
+      <li>Documentation-only and report-only decisions may produce preview steps, while live-action and invalid-input decisions remain blocked.</li>
+      <li>Reviewer-required plans include reviewer checks and stop before any mapped task, command, API call, SSH, device access, or configuration change.</li>
+    </ul>
+    <div class="refs">
+      <a href="{{ evidence_url('docs/ai/intent_dry_run_plan_builder.md') }}">Open Day74 AI doc</a>
+      <a href="{{ evidence_url('docs/roadmap/day74_dry_run_plan_builder.md') }}">Open Day74 roadmap</a>
+    </div>
+    <div class="paths">
+      <strong>Generated dry-run plan reports:</strong>
+      <ul>
+        <li><code>reports/lab-summary/day74_dry_run_plan_builder.json</code></li>
+        <li><code>reports/lab-summary/day74_dry_run_plan_builder.html</code></li>
+      </ul>
+    </div>
+    <div class="safe">Day74 is mock-only, dry-run-only, and read-only from this dashboard. It adds no OpenAI API, no AI SDK, no real AI runtime, no SSH, no device access, no live execution, no mapped task execution, no dashboard form, no POST route, no action endpoint, no approval unlock, and no router, switch, firewall, VPN, VRRP, or network configuration change.</div>
   </section>
 
   <section>
