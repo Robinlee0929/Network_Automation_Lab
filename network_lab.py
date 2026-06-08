@@ -19,6 +19,10 @@ from intent_offline_mock_runtime import build_mock_runtime_report
 from intent_reviewer_report_quality import build_reviewer_quality_report
 from intent_runtime_contract import validate_runtime_results
 from intent_runtime_audit_trail import build_runtime_audit_trail_report
+from intent_readonly_task_contract import (
+    build_readonly_task_contract_report,
+    write_readonly_task_contract_reports,
+)
 from intent_runtime_safety_case import build_runtime_safety_case_report
 from intent_runtime_safety_gate import build_runtime_safety_gate_report
 
@@ -154,6 +158,11 @@ DAY78_RUNTIME_SAFETY_CASE_DOC = Path("docs") / "ai" / "intent_runtime_safety_cas
 DAY78_RUNTIME_SAFETY_CASE_ROADMAP = Path("docs") / "roadmap" / "day78_runtime_safety_case.md"
 DAY78_RUNTIME_SAFETY_CASE_JSON = Path("reports") / "lab-summary" / "day78_runtime_safety_case.json"
 DAY78_RUNTIME_SAFETY_CASE_HTML = Path("reports") / "lab-summary" / "day78_runtime_safety_case.html"
+DAY79_READONLY_TASK_CONTRACT_TASK_ID = "readonly-task-contract"
+DAY79_READONLY_TASK_CONTRACT_DOC = Path("docs") / "ai" / "intent_readonly_task_contract.md"
+DAY79_READONLY_TASK_CONTRACT_ROADMAP = Path("docs") / "roadmap" / "day79_readonly_task_contract.md"
+DAY79_READONLY_TASK_CONTRACT_JSON = Path("reports") / "lab-summary" / "day79_readonly_task_contract.json"
+DAY79_READONLY_TASK_CONTRACT_HTML = Path("reports") / "lab-summary" / "day79_readonly_task_contract.html"
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
 WIREGUARD_RUNNER_DISPLAY_NAME = "WireGuard Runner Safety Layer"
@@ -791,6 +800,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY78_RUNTIME_SAFETY_CASE_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day79",
+        "title": "Controlled Read-only Task Contract & Allowlist",
+        "report_type": "Read-only task contract allowlist",
+        "safety_label": "deterministic mock-only / dry-run-only task eligibility contract",
+        "description": "Day79 defines future read-only task candidates, blocked write actions, destructive actions, and manual classification cases while preserving no execution unlock, no SSH, no device access, no mapped task execution, and no network change.",
+        "json_globs": [DAY79_READONLY_TASK_CONTRACT_JSON.as_posix()],
+        "html_globs": [DAY79_READONLY_TASK_CONTRACT_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY79_READONLY_TASK_CONTRACT_TASK_ID}"
         ),
     },
 ]
@@ -2554,6 +2576,34 @@ def list_tasks() -> List[Dict[str, Any]]:
             "related_script": "network_lab.py",
             "notes": "Deterministic mock-only dry-run reviewer safety case. Uses Day72, Day73, Day74, Day75, Day76, and Day77 deterministic records but does not call APIs, use AI SDKs, execute mapped tasks, run live tests, open SSH, read config.json, connect to devices, add dashboard forms, POST routes, approve/execute action endpoints, execution unlocks, arbitrary command execution, or modify network/device configuration.",
         },
+        {
+            "id": DAY79_READONLY_TASK_CONTRACT_TASK_ID,
+            "task_id": "day79_readonly_task_contract",
+            "display_name": "Day79 Controlled Read-only Task Contract & Allowlist",
+            "user_display_name": "Controlled Read-only Task Contract & Allowlist",
+            "day": "Day79",
+            "category": "ai_planning",
+            "description": "Defines deterministic future read-only task candidates, blocked write actions, destructive actions, unknown tasks, and manual classification cases without unlocking execution.",
+            "safety_level": "dry-run",
+            "execution_mode": "dry-run",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY79_READONLY_TASK_CONTRACT_JSON.as_posix(),
+                DAY79_READONLY_TASK_CONTRACT_HTML.as_posix(),
+                DAY79_READONLY_TASK_CONTRACT_DOC.as_posix(),
+                DAY79_READONLY_TASK_CONTRACT_ROADMAP.as_posix(),
+            ],
+            "report_outputs": [
+                "Day79 JSON/HTML controlled read-only task contract",
+                "Day79 read-only task contract documentation",
+            ],
+            "related_script": "network_lab.py",
+            "notes": "Deterministic mock-only dry-run task contract. It classifies read-only candidates, blocked write actions, destructive actions, unknown tasks, and manual classification cases but does not call APIs, use AI SDKs, execute mapped tasks, run live tests, open SSH, read config.json, connect to devices, add dashboard forms, POST routes, approve/execute action endpoints, execution unlocks, arbitrary command execution, or modify network/device configuration.",
+        },
     ]
 
 
@@ -2615,6 +2665,7 @@ manual-review-approval-envelope wraps Day74 dry-run plans in deterministic Day75
 runtime-audit-trail links Day73 decisions, Day74 dry-run plans, and Day75 approval envelopes into deterministic Day76 reviewer audit evidence without AI API, SSH, device access, config.json, live execution, mapped task execution, approval unlocks, or dashboard actions.
 runtime-safety-gate links Day73 decisions, Day74 dry-run plans, Day75 approval envelopes, and Day76 audit records into deterministic Day77 locked runtime safety gates without AI API, SSH, device access, config.json, live execution, mapped task execution, approval unlocks, execution controls, or dashboard actions.
 runtime-safety-case links Day72 input validation, Day73 decisions, Day74 dry-run plans, Day75 approval envelopes, Day76 audit records, and Day77 locked gates into deterministic Day78 end-to-end reviewer safety cases without AI API, SSH, device access, config.json, live execution, mapped task execution, approval unlocks, execution controls, or dashboard actions.
+readonly-task-contract defines deterministic Day79 read-only task candidates, blocked write actions, destructive actions, unknown tasks, and manual classification cases without AI API, SSH, device access, config.json, live execution, mapped task execution, approval unlocks, execution controls, or dashboard actions.
 wireguard-runner is dry-run by default and delegates to the existing WireGuard script only after explicit --allow-live-wireguard."""
     parser = argparse.ArgumentParser(
         description=f"Day14 {DAY14_NAME}.",
@@ -2657,6 +2708,7 @@ wireguard-runner is dry-run by default and delegates to the existing WireGuard s
             DAY76_RUNTIME_AUDIT_TRAIL_TASK_ID,
             DAY77_RUNTIME_SAFETY_GATE_TASK_ID,
             DAY78_RUNTIME_SAFETY_CASE_TASK_ID,
+            DAY79_READONLY_TASK_CONTRACT_TASK_ID,
             WIREGUARD_RUNNER_TASK_ALIAS,
         ],
         help="Task to run.",
@@ -4699,6 +4751,42 @@ def _run_day78_runtime_safety_case(project_root: Path) -> int:
         return 0
 
     print(f"{format_status('FAIL')} Day78 safety case invariants failed.")
+    return 1
+
+
+def _run_day79_readonly_task_contract(project_root: Path) -> int:
+    report = build_readonly_task_contract_report()
+    json_path, html_path = write_readonly_task_contract_reports(project_root, report)
+
+    print(format_heading("Day79 Controlled Read-only Task Contract & Allowlist"))
+    print("Safety: deterministic mock-only / dry-run-only task eligibility contract")
+    print(f"Overall status: {report['overall_status']} / {report['reviewer_status']}")
+    print(f"Contract records: {report['summary']['contract_record_count']}")
+    print(
+        "Read-only eligible values: "
+        f"{report['summary']['readonly_eligible_values']}"
+    )
+    print(
+        "Execution candidate values: "
+        f"{report['summary']['execution_candidate_values']}"
+    )
+    print(f"Allowed to execute values: {report['summary']['allowed_to_execute_values']}")
+    print(f"Dry-run-only values: {report['summary']['dry_run_only_values']}")
+    print(
+        "Execution unlock supported values: "
+        f"{report['summary']['execution_unlock_supported_values']}"
+    )
+    print(f"JSON report: {_relative_to_project(project_root, json_path)}")
+    print(f"HTML report: {_relative_to_project(project_root, html_path)}")
+    if report["overall_status"] == "PASS" and report["reviewer_status"] == "REVIEW_READY":
+        print(
+            f"{format_status('PASS')} REVIEW_READY. Read-only task contract is defined; "
+            "no SSH, device access, live execution, mapped task execution, approval "
+            "unlock, or network change occurred."
+        )
+        return 0
+
+    print(f"{format_status('FAIL')} Day79 read-only task contract invariants failed.")
     return 1
 
 
@@ -7048,6 +7136,8 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
         return _run_day77_runtime_safety_gate(root)
     if args.task == DAY78_RUNTIME_SAFETY_CASE_TASK_ID:
         return _run_day78_runtime_safety_case(root)
+    if args.task == DAY79_READONLY_TASK_CONTRACT_TASK_ID:
+        return _run_day79_readonly_task_contract(root)
 
     profile_path = _resolve_project_path(root, args.profile)
     try:

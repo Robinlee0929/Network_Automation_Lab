@@ -185,7 +185,7 @@ def test_ai_review_checklist_contains_wireguard_vpn_safety_items():
     assert "shell=False" in text
 
 
-def test_ai_intent_reviewer_references_day57_to_day78():
+def test_ai_intent_reviewer_references_day57_to_day79():
     references = dashboard.ai_intent_reviewer_references()
 
     assert [item.day for item in references] == [
@@ -207,6 +207,7 @@ def test_ai_intent_reviewer_references_day57_to_day78():
         "Day76",
         "Day77",
         "Day78",
+        "Day79",
     ]
     text = " ".join(
         f"{item.title} {item.summary} {item.doc_path} {item.roadmap_path} "
@@ -269,6 +270,10 @@ def test_ai_intent_reviewer_references_day57_to_day78():
     assert "docs/ai/intent_runtime_safety_case.md" in text
     assert "docs/roadmap/day78_runtime_safety_case.md" in text
     assert "reports/lab-summary/day78_runtime_safety_case.html" in text
+    assert "Controlled read-only task contract and allowlist" in text
+    assert "docs/ai/intent_readonly_task_contract.md" in text
+    assert "docs/roadmap/day79_readonly_task_contract.md" in text
+    assert "reports/lab-summary/day79_readonly_task_contract.html" in text
 
 
 def test_ai_intent_reviewer_safety_boundaries_are_report_only():
@@ -305,6 +310,8 @@ def test_ai_intent_reviewer_safety_boundaries_are_report_only():
     assert "Day78 links Day72 input validation, Day73 decisions, Day74 dry-run plans, Day75 approval envelopes, Day76 audit records, and Day77 locked gates into end-to-end reviewer safety case evidence only" in text
     assert "final_recommendation remains REVIEW_ONLY" in text
     assert "Day78 adds no OpenAI API, AI SDK, real AI runtime, SSH, device access, live execution, mapped task execution, dashboard form, POST route, approve button, execute button, action endpoint, approval unlock, execution control, or network configuration change" in text
+    assert "Day79 defines the read-only task allowlist and capability definition layer after the Day72-Day78 runtime safety chain" in text
+    assert "Day79 adds no OpenAI API, AI SDK, real AI runtime, SSH, device access, live execution, mapped task execution, dashboard form, POST route, approve button, execute button, action endpoint, approval unlock, execution control, or network configuration change" in text
 
 
 def test_day69_reviewer_evidence_drilldown_is_static_and_complete():
@@ -572,7 +579,7 @@ def test_dashboard_home_is_portfolio_demo_landing_page(tmp_path):
     assert "/ai-intent-reviewer" in text
 
 
-def test_ai_intent_reviewer_route_exposes_day57_to_day78_without_execution(tmp_path):
+def test_ai_intent_reviewer_route_exposes_day57_to_day79_without_execution(tmp_path):
     if dashboard.Flask is None:
         pytest.skip("Flask is not installed in this test environment.")
 
@@ -604,6 +611,7 @@ def test_ai_intent_reviewer_route_exposes_day57_to_day78_without_execution(tmp_p
     assert "Day76" in text
     assert "Day77" in text
     assert "Day78" in text
+    assert "Day79" in text
     assert "Day63 Traceability Evidence Map" in text
     assert "Day64 Reviewer Acceptance Runbook" in text
     assert "Day65 Acceptance Sign-off Package" in text
@@ -739,6 +747,17 @@ def test_ai_intent_reviewer_route_exposes_day57_to_day78_without_execution(tmp_p
     assert "docs/roadmap/day78_runtime_safety_case.md" in text
     assert "reports/lab-summary/day78_runtime_safety_case.json" in text
     assert "reports/lab-summary/day78_runtime_safety_case.html" in text
+    assert "Day79 Controlled Read-only Task Contract" in text
+    assert "read-only task allowlist and capability definition layer" in text
+    assert "READONLY_CONTRACT_READY" in text
+    assert "BLOCKED_WRITE_ACTION" in text
+    assert "BLOCKED_DESTRUCTIVE_ACTION" in text
+    assert "docs/ai/intent_readonly_task_contract.md" in text
+    assert "docs/roadmap/day79_readonly_task_contract.md" in text
+    assert "reports/lab-summary/day79_readonly_task_contract.json" in text
+    assert "reports/lab-summary/day79_readonly_task_contract.html" in text
+    assert "no execution unlock" in text
+    assert "no dashboard action surface" in text
     assert "ai_intent_reviewer_controlled_runtime_entry" in text
     assert "execution_allowed=false" in text
     assert "api_integration_allowed=false" in text
@@ -806,6 +825,8 @@ def test_ai_intent_reviewer_route_exposes_day57_to_day78_without_execution(tmp_p
     assert "Day77 adds no OpenAI API, AI SDK, real AI runtime, SSH, device access, live execution, mapped task execution, dashboard form, POST route, approve button, execute button, action endpoint, approval unlock, execution control, or network configuration change" in text
     assert "Day78 links Day72 input validation, Day73 decisions, Day74 dry-run plans, Day75 approval envelopes, Day76 audit records, and Day77 locked gates into end-to-end reviewer safety case evidence only" in text
     assert "Day78 adds no OpenAI API, AI SDK, real AI runtime, SSH, device access, live execution, mapped task execution, dashboard form, POST route, approve button, execute button, action endpoint, approval unlock, execution control, or network configuration change" in text
+    assert "Day79 defines the read-only task allowlist and capability definition layer after the Day72-Day78 runtime safety chain" in text
+    assert "Day79 adds no OpenAI API, AI SDK, real AI runtime, SSH, device access, live execution, mapped task execution, dashboard form, POST route, approve button, execute button, action endpoint, approval unlock, execution control, or network configuration change" in text
     assert "No mapped task was executed. This is a dry-run reviewer walkthrough only." in text
     html = text.lower()
     assert "<form" not in html
@@ -816,6 +837,18 @@ def test_ai_intent_reviewer_route_exposes_day57_to_day78_without_execution(tmp_p
     assert "fetch(" not in html
     assert "xmlhttprequest" not in html
     assert "run task" not in html
+    assert "task trigger" not in html
+    day79_section = html.split("<h2>day79 controlled read-only task contract", 1)[1]
+    day79_section = day79_section.split("<section>", 1)[0]
+    assert "<form" not in day79_section
+    assert "<button" not in day79_section
+    assert "method=\"post\"" not in day79_section
+    assert "method='post'" not in day79_section
+    assert "action=" not in day79_section
+    assert "fetch(" not in day79_section
+    assert "xmlhttprequest" not in day79_section
+    assert "run task" not in day79_section
+    assert "task trigger" not in day79_section
     assert "execute intent" not in html
     assert "submit intent" not in html
     assert "execute buttons" not in html
