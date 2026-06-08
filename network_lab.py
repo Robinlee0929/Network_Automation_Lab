@@ -11,6 +11,9 @@ from pathlib import Path
 from typing import Any, Dict, Iterator, List, Optional, Tuple
 
 from intent_dry_run_plan_builder import build_dry_run_plan_builder_report
+from intent_manual_review_approval_envelope import (
+    build_manual_review_approval_envelope_report,
+)
 from intent_mock_ai_decision_pipeline import build_mock_ai_decision_pipeline_report
 from intent_offline_mock_runtime import build_mock_runtime_report
 from intent_reviewer_report_quality import build_reviewer_quality_report
@@ -120,6 +123,19 @@ DAY74_DRY_RUN_PLAN_BUILDER_DOC = Path("docs") / "ai" / "intent_dry_run_plan_buil
 DAY74_DRY_RUN_PLAN_BUILDER_ROADMAP = Path("docs") / "roadmap" / "day74_dry_run_plan_builder.md"
 DAY74_DRY_RUN_PLAN_BUILDER_JSON = Path("reports") / "lab-summary" / "day74_dry_run_plan_builder.json"
 DAY74_DRY_RUN_PLAN_BUILDER_HTML = Path("reports") / "lab-summary" / "day74_dry_run_plan_builder.html"
+DAY75_MANUAL_REVIEW_APPROVAL_ENVELOPE_TASK_ID = "manual-review-approval-envelope"
+DAY75_MANUAL_REVIEW_APPROVAL_ENVELOPE_DOC = (
+    Path("docs") / "ai" / "intent_manual_review_approval_envelope.md"
+)
+DAY75_MANUAL_REVIEW_APPROVAL_ENVELOPE_ROADMAP = (
+    Path("docs") / "roadmap" / "day75_manual_review_approval_envelope.md"
+)
+DAY75_MANUAL_REVIEW_APPROVAL_ENVELOPE_JSON = (
+    Path("reports") / "lab-summary" / "day75_manual_review_approval_envelope.json"
+)
+DAY75_MANUAL_REVIEW_APPROVAL_ENVELOPE_HTML = (
+    Path("reports") / "lab-summary" / "day75_manual_review_approval_envelope.html"
+)
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
 WIREGUARD_RUNNER_DISPLAY_NAME = "WireGuard Runner Safety Layer"
@@ -705,6 +721,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY74_DRY_RUN_PLAN_BUILDER_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day75",
+        "title": "Manual Review Approval Envelope",
+        "report_type": "Reviewer sign-off envelope simulation report",
+        "safety_label": "mock-only / dry-run-only reviewer sign-off evidence",
+        "description": "Day75 wraps deterministic Day74 dry-run plans in reviewer approval envelope records without approval unlocks, AI API, SSH, device access, live execution, or mapped task execution.",
+        "json_globs": [DAY75_MANUAL_REVIEW_APPROVAL_ENVELOPE_JSON.as_posix()],
+        "html_globs": [DAY75_MANUAL_REVIEW_APPROVAL_ENVELOPE_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY75_MANUAL_REVIEW_APPROVAL_ENVELOPE_TASK_ID}"
         ),
     },
 ]
@@ -2356,6 +2385,34 @@ def list_tasks() -> List[Dict[str, Any]]:
             "related_script": "network_lab.py",
             "notes": "Dry-run-only report generation. Uses Day73 mock decisions but does not call APIs, use AI SDKs, execute mapped tasks, run live tests, open SSH, read config.json, connect to devices, add dashboard action surfaces, approval unlocks, or modify network/device configuration.",
         },
+        {
+            "id": DAY75_MANUAL_REVIEW_APPROVAL_ENVELOPE_TASK_ID,
+            "task_id": "day75_manual_review_approval_envelope",
+            "display_name": "Day75 Manual Review Approval Envelope",
+            "user_display_name": "Manual Review Approval Envelope",
+            "day": "Day75",
+            "category": "ai_planning",
+            "description": "Wraps Day74 dry-run plans in deterministic reviewer sign-off envelope records.",
+            "safety_level": "dry-run",
+            "execution_mode": "dry-run",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY75_MANUAL_REVIEW_APPROVAL_ENVELOPE_JSON.as_posix(),
+                DAY75_MANUAL_REVIEW_APPROVAL_ENVELOPE_HTML.as_posix(),
+                DAY75_MANUAL_REVIEW_APPROVAL_ENVELOPE_DOC.as_posix(),
+                DAY75_MANUAL_REVIEW_APPROVAL_ENVELOPE_ROADMAP.as_posix(),
+            ],
+            "report_outputs": [
+                "Day75 JSON/HTML manual review approval envelope report",
+                "Day75 manual review approval envelope documentation",
+            ],
+            "related_script": "network_lab.py",
+            "notes": "Mock-only dry-run sign-off simulation. Uses Day74 dry-run plans but does not call APIs, use AI SDKs, execute mapped tasks, run live tests, open SSH, read config.json, connect to devices, add dashboard forms, POST routes, approve/execute action endpoints, approval unlocks, or modify network/device configuration.",
+        },
     ]
 
 
@@ -2413,6 +2470,7 @@ offline-mock-runtime-contract validates Day66 mock output fields and safety inva
 offline-mock-runtime-review reviews Day66-Day67 report quality and evidence traceability without API, voice, SSH, device access, config.json, live execution, or mapped task execution.
 mock-ai-decision-pipeline runs deterministic Day73 mock decisions after Day72 validation without AI API, SSH, device access, config.json, live execution, mapped task execution, or dashboard actions.
 dry-run-plan-builder converts Day73 mock decisions into deterministic Day74 dry-run plan previews without AI API, SSH, device access, config.json, live execution, mapped task execution, or dashboard actions.
+manual-review-approval-envelope wraps Day74 dry-run plans in deterministic Day75 reviewer sign-off envelopes without AI API, SSH, device access, config.json, live execution, mapped task execution, approval unlocks, or dashboard actions.
 wireguard-runner is dry-run by default and delegates to the existing WireGuard script only after explicit --allow-live-wireguard."""
     parser = argparse.ArgumentParser(
         description=f"Day14 {DAY14_NAME}.",
@@ -2451,6 +2509,7 @@ wireguard-runner is dry-run by default and delegates to the existing WireGuard s
             DAY68_OFFLINE_MOCK_RUNTIME_REVIEW_TASK_ID,
             DAY73_MOCK_AI_DECISION_PIPELINE_TASK_ID,
             DAY74_DRY_RUN_PLAN_BUILDER_TASK_ID,
+            DAY75_MANUAL_REVIEW_APPROVAL_ENVELOPE_TASK_ID,
             WIREGUARD_RUNNER_TASK_ALIAS,
         ],
         help="Task to run.",
@@ -3929,6 +3988,152 @@ def _run_day74_dry_run_plan_builder(project_root: Path) -> int:
         return 0
 
     print(f"{format_status('FAIL')} Day74 safety invariants failed.")
+    return 1
+
+
+def write_day75_manual_review_approval_envelope_html(
+    report: Dict[str, Any], output_path: Path
+) -> None:
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    envelope_rows = "".join(
+        "<tr>"
+        f"<td>{html.escape(str(item.get('envelope_id', '')))}</td>"
+        f"<td>{html.escape(str(item.get('scenario_id', '')))}</td>"
+        f"<td>{html.escape(str(item.get('dry_run_plan_id', '')))}</td>"
+        f"<td>{html.escape(str(item.get('reviewer_signoff_state', '')))}</td>"
+        f"<td>{html.escape(str(item.get('reviewer_decision', '')))}</td>"
+        f"<td>{html.escape(str(item.get('allowed_to_execute', '')))}</td>"
+        f"<td>{html.escape(str(item.get('dry_run_only', '')))}</td>"
+        f"<td>{html.escape(str(item.get('execution_unlock_supported', '')))}</td>"
+        f"<td>{html.escape('; '.join(str(step) for step in item.get('required_review_items', [])))}</td>"
+        "</tr>"
+        for item in report.get("approval_envelopes", [])
+    )
+    invariant_rows = "".join(
+        "<tr>"
+        f"<th>{html.escape(str(label).replace('_', ' ').title())}</th>"
+        f"<td>{html.escape(str(value))}</td>"
+        "</tr>"
+        for label, value in report.get("safety_invariants", {}).items()
+    )
+    summary_rows = "".join(
+        "<tr>"
+        f"<th>{html.escape(str(label))}</th>"
+        f"<td>{html.escape(str(value))}</td>"
+        "</tr>"
+        for label, value in [
+            ("Overall status", report.get("overall_status")),
+            ("Reviewer status", report.get("reviewer_status")),
+            ("Execution mode", report.get("execution_mode")),
+            (
+                "Approval envelope count",
+                report.get("summary", {}).get("approval_envelope_count"),
+            ),
+            (
+                "Allowed to execute values",
+                report.get("summary", {}).get("allowed_to_execute_values"),
+            ),
+            ("Dry-run-only values", report.get("summary", {}).get("dry_run_only_values")),
+            (
+                "Execution unlock supported values",
+                report.get("summary", {}).get("execution_unlock_supported_values"),
+            ),
+        ]
+    )
+    decision_rows = "".join(
+        "<tr>"
+        f"<th>{html.escape(str(label))}</th>"
+        f"<td>{html.escape(str(count))}</td>"
+        "</tr>"
+        for label, count in report.get("summary", {}).get("reviewer_decision_counts", {}).items()
+    )
+    boundary_items = "".join(
+        f"<li>{html.escape(str(item))}</li>" for item in report.get("safety_boundary", [])
+    )
+    refs = "".join(
+        f"<li><code>{html.escape(str(ref))}</code></li>"
+        for ref in report.get("evidence_links_or_doc_refs", [])
+    )
+    validation_errors = "".join(
+        f"<li>{html.escape(str(error))}</li>" for error in report.get("validation_errors", [])
+    ) or "<li>None</li>"
+    output_path.write_text(
+        f"""<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Day75 Manual Review Approval Envelope</title>
+  <style>
+    body {{ font-family: Arial, sans-serif; margin: 24px; color: #182230; }}
+    table {{ border-collapse: collapse; width: 100%; margin: 12px 0 20px; }}
+    td, th {{ border: 1px solid #d8e0ec; padding: 8px 10px; text-align: left; vertical-align: top; }}
+    th {{ background: #edf2f8; }}
+    .safe {{ background: #ecfdf3; border: 1px solid #abefc6; color: #05603a; padding: 12px; }}
+    .warn {{ background: #fff4d8; border: 1px solid #f0c66a; color: #765200; padding: 12px; }}
+    code {{ overflow-wrap: anywhere; }}
+  </style>
+</head>
+<body>
+  <h1>Day75 Manual Review Approval Envelope</h1>
+  <p class="safe">{html.escape(str(report.get("final_safety_statement", "")))}</p>
+  <h2>Summary</h2>
+  <table><tbody>{summary_rows}</tbody></table>
+  <h2>Reviewer Decision Counts</h2>
+  <table><tbody>{decision_rows}</tbody></table>
+  <h2>Approval Envelopes</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Envelope ID</th><th>Scenario</th><th>Dry-run plan</th><th>Sign-off state</th>
+        <th>Reviewer decision</th><th>Allowed to execute?</th><th>Dry-run only?</th>
+        <th>Execution unlock supported?</th><th>Required review items</th>
+      </tr>
+    </thead>
+    <tbody>{envelope_rows}</tbody>
+  </table>
+  <h2>Safety Invariants</h2>
+  <table><tbody>{invariant_rows}</tbody></table>
+  <h2>Validation Errors</h2>
+  <ul class="warn">{validation_errors}</ul>
+  <h2>Safety Boundary</h2>
+  <ul>{boundary_items}</ul>
+  <h2>Evidence References</h2>
+  <ul>{refs}</ul>
+</body>
+</html>
+""",
+        encoding="utf-8",
+    )
+
+
+def _run_day75_manual_review_approval_envelope(project_root: Path) -> int:
+    report = build_manual_review_approval_envelope_report()
+    json_path = project_root / DAY75_MANUAL_REVIEW_APPROVAL_ENVELOPE_JSON
+    html_path = project_root / DAY75_MANUAL_REVIEW_APPROVAL_ENVELOPE_HTML
+    write_json_report(report, json_path)
+    write_day75_manual_review_approval_envelope_html(mask_secret_values(report), html_path)
+
+    print(format_heading("Day75 Manual Review Approval Envelope"))
+    print("Safety: deterministic mock-only / dry-run-only reviewer sign-off simulation")
+    print(f"Overall status: {report['overall_status']} / {report['reviewer_status']}")
+    print(f"Approval envelopes: {report['summary']['approval_envelope_count']}")
+    print(f"Allowed to execute values: {report['summary']['allowed_to_execute_values']}")
+    print(f"Dry-run-only values: {report['summary']['dry_run_only_values']}")
+    print(
+        "Execution unlock supported values: "
+        f"{report['summary']['execution_unlock_supported_values']}"
+    )
+    print(f"JSON report: {_relative_to_project(project_root, json_path)}")
+    print(f"HTML report: {_relative_to_project(project_root, html_path)}")
+    if report["overall_status"] == "PASS":
+        print(
+            f"{format_status('PASS')} No AI API, SSH, device access, live execution, "
+            "mapped task execution, config.json dependency, approval unlock, dashboard "
+            "action surface, or network change occurred."
+        )
+        return 0
+
+    print(f"{format_status('FAIL')} Day75 safety invariants failed.")
     return 1
 
 
@@ -6270,6 +6475,8 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
         return _run_day73_mock_ai_decision_pipeline(root)
     if args.task == DAY74_DRY_RUN_PLAN_BUILDER_TASK_ID:
         return _run_day74_dry_run_plan_builder(root)
+    if args.task == DAY75_MANUAL_REVIEW_APPROVAL_ENVELOPE_TASK_ID:
+        return _run_day75_manual_review_approval_envelope(root)
 
     profile_path = _resolve_project_path(root, args.profile)
     try:

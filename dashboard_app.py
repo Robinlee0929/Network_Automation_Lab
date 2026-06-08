@@ -867,6 +867,20 @@ def ai_intent_reviewer_references() -> List[AIIntentReviewerReference]:
                 "reports/lab-summary/day74_dry_run_plan_builder.html",
             ),
         ),
+        AIIntentReviewerReference(
+            day="Day75",
+            title="Manual review approval envelope",
+            summary=(
+                "Wraps Day74 dry-run plans in deterministic reviewer sign-off "
+                "envelopes while preserving no execution unlock."
+            ),
+            doc_path="docs/ai/intent_manual_review_approval_envelope.md",
+            roadmap_path="docs/roadmap/day75_manual_review_approval_envelope.md",
+            report_paths=(
+                "reports/lab-summary/day75_manual_review_approval_envelope.json",
+                "reports/lab-summary/day75_manual_review_approval_envelope.html",
+            ),
+        ),
     ]
 
 
@@ -1070,6 +1084,8 @@ def ai_intent_safety_boundaries() -> List[str]:
         "Day73 adds no OpenAI API, AI SDK, real AI runtime, SSH, device access, live execution, mapped task execution, dashboard POST/action endpoint, or network configuration change.",
         "Day74 converts Day73 mock decisions into dry-run plan previews only; allowed_to_execute remains false and dry_run_only remains true.",
         "Day74 adds no OpenAI API, AI SDK, real AI runtime, SSH, device access, live execution, mapped task execution, dashboard form, POST route, action endpoint, approval unlock, or network configuration change.",
+        "Day75 wraps Day74 dry-run plans in record-only reviewer sign-off envelopes; allowed_to_execute remains false, dry_run_only remains true, and execution_unlock_supported remains false.",
+        "Day75 adds no OpenAI API, AI SDK, real AI runtime, SSH, device access, live execution, mapped task execution, dashboard form, POST route, approval surface, execution control, approval unlock, or network configuration change.",
     ]
 
 

@@ -2959,3 +2959,84 @@ def test_day74_cli_generates_dry_run_plan_report_without_config_or_device_access
     assert "DRY_RUN_READY" in html
     assert "INVALID_INPUT_BLOCKED" in html
     assert "Dry-run only?" in html
+
+
+def test_day75_manual_review_approval_envelope_task_exists_in_catalog():
+    task = next(
+        task for task in network_lab.list_tasks() if task["id"] == "manual-review-approval-envelope"
+    )
+
+    assert task["task_id"] == "day75_manual_review_approval_envelope"
+    assert task["day"] == "Day75"
+    assert task["safety_level"] == "dry-run"
+    assert task["execution_mode"] == "dry-run"
+    assert task["requires_live_device"] is False
+    assert task["requires_password"] is False
+    assert task["produces_report"] is True
+    assert "reports/lab-summary/day75_manual_review_approval_envelope.json" in task["report_paths"]
+    assert "reports/lab-summary/day75_manual_review_approval_envelope.html" in task["report_paths"]
+    assert "docs/ai/intent_manual_review_approval_envelope.md" in task["report_paths"]
+    assert "docs/roadmap/day75_manual_review_approval_envelope.md" in task["report_paths"]
+    assert "does not call APIs" in task["notes"]
+    assert "approval unlocks" in task["notes"]
+
+
+def test_day75_cli_generates_approval_envelope_report_without_config_or_device_access(
+    tmp_path,
+    monkeypatch,
+    capsys,
+):
+    def fail_run(*_args, **_kwargs):
+        raise AssertionError("Day75 approval envelope must not execute subprocess")
+
+    def fail_profile_load(*_args, **_kwargs):
+        raise AssertionError("Day75 approval envelope must not load profile or config data")
+
+    monkeypatch.setattr(network_lab.subprocess, "run", fail_run)
+    monkeypatch.setattr(network_lab, "load_lab_runner_profile", fail_profile_load)
+
+    exit_code = network_lab.main(
+        ["--task", "manual-review-approval-envelope"], project_root=tmp_path
+    )
+
+    output = capsys.readouterr().out
+    json_path = tmp_path / "reports/lab-summary/day75_manual_review_approval_envelope.json"
+    html_path = tmp_path / "reports/lab-summary/day75_manual_review_approval_envelope.html"
+    assert exit_code == 0
+    assert "Day75 Manual Review Approval Envelope" in output
+    assert "PASS" in output
+    assert "REVIEW_READY" in output
+    assert "Approval envelopes: 5" in output
+    assert "Allowed to execute values: [False]" in output
+    assert "Dry-run-only values: [True]" in output
+    assert "Execution unlock supported values: [False]" in output
+    assert json_path.exists()
+    assert html_path.exists()
+    assert not (tmp_path / "config.json").exists()
+
+    report = json.loads(json_path.read_text(encoding="utf-8"))
+    html = html_path.read_text(encoding="utf-8")
+    assert report["day"] == "Day75"
+    assert report["overall_status"] == "PASS"
+    assert report["reviewer_status"] == "REVIEW_READY"
+    assert report["summary"]["approval_envelope_count"] == 5
+    assert report["summary"]["allowed_to_execute_values"] == [False]
+    assert report["summary"]["dry_run_only_values"] == [True]
+    assert report["summary"]["execution_unlock_supported_values"] == [False]
+    assert report["safety_invariants"]["allowed_to_execute_always_false"] is True
+    assert report["safety_invariants"]["dry_run_only_always_true"] is True
+    assert report["safety_invariants"]["execution_unlock_supported_always_false"] is True
+    assert report["safety_invariants"]["approval_states_do_not_unlock_execution"] is True
+    assert report["safety_invariants"]["mapped_task_executed"] is False
+    assert report["safety_invariants"]["openai_api_used"] is False
+    assert report["safety_invariants"]["ssh_used"] is False
+    assert report["safety_invariants"]["device_access_used"] is False
+    assert report["safety_invariants"]["config_json_read"] is False
+    assert all(item["allowed_to_execute"] is False for item in report["approval_envelopes"])
+    assert all(item["dry_run_only"] is True for item in report["approval_envelopes"])
+    assert all(
+        item["execution_unlock_supported"] is False for item in report["approval_envelopes"]
+    )
+    assert "approved_for_record_only" in html
+    assert "blocked_live_action" in html
+    assert "Execution unlock supported?" in html
