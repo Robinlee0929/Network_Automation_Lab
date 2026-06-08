@@ -18,6 +18,7 @@ from intent_mock_ai_decision_pipeline import build_mock_ai_decision_pipeline_rep
 from intent_offline_mock_runtime import build_mock_runtime_report
 from intent_reviewer_report_quality import build_reviewer_quality_report
 from intent_runtime_contract import validate_runtime_results
+from intent_runtime_audit_trail import build_runtime_audit_trail_report
 
 
 DAY14_NAME = "Unified Lab Runner and Report Index"
@@ -136,6 +137,11 @@ DAY75_MANUAL_REVIEW_APPROVAL_ENVELOPE_JSON = (
 DAY75_MANUAL_REVIEW_APPROVAL_ENVELOPE_HTML = (
     Path("reports") / "lab-summary" / "day75_manual_review_approval_envelope.html"
 )
+DAY76_RUNTIME_AUDIT_TRAIL_TASK_ID = "runtime-audit-trail"
+DAY76_RUNTIME_AUDIT_TRAIL_DOC = Path("docs") / "ai" / "intent_runtime_audit_trail.md"
+DAY76_RUNTIME_AUDIT_TRAIL_ROADMAP = Path("docs") / "roadmap" / "day76_runtime_audit_trail.md"
+DAY76_RUNTIME_AUDIT_TRAIL_JSON = Path("reports") / "lab-summary" / "day76_runtime_audit_trail.json"
+DAY76_RUNTIME_AUDIT_TRAIL_HTML = Path("reports") / "lab-summary" / "day76_runtime_audit_trail.html"
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
 WIREGUARD_RUNNER_DISPLAY_NAME = "WireGuard Runner Safety Layer"
@@ -734,6 +740,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY75_MANUAL_REVIEW_APPROVAL_ENVELOPE_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day76",
+        "title": "Controlled Runtime Audit Trail",
+        "report_type": "Reviewer decision evidence package",
+        "safety_label": "mock-only / dry-run-only runtime audit evidence",
+        "description": "Day76 links Day73 decisions, Day74 plans, and Day75 approval envelopes into reviewer audit records without execution unlocks, AI API, SSH, device access, live execution, or mapped task execution.",
+        "json_globs": [DAY76_RUNTIME_AUDIT_TRAIL_JSON.as_posix()],
+        "html_globs": [DAY76_RUNTIME_AUDIT_TRAIL_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY76_RUNTIME_AUDIT_TRAIL_TASK_ID}"
         ),
     },
 ]
@@ -2413,6 +2432,34 @@ def list_tasks() -> List[Dict[str, Any]]:
             "related_script": "network_lab.py",
             "notes": "Mock-only dry-run sign-off simulation. Uses Day74 dry-run plans but does not call APIs, use AI SDKs, execute mapped tasks, run live tests, open SSH, read config.json, connect to devices, add dashboard forms, POST routes, approve/execute action endpoints, approval unlocks, or modify network/device configuration.",
         },
+        {
+            "id": DAY76_RUNTIME_AUDIT_TRAIL_TASK_ID,
+            "task_id": "day76_runtime_audit_trail",
+            "display_name": "Day76 Controlled Runtime Audit Trail",
+            "user_display_name": "Controlled Runtime Audit Trail",
+            "day": "Day76",
+            "category": "ai_planning",
+            "description": "Links Day73 decisions, Day74 dry-run plans, and Day75 approval envelopes into deterministic reviewer evidence packages.",
+            "safety_level": "dry-run",
+            "execution_mode": "dry-run",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY76_RUNTIME_AUDIT_TRAIL_JSON.as_posix(),
+                DAY76_RUNTIME_AUDIT_TRAIL_HTML.as_posix(),
+                DAY76_RUNTIME_AUDIT_TRAIL_DOC.as_posix(),
+                DAY76_RUNTIME_AUDIT_TRAIL_ROADMAP.as_posix(),
+            ],
+            "report_outputs": [
+                "Day76 JSON/HTML controlled runtime audit trail report",
+                "Day76 controlled runtime audit trail documentation",
+            ],
+            "related_script": "network_lab.py",
+            "notes": "Mock-only dry-run audit evidence. Uses Day73, Day74, and Day75 deterministic records but does not call APIs, use AI SDKs, execute mapped tasks, run live tests, open SSH, read config.json, connect to devices, add dashboard forms, POST routes, approve/execute action endpoints, execution unlocks, or modify network/device configuration.",
+        },
     ]
 
 
@@ -2471,6 +2518,7 @@ offline-mock-runtime-review reviews Day66-Day67 report quality and evidence trac
 mock-ai-decision-pipeline runs deterministic Day73 mock decisions after Day72 validation without AI API, SSH, device access, config.json, live execution, mapped task execution, or dashboard actions.
 dry-run-plan-builder converts Day73 mock decisions into deterministic Day74 dry-run plan previews without AI API, SSH, device access, config.json, live execution, mapped task execution, or dashboard actions.
 manual-review-approval-envelope wraps Day74 dry-run plans in deterministic Day75 reviewer sign-off envelopes without AI API, SSH, device access, config.json, live execution, mapped task execution, approval unlocks, or dashboard actions.
+runtime-audit-trail links Day73 decisions, Day74 dry-run plans, and Day75 approval envelopes into deterministic Day76 reviewer audit evidence without AI API, SSH, device access, config.json, live execution, mapped task execution, approval unlocks, or dashboard actions.
 wireguard-runner is dry-run by default and delegates to the existing WireGuard script only after explicit --allow-live-wireguard."""
     parser = argparse.ArgumentParser(
         description=f"Day14 {DAY14_NAME}.",
@@ -2510,6 +2558,7 @@ wireguard-runner is dry-run by default and delegates to the existing WireGuard s
             DAY73_MOCK_AI_DECISION_PIPELINE_TASK_ID,
             DAY74_DRY_RUN_PLAN_BUILDER_TASK_ID,
             DAY75_MANUAL_REVIEW_APPROVAL_ENVELOPE_TASK_ID,
+            DAY76_RUNTIME_AUDIT_TRAIL_TASK_ID,
             WIREGUARD_RUNNER_TASK_ALIAS,
         ],
         help="Task to run.",
@@ -4134,6 +4183,140 @@ def _run_day75_manual_review_approval_envelope(project_root: Path) -> int:
         return 0
 
     print(f"{format_status('FAIL')} Day75 safety invariants failed.")
+    return 1
+
+
+def write_day76_runtime_audit_trail_html(report: Dict[str, Any], output_path: Path) -> None:
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    audit_rows = "".join(
+        "<tr>"
+        f"<td>{html.escape(str(item.get('audit_id', '')))}</td>"
+        f"<td>{html.escape(str(item.get('scenario_id', '')))}</td>"
+        f"<td>{html.escape(str(item.get('decision_id', '')))}</td>"
+        f"<td>{html.escape(str(item.get('dry_run_plan_id', '')))}</td>"
+        f"<td>{html.escape(str(item.get('approval_envelope_id', '')))}</td>"
+        f"<td>{html.escape(str(item.get('evidence_chain_complete', '')))}</td>"
+        f"<td>{html.escape(str(item.get('audit_result', '')))}</td>"
+        f"<td>{html.escape(str(item.get('allowed_to_execute', '')))}</td>"
+        f"<td>{html.escape(str(item.get('dry_run_only', '')))}</td>"
+        f"<td>{html.escape(str(item.get('execution_unlock_supported', '')))}</td>"
+        f"<td>{html.escape('; '.join(str(step) for step in item.get('reviewer_trace', [])))}</td>"
+        "</tr>"
+        for item in report.get("audit_records", [])
+    )
+    invariant_rows = "".join(
+        "<tr>"
+        f"<th>{html.escape(str(label).replace('_', ' ').title())}</th>"
+        f"<td>{html.escape(str(value))}</td>"
+        "</tr>"
+        for label, value in report.get("safety_invariants", {}).items()
+    )
+    summary_rows = "".join(
+        "<tr>"
+        f"<th>{html.escape(str(label).replace('_', ' ').title())}</th>"
+        f"<td>{html.escape(str(value))}</td>"
+        "</tr>"
+        for label, value in report.get("summary", {}).items()
+    )
+    result_rows = "".join(
+        "<tr>"
+        f"<th>{html.escape(str(label))}</th>"
+        f"<td>{html.escape(str(value))}</td>"
+        "</tr>"
+        for label, value in report.get("summary", {}).get("audit_result_counts", {}).items()
+    )
+    validation_errors = "".join(
+        f"<li>{html.escape(str(item))}</li>" for item in report.get("validation_errors", [])
+    ) or "<li>None</li>"
+    boundary_items = "".join(
+        f"<li>{html.escape(str(item))}</li>" for item in report.get("safety_boundary", [])
+    )
+    refs = "".join(
+        f"<li><code>{html.escape(str(item))}</code></li>"
+        for item in report.get("evidence_links_or_doc_refs", [])
+    )
+    output_path.write_text(
+        f"""<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Day76 Controlled Runtime Audit Trail</title>
+  <style>
+    body {{ font-family: Arial, sans-serif; margin: 24px; color: #182230; }}
+    table {{ border-collapse: collapse; width: 100%; margin: 12px 0 20px; }}
+    td, th {{ border: 1px solid #d8e0ec; padding: 8px 10px; text-align: left; vertical-align: top; }}
+    th {{ background: #edf2f8; }}
+    .safe {{ background: #ecfdf3; border: 1px solid #abefc6; color: #05603a; padding: 12px; }}
+    .warn {{ color: #7a4d00; }}
+    code {{ overflow-wrap: anywhere; }}
+  </style>
+</head>
+<body>
+  <h1>Day76 Controlled Runtime Audit Trail</h1>
+  <p class="safe">{html.escape(str(report.get("final_safety_statement", "")))}</p>
+  <h2>Summary</h2>
+  <table><tbody>{summary_rows}</tbody></table>
+  <h2>Audit Result Counts</h2>
+  <table><tbody>{result_rows}</tbody></table>
+  <h2>Reviewer Decision Evidence Packages</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Audit ID</th><th>Scenario</th><th>Decision ID</th><th>Dry-run plan</th>
+        <th>Approval envelope</th><th>Evidence chain complete?</th><th>Audit result</th>
+        <th>Allowed to execute?</th><th>Dry-run only?</th><th>Execution unlock supported?</th>
+        <th>Reviewer trace</th>
+      </tr>
+    </thead>
+    <tbody>{audit_rows}</tbody>
+  </table>
+  <h2>Safety Invariants</h2>
+  <table><tbody>{invariant_rows}</tbody></table>
+  <h2>Validation Errors</h2>
+  <ul class="warn">{validation_errors}</ul>
+  <h2>Safety Boundary</h2>
+  <ul>{boundary_items}</ul>
+  <h2>Evidence References</h2>
+  <ul>{refs}</ul>
+</body>
+</html>
+""",
+        encoding="utf-8",
+    )
+
+
+def _run_day76_runtime_audit_trail(project_root: Path) -> int:
+    report = build_runtime_audit_trail_report()
+    json_path = project_root / DAY76_RUNTIME_AUDIT_TRAIL_JSON
+    html_path = project_root / DAY76_RUNTIME_AUDIT_TRAIL_HTML
+    write_json_report(report, json_path)
+    write_day76_runtime_audit_trail_html(mask_secret_values(report), html_path)
+
+    print(format_heading("Day76 Controlled Runtime Audit Trail"))
+    print("Safety: deterministic mock-only / dry-run-only reviewer audit evidence")
+    print(f"Overall status: {report['overall_status']} / {report['reviewer_status']}")
+    print(f"Audit records: {report['summary']['audit_record_count']}")
+    print(
+        "Evidence chain complete values: "
+        f"{report['summary']['evidence_chain_complete_values']}"
+    )
+    print(f"Allowed to execute values: {report['summary']['allowed_to_execute_values']}")
+    print(f"Dry-run-only values: {report['summary']['dry_run_only_values']}")
+    print(
+        "Execution unlock supported values: "
+        f"{report['summary']['execution_unlock_supported_values']}"
+    )
+    print(f"JSON report: {_relative_to_project(project_root, json_path)}")
+    print(f"HTML report: {_relative_to_project(project_root, html_path)}")
+    if report["overall_status"] == "PASS" and report["reviewer_status"] == "REVIEW_READY":
+        print(
+            f"{format_status('PASS')} REVIEW_READY. No AI API, SSH, device access, "
+            "live execution, mapped task execution, config.json dependency, approval "
+            "unlock, dashboard action surface, or network change occurred."
+        )
+        return 0
+
+    print(f"{format_status('FAIL')} Day76 safety invariants failed.")
     return 1
 
 
@@ -6477,6 +6660,8 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
         return _run_day74_dry_run_plan_builder(root)
     if args.task == DAY75_MANUAL_REVIEW_APPROVAL_ENVELOPE_TASK_ID:
         return _run_day75_manual_review_approval_envelope(root)
+    if args.task == DAY76_RUNTIME_AUDIT_TRAIL_TASK_ID:
+        return _run_day76_runtime_audit_trail(root)
 
     profile_path = _resolve_project_path(root, args.profile)
     try:

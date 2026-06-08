@@ -79,6 +79,7 @@ The v0.1 portfolio package covers Day 1 through Day 30 post-tag verification. Th
 - Day73 - Mock AI Decision Pipeline
 - Day74 - Controlled Dry-run Plan Builder
 - Day75 - Manual Review Approval Envelope
+- Day76 - Controlled Runtime Audit Trail
 
 The project is designed as a practical QA Automation / SDET portfolio project for network infrastructure. It focuses on repeatable validation, structured test evidence, and readable JSON / HTML reports rather than one-off manual checks.
 
@@ -103,7 +104,7 @@ Recommended quick path:
 7. Use `docs/roadmap/day57_ai_assisted_task_intent_mapping_prototype_plan.md` for the dry-run-only intent mapping prototype plan.
 8. Use `docs/roadmap/day58_intent_mapping_safety_review_confirmation_gate.md` for the dry-run intent safety review and blocked-by-default confirmation gate design.
 9. Use `docs/ai/day59_intent_policy_matrix_reviewer_safety_explanation.md` for the reviewer-facing intent policy matrix.
-10. If running the dashboard locally, open `/ai-intent-reviewer` for the Day57-Day75 reviewer UI entry point, Day62 scenario pack link, Day63 traceability evidence map link, Day64 acceptance runbook link, Day65 sign-off package link, Day66 offline mock runtime skeleton link, Day67 contract validation link, Day68 reviewer quality status, Day69 scenario evidence drilldown, Day70 AI runtime readiness gate, Day71 controlled AI runtime entry design, Day72 controlled AI runtime input contract validator, Day73 mock AI decision pipeline, Day74 controlled dry-run plan builder, and Day75 manual review approval envelope.
+10. If running the dashboard locally, open `/ai-intent-reviewer` for the Day57-Day76 reviewer UI entry point, Day62 scenario pack link, Day63 traceability evidence map link, Day64 acceptance runbook link, Day65 sign-off package link, Day66 offline mock runtime skeleton link, Day67 contract validation link, Day68 reviewer quality status, Day69 scenario evidence drilldown, Day70 AI runtime readiness gate, Day71 controlled AI runtime entry design, Day72 controlled AI runtime input contract validator, Day73 mock AI decision pipeline, Day74 controlled dry-run plan builder, Day75 manual review approval envelope, and Day76 controlled runtime audit trail.
 
 ## Why This Project Exists
 
@@ -214,6 +215,8 @@ Cisco validation is read-only. It runs show commands for topology evidence and d
 | Day 72 | Controlled AI Runtime Input Contract Validator; validates structured future AI runtime intent payloads deterministically while remaining validation-only with no OpenAI API, voice, SSH/device access, live execution, mapped task execution, config changes, forms, POST routes, action endpoints, or dashboard action surface | Ready with notes |
 | Day 73 | Mock AI Decision Pipeline; runs deterministic mock-only decisions after the Day72 validator with no OpenAI API, AI SDK, real AI runtime, SSH/device access, live execution, mapped task execution, dashboard action endpoint, or network configuration change | Ready with notes |
 | Day 74 | Controlled Dry-run Plan Builder; converts Day73 mock decisions into deterministic dry-run plan previews with no OpenAI API, AI SDK, device access, mapped task execution, approval unlock, dashboard action endpoint, or network configuration change | Ready with notes |
+| Day 75 | Manual Review Approval Envelope; wraps Day74 dry-run plans in deterministic record-only reviewer sign-off envelopes with no OpenAI API, AI SDK, device access, mapped task execution, dashboard form, POST route, execution control, approval unlock, or network configuration change | Ready with notes |
+| Day 76 | Controlled Runtime Audit Trail; links Day73 decisions, Day74 plans, and Day75 approval envelopes into deterministic reviewer evidence packages with no OpenAI API, AI SDK, device access, mapped task execution, dashboard action endpoint, execution unlock, or network configuration change | Ready with notes |
 
 ## Lab Topology
 
@@ -2168,6 +2171,19 @@ reports/lab-summary/day75_manual_review_approval_envelope.html
 
 Day75 adds `manual-review-approval-envelope`, a deterministic mock-only and dry-run-only reviewer sign-off simulation after the Day74 plan builder. It wraps Day74 plans into record-only approval envelopes with reviewer decisions such as `approved_for_record_only`, `rejected_for_review_gap`, `requires_manual_follow_up`, and `blocked_live_action`. Every envelope keeps `allowed_to_execute` set to `False`, `dry_run_only` set to `True`, and `execution_unlock_supported` set to `False`; no reviewer decision, approval state, OpenAI API, AI SDK, real AI runtime, SSH, device access, live execution, mapped task execution, `config.json` dependency, dashboard form, POST route, action endpoint, approval unlock, release tag, or router/switch/firewall/VPN/VRRP/network configuration change is added.
 
+Day76 - Controlled Runtime Audit Trail:
+
+```text
+docs/roadmap/day76_runtime_audit_trail.md
+docs/ai/intent_runtime_audit_trail.md
+intent_runtime_audit_trail.py
+reports/lab-summary/day76_runtime_audit_trail.json
+reports/lab-summary/day76_runtime_audit_trail.html
+/ai-intent-reviewer
+```
+
+Day76 adds `runtime-audit-trail`, a deterministic mock-only and dry-run-only reviewer evidence package after the Day75 approval envelope. It links Day73 mock AI decision records, Day74 dry-run plans, and Day75 approval envelopes into audit records with `decision_id`, `dry_run_plan_id`, `approval_envelope_id`, `evidence_chain`, `reviewer_trace`, safety invariants, and final runtime policy. Every audit record keeps `allowed_to_execute` set to `False`, `dry_run_only` set to `True`, and `execution_unlock_supported` set to `False`; no audit result, reviewer decision, approval state, OpenAI API, AI SDK, real AI runtime, SSH, device access, live execution, mapped task execution, `config.json` dependency, dashboard form, POST route, approve button, execute button, action endpoint, approval unlock, release tag, or router/switch/firewall/VPN/VRRP/network configuration change is added.
+
 Validation commands:
 
 ```text
@@ -2180,6 +2196,7 @@ python network_lab.py --task offline-mock-runtime-review
 python network_lab.py --task mock-ai-decision-pipeline
 python network_lab.py --task dry-run-plan-builder
 python network_lab.py --task manual-review-approval-envelope
+python network_lab.py --task runtime-audit-trail
 ```
 
 ## Testing Strategy
@@ -2258,6 +2275,7 @@ For documentation-only review passes, run `python -m pytest` before sharing the 
 - Includes Day73 Mock AI Decision Pipeline, a deterministic mock-only decision stage after Day72 validation that produces reviewer labels and JSON/HTML reports while keeping OpenAI API, AI SDKs, real AI runtime, SSH/device access, live execution, mapped task execution, dashboard action endpoints, and network configuration changes disabled.
 - Includes Day74 Controlled Dry-run Plan Builder, a deterministic dry-run-only post-processing stage after Day73 that produces reviewer plan previews and JSON/HTML reports while keeping OpenAI API, AI SDKs, real AI runtime, SSH/device access, live execution, mapped task execution, approval unlocks, dashboard action endpoints, and network configuration changes disabled.
 - Includes Day75 Manual Review Approval Envelope, a deterministic mock-only sign-off simulation after Day74 that produces reviewer envelope JSON/HTML reports while keeping OpenAI API, AI SDKs, real AI runtime, SSH/device access, live execution, mapped task execution, dashboard forms, POST routes, approval unlocks, execution controls, and network configuration changes disabled.
+- Includes Day76 Controlled Runtime Audit Trail, a deterministic mock-only and dry-run-only evidence package after Day75 that links decisions, plans, and approval envelopes while keeping OpenAI API, AI SDKs, real AI runtime, SSH/device access, live execution, mapped task execution, dashboard forms, POST routes, action endpoints, approval unlocks, execution controls, and network configuration changes disabled.
 
 ## Roadmap
 
