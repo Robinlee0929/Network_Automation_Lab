@@ -193,7 +193,7 @@
   </nav>
 
   <h1>AI Intent Reviewer Entry Point</h1>
-  <p>Reviewer-friendly dashboard view for the Day57-Day70 AI intent workflow. It explains the demo path, links to the committed docs, scenario pack, traceability map, acceptance runbook, sign-off package, offline mock runtime skeleton, contract validation layer, reviewer quality trace, Day69 evidence drilldown, and Day70 AI runtime readiness gate while keeping the no-execution boundary visible.</p>
+  <p>Reviewer-friendly dashboard view for the Day57-Day71 AI intent workflow. It explains the demo path, links to the committed docs, scenario pack, traceability map, acceptance runbook, sign-off package, offline mock runtime skeleton, contract validation layer, reviewer quality trace, Day69 evidence drilldown, Day70 AI runtime readiness gate, and Day71 controlled entry design while keeping the no-execution boundary visible.</p>
   <div class="note">This page is report-only. It does not call an AI model, listen to voice input, execute mapped tasks, open SSH, connect to devices, or change network configuration.</div>
 
   <section>
@@ -209,7 +209,7 @@
       </article>
       <article class="summary-card">
         <h3>Reviewer Evidence</h3>
-        <p>Day57-Day70 docs and optional generated JSON/HTML reports show how the workflow makes allowed and blocked decisions visible.</p>
+        <p>Day57-Day71 docs and optional generated JSON/HTML reports show how the workflow makes allowed and blocked decisions visible.</p>
       </article>
       <article class="summary-card">
         <h3>No Runtime Execution</h3>
@@ -219,7 +219,7 @@
   </section>
 
   <section>
-    <h2>Day57-Day70 Review Path</h2>
+    <h2>Day57-Day71 Review Path</h2>
     <div class="day-grid">
       {% for item in references %}
       <article class="day-card">
@@ -261,6 +261,7 @@
       <li>Read Day68 to confirm reviewer-visible report quality, evidence traceability, contract validation proof, and no-execution evidence.</li>
       <li>Read Day69 to drill into each offline mock scenario from the dashboard without submitting, executing, or delegating anything.</li>
       <li>Read Day70 to confirm the offline mock runtime phase exit decision and AI runtime readiness gate before any controlled Day71+ prototype planning.</li>
+      <li>Read Day71 to review the controlled future AI runtime entry design, accepted input fields, expected output fields, safety gate order, and still-blocked surfaces.</li>
       <li>Use <a href="{{ url_for('reports') }}">Reports</a> for generated local evidence when available.</li>
     </ol>
     <div class="safe">Expected Day60 statement: <code>No mapped task was executed. This is a dry-run reviewer walkthrough only.</code></div>
@@ -469,6 +470,101 @@
       <a href="{{ evidence_url('docs/roadmap/day70_offline_mock_runtime_phase_exit_ai_readiness_gate.md') }}">Open Day70 roadmap</a>
     </div>
     <div class="note">Day70 decision: ready for controlled Day71+ AI runtime prototype planning only after human review accepts the documented gates. Stay in mock/report-only mode if any API, voice, SSH, device access, live execution, dashboard form, POST action, command surface, or configuration dependency is requested without a separate approved safety design.</div>
+  </section>
+
+  <section>
+    <h2>Day71 Controlled AI Runtime Prototype Entry Design</h2>
+    <p>Day71 defines the controlled entry design for a future AI runtime. It does not implement AI runtime execution, model invocation, OpenAI API integration, voice, SSH, device access, live execution, mapped task execution, or configuration changes.</p>
+    <div class="safe">
+      Day71 status: <code>{{ day71_entry_design.safety_stage }}</code>.
+      Proposed future entry point: <code>{{ day71_entry_design.proposed_future_entry_point }}</code>.
+      Current gate values: <code>execution_allowed=false</code>,
+      <code>api_integration_allowed=false</code>, <code>voice_allowed=false</code>,
+      <code>device_access_allowed=false</code>, and
+      <code>dashboard_action_surface_allowed=false</code>.
+    </div>
+
+    <h3>Proposed Future Input Contract</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Field</th>
+          <th>Requirement</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for field in day71_entry_design.input_contract %}
+        <tr>
+          <td><code>{{ field.name }}</code></td>
+          <td>{{ field.requirement }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <h3>Proposed Future Output Contract</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Field</th>
+          <th>Requirement</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for field in day71_entry_design.output_contract %}
+        <tr>
+          <td><code>{{ field.name }}</code></td>
+          <td>{{ field.requirement }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <h3>Safety Gate Sequence</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Order</th>
+          <th>Gate</th>
+          <th>Day71 Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for gate in day71_entry_design.safety_gate_sequence %}
+        <tr>
+          <td>{{ gate.order }}</td>
+          <td>{{ gate.name }}</td>
+          <td class="gate-status deferred">{{ gate.day71_status }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <h3>Reviewer Evidence Mapping</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Day</th>
+          <th>Artifact</th>
+          <th>Reviewer Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in day71_entry_design.reviewer_evidence_map %}
+        <tr>
+          <td>{{ item.day }}</td>
+          <td>{{ item.artifact }}</td>
+          <td>{{ item.reviewer_value }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <div class="refs">
+      <a href="{{ evidence_url('docs/ai/intent_controlled_ai_runtime_entry_design.md') }}">Open Day71 design doc</a>
+      <a href="{{ evidence_url('docs/roadmap/day71_controlled_ai_runtime_prototype_entry_design.md') }}">Open Day71 roadmap</a>
+    </div>
+    <div class="note">Day71 stops before real execution. Future controlled execution can only be considered after intent normalization, task classification, blocked-action screening, evidence mapping, offline mock validation, reviewer approval, dry-run report generation, and explicit human confirmation.</div>
   </section>
 
   <section>

@@ -185,7 +185,7 @@ def test_ai_review_checklist_contains_wireguard_vpn_safety_items():
     assert "shell=False" in text
 
 
-def test_ai_intent_reviewer_references_day57_to_day62():
+def test_ai_intent_reviewer_references_day57_to_day71():
     references = dashboard.ai_intent_reviewer_references()
 
     assert [item.day for item in references] == [
@@ -199,6 +199,7 @@ def test_ai_intent_reviewer_references_day57_to_day62():
         "Day68",
         "Day69",
         "Day70",
+        "Day71",
     ]
     text = " ".join(
         f"{item.title} {item.summary} {item.doc_path} {item.roadmap_path} "
@@ -231,6 +232,9 @@ def test_ai_intent_reviewer_references_day57_to_day62():
     assert "AI runtime readiness gate" in text
     assert "docs/ai/intent_offline_mock_runtime_phase_exit_review.md" in text
     assert "docs/roadmap/day70_offline_mock_runtime_phase_exit_ai_readiness_gate.md" in text
+    assert "Controlled AI runtime prototype entry design" in text
+    assert "docs/ai/intent_controlled_ai_runtime_entry_design.md" in text
+    assert "docs/roadmap/day71_controlled_ai_runtime_prototype_entry_design.md" in text
 
 
 def test_ai_intent_reviewer_safety_boundaries_are_report_only():
@@ -296,6 +300,45 @@ def test_day70_ai_runtime_readiness_gate_is_static_and_explicit():
     assert "Day70 is a readiness gate only, not runtime implementation" in text
     assert "No SSH, router, switch, firewall, VPN, or lab device access" in text
     assert "No OpenAI dependency, API key, environment variable, or API call" in text
+
+
+def test_day71_controlled_entry_design_is_static_and_explicit():
+    design = dashboard.day71_controlled_ai_runtime_entry_design()
+
+    assert design["day"] == 71
+    assert design["title"] == "Controlled AI Runtime Prototype Entry Design"
+    assert design["safety_stage"] == "design_only"
+    assert design["execution_allowed"] is False
+    assert design["api_integration_allowed"] is False
+    assert design["voice_allowed"] is False
+    assert design["device_access_allowed"] is False
+    assert design["dashboard_action_surface_allowed"] is False
+    assert design["mapped_task_execution_allowed"] is False
+    assert design["live_execution_allowed"] is False
+    assert design["required_reviewer_gate"] is True
+    assert any(
+        item["name"] == "execution_allowed" and "Always false" in item["requirement"]
+        for item in design["input_contract"]
+    )
+    assert [item["name"] for item in design["safety_gate_sequence"]][-1] == (
+        "future controlled execution consideration"
+    )
+    assert [item["day"] for item in design["reviewer_evidence_map"]] == [
+        "Day57",
+        "Day58",
+        "Day59",
+        "Day60",
+        "Day61",
+        "Day62",
+        "Day63",
+        "Day64",
+        "Day65",
+        "Day66",
+        "Day67",
+        "Day68",
+        "Day69",
+        "Day70",
+    ]
 
 
 def day12_report(private_key_line="PrivateKey = REDACTED"):
@@ -478,7 +521,7 @@ def test_dashboard_home_is_portfolio_demo_landing_page(tmp_path):
     assert "/ai-intent-reviewer" in text
 
 
-def test_ai_intent_reviewer_route_exposes_day57_to_day70_without_execution(tmp_path):
+def test_ai_intent_reviewer_route_exposes_day57_to_day71_without_execution(tmp_path):
     if dashboard.Flask is None:
         pytest.skip("Flask is not installed in this test environment.")
 
@@ -502,6 +545,7 @@ def test_ai_intent_reviewer_route_exposes_day57_to_day70_without_execution(tmp_p
     assert "Day68" in text
     assert "Day69" in text
     assert "Day70" in text
+    assert "Day71" in text
     assert "Day63 Traceability Evidence Map" in text
     assert "Day64 Reviewer Acceptance Runbook" in text
     assert "Day65 Acceptance Sign-off Package" in text
@@ -565,6 +609,39 @@ def test_ai_intent_reviewer_route_exposes_day57_to_day70_without_execution(tmp_p
     assert "does not enable AI runtime, OpenAI API, voice, SSH, device access, live execution" in text
     assert "docs/ai/intent_offline_mock_runtime_phase_exit_review.md" in text
     assert "docs/roadmap/day70_offline_mock_runtime_phase_exit_ai_readiness_gate.md" in text
+    assert "Day71 Controlled AI Runtime Prototype Entry Design" in text
+    assert "Controlled AI runtime prototype entry design" in text
+    assert "docs/ai/intent_controlled_ai_runtime_entry_design.md" in text
+    assert "docs/roadmap/day71_controlled_ai_runtime_prototype_entry_design.md" in text
+    assert "Proposed Future Input Contract" in text
+    assert "Proposed Future Output Contract" in text
+    assert "Safety Gate Sequence" in text
+    assert "Reviewer Evidence Mapping" in text
+    assert "ai_intent_reviewer_controlled_runtime_entry" in text
+    assert "execution_allowed=false" in text
+    assert "api_integration_allowed=false" in text
+    assert "voice_allowed=false" in text
+    assert "device_access_allowed=false" in text
+    assert "dashboard_action_surface_allowed=false" in text
+    assert "user_intent_text" in text
+    assert "requested_operation_type" in text
+    assert "target_scope" in text
+    assert "safety_level" in text
+    assert "evidence_required" in text
+    assert "reviewer_required" in text
+    assert "normalized_intent" in text
+    assert "mapped_category" in text
+    assert "risk_level" in text
+    assert "required_evidence" in text
+    assert "reviewer_decision_required" in text
+    assert "blocked_reason" in text
+    assert "next_safe_step" in text
+    assert "intent normalization" in text
+    assert "task classification" in text
+    assert "blocked-action screening" in text
+    assert "offline mock validation" in text
+    assert "explicit human confirmation" in text
+    assert "STOPPED_BEFORE_EXECUTION" in text
     assert "Scenario Evidence Drilldown" in text
     assert "documentation_only" in text
     assert "report_only" in text
@@ -600,9 +677,12 @@ def test_ai_intent_reviewer_route_exposes_day57_to_day70_without_execution(tmp_p
     assert "method=\"post\"" not in html
     assert "method='post'" not in html
     assert "action=" not in html
+    assert "fetch(" not in html
+    assert "xmlhttprequest" not in html
     assert "run task" not in html
     assert "execute intent" not in html
     assert "submit intent" not in html
+    assert "execute buttons" not in html
     assert "post /" not in html
     assert "action runner" not in html
     assert "task runner endpoint" not in html

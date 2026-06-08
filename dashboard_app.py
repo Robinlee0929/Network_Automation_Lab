@@ -22,6 +22,7 @@ from dashboard_command_runner import (
     list_execution_logs,
     load_execution_log,
 )
+from intent_controlled_ai_runtime_entry import get_day71_controlled_entry_design
 from intent_offline_mock_runtime import build_mock_runtime_report
 from intent_reviewer_report_quality import build_reviewer_quality_report
 from network_lab import discover_report_visibility, discover_vrrp_evidence, infer_report_result, mask_secret_values
@@ -815,6 +816,18 @@ def ai_intent_reviewer_references() -> List[AIIntentReviewerReference]:
             roadmap_path="docs/roadmap/day70_offline_mock_runtime_phase_exit_ai_readiness_gate.md",
             report_paths=(),
         ),
+        AIIntentReviewerReference(
+            day="Day71",
+            title="Controlled AI runtime prototype entry design",
+            summary=(
+                "Defines the controlled future AI runtime entry contract, input/output "
+                "fields, safety gate sequence, and blocked surfaces while keeping "
+                "execution disabled."
+            ),
+            doc_path="docs/ai/intent_controlled_ai_runtime_entry_design.md",
+            roadmap_path="docs/roadmap/day71_controlled_ai_runtime_prototype_entry_design.md",
+            report_paths=(),
+        ),
     ]
 
 
@@ -986,6 +999,10 @@ def day70_ai_runtime_readiness_gates() -> List[Day70ReadinessGate]:
     ]
 
 
+def day71_controlled_ai_runtime_entry_design() -> Dict[str, object]:
+    return get_day71_controlled_entry_design()
+
+
 def ai_intent_safety_boundaries() -> List[str]:
     return [
         "Report-only reviewer entry point; this page does not execute anything.",
@@ -1006,6 +1023,8 @@ def ai_intent_safety_boundaries() -> List[str]:
         "Day69 presents reviewer evidence drilldown only; it is static, read-only, and report-only.",
         "Day70 is an AI runtime readiness gate only; it does not start AI runtime implementation.",
         "Day70 preserves no dashboard forms, no POST routes for AI intent review, and no action endpoints.",
+        "Day71 defines a controlled AI runtime entry design only; execution_allowed remains false.",
+        "Day71 keeps API integration, voice, device access, live execution, mapped task execution, and dashboard action surfaces disabled.",
     ]
 
 
@@ -1116,6 +1135,7 @@ def create_app(
             day69_evidence_chain=day69_evidence_chain(),
             day69_scenario_drilldown=day69_scenario_evidence_drilldown(),
             day70_readiness_gates=day70_ai_runtime_readiness_gates(),
+            day71_entry_design=day71_controlled_ai_runtime_entry_design(),
             safety_boundaries=ai_intent_safety_boundaries(),
         )
 
