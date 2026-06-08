@@ -107,6 +107,13 @@ class Day69ScenarioEvidence:
     report_paths: Sequence[str]
 
 
+@dataclass
+class Day70ReadinessGate:
+    gate: str
+    status: str
+    evidence: str
+
+
 DAY12_REPORT_JSON = "day12_wireguard_vpn_automation_report.json"
 DAY12_REPORT_HTML = "day12_wireguard_vpn_automation_report.html"
 
@@ -796,6 +803,18 @@ def ai_intent_reviewer_references() -> List[AIIntentReviewerReference]:
             roadmap_path="docs/roadmap/day69_offline_mock_runtime_reviewer_dashboard_evidence_drilldown.md",
             report_paths=(),
         ),
+        AIIntentReviewerReference(
+            day="Day70",
+            title="AI runtime readiness gate",
+            summary=(
+                "Reviews the Day66-Day69 offline mock runtime evidence chain and "
+                "records whether the project is ready to plan a controlled AI "
+                "runtime prototype without starting that runtime."
+            ),
+            doc_path="docs/ai/intent_offline_mock_runtime_phase_exit_review.md",
+            roadmap_path="docs/roadmap/day70_offline_mock_runtime_phase_exit_ai_readiness_gate.md",
+            report_paths=(),
+        ),
     ]
 
 
@@ -912,6 +931,61 @@ def day69_scenario_evidence_drilldown() -> List[Day69ScenarioEvidence]:
     return scenario_cards
 
 
+def day70_ai_runtime_readiness_gates() -> List[Day70ReadinessGate]:
+    return [
+        Day70ReadinessGate(
+            gate="Offline mock runtime exists",
+            status="PASS",
+            evidence="Day66 deterministic offline mock runtime skeleton.",
+        ),
+        Day70ReadinessGate(
+            gate="Contract validation exists",
+            status="PASS",
+            evidence="Day67 contract and safety invariant validation.",
+        ),
+        Day70ReadinessGate(
+            gate="Reviewer quality review exists",
+            status="PASS",
+            evidence="Day68 reviewer report quality and evidence trace review.",
+        ),
+        Day70ReadinessGate(
+            gate="Dashboard evidence drilldown exists",
+            status="PASS",
+            evidence="Day69 static reviewer dashboard evidence drilldown.",
+        ),
+        Day70ReadinessGate(
+            gate="Live execution boundary documented",
+            status="PASS",
+            evidence="Day70 safety boundary keeps live execution outside scope.",
+        ),
+        Day70ReadinessGate(
+            gate="Human review requirement documented",
+            status="PASS",
+            evidence="Day70 requires human review before any Day71+ prototype.",
+        ),
+        Day70ReadinessGate(
+            gate="AI runtime implementation started",
+            status="NOT STARTED",
+            evidence="Day70 is a readiness gate only, not runtime implementation.",
+        ),
+        Day70ReadinessGate(
+            gate="Voice integration started",
+            status="NOT STARTED",
+            evidence="No voice input, speech API, or voice control is added.",
+        ),
+        Day70ReadinessGate(
+            gate="Device access enabled",
+            status="NOT ENABLED",
+            evidence="No SSH, router, switch, firewall, VPN, or lab device access.",
+        ),
+        Day70ReadinessGate(
+            gate="OpenAI API enabled",
+            status="NOT ENABLED",
+            evidence="No OpenAI dependency, API key, environment variable, or API call.",
+        ),
+    ]
+
+
 def ai_intent_safety_boundaries() -> List[str]:
     return [
         "Report-only reviewer entry point; this page does not execute anything.",
@@ -930,6 +1004,8 @@ def ai_intent_safety_boundaries() -> List[str]:
         "Day67 validates contract and safety invariants without enabling runtime behavior.",
         "Day68 reviews report quality and evidence traceability without enabling runtime behavior.",
         "Day69 presents reviewer evidence drilldown only; it is static, read-only, and report-only.",
+        "Day70 is an AI runtime readiness gate only; it does not start AI runtime implementation.",
+        "Day70 preserves no dashboard forms, no POST routes for AI intent review, and no action endpoints.",
     ]
 
 
@@ -1039,6 +1115,7 @@ def create_app(
             references=ai_intent_reviewer_references(),
             day69_evidence_chain=day69_evidence_chain(),
             day69_scenario_drilldown=day69_scenario_evidence_drilldown(),
+            day70_readiness_gates=day70_ai_runtime_readiness_gates(),
             safety_boundaries=ai_intent_safety_boundaries(),
         )
 

@@ -198,6 +198,7 @@ def test_ai_intent_reviewer_references_day57_to_day62():
         "Day67",
         "Day68",
         "Day69",
+        "Day70",
     ]
     text = " ".join(
         f"{item.title} {item.summary} {item.doc_path} {item.roadmap_path} "
@@ -227,6 +228,9 @@ def test_ai_intent_reviewer_references_day57_to_day62():
     assert "Reviewer dashboard evidence drilldown" in text
     assert "docs/ai/intent_offline_mock_runtime_reviewer_dashboard_evidence_drilldown.md" in text
     assert "docs/roadmap/day69_offline_mock_runtime_reviewer_dashboard_evidence_drilldown.md" in text
+    assert "AI runtime readiness gate" in text
+    assert "docs/ai/intent_offline_mock_runtime_phase_exit_review.md" in text
+    assert "docs/roadmap/day70_offline_mock_runtime_phase_exit_ai_readiness_gate.md" in text
 
 
 def test_ai_intent_reviewer_safety_boundaries_are_report_only():
@@ -244,6 +248,8 @@ def test_ai_intent_reviewer_safety_boundaries_are_report_only():
     assert "Day67 validates contract and safety invariants" in text
     assert "Day68 reviews report quality and evidence traceability" in text
     assert "Day69 presents reviewer evidence drilldown only" in text
+    assert "Day70 is an AI runtime readiness gate only" in text
+    assert "no dashboard forms, no POST routes for AI intent review, and no action endpoints" in text
 
 
 def test_day69_reviewer_evidence_drilldown_is_static_and_complete():
@@ -267,6 +273,29 @@ def test_day69_reviewer_evidence_drilldown_is_static_and_complete():
     assert all("Day66 mock_scenarios" in scenario.evidence_source for scenario in scenarios)
     assert all("No API" in scenario.safety_note for scenario in scenarios)
     assert all("reports/lab-summary/day68_offline_mock_runtime_reviewer_report_quality.json" in scenario.report_paths for scenario in scenarios)
+
+
+def test_day70_ai_runtime_readiness_gate_is_static_and_explicit():
+    gates = dashboard.day70_ai_runtime_readiness_gates()
+
+    statuses_by_gate = {gate.gate: gate.status for gate in gates}
+
+    assert statuses_by_gate == {
+        "Offline mock runtime exists": "PASS",
+        "Contract validation exists": "PASS",
+        "Reviewer quality review exists": "PASS",
+        "Dashboard evidence drilldown exists": "PASS",
+        "Live execution boundary documented": "PASS",
+        "Human review requirement documented": "PASS",
+        "AI runtime implementation started": "NOT STARTED",
+        "Voice integration started": "NOT STARTED",
+        "Device access enabled": "NOT ENABLED",
+        "OpenAI API enabled": "NOT ENABLED",
+    }
+    text = " ".join(f"{gate.gate} {gate.status} {gate.evidence}" for gate in gates)
+    assert "Day70 is a readiness gate only, not runtime implementation" in text
+    assert "No SSH, router, switch, firewall, VPN, or lab device access" in text
+    assert "No OpenAI dependency, API key, environment variable, or API call" in text
 
 
 def day12_report(private_key_line="PrivateKey = REDACTED"):
@@ -449,7 +478,7 @@ def test_dashboard_home_is_portfolio_demo_landing_page(tmp_path):
     assert "/ai-intent-reviewer" in text
 
 
-def test_ai_intent_reviewer_route_exposes_day57_to_day65_without_execution(tmp_path):
+def test_ai_intent_reviewer_route_exposes_day57_to_day70_without_execution(tmp_path):
     if dashboard.Flask is None:
         pytest.skip("Flask is not installed in this test environment.")
 
@@ -472,6 +501,7 @@ def test_ai_intent_reviewer_route_exposes_day57_to_day65_without_execution(tmp_p
     assert "Day67" in text
     assert "Day68" in text
     assert "Day69" in text
+    assert "Day70" in text
     assert "Day63 Traceability Evidence Map" in text
     assert "Day64 Reviewer Acceptance Runbook" in text
     assert "Day65 Acceptance Sign-off Package" in text
@@ -515,6 +545,26 @@ def test_ai_intent_reviewer_route_exposes_day57_to_day65_without_execution(tmp_p
     assert "reports/lab-summary/day68_offline_mock_runtime_reviewer_report_quality.html" in text
     assert "docs/ai/intent_offline_mock_runtime_reviewer_dashboard_evidence_drilldown.md" in text
     assert "docs/roadmap/day69_offline_mock_runtime_reviewer_dashboard_evidence_drilldown.md" in text
+    assert "Day70 AI Runtime Readiness Gate" in text
+    assert "Day70 is a phase exit review for the Day66-Day69 offline mock runtime chain" in text
+    assert "not AI runtime implementation" in text
+    assert "Offline mock runtime exists" in text
+    assert "Contract validation exists" in text
+    assert "Reviewer quality review exists" in text
+    assert "Dashboard evidence drilldown exists" in text
+    assert "Live execution boundary documented" in text
+    assert "Human review requirement documented" in text
+    assert "AI runtime implementation started" in text
+    assert "Voice integration started" in text
+    assert "Device access enabled" in text
+    assert "OpenAI API enabled" in text
+    assert "PASS" in text
+    assert "NOT STARTED" in text
+    assert "NOT ENABLED" in text
+    assert "Day70 is static, read-only, report-only, and reviewer-facing" in text
+    assert "does not enable AI runtime, OpenAI API, voice, SSH, device access, live execution" in text
+    assert "docs/ai/intent_offline_mock_runtime_phase_exit_review.md" in text
+    assert "docs/roadmap/day70_offline_mock_runtime_phase_exit_ai_readiness_gate.md" in text
     assert "Scenario Evidence Drilldown" in text
     assert "documentation_only" in text
     assert "report_only" in text
@@ -558,6 +608,18 @@ def test_ai_intent_reviewer_route_exposes_day57_to_day65_without_execution(tmp_p
     assert "task runner endpoint" not in html
     assert "start task runner" not in html
     assert "openai api key" not in html
+
+    ai_post_rules = [
+        rule.rule
+        for rule in app.url_map.iter_rules()
+        if "POST" in rule.methods and ("ai" in rule.rule.lower() or "intent" in rule.rule.lower())
+    ]
+    assert ai_post_rules == []
+    assert "live execution control" not in html
+    assert "arbitrary command surface" not in html
+    assert "ssh trigger" not in html
+    assert "device access trigger" not in html
+    assert "ai runtime trigger" not in html
 
 
 def test_dashboard_reports_route_exposes_vrrp_evidence_group(tmp_path):

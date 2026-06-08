@@ -148,10 +148,37 @@
       margin-top: 10px;
       padding: 10px;
     }
+    table {
+      border-collapse: collapse;
+      margin-top: 12px;
+      width: 100%;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 9px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background: #f8fafc;
+      color: var(--text);
+      font-size: 13px;
+      text-transform: uppercase;
+    }
+    .gate-status {
+      color: #05603a;
+      font-weight: 850;
+      white-space: nowrap;
+    }
+    .gate-status.deferred {
+      color: #7a4d00;
+    }
     @media (max-width: 720px) {
       main { padding: 20px 12px 36px; }
       h1 { font-size: 25px; }
       .summary-grid, .day-grid, .chain-grid, .scenario-grid, .status-row { grid-template-columns: 1fr; }
+      th, td { display: block; width: 100%; }
+      tr { display: block; margin-bottom: 10px; }
     }
   </style>
 </head>
@@ -166,7 +193,7 @@
   </nav>
 
   <h1>AI Intent Reviewer Entry Point</h1>
-  <p>Reviewer-friendly dashboard view for the Day57-Day69 AI intent workflow. It explains the demo path, links to the committed docs, scenario pack, traceability map, acceptance runbook, sign-off package, offline mock runtime skeleton, contract validation layer, reviewer quality trace, and Day69 evidence drilldown while keeping the no-execution boundary visible.</p>
+  <p>Reviewer-friendly dashboard view for the Day57-Day70 AI intent workflow. It explains the demo path, links to the committed docs, scenario pack, traceability map, acceptance runbook, sign-off package, offline mock runtime skeleton, contract validation layer, reviewer quality trace, Day69 evidence drilldown, and Day70 AI runtime readiness gate while keeping the no-execution boundary visible.</p>
   <div class="note">This page is report-only. It does not call an AI model, listen to voice input, execute mapped tasks, open SSH, connect to devices, or change network configuration.</div>
 
   <section>
@@ -182,7 +209,7 @@
       </article>
       <article class="summary-card">
         <h3>Reviewer Evidence</h3>
-        <p>Day57-Day69 docs and optional generated JSON/HTML reports show how the workflow makes allowed and blocked decisions visible.</p>
+        <p>Day57-Day70 docs and optional generated JSON/HTML reports show how the workflow makes allowed and blocked decisions visible.</p>
       </article>
       <article class="summary-card">
         <h3>No Runtime Execution</h3>
@@ -192,7 +219,7 @@
   </section>
 
   <section>
-    <h2>Day57-Day69 Review Path</h2>
+    <h2>Day57-Day70 Review Path</h2>
     <div class="day-grid">
       {% for item in references %}
       <article class="day-card">
@@ -233,6 +260,7 @@
       <li>Read Day67 to inspect the fixed runtime output contract and safety invariant validation layer.</li>
       <li>Read Day68 to confirm reviewer-visible report quality, evidence traceability, contract validation proof, and no-execution evidence.</li>
       <li>Read Day69 to drill into each offline mock scenario from the dashboard without submitting, executing, or delegating anything.</li>
+      <li>Read Day70 to confirm the offline mock runtime phase exit decision and AI runtime readiness gate before any controlled Day71+ prototype planning.</li>
       <li>Use <a href="{{ url_for('reports') }}">Reports</a> for generated local evidence when available.</li>
     </ol>
     <div class="safe">Expected Day60 statement: <code>No mapped task was executed. This is a dry-run reviewer walkthrough only.</code></div>
@@ -412,6 +440,35 @@
       {% endfor %}
     </div>
     <div class="safe">Day69 is static/read-only/report-only. The drilldown is generated from deterministic local evidence helpers and does not start AI runtime, call OpenAI APIs, add voice, open SSH, access devices, perform live execution, or execute mapped tasks.</div>
+  </section>
+
+  <section>
+    <h2>Day70 AI Runtime Readiness Gate</h2>
+    <p>Day70 is a phase exit review for the Day66-Day69 offline mock runtime chain. It answers whether the project is ready to plan a controlled AI runtime prototype, but it is not AI runtime implementation.</p>
+    <div class="safe">Day70 is static, read-only, report-only, and reviewer-facing. It does not enable AI runtime, OpenAI API, voice, SSH, device access, live execution, mapped task execution, arbitrary command execution, dashboard forms, POST routes, or action endpoints.</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Gate</th>
+          <th>Status</th>
+          <th>Evidence</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for gate in day70_readiness_gates %}
+        <tr>
+          <td>{{ gate.gate }}</td>
+          <td class="gate-status{% if gate.status != 'PASS' %} deferred{% endif %}">{{ gate.status }}</td>
+          <td>{{ gate.evidence }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <div class="refs">
+      <a href="{{ evidence_url('docs/ai/intent_offline_mock_runtime_phase_exit_review.md') }}">Open phase exit review</a>
+      <a href="{{ evidence_url('docs/roadmap/day70_offline_mock_runtime_phase_exit_ai_readiness_gate.md') }}">Open Day70 roadmap</a>
+    </div>
+    <div class="note">Day70 decision: ready for controlled Day71+ AI runtime prototype planning only after human review accepts the documented gates. Stay in mock/report-only mode if any API, voice, SSH, device access, live execution, dashboard form, POST action, command surface, or configuration dependency is requested without a separate approved safety design.</div>
   </section>
 
   <section>
