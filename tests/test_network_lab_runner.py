@@ -3383,3 +3383,101 @@ def test_day79_readonly_task_contract_runner_outputs_reports_without_live_access
     assert "Day79 Controlled Read-only Task Contract" in html
     assert "READONLY_CONTRACT_READY" in html
     assert "Execution unlock supported values" in html
+
+
+def test_day80_readonly_execution_broker_task_exists_in_catalog():
+    task = next(task for task in network_lab.list_tasks() if task["id"] == "readonly-execution-broker")
+
+    assert task["task_id"] == "day80_readonly_execution_broker"
+    assert task["day"] == "Day80"
+    assert task["safety_level"] == "dry-run"
+    assert task["execution_mode"] == "dry-run"
+    assert task["requires_live_device"] is False
+    assert task["requires_password"] is False
+    assert task["produces_report"] is True
+    assert "reports/lab-summary/day80_readonly_execution_broker.json" in task["report_paths"]
+    assert "reports/lab-summary/day80_readonly_execution_broker.html" in task["report_paths"]
+    assert "docs/ai/intent_readonly_execution_broker.md" in task["report_paths"]
+    assert "docs/roadmap/day80_readonly_execution_broker_skeleton.md" in task["report_paths"]
+    assert "Day79 read-only task contract" in task["notes"]
+    assert "does not call APIs" in task["notes"]
+
+
+def test_day80_readonly_execution_broker_runner_outputs_reports_without_live_access(
+    tmp_path, monkeypatch, capsys
+):
+    def fail_run(*_args, **_kwargs):
+        raise AssertionError("Day80 read-only execution broker must not execute subprocess")
+
+    def fail_profile_load(*_args, **_kwargs):
+        raise AssertionError("Day80 read-only execution broker must not load profile or config data")
+
+    monkeypatch.setattr(network_lab.subprocess, "run", fail_run)
+    monkeypatch.setattr(network_lab, "load_lab_runner_profile", fail_profile_load)
+
+    exit_code = network_lab.main(["--task", "readonly-execution-broker"], project_root=tmp_path)
+
+    output = capsys.readouterr().out
+    json_path = tmp_path / "reports/lab-summary/day80_readonly_execution_broker.json"
+    html_path = tmp_path / "reports/lab-summary/day80_readonly_execution_broker.html"
+    assert exit_code == 0
+    assert "Day80 Read-only Execution Broker Skeleton" in output
+    assert "Safety: deterministic mock-only / dry-run-only broker skeleton" in output
+    assert "Overall status: PASS / REVIEW_READY" in output
+    assert "Broker records: 5" in output
+    assert "Broker statuses:" in output
+    assert "MOCK_EXECUTION_REQUEST_PREPARED" in output
+    assert "QUEUED_FOR_REVIEW" in output
+    assert "REJECTED" in output
+    assert "Allowed to execute values: [False]" in output
+    assert "Dry-run-only values: [True]" in output
+    assert "Execution unlock supported values: [False]" in output
+    assert "Device connection allowed values: [False]" in output
+    assert "SSH allowed values: [False]" in output
+    assert "Live command allowed values: [False]" in output
+    assert "JSON report: reports/lab-summary/day80_readonly_execution_broker.json" in output
+    assert "HTML report: reports/lab-summary/day80_readonly_execution_broker.html" in output
+    assert "[PASS] REVIEW_READY. Read-only broker skeleton is defined" in output
+    assert "no live command was executed" in output
+    assert "no mapped task was executed" in output
+    assert "no device was accessed" in output
+    assert json_path.exists()
+    assert html_path.exists()
+    assert not (tmp_path / "config.json").exists()
+
+    report = json.loads(json_path.read_text(encoding="utf-8"))
+    html = html_path.read_text(encoding="utf-8")
+    assert report["day"] == "Day80"
+    assert report["overall_status"] == "PASS"
+    assert report["reviewer_status"] == "REVIEW_READY"
+    assert report["summary"]["broker_record_count"] == 5
+    assert report["summary"]["allowed_to_execute_values"] == [False]
+    assert report["summary"]["dry_run_only_values"] == [True]
+    assert report["summary"]["execution_unlock_supported_values"] == [False]
+    assert report["summary"]["device_connection_allowed_values"] == [False]
+    assert report["summary"]["ssh_allowed_values"] == [False]
+    assert report["summary"]["live_command_allowed_values"] == [False]
+    assert report["safety_invariants"]["allowed_to_execute_always_false"] is True
+    assert report["safety_invariants"]["dry_run_only_always_true"] is True
+    assert report["safety_invariants"]["execution_unlock_supported_always_false"] is True
+    assert report["safety_invariants"]["device_connection_allowed_always_false"] is True
+    assert report["safety_invariants"]["ssh_allowed_always_false"] is True
+    assert report["safety_invariants"]["live_command_allowed_always_false"] is True
+    assert report["safety_invariants"]["mapped_task_executed"] is False
+    assert report["safety_invariants"]["device_access_used"] is False
+    assert all(item["allowed_to_execute"] is False for item in report["broker_records"])
+    assert all(item["dry_run_only"] is True for item in report["broker_records"])
+    assert all(
+        item["execution_unlock_supported"] is False
+        for item in report["broker_records"]
+    )
+    assert all(item["ssh_allowed"] is False for item in report["broker_records"])
+    assert all(item["live_command_allowed"] is False for item in report["broker_records"])
+    assert any(
+        item["broker_status"] == "MOCK_EXECUTION_REQUEST_PREPARED"
+        and isinstance(item["mock_execution_request"], dict)
+        for item in report["broker_records"]
+    )
+    assert "Day80 Read-only Execution Broker Skeleton" in html
+    assert "MOCK_EXECUTION_REQUEST_PREPARED" in html
+    assert "Live command allowed values" in html
