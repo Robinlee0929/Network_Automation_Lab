@@ -188,7 +188,17 @@ def test_ai_review_checklist_contains_wireguard_vpn_safety_items():
 def test_ai_intent_reviewer_references_day57_to_day62():
     references = dashboard.ai_intent_reviewer_references()
 
-    assert [item.day for item in references] == ["Day57", "Day58", "Day59", "Day60", "Day62", "Day66", "Day67", "Day68"]
+    assert [item.day for item in references] == [
+        "Day57",
+        "Day58",
+        "Day59",
+        "Day60",
+        "Day62",
+        "Day66",
+        "Day67",
+        "Day68",
+        "Day69",
+    ]
     text = " ".join(
         f"{item.title} {item.summary} {item.doc_path} {item.roadmap_path} "
         f"{' '.join(item.report_paths)}"
@@ -214,6 +224,9 @@ def test_ai_intent_reviewer_references_day57_to_day62():
     assert "docs/ai/intent_offline_mock_runtime_reviewer_report_quality.md" in text
     assert "docs/roadmap/day68_offline_mock_runtime_reviewer_report_quality.md" in text
     assert "reports/lab-summary/day68_offline_mock_runtime_reviewer_report_quality.html" in text
+    assert "Reviewer dashboard evidence drilldown" in text
+    assert "docs/ai/intent_offline_mock_runtime_reviewer_dashboard_evidence_drilldown.md" in text
+    assert "docs/roadmap/day69_offline_mock_runtime_reviewer_dashboard_evidence_drilldown.md" in text
 
 
 def test_ai_intent_reviewer_safety_boundaries_are_report_only():
@@ -230,6 +243,30 @@ def test_ai_intent_reviewer_safety_boundaries_are_report_only():
     assert "Day66 mock runtime output is fixed offline evidence only" in text
     assert "Day67 validates contract and safety invariants" in text
     assert "Day68 reviews report quality and evidence traceability" in text
+    assert "Day69 presents reviewer evidence drilldown only" in text
+
+
+def test_day69_reviewer_evidence_drilldown_is_static_and_complete():
+    chain = dashboard.day69_evidence_chain()
+    scenarios = dashboard.day69_scenario_evidence_drilldown()
+
+    assert [item.day for item in chain] == ["Day66", "Day67", "Day68", "Day69"]
+    assert chain[1].status == "PASS"
+    assert chain[2].status == "REVIEW_READY"
+    assert chain[3].status == "STATIC_REVIEW_READY"
+
+    categories = {scenario.safety_category for scenario in scenarios}
+    assert {
+        "documentation_only",
+        "report_only",
+        "blocked_live_action",
+        "needs_manual_review",
+    }.issubset(categories)
+    assert all(scenario.contract_status == "PASS" for scenario in scenarios)
+    assert all(scenario.review_quality_status == "REVIEW_READY" for scenario in scenarios)
+    assert all("Day66 mock_scenarios" in scenario.evidence_source for scenario in scenarios)
+    assert all("No API" in scenario.safety_note for scenario in scenarios)
+    assert all("reports/lab-summary/day68_offline_mock_runtime_reviewer_report_quality.json" in scenario.report_paths for scenario in scenarios)
 
 
 def day12_report(private_key_line="PrivateKey = REDACTED"):
@@ -434,12 +471,15 @@ def test_ai_intent_reviewer_route_exposes_day57_to_day65_without_execution(tmp_p
     assert "Day66" in text
     assert "Day67" in text
     assert "Day68" in text
+    assert "Day69" in text
     assert "Day63 Traceability Evidence Map" in text
     assert "Day64 Reviewer Acceptance Runbook" in text
     assert "Day65 Acceptance Sign-off Package" in text
     assert "Day66 Offline Mock Runtime Skeleton" in text
     assert "Day67 - Offline Mock Runtime Contract &amp; Safety Invariant Validation" in text
     assert "Day68 - Reviewer Report Quality &amp; Evidence Trace Review" in text
+    assert "Day69 Reviewer Evidence Drilldown" in text
+    assert "Evidence chain: Day66 Offline Mock Runtime &rarr; Day67 Contract Validation / Safety Invariants &rarr; Day68 Reviewer Report Quality &rarr; Day69 Dashboard Evidence Drilldown" in text
     assert "docs/ai/day57_intent_mapping_prototype.md" in text
     assert "reports/portfolio/day60_intent_workflow_demo.html" in text
     assert "docs/ai/intent_reviewer_scenario_pack.md" in text
@@ -473,6 +513,24 @@ def test_ai_intent_reviewer_route_exposes_day57_to_day65_without_execution(tmp_p
     assert "reports/portfolio/day67_offline_mock_runtime_contract.html" in text
     assert "docs/ai/intent_offline_mock_runtime_reviewer_report_quality.md" in text
     assert "reports/lab-summary/day68_offline_mock_runtime_reviewer_report_quality.html" in text
+    assert "docs/ai/intent_offline_mock_runtime_reviewer_dashboard_evidence_drilldown.md" in text
+    assert "docs/roadmap/day69_offline_mock_runtime_reviewer_dashboard_evidence_drilldown.md" in text
+    assert "Scenario Evidence Drilldown" in text
+    assert "documentation_only" in text
+    assert "report_only" in text
+    assert "blocked_live_action" in text
+    assert "needs_manual_review" in text
+    assert "Decision: allowed_documentation_only" in text
+    assert "Decision: allowed_report_only" in text
+    assert "Decision: blocked" in text
+    assert "Decision: manual_review_required" in text
+    assert "Contract: PASS" in text
+    assert "Review quality: REVIEW_READY" in text
+    assert "Day66 mock_scenarios -&gt; Day67 contract validator -&gt; Day68 scenario_reviews" in text
+    assert "Day69 is static/read-only/report-only" in text
+    assert "reports/portfolio/day66_offline_mock_runtime_skeleton.json" in text
+    assert "reports/portfolio/day67_offline_mock_runtime_contract.json" in text
+    assert "reports/lab-summary/day68_offline_mock_runtime_reviewer_report_quality.json" in text
     assert "reviewer-visible report quality" in text
     assert "contract validation proof" in text
     assert "no-device/network-change evidence" in text
@@ -484,6 +542,7 @@ def test_ai_intent_reviewer_route_exposes_day57_to_day65_without_execution(tmp_p
     assert "No config.json requirement" in text
     assert "No automatic execution of mapped tasks from scenario examples" in text
     assert "Day66 mock runtime output is fixed offline evidence only" in text
+    assert "Day69 presents reviewer evidence drilldown only" in text
     assert "No mapped task was executed. This is a dry-run reviewer walkthrough only." in text
     html = text.lower()
     assert "<form" not in html
@@ -498,6 +557,7 @@ def test_ai_intent_reviewer_route_exposes_day57_to_day65_without_execution(tmp_p
     assert "action runner" not in html
     assert "task runner endpoint" not in html
     assert "start task runner" not in html
+    assert "openai api key" not in html
 
 
 def test_dashboard_reports_route_exposes_vrrp_evidence_group(tmp_path):
