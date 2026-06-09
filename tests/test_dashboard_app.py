@@ -99,6 +99,35 @@ def test_dashboard_evidence_handles_sample_json_and_html_reports(tmp_path):
     assert day4.html_view_path == "reports/Hex-s-2025-lab01/day4_baseline_validation.html"
 
 
+def test_dashboard_evidence_surfaces_day88_design_report(tmp_path):
+    reports_dir = tmp_path / "reports"
+    write_json(
+        reports_dir / "lab-summary" / "day88_real_readonly_executor_adapter_design.json",
+        {
+            "overall_status": "PASS",
+            "phase_state": "DESIGN_ONLY",
+            "execution_supported": False,
+            "dashboard_execute_button_supported": False,
+        },
+    )
+    (reports_dir / "lab-summary" / "day88_real_readonly_executor_adapter_design.html").write_text(
+        "<html>Day88 design-only report</html>",
+        encoding="utf-8",
+    )
+
+    entries = dashboard.collect_dashboard_evidence(tmp_path, reports_dir)
+
+    day88 = next(entry for entry in entries if entry.day == "Day88")
+    assert day88.title == "Real Read-only Executor Adapter Design Draft"
+    assert day88.status == "PASS"
+    assert day88.json_view_path == "reports/lab-summary/day88_real_readonly_executor_adapter_design.json"
+    assert day88.html_view_path == "reports/lab-summary/day88_real_readonly_executor_adapter_design.html"
+    day88_text = f"{day88.title} {day88.description} {day88.notes}".lower()
+    assert "ssh_supported=false" in day88_text
+    assert "routeros_connection_supported=false" in day88_text
+    assert "live_command_supported=false" in day88_text
+
+
 def test_dashboard_evidence_missing_html_does_not_crash(tmp_path):
     reports_dir = tmp_path / "reports"
     write_json(
@@ -216,6 +245,7 @@ def test_ai_intent_reviewer_references_day57_to_day85():
         "Day85",
         "Day86",
         "Day87",
+        "Day88",
     ]
     text = " ".join(
         f"{item.title} {item.summary} {item.doc_path} {item.roadmap_path} "
@@ -238,6 +268,10 @@ def test_ai_intent_reviewer_references_day57_to_day85():
     assert "docs/ai/intent_offline_mock_runtime_contract.md" in text
     assert "docs/roadmap/day67_offline_mock_runtime_contract_safety_invariants.md" in text
     assert "reports/portfolio/day67_offline_mock_runtime_contract.html" in text
+    assert "Real Read-only Executor Adapter Design Draft" in text
+    assert "docs/ai/intent_real_readonly_executor_adapter_design.md" in text
+    assert "docs/roadmap/day88_real_readonly_executor_adapter_design.md" in text
+    assert "reports/lab-summary/day88_real_readonly_executor_adapter_design.html" in text
     assert "Reviewer report quality and evidence trace" in text
     assert "docs/ai/intent_offline_mock_runtime_reviewer_report_quality.md" in text
     assert "docs/roadmap/day68_offline_mock_runtime_reviewer_report_quality.md" in text
@@ -919,6 +953,9 @@ def test_ai_intent_reviewer_route_exposes_day57_to_day82_without_execution(tmp_p
     assert "Day87 is a phase gate review" in text
     assert "Day87 keeps execution_allowed false, ssh_allowed false, live_command_allowed false, write_command_allowed false" in text
     assert "Day88 remains design-only" in text
+    assert "Day88 is the Real Read-only Executor Adapter Design Draft only" in text
+    assert "Day88 keeps execution_supported false, ssh_supported false, routeros_connection_supported false, live_command_supported false" in text
+    assert "Day88 hands off to Day89 Real Adapter Safety Boundary Spec" in text
     assert "No mapped task was executed. This is a dry-run reviewer walkthrough only." in text
     html = text.lower()
     assert "<form" not in html

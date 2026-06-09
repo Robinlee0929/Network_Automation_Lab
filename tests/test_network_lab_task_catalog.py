@@ -31,6 +31,7 @@ def test_runner_task_catalog_uses_consistent_day23_safety_labels():
         "guarded-live",
         "read-only",
         "report-only",
+        "design-only",
         "disabled",
         "controlled_failover_observation",
     }
@@ -39,6 +40,7 @@ def test_runner_task_catalog_uses_consistent_day23_safety_labels():
         "guarded-live",
         "read-only",
         "report-only",
+        "design-only",
         "disabled",
         "controlled_failover_observation",
     }
