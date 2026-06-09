@@ -43,6 +43,10 @@ from intent_readonly_executor_adapter_contract import (
     build_readonly_executor_adapter_contract_report,
     write_readonly_executor_adapter_contract_reports,
 )
+from intent_mock_adapter_evidence_binding import (
+    build_mock_adapter_evidence_binding_report,
+    write_mock_adapter_evidence_binding_reports,
+)
 from intent_runtime_safety_case import build_runtime_safety_case_report
 from intent_runtime_safety_gate import build_runtime_safety_gate_report
 
@@ -232,6 +236,19 @@ DAY84_READONLY_EXECUTOR_ADAPTER_CONTRACT_JSON = (
 )
 DAY84_READONLY_EXECUTOR_ADAPTER_CONTRACT_HTML = (
     Path("reports") / "lab-summary" / "day84_readonly_executor_adapter_contract.html"
+)
+DAY85_MOCK_ADAPTER_EVIDENCE_BINDING_TASK_ID = "mock-adapter-evidence-binding"
+DAY85_MOCK_ADAPTER_EVIDENCE_BINDING_DOC = (
+    Path("docs") / "ai" / "intent_mock_adapter_evidence_binding.md"
+)
+DAY85_MOCK_ADAPTER_EVIDENCE_BINDING_ROADMAP = (
+    Path("docs") / "roadmap" / "day85_mock_adapter_evidence_binding.md"
+)
+DAY85_MOCK_ADAPTER_EVIDENCE_BINDING_JSON = (
+    Path("reports") / "lab-summary" / "day85_mock_adapter_evidence_binding.json"
+)
+DAY85_MOCK_ADAPTER_EVIDENCE_BINDING_HTML = (
+    Path("reports") / "lab-summary" / "day85_mock_adapter_evidence_binding.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -948,6 +965,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY84_READONLY_EXECUTOR_ADAPTER_CONTRACT_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day85",
+        "title": "Mock Adapter + Evidence Binding",
+        "report_type": "Mock adapter evidence binding",
+        "safety_label": "deterministic mock-only evidence-bound adapter fixture",
+        "description": "Day85 binds deterministic mock adapter responses to Day84 contract references and reviewer evidence while preserving no SSH, no device access, no live command execution, no AI API, no approval/execution unlock, and no dashboard action endpoint. Compatibility Matrix remains internal validation evidence only.",
+        "json_globs": [DAY85_MOCK_ADAPTER_EVIDENCE_BINDING_JSON.as_posix()],
+        "html_globs": [DAY85_MOCK_ADAPTER_EVIDENCE_BINDING_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY85_MOCK_ADAPTER_EVIDENCE_BINDING_TASK_ID}"
         ),
     },
 ]
@@ -2879,6 +2909,35 @@ def list_tasks() -> List[Dict[str, Any]]:
             "related_script": "network_lab.py",
             "notes": "Deterministic contract-only adapter boundary. It defines future request, response, capability, evidence, safety flag, and validation result shapes only; it is not an executor or adapter implementation and does not call APIs, use AI SDKs, execute mapped tasks, run live tests, open SSH, read config.json, connect to devices, add dashboard forms, POST routes, action endpoints, approval unlocks, execution unlocks, arbitrary command execution, or modify network/device configuration.",
         },
+        {
+            "id": DAY85_MOCK_ADAPTER_EVIDENCE_BINDING_TASK_ID,
+            "task_id": "day85_mock_adapter_evidence_binding",
+            "display_name": "Day85 Mock Adapter + Evidence Binding",
+            "user_display_name": "Mock Adapter + Evidence Binding",
+            "day": "Day85",
+            "category": "ai_planning",
+            "description": "Creates deterministic mock adapter fixtures that conform to the Day84 adapter interface contract and binds every response to reviewer evidence.",
+            "safety_level": "dry-run",
+            "execution_mode": "dry-run",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY85_MOCK_ADAPTER_EVIDENCE_BINDING_JSON.as_posix(),
+                DAY85_MOCK_ADAPTER_EVIDENCE_BINDING_HTML.as_posix(),
+                DAY85_MOCK_ADAPTER_EVIDENCE_BINDING_DOC.as_posix(),
+                DAY85_MOCK_ADAPTER_EVIDENCE_BINDING_ROADMAP.as_posix(),
+            ],
+            "report_outputs": [
+                "Day85 JSON/HTML mock adapter evidence binding",
+                "Day85 mock-only adapter fixture documentation",
+                "Compatibility Matrix internal validation evidence",
+            ],
+            "related_script": "network_lab.py",
+            "notes": "Deterministic mock-only evidence-bound adapter fixture. It conforms to the Day84 contract, binds every mock response to request, adapter, contract, evidence, and reviewer decision fields, and keeps Compatibility Matrix as internal validation only; it is not a standalone topic and does not call APIs, use AI SDKs, execute mapped tasks, run live tests, open SSH, read config.json, connect to devices, add dashboard forms, POST routes, action endpoints, approval unlocks, execution unlocks, arbitrary command execution, or modify network/device configuration.",
+        },
     ]
 
 
@@ -2996,6 +3055,7 @@ wireguard-runner is dry-run by default and delegates to the existing WireGuard s
             DAY82_REVIEWER_DECISION_AUDIT_TASK_ID,
             DAY83_READONLY_EXECUTOR_READINESS_GATE_TASK_ID,
             DAY84_READONLY_EXECUTOR_ADAPTER_CONTRACT_TASK_ID,
+            DAY85_MOCK_ADAPTER_EVIDENCE_BINDING_TASK_ID,
             WIREGUARD_RUNNER_TASK_ALIAS,
         ],
         help="Task to run.",
@@ -5281,6 +5341,48 @@ def _run_day84_readonly_executor_adapter_contract(project_root: Path) -> int:
         return 0
 
     print(f"{format_status('FAIL')} Day84 read-only executor adapter contract invariants failed.")
+    return 1
+
+
+def _run_day85_mock_adapter_evidence_binding(project_root: Path) -> int:
+    report = build_mock_adapter_evidence_binding_report()
+    json_path, html_path = write_mock_adapter_evidence_binding_reports(project_root, report)
+    summary = report["traceability_summary"]
+    flags = report["safety_invariants"]
+
+    def flag(name: str) -> str:
+        return json.dumps(flags[name])
+
+    print(format_heading("Day85 Mock Adapter + Evidence Binding"))
+    print("Task name: mock-adapter-evidence-binding")
+    print("Safety: deterministic mock-only adapter fixture; evidence-bound and non-executing")
+    print(f"Result: {report['overall_status']} / {report['review_status']}")
+    print(f"Final recommendation: {report['final_recommendation']}")
+    print(f"Adapter records: {summary['adapter_record_count']}")
+    print(f"Evidence bindings: {summary['evidence_binding_count']}")
+    print(f"Compatible adapters: {summary['compatible_adapter_count']}")
+    print(f"Blocked adapters: {summary['blocked_adapter_count']}")
+    print("Compatibility Matrix: internal Day85/Day86 validation only")
+    print(f"Allowed to execute: {flag('allowed_to_execute')}")
+    print(f"SSH allowed: {flag('ssh_allowed')}")
+    print(f"Device access allowed: {flag('device_access_allowed')}")
+    print(f"Live command allowed: {flag('live_command_allowed')}")
+    print(f"Approval unlock supported: {flag('approval_unlock_supported')}")
+    print(f"Execution unlock supported: {flag('execution_unlock_supported')}")
+    print(f"AI API allowed: {flag('ai_api_allowed')}")
+    print(f"JSON report: {_relative_to_project(project_root, json_path)}")
+    print(f"HTML report: {_relative_to_project(project_root, html_path)}")
+
+    if report["overall_status"] == "PASS" and report["review_status"] == "REVIEW_READY":
+        print(
+            f"{format_status('PASS')} REVIEW_READY. Mock adapter evidence binding "
+            "is review-only; Compatibility Matrix stayed internal validation, "
+            "and no SSH, device, live command, AI API, approval unlock, or "
+            "execution unlock path was added."
+        )
+        return 0
+
+    print(f"{format_status('FAIL')} Day85 mock adapter evidence binding invariants failed.")
     return 1
 
 
@@ -7644,6 +7746,8 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
         return _run_day83_readonly_executor_readiness_gate(root)
     if args.task == DAY84_READONLY_EXECUTOR_ADAPTER_CONTRACT_TASK_ID:
         return _run_day84_readonly_executor_adapter_contract(root)
+    if args.task == DAY85_MOCK_ADAPTER_EVIDENCE_BINDING_TASK_ID:
+        return _run_day85_mock_adapter_evidence_binding(root)
 
     profile_path = _resolve_project_path(root, args.profile)
     try:

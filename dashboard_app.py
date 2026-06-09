@@ -988,6 +988,51 @@ def ai_intent_reviewer_references() -> List[AIIntentReviewerReference]:
                 "reports/lab-summary/day82_reviewer_decision_audit_summary.html",
             ),
         ),
+        AIIntentReviewerReference(
+            day="Day83",
+            title="Read-only executor readiness gate",
+            summary=(
+                "Validates the Day79-Day82 evidence chain as future adapter design "
+                "readiness only, while preserving no executor, SSH, device access, "
+                "AI runtime, mapped task, dashboard action, or unlock path."
+            ),
+            doc_path="docs/ai/readonly_executor_readiness_gate.md",
+            roadmap_path="docs/roadmap/day83_readonly_executor_readiness_gate.md",
+            report_paths=(
+                "reports/lab-summary/day83_readonly_executor_readiness_gate.json",
+                "reports/lab-summary/day83_readonly_executor_readiness_gate.html",
+            ),
+        ),
+        AIIntentReviewerReference(
+            day="Day84",
+            title="Read-only executor adapter interface contract",
+            summary=(
+                "Defines future adapter request, response, capability, evidence, "
+                "safety flag, and validation shapes as a contract-only boundary."
+            ),
+            doc_path="docs/ai/intent_readonly_executor_adapter_contract.md",
+            roadmap_path="docs/roadmap/day84_readonly_executor_adapter_interface_contract.md",
+            report_paths=(
+                "reports/lab-summary/day84_readonly_executor_adapter_contract.json",
+                "reports/lab-summary/day84_readonly_executor_adapter_contract.html",
+            ),
+        ),
+        AIIntentReviewerReference(
+            day="Day85",
+            title="Mock Adapter + Evidence Binding",
+            summary=(
+                "Builds deterministic mock adapter fixtures that conform to Day84 "
+                "and bind every response to request, adapter, contract, evidence, "
+                "and reviewer decision fields; Compatibility Matrix stays internal "
+                "validation only."
+            ),
+            doc_path="docs/ai/intent_mock_adapter_evidence_binding.md",
+            roadmap_path="docs/roadmap/day85_mock_adapter_evidence_binding.md",
+            report_paths=(
+                "reports/lab-summary/day85_mock_adapter_evidence_binding.json",
+                "reports/lab-summary/day85_mock_adapter_evidence_binding.html",
+            ),
+        ),
     ]
 
 
@@ -1209,6 +1254,10 @@ def ai_intent_safety_boundaries() -> List[str]:
         "Day82 summarizes Day81 queue decisions into reviewer audit evidence exports only; it is review-only, mock/deterministic, dry-run-only, report-only, and has no execution unlock.",
         "Day82 keeps allowed_to_execute false, dry_run_only true, execution_unlock_supported false, device_connection_allowed false, ssh_allowed false, live_command_allowed false, network_change_allowed false, ai_runtime_allowed false, and dashboard_action_allowed false.",
         "Day82 adds no OpenAI API, AI SDK runtime, real AI runtime, voice, SSH, device access, live execution, live command execution, mapped task execution, dashboard form, POST route, action endpoint, approval unlock, execution control, or network configuration change.",
+        "Day83 marks future read-only executor adapter design readiness only; it adds no executor, AI runtime, SSH, device access, live execution, mapped task execution, dashboard action, approval unlock, or execution unlock.",
+        "Day84 defines the read-only executor adapter interface contract only; it adds no adapter implementation, executor implementation, SSH, device access, live command execution, AI API, approval unlock, execution unlock, dashboard form, POST route, or action endpoint.",
+        "Day85 remains Mock Adapter + Evidence Binding; Compatibility Matrix is internal validation evidence only and not a standalone topic.",
+        "Day85 keeps every adapter record non-executing with allowed_to_execute false, ssh_allowed false, device_access_allowed false, live_command_allowed false, approval_unlock_supported false, execution_unlock_supported false, and ai_api_allowed false.",
     ]
 
 

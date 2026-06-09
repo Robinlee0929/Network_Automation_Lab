@@ -3883,3 +3883,95 @@ def test_day84_readonly_executor_adapter_contract_runner_outputs_reports_without
     assert "<form" not in html.lower()
     assert "<button" not in html.lower()
     assert "<script" not in html.lower()
+
+
+def test_day85_mock_adapter_evidence_binding_task_exists_in_catalog():
+    task = next(
+        task for task in network_lab.list_tasks() if task["id"] == "mock-adapter-evidence-binding"
+    )
+
+    assert task["task_id"] == "day85_mock_adapter_evidence_binding"
+    assert task["day"] == "Day85"
+    assert task["display_name"] == "Day85 Mock Adapter + Evidence Binding"
+    assert task["safety_level"] == "dry-run"
+    assert task["execution_mode"] == "dry-run"
+    assert task["requires_live_device"] is False
+    assert task["requires_password"] is False
+    assert task["produces_report"] is True
+    assert "reports/lab-summary/day85_mock_adapter_evidence_binding.json" in task["report_paths"]
+    assert "reports/lab-summary/day85_mock_adapter_evidence_binding.html" in task["report_paths"]
+    assert "docs/ai/intent_mock_adapter_evidence_binding.md" in task["report_paths"]
+    assert "docs/roadmap/day85_mock_adapter_evidence_binding.md" in task["report_paths"]
+    assert "Mock Adapter + Evidence Binding" in task["display_name"]
+    assert "Compatibility Matrix as internal validation only" in task["notes"]
+    assert "not a standalone topic" in task["notes"]
+
+
+def test_day85_mock_adapter_evidence_binding_runner_outputs_reports_without_live_access(
+    tmp_path, monkeypatch, capsys
+):
+    def fail_run(*_args, **_kwargs):
+        raise AssertionError("Day85 mock adapter evidence binding must not execute subprocess")
+
+    def fail_profile_load(*_args, **_kwargs):
+        raise AssertionError("Day85 mock adapter evidence binding must not load profile or config data")
+
+    monkeypatch.setattr(network_lab.subprocess, "run", fail_run)
+    monkeypatch.setattr(network_lab, "load_lab_runner_profile", fail_profile_load)
+
+    exit_code = network_lab.main(
+        ["--task", "mock-adapter-evidence-binding"], project_root=tmp_path
+    )
+
+    output = capsys.readouterr().out
+    json_path = tmp_path / "reports/lab-summary/day85_mock_adapter_evidence_binding.json"
+    html_path = tmp_path / "reports/lab-summary/day85_mock_adapter_evidence_binding.html"
+    assert exit_code == 0
+    assert "Day85 Mock Adapter + Evidence Binding" in output
+    assert "Task name: mock-adapter-evidence-binding" in output
+    assert "Result: PASS / REVIEW_READY" in output
+    assert "Final recommendation: REVIEW_ONLY" in output
+    assert "Adapter records: 7" in output
+    assert "Evidence bindings: 7" in output
+    assert "Compatible adapters: 3" in output
+    assert "Blocked adapters: 4" in output
+    assert "Compatibility Matrix: internal Day85/Day86 validation only" in output
+    assert "Allowed to execute: false" in output
+    assert "SSH allowed: false" in output
+    assert "Device access allowed: false" in output
+    assert "Live command allowed: false" in output
+    assert "Approval unlock supported: false" in output
+    assert "Execution unlock supported: false" in output
+    assert "AI API allowed: false" in output
+    assert "JSON report: reports/lab-summary/day85_mock_adapter_evidence_binding.json" in output
+    assert "HTML report: reports/lab-summary/day85_mock_adapter_evidence_binding.html" in output
+    assert "[PASS] REVIEW_READY. Mock adapter evidence binding is review-only" in output
+    assert json_path.exists()
+    assert html_path.exists()
+    assert not (tmp_path / "config.json").exists()
+
+    report = json.loads(json_path.read_text(encoding="utf-8"))
+    html = html_path.read_text(encoding="utf-8")
+    assert report["day"] == "Day85"
+    assert report["title"] == "Day85 Mock Adapter + Evidence Binding"
+    assert report["overall_status"] == "PASS"
+    assert report["review_status"] == "REVIEW_READY"
+    assert report["final_recommendation"] == "REVIEW_ONLY"
+    assert report["traceability_summary"]["adapter_record_count"] == 7
+    assert report["traceability_summary"]["compatible_adapter_count"] == 3
+    assert report["traceability_summary"]["blocked_adapter_count"] == 4
+    assert report["safety_invariants"]["compatibility_matrix_is_internal_validation"] is True
+    assert report["safety_invariants"]["compatibility_matrix_is_standalone_topic"] is False
+    assert report["safety_invariants"]["allowed_to_execute"] is False
+    assert report["safety_invariants"]["ssh_allowed"] is False
+    assert report["safety_invariants"]["device_access_allowed"] is False
+    assert report["safety_invariants"]["live_command_allowed"] is False
+    assert report["safety_invariants"]["approval_unlock_supported"] is False
+    assert report["safety_invariants"]["execution_unlock_supported"] is False
+    assert report["safety_invariants"]["ai_api_allowed"] is False
+    assert "Day85 Mock Adapter + Evidence Binding" in html
+    assert "Compatibility Matrix Internal Validation" in html
+    assert "not a standalone Day85 topic" in html
+    assert "<form" not in html.lower()
+    assert "<button" not in html.lower()
+    assert "<script" not in html.lower()

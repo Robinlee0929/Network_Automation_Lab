@@ -185,7 +185,7 @@ def test_ai_review_checklist_contains_wireguard_vpn_safety_items():
     assert "shell=False" in text
 
 
-def test_ai_intent_reviewer_references_day57_to_day82():
+def test_ai_intent_reviewer_references_day57_to_day85():
     references = dashboard.ai_intent_reviewer_references()
 
     assert [item.day for item in references] == [
@@ -211,6 +211,9 @@ def test_ai_intent_reviewer_references_day57_to_day82():
         "Day80",
         "Day81",
         "Day82",
+        "Day83",
+        "Day84",
+        "Day85",
     ]
     text = " ".join(
         f"{item.title} {item.summary} {item.doc_path} {item.roadmap_path} "
@@ -289,6 +292,19 @@ def test_ai_intent_reviewer_references_day57_to_day82():
     assert "docs/ai/intent_reviewer_decision_audit_summary.md" in text
     assert "docs/roadmap/day82_reviewer_decision_audit_summary.md" in text
     assert "reports/lab-summary/day82_reviewer_decision_audit_summary.html" in text
+    assert "Read-only executor readiness gate" in text
+    assert "docs/ai/readonly_executor_readiness_gate.md" in text
+    assert "docs/roadmap/day83_readonly_executor_readiness_gate.md" in text
+    assert "reports/lab-summary/day83_readonly_executor_readiness_gate.html" in text
+    assert "Read-only executor adapter interface contract" in text
+    assert "docs/ai/intent_readonly_executor_adapter_contract.md" in text
+    assert "docs/roadmap/day84_readonly_executor_adapter_interface_contract.md" in text
+    assert "reports/lab-summary/day84_readonly_executor_adapter_contract.html" in text
+    assert "Mock Adapter + Evidence Binding" in text
+    assert "Compatibility Matrix stays internal validation only" in text
+    assert "docs/ai/intent_mock_adapter_evidence_binding.md" in text
+    assert "docs/roadmap/day85_mock_adapter_evidence_binding.md" in text
+    assert "reports/lab-summary/day85_mock_adapter_evidence_binding.html" in text
 
 
 def test_ai_intent_reviewer_safety_boundaries_are_report_only():
@@ -888,6 +904,11 @@ def test_ai_intent_reviewer_route_exposes_day57_to_day82_without_execution(tmp_p
     assert "Day82 summarizes Day81 queue decisions into reviewer audit evidence exports only" in text
     assert "Day82 keeps allowed_to_execute false, dry_run_only true, execution_unlock_supported false, device_connection_allowed false, ssh_allowed false, live_command_allowed false, network_change_allowed false, ai_runtime_allowed false, and dashboard_action_allowed false" in text
     assert "Day82 adds no OpenAI API, AI SDK runtime, real AI runtime, voice, SSH, device access, live execution, live command execution, mapped task execution, dashboard form, POST route, action endpoint, approval unlock, execution control, or network configuration change" in text
+    assert "Day83 marks future read-only executor adapter design readiness only" in text
+    assert "Day84 defines the read-only executor adapter interface contract only" in text
+    assert "Day85 remains Mock Adapter + Evidence Binding" in text
+    assert "Compatibility Matrix is internal validation evidence only" in text
+    assert "Day85 keeps every adapter record non-executing" in text
     assert "No mapped task was executed. This is a dry-run reviewer walkthrough only." in text
     html = text.lower()
     assert "<form" not in html
