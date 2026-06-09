@@ -4224,3 +4224,92 @@ def test_day88_real_readonly_executor_adapter_design_runner_outputs_reports_with
     assert "<form" not in html.lower()
     assert "<button" not in html.lower()
     assert "method=\"post\"" not in html.lower()
+
+
+def test_day89_real_adapter_safety_boundary_spec_task_exists_in_catalog():
+    task = next(
+        task for task in network_lab.list_tasks() if task["id"] == "real-adapter-safety-boundary-spec"
+    )
+
+    assert task["task_id"] == "day89_real_adapter_safety_boundary_spec"
+    assert task["day"] == "Day89"
+    assert task["display_name"] == "Day89 Real Adapter Safety Boundary Spec"
+    assert task["safety_level"] == "design-only"
+    assert task["execution_mode"] == "design-only"
+    assert task["requires_live_device"] is False
+    assert task["requires_password"] is False
+    assert task["produces_report"] is True
+    assert "reports/lab-summary/day89_real_adapter_safety_boundary_spec.json" in task["report_paths"]
+    assert "reports/lab-summary/day89_real_adapter_safety_boundary_spec.html" in task["report_paths"]
+    assert "docs/ai/real_adapter_safety_boundary_spec.md" in task["report_paths"]
+    assert "docs/roadmap/day89_real_adapter_safety_boundary_spec.md" in task["report_paths"]
+    assert "implementation_allowed remains false" in task["notes"]
+    assert "live_device_access_allowed remains false" in task["notes"]
+    assert "ssh_allowed remains false" in task["notes"]
+
+
+def test_day89_real_adapter_safety_boundary_spec_runner_writes_reports(
+    tmp_path, capsys, monkeypatch
+):
+    def fail_run(*_args, **_kwargs):
+        raise AssertionError("Day89 boundary spec must not execute subprocess")
+
+    def fail_profile_load(*_args, **_kwargs):
+        raise AssertionError("Day89 boundary spec must not load profile or config data")
+
+    monkeypatch.setattr(network_lab.subprocess, "run", fail_run)
+    monkeypatch.setattr(network_lab, "load_lab_runner_profile", fail_profile_load)
+
+    exit_code = network_lab.main(
+        ["--task", "real-adapter-safety-boundary-spec"], project_root=tmp_path
+    )
+
+    output = capsys.readouterr().out
+    json_path = tmp_path / "reports/lab-summary/day89_real_adapter_safety_boundary_spec.json"
+    html_path = tmp_path / "reports/lab-summary/day89_real_adapter_safety_boundary_spec.html"
+    assert exit_code == 0
+    assert "Day89 Real Adapter Safety Boundary Spec" in output
+    assert "Task name: real-adapter-safety-boundary-spec" in output
+    assert "Result: PASS / DESIGN_ONLY" in output
+    assert "safety_boundary_locked=True" in output
+    assert "implementation_allowed=False" in output
+    assert "live_device_access_allowed=False" in output
+    assert "SSH allowed: false" in output
+    assert "Config change allowed: false" in output
+    assert "Command execution allowed: false" in output
+    assert "Reviewer decision required: true" in output
+    assert "JSON report: reports/lab-summary/day89_real_adapter_safety_boundary_spec.json" in output
+    assert "HTML report: reports/lab-summary/day89_real_adapter_safety_boundary_spec.html" in output
+    assert "[PASS] DESIGN_ONLY. Day89 locks the safety boundary" in output
+    assert json_path.exists()
+    assert html_path.exists()
+    assert not (tmp_path / "config.json").exists()
+
+    report = json.loads(json_path.read_text(encoding="utf-8"))
+    html = html_path.read_text(encoding="utf-8")
+    assert report["day"] == 89
+    assert report["phase"] == "DESIGN_ONLY"
+    assert report["status"] == "PASS"
+    assert report["implementation_allowed"] is False
+    assert report["live_device_access_allowed"] is False
+    assert report["ssh_allowed"] is False
+    assert report["safety_boundary_locked"] is True
+    assert "configuration changes" in {item["capability"] for item in report["blocked_capabilities"]}
+    assert "Real Adapter Safety Boundary Spec" in html
+    assert "<form" not in html.lower()
+    assert "<button" not in html.lower()
+    assert "method=\"post\"" not in html.lower()
+
+
+def test_day89_report_index_visibility_includes_boundary_spec(tmp_path, capsys):
+    assert network_lab.main(["--task", "real-adapter-safety-boundary-spec"], project_root=tmp_path) == 0
+
+    exit_code = network_lab.main(["--report-index"], project_root=tmp_path)
+
+    index_html = tmp_path / "reports/report_index.html"
+    assert exit_code == 0
+    assert index_html.exists()
+    html = index_html.read_text(encoding="utf-8")
+    assert "Real Adapter Safety Boundary Spec" in html
+    assert "reports/lab-summary/day89_real_adapter_safety_boundary_spec.json" in html
+    assert "reports/lab-summary/day89_real_adapter_safety_boundary_spec.html" in html

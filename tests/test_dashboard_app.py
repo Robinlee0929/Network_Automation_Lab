@@ -128,6 +128,38 @@ def test_dashboard_evidence_surfaces_day88_design_report(tmp_path):
     assert "live_command_supported=false" in day88_text
 
 
+def test_dashboard_evidence_surfaces_day89_safety_boundary_report(tmp_path):
+    reports_dir = tmp_path / "reports"
+    write_json(
+        reports_dir / "lab-summary" / "day89_real_adapter_safety_boundary_spec.json",
+        {
+            "status": "PASS",
+            "phase": "DESIGN_ONLY",
+            "implementation_allowed": False,
+            "live_device_access_allowed": False,
+            "ssh_allowed": False,
+            "safety_boundary_locked": True,
+        },
+    )
+    (reports_dir / "lab-summary" / "day89_real_adapter_safety_boundary_spec.html").write_text(
+        "<html>Day89 boundary report</html>",
+        encoding="utf-8",
+    )
+
+    entries = dashboard.collect_dashboard_evidence(tmp_path, reports_dir)
+
+    day89 = next(entry for entry in entries if entry.day == "Day89")
+    assert day89.title == "Real Adapter Safety Boundary Spec"
+    assert day89.status == "PASS"
+    assert day89.json_view_path == "reports/lab-summary/day89_real_adapter_safety_boundary_spec.json"
+    assert day89.html_view_path == "reports/lab-summary/day89_real_adapter_safety_boundary_spec.html"
+    day89_text = f"{day89.title} {day89.description} {day89.notes}".lower()
+    assert "implementation_allowed=false" in day89_text
+    assert "live_device_access_allowed=false" in day89_text
+    assert "ssh_allowed=false" in day89_text
+    assert "safety_boundary_locked=true" in day89_text
+
+
 def test_dashboard_evidence_missing_html_does_not_crash(tmp_path):
     reports_dir = tmp_path / "reports"
     write_json(
@@ -246,6 +278,7 @@ def test_ai_intent_reviewer_references_day57_to_day85():
         "Day86",
         "Day87",
         "Day88",
+        "Day89",
     ]
     text = " ".join(
         f"{item.title} {item.summary} {item.doc_path} {item.roadmap_path} "
@@ -272,6 +305,10 @@ def test_ai_intent_reviewer_references_day57_to_day85():
     assert "docs/ai/intent_real_readonly_executor_adapter_design.md" in text
     assert "docs/roadmap/day88_real_readonly_executor_adapter_design.md" in text
     assert "reports/lab-summary/day88_real_readonly_executor_adapter_design.html" in text
+    assert "Real Adapter Safety Boundary Spec" in text
+    assert "docs/ai/real_adapter_safety_boundary_spec.md" in text
+    assert "docs/roadmap/day89_real_adapter_safety_boundary_spec.md" in text
+    assert "reports/lab-summary/day89_real_adapter_safety_boundary_spec.html" in text
     assert "Reviewer report quality and evidence trace" in text
     assert "docs/ai/intent_offline_mock_runtime_reviewer_report_quality.md" in text
     assert "docs/roadmap/day68_offline_mock_runtime_reviewer_report_quality.md" in text
@@ -956,6 +993,9 @@ def test_ai_intent_reviewer_route_exposes_day57_to_day82_without_execution(tmp_p
     assert "Day88 is the Real Read-only Executor Adapter Design Draft only" in text
     assert "Day88 keeps execution_supported false, ssh_supported false, routeros_connection_supported false, live_command_supported false" in text
     assert "Day88 hands off to Day89 Real Adapter Safety Boundary Spec" in text
+    assert "Day89 is a pre-implementation safety boundary lock" in text
+    assert "Day89 keeps implementation_allowed false, live_device_access_allowed false, ssh_allowed false, config_change_allowed false, command_execution_allowed false" in text
+    assert "Day89 allows only static spec loading" in text
     assert "No mapped task was executed. This is a dry-run reviewer walkthrough only." in text
     html = text.lower()
     assert "<form" not in html
