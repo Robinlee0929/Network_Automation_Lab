@@ -193,7 +193,7 @@
   </nav>
 
   <h1>AI Intent Reviewer Entry Point</h1>
-  <p>Reviewer-friendly dashboard view for the Day57-Day80 AI intent workflow. It explains the demo path, links to the committed docs, scenario pack, traceability map, acceptance runbook, sign-off package, offline mock runtime skeleton, contract validation layer, reviewer quality trace, Day69 evidence drilldown, Day70 AI runtime readiness gate, Day71 controlled entry design, Day72 input contract validator, Day73 mock AI decision pipeline, Day74 dry-run plan builder, Day75 manual review approval envelope, Day76 controlled runtime audit trail, Day77 runtime safety gate, Day78 controlled runtime safety case, Day79 read-only task contract, and Day80 read-only broker skeleton while keeping the no-execution boundary visible.</p>
+  <p>Reviewer-friendly dashboard view for the Day57-Day82 AI intent workflow. It explains the demo path, links to the committed docs, scenario pack, traceability map, acceptance runbook, sign-off package, offline mock runtime skeleton, contract validation layer, reviewer quality trace, Day69 evidence drilldown, Day70 AI runtime readiness gate, Day71 controlled entry design, Day72 input contract validator, Day73 mock AI decision pipeline, Day74 dry-run plan builder, Day75 manual review approval envelope, Day76 controlled runtime audit trail, Day77 runtime safety gate, Day78 controlled runtime safety case, Day79 read-only task contract, Day80 read-only broker skeleton, Day81 broker review queue, and Day82 reviewer decision audit summary while keeping the no-execution boundary visible.</p>
   <div class="note">This page is report-only. It does not call an AI model, listen to voice input, execute mapped tasks, open SSH, connect to devices, or change network configuration.</div>
 
   <section>
@@ -209,7 +209,7 @@
       </article>
       <article class="summary-card">
         <h3>Reviewer Evidence</h3>
-        <p>Day57-Day80 docs and optional generated JSON/HTML reports show how the workflow makes allowed and blocked decisions visible.</p>
+        <p>Day57-Day82 docs and optional generated JSON/HTML reports show how the workflow makes allowed and blocked decisions visible.</p>
       </article>
       <article class="summary-card">
         <h3>No Runtime Execution</h3>
@@ -219,7 +219,7 @@
   </section>
 
   <section>
-    <h2>Day57-Day80 Review Path</h2>
+    <h2>Day57-Day82 Review Path</h2>
     <div class="day-grid">
       {% for item in references %}
       <article class="day-card">
@@ -269,6 +269,8 @@
       <li>Read Day76 to review the deterministic audit trail that links Day73 decisions, Day74 plans, and Day75 approval envelopes into evidence packages without unlocking execution.</li>
       <li>Read Day79 to review the read-only task contract and allowlist before any broker-shaped request handling is considered.</li>
       <li>Read Day80 to review the deterministic broker skeleton that rejects unsafe requests, queues review-only requests, or prepares mock execution request data without executing anything.</li>
+      <li>Read Day81 to review the deterministic broker review queue and decision states produced from Day80 records without executing anything.</li>
+      <li>Read Day82 to review the deterministic reviewer decision audit summary and queue evidence export produced from Day81 records without executing anything.</li>
       <li>Use <a href="{{ url_for('reports') }}">Reports</a> for generated local evidence when available.</li>
     </ol>
     <div class="safe">Expected Day60 statement: <code>No mapped task was executed. This is a dry-run reviewer walkthrough only.</code></div>
@@ -789,6 +791,56 @@
       </ul>
     </div>
     <div class="safe">Day80 is deterministic, mock-only, dry-run-only, and static from this dashboard. It adds no SSH, no device access, no live command execution, no execution unlock, and no dashboard action surface.</div>
+  </section>
+
+  <section>
+    <h2>Day81 Read-only Broker Review Queue &amp; Decision State Report</h2>
+    <p>Day81 transforms Day80 broker records into reviewer-facing queue records with stable review states and decision states. It is a queue evidence layer only, not an execution broker.</p>
+    <ul>
+      <li><code>REJECTED_BY_BROKER</code>, <code>QUEUED_FOR_HUMAN_REVIEW</code>, <code>MOCK_EXECUTION_REQUEST_PREPARED</code>, <code>REVIEW_BLOCKED_BY_POLICY</code>, and <code>REVIEW_READY_NO_EXECUTION</code> are reviewer labels only.</li>
+      <li><code>allowed_to_execute</code> remains <code>false</code> for every queue record.</li>
+      <li><code>dry_run_only</code> remains <code>true</code> for every queue record.</li>
+      <li><code>execution_unlock_supported</code>, <code>device_connection_allowed</code>, <code>ssh_allowed</code>, <code>live_command_allowed</code>, <code>mapped_task_execution_allowed</code>, and <code>dashboard_action_allowed</code> remain <code>false</code>.</li>
+    </ul>
+    <div class="refs">
+      <a href="{{ evidence_url('docs/ai/intent_broker_review_queue.md') }}">Open Day81 AI doc</a>
+      <a href="{{ evidence_url('docs/roadmap/day81_broker_review_queue.md') }}">Open Day81 roadmap</a>
+      <a href="{{ evidence_url('reports/lab-summary/day81_broker_review_queue.json') }}">Open Day81 JSON report</a>
+      <a href="{{ evidence_url('reports/lab-summary/day81_broker_review_queue.html') }}">Open Day81 HTML report</a>
+    </div>
+    <div class="paths">
+      <strong>Generated broker review queue reports:</strong>
+      <ul>
+        <li><code>reports/lab-summary/day81_broker_review_queue.json</code></li>
+        <li><code>reports/lab-summary/day81_broker_review_queue.html</code></li>
+      </ul>
+    </div>
+    <div class="safe">Day81 is review-only, mock/deterministic, dry-run-only, and static from this dashboard. It adds no live execution, no SSH/device access, no OpenAI API or AI SDK runtime, no dashboard form, no POST route, and no dashboard action endpoint.</div>
+  </section>
+
+  <section>
+    <h2>Day82 Reviewer Decision Audit Summary / Queue Evidence Export</h2>
+    <p>Day82 summarizes Day81 broker review queue decisions and exports reviewer audit evidence. It does not create another queue, approve decisions, or add any execution surface.</p>
+    <ul>
+      <li>Day82 links the chain from Day79 read-only task contract to Day80 broker skeleton, Day81 review queue, and Day82 audit evidence export.</li>
+      <li><code>allowed_to_execute</code> remains <code>false</code> for every evidence export.</li>
+      <li><code>dry_run_only</code> remains <code>true</code> for every evidence export.</li>
+      <li><code>execution_unlock_supported</code>, <code>device_connection_allowed</code>, <code>ssh_allowed</code>, <code>live_command_allowed</code>, <code>network_change_allowed</code>, <code>ai_runtime_allowed</code>, and <code>dashboard_action_allowed</code> remain <code>false</code>.</li>
+    </ul>
+    <div class="refs">
+      <a href="{{ evidence_url('docs/ai/intent_reviewer_decision_audit_summary.md') }}">Open Day82 AI doc</a>
+      <a href="{{ evidence_url('docs/roadmap/day82_reviewer_decision_audit_summary.md') }}">Open Day82 roadmap</a>
+      <a href="{{ evidence_url('reports/lab-summary/day82_reviewer_decision_audit_summary.json') }}">Open Day82 JSON report</a>
+      <a href="{{ evidence_url('reports/lab-summary/day82_reviewer_decision_audit_summary.html') }}">Open Day82 HTML report</a>
+    </div>
+    <div class="paths">
+      <strong>Generated reviewer audit summary reports:</strong>
+      <ul>
+        <li><code>reports/lab-summary/day82_reviewer_decision_audit_summary.json</code></li>
+        <li><code>reports/lab-summary/day82_reviewer_decision_audit_summary.html</code></li>
+      </ul>
+    </div>
+    <div class="safe">Day82 is review-only, mock/deterministic, dry-run-only, and static from this dashboard. It adds no live execution, no SSH/device access, no OpenAI API or AI SDK runtime, no dashboard form, no POST route, and no dashboard action endpoint.</div>
   </section>
 
   <section>
