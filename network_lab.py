@@ -39,6 +39,10 @@ from intent_readonly_executor_readiness_gate import (
     build_readonly_executor_readiness_gate_report,
     write_readonly_executor_readiness_gate_reports,
 )
+from intent_readonly_executor_adapter_contract import (
+    build_readonly_executor_adapter_contract_report,
+    write_readonly_executor_adapter_contract_reports,
+)
 from intent_runtime_safety_case import build_runtime_safety_case_report
 from intent_runtime_safety_gate import build_runtime_safety_gate_report
 
@@ -215,6 +219,19 @@ DAY83_READONLY_EXECUTOR_READINESS_GATE_JSON = (
 )
 DAY83_READONLY_EXECUTOR_READINESS_GATE_HTML = (
     Path("reports") / "lab-summary" / "day83_readonly_executor_readiness_gate.html"
+)
+DAY84_READONLY_EXECUTOR_ADAPTER_CONTRACT_TASK_ID = "readonly-executor-adapter-contract"
+DAY84_READONLY_EXECUTOR_ADAPTER_CONTRACT_DOC = (
+    Path("docs") / "ai" / "intent_readonly_executor_adapter_contract.md"
+)
+DAY84_READONLY_EXECUTOR_ADAPTER_CONTRACT_ROADMAP = (
+    Path("docs") / "roadmap" / "day84_readonly_executor_adapter_interface_contract.md"
+)
+DAY84_READONLY_EXECUTOR_ADAPTER_CONTRACT_JSON = (
+    Path("reports") / "lab-summary" / "day84_readonly_executor_adapter_contract.json"
+)
+DAY84_READONLY_EXECUTOR_ADAPTER_CONTRACT_HTML = (
+    Path("reports") / "lab-summary" / "day84_readonly_executor_adapter_contract.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -918,6 +935,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY83_READONLY_EXECUTOR_READINESS_GATE_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day84",
+        "title": "Read-only Executor Adapter Interface Contract",
+        "report_type": "Read-only executor adapter interface contract",
+        "safety_label": "deterministic contract-only adapter boundary",
+        "description": "Day84 defines future read-only executor adapter request, response, capability, evidence, safety flag, and validation result shapes while preserving no executor implementation, no SSH, no device access, no live command execution, no AI API, no approval/execution unlock, and no dashboard action endpoint.",
+        "json_globs": [DAY84_READONLY_EXECUTOR_ADAPTER_CONTRACT_JSON.as_posix()],
+        "html_globs": [DAY84_READONLY_EXECUTOR_ADAPTER_CONTRACT_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY84_READONLY_EXECUTOR_ADAPTER_CONTRACT_TASK_ID}"
         ),
     },
 ]
@@ -2821,6 +2851,34 @@ def list_tasks() -> List[Dict[str, Any]]:
             "related_script": "network_lab.py",
             "notes": "Deterministic offline review-only readiness gate. It marks future adapter design candidacy only; it is not the read-only executor and does not call APIs, use AI SDKs, execute mapped tasks, run live tests, open SSH, read config.json, connect to devices, add dashboard forms, POST routes, action endpoints, approval unlocks, execution unlocks, arbitrary command execution, or modify network/device configuration.",
         },
+        {
+            "id": DAY84_READONLY_EXECUTOR_ADAPTER_CONTRACT_TASK_ID,
+            "task_id": "day84_readonly_executor_adapter_contract",
+            "display_name": "Day84 Read-only Executor Adapter Interface Contract",
+            "user_display_name": "Read-only Executor Adapter Interface Contract",
+            "day": "Day84",
+            "category": "ai_planning",
+            "description": "Defines the future read-only executor adapter input/output contract without implementing an executor or adapter.",
+            "safety_level": "dry-run",
+            "execution_mode": "dry-run",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY84_READONLY_EXECUTOR_ADAPTER_CONTRACT_JSON.as_posix(),
+                DAY84_READONLY_EXECUTOR_ADAPTER_CONTRACT_HTML.as_posix(),
+                DAY84_READONLY_EXECUTOR_ADAPTER_CONTRACT_DOC.as_posix(),
+                DAY84_READONLY_EXECUTOR_ADAPTER_CONTRACT_ROADMAP.as_posix(),
+            ],
+            "report_outputs": [
+                "Day84 JSON/HTML read-only executor adapter contract",
+                "Day84 contract-only adapter boundary documentation",
+            ],
+            "related_script": "network_lab.py",
+            "notes": "Deterministic contract-only adapter boundary. It defines future request, response, capability, evidence, safety flag, and validation result shapes only; it is not an executor or adapter implementation and does not call APIs, use AI SDKs, execute mapped tasks, run live tests, open SSH, read config.json, connect to devices, add dashboard forms, POST routes, action endpoints, approval unlocks, execution unlocks, arbitrary command execution, or modify network/device configuration.",
+        },
     ]
 
 
@@ -2888,6 +2946,7 @@ broker-review-queue transforms Day80 broker records into deterministic Day81 rev
 broker-review-queue-decision-state is a compatibility alias for broker-review-queue.
 reviewer-decision-audit-summary summarizes Day81 queue decisions into deterministic Day82 reviewer audit evidence without AI API, AI SDK runtime, SSH, device access, config.json, live execution, mapped task execution, execution unlocks, dashboard forms, POST routes, or action endpoints.
 readonly-executor-readiness-gate validates Day79-Day82 safety evidence as deterministic Day83 future-adapter candidate readiness only; it is not an executor and does not enable AI API, AI SDK runtime, SSH, device access, config.json, live execution, mapped task execution, approval/execution unlocks, dashboard forms, POST routes, or action endpoints.
+readonly-executor-adapter-contract defines deterministic Day84 future adapter request/response/capability/evidence/validation shapes only; it is not an executor or adapter implementation and does not enable AI API, SSH, device access, live execution, mapped task execution, approval/execution unlocks, dashboard forms, POST routes, or action endpoints.
 wireguard-runner is dry-run by default and delegates to the existing WireGuard script only after explicit --allow-live-wireguard."""
     parser = argparse.ArgumentParser(
         description=f"Day14 {DAY14_NAME}.",
@@ -2936,6 +2995,7 @@ wireguard-runner is dry-run by default and delegates to the existing WireGuard s
             DAY81_BROKER_REVIEW_QUEUE_DECISION_STATE_TASK_ALIAS,
             DAY82_REVIEWER_DECISION_AUDIT_TASK_ID,
             DAY83_READONLY_EXECUTOR_READINESS_GATE_TASK_ID,
+            DAY84_READONLY_EXECUTOR_ADAPTER_CONTRACT_TASK_ID,
             WIREGUARD_RUNNER_TASK_ALIAS,
         ],
         help="Task to run.",
@@ -5178,6 +5238,49 @@ def _run_day83_readonly_executor_readiness_gate(project_root: Path) -> int:
         return 0
 
     print(f"{format_status('FAIL')} Day83 read-only executor readiness gate invariants failed.")
+    return 1
+
+
+def _run_day84_readonly_executor_adapter_contract(project_root: Path) -> int:
+    report = build_readonly_executor_adapter_contract_report()
+    json_path, html_path = write_readonly_executor_adapter_contract_reports(project_root, report)
+    summary = report["summary"]
+
+    def flag(name: str) -> str:
+        return json.dumps(report["adapter_safety_flags"][name])
+
+    print(format_heading("Day84 Read-only Executor Adapter Interface Contract"))
+    print("Task name: readonly-executor-adapter-contract")
+    print("Safety: deterministic contract-only adapter boundary; this is not an executor")
+    print(f"Result: {report['overall_status']} / {report['reviewer_status']}")
+    print(f"Contract state: {report['contract_state']}")
+    print(f"Request shapes: {summary['request_shape_count']}")
+    print(f"Response shapes: {summary['response_shape_count']}")
+    print(f"Capability declarations: {summary['capability_declaration_count']}")
+    print(f"Evidence references: {summary['evidence_reference_count']}")
+    print(f"Read-only only: {flag('read_only_only')}")
+    print(f"Dry-run only: {flag('dry_run_only')}")
+    print(f"Allowed to execute: {flag('allowed_to_execute')}")
+    print(f"SSH allowed: {flag('ssh_allowed')}")
+    print(f"Device access allowed: {flag('device_access_allowed')}")
+    print(f"Live command allowed: {flag('live_command_allowed')}")
+    print(f"Approval unlock supported: {flag('approval_unlock_supported')}")
+    print(f"Execution unlock supported: {flag('execution_unlock_supported')}")
+    print(f"AI API allowed: {flag('ai_api_allowed')}")
+    print(f"Adapter implementation present: {flag('adapter_implementation_present')}")
+    print(f"JSON report: {_relative_to_project(project_root, json_path)}")
+    print(f"HTML report: {_relative_to_project(project_root, html_path)}")
+
+    if report["overall_status"] == "PASS" and report["reviewer_status"] == "REVIEW_READY":
+        print(
+            f"{format_status('PASS')} REVIEW_READY. Read-only executor adapter "
+            "contract is locked as review-only; no executor implementation, SSH, "
+            "device access, live command, AI API, approval unlock, or execution "
+            "unlock was added."
+        )
+        return 0
+
+    print(f"{format_status('FAIL')} Day84 read-only executor adapter contract invariants failed.")
     return 1
 
 
@@ -7539,6 +7642,8 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
         return _run_day82_reviewer_decision_audit_summary(root)
     if args.task == DAY83_READONLY_EXECUTOR_READINESS_GATE_TASK_ID:
         return _run_day83_readonly_executor_readiness_gate(root)
+    if args.task == DAY84_READONLY_EXECUTOR_ADAPTER_CONTRACT_TASK_ID:
+        return _run_day84_readonly_executor_adapter_contract(root)
 
     profile_path = _resolve_project_path(root, args.profile)
     try:
