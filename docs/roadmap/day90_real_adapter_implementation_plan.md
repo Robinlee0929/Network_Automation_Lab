@@ -36,7 +36,11 @@ implementation-entry decision. It is `planning_only`.
 
 ## Day91 Roadmap
 
-Day91 may enter prototype only if Day90 produces an approving decision and the
-prototype remains minimal and read-only. Any future live-read path must require
-an explicit allow flag, bounded command allowlist, timeout, evidence logging,
-redaction, fail-closed behavior, and no configuration mutation.
+Day91 must be Real Adapter Safety Scaffold only. Day90 produced
+`CONDITIONAL_GO`, not `GO`, so Day91 must prove dangerous actions are denied
+before any read-only behavior is considered.
+
+Day91 may list future read-only candidates only as `NOT_EXECUTABLE`,
+`PENDING_GUARD`, and `FUTURE_ONLY`. Live-read remains blocked until later days
+prove executable guards, fake transport, runner dry-run wiring, regression
+locks, and live-read review.

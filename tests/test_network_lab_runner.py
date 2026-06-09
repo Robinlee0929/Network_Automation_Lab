@@ -4402,3 +4402,95 @@ def test_day90_report_index_visibility_includes_implementation_plan(tmp_path, ca
     assert "Real Adapter Implementation Plan" in html
     assert "reports/lab-summary/day90_real_adapter_implementation_plan.json" in html
     assert "reports/lab-summary/day90_real_adapter_implementation_plan.html" in html
+
+
+def test_day91_real_adapter_safety_scaffold_task_exists_in_catalog():
+    task = next(
+        task for task in network_lab.list_tasks() if task["id"] == "real-adapter-safety-scaffold"
+    )
+
+    assert task["task_id"] == "day91_real_adapter_safety_scaffold"
+    assert task["day"] == "Day91"
+    assert task["display_name"] == "Day91 Real Adapter Safety Scaffold"
+    assert task["safety_level"] == "scaffold-only"
+    assert task["execution_mode"] == "scaffold-only"
+    assert task["requires_live_device"] is False
+    assert task["requires_password"] is False
+    assert task["produces_report"] is True
+    assert "reports/lab-summary/day91_real_adapter_safety_scaffold.json" in task["report_paths"]
+    assert "reports/lab-summary/day91_real_adapter_safety_scaffold.html" in task["report_paths"]
+    assert "docs/ai/intent_real_adapter_safety_scaffold.md" in task["report_paths"]
+    assert "docs/roadmap/day91_real_adapter_safety_scaffold.md" in task["report_paths"]
+    assert "CONDITIONAL_GO only" in task["notes"]
+    assert "live_read_allowed false" in task["notes"]
+    assert "real_device_contact_allowed false" in task["notes"]
+
+
+def test_day91_real_adapter_safety_scaffold_runner_writes_reports_without_live_access(
+    tmp_path, capsys, monkeypatch
+):
+    def fail_run(*_args, **_kwargs):
+        raise AssertionError("Day91 safety scaffold must not execute subprocess")
+
+    def fail_profile_load(*_args, **_kwargs):
+        raise AssertionError("Day91 safety scaffold must not load profile or config data")
+
+    monkeypatch.setattr(network_lab.subprocess, "run", fail_run)
+    monkeypatch.setattr(network_lab, "load_lab_runner_profile", fail_profile_load)
+
+    exit_code = network_lab.main(
+        ["--task", "real-adapter-safety-scaffold"], project_root=tmp_path
+    )
+
+    output = capsys.readouterr().out
+    json_path = tmp_path / "reports/lab-summary/day91_real_adapter_safety_scaffold.json"
+    html_path = tmp_path / "reports/lab-summary/day91_real_adapter_safety_scaffold.html"
+    assert exit_code == 0
+    assert "Day91 Real Adapter Safety Scaffold" in output
+    assert "Task name: real-adapter-safety-scaffold" in output
+    assert "Result: PASS / SCAFFOLD_ONLY" in output
+    assert "Day90 gate: CONDITIONAL_GO only" in output
+    assert "Dangerous actions denied:" in output
+    assert "Read-only candidates future-only:" in output
+    assert "live_read_allowed: false" in output
+    assert "write_allowed: false" in output
+    assert "raw_command_allowed: false" in output
+    assert "credential_required: false" in output
+    assert "transport_required: false" in output
+    assert "real_device_contact_allowed: false" in output
+    assert "Next required days: Day92, Day93, Day94, Day95, Day96" in output
+    assert "JSON report: reports/lab-summary/day91_real_adapter_safety_scaffold.json" in output
+    assert "HTML report: reports/lab-summary/day91_real_adapter_safety_scaffold.html" in output
+    assert "[PASS] SCAFFOLD_ONLY. Day91 denied dangerous actions" in output
+    assert json_path.exists()
+    assert html_path.exists()
+    assert not (tmp_path / "config.json").exists()
+
+    report = json.loads(json_path.read_text(encoding="utf-8"))
+    html = html_path.read_text(encoding="utf-8")
+    assert report["overall_decision"] == "PASS"
+    assert report["status"] == "SCAFFOLD_ONLY"
+    assert report["day90_gate"]["decision"] == "CONDITIONAL_GO"
+    assert all(item["decision"] == "DENY" for item in report["dangerous_actions"])
+    assert all(item["scope_state"] == "FUTURE_ONLY" for item in report["read_only_candidates"])
+    assert report["invariants"]["live_read_allowed"] is False
+    assert report["invariants"]["credential_required"] is False
+    assert "Real Adapter Safety Scaffold" in html
+    assert "<form" not in html.lower()
+    assert "<button" not in html.lower()
+    assert "method=\"post\"" not in html.lower()
+
+
+def test_day91_report_index_visibility_includes_safety_scaffold(tmp_path, capsys):
+    assert network_lab.main(["--task", "real-adapter-safety-scaffold"], project_root=tmp_path) == 0
+
+    exit_code = network_lab.main(["--report-index"], project_root=tmp_path)
+
+    index_html = tmp_path / "reports/report_index.html"
+    assert exit_code == 0
+    assert index_html.exists()
+    html = index_html.read_text(encoding="utf-8")
+    assert "Real Adapter Safety Scaffold" in html
+    assert "scaffold-only" in html
+    assert "reports/lab-summary/day91_real_adapter_safety_scaffold.json" in html
+    assert "reports/lab-summary/day91_real_adapter_safety_scaffold.html" in html

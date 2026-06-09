@@ -42,23 +42,19 @@ FORBIDDEN_SCOPE = (
 )
 
 MINIMUM_SAFE_REAL_ADAPTER_SCOPE = (
-    "minimal read-only prototype only after a later explicit Day91 gate",
-    "explicit allow flag required before any future live-read path",
-    "bounded positive command allowlist",
-    "short timeout with fail-closed handling",
-    "reviewer-visible evidence logging",
-    "redaction or digest-only output handling",
+    "Day91 safety scaffold only after Day90 CONDITIONAL_GO",
+    "dangerous actions denied before any future read-only proof",
+    "future read-only candidates marked not executable pending later guards",
+    "no live-read path until Day96 review conditions are satisfied",
     "no configuration mutation",
 )
 
 REQUIRED_NEXT_PHASE_CONTROLS = (
-    "Keep the first future implementation phase to a minimal read-only prototype.",
-    "Require an explicit allow flag before any future live-read request can cross the boundary.",
-    "Validate every future command against a bounded positive allowlist before adapter entry.",
-    "Apply a bounded timeout and fail closed on timeout or adapter error.",
-    "Log reviewer-visible evidence for every future live-read attempt.",
-    "Reject or redact secret-bearing output before storage.",
-    "Keep configuration mutation and automatic apply paths blocked.",
+    "Day91 must prove dangerous actions are denied before any read-only behavior is considered.",
+    "Day91 must mark future read-only candidates as not executable pending later guards.",
+    "Day91 must keep live-read, credentials, transport, SSH, RouterOS API, sockets, and subprocess device operations blocked.",
+    "Day92 must add executable guards before any fake transport or runner wiring.",
+    "Day93-Day96 must prove fake transport, dry-run wiring, regression locks, and live-read review before live-read can be considered.",
 )
 
 IMPLEMENTATION_ENTRY_CRITERIA = (
@@ -67,7 +63,7 @@ IMPLEMENTATION_ENTRY_CRITERIA = (
     "Day90 report keeps live_device_access_allowed=false.",
     "Day90 report keeps ssh_allowed=false.",
     "Day90 report keeps routeros_command_execution_allowed=false.",
-    "Day91 scope is limited to a minimal read-only prototype with hard safety guards.",
+    "Day91 scope is limited to a scaffold-only safety proof; executable guards begin no earlier than Day92.",
 )
 
 
@@ -289,7 +285,7 @@ def decide_day90(non_go_blockers: List[Dict[str, Any]]) -> Tuple[str, str, str]:
         "READY_WITH_CONDITIONS",
         (
             "Required design and safety evidence exists, but Day90 remains planning-only; "
-            "Day91 may enter only a minimal read-only prototype path with explicit hard guards."
+            "Day91 may enter only a scaffold-only safety proof that denies dangerous actions first."
         ),
     )
 
@@ -297,7 +293,7 @@ def decide_day90(non_go_blockers: List[Dict[str, Any]]) -> Tuple[str, str, str]:
 def build_conditional_go_requirements(non_go_blockers: List[Dict[str, Any]]) -> List[str]:
     if non_go_blockers:
         return [
-            "Resolve every non_go_blocker before requesting Day91 prototype entry.",
+            "Resolve every non_go_blocker before requesting Day91 scaffold entry.",
             "Regenerate Day90 after missing critical evidence is restored.",
         ]
     return list(REQUIRED_NEXT_PHASE_CONTROLS)
@@ -359,8 +355,8 @@ def build_real_adapter_implementation_plan_report(project_root: Path = Path(".")
             "Do not enter Day91 implementation; restore missing critical evidence first."
             if decision == "NO_GO"
             else (
-                "Day91 may be positioned as a minimal read-only prototype only, with explicit "
-                "allow flag, bounded allowlist, timeout, evidence logging, redaction, and no mutation."
+                "Day91 must be positioned as Real Adapter Safety Scaffold only: prove dangerous "
+                "actions are denied, list read-only candidates as future-only, and keep live-read blocked."
             )
         ),
         "reports": {
@@ -435,7 +431,7 @@ def write_real_adapter_implementation_plan_html(report: Dict[str, Any], output_p
   <ul>{_html_list([blocker['reason'] + ' ' + ', '.join(blocker['missing_required']) for blocker in report['non_go_blockers']] or ['none'])}</ul>
   <h2>Required Controls Before Implementation</h2>
   <ul>{_html_list(report['required_next_phase_controls'])}</ul>
-  <h2>Minimum Safe Real Adapter Scope</h2>
+  <h2>Minimum Safe Next Scope</h2>
   <ul>{_html_list(report['minimum_safe_real_adapter_scope'])}</ul>
   <h2>Forbidden Actions</h2>
   <ul>{_html_list(report['explicitly_forbidden_scope'])}</ul>
