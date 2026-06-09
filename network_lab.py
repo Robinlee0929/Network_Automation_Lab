@@ -63,6 +63,10 @@ from intent_real_adapter_safety_boundary_spec import (
     build_real_adapter_safety_boundary_spec_report,
     write_real_adapter_safety_boundary_spec_reports,
 )
+from intent_real_adapter_implementation_plan import (
+    build_real_adapter_implementation_plan_report,
+    write_real_adapter_implementation_plan_reports,
+)
 from intent_runtime_safety_case import build_runtime_safety_case_report
 from intent_runtime_safety_gate import build_runtime_safety_gate_report
 
@@ -317,6 +321,19 @@ DAY89_REAL_ADAPTER_SAFETY_BOUNDARY_SPEC_JSON = (
 )
 DAY89_REAL_ADAPTER_SAFETY_BOUNDARY_SPEC_HTML = (
     Path("reports") / "lab-summary" / "day89_real_adapter_safety_boundary_spec.html"
+)
+DAY90_REAL_ADAPTER_IMPLEMENTATION_PLAN_TASK_ID = "real-adapter-implementation-plan"
+DAY90_REAL_ADAPTER_IMPLEMENTATION_PLAN_DOC = (
+    Path("docs") / "ai" / "intent_real_adapter_implementation_plan.md"
+)
+DAY90_REAL_ADAPTER_IMPLEMENTATION_PLAN_ROADMAP = (
+    Path("docs") / "roadmap" / "day90_real_adapter_implementation_plan.md"
+)
+DAY90_REAL_ADAPTER_IMPLEMENTATION_PLAN_JSON = (
+    Path("reports") / "lab-summary" / "day90_real_adapter_implementation_plan.json"
+)
+DAY90_REAL_ADAPTER_IMPLEMENTATION_PLAN_HTML = (
+    Path("reports") / "lab-summary" / "day90_real_adapter_implementation_plan.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -1098,6 +1115,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY89_REAL_ADAPTER_SAFETY_BOUNDARY_SPEC_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day90",
+        "title": "Real Adapter Implementation Plan",
+        "report_type": "Real adapter implementation-entry decision plan",
+        "safety_label": "deterministic planning-only decision; no adapter implementation",
+        "description": "Day90 decides GO, CONDITIONAL_GO, or NO_GO from repository evidence while keeping scope=planning_only, adapter_implementation_allowed=false, live_device_access_allowed=false, ssh_allowed=false, and routeros_command_execution_allowed=false.",
+        "json_globs": [DAY90_REAL_ADAPTER_IMPLEMENTATION_PLAN_JSON.as_posix()],
+        "html_globs": [DAY90_REAL_ADAPTER_IMPLEMENTATION_PLAN_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY90_REAL_ADAPTER_IMPLEMENTATION_PLAN_TASK_ID}"
         ),
     },
 ]
@@ -3170,6 +3200,34 @@ def list_tasks() -> List[Dict[str, Any]]:
             "related_script": "network_lab.py",
             "notes": "Deterministic design-only boundary lock. It allows only spec-level classification, allowlist metadata validation, evidence-only reporting, deterministic output, and no network side effects; implementation_allowed remains false, live_device_access_allowed remains false, ssh_allowed remains false, config_change_allowed remains false, command_execution_allowed remains false, and no SSH, RouterOS connection, live command, arbitrary executor, dashboard action, file upload, shell escape, or device change is added.",
         },
+        {
+            "id": DAY90_REAL_ADAPTER_IMPLEMENTATION_PLAN_TASK_ID,
+            "task_id": "day90_real_adapter_implementation_plan",
+            "display_name": "Day90 Real Adapter Implementation Plan",
+            "user_display_name": "Real Adapter Implementation Plan",
+            "day": "Day90",
+            "category": "ai_planning",
+            "description": "Decides whether repository evidence is ready for a later minimal real read-only adapter prototype.",
+            "safety_level": "planning-only",
+            "execution_mode": "planning-only",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY90_REAL_ADAPTER_IMPLEMENTATION_PLAN_JSON.as_posix(),
+                DAY90_REAL_ADAPTER_IMPLEMENTATION_PLAN_HTML.as_posix(),
+                DAY90_REAL_ADAPTER_IMPLEMENTATION_PLAN_DOC.as_posix(),
+                DAY90_REAL_ADAPTER_IMPLEMENTATION_PLAN_ROADMAP.as_posix(),
+            ],
+            "report_outputs": [
+                "Day90 JSON/HTML real adapter implementation-entry decision report",
+                "Day90 planning-only AI reviewer and roadmap documentation",
+            ],
+            "related_script": "network_lab.py",
+            "notes": "Deterministic planning-only decision. It may produce GO, CONDITIONAL_GO, or NO_GO from repository evidence, but scope remains planning_only; adapter_implementation_allowed remains false, live_device_access_allowed remains false, ssh_allowed remains false, routeros_command_execution_allowed remains false, and no SSH client, RouterOS command runner, real device credentials, adapter connection logic, automatic apply, dashboard action, subprocess, network command, or configuration mutation is added.",
+        },
     ]
 
 
@@ -3242,6 +3300,7 @@ controlled-runner-harness runs deterministic Day86 runner-level safety regressio
 readonly-executor-phase-gate-review reviews Day83-Day86 safety evidence as deterministic Day87 phase gate evidence only; it may recommend Day88 DESIGN_ONLY but does not design or implement a real adapter, execute mapped tasks, open SSH, connect devices, run live/write commands, call APIs, or add dashboard actions.
 readonly-executor-adapter-design defines deterministic Day88 real read-only executor adapter design contracts only; it remains DESIGN_ONLY, does not implement SSH or RouterOS connection, does not support live commands, and does not add dashboard actions.
 real-adapter-safety-boundary-spec locks the Day89 pre-implementation safety boundary for any future real adapter; it remains DESIGN_ONLY, does not implement SSH or RouterOS connection, does not execute commands, and does not add dashboard actions.
+real-adapter-implementation-plan produces the Day90 implementation-entry decision report; it remains PLANNING_ONLY and does not implement SSH, RouterOS commands, live adapter access, or automatic apply.
 wireguard-runner is dry-run by default and delegates to the existing WireGuard script only after explicit --allow-live-wireguard."""
     parser = argparse.ArgumentParser(
         description=f"Day14 {DAY14_NAME}.",
@@ -3296,6 +3355,7 @@ wireguard-runner is dry-run by default and delegates to the existing WireGuard s
             DAY87_READONLY_EXECUTOR_PHASE_GATE_REVIEW_TASK_ID,
             DAY88_REAL_READONLY_EXECUTOR_ADAPTER_DESIGN_TASK_ID,
             DAY89_REAL_ADAPTER_SAFETY_BOUNDARY_SPEC_TASK_ID,
+            DAY90_REAL_ADAPTER_IMPLEMENTATION_PLAN_TASK_ID,
             WIREGUARD_RUNNER_TASK_ALIAS,
         ],
         help="Task to run.",
@@ -5802,6 +5862,49 @@ def _run_day89_real_adapter_safety_boundary_spec(project_root: Path) -> int:
     return 1
 
 
+def _run_day90_real_adapter_implementation_plan(project_root: Path) -> int:
+    report = build_real_adapter_implementation_plan_report(project_root)
+    json_path, html_path = write_real_adapter_implementation_plan_reports(project_root, report)
+
+    def flag(name: str) -> str:
+        return json.dumps(report[name])
+
+    print(format_heading("Day90 Real Adapter Implementation Plan"))
+    print("Task name: real-adapter-implementation-plan")
+    print("Safety: deterministic planning-only decision; no real adapter implementation")
+    print("Scope: PLANNING_ONLY")
+    print(f"Result: {report['status']} / {report['readiness_level']}")
+    print(f"Decision: {report['decision']}")
+    print(f"Decision reason: {report['decision_reason']}")
+    print(f"Adapter implementation allowed: {flag('adapter_implementation_allowed')}")
+    print(f"Live device access allowed: {flag('live_device_access_allowed')}")
+    print(f"SSH allowed: {flag('ssh_allowed')}")
+    print(f"RouterOS command execution allowed: {flag('routeros_command_execution_allowed')}")
+    print(f"Non-GO blockers: {len(report['non_go_blockers'])}")
+    print(f"Evidence chain items: {len(report['evidence_chain'])}")
+    print(f"Recommended Day91 positioning: {report['recommended_day91_positioning']}")
+    print(f"JSON report: {_relative_to_project(project_root, json_path)}")
+    print(f"HTML report: {_relative_to_project(project_root, html_path)}")
+
+    if (
+        report["status"] == "PASS"
+        and report["scope"] == "planning_only"
+        and report["decision"] in {"GO", "CONDITIONAL_GO", "NO_GO"}
+        and report["adapter_implementation_allowed"] is False
+        and report["live_device_access_allowed"] is False
+        and report["ssh_allowed"] is False
+        and report["routeros_command_execution_allowed"] is False
+    ):
+        print(
+            f"{format_status('PASS')} PLANNING_ONLY. Day90 produced an "
+            "implementation-entry decision without live adapter behavior."
+        )
+        return 0
+
+    print(f"{format_status('FAIL')} Day90 real adapter implementation plan failed validation.")
+    return 1
+
+
 def _relative_to_project(project_root: Path, path: Path) -> str:
     try:
         return path.resolve().relative_to(project_root.resolve()).as_posix()
@@ -8172,6 +8275,8 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
         return _run_day88_real_readonly_executor_adapter_design(root)
     if args.task == DAY89_REAL_ADAPTER_SAFETY_BOUNDARY_SPEC_TASK_ID:
         return _run_day89_real_adapter_safety_boundary_spec(root)
+    if args.task == DAY90_REAL_ADAPTER_IMPLEMENTATION_PLAN_TASK_ID:
+        return _run_day90_real_adapter_implementation_plan(root)
 
     profile_path = _resolve_project_path(root, args.profile)
     try:

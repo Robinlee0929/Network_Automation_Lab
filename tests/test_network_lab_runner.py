@@ -4313,3 +4313,92 @@ def test_day89_report_index_visibility_includes_boundary_spec(tmp_path, capsys):
     assert "Real Adapter Safety Boundary Spec" in html
     assert "reports/lab-summary/day89_real_adapter_safety_boundary_spec.json" in html
     assert "reports/lab-summary/day89_real_adapter_safety_boundary_spec.html" in html
+
+
+def test_day90_real_adapter_implementation_plan_task_exists_in_catalog():
+    task = next(
+        task for task in network_lab.list_tasks() if task["id"] == "real-adapter-implementation-plan"
+    )
+
+    assert task["task_id"] == "day90_real_adapter_implementation_plan"
+    assert task["day"] == "Day90"
+    assert task["display_name"] == "Day90 Real Adapter Implementation Plan"
+    assert task["safety_level"] == "planning-only"
+    assert task["execution_mode"] == "planning-only"
+    assert task["requires_live_device"] is False
+    assert task["requires_password"] is False
+    assert task["produces_report"] is True
+    assert "reports/lab-summary/day90_real_adapter_implementation_plan.json" in task["report_paths"]
+    assert "reports/lab-summary/day90_real_adapter_implementation_plan.html" in task["report_paths"]
+    assert "docs/ai/intent_real_adapter_implementation_plan.md" in task["report_paths"]
+    assert "docs/roadmap/day90_real_adapter_implementation_plan.md" in task["report_paths"]
+    assert "adapter_implementation_allowed remains false" in task["notes"]
+    assert "live_device_access_allowed remains false" in task["notes"]
+    assert "routeros_command_execution_allowed remains false" in task["notes"]
+
+
+def test_day90_real_adapter_implementation_plan_runner_writes_reports_without_live_access(
+    tmp_path, capsys, monkeypatch
+):
+    def fail_run(*_args, **_kwargs):
+        raise AssertionError("Day90 implementation plan must not execute subprocess")
+
+    def fail_profile_load(*_args, **_kwargs):
+        raise AssertionError("Day90 implementation plan must not load profile or config data")
+
+    monkeypatch.setattr(network_lab.subprocess, "run", fail_run)
+    monkeypatch.setattr(network_lab, "load_lab_runner_profile", fail_profile_load)
+
+    exit_code = network_lab.main(
+        ["--task", "real-adapter-implementation-plan"], project_root=tmp_path
+    )
+
+    output = capsys.readouterr().out
+    json_path = tmp_path / "reports/lab-summary/day90_real_adapter_implementation_plan.json"
+    html_path = tmp_path / "reports/lab-summary/day90_real_adapter_implementation_plan.html"
+    assert exit_code == 0
+    assert "Day90 Real Adapter Implementation Plan" in output
+    assert "Task name: real-adapter-implementation-plan" in output
+    assert "Scope: PLANNING_ONLY" in output
+    assert "Decision: NO_GO" in output
+    assert "Adapter implementation allowed: false" in output
+    assert "Live device access allowed: false" in output
+    assert "SSH allowed: false" in output
+    assert "RouterOS command execution allowed: false" in output
+    assert "JSON report: reports/lab-summary/day90_real_adapter_implementation_plan.json" in output
+    assert "HTML report: reports/lab-summary/day90_real_adapter_implementation_plan.html" in output
+    assert "[PASS] PLANNING_ONLY. Day90 produced an implementation-entry decision" in output
+    assert json_path.exists()
+    assert html_path.exists()
+    assert not (tmp_path / "config.json").exists()
+
+    report = json.loads(json_path.read_text(encoding="utf-8"))
+    html = html_path.read_text(encoding="utf-8")
+    assert report["day"] == 90
+    assert report["scope"] == "planning_only"
+    assert report["decision"] in {"GO", "CONDITIONAL_GO", "NO_GO"}
+    assert report["decision"] != "GO"
+    assert report["adapter_implementation_allowed"] is False
+    assert report["live_device_access_allowed"] is False
+    assert report["ssh_allowed"] is False
+    assert report["routeros_command_execution_allowed"] is False
+    assert report["evidence_chain"]
+    assert "configuration mutation" in report["explicitly_forbidden_scope"]
+    assert "Real Adapter Implementation Plan" in html
+    assert "<form" not in html.lower()
+    assert "<button" not in html.lower()
+    assert "method=\"post\"" not in html.lower()
+
+
+def test_day90_report_index_visibility_includes_implementation_plan(tmp_path, capsys):
+    assert network_lab.main(["--task", "real-adapter-implementation-plan"], project_root=tmp_path) == 0
+
+    exit_code = network_lab.main(["--report-index"], project_root=tmp_path)
+
+    index_html = tmp_path / "reports/report_index.html"
+    assert exit_code == 0
+    assert index_html.exists()
+    html = index_html.read_text(encoding="utf-8")
+    assert "Real Adapter Implementation Plan" in html
+    assert "reports/lab-summary/day90_real_adapter_implementation_plan.json" in html
+    assert "reports/lab-summary/day90_real_adapter_implementation_plan.html" in html

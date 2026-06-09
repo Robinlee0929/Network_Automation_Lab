@@ -160,6 +160,39 @@ def test_dashboard_evidence_surfaces_day89_safety_boundary_report(tmp_path):
     assert "safety_boundary_locked=true" in day89_text
 
 
+def test_dashboard_evidence_surfaces_day90_implementation_plan_report(tmp_path):
+    reports_dir = tmp_path / "reports"
+    write_json(
+        reports_dir / "lab-summary" / "day90_real_adapter_implementation_plan.json",
+        {
+            "status": "PASS",
+            "scope": "planning_only",
+            "decision": "CONDITIONAL_GO",
+            "adapter_implementation_allowed": False,
+            "live_device_access_allowed": False,
+            "ssh_allowed": False,
+            "routeros_command_execution_allowed": False,
+        },
+    )
+    (reports_dir / "lab-summary" / "day90_real_adapter_implementation_plan.html").write_text(
+        "<html>Day90 implementation plan</html>",
+        encoding="utf-8",
+    )
+
+    entries = dashboard.collect_dashboard_evidence(tmp_path, reports_dir)
+
+    day90 = next(entry for entry in entries if entry.day == "Day90")
+    assert day90.title == "Real Adapter Implementation Plan"
+    assert day90.status == "PASS"
+    assert day90.json_view_path == "reports/lab-summary/day90_real_adapter_implementation_plan.json"
+    assert day90.html_view_path == "reports/lab-summary/day90_real_adapter_implementation_plan.html"
+    day90_text = f"{day90.title} {day90.description} {day90.notes}".lower()
+    assert "scope=planning_only" in day90_text
+    assert "adapter_implementation_allowed=false" in day90_text
+    assert "live_device_access_allowed=false" in day90_text
+    assert "routeros_command_execution_allowed=false" in day90_text
+
+
 def test_dashboard_evidence_missing_html_does_not_crash(tmp_path):
     reports_dir = tmp_path / "reports"
     write_json(
@@ -279,6 +312,7 @@ def test_ai_intent_reviewer_references_day57_to_day85():
         "Day87",
         "Day88",
         "Day89",
+        "Day90",
     ]
     text = " ".join(
         f"{item.title} {item.summary} {item.doc_path} {item.roadmap_path} "
@@ -309,6 +343,10 @@ def test_ai_intent_reviewer_references_day57_to_day85():
     assert "docs/ai/real_adapter_safety_boundary_spec.md" in text
     assert "docs/roadmap/day89_real_adapter_safety_boundary_spec.md" in text
     assert "reports/lab-summary/day89_real_adapter_safety_boundary_spec.html" in text
+    assert "Real Adapter Implementation Plan" in text
+    assert "docs/ai/intent_real_adapter_implementation_plan.md" in text
+    assert "docs/roadmap/day90_real_adapter_implementation_plan.md" in text
+    assert "reports/lab-summary/day90_real_adapter_implementation_plan.html" in text
     assert "Reviewer report quality and evidence trace" in text
     assert "docs/ai/intent_offline_mock_runtime_reviewer_report_quality.md" in text
     assert "docs/roadmap/day68_offline_mock_runtime_reviewer_report_quality.md" in text
@@ -996,6 +1034,9 @@ def test_ai_intent_reviewer_route_exposes_day57_to_day82_without_execution(tmp_p
     assert "Day89 is a pre-implementation safety boundary lock" in text
     assert "Day89 keeps implementation_allowed false, live_device_access_allowed false, ssh_allowed false, config_change_allowed false, command_execution_allowed false" in text
     assert "Day89 allows only static spec loading" in text
+    assert "Day90 is a planning-only implementation-entry decision" in text
+    assert "Day90 keeps scope planning_only, adapter_implementation_allowed false, live_device_access_allowed false, ssh_allowed false, and routeros_command_execution_allowed false" in text
+    assert "Day90 may recommend Day91 only as a minimal read-only prototype" in text
     assert "No mapped task was executed. This is a dry-run reviewer walkthrough only." in text
     html = text.lower()
     assert "<form" not in html

@@ -1094,6 +1094,21 @@ def ai_intent_reviewer_references() -> List[AIIntentReviewerReference]:
                 "reports/lab-summary/day89_real_adapter_safety_boundary_spec.html",
             ),
         ),
+        AIIntentReviewerReference(
+            day="Day90",
+            title="Real Adapter Implementation Plan",
+            summary=(
+                "Decides whether repository evidence is ready for a later "
+                "minimal read-only adapter prototype while remaining "
+                "planning-only and non-executing."
+            ),
+            doc_path="docs/ai/intent_real_adapter_implementation_plan.md",
+            roadmap_path="docs/roadmap/day90_real_adapter_implementation_plan.md",
+            report_paths=(
+                "reports/lab-summary/day90_real_adapter_implementation_plan.json",
+                "reports/lab-summary/day90_real_adapter_implementation_plan.html",
+            ),
+        ),
     ]
 
 
@@ -1330,6 +1345,9 @@ def ai_intent_safety_boundaries() -> List[str]:
         "Day89 is a pre-implementation safety boundary lock; it does not implement a real adapter, SSH, RouterOS connection, live read-only command execution, arbitrary command execution, or device configuration changes.",
         "Day89 keeps implementation_allowed false, live_device_access_allowed false, ssh_allowed false, config_change_allowed false, command_execution_allowed false, safety_boundary_locked true, and reviewer_decision_required true.",
         "Day89 allows only static spec loading, future allowlist metadata validation, candidate command classification, evidence-only reports, deterministic output, and no network side effects.",
+        "Day90 is a planning-only implementation-entry decision; it decides GO, CONDITIONAL_GO, or NO_GO from repository evidence and does not implement a real adapter, SSH client, RouterOS command runner, live device access, or automatic apply.",
+        "Day90 keeps scope planning_only, adapter_implementation_allowed false, live_device_access_allowed false, ssh_allowed false, and routeros_command_execution_allowed false.",
+        "Day90 may recommend Day91 only as a minimal read-only prototype with explicit allow flag, bounded command allowlist, timeout, evidence logging, redaction, and no configuration mutation.",
     ]
 
 
