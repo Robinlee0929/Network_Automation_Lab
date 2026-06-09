@@ -29,21 +29,23 @@ def test_runner_task_catalog_uses_consistent_day23_safety_labels():
     allowed_safety_levels = {
         "dry-run",
         "guarded-live",
-        "read-only",
-        "report-only",
-        "design-only",
-        "disabled",
-        "controlled_failover_observation",
-    }
+            "read-only",
+            "report-only",
+            "design-only",
+            "planning-only",
+            "disabled",
+            "controlled_failover_observation",
+        }
     allowed_execution_modes = {
         "dry-run",
         "guarded-live",
-        "read-only",
-        "report-only",
-        "design-only",
-        "disabled",
-        "controlled_failover_observation",
-    }
+            "read-only",
+            "report-only",
+            "design-only",
+            "planning-only",
+            "disabled",
+            "controlled_failover_observation",
+        }
 
     for task in network_lab.list_tasks():
         assert task["safety_level"] in allowed_safety_levels
