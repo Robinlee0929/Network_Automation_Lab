@@ -1064,6 +1064,21 @@ def ai_intent_reviewer_references() -> List[AIIntentReviewerReference]:
                 "reports/lab-summary/day87_readonly_executor_phase_gate_review.html",
             ),
         ),
+        AIIntentReviewerReference(
+            day="Day88",
+            title="Real Read-only Executor Adapter Design Draft",
+            summary=(
+                "Defines the future real read-only adapter architecture, positive "
+                "allowlist, evidence contract, error contract, timeout contract, "
+                "and safety boundary while remaining DESIGN_ONLY."
+            ),
+            doc_path="docs/ai/intent_real_readonly_executor_adapter_design.md",
+            roadmap_path="docs/roadmap/day88_real_readonly_executor_adapter_design.md",
+            report_paths=(
+                "reports/lab-summary/day88_real_readonly_executor_adapter_design.json",
+                "reports/lab-summary/day88_real_readonly_executor_adapter_design.html",
+            ),
+        ),
     ]
 
 
@@ -1294,6 +1309,9 @@ def ai_intent_safety_boundaries() -> List[str]:
         "Day87 is a phase gate review, not a real adapter design or implementation; phase_gate_status may be PASS only when all Day83-Day86 required checks pass.",
         "Day87 keeps execution_allowed false, ssh_allowed false, live_command_allowed false, write_command_allowed false, device_connection_allowed false, real_adapter_implementation_allowed false, and real_adapter_design_allowed true.",
         "Day87 only allows proceeding to Day88 Real Read-only Executor Adapter Design Draft; Day88 remains design-only and real adapter implementation stays blocked until a later explicit gate.",
+        "Day88 is the Real Read-only Executor Adapter Design Draft only; it defines architecture, positive allowlist, evidence, error, timeout, and safety contracts without adding a real adapter.",
+        "Day88 keeps execution_supported false, ssh_supported false, routeros_connection_supported false, live_command_supported false, execution_unlock_supported false, and dashboard action surfaces disabled.",
+        "Day88 hands off to Day89 Real Adapter Safety Boundary Spec and does not redo Day87.",
     ]
 
 
