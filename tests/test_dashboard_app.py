@@ -214,6 +214,7 @@ def test_ai_intent_reviewer_references_day57_to_day85():
         "Day83",
         "Day84",
         "Day85",
+        "Day86",
     ]
     text = " ".join(
         f"{item.title} {item.summary} {item.doc_path} {item.roadmap_path} "
@@ -301,6 +302,9 @@ def test_ai_intent_reviewer_references_day57_to_day85():
     assert "docs/roadmap/day84_readonly_executor_adapter_interface_contract.md" in text
     assert "reports/lab-summary/day84_readonly_executor_adapter_contract.html" in text
     assert "Mock Adapter + Evidence Binding" in text
+    assert "Controlled Runner Harness + Safety Regression" in text
+    assert "docs/ai/intent_controlled_runner_harness.md" in text
+    assert "reports/lab-summary/day86_controlled_runner_harness.html" in text
     assert "Compatibility Matrix stays internal validation only" in text
     assert "docs/ai/intent_mock_adapter_evidence_binding.md" in text
     assert "docs/roadmap/day85_mock_adapter_evidence_binding.md" in text
@@ -909,6 +913,8 @@ def test_ai_intent_reviewer_route_exposes_day57_to_day82_without_execution(tmp_p
     assert "Day85 remains Mock Adapter + Evidence Binding" in text
     assert "Compatibility Matrix is internal validation evidence only" in text
     assert "Day85 keeps every adapter record non-executing" in text
+    assert "Day86 is a runner-level safety regression" in text
+    assert "Day86 keeps allowed_to_execute false, ssh_allowed false, live_command_allowed false, mapped_task_executed false" in text
     assert "No mapped task was executed. This is a dry-run reviewer walkthrough only." in text
     html = text.lower()
     assert "<form" not in html

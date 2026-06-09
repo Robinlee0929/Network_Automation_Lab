@@ -47,6 +47,10 @@ from intent_mock_adapter_evidence_binding import (
     build_mock_adapter_evidence_binding_report,
     write_mock_adapter_evidence_binding_reports,
 )
+from intent_controlled_runner_harness import (
+    build_controlled_runner_harness_report,
+    write_controlled_runner_harness_reports,
+)
 from intent_runtime_safety_case import build_runtime_safety_case_report
 from intent_runtime_safety_gate import build_runtime_safety_gate_report
 
@@ -249,6 +253,19 @@ DAY85_MOCK_ADAPTER_EVIDENCE_BINDING_JSON = (
 )
 DAY85_MOCK_ADAPTER_EVIDENCE_BINDING_HTML = (
     Path("reports") / "lab-summary" / "day85_mock_adapter_evidence_binding.html"
+)
+DAY86_CONTROLLED_RUNNER_HARNESS_TASK_ID = "controlled-runner-harness"
+DAY86_CONTROLLED_RUNNER_HARNESS_DOC = (
+    Path("docs") / "ai" / "intent_controlled_runner_harness.md"
+)
+DAY86_CONTROLLED_RUNNER_HARNESS_ROADMAP = (
+    Path("docs") / "roadmap" / "day86_controlled_runner_harness_safety_regression.md"
+)
+DAY86_CONTROLLED_RUNNER_HARNESS_JSON = (
+    Path("reports") / "lab-summary" / "day86_controlled_runner_harness.json"
+)
+DAY86_CONTROLLED_RUNNER_HARNESS_HTML = (
+    Path("reports") / "lab-summary" / "day86_controlled_runner_harness.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -978,6 +995,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY85_MOCK_ADAPTER_EVIDENCE_BINDING_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day86",
+        "title": "Controlled Runner Harness + Safety Regression",
+        "report_type": "Controlled runner harness safety regression",
+        "safety_label": "deterministic runner-level dry-run safety regression",
+        "description": "Day86 consumes Day85-style adapter compatibility and evidence signals at the runner layer while preserving allowed_to_execute=false, ssh_allowed=false, live_command_allowed=false, mapped_task_executed=false, no approval/execution unlock, and no dashboard action endpoint.",
+        "json_globs": [DAY86_CONTROLLED_RUNNER_HARNESS_JSON.as_posix()],
+        "html_globs": [DAY86_CONTROLLED_RUNNER_HARNESS_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY86_CONTROLLED_RUNNER_HARNESS_TASK_ID}"
         ),
     },
 ]
@@ -2938,6 +2968,34 @@ def list_tasks() -> List[Dict[str, Any]]:
             "related_script": "network_lab.py",
             "notes": "Deterministic mock-only evidence-bound adapter fixture. It conforms to the Day84 contract, binds every mock response to request, adapter, contract, evidence, and reviewer decision fields, and keeps Compatibility Matrix as internal validation only; it is not a standalone topic and does not call APIs, use AI SDKs, execute mapped tasks, run live tests, open SSH, read config.json, connect to devices, add dashboard forms, POST routes, action endpoints, approval unlocks, execution unlocks, arbitrary command execution, or modify network/device configuration.",
         },
+        {
+            "id": DAY86_CONTROLLED_RUNNER_HARNESS_TASK_ID,
+            "task_id": "day86_controlled_runner_harness",
+            "display_name": "Day86 Controlled Runner Harness + Safety Regression",
+            "user_display_name": "Controlled Runner Harness",
+            "day": "Day86",
+            "category": "ai_planning",
+            "description": "Runs deterministic runner-level safety regression scenarios over Day85-style adapter compatibility and evidence signals.",
+            "safety_level": "dry-run",
+            "execution_mode": "dry-run",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY86_CONTROLLED_RUNNER_HARNESS_JSON.as_posix(),
+                DAY86_CONTROLLED_RUNNER_HARNESS_HTML.as_posix(),
+                DAY86_CONTROLLED_RUNNER_HARNESS_DOC.as_posix(),
+                DAY86_CONTROLLED_RUNNER_HARNESS_ROADMAP.as_posix(),
+            ],
+            "report_outputs": [
+                "Day86 JSON/HTML controlled runner harness safety regression",
+                "Day86 runner-level review-only safety documentation",
+            ],
+            "related_script": "network_lab.py",
+            "notes": "Deterministic runner-level safety regression. It consumes Day85-style adapter compatibility, blocked adapter, and evidence binding signals, but allowed_to_execute remains false, ssh_allowed remains false, live_command_allowed remains false, mapped_task_executed remains false, final recommendation remains REVIEW_ONLY, and it does not add adapter functionality, call APIs, use AI SDKs, execute mapped tasks, run live tests, open SSH, read config.json, connect to devices, add dashboard forms, POST routes, action endpoints, approval unlocks, execution unlocks, arbitrary command execution, or modify network/device configuration.",
+        },
     ]
 
 
@@ -3006,6 +3064,7 @@ broker-review-queue-decision-state is a compatibility alias for broker-review-qu
 reviewer-decision-audit-summary summarizes Day81 queue decisions into deterministic Day82 reviewer audit evidence without AI API, AI SDK runtime, SSH, device access, config.json, live execution, mapped task execution, execution unlocks, dashboard forms, POST routes, or action endpoints.
 readonly-executor-readiness-gate validates Day79-Day82 safety evidence as deterministic Day83 future-adapter candidate readiness only; it is not an executor and does not enable AI API, AI SDK runtime, SSH, device access, config.json, live execution, mapped task execution, approval/execution unlocks, dashboard forms, POST routes, or action endpoints.
 readonly-executor-adapter-contract defines deterministic Day84 future adapter request/response/capability/evidence/validation shapes only; it is not an executor or adapter implementation and does not enable AI API, SSH, device access, live execution, mapped task execution, approval/execution unlocks, dashboard forms, POST routes, or action endpoints.
+controlled-runner-harness runs deterministic Day86 runner-level safety regression scenarios over Day85-style adapter compatibility/evidence signals without AI API, SSH, device access, config.json, live command execution, mapped task execution, approval/execution unlocks, dashboard forms, POST routes, or action endpoints.
 wireguard-runner is dry-run by default and delegates to the existing WireGuard script only after explicit --allow-live-wireguard."""
     parser = argparse.ArgumentParser(
         description=f"Day14 {DAY14_NAME}.",
@@ -3056,6 +3115,7 @@ wireguard-runner is dry-run by default and delegates to the existing WireGuard s
             DAY83_READONLY_EXECUTOR_READINESS_GATE_TASK_ID,
             DAY84_READONLY_EXECUTOR_ADAPTER_CONTRACT_TASK_ID,
             DAY85_MOCK_ADAPTER_EVIDENCE_BINDING_TASK_ID,
+            DAY86_CONTROLLED_RUNNER_HARNESS_TASK_ID,
             WIREGUARD_RUNNER_TASK_ALIAS,
         ],
         help="Task to run.",
@@ -5383,6 +5443,48 @@ def _run_day85_mock_adapter_evidence_binding(project_root: Path) -> int:
         return 0
 
     print(f"{format_status('FAIL')} Day85 mock adapter evidence binding invariants failed.")
+    return 1
+
+
+def _run_day86_controlled_runner_harness(project_root: Path) -> int:
+    report = build_controlled_runner_harness_report()
+    json_path, html_path = write_controlled_runner_harness_reports(project_root, report)
+    summary = report["summary"]
+    flags = report["safety_invariants"]
+
+    def flag(name: str) -> str:
+        return json.dumps(flags[name])
+
+    print(format_heading("Day86 Controlled Runner Harness + Safety Regression"))
+    print("Task name: controlled-runner-harness")
+    print("Safety: deterministic runner-level safety regression; dry-run/review-only")
+    print(f"Result: {report['overall_status']} / {report['review_status']}")
+    print(f"Runner mode: {report['runner_mode']}")
+    print(f"Final recommendation: {report['final_recommendation']}")
+    print(f"Total scenarios: {summary['total_scenarios']}")
+    print(f"Failed scenarios: {summary['failed_scenarios']}")
+    print(f"allowed_to_execute={flag('allowed_to_execute')}")
+    print(f"ssh_allowed={flag('ssh_allowed')}")
+    print(f"live_command_allowed={flag('live_command_allowed')}")
+    print(f"mapped_task_executed={flag('mapped_task_executed')}")
+    print(f"Execution unlock supported: {flag('execution_unlock_supported')}")
+    print(f"JSON report: {_relative_to_project(project_root, json_path)}")
+    print(f"HTML report: {_relative_to_project(project_root, html_path)}")
+
+    if (
+        report["overall_status"] == "PASS"
+        and report["review_status"] == "REVIEW_ONLY"
+        and report["final_recommendation"] == "REVIEW_ONLY"
+    ):
+        print(
+            f"{format_status('PASS')} REVIEW_ONLY. Controlled runner harness "
+            "is dry-run-only; adapter compatibility and report generation did "
+            "not enable SSH, live command execution, mapped task execution, or "
+            "execution unlock."
+        )
+        return 0
+
+    print(f"{format_status('FAIL')} Day86 controlled runner harness safety regression failed.")
     return 1
 
 
@@ -7748,6 +7850,8 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
         return _run_day84_readonly_executor_adapter_contract(root)
     if args.task == DAY85_MOCK_ADAPTER_EVIDENCE_BINDING_TASK_ID:
         return _run_day85_mock_adapter_evidence_binding(root)
+    if args.task == DAY86_CONTROLLED_RUNNER_HARNESS_TASK_ID:
+        return _run_day86_controlled_runner_harness(root)
 
     profile_path = _resolve_project_path(root, args.profile)
     try:

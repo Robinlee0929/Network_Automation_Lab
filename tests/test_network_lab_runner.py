@@ -3975,3 +3975,90 @@ def test_day85_mock_adapter_evidence_binding_runner_outputs_reports_without_live
     assert "<form" not in html.lower()
     assert "<button" not in html.lower()
     assert "<script" not in html.lower()
+
+
+def test_day86_controlled_runner_harness_task_exists_in_catalog():
+    task = next(
+        task for task in network_lab.list_tasks() if task["id"] == "controlled-runner-harness"
+    )
+
+    assert task["task_id"] == "day86_controlled_runner_harness"
+    assert task["day"] == "Day86"
+    assert task["display_name"] == "Day86 Controlled Runner Harness + Safety Regression"
+    assert task["safety_level"] == "dry-run"
+    assert task["execution_mode"] == "dry-run"
+    assert task["requires_live_device"] is False
+    assert task["requires_password"] is False
+    assert task["produces_report"] is True
+    assert "reports/lab-summary/day86_controlled_runner_harness.json" in task["report_paths"]
+    assert "reports/lab-summary/day86_controlled_runner_harness.html" in task["report_paths"]
+    assert "docs/ai/intent_controlled_runner_harness.md" in task["report_paths"]
+    assert "docs/roadmap/day86_controlled_runner_harness_safety_regression.md" in task["report_paths"]
+    assert "runner-level safety regression" in task["notes"]
+    assert "mapped_task_executed remains false" in task["notes"]
+    assert "does not add adapter functionality" in task["notes"]
+
+
+def test_day86_controlled_runner_harness_runner_outputs_reports_without_live_access(
+    tmp_path, monkeypatch, capsys
+):
+    def fail_run(*_args, **_kwargs):
+        raise AssertionError("Day86 controlled runner harness must not execute subprocess")
+
+    def fail_profile_load(*_args, **_kwargs):
+        raise AssertionError("Day86 controlled runner harness must not load profile or config data")
+
+    monkeypatch.setattr(network_lab.subprocess, "run", fail_run)
+    monkeypatch.setattr(network_lab, "load_lab_runner_profile", fail_profile_load)
+
+    exit_code = network_lab.main(
+        ["--task", "controlled-runner-harness"], project_root=tmp_path
+    )
+
+    output = capsys.readouterr().out
+    json_path = tmp_path / "reports/lab-summary/day86_controlled_runner_harness.json"
+    html_path = tmp_path / "reports/lab-summary/day86_controlled_runner_harness.html"
+    assert exit_code == 0
+    assert "Day86 Controlled Runner Harness + Safety Regression" in output
+    assert "Task name: controlled-runner-harness" in output
+    assert "Result: PASS / REVIEW_ONLY" in output
+    assert "Runner mode: CONTROLLED_HARNESS" in output
+    assert "Final recommendation: REVIEW_ONLY" in output
+    assert "Total scenarios: 6" in output
+    assert "Failed scenarios: 0" in output
+    assert "allowed_to_execute=false" in output
+    assert "ssh_allowed=false" in output
+    assert "live_command_allowed=false" in output
+    assert "mapped_task_executed=false" in output
+    assert "Execution unlock supported: false" in output
+    assert "JSON report: reports/lab-summary/day86_controlled_runner_harness.json" in output
+    assert "HTML report: reports/lab-summary/day86_controlled_runner_harness.html" in output
+    assert "[PASS] REVIEW_ONLY. Controlled runner harness is dry-run-only" in output
+    assert json_path.exists()
+    assert html_path.exists()
+    assert not (tmp_path / "config.json").exists()
+
+    report = json.loads(json_path.read_text(encoding="utf-8"))
+    html = html_path.read_text(encoding="utf-8")
+    assert report["day"] == "Day86"
+    assert report["phase"] == "Day86"
+    assert report["overall_status"] == "PASS"
+    assert report["runner_mode"] == "CONTROLLED_HARNESS"
+    assert report["final_recommendation"] == "REVIEW_ONLY"
+    assert report["execution_unlock_supported"] is False
+    assert report["summary"]["total_scenarios"] == 6
+    assert report["summary"]["failed_scenarios"] == 0
+    assert report["safety_invariants"]["allowed_to_execute"] is False
+    assert report["safety_invariants"]["ssh_allowed"] is False
+    assert report["safety_invariants"]["live_command_allowed"] is False
+    assert report["safety_invariants"]["mapped_task_executed"] is False
+    assert report["summary"]["safety_lock_summary"]["allowed_to_execute_values"] == [False]
+    assert report["summary"]["safety_lock_summary"]["ssh_allowed_values"] == [False]
+    assert report["summary"]["safety_lock_summary"]["live_command_allowed_values"] == [False]
+    assert report["summary"]["safety_lock_summary"]["mapped_task_executed_values"] == [False]
+    assert all(scenario["mapped_task_executed"] is False for scenario in report["scenarios"])
+    assert "Day86 Controlled Runner Harness" in html
+    assert "Mapped task executed values" in html
+    assert "<form" not in html.lower()
+    assert "<button" not in html.lower()
+    assert "<script" not in html.lower()
