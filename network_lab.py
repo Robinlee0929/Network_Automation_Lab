@@ -71,6 +71,10 @@ from intent_real_adapter_safety_scaffold import (
     build_day91_real_adapter_safety_scaffold,
     write_day91_real_adapter_safety_scaffold_reports,
 )
+from intent_executable_guards import (
+    build_day92_real_adapter_executable_guards_report,
+    write_day92_real_adapter_executable_guards_reports,
+)
 from intent_runtime_safety_case import build_runtime_safety_case_report
 from intent_runtime_safety_gate import build_runtime_safety_gate_report
 
@@ -351,6 +355,19 @@ DAY91_REAL_ADAPTER_SAFETY_SCAFFOLD_JSON = (
 )
 DAY91_REAL_ADAPTER_SAFETY_SCAFFOLD_HTML = (
     Path("reports") / "lab-summary" / "day91_real_adapter_safety_scaffold.html"
+)
+DAY92_REAL_ADAPTER_EXECUTABLE_GUARDS_TASK_ID = "real-adapter-executable-guards"
+DAY92_REAL_ADAPTER_EXECUTABLE_GUARDS_DOC = (
+    Path("docs") / "ai" / "intent_executable_guards.md"
+)
+DAY92_REAL_ADAPTER_EXECUTABLE_GUARDS_ROADMAP = (
+    Path("docs") / "roadmap" / "day92_real_adapter_executable_guards.md"
+)
+DAY92_REAL_ADAPTER_EXECUTABLE_GUARDS_JSON = (
+    Path("reports") / "lab-summary" / "day92_real_adapter_executable_guards_report.json"
+)
+DAY92_REAL_ADAPTER_EXECUTABLE_GUARDS_HTML = (
+    Path("reports") / "lab-summary" / "day92_real_adapter_executable_guards_report.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -1158,6 +1175,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY91_REAL_ADAPTER_SAFETY_SCAFFOLD_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day92",
+        "title": "Real Adapter Executable Guards",
+        "report_type": "Real adapter executable guard evidence",
+        "safety_label": "offline deterministic guard; no adapter implementation",
+        "description": "Day92 turns the Day91 static safety scaffold into executable request guards with no adapter implementation: safe simulated read-only requests may pass to a fake executor, dangerous/unknown/sensitive requests are rejected before executor invocation, and rejected_adapter_invocations remains 0.",
+        "json_globs": [DAY92_REAL_ADAPTER_EXECUTABLE_GUARDS_JSON.as_posix()],
+        "html_globs": [DAY92_REAL_ADAPTER_EXECUTABLE_GUARDS_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY92_REAL_ADAPTER_EXECUTABLE_GUARDS_TASK_ID}"
         ),
     },
 ]
@@ -3302,6 +3332,34 @@ def list_tasks() -> List[Dict[str, Any]]:
             "related_script": "network_lab.py",
             "notes": "Deterministic scaffold-only evidence. Day90 was CONDITIONAL_GO only; Day91 denies dangerous actions, marks read-only candidates future-only, keeps live_read_allowed false, write_allowed false, raw_command_allowed false, credential_required false, transport_required false, real_device_contact_allowed false, and adds no SSH, RouterOS API, socket, subprocess device operation, credential use, real adapter, executable guard, dashboard action, command input, or live-read path.",
         },
+        {
+            "id": DAY92_REAL_ADAPTER_EXECUTABLE_GUARDS_TASK_ID,
+            "task_id": "day92_real_adapter_executable_guards",
+            "display_name": "Day92 Real Adapter Executable Guards",
+            "user_display_name": "Real Adapter Executable Guards",
+            "day": "Day92",
+            "category": "ai_planning",
+            "description": "Converts the Day91 static scaffold into executable guards that allow safe simulated read-only requests and reject dangerous, sensitive, ambiguous, or unknown requests before any executor can be reached.",
+            "safety_level": "offline-deterministic-guard",
+            "execution_mode": "guard-only",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY92_REAL_ADAPTER_EXECUTABLE_GUARDS_JSON.as_posix(),
+                DAY92_REAL_ADAPTER_EXECUTABLE_GUARDS_HTML.as_posix(),
+                DAY92_REAL_ADAPTER_EXECUTABLE_GUARDS_DOC.as_posix(),
+                DAY92_REAL_ADAPTER_EXECUTABLE_GUARDS_ROADMAP.as_posix(),
+            ],
+            "report_outputs": [
+                "Day92 JSON/HTML executable guard evidence",
+                "Day92 guard-only AI reviewer and roadmap documentation",
+            ],
+            "related_script": "network_lab.py",
+            "notes": "Deterministic executable guard layer only. Safe read-only requests are simulated and offline; dangerous, sensitive, ambiguous, or unknown requests fail closed with reason_code, matched_rule_name, blocked_action_category, and evidence. rejected_adapter_invocations remains 0, adapter_implementation_added remains false, and Day92 adds no real adapter, SSH, RouterOS API, socket, subprocess device operation, credential use, dashboard action, command input, live-read path, or device contact.",
+        },
     ]
 
 
@@ -3432,6 +3490,7 @@ wireguard-runner is dry-run by default and delegates to the existing WireGuard s
             DAY89_REAL_ADAPTER_SAFETY_BOUNDARY_SPEC_TASK_ID,
             DAY90_REAL_ADAPTER_IMPLEMENTATION_PLAN_TASK_ID,
             DAY91_REAL_ADAPTER_SAFETY_SCAFFOLD_TASK_ID,
+            DAY92_REAL_ADAPTER_EXECUTABLE_GUARDS_TASK_ID,
             WIREGUARD_RUNNER_TASK_ALIAS,
         ],
         help="Task to run.",
@@ -6035,6 +6094,43 @@ def _run_day91_real_adapter_safety_scaffold(project_root: Path) -> int:
     return 1
 
 
+def _run_day92_real_adapter_executable_guards(project_root: Path) -> int:
+    report = build_day92_real_adapter_executable_guards_report()
+    json_path, html_path = write_day92_real_adapter_executable_guards_reports(project_root, report)
+
+    print(format_heading("Day92 Real Adapter Executable Guards"))
+    print("Task name: real-adapter-executable-guards")
+    print("Safety: offline deterministic executable guard; no real adapter, SSH, socket, or subprocess")
+    print(f"Result: {report['status']} / {report['phase']}")
+    print(f"Total scenarios: {report['total_scenarios']}")
+    print(f"Allowed count: {report['allowed_scenarios']}")
+    print(f"Rejected count: {report['rejected_scenarios']}")
+    print(f"adapter_invoked_for_rejected = {report['adapter_invoked_for_rejected']}")
+    print(f"Evidence report JSON: {_relative_to_project(project_root, json_path)}")
+    print(f"Evidence report HTML: {_relative_to_project(project_root, html_path)}")
+
+    if (
+        report["status"] == "PASS"
+        and report["phase"] == "GUARD_ENFORCED"
+        and report["no_real_device_access"] is True
+        and report["no_ssh"] is True
+        and report["no_subprocess"] is True
+        and report["no_socket"] is True
+        and report["no_real_adapter"] is True
+        and report["adapter_implementation_added"] is False
+        and report["rejected_adapter_invocations"] == 0
+        and not report["validation_errors"]
+    ):
+        print(
+            f"{format_status('PASS')} GUARD_ENFORCED. Day92 rejected unsafe "
+            "requests before executor invocation and allowed only simulated read-only cases."
+        )
+        return 0
+
+    print(f"{format_status('FAIL')} Day92 real adapter executable guards failed validation.")
+    return 1
+
+
 def _relative_to_project(project_root: Path, path: Path) -> str:
     try:
         return path.resolve().relative_to(project_root.resolve()).as_posix()
@@ -8409,6 +8505,8 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
         return _run_day90_real_adapter_implementation_plan(root)
     if args.task == DAY91_REAL_ADAPTER_SAFETY_SCAFFOLD_TASK_ID:
         return _run_day91_real_adapter_safety_scaffold(root)
+    if args.task == DAY92_REAL_ADAPTER_EXECUTABLE_GUARDS_TASK_ID:
+        return _run_day92_real_adapter_executable_guards(root)
 
     profile_path = _resolve_project_path(root, args.profile)
     try:

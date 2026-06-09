@@ -4494,3 +4494,96 @@ def test_day91_report_index_visibility_includes_safety_scaffold(tmp_path, capsys
     assert "scaffold-only" in html
     assert "reports/lab-summary/day91_real_adapter_safety_scaffold.json" in html
     assert "reports/lab-summary/day91_real_adapter_safety_scaffold.html" in html
+
+
+def test_day92_real_adapter_executable_guards_task_exists_in_catalog():
+    task = next(
+        task for task in network_lab.list_tasks() if task["id"] == "real-adapter-executable-guards"
+    )
+
+    assert task["task_id"] == "day92_real_adapter_executable_guards"
+    assert task["day"] == "Day92"
+    assert task["display_name"] == "Day92 Real Adapter Executable Guards"
+    assert task["safety_level"] == "offline-deterministic-guard"
+    assert task["execution_mode"] == "guard-only"
+    assert task["requires_live_device"] is False
+    assert task["requires_password"] is False
+    assert task["produces_report"] is True
+    assert "reports/lab-summary/day92_real_adapter_executable_guards_report.json" in task["report_paths"]
+    assert "reports/lab-summary/day92_real_adapter_executable_guards_report.html" in task["report_paths"]
+    assert "docs/ai/intent_executable_guards.md" in task["report_paths"]
+    assert "docs/roadmap/day92_real_adapter_executable_guards.md" in task["report_paths"]
+    assert "rejected_adapter_invocations remains 0" in task["notes"]
+    assert "adapter_implementation_added remains false" in task["notes"]
+    assert "adds no real adapter" in task["notes"]
+
+
+def test_day92_real_adapter_executable_guards_runner_writes_reports_without_live_access(
+    tmp_path, capsys, monkeypatch
+):
+    def fail_run(*_args, **_kwargs):
+        raise AssertionError("Day92 executable guards must not execute subprocess")
+
+    def fail_load(_path):
+        raise AssertionError("Day92 executable guards must not load profile or config data")
+
+    monkeypatch.setattr(network_lab.subprocess, "run", fail_run)
+    monkeypatch.setattr(network_lab, "load_lab_runner_profile", fail_load)
+
+    exit_code = network_lab.main(["--task", "real-adapter-executable-guards"], project_root=tmp_path)
+    output = capsys.readouterr().out
+
+    json_path = tmp_path / "reports/lab-summary/day92_real_adapter_executable_guards_report.json"
+    html_path = tmp_path / "reports/lab-summary/day92_real_adapter_executable_guards_report.html"
+    assert exit_code == 0
+    assert "Day92 Real Adapter Executable Guards" in output
+    assert "Task name: real-adapter-executable-guards" in output
+    assert "Result: PASS / GUARD_ENFORCED" in output
+    assert "Total scenarios: 20" in output
+    assert "Allowed count: 5" in output
+    assert "Rejected count: 15" in output
+    assert "adapter_invoked_for_rejected = 0" in output
+    assert "Evidence report JSON: reports/lab-summary/day92_real_adapter_executable_guards_report.json" in output
+    assert "Evidence report HTML: reports/lab-summary/day92_real_adapter_executable_guards_report.html" in output
+    assert "[PASS] GUARD_ENFORCED. Day92 rejected unsafe requests" in output
+    assert json_path.exists()
+    assert html_path.exists()
+    assert not (tmp_path / "config.json").exists()
+
+    report = json.loads(json_path.read_text(encoding="utf-8"))
+    html = html_path.read_text(encoding="utf-8")
+    assert report["status"] == "PASS"
+    assert report["phase"] == "GUARD_ENFORCED"
+    assert report["safety_level"] == "offline_deterministic_guard"
+    assert report["no_real_device_access"] is True
+    assert report["no_ssh"] is True
+    assert report["no_subprocess"] is True
+    assert report["no_socket"] is True
+    assert report["no_real_adapter"] is True
+    assert report["adapter_implementation_added"] is False
+    assert report["rejected_adapter_invocations"] == 0
+    assert all(
+        item["executor_invoked"] is False
+        for item in report["scenario_results"]
+        if item["guard_decision"]["decision"] == "REJECT"
+    )
+    assert "Real Adapter Executable Guards" in html
+    assert "GUARD_ENFORCED" in html
+    assert "<form" not in html.lower()
+    assert "<button" not in html.lower()
+    assert "method=\"post\"" not in html.lower()
+
+
+def test_day92_report_index_visibility_includes_executable_guards(tmp_path, capsys):
+    assert network_lab.main(["--task", "real-adapter-executable-guards"], project_root=tmp_path) == 0
+
+    exit_code = network_lab.main(["--report-index"], project_root=tmp_path)
+
+    index_html = tmp_path / "reports/report_index.html"
+    assert exit_code == 0
+    assert index_html.exists()
+    html = index_html.read_text(encoding="utf-8")
+    assert "Real Adapter Executable Guards" in html
+    assert "offline deterministic guard" in html
+    assert "reports/lab-summary/day92_real_adapter_executable_guards_report.json" in html
+    assert "reports/lab-summary/day92_real_adapter_executable_guards_report.html" in html

@@ -229,6 +229,38 @@ def test_dashboard_evidence_surfaces_day91_safety_scaffold_report(tmp_path):
     assert "dangerous actions" in day91_text
 
 
+def test_dashboard_evidence_surfaces_day92_executable_guards_report(tmp_path):
+    reports_dir = tmp_path / "reports"
+    write_json(
+        reports_dir / "lab-summary" / "day92_real_adapter_executable_guards_report.json",
+        {
+            "status": "PASS",
+            "phase": "GUARD_ENFORCED",
+            "safety_level": "offline_deterministic_guard",
+            "no_real_device_access": True,
+            "no_ssh": True,
+            "no_subprocess": True,
+            "rejected_adapter_invocations": 0,
+        },
+    )
+    (reports_dir / "lab-summary" / "day92_real_adapter_executable_guards_report.html").write_text(
+        "<html>Day92 guard-enforced report</html>",
+        encoding="utf-8",
+    )
+
+    entries = dashboard.collect_dashboard_evidence(tmp_path, reports_dir)
+
+    day92 = next(entry for entry in entries if entry.day == "Day92")
+    assert day92.title == "Real Adapter Executable Guards"
+    assert day92.status == "PASS"
+    assert day92.json_view_path == "reports/lab-summary/day92_real_adapter_executable_guards_report.json"
+    assert day92.html_view_path == "reports/lab-summary/day92_real_adapter_executable_guards_report.html"
+    day92_text = f"{day92.title} {day92.description} {day92.notes}".lower()
+    assert "executable guard" in day92_text
+    assert "no adapter implementation" in day92_text
+    assert "rejected_adapter_invocations" in day92_text
+
+
 def test_dashboard_evidence_missing_html_does_not_crash(tmp_path):
     reports_dir = tmp_path / "reports"
     write_json(
@@ -315,7 +347,7 @@ def test_ai_review_checklist_contains_wireguard_vpn_safety_items():
     assert "shell=False" in text
 
 
-def test_ai_intent_reviewer_references_day57_to_day85():
+def test_ai_intent_reviewer_references_day57_to_day92():
     references = dashboard.ai_intent_reviewer_references()
 
     assert [item.day for item in references] == [
@@ -350,6 +382,7 @@ def test_ai_intent_reviewer_references_day57_to_day85():
         "Day89",
         "Day90",
         "Day91",
+        "Day92",
     ]
     text = " ".join(
         f"{item.title} {item.summary} {item.doc_path} {item.roadmap_path} "
@@ -384,6 +417,14 @@ def test_ai_intent_reviewer_references_day57_to_day85():
     assert "docs/ai/intent_real_adapter_implementation_plan.md" in text
     assert "docs/roadmap/day90_real_adapter_implementation_plan.md" in text
     assert "reports/lab-summary/day90_real_adapter_implementation_plan.html" in text
+    assert "Real Adapter Safety Scaffold" in text
+    assert "docs/ai/intent_real_adapter_safety_scaffold.md" in text
+    assert "docs/roadmap/day91_real_adapter_safety_scaffold.md" in text
+    assert "reports/lab-summary/day91_real_adapter_safety_scaffold.html" in text
+    assert "Real Adapter Executable Guards" in text
+    assert "docs/ai/intent_executable_guards.md" in text
+    assert "docs/roadmap/day92_real_adapter_executable_guards.md" in text
+    assert "reports/lab-summary/day92_real_adapter_executable_guards_report.html" in text
     assert "Reviewer report quality and evidence trace" in text
     assert "docs/ai/intent_offline_mock_runtime_reviewer_report_quality.md" in text
     assert "docs/roadmap/day68_offline_mock_runtime_reviewer_report_quality.md" in text
@@ -1076,6 +1117,8 @@ def test_ai_intent_reviewer_route_exposes_day57_to_day82_without_execution(tmp_p
     assert "Day90 produced CONDITIONAL_GO only, not GO" in text
     assert "Day91 must therefore be positioned as Real Adapter Safety Scaffold" in text
     assert "Day91 keeps fail_closed_default true, live_read_allowed false" in text
+    assert "Day92 is an executable guard layer, not an adapter implementation" in text
+    assert "Day92 keeps no_real_device_access true, no_ssh true, no_subprocess true" in text
     assert "No mapped task was executed. This is a dry-run reviewer walkthrough only." in text
     html = text.lower()
     assert "<form" not in html

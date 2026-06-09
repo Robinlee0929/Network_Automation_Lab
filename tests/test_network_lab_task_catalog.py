@@ -32,22 +32,24 @@ def test_runner_task_catalog_uses_consistent_day23_safety_labels():
             "read-only",
             "report-only",
             "design-only",
-            "planning-only",
-            "scaffold-only",
-            "disabled",
-            "controlled_failover_observation",
-        }
+        "planning-only",
+        "scaffold-only",
+        "offline-deterministic-guard",
+        "disabled",
+        "controlled_failover_observation",
+    }
     allowed_execution_modes = {
         "dry-run",
         "guarded-live",
             "read-only",
             "report-only",
             "design-only",
-            "planning-only",
-            "scaffold-only",
-            "disabled",
-            "controlled_failover_observation",
-        }
+        "planning-only",
+        "scaffold-only",
+        "guard-only",
+        "disabled",
+        "controlled_failover_observation",
+    }
 
     for task in network_lab.list_tasks():
         assert task["safety_level"] in allowed_safety_levels
