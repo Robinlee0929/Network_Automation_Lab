@@ -1033,6 +1033,22 @@ def ai_intent_reviewer_references() -> List[AIIntentReviewerReference]:
                 "reports/lab-summary/day85_mock_adapter_evidence_binding.html",
             ),
         ),
+        AIIntentReviewerReference(
+            day="Day86",
+            title="Controlled Runner Harness + Safety Regression",
+            summary=(
+                "Elevates Day85 adapter compatibility, blocked adapter, and "
+                "evidence binding signals into deterministic runner-level "
+                "safety regression checks while keeping every scenario "
+                "dry-run-only and review-only."
+            ),
+            doc_path="docs/ai/intent_controlled_runner_harness.md",
+            roadmap_path="docs/roadmap/day86_controlled_runner_harness_safety_regression.md",
+            report_paths=(
+                "reports/lab-summary/day86_controlled_runner_harness.json",
+                "reports/lab-summary/day86_controlled_runner_harness.html",
+            ),
+        ),
     ]
 
 
@@ -1258,6 +1274,8 @@ def ai_intent_safety_boundaries() -> List[str]:
         "Day84 defines the read-only executor adapter interface contract only; it adds no adapter implementation, executor implementation, SSH, device access, live command execution, AI API, approval unlock, execution unlock, dashboard form, POST route, or action endpoint.",
         "Day85 remains Mock Adapter + Evidence Binding; Compatibility Matrix is internal validation evidence only and not a standalone topic.",
         "Day85 keeps every adapter record non-executing with allowed_to_execute false, ssh_allowed false, device_access_allowed false, live_command_allowed false, approval_unlock_supported false, execution_unlock_supported false, and ai_api_allowed false.",
+        "Day86 is a runner-level safety regression, not new adapter functionality; compatible adapters and generated reports still do not imply execution approval.",
+        "Day86 keeps allowed_to_execute false, ssh_allowed false, live_command_allowed false, mapped_task_executed false, execution_unlock_supported false, and final_recommendation REVIEW_ONLY.",
     ]
 
 
