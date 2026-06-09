@@ -1049,6 +1049,21 @@ def ai_intent_reviewer_references() -> List[AIIntentReviewerReference]:
                 "reports/lab-summary/day86_controlled_runner_harness.html",
             ),
         ),
+        AIIntentReviewerReference(
+            day="Day87",
+            title="Read-only Executor Phase Gate Review",
+            summary=(
+                "Reviews Day83-Day86 safety evidence as a phase gate only and "
+                "permits Day88 design draft work while keeping execution and "
+                "real adapter implementation blocked."
+            ),
+            doc_path="docs/ai/intent_readonly_executor_phase_gate_review.md",
+            roadmap_path="docs/roadmap/day87_readonly_executor_phase_gate_review.md",
+            report_paths=(
+                "reports/lab-summary/day87_readonly_executor_phase_gate_review.json",
+                "reports/lab-summary/day87_readonly_executor_phase_gate_review.html",
+            ),
+        ),
     ]
 
 
@@ -1276,6 +1291,9 @@ def ai_intent_safety_boundaries() -> List[str]:
         "Day85 keeps every adapter record non-executing with allowed_to_execute false, ssh_allowed false, device_access_allowed false, live_command_allowed false, approval_unlock_supported false, execution_unlock_supported false, and ai_api_allowed false.",
         "Day86 is a runner-level safety regression, not new adapter functionality; compatible adapters and generated reports still do not imply execution approval.",
         "Day86 keeps allowed_to_execute false, ssh_allowed false, live_command_allowed false, mapped_task_executed false, execution_unlock_supported false, and final_recommendation REVIEW_ONLY.",
+        "Day87 is a phase gate review, not a real adapter design or implementation; phase_gate_status may be PASS only when all Day83-Day86 required checks pass.",
+        "Day87 keeps execution_allowed false, ssh_allowed false, live_command_allowed false, write_command_allowed false, device_connection_allowed false, real_adapter_implementation_allowed false, and real_adapter_design_allowed true.",
+        "Day87 only allows proceeding to Day88 Real Read-only Executor Adapter Design Draft; Day88 remains design-only and real adapter implementation stays blocked until a later explicit gate.",
     ]
 
 

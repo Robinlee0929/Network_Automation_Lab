@@ -51,6 +51,10 @@ from intent_controlled_runner_harness import (
     build_controlled_runner_harness_report,
     write_controlled_runner_harness_reports,
 )
+from intent_readonly_executor_phase_gate_review import (
+    build_readonly_executor_phase_gate_review,
+    write_readonly_executor_phase_gate_review_reports,
+)
 from intent_runtime_safety_case import build_runtime_safety_case_report
 from intent_runtime_safety_gate import build_runtime_safety_gate_report
 
@@ -266,6 +270,19 @@ DAY86_CONTROLLED_RUNNER_HARNESS_JSON = (
 )
 DAY86_CONTROLLED_RUNNER_HARNESS_HTML = (
     Path("reports") / "lab-summary" / "day86_controlled_runner_harness.html"
+)
+DAY87_READONLY_EXECUTOR_PHASE_GATE_REVIEW_TASK_ID = "readonly-executor-phase-gate-review"
+DAY87_READONLY_EXECUTOR_PHASE_GATE_REVIEW_DOC = (
+    Path("docs") / "ai" / "intent_readonly_executor_phase_gate_review.md"
+)
+DAY87_READONLY_EXECUTOR_PHASE_GATE_REVIEW_ROADMAP = (
+    Path("docs") / "roadmap" / "day87_readonly_executor_phase_gate_review.md"
+)
+DAY87_READONLY_EXECUTOR_PHASE_GATE_REVIEW_JSON = (
+    Path("reports") / "lab-summary" / "day87_readonly_executor_phase_gate_review.json"
+)
+DAY87_READONLY_EXECUTOR_PHASE_GATE_REVIEW_HTML = (
+    Path("reports") / "lab-summary" / "day87_readonly_executor_phase_gate_review.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -1008,6 +1025,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY86_CONTROLLED_RUNNER_HARNESS_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day87",
+        "title": "Read-only Executor Phase Gate Review",
+        "report_type": "Read-only executor phase gate review",
+        "safety_label": "deterministic phase gate review; design-only recommendation",
+        "description": "Day87 reviews Day83-Day86 safety and readiness evidence to decide whether Day88 may start the Real Read-only Executor Adapter Design Draft while preserving execution_allowed=false, ssh_allowed=false, live_command_allowed=false, write_command_allowed=false, device_connection_allowed=false, real_adapter_implementation_allowed=false, and real_adapter_design_allowed=true.",
+        "json_globs": [DAY87_READONLY_EXECUTOR_PHASE_GATE_REVIEW_JSON.as_posix()],
+        "html_globs": [DAY87_READONLY_EXECUTOR_PHASE_GATE_REVIEW_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY87_READONLY_EXECUTOR_PHASE_GATE_REVIEW_TASK_ID}"
         ),
     },
 ]
@@ -2996,6 +3026,34 @@ def list_tasks() -> List[Dict[str, Any]]:
             "related_script": "network_lab.py",
             "notes": "Deterministic runner-level safety regression. It consumes Day85-style adapter compatibility, blocked adapter, and evidence binding signals, but allowed_to_execute remains false, ssh_allowed remains false, live_command_allowed remains false, mapped_task_executed remains false, final recommendation remains REVIEW_ONLY, and it does not add adapter functionality, call APIs, use AI SDKs, execute mapped tasks, run live tests, open SSH, read config.json, connect to devices, add dashboard forms, POST routes, action endpoints, approval unlocks, execution unlocks, arbitrary command execution, or modify network/device configuration.",
         },
+        {
+            "id": DAY87_READONLY_EXECUTOR_PHASE_GATE_REVIEW_TASK_ID,
+            "task_id": "day87_readonly_executor_phase_gate_review",
+            "display_name": "Day87 Read-only Executor Phase Gate Review",
+            "user_display_name": "Read-only Executor Phase Gate Review",
+            "day": "Day87",
+            "category": "ai_planning",
+            "description": "Reviews Day83-Day86 readiness and safety evidence to decide whether Day88 may start a real read-only executor adapter design draft.",
+            "safety_level": "dry-run",
+            "execution_mode": "dry-run",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY87_READONLY_EXECUTOR_PHASE_GATE_REVIEW_JSON.as_posix(),
+                DAY87_READONLY_EXECUTOR_PHASE_GATE_REVIEW_HTML.as_posix(),
+                DAY87_READONLY_EXECUTOR_PHASE_GATE_REVIEW_DOC.as_posix(),
+                DAY87_READONLY_EXECUTOR_PHASE_GATE_REVIEW_ROADMAP.as_posix(),
+            ],
+            "report_outputs": [
+                "Day87 JSON/HTML read-only executor phase gate review",
+                "Day87 design-only phase gate documentation",
+            ],
+            "related_script": "network_lab.py",
+            "notes": "Deterministic phase gate review only. It aggregates Day83-Day86 evidence and may recommend DESIGN_ONLY for Day88, but execution_allowed remains false, ssh_allowed remains false, live_command_allowed remains false, write_command_allowed remains false, device_connection_allowed remains false, real_adapter_implementation_allowed remains false, and it does not design or implement a real adapter, call APIs, use AI SDKs, execute mapped tasks, run live tests, open SSH, read config.json, connect to devices, add dashboard forms, POST routes, action endpoints, approval unlocks, execution unlocks, arbitrary command execution, or modify network/device configuration.",
+        },
     ]
 
 
@@ -3065,6 +3123,7 @@ reviewer-decision-audit-summary summarizes Day81 queue decisions into determinis
 readonly-executor-readiness-gate validates Day79-Day82 safety evidence as deterministic Day83 future-adapter candidate readiness only; it is not an executor and does not enable AI API, AI SDK runtime, SSH, device access, config.json, live execution, mapped task execution, approval/execution unlocks, dashboard forms, POST routes, or action endpoints.
 readonly-executor-adapter-contract defines deterministic Day84 future adapter request/response/capability/evidence/validation shapes only; it is not an executor or adapter implementation and does not enable AI API, SSH, device access, live execution, mapped task execution, approval/execution unlocks, dashboard forms, POST routes, or action endpoints.
 controlled-runner-harness runs deterministic Day86 runner-level safety regression scenarios over Day85-style adapter compatibility/evidence signals without AI API, SSH, device access, config.json, live command execution, mapped task execution, approval/execution unlocks, dashboard forms, POST routes, or action endpoints.
+readonly-executor-phase-gate-review reviews Day83-Day86 safety evidence as deterministic Day87 phase gate evidence only; it may recommend Day88 DESIGN_ONLY but does not design or implement a real adapter, execute mapped tasks, open SSH, connect devices, run live/write commands, call APIs, or add dashboard actions.
 wireguard-runner is dry-run by default and delegates to the existing WireGuard script only after explicit --allow-live-wireguard."""
     parser = argparse.ArgumentParser(
         description=f"Day14 {DAY14_NAME}.",
@@ -3116,6 +3175,7 @@ wireguard-runner is dry-run by default and delegates to the existing WireGuard s
             DAY84_READONLY_EXECUTOR_ADAPTER_CONTRACT_TASK_ID,
             DAY85_MOCK_ADAPTER_EVIDENCE_BINDING_TASK_ID,
             DAY86_CONTROLLED_RUNNER_HARNESS_TASK_ID,
+            DAY87_READONLY_EXECUTOR_PHASE_GATE_REVIEW_TASK_ID,
             WIREGUARD_RUNNER_TASK_ALIAS,
         ],
         help="Task to run.",
@@ -5488,6 +5548,49 @@ def _run_day86_controlled_runner_harness(project_root: Path) -> int:
     return 1
 
 
+def _run_day87_readonly_executor_phase_gate_review(project_root: Path) -> int:
+    report = build_readonly_executor_phase_gate_review()
+    json_path, html_path = write_readonly_executor_phase_gate_review_reports(project_root, report)
+
+    def flag(name: str) -> str:
+        return json.dumps(report[name])
+
+    passed_checks = sum(1 for check in report["gate_checks"] if check["status"] == "PASS")
+    print(format_heading("Day87 Read-only Executor Phase Gate Review"))
+    print("Task name: readonly-executor-phase-gate-review")
+    print("Safety: deterministic phase gate review only; no real adapter design or implementation")
+    print(f"Result: {report['phase_gate_status']} / {report['phase_gate_recommendation']}")
+    print(f"Reviewed days: {', '.join(report['reviewed_days'])}")
+    print(f"Gate checks: {passed_checks} / {len(report['gate_checks'])}")
+    print(f"Execution allowed: {flag('execution_allowed')}")
+    print(f"SSH allowed: {flag('ssh_allowed')}")
+    print(f"Live command allowed: {flag('live_command_allowed')}")
+    print(f"Write command allowed: {flag('write_command_allowed')}")
+    print(f"Device connection allowed: {flag('device_connection_allowed')}")
+    print(f"Real adapter design allowed: {flag('real_adapter_design_allowed')}")
+    print(f"Real adapter implementation allowed: {flag('real_adapter_implementation_allowed')}")
+    print(f"Next phase: Day88 {report['allowed_next_step']}")
+    print(f"JSON report: {_relative_to_project(project_root, json_path)}")
+    print(f"HTML report: {_relative_to_project(project_root, html_path)}")
+
+    if (
+        report["phase_gate_status"] == "PASS"
+        and report["phase_gate_recommendation"] == "DESIGN_ONLY"
+        and report["execution_allowed"] is False
+        and report["real_adapter_design_allowed"] is True
+        and report["real_adapter_implementation_allowed"] is False
+    ):
+        print(
+            f"{format_status('PASS')} DESIGN_ONLY. Reviewed Day83, Day84, Day85, "
+            "and Day86; Day88 may start the design draft only, while execution "
+            "and real adapter implementation remain blocked."
+        )
+        return 0
+
+    print(f"{format_status('FAIL')} Day87 read-only executor phase gate review failed.")
+    return 1
+
+
 def _relative_to_project(project_root: Path, path: Path) -> str:
     try:
         return path.resolve().relative_to(project_root.resolve()).as_posix()
@@ -7852,6 +7955,8 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
         return _run_day85_mock_adapter_evidence_binding(root)
     if args.task == DAY86_CONTROLLED_RUNNER_HARNESS_TASK_ID:
         return _run_day86_controlled_runner_harness(root)
+    if args.task == DAY87_READONLY_EXECUTOR_PHASE_GATE_REVIEW_TASK_ID:
+        return _run_day87_readonly_executor_phase_gate_review(root)
 
     profile_path = _resolve_project_path(root, args.profile)
     try:

@@ -215,6 +215,7 @@ def test_ai_intent_reviewer_references_day57_to_day85():
         "Day84",
         "Day85",
         "Day86",
+        "Day87",
     ]
     text = " ".join(
         f"{item.title} {item.summary} {item.doc_path} {item.roadmap_path} "
@@ -915,6 +916,9 @@ def test_ai_intent_reviewer_route_exposes_day57_to_day82_without_execution(tmp_p
     assert "Day85 keeps every adapter record non-executing" in text
     assert "Day86 is a runner-level safety regression" in text
     assert "Day86 keeps allowed_to_execute false, ssh_allowed false, live_command_allowed false, mapped_task_executed false" in text
+    assert "Day87 is a phase gate review" in text
+    assert "Day87 keeps execution_allowed false, ssh_allowed false, live_command_allowed false, write_command_allowed false" in text
+    assert "Day88 remains design-only" in text
     assert "No mapped task was executed. This is a dry-run reviewer walkthrough only." in text
     html = text.lower()
     assert "<form" not in html

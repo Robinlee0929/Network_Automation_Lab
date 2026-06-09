@@ -4062,3 +4062,79 @@ def test_day86_controlled_runner_harness_runner_outputs_reports_without_live_acc
     assert "<form" not in html.lower()
     assert "<button" not in html.lower()
     assert "<script" not in html.lower()
+
+
+def test_day87_readonly_executor_phase_gate_review_task_exists_in_catalog():
+    task = next(
+        task for task in network_lab.list_tasks() if task["id"] == "readonly-executor-phase-gate-review"
+    )
+
+    assert task["task_id"] == "day87_readonly_executor_phase_gate_review"
+    assert task["day"] == "Day87"
+    assert task["display_name"] == "Day87 Read-only Executor Phase Gate Review"
+    assert task["safety_level"] == "dry-run"
+    assert task["execution_mode"] == "dry-run"
+    assert task["requires_live_device"] is False
+    assert task["requires_password"] is False
+    assert task["produces_report"] is True
+    assert "reports/lab-summary/day87_readonly_executor_phase_gate_review.json" in task["report_paths"]
+    assert "reports/lab-summary/day87_readonly_executor_phase_gate_review.html" in task["report_paths"]
+    assert "docs/ai/intent_readonly_executor_phase_gate_review.md" in task["report_paths"]
+    assert "docs/roadmap/day87_readonly_executor_phase_gate_review.md" in task["report_paths"]
+    assert "DESIGN_ONLY" in task["notes"]
+    assert "real_adapter_implementation_allowed remains false" in task["notes"]
+
+
+def test_day87_readonly_executor_phase_gate_review_runner_outputs_reports_without_live_access(
+    tmp_path, monkeypatch, capsys
+):
+    def fail_run(*_args, **_kwargs):
+        raise AssertionError("Day87 phase gate review must not execute subprocess")
+
+    def fail_profile_load(*_args, **_kwargs):
+        raise AssertionError("Day87 phase gate review must not load profile or config data")
+
+    monkeypatch.setattr(network_lab.subprocess, "run", fail_run)
+    monkeypatch.setattr(network_lab, "load_lab_runner_profile", fail_profile_load)
+
+    exit_code = network_lab.main(
+        ["--task", "readonly-executor-phase-gate-review"], project_root=tmp_path
+    )
+
+    output = capsys.readouterr().out
+    json_path = tmp_path / "reports/lab-summary/day87_readonly_executor_phase_gate_review.json"
+    html_path = tmp_path / "reports/lab-summary/day87_readonly_executor_phase_gate_review.html"
+    assert exit_code == 0
+    assert "Day87 Read-only Executor Phase Gate Review" in output
+    assert "Task name: readonly-executor-phase-gate-review" in output
+    assert "Result: PASS / DESIGN_ONLY" in output
+    assert "Reviewed days: Day83, Day84, Day85, Day86" in output
+    assert "Execution allowed: false" in output
+    assert "SSH allowed: false" in output
+    assert "Live command allowed: false" in output
+    assert "Write command allowed: false" in output
+    assert "Device connection allowed: false" in output
+    assert "Real adapter design allowed: true" in output
+    assert "Real adapter implementation allowed: false" in output
+    assert "Next phase: Day88 Real Read-only Executor Adapter Design Draft" in output
+    assert "JSON report: reports/lab-summary/day87_readonly_executor_phase_gate_review.json" in output
+    assert "HTML report: reports/lab-summary/day87_readonly_executor_phase_gate_review.html" in output
+    assert "[PASS] DESIGN_ONLY. Reviewed Day83, Day84, Day85, and Day86" in output
+    assert json_path.exists()
+    assert html_path.exists()
+    assert not (tmp_path / "config.json").exists()
+
+    report = json.loads(json_path.read_text(encoding="utf-8"))
+    html = html_path.read_text(encoding="utf-8")
+    assert report["phase_gate_status"] == "PASS"
+    assert report["phase_gate_recommendation"] == "DESIGN_ONLY"
+    assert report["execution_allowed"] is False
+    assert report["real_adapter_design_allowed"] is True
+    assert report["real_adapter_implementation_allowed"] is False
+    chain_text = json.dumps(report["evidence_chain"], sort_keys=True)
+    for day in ("Day83", "Day84", "Day85", "Day86"):
+        assert day in chain_text
+        assert day in html
+    assert "<form" not in html.lower()
+    assert "<button" not in html.lower()
+    assert "method=\"post\"" not in html.lower()
