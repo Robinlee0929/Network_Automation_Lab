@@ -35,6 +35,10 @@ from intent_reviewer_decision_audit_summary import (
     build_reviewer_decision_audit_summary_report,
     write_reviewer_decision_audit_summary_reports,
 )
+from intent_readonly_executor_readiness_gate import (
+    build_readonly_executor_readiness_gate_report,
+    write_readonly_executor_readiness_gate_reports,
+)
 from intent_runtime_safety_case import build_runtime_safety_case_report
 from intent_runtime_safety_gate import build_runtime_safety_gate_report
 
@@ -198,6 +202,19 @@ DAY82_REVIEWER_DECISION_AUDIT_JSON = (
 )
 DAY82_REVIEWER_DECISION_AUDIT_HTML = (
     Path("reports") / "lab-summary" / "day82_reviewer_decision_audit_summary.html"
+)
+DAY83_READONLY_EXECUTOR_READINESS_GATE_TASK_ID = "readonly-executor-readiness-gate"
+DAY83_READONLY_EXECUTOR_READINESS_GATE_DOC = (
+    Path("docs") / "ai" / "readonly_executor_readiness_gate.md"
+)
+DAY83_READONLY_EXECUTOR_READINESS_GATE_ROADMAP = (
+    Path("docs") / "roadmap" / "day83_readonly_executor_readiness_gate.md"
+)
+DAY83_READONLY_EXECUTOR_READINESS_GATE_JSON = (
+    Path("reports") / "lab-summary" / "day83_readonly_executor_readiness_gate.json"
+)
+DAY83_READONLY_EXECUTOR_READINESS_GATE_HTML = (
+    Path("reports") / "lab-summary" / "day83_readonly_executor_readiness_gate.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -888,6 +905,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY82_REVIEWER_DECISION_AUDIT_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day83",
+        "title": "Read-only Executor Readiness Gate / Controlled Runner Preflight",
+        "report_type": "Read-only executor readiness gate",
+        "safety_label": "deterministic offline review-only readiness gate",
+        "description": "Day83 validates the Day79-Day82 safety evidence chain as sufficient for future read-only executor adapter design review while preserving executor_allowed=false, no live execution, no SSH, no device access, no AI runtime, no mapped task execution, no approval/execution unlock, and no dashboard action endpoint.",
+        "json_globs": [DAY83_READONLY_EXECUTOR_READINESS_GATE_JSON.as_posix()],
+        "html_globs": [DAY83_READONLY_EXECUTOR_READINESS_GATE_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY83_READONLY_EXECUTOR_READINESS_GATE_TASK_ID}"
         ),
     },
 ]
@@ -2763,6 +2793,34 @@ def list_tasks() -> List[Dict[str, Any]]:
             "related_script": "network_lab.py",
             "notes": "Deterministic mock-only dry-run reviewer decision audit summary. It summarizes and exports Day81 queue evidence only; it does not call APIs, use AI SDKs, execute mapped tasks, run live tests, open SSH, read config.json, connect to devices, add dashboard forms, POST routes, action endpoints, execution unlocks, arbitrary command execution, or modify network/device configuration.",
         },
+        {
+            "id": DAY83_READONLY_EXECUTOR_READINESS_GATE_TASK_ID,
+            "task_id": "day83_readonly_executor_readiness_gate",
+            "display_name": "Day83 Read-only Executor Readiness Gate / Controlled Runner Preflight",
+            "user_display_name": "Read-only Executor Readiness Gate / Controlled Runner Preflight",
+            "day": "Day83",
+            "category": "ai_planning",
+            "description": "Validates whether Day79-Day82 safety evidence is sufficient to mark a request as a future read-only executor candidate without executing anything.",
+            "safety_level": "dry-run",
+            "execution_mode": "dry-run",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY83_READONLY_EXECUTOR_READINESS_GATE_JSON.as_posix(),
+                DAY83_READONLY_EXECUTOR_READINESS_GATE_HTML.as_posix(),
+                DAY83_READONLY_EXECUTOR_READINESS_GATE_DOC.as_posix(),
+                DAY83_READONLY_EXECUTOR_READINESS_GATE_ROADMAP.as_posix(),
+            ],
+            "report_outputs": [
+                "Day83 JSON/HTML read-only executor readiness gate",
+                "Day83 controlled runner preflight documentation",
+            ],
+            "related_script": "network_lab.py",
+            "notes": "Deterministic offline review-only readiness gate. It marks future adapter design candidacy only; it is not the read-only executor and does not call APIs, use AI SDKs, execute mapped tasks, run live tests, open SSH, read config.json, connect to devices, add dashboard forms, POST routes, action endpoints, approval unlocks, execution unlocks, arbitrary command execution, or modify network/device configuration.",
+        },
     ]
 
 
@@ -2829,6 +2887,7 @@ readonly-execution-broker defines deterministic Day80 read-only broker request r
 broker-review-queue transforms Day80 broker records into deterministic Day81 reviewer queue and decision state records without AI API, SSH, device access, config.json, live execution, mapped task execution, execution unlocks, dashboard forms, POST routes, or action endpoints.
 broker-review-queue-decision-state is a compatibility alias for broker-review-queue.
 reviewer-decision-audit-summary summarizes Day81 queue decisions into deterministic Day82 reviewer audit evidence without AI API, AI SDK runtime, SSH, device access, config.json, live execution, mapped task execution, execution unlocks, dashboard forms, POST routes, or action endpoints.
+readonly-executor-readiness-gate validates Day79-Day82 safety evidence as deterministic Day83 future-adapter candidate readiness only; it is not an executor and does not enable AI API, AI SDK runtime, SSH, device access, config.json, live execution, mapped task execution, approval/execution unlocks, dashboard forms, POST routes, or action endpoints.
 wireguard-runner is dry-run by default and delegates to the existing WireGuard script only after explicit --allow-live-wireguard."""
     parser = argparse.ArgumentParser(
         description=f"Day14 {DAY14_NAME}.",
@@ -2876,6 +2935,7 @@ wireguard-runner is dry-run by default and delegates to the existing WireGuard s
             DAY81_BROKER_REVIEW_QUEUE_TASK_ID,
             DAY81_BROKER_REVIEW_QUEUE_DECISION_STATE_TASK_ALIAS,
             DAY82_REVIEWER_DECISION_AUDIT_TASK_ID,
+            DAY83_READONLY_EXECUTOR_READINESS_GATE_TASK_ID,
             WIREGUARD_RUNNER_TASK_ALIAS,
         ],
         help="Task to run.",
@@ -5075,6 +5135,49 @@ def _run_day82_reviewer_decision_audit_summary(project_root: Path) -> int:
         return 0
 
     print(f"{format_status('FAIL')} Day82 reviewer decision audit summary invariants failed.")
+    return 1
+
+
+def _run_day83_readonly_executor_readiness_gate(project_root: Path) -> int:
+    report = build_readonly_executor_readiness_gate_report()
+    json_path, html_path = write_readonly_executor_readiness_gate_reports(project_root, report)
+    summary = report["summary"]
+
+    def flag(name: str) -> str:
+        return json.dumps(report[name])
+
+    print(format_heading("Day83 Read-only Executor Readiness Gate / Controlled Runner Preflight"))
+    print("Task name: readonly-executor-readiness-gate")
+    print("Safety: deterministic offline / review-only readiness gate; this is not an executor")
+    print(f"Result: {report['overall_status']} / {report['readiness_state']}")
+    print(f"Readiness checks: {summary['readiness_checks_passed']} / {summary['readiness_check_count']}")
+    print(f"Day79 contract records: {summary['day79_contract_records']}")
+    print(f"Day80 broker records: {summary['day80_broker_records']}")
+    print(f"Day81 queue records: {summary['day81_queue_records']}")
+    print(f"Day82 evidence exports: {summary['day82_evidence_exports']}")
+    print(f"Executor allowed: {flag('executor_allowed')}")
+    print(f"Read-only executor candidate: {flag('readonly_executor_candidate')}")
+    print(f"Live execution allowed: {flag('live_execution_allowed')}")
+    print(f"SSH allowed: {flag('ssh_allowed')}")
+    print(f"Device access allowed: {flag('device_access_allowed')}")
+    print(f"AI runtime allowed: {flag('ai_runtime_allowed')}")
+    print(f"Dashboard action allowed: {flag('dashboard_action_allowed')}")
+    print(f"Mapped task execution allowed: {flag('mapped_task_execution_allowed')}")
+    print(f"Approval unlock allowed: {flag('approval_unlock_allowed')}")
+    print(f"Execution unlock supported: {flag('execution_unlock_supported')}")
+    print(f"JSON report: {_relative_to_project(project_root, json_path)}")
+    print(f"HTML report: {_relative_to_project(project_root, html_path)}")
+
+    if report["overall_status"] == "PASS" and report["readiness_state"] == "READINESS_REVIEW_READY":
+        print(
+            f"{format_status('PASS')} READINESS_REVIEW_READY. Read-only executor "
+            "candidate status is review-only; no executor, live execution, SSH, "
+            "device access, AI runtime, mapped task execution, dashboard action, "
+            "approval unlock, or execution unlock was added."
+        )
+        return 0
+
+    print(f"{format_status('FAIL')} Day83 read-only executor readiness gate invariants failed.")
     return 1
 
 
@@ -7434,6 +7537,8 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
         return _run_day81_broker_review_queue(root)
     if args.task == DAY82_REVIEWER_DECISION_AUDIT_TASK_ID:
         return _run_day82_reviewer_decision_audit_summary(root)
+    if args.task == DAY83_READONLY_EXECUTOR_READINESS_GATE_TASK_ID:
+        return _run_day83_readonly_executor_readiness_gate(root)
 
     profile_path = _resolve_project_path(root, args.profile)
     try:

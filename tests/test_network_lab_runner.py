@@ -3693,3 +3693,94 @@ def test_day82_reviewer_decision_audit_summary_runner_outputs_reports_without_li
         assert day in traceability_text
     assert "Reviewer Decision Audit Summary / Queue Evidence Export" in html
     assert "AI runtime allowed values" in html
+
+
+def test_day83_readonly_executor_readiness_gate_task_exists_in_catalog():
+    task = next(
+        task for task in network_lab.list_tasks() if task["id"] == "readonly-executor-readiness-gate"
+    )
+
+    assert task["task_id"] == "day83_readonly_executor_readiness_gate"
+    assert task["day"] == "Day83"
+    assert task["safety_level"] == "dry-run"
+    assert task["execution_mode"] == "dry-run"
+    assert task["requires_live_device"] is False
+    assert task["requires_password"] is False
+    assert task["produces_report"] is True
+    assert "reports/lab-summary/day83_readonly_executor_readiness_gate.json" in task["report_paths"]
+    assert "reports/lab-summary/day83_readonly_executor_readiness_gate.html" in task["report_paths"]
+    assert "docs/ai/readonly_executor_readiness_gate.md" in task["report_paths"]
+    assert "docs/roadmap/day83_readonly_executor_readiness_gate.md" in task["report_paths"]
+    assert "future adapter design candidacy only" in task["notes"]
+    assert "does not call APIs" in task["notes"]
+
+
+def test_day83_readonly_executor_readiness_gate_runner_outputs_reports_without_live_access(
+    tmp_path, monkeypatch, capsys
+):
+    def fail_run(*_args, **_kwargs):
+        raise AssertionError("Day83 read-only executor readiness gate must not execute subprocess")
+
+    def fail_profile_load(*_args, **_kwargs):
+        raise AssertionError("Day83 read-only executor readiness gate must not load profile or config data")
+
+    monkeypatch.setattr(network_lab.subprocess, "run", fail_run)
+    monkeypatch.setattr(network_lab, "load_lab_runner_profile", fail_profile_load)
+
+    exit_code = network_lab.main(
+        ["--task", "readonly-executor-readiness-gate"], project_root=tmp_path
+    )
+
+    output = capsys.readouterr().out
+    json_path = tmp_path / "reports/lab-summary/day83_readonly_executor_readiness_gate.json"
+    html_path = tmp_path / "reports/lab-summary/day83_readonly_executor_readiness_gate.html"
+    assert exit_code == 0
+    assert "Day83 Read-only Executor Readiness Gate / Controlled Runner Preflight" in output
+    assert "Task name: readonly-executor-readiness-gate" in output
+    assert "Result: PASS / READINESS_REVIEW_READY" in output
+    assert "Readiness checks: 7 / 7" in output
+    assert "Day79 contract records: 5" in output
+    assert "Day80 broker records: 5" in output
+    assert "Day81 queue records: 5" in output
+    assert "Day82 evidence exports: 5" in output
+    assert "Executor allowed: false" in output
+    assert "Read-only executor candidate: true" in output
+    assert "Live execution allowed: false" in output
+    assert "SSH allowed: false" in output
+    assert "Device access allowed: false" in output
+    assert "AI runtime allowed: false" in output
+    assert "Dashboard action allowed: false" in output
+    assert "Mapped task execution allowed: false" in output
+    assert "Approval unlock allowed: false" in output
+    assert "Execution unlock supported: false" in output
+    assert "JSON report: reports/lab-summary/day83_readonly_executor_readiness_gate.json" in output
+    assert "HTML report: reports/lab-summary/day83_readonly_executor_readiness_gate.html" in output
+    assert "[PASS] READINESS_REVIEW_READY. Read-only executor candidate status is review-only" in output
+    assert "no executor" in output
+    assert "approval unlock" in output
+    assert json_path.exists()
+    assert html_path.exists()
+    assert not (tmp_path / "config.json").exists()
+
+    report = json.loads(json_path.read_text(encoding="utf-8"))
+    html = html_path.read_text(encoding="utf-8")
+    assert report["day"] == "Day83"
+    assert report["overall_status"] == "PASS"
+    assert report["readiness_state"] == "READINESS_REVIEW_READY"
+    assert report["executor_allowed"] is False
+    assert report["readonly_executor_candidate"] is True
+    assert report["live_execution_allowed"] is False
+    assert report["ssh_allowed"] is False
+    assert report["device_access_allowed"] is False
+    assert report["ai_runtime_allowed"] is False
+    assert report["dashboard_action_allowed"] is False
+    assert report["mapped_task_execution_allowed"] is False
+    assert report["approval_unlock_allowed"] is False
+    assert report["execution_unlock_supported"] is False
+    assert report["candidate_scope"]["candidate_means_execution_allowed"] is False
+    assert report["summary"]["source_days"] == ["Day79", "Day80", "Day81", "Day82"]
+    assert {check["status"] for check in report["readiness_checks"]} == {"PASS"}
+    assert "Day83 Read-only Executor Readiness Gate" in html
+    assert "Executor allowed" in html
+    assert "<form" not in html.lower()
+    assert "<button" not in html.lower()
