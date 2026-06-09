@@ -36,6 +36,7 @@ STATUS_FIELDS = (
     "overall_result",
     "overall_status",
     "result",
+    "overall_decision",
     "status",
     "passed",
     "pass",
@@ -1098,15 +1099,29 @@ def ai_intent_reviewer_references() -> List[AIIntentReviewerReference]:
             day="Day90",
             title="Real Adapter Implementation Plan",
             summary=(
-                "Decides whether repository evidence is ready for a later "
-                "minimal read-only adapter prototype while remaining "
-                "planning-only and non-executing."
+                "Produces a CONDITIONAL_GO planning decision only; it does "
+                "not implement a real adapter or live-read path."
             ),
             doc_path="docs/ai/intent_real_adapter_implementation_plan.md",
             roadmap_path="docs/roadmap/day90_real_adapter_implementation_plan.md",
             report_paths=(
                 "reports/lab-summary/day90_real_adapter_implementation_plan.json",
                 "reports/lab-summary/day90_real_adapter_implementation_plan.html",
+            ),
+        ),
+        AIIntentReviewerReference(
+            day="Day91",
+            title="Real Adapter Safety Scaffold",
+            summary=(
+                "Creates scaffold-only safety evidence after Day90 "
+                "CONDITIONAL_GO: dangerous actions are denied, read-only "
+                "candidates are future-only, and live-read remains blocked."
+            ),
+            doc_path="docs/ai/intent_real_adapter_safety_scaffold.md",
+            roadmap_path="docs/roadmap/day91_real_adapter_safety_scaffold.md",
+            report_paths=(
+                "reports/lab-summary/day91_real_adapter_safety_scaffold.json",
+                "reports/lab-summary/day91_real_adapter_safety_scaffold.html",
             ),
         ),
     ]
@@ -1347,7 +1362,10 @@ def ai_intent_safety_boundaries() -> List[str]:
         "Day89 allows only static spec loading, future allowlist metadata validation, candidate command classification, evidence-only reports, deterministic output, and no network side effects.",
         "Day90 is a planning-only implementation-entry decision; it decides GO, CONDITIONAL_GO, or NO_GO from repository evidence and does not implement a real adapter, SSH client, RouterOS command runner, live device access, or automatic apply.",
         "Day90 keeps scope planning_only, adapter_implementation_allowed false, live_device_access_allowed false, ssh_allowed false, and routeros_command_execution_allowed false.",
-        "Day90 may recommend Day91 only as a minimal read-only prototype with explicit allow flag, bounded command allowlist, timeout, evidence logging, redaction, and no configuration mutation.",
+        "Day90 produced CONDITIONAL_GO only, not GO; Day91 must therefore be positioned as Real Adapter Safety Scaffold, not a read-only prototype.",
+        "Day91 proves dangerous live/device-modifying actions are structurally denied before any real adapter, transport, SSH, RouterOS API, socket, subprocess device operation, credential use, executable guard, or live-read path exists.",
+        "Day91 keeps fail_closed_default true, live_read_allowed false, write_allowed false, raw_command_allowed false, credential_required false, transport_required false, and real_device_contact_allowed false.",
+        "Day91 lists future read-only candidates only as NOT_EXECUTABLE, PENDING_GUARD, and FUTURE_ONLY; Day92-Day96 must prove guards, fake transport, dry-run runner wiring, regression locks, and live-read review before live-read can be considered.",
     ]
 
 

@@ -1,8 +1,8 @@
 # Day90 Real Adapter Implementation Plan
 
 Day90 is not implementation. It is a planning-only decision record that decides
-whether the repository evidence is ready to enter a later real read-only adapter
-prototype phase.
+whether the repository evidence is ready to enter the next safety proof. Day90
+produced `CONDITIONAL_GO`, not `GO`, so Day91 must be scaffold-only.
 
 Day90 does not add a real SSH client, RouterOS command runner, real device host,
 username, password, adapter connection logic, subprocess/network execution, or
@@ -38,16 +38,23 @@ When the major evidence chain is complete, Day90 may produce
 
 ## Day91 Boundary
 
-If Day90 approves entry, the first implementation phase must be a minimal
-read-only prototype only. Any future live-read path must require:
+After Day90 `CONDITIONAL_GO`, Day91 must be Real Adapter Safety Scaffold only.
+It must prove dangerous actions are denied before any read-only behavior is
+considered.
 
-- Explicit allow flag.
-- Bounded positive command allowlist.
-- Timeout and fail-closed handling.
-- Evidence logging.
-- Redaction or digest-only output handling.
-- No configuration mutation.
+Day91 must keep:
+
+- `fail_closed_default == True`
+- `live_read_allowed == False`
+- `write_allowed == False`
+- `raw_command_allowed == False`
+- `credential_required == False`
+- `transport_required == False`
+- `real_device_contact_allowed == False`
 
 Configuration changes, write operations, automatic apply behavior, arbitrary
 commands, destructive RouterOS commands, host credentials in repo, and adapter
-connection logic outside the approved prototype boundary remain forbidden.
+connection logic remain forbidden. Future read-only candidates may be listed
+only as `NOT_EXECUTABLE`, `PENDING_GUARD`, and `FUTURE_ONLY` until Day92-Day96
+prove executable guards, fake transport, runner dry-run wiring, regression
+locks, and live-read review.

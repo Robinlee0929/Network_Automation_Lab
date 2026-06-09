@@ -193,6 +193,42 @@ def test_dashboard_evidence_surfaces_day90_implementation_plan_report(tmp_path):
     assert "routeros_command_execution_allowed=false" in day90_text
 
 
+def test_dashboard_evidence_surfaces_day91_safety_scaffold_report(tmp_path):
+    reports_dir = tmp_path / "reports"
+    write_json(
+        reports_dir / "lab-summary" / "day91_real_adapter_safety_scaffold.json",
+        {
+            "overall_decision": "PASS",
+            "status": "SCAFFOLD_ONLY",
+            "day90_gate": {"decision": "CONDITIONAL_GO"},
+            "invariants": {
+                "live_read_allowed": False,
+                "write_allowed": False,
+                "raw_command_allowed": False,
+                "credential_required": False,
+                "transport_required": False,
+                "real_device_contact_allowed": False,
+            },
+        },
+    )
+    (reports_dir / "lab-summary" / "day91_real_adapter_safety_scaffold.html").write_text(
+        "<html>Day91 scaffold-only report</html>",
+        encoding="utf-8",
+    )
+
+    entries = dashboard.collect_dashboard_evidence(tmp_path, reports_dir)
+
+    day91 = next(entry for entry in entries if entry.day == "Day91")
+    assert day91.title == "Real Adapter Safety Scaffold"
+    assert day91.status == "PASS"
+    assert day91.json_view_path == "reports/lab-summary/day91_real_adapter_safety_scaffold.json"
+    assert day91.html_view_path == "reports/lab-summary/day91_real_adapter_safety_scaffold.html"
+    day91_text = f"{day91.title} {day91.description} {day91.notes}".lower()
+    assert "scaffold-only" in day91_text
+    assert "no live-read" in day91_text
+    assert "dangerous actions" in day91_text
+
+
 def test_dashboard_evidence_missing_html_does_not_crash(tmp_path):
     reports_dir = tmp_path / "reports"
     write_json(
@@ -313,6 +349,7 @@ def test_ai_intent_reviewer_references_day57_to_day85():
         "Day88",
         "Day89",
         "Day90",
+        "Day91",
     ]
     text = " ".join(
         f"{item.title} {item.summary} {item.doc_path} {item.roadmap_path} "
@@ -1036,7 +1073,9 @@ def test_ai_intent_reviewer_route_exposes_day57_to_day82_without_execution(tmp_p
     assert "Day89 allows only static spec loading" in text
     assert "Day90 is a planning-only implementation-entry decision" in text
     assert "Day90 keeps scope planning_only, adapter_implementation_allowed false, live_device_access_allowed false, ssh_allowed false, and routeros_command_execution_allowed false" in text
-    assert "Day90 may recommend Day91 only as a minimal read-only prototype" in text
+    assert "Day90 produced CONDITIONAL_GO only, not GO" in text
+    assert "Day91 must therefore be positioned as Real Adapter Safety Scaffold" in text
+    assert "Day91 keeps fail_closed_default true, live_read_allowed false" in text
     assert "No mapped task was executed. This is a dry-run reviewer walkthrough only." in text
     html = text.lower()
     assert "<form" not in html

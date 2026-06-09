@@ -33,6 +33,7 @@ def test_runner_task_catalog_uses_consistent_day23_safety_labels():
             "report-only",
             "design-only",
             "planning-only",
+            "scaffold-only",
             "disabled",
             "controlled_failover_observation",
         }
@@ -43,6 +44,7 @@ def test_runner_task_catalog_uses_consistent_day23_safety_labels():
             "report-only",
             "design-only",
             "planning-only",
+            "scaffold-only",
             "disabled",
             "controlled_failover_observation",
         }

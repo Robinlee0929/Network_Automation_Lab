@@ -67,6 +67,10 @@ from intent_real_adapter_implementation_plan import (
     build_real_adapter_implementation_plan_report,
     write_real_adapter_implementation_plan_reports,
 )
+from intent_real_adapter_safety_scaffold import (
+    build_day91_real_adapter_safety_scaffold,
+    write_day91_real_adapter_safety_scaffold_reports,
+)
 from intent_runtime_safety_case import build_runtime_safety_case_report
 from intent_runtime_safety_gate import build_runtime_safety_gate_report
 
@@ -334,6 +338,19 @@ DAY90_REAL_ADAPTER_IMPLEMENTATION_PLAN_JSON = (
 )
 DAY90_REAL_ADAPTER_IMPLEMENTATION_PLAN_HTML = (
     Path("reports") / "lab-summary" / "day90_real_adapter_implementation_plan.html"
+)
+DAY91_REAL_ADAPTER_SAFETY_SCAFFOLD_TASK_ID = "real-adapter-safety-scaffold"
+DAY91_REAL_ADAPTER_SAFETY_SCAFFOLD_DOC = (
+    Path("docs") / "ai" / "intent_real_adapter_safety_scaffold.md"
+)
+DAY91_REAL_ADAPTER_SAFETY_SCAFFOLD_ROADMAP = (
+    Path("docs") / "roadmap" / "day91_real_adapter_safety_scaffold.md"
+)
+DAY91_REAL_ADAPTER_SAFETY_SCAFFOLD_JSON = (
+    Path("reports") / "lab-summary" / "day91_real_adapter_safety_scaffold.json"
+)
+DAY91_REAL_ADAPTER_SAFETY_SCAFFOLD_HTML = (
+    Path("reports") / "lab-summary" / "day91_real_adapter_safety_scaffold.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -1130,6 +1147,19 @@ REPORT_CATALOG = [
             f"{DAY90_REAL_ADAPTER_IMPLEMENTATION_PLAN_TASK_ID}"
         ),
     },
+    {
+        "day": "Day91",
+        "title": "Real Adapter Safety Scaffold",
+        "report_type": "Real adapter scaffold-only safety evidence",
+        "safety_label": "deterministic scaffold-only evidence; no live-read",
+        "description": "Day91 is scaffold-only with no live-read and follows Day90 CONDITIONAL_GO by proving dangerous actions are denied before any real adapter, transport, SSH, RouterOS API, socket, subprocess device operation, credential use, or live-read path exists.",
+        "json_globs": [DAY91_REAL_ADAPTER_SAFETY_SCAFFOLD_JSON.as_posix()],
+        "html_globs": [DAY91_REAL_ADAPTER_SAFETY_SCAFFOLD_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY91_REAL_ADAPTER_SAFETY_SCAFFOLD_TASK_ID}"
+        ),
+    },
 ]
 
 
@@ -1554,14 +1584,30 @@ def infer_report_result(json_data: Any) -> str:
     if not isinstance(json_data, dict):
         return "UNKNOWN"
 
-    for key in ("overall_result", "overall_status", "result", "status", "passed", "validation_result"):
+    for key in (
+        "overall_result",
+        "overall_status",
+        "result",
+        "overall_decision",
+        "status",
+        "passed",
+        "validation_result",
+    ):
         if key in json_data:
             return normalize_result(json_data.get(key))
 
     for container_key in ("summary", "aggregate", "day13", "Day13 summary"):
         nested = json_data.get(container_key)
         if isinstance(nested, dict):
-            for key in ("overall_result", "overall_status", "result", "status", "passed", "validation_result"):
+            for key in (
+                "overall_result",
+                "overall_status",
+                "result",
+                "overall_decision",
+                "status",
+                "passed",
+                "validation_result",
+            ):
                 if key in nested:
                     return normalize_result(nested.get(key))
 
@@ -3228,6 +3274,34 @@ def list_tasks() -> List[Dict[str, Any]]:
             "related_script": "network_lab.py",
             "notes": "Deterministic planning-only decision. It may produce GO, CONDITIONAL_GO, or NO_GO from repository evidence, but scope remains planning_only; adapter_implementation_allowed remains false, live_device_access_allowed remains false, ssh_allowed remains false, routeros_command_execution_allowed remains false, and no SSH client, RouterOS command runner, real device credentials, adapter connection logic, automatic apply, dashboard action, subprocess, network command, or configuration mutation is added.",
         },
+        {
+            "id": DAY91_REAL_ADAPTER_SAFETY_SCAFFOLD_TASK_ID,
+            "task_id": "day91_real_adapter_safety_scaffold",
+            "display_name": "Day91 Real Adapter Safety Scaffold",
+            "user_display_name": "Real Adapter Safety Scaffold",
+            "day": "Day91",
+            "category": "ai_planning",
+            "description": "Creates scaffold-only evidence after Day90 CONDITIONAL_GO that dangerous live/device-modifying actions are structurally denied before any read-only execution path exists.",
+            "safety_level": "scaffold-only",
+            "execution_mode": "scaffold-only",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY91_REAL_ADAPTER_SAFETY_SCAFFOLD_JSON.as_posix(),
+                DAY91_REAL_ADAPTER_SAFETY_SCAFFOLD_HTML.as_posix(),
+                DAY91_REAL_ADAPTER_SAFETY_SCAFFOLD_DOC.as_posix(),
+                DAY91_REAL_ADAPTER_SAFETY_SCAFFOLD_ROADMAP.as_posix(),
+            ],
+            "report_outputs": [
+                "Day91 JSON/HTML real adapter safety scaffold",
+                "Day91 scaffold-only AI reviewer and roadmap documentation",
+            ],
+            "related_script": "network_lab.py",
+            "notes": "Deterministic scaffold-only evidence. Day90 was CONDITIONAL_GO only; Day91 denies dangerous actions, marks read-only candidates future-only, keeps live_read_allowed false, write_allowed false, raw_command_allowed false, credential_required false, transport_required false, real_device_contact_allowed false, and adds no SSH, RouterOS API, socket, subprocess device operation, credential use, real adapter, executable guard, dashboard action, command input, or live-read path.",
+        },
     ]
 
 
@@ -3301,6 +3375,7 @@ readonly-executor-phase-gate-review reviews Day83-Day86 safety evidence as deter
 readonly-executor-adapter-design defines deterministic Day88 real read-only executor adapter design contracts only; it remains DESIGN_ONLY, does not implement SSH or RouterOS connection, does not support live commands, and does not add dashboard actions.
 real-adapter-safety-boundary-spec locks the Day89 pre-implementation safety boundary for any future real adapter; it remains DESIGN_ONLY, does not implement SSH or RouterOS connection, does not execute commands, and does not add dashboard actions.
 real-adapter-implementation-plan produces the Day90 implementation-entry decision report; it remains PLANNING_ONLY and does not implement SSH, RouterOS commands, live adapter access, or automatic apply.
+real-adapter-safety-scaffold produces the Day91 scaffold-only safety evidence after Day90 CONDITIONAL_GO; dangerous actions are denied, read-only candidates are future-only, and live-read remains blocked.
 wireguard-runner is dry-run by default and delegates to the existing WireGuard script only after explicit --allow-live-wireguard."""
     parser = argparse.ArgumentParser(
         description=f"Day14 {DAY14_NAME}.",
@@ -3356,6 +3431,7 @@ wireguard-runner is dry-run by default and delegates to the existing WireGuard s
             DAY88_REAL_READONLY_EXECUTOR_ADAPTER_DESIGN_TASK_ID,
             DAY89_REAL_ADAPTER_SAFETY_BOUNDARY_SPEC_TASK_ID,
             DAY90_REAL_ADAPTER_IMPLEMENTATION_PLAN_TASK_ID,
+            DAY91_REAL_ADAPTER_SAFETY_SCAFFOLD_TASK_ID,
             WIREGUARD_RUNNER_TASK_ALIAS,
         ],
         help="Task to run.",
@@ -5905,6 +5981,60 @@ def _run_day90_real_adapter_implementation_plan(project_root: Path) -> int:
     return 1
 
 
+def _run_day91_real_adapter_safety_scaffold(project_root: Path) -> int:
+    report = build_day91_real_adapter_safety_scaffold()
+    json_path, html_path = write_day91_real_adapter_safety_scaffold_reports(project_root, report)
+    invariants = report["invariants"]
+
+    def flag(name: str) -> str:
+        return json.dumps(invariants[name])
+
+    print(format_heading("Day91 Real Adapter Safety Scaffold"))
+    print("Task name: real-adapter-safety-scaffold")
+    print("Safety: deterministic scaffold-only evidence; no real adapter or live-read")
+    print(f"Result: {report['overall_decision']} / {report['status']}")
+    print(f"Day90 gate: {report['day90_gate']['decision']} only")
+    print(f"Dangerous actions denied: {len(report['dangerous_actions'])}")
+    print(f"Read-only candidates future-only: {len(report['read_only_candidates'])}")
+    print(f"fail_closed_default: {flag('fail_closed_default')}")
+    print(f"live_read_allowed: {flag('live_read_allowed')}")
+    print(f"write_allowed: {flag('write_allowed')}")
+    print(f"raw_command_allowed: {flag('raw_command_allowed')}")
+    print(f"credential_required: {flag('credential_required')}")
+    print(f"transport_required: {flag('transport_required')}")
+    print(f"real_device_contact_allowed: {flag('real_device_contact_allowed')}")
+    print(f"Next required days: {', '.join(item['day'] for item in report['next_required_days'])}")
+    print(f"JSON report: {_relative_to_project(project_root, json_path)}")
+    print(f"HTML report: {_relative_to_project(project_root, html_path)}")
+
+    if (
+        report["overall_decision"] == "PASS"
+        and report["status"] == "SCAFFOLD_ONLY"
+        and report["day90_gate"]["decision"] == "CONDITIONAL_GO"
+        and all(item["decision"] == "DENY" and item["allowed"] is False for item in report["dangerous_actions"])
+        and all(
+            item["execution_state"] == "NOT_EXECUTABLE"
+            and item["guard_state"] == "PENDING_GUARD"
+            and item["scope_state"] == "FUTURE_ONLY"
+            for item in report["read_only_candidates"]
+        )
+        and invariants["live_read_allowed"] is False
+        and invariants["write_allowed"] is False
+        and invariants["raw_command_allowed"] is False
+        and invariants["credential_required"] is False
+        and invariants["transport_required"] is False
+        and invariants["real_device_contact_allowed"] is False
+    ):
+        print(
+            f"{format_status('PASS')} SCAFFOLD_ONLY. Day91 denied dangerous "
+            "actions, kept read-only candidates future-only, and left live-read blocked."
+        )
+        return 0
+
+    print(f"{format_status('FAIL')} Day91 real adapter safety scaffold failed validation.")
+    return 1
+
+
 def _relative_to_project(project_root: Path, path: Path) -> str:
     try:
         return path.resolve().relative_to(project_root.resolve()).as_posix()
@@ -8277,6 +8407,8 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
         return _run_day89_real_adapter_safety_boundary_spec(root)
     if args.task == DAY90_REAL_ADAPTER_IMPLEMENTATION_PLAN_TASK_ID:
         return _run_day90_real_adapter_implementation_plan(root)
+    if args.task == DAY91_REAL_ADAPTER_SAFETY_SCAFFOLD_TASK_ID:
+        return _run_day91_real_adapter_safety_scaffold(root)
 
     profile_path = _resolve_project_path(root, args.profile)
     try:
