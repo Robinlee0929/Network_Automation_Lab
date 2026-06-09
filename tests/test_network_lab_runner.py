@@ -3784,3 +3784,102 @@ def test_day83_readonly_executor_readiness_gate_runner_outputs_reports_without_l
     assert "Executor allowed" in html
     assert "<form" not in html.lower()
     assert "<button" not in html.lower()
+
+
+def test_day84_readonly_executor_adapter_contract_task_exists_in_catalog():
+    task = next(
+        task for task in network_lab.list_tasks() if task["id"] == "readonly-executor-adapter-contract"
+    )
+
+    assert task["task_id"] == "day84_readonly_executor_adapter_contract"
+    assert task["day"] == "Day84"
+    assert task["safety_level"] == "dry-run"
+    assert task["execution_mode"] == "dry-run"
+    assert task["requires_live_device"] is False
+    assert task["requires_password"] is False
+    assert task["produces_report"] is True
+    assert "reports/lab-summary/day84_readonly_executor_adapter_contract.json" in task["report_paths"]
+    assert "reports/lab-summary/day84_readonly_executor_adapter_contract.html" in task["report_paths"]
+    assert "docs/ai/intent_readonly_executor_adapter_contract.md" in task["report_paths"]
+    assert "docs/roadmap/day84_readonly_executor_adapter_interface_contract.md" in task["report_paths"]
+    assert "contract-only adapter boundary" in task["notes"]
+    assert "not an executor or adapter implementation" in task["notes"]
+    assert "does not call APIs" in task["notes"]
+
+
+def test_day84_readonly_executor_adapter_contract_runner_outputs_reports_without_live_access(
+    tmp_path, monkeypatch, capsys
+):
+    def fail_run(*_args, **_kwargs):
+        raise AssertionError("Day84 read-only executor adapter contract must not execute subprocess")
+
+    def fail_profile_load(*_args, **_kwargs):
+        raise AssertionError("Day84 read-only executor adapter contract must not load profile or config data")
+
+    monkeypatch.setattr(network_lab.subprocess, "run", fail_run)
+    monkeypatch.setattr(network_lab, "load_lab_runner_profile", fail_profile_load)
+
+    exit_code = network_lab.main(
+        ["--task", "readonly-executor-adapter-contract"], project_root=tmp_path
+    )
+
+    output = capsys.readouterr().out
+    json_path = tmp_path / "reports/lab-summary/day84_readonly_executor_adapter_contract.json"
+    html_path = tmp_path / "reports/lab-summary/day84_readonly_executor_adapter_contract.html"
+    assert exit_code == 0
+    assert "Day84 Read-only Executor Adapter Interface Contract" in output
+    assert "Task name: readonly-executor-adapter-contract" in output
+    assert "Result: PASS / REVIEW_READY" in output
+    assert "Contract state: LOCKED_REVIEW_ONLY_CONTRACT" in output
+    assert "Request shapes: 1" in output
+    assert "Response shapes: 1" in output
+    assert "Capability declarations: 1" in output
+    assert "Evidence references: 1" in output
+    assert "Read-only only: true" in output
+    assert "Dry-run only: true" in output
+    assert "Allowed to execute: false" in output
+    assert "SSH allowed: false" in output
+    assert "Device access allowed: false" in output
+    assert "Live command allowed: false" in output
+    assert "Approval unlock supported: false" in output
+    assert "Execution unlock supported: false" in output
+    assert "AI API allowed: false" in output
+    assert "Adapter implementation present: false" in output
+    assert "JSON report: reports/lab-summary/day84_readonly_executor_adapter_contract.json" in output
+    assert "HTML report: reports/lab-summary/day84_readonly_executor_adapter_contract.html" in output
+    assert "[PASS] REVIEW_READY. Read-only executor adapter contract is locked as review-only" in output
+    assert "no executor implementation" in output
+    assert "approval unlock" in output
+    assert json_path.exists()
+    assert html_path.exists()
+    assert not (tmp_path / "config.json").exists()
+
+    report = json.loads(json_path.read_text(encoding="utf-8"))
+    html = html_path.read_text(encoding="utf-8")
+    assert report["day"] == "Day84"
+    assert report["overall_status"] == "PASS"
+    assert report["reviewer_status"] == "REVIEW_READY"
+    assert report["contract_state"] == "LOCKED_REVIEW_ONLY_CONTRACT"
+    assert report["adapter_boundary"]["boundary_type"] == "contract_only_boundary"
+    assert report["adapter_boundary"]["implements_executor"] is False
+    assert report["adapter_boundary"]["implements_adapter"] is False
+    assert report["adapter_safety_flags"]["read_only_only"] is True
+    assert report["adapter_safety_flags"]["dry_run_only"] is True
+    assert report["adapter_safety_flags"]["allowed_to_execute"] is False
+    assert report["adapter_safety_flags"]["ssh_allowed"] is False
+    assert report["adapter_safety_flags"]["device_access_allowed"] is False
+    assert report["adapter_safety_flags"]["live_command_allowed"] is False
+    assert report["adapter_safety_flags"]["approval_unlock_supported"] is False
+    assert report["adapter_safety_flags"]["execution_unlock_supported"] is False
+    assert report["adapter_safety_flags"]["ai_api_allowed"] is False
+    assert report["adapter_safety_flags"]["adapter_implementation_present"] is False
+    assert report["adapter_capability_declaration_shape"]["supported_transports"] == ["none_contract_only"]
+    assert report["adapter_capability_declaration_shape"]["runnable_entrypoint"] is None
+    assert report["adapter_capability_declaration_shape"]["implementation_module"] is None
+    assert report["adapter_response_shape"]["execution_result"] is None
+    assert report["adapter_response_shape"]["commands_executed"] == []
+    assert "Day84 Read-only Executor Adapter Interface Contract" in html
+    assert "Adapter implementation present values" in html
+    assert "<form" not in html.lower()
+    assert "<button" not in html.lower()
+    assert "<script" not in html.lower()
