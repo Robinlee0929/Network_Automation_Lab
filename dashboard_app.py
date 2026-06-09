@@ -1124,6 +1124,22 @@ def ai_intent_reviewer_references() -> List[AIIntentReviewerReference]:
                 "reports/lab-summary/day91_real_adapter_safety_scaffold.html",
             ),
         ),
+        AIIntentReviewerReference(
+            day="Day92",
+            title="Real Adapter Executable Guards",
+            summary=(
+                "Turns Day91 static safety rules into executable guards: "
+                "simulated read-only requests may pass, while dangerous, "
+                "sensitive, ambiguous, and unknown requests are rejected before "
+                "executor invocation."
+            ),
+            doc_path="docs/ai/intent_executable_guards.md",
+            roadmap_path="docs/roadmap/day92_real_adapter_executable_guards.md",
+            report_paths=(
+                "reports/lab-summary/day92_real_adapter_executable_guards_report.json",
+                "reports/lab-summary/day92_real_adapter_executable_guards_report.html",
+            ),
+        ),
     ]
 
 
@@ -1366,6 +1382,8 @@ def ai_intent_safety_boundaries() -> List[str]:
         "Day91 proves dangerous live/device-modifying actions are structurally denied before any real adapter, transport, SSH, RouterOS API, socket, subprocess device operation, credential use, executable guard, or live-read path exists.",
         "Day91 keeps fail_closed_default true, live_read_allowed false, write_allowed false, raw_command_allowed false, credential_required false, transport_required false, and real_device_contact_allowed false.",
         "Day91 lists future read-only candidates only as NOT_EXECUTABLE, PENDING_GUARD, and FUTURE_ONLY; Day92-Day96 must prove guards, fake transport, dry-run runner wiring, regression locks, and live-read review before live-read can be considered.",
+        "Day92 is an executable guard layer, not an adapter implementation; it rejects dangerous, sensitive, ambiguous, and unknown simulated requests before executor invocation.",
+        "Day92 keeps no_real_device_access true, no_ssh true, no_subprocess true, no_socket true, no_real_adapter true, adapter_implementation_added false, and rejected_adapter_invocations 0.",
     ]
 
 
