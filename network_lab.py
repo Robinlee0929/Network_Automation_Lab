@@ -59,6 +59,10 @@ from intent_real_readonly_executor_adapter_design import (
     build_real_readonly_executor_adapter_design_report,
     write_real_readonly_executor_adapter_design_reports,
 )
+from intent_real_adapter_safety_boundary_spec import (
+    build_real_adapter_safety_boundary_spec_report,
+    write_real_adapter_safety_boundary_spec_reports,
+)
 from intent_runtime_safety_case import build_runtime_safety_case_report
 from intent_runtime_safety_gate import build_runtime_safety_gate_report
 
@@ -300,6 +304,19 @@ DAY88_REAL_READONLY_EXECUTOR_ADAPTER_DESIGN_JSON = (
 )
 DAY88_REAL_READONLY_EXECUTOR_ADAPTER_DESIGN_HTML = (
     Path("reports") / "lab-summary" / "day88_real_readonly_executor_adapter_design.html"
+)
+DAY89_REAL_ADAPTER_SAFETY_BOUNDARY_SPEC_TASK_ID = "real-adapter-safety-boundary-spec"
+DAY89_REAL_ADAPTER_SAFETY_BOUNDARY_SPEC_DOC = (
+    Path("docs") / "ai" / "real_adapter_safety_boundary_spec.md"
+)
+DAY89_REAL_ADAPTER_SAFETY_BOUNDARY_SPEC_ROADMAP = (
+    Path("docs") / "roadmap" / "day89_real_adapter_safety_boundary_spec.md"
+)
+DAY89_REAL_ADAPTER_SAFETY_BOUNDARY_SPEC_JSON = (
+    Path("reports") / "lab-summary" / "day89_real_adapter_safety_boundary_spec.json"
+)
+DAY89_REAL_ADAPTER_SAFETY_BOUNDARY_SPEC_HTML = (
+    Path("reports") / "lab-summary" / "day89_real_adapter_safety_boundary_spec.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -1068,6 +1085,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY88_REAL_READONLY_EXECUTOR_ADAPTER_DESIGN_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day89",
+        "title": "Real Adapter Safety Boundary Spec",
+        "report_type": "Real adapter pre-implementation safety boundary spec",
+        "safety_label": "deterministic design-only boundary lock; no live adapter",
+        "description": "Day89 locks the safety boundary before any real adapter implementation while keeping implementation_allowed=false, live_device_access_allowed=false, ssh_allowed=false, config_change_allowed=false, command_execution_allowed=false, and safety_boundary_locked=true.",
+        "json_globs": [DAY89_REAL_ADAPTER_SAFETY_BOUNDARY_SPEC_JSON.as_posix()],
+        "html_globs": [DAY89_REAL_ADAPTER_SAFETY_BOUNDARY_SPEC_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY89_REAL_ADAPTER_SAFETY_BOUNDARY_SPEC_TASK_ID}"
         ),
     },
 ]
@@ -3112,6 +3142,34 @@ def list_tasks() -> List[Dict[str, Any]]:
             "related_script": "network_lab.py",
             "notes": "Deterministic design-only draft. It defines future adapter architecture, positive allowlist, evidence contract, error contract, timeout contract, and safety boundary only; execution_supported remains false, ssh_supported remains false, routeros_connection_supported remains false, live_command_supported remains false, execution_unlock_supported remains false, dashboard action surfaces remain disabled, Day87 is not redone, and no SSH, RouterOS connection, live command, subprocess, mapped task execution, approval unlock, or real adapter implementation is added.",
         },
+        {
+            "id": DAY89_REAL_ADAPTER_SAFETY_BOUNDARY_SPEC_TASK_ID,
+            "task_id": "day89_real_adapter_safety_boundary_spec",
+            "display_name": "Day89 Real Adapter Safety Boundary Spec",
+            "user_display_name": "Real Adapter Safety Boundary Spec",
+            "day": "Day89",
+            "category": "ai_planning",
+            "description": "Locks the pre-implementation safety boundary before any future real adapter implementation.",
+            "safety_level": "design-only",
+            "execution_mode": "design-only",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY89_REAL_ADAPTER_SAFETY_BOUNDARY_SPEC_JSON.as_posix(),
+                DAY89_REAL_ADAPTER_SAFETY_BOUNDARY_SPEC_HTML.as_posix(),
+                DAY89_REAL_ADAPTER_SAFETY_BOUNDARY_SPEC_DOC.as_posix(),
+                DAY89_REAL_ADAPTER_SAFETY_BOUNDARY_SPEC_ROADMAP.as_posix(),
+            ],
+            "report_outputs": [
+                "Day89 JSON/HTML real adapter safety boundary spec",
+                "Day89 pre-implementation safety boundary documentation",
+            ],
+            "related_script": "network_lab.py",
+            "notes": "Deterministic design-only boundary lock. It allows only spec-level classification, allowlist metadata validation, evidence-only reporting, deterministic output, and no network side effects; implementation_allowed remains false, live_device_access_allowed remains false, ssh_allowed remains false, config_change_allowed remains false, command_execution_allowed remains false, and no SSH, RouterOS connection, live command, arbitrary executor, dashboard action, file upload, shell escape, or device change is added.",
+        },
     ]
 
 
@@ -3183,6 +3241,7 @@ readonly-executor-adapter-contract defines deterministic Day84 future adapter re
 controlled-runner-harness runs deterministic Day86 runner-level safety regression scenarios over Day85-style adapter compatibility/evidence signals without AI API, SSH, device access, config.json, live command execution, mapped task execution, approval/execution unlocks, dashboard forms, POST routes, or action endpoints.
 readonly-executor-phase-gate-review reviews Day83-Day86 safety evidence as deterministic Day87 phase gate evidence only; it may recommend Day88 DESIGN_ONLY but does not design or implement a real adapter, execute mapped tasks, open SSH, connect devices, run live/write commands, call APIs, or add dashboard actions.
 readonly-executor-adapter-design defines deterministic Day88 real read-only executor adapter design contracts only; it remains DESIGN_ONLY, does not implement SSH or RouterOS connection, does not support live commands, and does not add dashboard actions.
+real-adapter-safety-boundary-spec locks the Day89 pre-implementation safety boundary for any future real adapter; it remains DESIGN_ONLY, does not implement SSH or RouterOS connection, does not execute commands, and does not add dashboard actions.
 wireguard-runner is dry-run by default and delegates to the existing WireGuard script only after explicit --allow-live-wireguard."""
     parser = argparse.ArgumentParser(
         description=f"Day14 {DAY14_NAME}.",
@@ -3236,6 +3295,7 @@ wireguard-runner is dry-run by default and delegates to the existing WireGuard s
             DAY86_CONTROLLED_RUNNER_HARNESS_TASK_ID,
             DAY87_READONLY_EXECUTOR_PHASE_GATE_REVIEW_TASK_ID,
             DAY88_REAL_READONLY_EXECUTOR_ADAPTER_DESIGN_TASK_ID,
+            DAY89_REAL_ADAPTER_SAFETY_BOUNDARY_SPEC_TASK_ID,
             WIREGUARD_RUNNER_TASK_ALIAS,
         ],
         help="Task to run.",
@@ -5698,6 +5758,50 @@ def _run_day88_real_readonly_executor_adapter_design(project_root: Path) -> int:
     return 1
 
 
+def _run_day89_real_adapter_safety_boundary_spec(project_root: Path) -> int:
+    report = build_real_adapter_safety_boundary_spec_report()
+    json_path, html_path = write_real_adapter_safety_boundary_spec_reports(project_root, report)
+
+    def flag(name: str) -> str:
+        return json.dumps(report[name])
+
+    print(format_heading("Day89 Real Adapter Safety Boundary Spec"))
+    print("Task name: real-adapter-safety-boundary-spec")
+    print("Safety: deterministic design-only boundary lock; no real adapter implementation")
+    print(f"Result: {report['status']} / {report['phase']}")
+    print(f"safety_boundary_locked={report['safety_boundary_locked']}")
+    print(f"implementation_allowed={report['implementation_allowed']}")
+    print(f"live_device_access_allowed={report['live_device_access_allowed']}")
+    print(f"SSH allowed: {flag('ssh_allowed')}")
+    print(f"Config change allowed: {flag('config_change_allowed')}")
+    print(f"Command execution allowed: {flag('command_execution_allowed')}")
+    print(f"Reviewer decision required: {flag('reviewer_decision_required')}")
+    print(f"Blocked capabilities: {len(report['blocked_capabilities'])}")
+    print(f"Allowed spec-level capabilities: {len(report['allowed_capabilities'])}")
+    print(f"JSON report: {_relative_to_project(project_root, json_path)}")
+    print(f"HTML report: {_relative_to_project(project_root, html_path)}")
+
+    if (
+        report["status"] == "PASS"
+        and report["phase"] == "DESIGN_ONLY"
+        and report["safety_boundary_locked"] is True
+        and report["implementation_allowed"] is False
+        and report["live_device_access_allowed"] is False
+        and report["ssh_allowed"] is False
+        and report["config_change_allowed"] is False
+        and report["command_execution_allowed"] is False
+    ):
+        print(
+            f"{format_status('PASS')} DESIGN_ONLY. Day89 locks the safety boundary "
+            "before any real adapter implementation; live access and command "
+            "execution remain blocked."
+        )
+        return 0
+
+    print(f"{format_status('FAIL')} Day89 real adapter safety boundary spec failed.")
+    return 1
+
+
 def _relative_to_project(project_root: Path, path: Path) -> str:
     try:
         return path.resolve().relative_to(project_root.resolve()).as_posix()
@@ -8066,6 +8170,8 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
         return _run_day87_readonly_executor_phase_gate_review(root)
     if args.task == DAY88_REAL_READONLY_EXECUTOR_ADAPTER_DESIGN_TASK_ID:
         return _run_day88_real_readonly_executor_adapter_design(root)
+    if args.task == DAY89_REAL_ADAPTER_SAFETY_BOUNDARY_SPEC_TASK_ID:
+        return _run_day89_real_adapter_safety_boundary_spec(root)
 
     profile_path = _resolve_project_path(root, args.profile)
     try:

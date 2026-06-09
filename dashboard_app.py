@@ -1079,6 +1079,21 @@ def ai_intent_reviewer_references() -> List[AIIntentReviewerReference]:
                 "reports/lab-summary/day88_real_readonly_executor_adapter_design.html",
             ),
         ),
+        AIIntentReviewerReference(
+            day="Day89",
+            title="Real Adapter Safety Boundary Spec",
+            summary=(
+                "Locks the pre-implementation safety boundary before any real "
+                "adapter implementation while keeping SSH, live device access, "
+                "configuration changes, and command execution blocked."
+            ),
+            doc_path="docs/ai/real_adapter_safety_boundary_spec.md",
+            roadmap_path="docs/roadmap/day89_real_adapter_safety_boundary_spec.md",
+            report_paths=(
+                "reports/lab-summary/day89_real_adapter_safety_boundary_spec.json",
+                "reports/lab-summary/day89_real_adapter_safety_boundary_spec.html",
+            ),
+        ),
     ]
 
 
@@ -1312,6 +1327,9 @@ def ai_intent_safety_boundaries() -> List[str]:
         "Day88 is the Real Read-only Executor Adapter Design Draft only; it defines architecture, positive allowlist, evidence, error, timeout, and safety contracts without adding a real adapter.",
         "Day88 keeps execution_supported false, ssh_supported false, routeros_connection_supported false, live_command_supported false, execution_unlock_supported false, and dashboard action surfaces disabled.",
         "Day88 hands off to Day89 Real Adapter Safety Boundary Spec and does not redo Day87.",
+        "Day89 is a pre-implementation safety boundary lock; it does not implement a real adapter, SSH, RouterOS connection, live read-only command execution, arbitrary command execution, or device configuration changes.",
+        "Day89 keeps implementation_allowed false, live_device_access_allowed false, ssh_allowed false, config_change_allowed false, command_execution_allowed false, safety_boundary_locked true, and reviewer_decision_required true.",
+        "Day89 allows only static spec loading, future allowlist metadata validation, candidate command classification, evidence-only reports, deterministic output, and no network side effects.",
     ]
 
 
