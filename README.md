@@ -229,6 +229,7 @@ Cisco validation is read-only. It runs show commands for topology evidence and d
 | Day 80 | Read-only Execution Broker Skeleton; receives fixed mock read-only requests, validates them against Day79, rejects unsafe requests, queues review-only requests, and prepares mock execution request data while remaining mock-only and dry-run-only | Ready with notes |
 | Day 81 | Read-only Broker Review Queue & Decision State Report; transforms Day80 broker records into reviewer queue and decision state evidence while preserving no execution unlock, no SSH/device access, no mapped task execution, and no dashboard action endpoint | Ready with notes |
 | Day 82 | Reviewer Decision Audit Summary / Queue Evidence Export; summarizes Day81 queue decisions into deterministic reviewer audit evidence while preserving no live execution, no AI runtime, no SSH/device access, no config dependency, and no dashboard action endpoint | Ready with notes |
+| Day 93 | Guarded Fake Adapter Contract; proves guard-first ordering before a fake adapter boundary, with allowed scenarios invoking only the fake adapter and rejected scenarios never entering any adapter boundary | Ready with notes |
 
 ## Lab Topology
 
@@ -2273,6 +2274,19 @@ reports/lab-summary/day82_reviewer_decision_audit_summary.html
 ```
 
 Day82 adds `reviewer-decision-audit-summary`, a deterministic mock-only and dry-run-only audit/evidence export layer after the Day81 broker review queue. It does not repeat Day81 as another queue feature. Instead, it summarizes the Day81 queue decisions, exports one reviewer evidence record per Day81 queue record, proves safety invariant preservation, and maps traceability across Day79, Day80, Day81, and Day82. Every Day82 evidence export keeps `allowed_to_execute` set to `False`, `dry_run_only` set to `True`, `execution_unlock_supported` set to `False`, `device_connection_allowed` set to `False`, `ssh_allowed` set to `False`, `live_command_allowed` set to `False`, `network_change_allowed` set to `False`, `ai_runtime_allowed` set to `False`, and `dashboard_action_allowed` set to `False`; no Day82 status unlocks real AI execution, real SSH, device control, live command execution, mapped task execution, approval unlock, dashboard action surface, `config.json` dependency, or network configuration change.
+
+Day93 - Guarded Fake Adapter Contract:
+
+```text
+docs/roadmap/day93_guarded_fake_adapter_contract.md
+docs/ai/intent_guarded_fake_adapter_contract.md
+intent_guarded_fake_adapter_contract.py
+reports/lab-summary/day93_guarded_fake_adapter_contract.json
+reports/lab-summary/day93_guarded_fake_adapter_contract.html
+/ai-intent-reviewer
+```
+
+Day93 adds `guarded-fake-adapter-contract`, a deterministic fake-adapter-only boundary audit after the executable guard work. It proves every scenario is evaluated by the guard before adapter invocation, allowed read-only scenarios enter only the fake adapter boundary, rejected scenarios never enter the adapter boundary, and every fake adapter invocation has audit evidence. Day93 keeps `rejected_adapter_invocations` at `0`, `real_adapter_invocations` at `0`, `ssh_allowed` false, `device_access_allowed` false, `live_command_allowed` false, `no_config_json_read` true, and `final_recommendation` set to `KEEP_FAKE_ONLY`; it does not unlock real adapter execution, SSH, device access, live command execution, dashboard action surfaces, approval unlocks, OpenAI API calls, or network configuration changes.
 
 Validation commands:
 

@@ -4587,3 +4587,93 @@ def test_day92_report_index_visibility_includes_executable_guards(tmp_path, caps
     assert "offline deterministic guard" in html
     assert "reports/lab-summary/day92_real_adapter_executable_guards_report.json" in html
     assert "reports/lab-summary/day92_real_adapter_executable_guards_report.html" in html
+
+
+def test_day93_guarded_fake_adapter_contract_task_exists_in_catalog():
+    task = next(
+        task for task in network_lab.list_tasks() if task["id"] == "guarded-fake-adapter-contract"
+    )
+
+    assert task["task_id"] == "day93_guarded_fake_adapter_contract"
+    assert task["day"] == "Day93"
+    assert task["display_name"] == "Day93 Guarded Fake Adapter Contract"
+    assert task["safety_level"] == "fake-adapter-only"
+    assert task["execution_mode"] == "guarded-fake-only"
+    assert task["requires_live_device"] is False
+    assert task["requires_password"] is False
+    assert task["produces_report"] is True
+    assert "reports/lab-summary/day93_guarded_fake_adapter_contract.json" in task["report_paths"]
+    assert "reports/lab-summary/day93_guarded_fake_adapter_contract.html" in task["report_paths"]
+    assert "docs/ai/intent_guarded_fake_adapter_contract.md" in task["report_paths"]
+    assert "docs/roadmap/day93_guarded_fake_adapter_contract.md" in task["report_paths"]
+    assert "real_adapter_invocations remains 0" in task["notes"]
+    assert "ssh_allowed remains false" in task["notes"]
+    assert "no config.json is read" in task["notes"]
+
+
+def test_day93_guarded_fake_adapter_contract_runner_writes_reports_without_live_access(
+    tmp_path, capsys, monkeypatch
+):
+    def fail_run(*_args, **_kwargs):
+        raise AssertionError("Day93 guarded fake adapter contract must not execute subprocess")
+
+    def fail_load(_path):
+        raise AssertionError("Day93 guarded fake adapter contract must not load profile or config data")
+
+    monkeypatch.setattr(network_lab.subprocess, "run", fail_run)
+    monkeypatch.setattr(network_lab, "load_lab_runner_profile", fail_load)
+
+    exit_code = network_lab.main(["--task", "guarded-fake-adapter-contract"], project_root=tmp_path)
+    output = capsys.readouterr().out
+
+    json_path = tmp_path / "reports/lab-summary/day93_guarded_fake_adapter_contract.json"
+    html_path = tmp_path / "reports/lab-summary/day93_guarded_fake_adapter_contract.html"
+    assert exit_code == 0
+    assert "Day93 Guarded Fake Adapter Contract" in output
+    assert "Task name: guarded-fake-adapter-contract" in output
+    assert "PASS" in output
+    assert "FAKE_ADAPTER_ONLY" in output
+    assert "Total scenarios: 9" in output
+    assert "Allowed count: 3" in output
+    assert "Rejected count: 6" in output
+    assert "Fake adapter invocations: 3" in output
+    assert "Rejected adapter invocations = 0" in output
+    assert "Real adapter invocations = 0" in output
+    assert "JSON report: reports/lab-summary/day93_guarded_fake_adapter_contract.json" in output
+    assert "HTML report: reports/lab-summary/day93_guarded_fake_adapter_contract.html" in output
+    assert "[PASS] FAKE_ADAPTER_ONLY" in output
+    assert json_path.exists()
+    assert html_path.exists()
+    assert not (tmp_path / "config.json").exists()
+
+    report = json.loads(json_path.read_text(encoding="utf-8"))
+    html = html_path.read_text(encoding="utf-8")
+    assert report["overall_status"] == "PASS"
+    assert report["mode"] == "FAKE_ADAPTER_ONLY"
+    assert report["fake_adapter_invocations"] == report["allowed_count"]
+    assert report["rejected_adapter_invocations"] == 0
+    assert report["real_adapter_invocations"] == 0
+    assert report["guard_ordering_violations"] == 0
+    assert report["safety_violations"] == 0
+    assert report["audit_chain_complete"] is True
+    assert report["adapter_boundary_verified"] is True
+    assert report["no_config_json_read"] is True
+    assert "Guarded Fake Adapter Contract" in html
+    assert "<form" not in html.lower()
+    assert "<button" not in html.lower()
+    assert "method=\"post\"" not in html.lower()
+
+
+def test_day93_report_index_visibility_includes_guarded_fake_adapter_contract(tmp_path, capsys):
+    assert network_lab.main(["--task", "guarded-fake-adapter-contract"], project_root=tmp_path) == 0
+
+    exit_code = network_lab.main(["--report-index"], project_root=tmp_path)
+
+    index_html = tmp_path / "reports/report_index.html"
+    assert exit_code == 0
+    assert index_html.exists()
+    html = index_html.read_text(encoding="utf-8")
+    assert "Guarded Fake Adapter Contract" in html
+    assert "fake adapter only" in html
+    assert "reports/lab-summary/day93_guarded_fake_adapter_contract.json" in html
+    assert "reports/lab-summary/day93_guarded_fake_adapter_contract.html" in html
