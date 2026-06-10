@@ -91,6 +91,10 @@ from intent_readonly_output_parser_prototype import (
     build_day96_parser_report,
     write_day96_parser_reports,
 )
+from intent_parser_evidence_quality import (
+    build_day97_parser_evidence_quality_report,
+    write_day97_parser_evidence_quality_reports,
+)
 from intent_runtime_safety_case import build_runtime_safety_case_report
 from intent_runtime_safety_gate import build_runtime_safety_gate_report
 
@@ -436,6 +440,19 @@ DAY96_READONLY_OUTPUT_PARSER_PROTOTYPE_JSON = (
 )
 DAY96_READONLY_OUTPUT_PARSER_PROTOTYPE_HTML = (
     Path("reports") / "lab-summary" / "day96_readonly_output_parser_prototype.html"
+)
+DAY97_PARSER_EVIDENCE_QUALITY_TASK_ID = "parser-evidence-quality"
+DAY97_PARSER_EVIDENCE_QUALITY_DOC = (
+    Path("docs") / "ai" / "intent_parser_evidence_quality.md"
+)
+DAY97_PARSER_EVIDENCE_QUALITY_ROADMAP = (
+    Path("docs") / "roadmap" / "day97_parser_evidence_quality_unsupported_output_case_hardening.md"
+)
+DAY97_PARSER_EVIDENCE_QUALITY_JSON = (
+    Path("reports") / "ai" / "day97_parser_evidence_quality_report.json"
+)
+DAY97_PARSER_EVIDENCE_QUALITY_HTML = (
+    Path("reports") / "ai" / "day97_parser_evidence_quality_report.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -1308,6 +1325,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY96_READONLY_OUTPUT_PARSER_PROTOTYPE_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day97",
+        "title": "Parser Evidence Quality",
+        "report_type": "Parser-only unsupported output evidence quality",
+        "safety_label": "static fake parser cases; no execution, SSH, live-read, write, or unlock path",
+        "description": "Day97 hardens Day96 parser evidence handling for empty, malformed, incomplete, ambiguous, unsupported, and degraded static fake outputs. Unsupported output remains parser evidence, not an execution-failure result, and all execution-related safety flags remain false.",
+        "json_globs": [DAY97_PARSER_EVIDENCE_QUALITY_JSON.as_posix()],
+        "html_globs": [DAY97_PARSER_EVIDENCE_QUALITY_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY97_PARSER_EVIDENCE_QUALITY_TASK_ID}"
         ),
     },
 ]
@@ -3592,6 +3622,34 @@ def list_tasks() -> List[Dict[str, Any]]:
             "related_script": "network_lab.py",
             "notes": "Parser-only prototype. Input is Day95 normalized fake adapter simulated_output only; unsupported or malformed inputs return REVIEW_NEEDED or UNSUPPORTED. live_read_enabled remains false, ssh_enabled remains false, routeros_enabled remains false, device_access_enabled remains false, adapter fallback remains false, runner live path remains false, no config.json is read, and Day96 adds no RouterOS connection, SSH, live command, real device command parser, dashboard action, POST route, command input, execution unlock, or device contact.",
         },
+        {
+            "id": DAY97_PARSER_EVIDENCE_QUALITY_TASK_ID,
+            "task_id": "day97_parser_evidence_quality",
+            "display_name": "Day97 Parser Evidence Quality",
+            "user_display_name": "Parser Evidence Quality",
+            "day": "Day97",
+            "category": "ai_planning",
+            "description": "Hardens Day96 parser evidence handling for unsupported, incomplete, malformed, ambiguous, empty, and degraded static fake output cases.",
+            "safety_level": "fake-adapter-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY97_PARSER_EVIDENCE_QUALITY_JSON.as_posix(),
+                DAY97_PARSER_EVIDENCE_QUALITY_HTML.as_posix(),
+                DAY97_PARSER_EVIDENCE_QUALITY_DOC.as_posix(),
+                DAY97_PARSER_EVIDENCE_QUALITY_ROADMAP.as_posix(),
+            ],
+            "report_outputs": [
+                "Day97 JSON/HTML parser evidence quality report",
+                "Day97 parser unsupported-output hardening AI reviewer and roadmap documentation",
+            ],
+            "related_script": "network_lab.py",
+            "notes": "Parser-only static fake cases. Unsupported output is classified as UNSUPPORTED_OUTPUT, INCOMPLETE_OUTPUT, MALFORMED_INPUT, EMPTY_OUTPUT, or AMBIGUOUS_OUTPUT, not an execution-failure result. live_read_allowed remains false, ssh_allowed remains false, write_allowed remains false, command_execution_allowed remains false, raw_command_allowed remains false, device_contact_allowed remains false, approval_unlock_supported remains false, mapped_task_execution_allowed remains false, no config.json is read, and Day97 adds no RouterOS execution, SSH, live-read, dashboard action, POST route, command input, execution unlock, OpenAI API, voice runtime, or device contact.",
+        },
     ]
 
 
@@ -3727,6 +3785,7 @@ wireguard-runner is dry-run by default and delegates to the existing WireGuard s
             DAY94_ADAPTER_BOUNDARY_REGRESSION_MATRIX_TASK_ID,
             DAY95_ADAPTER_RESULT_NORMALIZATION_TASK_ID,
             DAY96_READONLY_OUTPUT_PARSER_PROTOTYPE_TASK_ID,
+            DAY97_PARSER_EVIDENCE_QUALITY_TASK_ID,
             WIREGUARD_RUNNER_TASK_ALIAS,
         ],
         help="Task to run.",
@@ -6543,6 +6602,62 @@ def _run_day96_readonly_output_parser_prototype(project_root: Path) -> int:
     return 1
 
 
+def _run_day97_parser_evidence_quality(project_root: Path) -> int:
+    report = build_day97_parser_evidence_quality_report()
+    json_path, html_path = write_day97_parser_evidence_quality_reports(project_root, report)
+    summary = report["summary"]
+    invariants = report["safety_invariants"]
+
+    print(format_heading("Day97 Parser Evidence Quality"))
+    print("Task name: parser-evidence-quality")
+    print("Phase: HARDENED")
+    print("Safety: parser-only static fake cases; no SSH, live-read, RouterOS execution, writes, mapped task execution, approval unlock, OpenAI API, voice runtime, or device contact")
+    print(f"Result: {report['overall_status']} / {report['reviewer_status']}")
+    print(f"Total cases: {summary['total_cases']}")
+    print(f"Parser-supported count: {summary['parser_supported_count']}")
+    print(f"Unsupported/degraded count: {summary['unsupported_degraded_count']}")
+    print(f"Unsafe flag count: {summary['unsafe_flag_count']}")
+    print(f"overall_status = {summary['overall_status']}")
+    print(f"reviewer_status = {summary['reviewer_status']}")
+    print(f"failed_execution_count = {summary['failed_execution_count']}")
+    print(f"live_read_allowed = {json.dumps(invariants['live_read_allowed'])}")
+    print(f"ssh_allowed = {json.dumps(invariants['ssh_allowed'])}")
+    print(f"write_allowed = {json.dumps(invariants['write_allowed'])}")
+    print(f"command_execution_allowed = {json.dumps(invariants['command_execution_allowed'])}")
+    print(f"approval_unlock_supported = {json.dumps(invariants['approval_unlock_supported'])}")
+    print(f"mapped_task_execution_allowed = {json.dumps(invariants['mapped_task_execution_allowed'])}")
+    print(f"JSON report: {_relative_to_project(project_root, json_path)}")
+    print(f"HTML report: {_relative_to_project(project_root, html_path)}")
+
+    if (
+        report["overall_status"] == "PASS"
+        and report["reviewer_status"] in {"REVIEW_READY", "HARDENED"}
+        and summary["total_cases"] >= 14
+        and summary["unsupported_degraded_count"] >= 13
+        and summary["unsafe_flag_count"] == 0
+        and summary["failed_execution_count"] == 0
+        and all(invariants[flag] is False for flag in (
+            "live_read_allowed",
+            "ssh_allowed",
+            "write_allowed",
+            "command_execution_allowed",
+            "raw_command_allowed",
+            "device_contact_allowed",
+            "approval_unlock_supported",
+            "mapped_task_execution_allowed",
+        ))
+        and not report["validation_errors"]
+    ):
+        print(
+            f"{format_status('PASS')} {report['reviewer_status']}. "
+            "Day97 hardened parser evidence quality without execution or live fallback."
+        )
+        return 0
+
+    print(f"{format_status('FAIL')} Day97 parser evidence quality hardening failed validation.")
+    return 1
+
+
 def _relative_to_project(project_root: Path, path: Path) -> str:
     try:
         return path.resolve().relative_to(project_root.resolve()).as_posix()
@@ -8927,6 +9042,8 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
         return _run_day95_adapter_result_normalization(root)
     if args.task == DAY96_READONLY_OUTPUT_PARSER_PROTOTYPE_TASK_ID:
         return _run_day96_readonly_output_parser_prototype(root)
+    if args.task == DAY97_PARSER_EVIDENCE_QUALITY_TASK_ID:
+        return _run_day97_parser_evidence_quality(root)
 
     profile_path = _resolve_project_path(root, args.profile)
     try:
