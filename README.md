@@ -2290,6 +2290,8 @@ Day93 adds `guarded-fake-adapter-contract`, a deterministic fake-adapter-only bo
 
 Day94 adds `adapter-boundary-regression-matrix`, a deterministic fake-adapter-only regression matrix after Day93. It covers allowed, rejected, live-capable, configuration-mutation, unknown-intent, fake-adapter, and real-adapter-blocked rows; rejected rows never invoke the fake adapter, real adapter invocations remain `0`, live execution invocations remain `0`, and `adapter_invoked_for_rejected` remains `0`. It generates `reports/lab-summary/day94_adapter_boundary_regression_matrix.json` and `.html`, and does not unlock SSH, real device access, live execution, real adapter invocation, dashboard action surfaces, approval unlocks, OpenAI API calls, or network configuration changes.
 
+Day97 adds `parser-evidence-quality`, a parser-only static fake hardening task after the Day96 read-only output parser prototype. It checks empty, malformed, incomplete, ambiguous, duplicate, unsupported, and unsupported-not-failed-execution output evidence; all live-read, SSH, write, raw command, device contact, approval unlock, and mapped task execution flags remain `false`. Run it with `python network_lab.py --task parser-evidence-quality`; it writes `reports/ai/day97_parser_evidence_quality_report.json` and `.html`.
+
 Validation commands:
 
 ```text
