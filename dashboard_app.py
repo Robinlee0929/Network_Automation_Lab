@@ -1140,6 +1140,21 @@ def ai_intent_reviewer_references() -> List[AIIntentReviewerReference]:
                 "reports/lab-summary/day92_real_adapter_executable_guards_report.html",
             ),
         ),
+        AIIntentReviewerReference(
+            day="Day93",
+            title="Guarded Fake Adapter Contract",
+            summary=(
+                "Audits guard-first ordering at a fake read-only adapter "
+                "boundary: allowed scenarios enter only the fake adapter, "
+                "while rejected scenarios never reach any adapter boundary."
+            ),
+            doc_path="docs/ai/intent_guarded_fake_adapter_contract.md",
+            roadmap_path="docs/roadmap/day93_guarded_fake_adapter_contract.md",
+            report_paths=(
+                "reports/lab-summary/day93_guarded_fake_adapter_contract.json",
+                "reports/lab-summary/day93_guarded_fake_adapter_contract.html",
+            ),
+        ),
     ]
 
 
@@ -1384,6 +1399,8 @@ def ai_intent_safety_boundaries() -> List[str]:
         "Day91 lists future read-only candidates only as NOT_EXECUTABLE, PENDING_GUARD, and FUTURE_ONLY; Day92-Day96 must prove guards, fake transport, dry-run runner wiring, regression locks, and live-read review before live-read can be considered.",
         "Day92 is an executable guard layer, not an adapter implementation; it rejects dangerous, sensitive, ambiguous, and unknown simulated requests before executor invocation.",
         "Day92 keeps no_real_device_access true, no_ssh true, no_subprocess true, no_socket true, no_real_adapter true, adapter_implementation_added false, and rejected_adapter_invocations 0.",
+        "Day93 is a fake-adapter-only boundary audit; it proves guard evaluation happens before fake adapter invocation and does not unlock real adapter execution.",
+        "Day93 keeps rejected_adapter_invocations 0, real_adapter_invocations 0, ssh_allowed false, device_access_allowed false, live_command_allowed false, no_config_json_read true, and final_recommendation KEEP_FAKE_ONLY.",
     ]
 
 

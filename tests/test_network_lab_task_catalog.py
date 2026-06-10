@@ -35,6 +35,7 @@ def test_runner_task_catalog_uses_consistent_day23_safety_labels():
         "planning-only",
         "scaffold-only",
         "offline-deterministic-guard",
+        "fake-adapter-only",
         "disabled",
         "controlled_failover_observation",
     }
@@ -47,6 +48,7 @@ def test_runner_task_catalog_uses_consistent_day23_safety_labels():
         "planning-only",
         "scaffold-only",
         "guard-only",
+        "guarded-fake-only",
         "disabled",
         "controlled_failover_observation",
     }

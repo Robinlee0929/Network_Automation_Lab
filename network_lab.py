@@ -75,6 +75,10 @@ from intent_executable_guards import (
     build_day92_real_adapter_executable_guards_report,
     write_day92_real_adapter_executable_guards_reports,
 )
+from intent_guarded_fake_adapter_contract import (
+    run_guarded_fake_adapter_contract,
+    write_guarded_fake_adapter_contract_reports,
+)
 from intent_runtime_safety_case import build_runtime_safety_case_report
 from intent_runtime_safety_gate import build_runtime_safety_gate_report
 
@@ -368,6 +372,19 @@ DAY92_REAL_ADAPTER_EXECUTABLE_GUARDS_JSON = (
 )
 DAY92_REAL_ADAPTER_EXECUTABLE_GUARDS_HTML = (
     Path("reports") / "lab-summary" / "day92_real_adapter_executable_guards_report.html"
+)
+DAY93_GUARDED_FAKE_ADAPTER_CONTRACT_TASK_ID = "guarded-fake-adapter-contract"
+DAY93_GUARDED_FAKE_ADAPTER_CONTRACT_DOC = (
+    Path("docs") / "ai" / "intent_guarded_fake_adapter_contract.md"
+)
+DAY93_GUARDED_FAKE_ADAPTER_CONTRACT_ROADMAP = (
+    Path("docs") / "roadmap" / "day93_guarded_fake_adapter_contract.md"
+)
+DAY93_GUARDED_FAKE_ADAPTER_CONTRACT_JSON = (
+    Path("reports") / "lab-summary" / "day93_guarded_fake_adapter_contract.json"
+)
+DAY93_GUARDED_FAKE_ADAPTER_CONTRACT_HTML = (
+    Path("reports") / "lab-summary" / "day93_guarded_fake_adapter_contract.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -1188,6 +1205,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY92_REAL_ADAPTER_EXECUTABLE_GUARDS_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day93",
+        "title": "Guarded Fake Adapter Contract",
+        "report_type": "Guarded fake adapter boundary audit evidence",
+        "safety_label": "fake adapter only; no live execution",
+        "description": "Day93 proves guard-first ordering at the fake adapter boundary: allowed read-only scenarios enter only the fake adapter, rejected scenarios never enter any adapter boundary, and real_adapter_invocations remains 0.",
+        "json_globs": [DAY93_GUARDED_FAKE_ADAPTER_CONTRACT_JSON.as_posix()],
+        "html_globs": [DAY93_GUARDED_FAKE_ADAPTER_CONTRACT_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY93_GUARDED_FAKE_ADAPTER_CONTRACT_TASK_ID}"
         ),
     },
 ]
@@ -3360,6 +3390,34 @@ def list_tasks() -> List[Dict[str, Any]]:
             "related_script": "network_lab.py",
             "notes": "Deterministic executable guard layer only. Safe read-only requests are simulated and offline; dangerous, sensitive, ambiguous, or unknown requests fail closed with reason_code, matched_rule_name, blocked_action_category, and evidence. rejected_adapter_invocations remains 0, adapter_implementation_added remains false, and Day92 adds no real adapter, SSH, RouterOS API, socket, subprocess device operation, credential use, dashboard action, command input, live-read path, or device contact.",
         },
+        {
+            "id": DAY93_GUARDED_FAKE_ADAPTER_CONTRACT_TASK_ID,
+            "task_id": "day93_guarded_fake_adapter_contract",
+            "display_name": "Day93 Guarded Fake Adapter Contract",
+            "user_display_name": "Guarded Fake Adapter Contract",
+            "day": "Day93",
+            "category": "ai_planning",
+            "description": "Audits guard-first ordering for a fake read-only adapter boundary: allowed scenarios invoke only the fake adapter, while rejected scenarios never enter the adapter boundary.",
+            "safety_level": "fake-adapter-only",
+            "execution_mode": "guarded-fake-only",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY93_GUARDED_FAKE_ADAPTER_CONTRACT_JSON.as_posix(),
+                DAY93_GUARDED_FAKE_ADAPTER_CONTRACT_HTML.as_posix(),
+                DAY93_GUARDED_FAKE_ADAPTER_CONTRACT_DOC.as_posix(),
+                DAY93_GUARDED_FAKE_ADAPTER_CONTRACT_ROADMAP.as_posix(),
+            ],
+            "report_outputs": [
+                "Day93 JSON/HTML guarded fake adapter boundary evidence",
+                "Day93 fake-adapter-only AI reviewer and roadmap documentation",
+            ],
+            "related_script": "network_lab.py",
+            "notes": "Deterministic fake adapter boundary audit only. Guard evaluation happens before adapter invocation; rejected scenarios keep adapter_invocation_attempted false, adapter_boundary_entered false, and fake_adapter_invoked false; allowed scenarios use adapter_type fake only. real_adapter_invocations remains 0, ssh_allowed remains false, device_access_allowed remains false, live_command_allowed remains false, no config.json is read, and Day93 adds no real adapter, SSH, RouterOS API, socket, subprocess device operation, dashboard action, command input, execution unlock, or device contact.",
+        },
     ]
 
 
@@ -3491,6 +3549,7 @@ wireguard-runner is dry-run by default and delegates to the existing WireGuard s
             DAY90_REAL_ADAPTER_IMPLEMENTATION_PLAN_TASK_ID,
             DAY91_REAL_ADAPTER_SAFETY_SCAFFOLD_TASK_ID,
             DAY92_REAL_ADAPTER_EXECUTABLE_GUARDS_TASK_ID,
+            DAY93_GUARDED_FAKE_ADAPTER_CONTRACT_TASK_ID,
             WIREGUARD_RUNNER_TASK_ALIAS,
         ],
         help="Task to run.",
@@ -6131,6 +6190,48 @@ def _run_day92_real_adapter_executable_guards(project_root: Path) -> int:
     return 1
 
 
+def _run_day93_guarded_fake_adapter_contract(project_root: Path) -> int:
+    report = run_guarded_fake_adapter_contract()
+    json_path, html_path = write_guarded_fake_adapter_contract_reports(project_root, report)
+
+    print(format_heading("Day93 Guarded Fake Adapter Contract"))
+    print("Task name: guarded-fake-adapter-contract")
+    print("Mode: FAKE_ADAPTER_ONLY")
+    print("Safety: fake adapter only; no real device access, SSH, config.json read, or live execution")
+    print(f"Result: {report['overall_status']} / {report['mode']}")
+    print(f"Total scenarios: {report['total_scenarios']}")
+    print(f"Allowed count: {report['allowed_count']}")
+    print(f"Rejected count: {report['rejected_count']}")
+    print(f"Fake adapter invocations: {report['fake_adapter_invocations']}")
+    print(f"Rejected adapter invocations = {report['rejected_adapter_invocations']}")
+    print(f"Real adapter invocations = {report['real_adapter_invocations']}")
+    print(f"JSON report: {_relative_to_project(project_root, json_path)}")
+    print(f"HTML report: {_relative_to_project(project_root, html_path)}")
+
+    if (
+        report["overall_status"] == "PASS"
+        and report["mode"] == "FAKE_ADAPTER_ONLY"
+        and report["allowed_count"] > 0
+        and report["rejected_count"] > 0
+        and report["fake_adapter_invocations"] == report["allowed_count"]
+        and report["rejected_adapter_invocations"] == 0
+        and report["real_adapter_invocations"] == 0
+        and report["guard_ordering_violations"] == 0
+        and report["safety_violations"] == 0
+        and report["audit_chain_complete"] is True
+        and report["adapter_boundary_verified"] is True
+        and not report["validation_errors"]
+    ):
+        print(
+            f"{format_status('PASS')} FAKE_ADAPTER_ONLY. Day93 verified guard-first "
+            "ordering and fake-adapter-only boundary invocation evidence."
+        )
+        return 0
+
+    print(f"{format_status('FAIL')} Day93 guarded fake adapter contract failed validation.")
+    return 1
+
+
 def _relative_to_project(project_root: Path, path: Path) -> str:
     try:
         return path.resolve().relative_to(project_root.resolve()).as_posix()
@@ -8507,6 +8608,8 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
         return _run_day91_real_adapter_safety_scaffold(root)
     if args.task == DAY92_REAL_ADAPTER_EXECUTABLE_GUARDS_TASK_ID:
         return _run_day92_real_adapter_executable_guards(root)
+    if args.task == DAY93_GUARDED_FAKE_ADAPTER_CONTRACT_TASK_ID:
+        return _run_day93_guarded_fake_adapter_contract(root)
 
     profile_path = _resolve_project_path(root, args.profile)
     try:

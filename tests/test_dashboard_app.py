@@ -261,6 +261,39 @@ def test_dashboard_evidence_surfaces_day92_executable_guards_report(tmp_path):
     assert "rejected_adapter_invocations" in day92_text
 
 
+def test_dashboard_evidence_surfaces_day93_guarded_fake_adapter_contract_report(tmp_path):
+    reports_dir = tmp_path / "reports"
+    write_json(
+        reports_dir / "lab-summary" / "day93_guarded_fake_adapter_contract.json",
+        {
+            "overall_status": "PASS",
+            "mode": "FAKE_ADAPTER_ONLY",
+            "total_scenarios": 9,
+            "allowed_count": 3,
+            "rejected_count": 6,
+            "fake_adapter_invocations": 3,
+            "rejected_adapter_invocations": 0,
+            "real_adapter_invocations": 0,
+        },
+    )
+    (reports_dir / "lab-summary" / "day93_guarded_fake_adapter_contract.html").write_text(
+        "<html>Day93 fake adapter contract report</html>",
+        encoding="utf-8",
+    )
+
+    entries = dashboard.collect_dashboard_evidence(tmp_path, reports_dir)
+
+    day93 = next(entry for entry in entries if entry.day == "Day93")
+    assert day93.title == "Guarded Fake Adapter Contract"
+    assert day93.status == "PASS"
+    assert day93.json_view_path == "reports/lab-summary/day93_guarded_fake_adapter_contract.json"
+    assert day93.html_view_path == "reports/lab-summary/day93_guarded_fake_adapter_contract.html"
+    day93_text = f"{day93.title} {day93.description} {day93.notes}".lower()
+    assert "guard-first" in day93_text
+    assert "fake adapter" in day93_text
+    assert "real_adapter_invocations remains 0" in day93_text
+
+
 def test_dashboard_evidence_missing_html_does_not_crash(tmp_path):
     reports_dir = tmp_path / "reports"
     write_json(
@@ -383,6 +416,7 @@ def test_ai_intent_reviewer_references_day57_to_day92():
         "Day90",
         "Day91",
         "Day92",
+        "Day93",
     ]
     text = " ".join(
         f"{item.title} {item.summary} {item.doc_path} {item.roadmap_path} "
@@ -425,6 +459,10 @@ def test_ai_intent_reviewer_references_day57_to_day92():
     assert "docs/ai/intent_executable_guards.md" in text
     assert "docs/roadmap/day92_real_adapter_executable_guards.md" in text
     assert "reports/lab-summary/day92_real_adapter_executable_guards_report.html" in text
+    assert "Guarded Fake Adapter Contract" in text
+    assert "docs/ai/intent_guarded_fake_adapter_contract.md" in text
+    assert "docs/roadmap/day93_guarded_fake_adapter_contract.md" in text
+    assert "reports/lab-summary/day93_guarded_fake_adapter_contract.html" in text
     assert "Reviewer report quality and evidence trace" in text
     assert "docs/ai/intent_offline_mock_runtime_reviewer_report_quality.md" in text
     assert "docs/roadmap/day68_offline_mock_runtime_reviewer_report_quality.md" in text
@@ -1119,6 +1157,8 @@ def test_ai_intent_reviewer_route_exposes_day57_to_day82_without_execution(tmp_p
     assert "Day91 keeps fail_closed_default true, live_read_allowed false" in text
     assert "Day92 is an executable guard layer, not an adapter implementation" in text
     assert "Day92 keeps no_real_device_access true, no_ssh true, no_subprocess true" in text
+    assert "Day93 is a fake-adapter-only boundary audit" in text
+    assert "Day93 keeps rejected_adapter_invocations 0, real_adapter_invocations 0" in text
     assert "No mapped task was executed. This is a dry-run reviewer walkthrough only." in text
     html = text.lower()
     assert "<form" not in html
