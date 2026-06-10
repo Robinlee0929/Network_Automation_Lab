@@ -99,6 +99,10 @@ from intent_parser_classification_matrix import (
     build_parser_classification_matrix,
     write_parser_classification_matrix_reports,
 )
+from intent_parser_evidence_coverage_audit import (
+    build_parser_evidence_coverage_audit_report,
+    write_parser_evidence_coverage_audit_reports,
+)
 from intent_runtime_safety_case import build_runtime_safety_case_report
 from intent_runtime_safety_gate import build_runtime_safety_gate_report
 
@@ -467,6 +471,19 @@ DAY98_PARSER_CLASSIFICATION_MATRIX_JSON = (
 )
 DAY98_PARSER_CLASSIFICATION_MATRIX_HTML = (
     Path("reports") / "ai" / "day98_parser_classification_matrix.html"
+)
+DAY99_PARSER_EVIDENCE_COVERAGE_AUDIT_TASK_ID = "parser-evidence-coverage-audit"
+DAY99_PARSER_EVIDENCE_COVERAGE_AUDIT_DOC = (
+    Path("docs") / "ai-intent" / "day99_parser_evidence_coverage_audit.md"
+)
+DAY99_PARSER_EVIDENCE_COVERAGE_AUDIT_ROADMAP = (
+    Path("docs") / "roadmap" / "day99_parser_evidence_coverage_sample_gap_audit.md"
+)
+DAY99_PARSER_EVIDENCE_COVERAGE_AUDIT_JSON = (
+    Path("reports") / "ai" / "day99_parser_evidence_coverage_audit.json"
+)
+DAY99_PARSER_EVIDENCE_COVERAGE_AUDIT_HTML = (
+    Path("reports") / "ai" / "day99_parser_evidence_coverage_audit.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -1365,6 +1382,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY98_PARSER_CLASSIFICATION_MATRIX_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day99",
+        "title": "Parser Evidence Coverage / Sample Gap Audit",
+        "report_type": "Report-only parser evidence coverage audit",
+        "safety_label": "static Day96-Day98 report audit; UNDER_COVERED gaps are allowed",
+        "description": "Day99 audits Day96-Day98 parser samples and evidence coverage before Day100. It records under-covered categories as non-blocking sample gaps while keeping execution, adapter, broker, SSH, live device, config, dashboard action, OpenAI API, and voice paths disabled.",
+        "json_globs": [DAY99_PARSER_EVIDENCE_COVERAGE_AUDIT_JSON.as_posix()],
+        "html_globs": [DAY99_PARSER_EVIDENCE_COVERAGE_AUDIT_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY99_PARSER_EVIDENCE_COVERAGE_AUDIT_TASK_ID}"
         ),
     },
 ]
@@ -3704,6 +3734,34 @@ def list_tasks() -> List[Dict[str, Any]]:
             "related_script": "network_lab.py",
             "notes": "Report-only static Day96/Day97 sample matrix. Every row has parser_classification, parsed_fields or unsupported_reason, reviewer_action, safety_invariant, evidence_required, and trace_status. executable_allowed remains false, live_read_allowed remains false, ssh_allowed remains false, routeros_execution_allowed remains false, command_execution_allowed remains false, device_contact_allowed remains false, approval_unlock_supported remains false, no config.json is read, and Day98 adds no RouterOS execution, SSH, live-read, dashboard action, POST route, command input, execution unlock, OpenAI API, voice runtime, or external service call.",
         },
+        {
+            "id": DAY99_PARSER_EVIDENCE_COVERAGE_AUDIT_TASK_ID,
+            "task_id": "day99_parser_evidence_coverage_audit",
+            "display_name": "Day99 Parser Evidence Coverage / Sample Gap Audit",
+            "user_display_name": "Parser Evidence Coverage / Sample Gap Audit",
+            "day": "Day99",
+            "category": "ai_planning",
+            "description": "Audits Day96-Day98 parser sample coverage and records non-blocking sample gaps before the Day100 parser phase-gate readiness decision.",
+            "safety_level": "fake-adapter-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY99_PARSER_EVIDENCE_COVERAGE_AUDIT_JSON.as_posix(),
+                DAY99_PARSER_EVIDENCE_COVERAGE_AUDIT_HTML.as_posix(),
+                DAY99_PARSER_EVIDENCE_COVERAGE_AUDIT_DOC.as_posix(),
+                DAY99_PARSER_EVIDENCE_COVERAGE_AUDIT_ROADMAP.as_posix(),
+            ],
+            "report_outputs": [
+                "Day99 JSON/HTML parser evidence coverage and sample gap audit",
+                "Day99 coverage audit reviewer and roadmap documentation",
+            ],
+            "related_script": "network_lab.py",
+            "notes": "Report-only Day96-Day98 parser evidence coverage audit. UNDER_COVERED categories are allowed and become Day100 review inputs, not Day99 failures. execution_allowed remains false, adapter_path_allowed remains false, broker_path_allowed remains false, ssh_allowed remains false, live_device_path_allowed remains false, routeros_execution_allowed remains false, command_execution_allowed remains false, no config.json is read, and Day99 adds no parser capability, adapter execution, broker execution, SSH, live device path, dashboard action, POST route, command input, execution unlock, OpenAI API, voice runtime, or external service call.",
+        },
     ]
 
 
@@ -3841,6 +3899,7 @@ wireguard-runner is dry-run by default and delegates to the existing WireGuard s
             DAY96_READONLY_OUTPUT_PARSER_PROTOTYPE_TASK_ID,
             DAY97_PARSER_EVIDENCE_QUALITY_TASK_ID,
             DAY98_PARSER_CLASSIFICATION_MATRIX_TASK_ID,
+            DAY99_PARSER_EVIDENCE_COVERAGE_AUDIT_TASK_ID,
             WIREGUARD_RUNNER_TASK_ALIAS,
         ],
         help="Task to run.",
@@ -6777,6 +6836,68 @@ def _run_day98_parser_classification_matrix(project_root: Path) -> int:
     return 1
 
 
+def _run_day99_parser_evidence_coverage_audit(project_root: Path) -> int:
+    report = build_parser_evidence_coverage_audit_report()
+    json_path, html_path = write_parser_evidence_coverage_audit_reports(project_root, report)
+    summary = report["summary"]
+    invariants = report["safety_invariants"]
+
+    print(format_heading("Day99 Parser Evidence Coverage / Sample Gap Audit"))
+    print("Task name: parser-evidence-coverage-audit")
+    print("Phase: COVERAGE_AUDIT_READY")
+    print("Safety: report-only Day96-Day98 coverage audit; no parser expansion, adapter path, broker path, SSH, live device path, RouterOS execution, config.json, dashboard action, OpenAI API, voice runtime, or device contact")
+    print(f"Result: {report['overall_status']} / {report['reviewer_status']}")
+    print(f"Total coverage rows: {summary['total_coverage_rows']}")
+    print(f"Covered count: {summary['covered_count']}")
+    print(f"Under-covered count: {summary['under_covered_count']}")
+    print(f"under_covered_allowed = {json.dumps(summary['under_covered_allowed'])}")
+    print(f"blocking_gap_count = {summary['blocking_gap_count']}")
+    print(f"source_report_fail_count = {summary['source_report_fail_count']}")
+    print(f"runtime_violation_count = {summary['runtime_violation_count']}")
+    print(f"ready_for_day100_review = {json.dumps(summary['ready_for_day100_review'])}")
+    print(f"execution_allowed = {json.dumps(invariants['execution_allowed'])}")
+    print(f"adapter_path_allowed = {json.dumps(invariants['adapter_path_allowed'])}")
+    print(f"broker_path_allowed = {json.dumps(invariants['broker_path_allowed'])}")
+    print(f"ssh_allowed = {json.dumps(invariants['ssh_allowed'])}")
+    print(f"live_device_path_allowed = {json.dumps(invariants['live_device_path_allowed'])}")
+    print(f"routeros_execution_allowed = {json.dumps(invariants['routeros_execution_allowed'])}")
+    print(f"command_execution_allowed = {json.dumps(invariants['command_execution_allowed'])}")
+    print(f"dashboard_action_allowed = {json.dumps(invariants['dashboard_action_allowed'])}")
+    print(f"JSON report: {_relative_to_project(project_root, json_path)}")
+    print(f"HTML report: {_relative_to_project(project_root, html_path)}")
+
+    if (
+        report["overall_status"] == "PASS"
+        and report["reviewer_status"] == "COVERAGE_REVIEW_READY"
+        and summary["required_coverage_areas_present"] is True
+        and summary["under_covered_allowed"] is True
+        and summary["blocking_gap_count"] == 0
+        and summary["source_report_fail_count"] == 0
+        and summary["runtime_violation_count"] == 0
+        and summary["ready_for_day100_review"] is True
+        and all(invariants[flag] is False for flag in (
+            "execution_allowed",
+            "adapter_path_allowed",
+            "broker_path_allowed",
+            "ssh_allowed",
+            "live_device_path_allowed",
+            "routeros_execution_allowed",
+            "command_execution_allowed",
+            "dashboard_action_allowed",
+            "approval_unlock_supported",
+        ))
+        and not report["validation_errors"]
+    ):
+        print(
+            f"{format_status('PASS')} COVERAGE_REVIEW_READY. "
+            "Day99 audited parser evidence coverage and sample gaps without execution or parser expansion."
+        )
+        return 0
+
+    print(f"{format_status('FAIL')} Day99 parser evidence coverage audit failed validation.")
+    return 1
+
+
 def _relative_to_project(project_root: Path, path: Path) -> str:
     try:
         return path.resolve().relative_to(project_root.resolve()).as_posix()
@@ -9165,6 +9286,8 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
         return _run_day97_parser_evidence_quality(root)
     if args.task == DAY98_PARSER_CLASSIFICATION_MATRIX_TASK_ID:
         return _run_day98_parser_classification_matrix(root)
+    if args.task == DAY99_PARSER_EVIDENCE_COVERAGE_AUDIT_TASK_ID:
+        return _run_day99_parser_evidence_coverage_audit(root)
 
     profile_path = _resolve_project_path(root, args.profile)
     try:
