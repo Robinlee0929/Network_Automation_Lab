@@ -4863,3 +4863,103 @@ def test_day95_report_index_visibility_includes_adapter_result_normalization(tmp
     assert "fake-only result normalization" in html
     assert "reports/lab-summary/day95_adapter_result_normalization.json" in html
     assert "reports/lab-summary/day95_adapter_result_normalization.html" in html
+
+
+def test_day98_parser_classification_matrix_task_exists_in_catalog():
+    task = next(
+        task for task in network_lab.list_tasks() if task["id"] == "parser-classification-matrix"
+    )
+
+    assert task["task_id"] == "day98_parser_classification_matrix"
+    assert task["day"] == "Day98"
+    assert task["display_name"] == "Day98 Parser Classification Matrix"
+    assert task["safety_level"] == "fake-adapter-only"
+    assert task["execution_mode"] == "report-only"
+    assert task["requires_live_device"] is False
+    assert task["requires_password"] is False
+    assert task["produces_report"] is True
+    assert "reports/ai/day98_parser_classification_matrix.json" in task["report_paths"]
+    assert "reports/ai/day98_parser_classification_matrix.html" in task["report_paths"]
+    assert "docs/ai-intent/day98_parser_classification_matrix.md" in task["report_paths"]
+    assert "Every row has parser_classification" in task["notes"]
+    assert "executable_allowed remains false" in task["notes"]
+    assert "OpenAI API" in task["notes"]
+
+
+def test_day98_parser_classification_matrix_runner_writes_reports_without_live_access(
+    tmp_path, capsys, monkeypatch
+):
+    def fail_run(*_args, **_kwargs):
+        raise AssertionError("Day98 parser classification matrix must not execute subprocess")
+
+    def fail_load(_path):
+        raise AssertionError("Day98 parser classification matrix must not load profile or config data")
+
+    monkeypatch.setattr(network_lab.subprocess, "run", fail_run)
+    monkeypatch.setattr(network_lab, "load_lab_runner_profile", fail_load)
+
+    exit_code = network_lab.main(["--task", "parser-classification-matrix"], project_root=tmp_path)
+    output = capsys.readouterr().out
+
+    json_path = tmp_path / "reports/ai/day98_parser_classification_matrix.json"
+    html_path = tmp_path / "reports/ai/day98_parser_classification_matrix.html"
+    assert exit_code == 0
+    assert "Day98 Parser Classification Matrix" in output
+    assert "Task name: parser-classification-matrix" in output
+    assert "PASS / TRACEABILITY_READY" in output
+    assert "Total rows: 8" in output
+    assert "parsed_supported" in output
+    assert "unsupported_command_family" in output
+    assert "Unsupported reasons complete: true" in output
+    assert "executable_allowed_count = 0" in output
+    assert "reviewer_action_missing_count = 0" in output
+    assert "safety_invariant_missing_count = 0" in output
+    assert "external_runtime_dependency_count = 0" in output
+    assert "executable_allowed = false" in output
+    assert "live_read_allowed = false" in output
+    assert "ssh_allowed = false" in output
+    assert "routeros_execution_allowed = false" in output
+    assert "command_execution_allowed = false" in output
+    assert "approval_unlock_supported = false" in output
+    assert "dashboard_action_allowed = false" in output
+    assert "JSON report: reports/ai/day98_parser_classification_matrix.json" in output
+    assert "HTML report: reports/ai/day98_parser_classification_matrix.html" in output
+    assert "[PASS] TRACEABILITY_READY" in output
+    assert json_path.exists()
+    assert html_path.exists()
+    assert not (tmp_path / "config.json").exists()
+
+    report = json.loads(json_path.read_text(encoding="utf-8"))
+    html = html_path.read_text(encoding="utf-8")
+    assert report["overall_status"] == "PASS"
+    assert report["reviewer_status"] == "TRACEABILITY_READY"
+    assert report["summary"]["required_categories_present"] is True
+    assert report["summary"]["executable_allowed_count"] == 0
+    assert report["summary"]["unsupported_reasons_complete"] is True
+    assert all(row["executable_allowed"] is False for row in report["matrix_rows"])
+    assert all(row["reviewer_action"] for row in report["matrix_rows"])
+    assert all(
+        row["unsupported_reason"] or row["parser_classification"] == "parsed_supported"
+        for row in report["matrix_rows"]
+    )
+    assert "Parser Classification Matrix" in html
+    assert "<form" not in html.lower()
+    assert "<button" not in html.lower()
+    assert "method=\"post\"" not in html.lower()
+    assert "action=" not in html.lower()
+
+
+def test_day98_report_index_visibility_includes_parser_classification_matrix(tmp_path, capsys):
+    assert network_lab.main(["--task", "parser-classification-matrix"], project_root=tmp_path) == 0
+
+    exit_code = network_lab.main(["--report-index"], project_root=tmp_path)
+
+    index_html = tmp_path / "reports/report_index.html"
+    assert exit_code == 0
+    assert index_html.exists()
+    html = index_html.read_text(encoding="utf-8")
+    assert "Parser Classification Matrix" in html
+    assert "Parser-only reviewer traceability matrix" in html
+    assert "reports/ai/day98_parser_classification_matrix.json" in html
+    assert "reports/ai/day98_parser_classification_matrix.html" in html
+    assert "executable_allowed is always false" in html

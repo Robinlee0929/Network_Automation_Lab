@@ -95,6 +95,10 @@ from intent_parser_evidence_quality import (
     build_day97_parser_evidence_quality_report,
     write_day97_parser_evidence_quality_reports,
 )
+from intent_parser_classification_matrix import (
+    build_parser_classification_matrix,
+    write_parser_classification_matrix_reports,
+)
 from intent_runtime_safety_case import build_runtime_safety_case_report
 from intent_runtime_safety_gate import build_runtime_safety_gate_report
 
@@ -453,6 +457,16 @@ DAY97_PARSER_EVIDENCE_QUALITY_JSON = (
 )
 DAY97_PARSER_EVIDENCE_QUALITY_HTML = (
     Path("reports") / "ai" / "day97_parser_evidence_quality_report.html"
+)
+DAY98_PARSER_CLASSIFICATION_MATRIX_TASK_ID = "parser-classification-matrix"
+DAY98_PARSER_CLASSIFICATION_MATRIX_DOC = (
+    Path("docs") / "ai-intent" / "day98_parser_classification_matrix.md"
+)
+DAY98_PARSER_CLASSIFICATION_MATRIX_JSON = (
+    Path("reports") / "ai" / "day98_parser_classification_matrix.json"
+)
+DAY98_PARSER_CLASSIFICATION_MATRIX_HTML = (
+    Path("reports") / "ai" / "day98_parser_classification_matrix.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -1338,6 +1352,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY97_PARSER_EVIDENCE_QUALITY_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day98",
+        "title": "Parser Classification Matrix",
+        "report_type": "Parser-only reviewer traceability matrix",
+        "safety_label": "static Day96/Day97 samples; executable_allowed is always false",
+        "description": "Day98 connects Day96 parser prototype outcomes and Day97 unsupported-output hardening into a reviewer-facing traceability matrix: input sample, parser classification, parsed fields or unsupported reason, reviewer action, and safety invariant.",
+        "json_globs": [DAY98_PARSER_CLASSIFICATION_MATRIX_JSON.as_posix()],
+        "html_globs": [DAY98_PARSER_CLASSIFICATION_MATRIX_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY98_PARSER_CLASSIFICATION_MATRIX_TASK_ID}"
         ),
     },
 ]
@@ -3650,6 +3677,33 @@ def list_tasks() -> List[Dict[str, Any]]:
             "related_script": "network_lab.py",
             "notes": "Parser-only static fake cases. Unsupported output is classified as UNSUPPORTED_OUTPUT, INCOMPLETE_OUTPUT, MALFORMED_INPUT, EMPTY_OUTPUT, or AMBIGUOUS_OUTPUT, not an execution-failure result. live_read_allowed remains false, ssh_allowed remains false, write_allowed remains false, command_execution_allowed remains false, raw_command_allowed remains false, device_contact_allowed remains false, approval_unlock_supported remains false, mapped_task_execution_allowed remains false, no config.json is read, and Day97 adds no RouterOS execution, SSH, live-read, dashboard action, POST route, command input, execution unlock, OpenAI API, voice runtime, or device contact.",
         },
+        {
+            "id": DAY98_PARSER_CLASSIFICATION_MATRIX_TASK_ID,
+            "task_id": "day98_parser_classification_matrix",
+            "display_name": "Day98 Parser Classification Matrix",
+            "user_display_name": "Parser Classification Matrix",
+            "day": "Day98",
+            "category": "ai_planning",
+            "description": "Builds a reviewer-facing traceability matrix across Day96 parser prototype cases and Day97 unsupported-output hardening cases.",
+            "safety_level": "fake-adapter-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY98_PARSER_CLASSIFICATION_MATRIX_JSON.as_posix(),
+                DAY98_PARSER_CLASSIFICATION_MATRIX_HTML.as_posix(),
+                DAY98_PARSER_CLASSIFICATION_MATRIX_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Day98 JSON/HTML parser classification traceability matrix",
+                "Day98 reviewer traceability documentation",
+            ],
+            "related_script": "network_lab.py",
+            "notes": "Report-only static Day96/Day97 sample matrix. Every row has parser_classification, parsed_fields or unsupported_reason, reviewer_action, safety_invariant, evidence_required, and trace_status. executable_allowed remains false, live_read_allowed remains false, ssh_allowed remains false, routeros_execution_allowed remains false, command_execution_allowed remains false, device_contact_allowed remains false, approval_unlock_supported remains false, no config.json is read, and Day98 adds no RouterOS execution, SSH, live-read, dashboard action, POST route, command input, execution unlock, OpenAI API, voice runtime, or external service call.",
+        },
     ]
 
 
@@ -3786,6 +3840,7 @@ wireguard-runner is dry-run by default and delegates to the existing WireGuard s
             DAY95_ADAPTER_RESULT_NORMALIZATION_TASK_ID,
             DAY96_READONLY_OUTPUT_PARSER_PROTOTYPE_TASK_ID,
             DAY97_PARSER_EVIDENCE_QUALITY_TASK_ID,
+            DAY98_PARSER_CLASSIFICATION_MATRIX_TASK_ID,
             WIREGUARD_RUNNER_TASK_ALIAS,
         ],
         help="Task to run.",
@@ -6658,6 +6713,70 @@ def _run_day97_parser_evidence_quality(project_root: Path) -> int:
     return 1
 
 
+def _run_day98_parser_classification_matrix(project_root: Path) -> int:
+    report = build_parser_classification_matrix()
+    json_path, html_path = write_parser_classification_matrix_reports(project_root, report)
+    summary = report["summary"]
+    invariants = report["safety_invariants"]
+
+    print(format_heading("Day98 Parser Classification Matrix"))
+    print("Task name: parser-classification-matrix")
+    print("Phase: TRACEABILITY_HARDENED")
+    print("Safety: parser-only static Day96/Day97 samples; no SSH, live-read, RouterOS execution, config.json, dashboard action, OpenAI API, voice runtime, or device contact")
+    print(f"Result: {report['overall_status']} / {report['reviewer_status']}")
+    print(f"Total rows: {summary['total_rows']}")
+    print(f"Classifications: {', '.join(summary['classification_values'])}")
+    print(f"Trace complete count: {summary['trace_complete_count']}")
+    print(f"Trace review required count: {summary['trace_review_required_count']}")
+    print(f"Unsupported reasons complete: {json.dumps(summary['unsupported_reasons_complete'])}")
+    print(f"executable_allowed_count = {summary['executable_allowed_count']}")
+    print(f"reviewer_action_missing_count = {summary['reviewer_action_missing_count']}")
+    print(f"safety_invariant_missing_count = {summary['safety_invariant_missing_count']}")
+    print(f"external_runtime_dependency_count = {summary['external_runtime_dependency_count']}")
+    print(f"executable_allowed = {json.dumps(invariants['executable_allowed'])}")
+    print(f"live_read_allowed = {json.dumps(invariants['live_read_allowed'])}")
+    print(f"ssh_allowed = {json.dumps(invariants['ssh_allowed'])}")
+    print(f"routeros_execution_allowed = {json.dumps(invariants['routeros_execution_allowed'])}")
+    print(f"command_execution_allowed = {json.dumps(invariants['command_execution_allowed'])}")
+    print(f"approval_unlock_supported = {json.dumps(invariants['approval_unlock_supported'])}")
+    print(f"dashboard_action_allowed = {json.dumps(invariants['dashboard_action_allowed'])}")
+    print(f"JSON report: {_relative_to_project(project_root, json_path)}")
+    print(f"HTML report: {_relative_to_project(project_root, html_path)}")
+
+    if (
+        report["overall_status"] == "PASS"
+        and report["reviewer_status"] == "TRACEABILITY_READY"
+        and summary["total_rows"] >= 7
+        and summary["required_categories_present"] is True
+        and summary["all_trace_statuses_valid"] is True
+        and summary["unsupported_reasons_complete"] is True
+        and summary["executable_allowed_count"] == 0
+        and summary["reviewer_action_missing_count"] == 0
+        and summary["safety_invariant_missing_count"] == 0
+        and summary["external_runtime_dependency_count"] == 0
+        and all(invariants[flag] is False for flag in (
+            "executable_allowed",
+            "live_read_allowed",
+            "ssh_allowed",
+            "routeros_execution_allowed",
+            "device_contact_allowed",
+            "command_execution_allowed",
+            "approval_unlock_supported",
+            "dashboard_action_allowed",
+            "external_runtime_state_required",
+        ))
+        and not report["validation_errors"]
+    ):
+        print(
+            f"{format_status('PASS')} TRACEABILITY_READY. "
+            "Day98 linked parser classifications to reviewer actions without execution or live fallback."
+        )
+        return 0
+
+    print(f"{format_status('FAIL')} Day98 parser classification matrix failed validation.")
+    return 1
+
+
 def _relative_to_project(project_root: Path, path: Path) -> str:
     try:
         return path.resolve().relative_to(project_root.resolve()).as_posix()
@@ -9044,6 +9163,8 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
         return _run_day96_readonly_output_parser_prototype(root)
     if args.task == DAY97_PARSER_EVIDENCE_QUALITY_TASK_ID:
         return _run_day97_parser_evidence_quality(root)
+    if args.task == DAY98_PARSER_CLASSIFICATION_MATRIX_TASK_ID:
+        return _run_day98_parser_classification_matrix(root)
 
     profile_path = _resolve_project_path(root, args.profile)
     try:
