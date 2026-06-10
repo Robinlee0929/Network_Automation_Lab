@@ -83,6 +83,10 @@ from intent_adapter_boundary_regression_matrix import (
     run_adapter_boundary_regression_matrix,
     write_adapter_boundary_regression_matrix_reports,
 )
+from intent_adapter_result_normalization import (
+    run_adapter_result_normalization,
+    write_adapter_result_normalization_reports,
+)
 from intent_runtime_safety_case import build_runtime_safety_case_report
 from intent_runtime_safety_gate import build_runtime_safety_gate_report
 
@@ -402,6 +406,19 @@ DAY94_ADAPTER_BOUNDARY_REGRESSION_MATRIX_JSON = (
 )
 DAY94_ADAPTER_BOUNDARY_REGRESSION_MATRIX_HTML = (
     Path("reports") / "lab-summary" / "day94_adapter_boundary_regression_matrix.html"
+)
+DAY95_ADAPTER_RESULT_NORMALIZATION_TASK_ID = "adapter-result-normalization"
+DAY95_ADAPTER_RESULT_NORMALIZATION_DOC = (
+    Path("docs") / "ai" / "intent_adapter_result_normalization.md"
+)
+DAY95_ADAPTER_RESULT_NORMALIZATION_ROADMAP = (
+    Path("docs") / "roadmap" / "day95_adapter_result_normalization.md"
+)
+DAY95_ADAPTER_RESULT_NORMALIZATION_JSON = (
+    Path("reports") / "lab-summary" / "day95_adapter_result_normalization.json"
+)
+DAY95_ADAPTER_RESULT_NORMALIZATION_HTML = (
+    Path("reports") / "lab-summary" / "day95_adapter_result_normalization.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -1248,6 +1265,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY94_ADAPTER_BOUNDARY_REGRESSION_MATRIX_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day95",
+        "title": "Adapter Result Normalization",
+        "report_type": "Normalized fake adapter result evidence",
+        "safety_label": "fake-only result normalization; no live execution",
+        "description": "Day95 normalizes only deterministic fake adapter results after the Day93/Day94 fake boundary evidence chain: rejected scenarios produce no adapter result, real_adapter_result_count remains 0, and live_execution_result_count remains 0.",
+        "json_globs": [DAY95_ADAPTER_RESULT_NORMALIZATION_JSON.as_posix()],
+        "html_globs": [DAY95_ADAPTER_RESULT_NORMALIZATION_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY95_ADAPTER_RESULT_NORMALIZATION_TASK_ID}"
         ),
     },
 ]
@@ -3476,6 +3506,34 @@ def list_tasks() -> List[Dict[str, Any]]:
             "related_script": "network_lab.py",
             "notes": "Deterministic matrix evidence only. Rejected rows never invoke the fake adapter; allowed fake-adapter rows may invoke only fake boundary evidence. real_adapter_invocations remains 0, live_execution_invocations remains 0, adapter_invoked_for_rejected remains 0, no config.json is read, and Day94 adds no real adapter, SSH, RouterOS API, socket, subprocess device operation, dashboard action, command input, execution unlock, or device contact.",
         },
+        {
+            "id": DAY95_ADAPTER_RESULT_NORMALIZATION_TASK_ID,
+            "task_id": "day95_adapter_result_normalization",
+            "display_name": "Day95 Adapter Result Normalization",
+            "user_display_name": "Adapter Result Normalization",
+            "day": "Day95",
+            "category": "ai_planning",
+            "description": "Normalizes deterministic fake adapter boundary results into a fixed parser-ready schema while rejected scenarios produce no adapter result.",
+            "safety_level": "fake-adapter-only",
+            "execution_mode": "guarded-fake-only",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY95_ADAPTER_RESULT_NORMALIZATION_JSON.as_posix(),
+                DAY95_ADAPTER_RESULT_NORMALIZATION_HTML.as_posix(),
+                DAY95_ADAPTER_RESULT_NORMALIZATION_DOC.as_posix(),
+                DAY95_ADAPTER_RESULT_NORMALIZATION_ROADMAP.as_posix(),
+            ],
+            "report_outputs": [
+                "Day95 JSON/HTML normalized fake adapter result evidence",
+                "Day95 fake-adapter-only AI reviewer and roadmap documentation",
+            ],
+            "related_script": "network_lab.py",
+            "notes": "Deterministic fake result normalization only. Allowed scenarios produce schema_version day95.adapter_result.v1 normalized_fake_adapter_result records from the deterministic fake boundary; rejected scenarios keep adapter_result None. real_adapter_result_count remains 0, live_execution_result_count remains 0, result_status_source remains deterministic_fake_boundary, and Day95 adds no real adapter, SSH, RouterOS API, socket, subprocess device operation, dashboard action, POST route, command input, execution unlock, or device contact.",
+        },
     ]
 
 
@@ -3609,6 +3667,7 @@ wireguard-runner is dry-run by default and delegates to the existing WireGuard s
             DAY92_REAL_ADAPTER_EXECUTABLE_GUARDS_TASK_ID,
             DAY93_GUARDED_FAKE_ADAPTER_CONTRACT_TASK_ID,
             DAY94_ADAPTER_BOUNDARY_REGRESSION_MATRIX_TASK_ID,
+            DAY95_ADAPTER_RESULT_NORMALIZATION_TASK_ID,
             WIREGUARD_RUNNER_TASK_ALIAS,
         ],
         help="Task to run.",
@@ -6330,6 +6389,52 @@ def _run_day94_adapter_boundary_regression_matrix(project_root: Path) -> int:
     return 1
 
 
+def _run_day95_adapter_result_normalization(project_root: Path) -> int:
+    report = run_adapter_result_normalization()
+    json_path, html_path = write_adapter_result_normalization_reports(project_root, report)
+    summary = report["summary"]
+
+    print(format_heading("Day95 Adapter Result Normalization"))
+    print("Task name: adapter-result-normalization")
+    print("Phase: FAKE_ONLY_EVIDENCE_HARDENING")
+    print("Safety: fake-only; read-only report evidence; no SSH, real adapter, device access, or live execution")
+    print(f"Result: {report['overall_status']} / {report['phase']}")
+    print(f"Total scenarios: {summary['total_scenarios']}")
+    print(f"Allowed count: {summary['allowed_count']}")
+    print(f"Rejected count: {summary['rejected_count']}")
+    print(f"Normalized result count: {summary['normalized_result_count']}")
+    print(f"Fake adapter result count: {summary['fake_adapter_result_count']}")
+    print(f"real_adapter_result_count = {summary['real_adapter_result_count']}")
+    print(f"live_execution_result_count = {summary['live_execution_result_count']}")
+    print(f"result_status_source = {summary['result_status_source']}")
+    print(f"evidence_chain_complete = {json.dumps(summary['evidence_chain_complete'])}")
+    print(f"JSON report: {_relative_to_project(project_root, json_path)}")
+    print(f"HTML report: {_relative_to_project(project_root, html_path)}")
+
+    if (
+        report["overall_status"] == "PASS"
+        and summary["total_scenarios"] == 5
+        and summary["allowed_count"] == 2
+        and summary["rejected_count"] == 3
+        and summary["normalized_result_count"] == summary["allowed_count"]
+        and summary["fake_adapter_result_count"] == summary["allowed_count"]
+        and summary["real_adapter_result_count"] == 0
+        and summary["live_execution_result_count"] == 0
+        and summary["rejected_with_adapter_result"] == 0
+        and summary["result_status_source"] == "deterministic_fake_boundary"
+        and summary["evidence_chain_complete"] is True
+        and not report["validation_errors"]
+    ):
+        print(
+            f"{format_status('PASS')} FAKE_ONLY_EVIDENCE_HARDENING. "
+            "Day95 normalized deterministic fake adapter results and kept rejected scenarios result-free."
+        )
+        return 0
+
+    print(f"{format_status('FAIL')} Day95 adapter result normalization failed validation.")
+    return 1
+
+
 def _relative_to_project(project_root: Path, path: Path) -> str:
     try:
         return path.resolve().relative_to(project_root.resolve()).as_posix()
@@ -8710,6 +8815,8 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
         return _run_day93_guarded_fake_adapter_contract(root)
     if args.task == DAY94_ADAPTER_BOUNDARY_REGRESSION_MATRIX_TASK_ID:
         return _run_day94_adapter_boundary_regression_matrix(root)
+    if args.task == DAY95_ADAPTER_RESULT_NORMALIZATION_TASK_ID:
+        return _run_day95_adapter_result_normalization(root)
 
     profile_path = _resolve_project_path(root, args.profile)
     try:

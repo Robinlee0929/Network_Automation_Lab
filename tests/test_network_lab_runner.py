@@ -4769,3 +4769,97 @@ def test_day94_report_index_visibility_includes_adapter_boundary_regression_matr
     assert "fake-adapter-only matrix" in html
     assert "reports/lab-summary/day94_adapter_boundary_regression_matrix.json" in html
     assert "reports/lab-summary/day94_adapter_boundary_regression_matrix.html" in html
+
+
+def test_day95_adapter_result_normalization_task_exists_in_catalog():
+    task = next(
+        task for task in network_lab.list_tasks() if task["id"] == "adapter-result-normalization"
+    )
+
+    assert task["task_id"] == "day95_adapter_result_normalization"
+    assert task["day"] == "Day95"
+    assert task["display_name"] == "Day95 Adapter Result Normalization"
+    assert task["safety_level"] == "fake-adapter-only"
+    assert task["execution_mode"] == "guarded-fake-only"
+    assert task["requires_live_device"] is False
+    assert task["requires_password"] is False
+    assert task["produces_report"] is True
+    assert "reports/lab-summary/day95_adapter_result_normalization.json" in task["report_paths"]
+    assert "reports/lab-summary/day95_adapter_result_normalization.html" in task["report_paths"]
+    assert "docs/ai/intent_adapter_result_normalization.md" in task["report_paths"]
+    assert "docs/roadmap/day95_adapter_result_normalization.md" in task["report_paths"]
+    assert "rejected scenarios keep adapter_result None" in task["notes"]
+    assert "real_adapter_result_count remains 0" in task["notes"]
+    assert "live_execution_result_count remains 0" in task["notes"]
+
+
+def test_day95_adapter_result_normalization_runner_writes_reports_without_live_access(
+    tmp_path, capsys, monkeypatch
+):
+    def fail_run(*_args, **_kwargs):
+        raise AssertionError("Day95 adapter result normalization must not execute subprocess")
+
+    def fail_load(_path):
+        raise AssertionError("Day95 adapter result normalization must not load profile or config data")
+
+    monkeypatch.setattr(network_lab.subprocess, "run", fail_run)
+    monkeypatch.setattr(network_lab, "load_lab_runner_profile", fail_load)
+
+    exit_code = network_lab.main(["--task", "adapter-result-normalization"], project_root=tmp_path)
+    output = capsys.readouterr().out
+
+    json_path = tmp_path / "reports/lab-summary/day95_adapter_result_normalization.json"
+    html_path = tmp_path / "reports/lab-summary/day95_adapter_result_normalization.html"
+    assert exit_code == 0
+    assert "Day95 Adapter Result Normalization" in output
+    assert "Task name: adapter-result-normalization" in output
+    assert "PASS" in output
+    assert "Total scenarios: 5" in output
+    assert "Allowed count: 2" in output
+    assert "Rejected count: 3" in output
+    assert "Normalized result count: 2" in output
+    assert "Fake adapter result count: 2" in output
+    assert "real_adapter_result_count = 0" in output
+    assert "live_execution_result_count = 0" in output
+    assert "result_status_source = deterministic_fake_boundary" in output
+    assert "evidence_chain_complete = true" in output
+    assert "JSON report: reports/lab-summary/day95_adapter_result_normalization.json" in output
+    assert "HTML report: reports/lab-summary/day95_adapter_result_normalization.html" in output
+    assert "[PASS] FAKE_ONLY_EVIDENCE_HARDENING" in output
+    assert json_path.exists()
+    assert html_path.exists()
+    assert not (tmp_path / "config.json").exists()
+
+    report = json.loads(json_path.read_text(encoding="utf-8"))
+    html = html_path.read_text(encoding="utf-8")
+    assert report["overall_status"] == "PASS"
+    assert report["summary"]["normalized_result_count"] == report["summary"]["allowed_count"]
+    assert report["summary"]["rejected_with_adapter_result"] == 0
+    assert report["summary"]["real_adapter_result_count"] == 0
+    assert report["summary"]["live_execution_result_count"] == 0
+    assert report["summary"]["result_status_source"] == "deterministic_fake_boundary"
+    assert all(
+        record["adapter_result"] is None
+        for record in report["scenario_records"]
+        if record["guard_decision"] == "REJECT"
+    )
+    assert "Adapter Result Normalization" in html
+    assert "<form" not in html.lower()
+    assert "<button" not in html.lower()
+    assert "method=\"post\"" not in html.lower()
+    assert "action=" not in html.lower()
+
+
+def test_day95_report_index_visibility_includes_adapter_result_normalization(tmp_path, capsys):
+    assert network_lab.main(["--task", "adapter-result-normalization"], project_root=tmp_path) == 0
+
+    exit_code = network_lab.main(["--report-index"], project_root=tmp_path)
+
+    index_html = tmp_path / "reports/report_index.html"
+    assert exit_code == 0
+    assert index_html.exists()
+    html = index_html.read_text(encoding="utf-8")
+    assert "Adapter Result Normalization" in html
+    assert "fake-only result normalization" in html
+    assert "reports/lab-summary/day95_adapter_result_normalization.json" in html
+    assert "reports/lab-summary/day95_adapter_result_normalization.html" in html

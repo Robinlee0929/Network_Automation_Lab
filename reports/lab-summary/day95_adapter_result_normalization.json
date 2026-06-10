@@ -1,0 +1,385 @@
+{
+  "day": 95,
+  "day_id": "Day95",
+  "task": "adapter-result-normalization",
+  "title": "Adapter Result Normalization",
+  "created_at": "2026-06-10T00:00:00Z",
+  "phase": "FAKE_ONLY_EVIDENCE_HARDENING",
+  "overall_status": "PASS",
+  "summary": {
+    "total_scenarios": 5,
+    "allowed_count": 2,
+    "rejected_count": 3,
+    "normalized_result_count": 2,
+    "fake_adapter_result_count": 2,
+    "rejection_record_count": 3,
+    "rejected_with_adapter_result": 0,
+    "real_adapter_result_count": 0,
+    "live_execution_result_count": 0,
+    "scenario_failures": 0,
+    "result_status_values": [
+      "FAKE_RESULT_READY"
+    ],
+    "result_status_source": "deterministic_fake_boundary",
+    "evidence_chain_complete": true,
+    "overall_status": "PASS"
+  },
+  "normalized_schema": {
+    "schema_version": "day95.adapter_result.v1",
+    "result_kind": "normalized_fake_adapter_result",
+    "required_top_level_fields": [
+      "schema_version",
+      "result_kind",
+      "adapter_type",
+      "source_boundary",
+      "scenario_id",
+      "guard_decision",
+      "adapter_invoked",
+      "result_status",
+      "result_payload",
+      "safety",
+      "evidence"
+    ],
+    "payload_fields": [
+      "command_family",
+      "readonly_intent",
+      "simulated_output",
+      "parser_ready"
+    ],
+    "safety_fields": [
+      "real_adapter_result_present",
+      "live_execution_result_present",
+      "ssh_used",
+      "device_access_used",
+      "execution_unlocked"
+    ],
+    "status_source": "deterministic_fake_boundary"
+  },
+  "scenario_records": [
+    {
+      "scenario_id": "D95-S01-readonly-identity",
+      "intent": "Normalize fake identity evidence",
+      "command_family": "readonly_identity",
+      "guard_decision": "ALLOW",
+      "readonly_intent": true,
+      "simulated_output": "name: lab-router-simulated",
+      "reason": "Allowed read-only identity scenario reaches fake boundary.",
+      "unsafe_category": "none",
+      "adapter_invoked": true,
+      "fake_adapter_invoked": true,
+      "real_adapter_invoked": false,
+      "live_execution_invoked": false,
+      "ssh_used": false,
+      "device_access_used": false,
+      "dashboard_action_allowed": false,
+      "adapter_result": {
+        "schema_version": "day95.adapter_result.v1",
+        "result_kind": "normalized_fake_adapter_result",
+        "adapter_type": "fake",
+        "source_boundary": "guarded_fake_adapter_boundary",
+        "scenario_id": "D95-S01-readonly-identity",
+        "guard_decision": "ALLOW",
+        "adapter_invoked": true,
+        "result_status": "FAKE_RESULT_READY",
+        "result_payload": {
+          "command_family": "readonly_identity",
+          "readonly_intent": true,
+          "simulated_output": "name: lab-router-simulated",
+          "parser_ready": true
+        },
+        "safety": {
+          "real_adapter_result_present": false,
+          "live_execution_result_present": false,
+          "ssh_used": false,
+          "device_access_used": false,
+          "execution_unlocked": false
+        },
+        "evidence": {
+          "day93_guarded_fake_adapter_boundary_audit": true,
+          "day94_adapter_boundary_regression_matrix": true,
+          "normalization_applied": true
+        }
+      },
+      "adapter_result_present": true,
+      "fake_boundary_result_status": "FAKE_RESULT_READY",
+      "scenario_status": "PASS"
+    },
+    {
+      "scenario_id": "D95-S02-readonly-interfaces-multiline",
+      "intent": "Normalize fake multi-line interface evidence",
+      "command_family": "readonly_interfaces",
+      "guard_decision": "ALLOW",
+      "readonly_intent": true,
+      "simulated_output": "ether1 running\nbridge-lan running\nwireguard-lab disabled",
+      "reason": "Allowed read-only interface scenario proves multi-line parser-ready payload.",
+      "unsafe_category": "none",
+      "adapter_invoked": true,
+      "fake_adapter_invoked": true,
+      "real_adapter_invoked": false,
+      "live_execution_invoked": false,
+      "ssh_used": false,
+      "device_access_used": false,
+      "dashboard_action_allowed": false,
+      "adapter_result": {
+        "schema_version": "day95.adapter_result.v1",
+        "result_kind": "normalized_fake_adapter_result",
+        "adapter_type": "fake",
+        "source_boundary": "guarded_fake_adapter_boundary",
+        "scenario_id": "D95-S02-readonly-interfaces-multiline",
+        "guard_decision": "ALLOW",
+        "adapter_invoked": true,
+        "result_status": "FAKE_RESULT_READY",
+        "result_payload": {
+          "command_family": "readonly_interfaces",
+          "readonly_intent": true,
+          "simulated_output": "ether1 running\nbridge-lan running\nwireguard-lab disabled",
+          "parser_ready": true
+        },
+        "safety": {
+          "real_adapter_result_present": false,
+          "live_execution_result_present": false,
+          "ssh_used": false,
+          "device_access_used": false,
+          "execution_unlocked": false
+        },
+        "evidence": {
+          "day93_guarded_fake_adapter_boundary_audit": true,
+          "day94_adapter_boundary_regression_matrix": true,
+          "normalization_applied": true
+        }
+      },
+      "adapter_result_present": true,
+      "fake_boundary_result_status": "FAKE_RESULT_READY",
+      "scenario_status": "PASS"
+    },
+    {
+      "scenario_id": "D95-S03-reject-write-capable",
+      "intent": "Set interface address",
+      "command_family": "write_interface_address",
+      "guard_decision": "REJECT",
+      "readonly_intent": false,
+      "simulated_output": "",
+      "reason": "Write-capable request is rejected before adapter result creation.",
+      "unsafe_category": "write_capable",
+      "adapter_invoked": false,
+      "fake_adapter_invoked": false,
+      "real_adapter_invoked": false,
+      "live_execution_invoked": false,
+      "ssh_used": false,
+      "device_access_used": false,
+      "dashboard_action_allowed": false,
+      "adapter_result": null,
+      "adapter_result_present": false,
+      "fake_boundary_result_status": null,
+      "scenario_status": "PASS"
+    },
+    {
+      "scenario_id": "D95-S04-reject-live-capable",
+      "intent": "Run live command transport",
+      "command_family": "live_transport_command",
+      "guard_decision": "REJECT",
+      "readonly_intent": false,
+      "simulated_output": "",
+      "reason": "Live-capable request is rejected before fake adapter invocation.",
+      "unsafe_category": "live_capable",
+      "adapter_invoked": false,
+      "fake_adapter_invoked": false,
+      "real_adapter_invoked": false,
+      "live_execution_invoked": false,
+      "ssh_used": false,
+      "device_access_used": false,
+      "dashboard_action_allowed": false,
+      "adapter_result": null,
+      "adapter_result_present": false,
+      "fake_boundary_result_status": null,
+      "scenario_status": "PASS"
+    },
+    {
+      "scenario_id": "D95-S05-reject-ambiguous-unsafe",
+      "intent": "Inspect or repair unknown device state",
+      "command_family": "ambiguous_unknown",
+      "guard_decision": "REJECT",
+      "readonly_intent": false,
+      "simulated_output": "",
+      "reason": "Ambiguous request fails closed and produces no adapter result.",
+      "unsafe_category": "ambiguous_unsafe",
+      "adapter_invoked": false,
+      "fake_adapter_invoked": false,
+      "real_adapter_invoked": false,
+      "live_execution_invoked": false,
+      "ssh_used": false,
+      "device_access_used": false,
+      "dashboard_action_allowed": false,
+      "adapter_result": null,
+      "adapter_result_present": false,
+      "fake_boundary_result_status": null,
+      "scenario_status": "PASS"
+    }
+  ],
+  "normalized_result_records": [
+    {
+      "schema_version": "day95.adapter_result.v1",
+      "result_kind": "normalized_fake_adapter_result",
+      "adapter_type": "fake",
+      "source_boundary": "guarded_fake_adapter_boundary",
+      "scenario_id": "D95-S01-readonly-identity",
+      "guard_decision": "ALLOW",
+      "adapter_invoked": true,
+      "result_status": "FAKE_RESULT_READY",
+      "result_payload": {
+        "command_family": "readonly_identity",
+        "readonly_intent": true,
+        "simulated_output": "name: lab-router-simulated",
+        "parser_ready": true
+      },
+      "safety": {
+        "real_adapter_result_present": false,
+        "live_execution_result_present": false,
+        "ssh_used": false,
+        "device_access_used": false,
+        "execution_unlocked": false
+      },
+      "evidence": {
+        "day93_guarded_fake_adapter_boundary_audit": true,
+        "day94_adapter_boundary_regression_matrix": true,
+        "normalization_applied": true
+      }
+    },
+    {
+      "schema_version": "day95.adapter_result.v1",
+      "result_kind": "normalized_fake_adapter_result",
+      "adapter_type": "fake",
+      "source_boundary": "guarded_fake_adapter_boundary",
+      "scenario_id": "D95-S02-readonly-interfaces-multiline",
+      "guard_decision": "ALLOW",
+      "adapter_invoked": true,
+      "result_status": "FAKE_RESULT_READY",
+      "result_payload": {
+        "command_family": "readonly_interfaces",
+        "readonly_intent": true,
+        "simulated_output": "ether1 running\nbridge-lan running\nwireguard-lab disabled",
+        "parser_ready": true
+      },
+      "safety": {
+        "real_adapter_result_present": false,
+        "live_execution_result_present": false,
+        "ssh_used": false,
+        "device_access_used": false,
+        "execution_unlocked": false
+      },
+      "evidence": {
+        "day93_guarded_fake_adapter_boundary_audit": true,
+        "day94_adapter_boundary_regression_matrix": true,
+        "normalization_applied": true
+      }
+    }
+  ],
+  "rejection_records": [
+    {
+      "scenario_id": "D95-S03-reject-write-capable",
+      "guard_decision": "REJECT",
+      "adapter_invoked": false,
+      "adapter_result_present": false,
+      "result_payload_present": false,
+      "reason": "Write-capable request is rejected before adapter result creation.",
+      "unsafe_category": "write_capable"
+    },
+    {
+      "scenario_id": "D95-S04-reject-live-capable",
+      "guard_decision": "REJECT",
+      "adapter_invoked": false,
+      "adapter_result_present": false,
+      "result_payload_present": false,
+      "reason": "Live-capable request is rejected before fake adapter invocation.",
+      "unsafe_category": "live_capable"
+    },
+    {
+      "scenario_id": "D95-S05-reject-ambiguous-unsafe",
+      "guard_decision": "REJECT",
+      "adapter_invoked": false,
+      "adapter_result_present": false,
+      "result_payload_present": false,
+      "reason": "Ambiguous request fails closed and produces no adapter result.",
+      "unsafe_category": "ambiguous_unsafe"
+    }
+  ],
+  "fake_boundary_invocation_evidence": [
+    {
+      "invocation_id": "day95-fake-boundary-001",
+      "scenario_id": "D95-S01-readonly-identity",
+      "adapter_type": "fake",
+      "source_boundary": "guarded_fake_adapter_boundary",
+      "deterministic_status": "FAKE_RESULT_READY",
+      "command_family": "readonly_identity",
+      "readonly_intent": true,
+      "simulated_output": "name: lab-router-simulated",
+      "parser_ready": true
+    },
+    {
+      "invocation_id": "day95-fake-boundary-002",
+      "scenario_id": "D95-S02-readonly-interfaces-multiline",
+      "adapter_type": "fake",
+      "source_boundary": "guarded_fake_adapter_boundary",
+      "deterministic_status": "FAKE_RESULT_READY",
+      "command_family": "readonly_interfaces",
+      "readonly_intent": true,
+      "simulated_output": "ether1 running\nbridge-lan running\nwireguard-lab disabled",
+      "parser_ready": true
+    }
+  ],
+  "safety_invariant_summary": {
+    "fake_only": true,
+    "deterministic_only": true,
+    "report_only": true,
+    "read_only_dashboard": true,
+    "no_openai_api": true,
+    "no_ai_sdk_runtime": true,
+    "no_voice": true,
+    "no_ssh": true,
+    "no_device_access": true,
+    "no_live_execution": true,
+    "no_real_adapter_result": true,
+    "no_mapped_task_execution": true,
+    "no_dashboard_action": true,
+    "no_post_route": true,
+    "no_execution_approval_mechanism": true,
+    "rejected_scenarios_have_no_adapter_result": true
+  },
+  "evidence_chain_summary": {
+    "day93_guarded_fake_adapter_boundary_audit": true,
+    "day94_adapter_boundary_regression_matrix": true,
+    "day95_normalization_applied": true,
+    "chain": [
+      "Day93 proved guard-approved scenarios are the only ones reaching the fake adapter boundary.",
+      "Day94 expanded that proof into regression matrix evidence.",
+      "Day95 normalizes only deterministic fake adapter results and leaves rejected scenarios result-free."
+    ]
+  },
+  "references": {
+    "day93": {
+      "task": "guarded-fake-adapter-contract",
+      "report": "reports/lab-summary/day93_guarded_fake_adapter_contract.json",
+      "evidence": "Guard-first fake adapter boundary audit."
+    },
+    "day94": {
+      "task": "adapter-boundary-regression-matrix",
+      "report": "reports/lab-summary/day94_adapter_boundary_regression_matrix.json",
+      "evidence": "Adapter boundary regression matrix."
+    }
+  },
+  "no_real_device_access": true,
+  "no_ssh": true,
+  "no_live_execution": true,
+  "no_real_adapter_invocation": true,
+  "no_openai_api": true,
+  "no_ai_sdk_runtime": true,
+  "no_voice": true,
+  "no_config_json_read": true,
+  "dashboard_read_only": true,
+  "dashboard_action_allowed": false,
+  "reports": {
+    "json": "reports/lab-summary/day95_adapter_result_normalization.json",
+    "html": "reports/lab-summary/day95_adapter_result_normalization.html"
+  },
+  "validation_errors": []
+}

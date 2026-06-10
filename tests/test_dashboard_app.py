@@ -330,6 +330,43 @@ def test_dashboard_evidence_surfaces_day94_adapter_boundary_regression_matrix_re
     assert "live_execution_invocations remains 0" in day94_text
 
 
+def test_dashboard_evidence_surfaces_day95_adapter_result_normalization_report(tmp_path):
+    reports_dir = tmp_path / "reports"
+    write_json(
+        reports_dir / "lab-summary" / "day95_adapter_result_normalization.json",
+        {
+            "overall_status": "PASS",
+            "phase": "FAKE_ONLY_EVIDENCE_HARDENING",
+            "summary": {
+                "total_scenarios": 5,
+                "allowed_count": 2,
+                "rejected_count": 3,
+                "normalized_result_count": 2,
+                "fake_adapter_result_count": 2,
+                "real_adapter_result_count": 0,
+                "live_execution_result_count": 0,
+                "evidence_chain_complete": True,
+            },
+        },
+    )
+    (reports_dir / "lab-summary" / "day95_adapter_result_normalization.html").write_text(
+        "<html>Day95 adapter result normalization</html>",
+        encoding="utf-8",
+    )
+
+    entries = dashboard.collect_dashboard_evidence(tmp_path, reports_dir)
+
+    day95 = next(entry for entry in entries if entry.day == "Day95")
+    assert day95.title == "Adapter Result Normalization"
+    assert day95.status == "PASS"
+    assert day95.json_view_path == "reports/lab-summary/day95_adapter_result_normalization.json"
+    assert day95.html_view_path == "reports/lab-summary/day95_adapter_result_normalization.html"
+    day95_text = f"{day95.title} {day95.description} {day95.notes}".lower()
+    assert "rejected scenarios produce no adapter result" in day95_text
+    assert "real_adapter_result_count remains 0" in day95_text
+    assert "live_execution_result_count remains 0" in day95_text
+
+
 def test_dashboard_evidence_missing_html_does_not_crash(tmp_path):
     reports_dir = tmp_path / "reports"
     write_json(
@@ -454,6 +491,7 @@ def test_ai_intent_reviewer_references_day57_to_day92():
         "Day92",
         "Day93",
         "Day94",
+        "Day95",
     ]
     text = " ".join(
         f"{item.title} {item.summary} {item.doc_path} {item.roadmap_path} "
@@ -504,6 +542,10 @@ def test_ai_intent_reviewer_references_day57_to_day92():
     assert "docs/ai/intent_adapter_boundary_regression_matrix.md" in text
     assert "docs/roadmap/day94_adapter_boundary_regression_matrix.md" in text
     assert "reports/lab-summary/day94_adapter_boundary_regression_matrix.html" in text
+    assert "Adapter Result Normalization" in text
+    assert "docs/ai/intent_adapter_result_normalization.md" in text
+    assert "docs/roadmap/day95_adapter_result_normalization.md" in text
+    assert "reports/lab-summary/day95_adapter_result_normalization.html" in text
     assert "Reviewer report quality and evidence trace" in text
     assert "docs/ai/intent_offline_mock_runtime_reviewer_report_quality.md" in text
     assert "docs/roadmap/day68_offline_mock_runtime_reviewer_report_quality.md" in text
@@ -1202,6 +1244,8 @@ def test_ai_intent_reviewer_route_exposes_day57_to_day82_without_execution(tmp_p
     assert "Day93 keeps rejected_adapter_invocations 0, real_adapter_invocations 0" in text
     assert "Day94 is a fake-adapter-only regression matrix" in text
     assert "Day94 keeps adapter_invoked_for_rejected 0, real_adapter_invocations 0, live_execution_invocations 0" in text
+    assert "Day95 is fake-only adapter result normalization" in text
+    assert "Day95 keeps real_adapter_result_count 0, live_execution_result_count 0" in text
     assert "No mapped task was executed. This is a dry-run reviewer walkthrough only." in text
     html = text.lower()
     assert "<form" not in html
@@ -1268,6 +1312,17 @@ def test_ai_intent_reviewer_route_exposes_day57_to_day82_without_execution(tmp_p
     assert "xmlhttprequest" not in day94_section
     assert "run task" not in day94_section
     assert "task trigger" not in day94_section
+    day95_section = html.split("<h3>adapter result normalization", 1)[1]
+    day95_section = day95_section.split("</article>", 1)[0]
+    assert "<form" not in day95_section
+    assert "<button" not in day95_section
+    assert "method=\"post\"" not in day95_section
+    assert "method='post'" not in day95_section
+    assert "action=" not in day95_section
+    assert "fetch(" not in day95_section
+    assert "xmlhttprequest" not in day95_section
+    assert "run task" not in day95_section
+    assert "task trigger" not in day95_section
     assert "execute intent" not in html
     assert "submit intent" not in html
     assert "execute buttons" not in html
