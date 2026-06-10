@@ -87,6 +87,10 @@ from intent_adapter_result_normalization import (
     run_adapter_result_normalization,
     write_adapter_result_normalization_reports,
 )
+from intent_readonly_output_parser_prototype import (
+    build_day96_parser_report,
+    write_day96_parser_reports,
+)
 from intent_runtime_safety_case import build_runtime_safety_case_report
 from intent_runtime_safety_gate import build_runtime_safety_gate_report
 
@@ -419,6 +423,19 @@ DAY95_ADAPTER_RESULT_NORMALIZATION_JSON = (
 )
 DAY95_ADAPTER_RESULT_NORMALIZATION_HTML = (
     Path("reports") / "lab-summary" / "day95_adapter_result_normalization.html"
+)
+DAY96_READONLY_OUTPUT_PARSER_PROTOTYPE_TASK_ID = "readonly-output-parser-prototype"
+DAY96_READONLY_OUTPUT_PARSER_PROTOTYPE_DOC = (
+    Path("docs") / "ai" / "readonly_output_parser_prototype.md"
+)
+DAY96_READONLY_OUTPUT_PARSER_PROTOTYPE_ROADMAP = (
+    Path("docs") / "roadmap" / "day96_readonly_output_parser_prototype.md"
+)
+DAY96_READONLY_OUTPUT_PARSER_PROTOTYPE_JSON = (
+    Path("reports") / "lab-summary" / "day96_readonly_output_parser_prototype.json"
+)
+DAY96_READONLY_OUTPUT_PARSER_PROTOTYPE_HTML = (
+    Path("reports") / "lab-summary" / "day96_readonly_output_parser_prototype.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -1278,6 +1295,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY95_ADAPTER_RESULT_NORMALIZATION_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day96",
+        "title": "Read-only Output Parser Prototype",
+        "report_type": "Parser-only fake adapter simulated output evidence",
+        "safety_label": "parser-only; no live-read, SSH, RouterOS, or device access",
+        "description": "Day96 parses only Day95 normalized fake adapter simulated output into structured records. Unsupported or malformed inputs return REVIEW_NEEDED or UNSUPPORTED without adapter fallback, runner live path, SSH, RouterOS, config.json, or dashboard action.",
+        "json_globs": [DAY96_READONLY_OUTPUT_PARSER_PROTOTYPE_JSON.as_posix()],
+        "html_globs": [DAY96_READONLY_OUTPUT_PARSER_PROTOTYPE_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY96_READONLY_OUTPUT_PARSER_PROTOTYPE_TASK_ID}"
         ),
     },
 ]
@@ -3534,6 +3564,34 @@ def list_tasks() -> List[Dict[str, Any]]:
             "related_script": "network_lab.py",
             "notes": "Deterministic fake result normalization only. Allowed scenarios produce schema_version day95.adapter_result.v1 normalized_fake_adapter_result records from the deterministic fake boundary; rejected scenarios keep adapter_result None. real_adapter_result_count remains 0, live_execution_result_count remains 0, result_status_source remains deterministic_fake_boundary, and Day95 adds no real adapter, SSH, RouterOS API, socket, subprocess device operation, dashboard action, POST route, command input, execution unlock, or device contact.",
         },
+        {
+            "id": DAY96_READONLY_OUTPUT_PARSER_PROTOTYPE_TASK_ID,
+            "task_id": "day96_readonly_output_parser_prototype",
+            "display_name": "Day96 Read-only Output Parser Prototype",
+            "user_display_name": "Read-only Output Parser Prototype",
+            "day": "Day96",
+            "category": "ai_planning",
+            "description": "Parses only Day95 normalized fake adapter simulated output into structured parser records with explicit no-live safety metadata.",
+            "safety_level": "fake-adapter-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY96_READONLY_OUTPUT_PARSER_PROTOTYPE_JSON.as_posix(),
+                DAY96_READONLY_OUTPUT_PARSER_PROTOTYPE_HTML.as_posix(),
+                DAY96_READONLY_OUTPUT_PARSER_PROTOTYPE_DOC.as_posix(),
+                DAY96_READONLY_OUTPUT_PARSER_PROTOTYPE_ROADMAP.as_posix(),
+            ],
+            "report_outputs": [
+                "Day96 JSON/HTML parser-only fake output evidence",
+                "Day96 parser boundary AI reviewer and roadmap documentation",
+            ],
+            "related_script": "network_lab.py",
+            "notes": "Parser-only prototype. Input is Day95 normalized fake adapter simulated_output only; unsupported or malformed inputs return REVIEW_NEEDED or UNSUPPORTED. live_read_enabled remains false, ssh_enabled remains false, routeros_enabled remains false, device_access_enabled remains false, adapter fallback remains false, runner live path remains false, no config.json is read, and Day96 adds no RouterOS connection, SSH, live command, real device command parser, dashboard action, POST route, command input, execution unlock, or device contact.",
+        },
     ]
 
 
@@ -3668,6 +3726,7 @@ wireguard-runner is dry-run by default and delegates to the existing WireGuard s
             DAY93_GUARDED_FAKE_ADAPTER_CONTRACT_TASK_ID,
             DAY94_ADAPTER_BOUNDARY_REGRESSION_MATRIX_TASK_ID,
             DAY95_ADAPTER_RESULT_NORMALIZATION_TASK_ID,
+            DAY96_READONLY_OUTPUT_PARSER_PROTOTYPE_TASK_ID,
             WIREGUARD_RUNNER_TASK_ALIAS,
         ],
         help="Task to run.",
@@ -6435,6 +6494,55 @@ def _run_day95_adapter_result_normalization(project_root: Path) -> int:
     return 1
 
 
+def _run_day96_readonly_output_parser_prototype(project_root: Path) -> int:
+    report = build_day96_parser_report()
+    json_path, html_path = write_day96_parser_reports(project_root, report)
+    summary = report["parsed_records_summary"]
+
+    print(format_heading("Day96 Read-only Output Parser Prototype"))
+    print("Task name: readonly-output-parser-prototype")
+    print("Phase: PARSER_PROTOTYPE_READY")
+    print("Safety: parser-only over Day95 normalized fake adapter simulated output; no RouterOS, SSH, device access, live-read, adapter fallback, or runner live path")
+    print(f"Result: {report['overall_status']} / {report['phase']}")
+    print(f"Total cases: {summary['total_cases']}")
+    print(f"Parsed cases: {summary['parsed_case_count']}")
+    print(f"Review-needed cases: {summary['review_needed_case_count']}")
+    print(f"Unsupported cases: {summary['unsupported_case_count']}")
+    print(f"Parsed records: {summary['parsed_record_count']}")
+    print(f"live_fallback_attempts = {summary['live_fallback_attempts']}")
+    print(f"adapter_fallback_attempts = {summary['adapter_fallback_attempts']}")
+    print(f"device_access_attempts = {summary['device_access_attempts']}")
+    print(f"live_read_enabled = {json.dumps(report['safety_boundary']['live_read_enabled'])}")
+    print(f"ssh_enabled = {json.dumps(report['safety_boundary']['ssh_enabled'])}")
+    print(f"routeros_enabled = {json.dumps(report['safety_boundary']['routeros_enabled'])}")
+    print(f"device_access_enabled = {json.dumps(report['safety_boundary']['device_access_enabled'])}")
+    print(f"JSON report: {_relative_to_project(project_root, json_path)}")
+    print(f"HTML report: {_relative_to_project(project_root, html_path)}")
+
+    if (
+        report["overall_status"] == "PASS"
+        and summary["parsed_case_count"] >= 2
+        and summary["review_needed_case_count"] >= 2
+        and summary["unsupported_case_count"] >= 1
+        and summary["live_fallback_attempts"] == 0
+        and summary["adapter_fallback_attempts"] == 0
+        and summary["device_access_attempts"] == 0
+        and report["safety_boundary"]["live_read_enabled"] is False
+        and report["safety_boundary"]["ssh_enabled"] is False
+        and report["safety_boundary"]["routeros_enabled"] is False
+        and report["safety_boundary"]["device_access_enabled"] is False
+        and not report["validation_errors"]
+    ):
+        print(
+            f"{format_status('PASS')} PARSER_PROTOTYPE_READY. "
+            "Day96 parsed fake simulated output without live-read or fallback."
+        )
+        return 0
+
+    print(f"{format_status('FAIL')} Day96 read-only output parser prototype failed validation.")
+    return 1
+
+
 def _relative_to_project(project_root: Path, path: Path) -> str:
     try:
         return path.resolve().relative_to(project_root.resolve()).as_posix()
@@ -8817,6 +8925,8 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
         return _run_day94_adapter_boundary_regression_matrix(root)
     if args.task == DAY95_ADAPTER_RESULT_NORMALIZATION_TASK_ID:
         return _run_day95_adapter_result_normalization(root)
+    if args.task == DAY96_READONLY_OUTPUT_PARSER_PROTOTYPE_TASK_ID:
+        return _run_day96_readonly_output_parser_prototype(root)
 
     profile_path = _resolve_project_path(root, args.profile)
     try:
