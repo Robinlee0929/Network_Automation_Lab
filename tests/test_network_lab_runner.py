@@ -4677,3 +4677,95 @@ def test_day93_report_index_visibility_includes_guarded_fake_adapter_contract(tm
     assert "fake adapter only" in html
     assert "reports/lab-summary/day93_guarded_fake_adapter_contract.json" in html
     assert "reports/lab-summary/day93_guarded_fake_adapter_contract.html" in html
+
+
+def test_day94_adapter_boundary_regression_matrix_task_exists_in_catalog():
+    task = next(
+        task for task in network_lab.list_tasks() if task["id"] == "adapter-boundary-regression-matrix"
+    )
+
+    assert task["task_id"] == "day94_adapter_boundary_regression_matrix"
+    assert task["day"] == "Day94"
+    assert task["display_name"] == "Day94 Adapter Boundary Regression Matrix"
+    assert task["safety_level"] == "fake-adapter-only"
+    assert task["execution_mode"] == "guarded-fake-only"
+    assert task["requires_live_device"] is False
+    assert task["requires_password"] is False
+    assert task["produces_report"] is True
+    assert "reports/lab-summary/day94_adapter_boundary_regression_matrix.json" in task["report_paths"]
+    assert "reports/lab-summary/day94_adapter_boundary_regression_matrix.html" in task["report_paths"]
+    assert "docs/ai/intent_adapter_boundary_regression_matrix.md" in task["report_paths"]
+    assert "docs/roadmap/day94_adapter_boundary_regression_matrix.md" in task["report_paths"]
+    assert "adapter_invoked_for_rejected remains 0" in task["notes"]
+    assert "real_adapter_invocations remains 0" in task["notes"]
+    assert "live_execution_invocations remains 0" in task["notes"]
+
+
+def test_day94_adapter_boundary_regression_matrix_runner_writes_reports_without_live_access(
+    tmp_path, capsys, monkeypatch
+):
+    def fail_run(*_args, **_kwargs):
+        raise AssertionError("Day94 adapter boundary matrix must not execute subprocess")
+
+    def fail_load(_path):
+        raise AssertionError("Day94 adapter boundary matrix must not load profile or config data")
+
+    monkeypatch.setattr(network_lab.subprocess, "run", fail_run)
+    monkeypatch.setattr(network_lab, "load_lab_runner_profile", fail_load)
+
+    exit_code = network_lab.main(["--task", "adapter-boundary-regression-matrix"], project_root=tmp_path)
+    output = capsys.readouterr().out
+
+    json_path = tmp_path / "reports/lab-summary/day94_adapter_boundary_regression_matrix.json"
+    html_path = tmp_path / "reports/lab-summary/day94_adapter_boundary_regression_matrix.html"
+    assert exit_code == 0
+    assert "Day94 Adapter Boundary Regression Matrix" in output
+    assert "Task name: adapter-boundary-regression-matrix" in output
+    assert "PASS" in output
+    assert "Total rows: 14" in output
+    assert "Allowed rows: 6" in output
+    assert "Rejected rows: 8" in output
+    assert "Fake adapter invocations: 4" in output
+    assert "adapter_invoked_for_rejected = 0" in output
+    assert "real_adapter_invocations = 0" in output
+    assert "live_execution_invocations = 0" in output
+    assert "JSON report: reports/lab-summary/day94_adapter_boundary_regression_matrix.json" in output
+    assert "HTML report: reports/lab-summary/day94_adapter_boundary_regression_matrix.html" in output
+    assert "[PASS] FAKE_ADAPTER_BOUNDARY_EVIDENCE_ONLY" in output
+    assert json_path.exists()
+    assert html_path.exists()
+    assert not (tmp_path / "config.json").exists()
+
+    report = json.loads(json_path.read_text(encoding="utf-8"))
+    html = html_path.read_text(encoding="utf-8")
+    assert report["overall_status"] == "PASS"
+    assert report["summary"]["total_rows"] >= 12
+    assert report["summary"]["failed_rows"] == 0
+    assert report["summary"]["adapter_invoked_for_rejected"] == 0
+    assert report["summary"]["real_adapter_invocations"] == 0
+    assert report["summary"]["live_execution_invocations"] == 0
+    assert all(
+        row["actual_fake_adapter_invoked"] is False
+        for row in report["matrix_rows"]
+        if row["guard_decision"] == "rejected"
+    )
+    assert "Adapter Boundary Regression Matrix" in html
+    assert "<form" not in html.lower()
+    assert "<button" not in html.lower()
+    assert "method=\"post\"" not in html.lower()
+    assert "action=" not in html.lower()
+
+
+def test_day94_report_index_visibility_includes_adapter_boundary_regression_matrix(tmp_path, capsys):
+    assert network_lab.main(["--task", "adapter-boundary-regression-matrix"], project_root=tmp_path) == 0
+
+    exit_code = network_lab.main(["--report-index"], project_root=tmp_path)
+
+    index_html = tmp_path / "reports/report_index.html"
+    assert exit_code == 0
+    assert index_html.exists()
+    html = index_html.read_text(encoding="utf-8")
+    assert "Adapter Boundary Regression Matrix" in html
+    assert "fake-adapter-only matrix" in html
+    assert "reports/lab-summary/day94_adapter_boundary_regression_matrix.json" in html
+    assert "reports/lab-summary/day94_adapter_boundary_regression_matrix.html" in html
