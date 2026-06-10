@@ -1155,6 +1155,21 @@ def ai_intent_reviewer_references() -> List[AIIntentReviewerReference]:
                 "reports/lab-summary/day93_guarded_fake_adapter_contract.html",
             ),
         ),
+        AIIntentReviewerReference(
+            day="Day94",
+            title="Adapter Boundary Regression Matrix",
+            summary=(
+                "Expands Day93 into deterministic matrix coverage: rejected rows "
+                "never invoke the fake adapter, real adapter invocations stay at 0, "
+                "and allowed fake-adapter rows remain evidence-only."
+            ),
+            doc_path="docs/ai/intent_adapter_boundary_regression_matrix.md",
+            roadmap_path="docs/roadmap/day94_adapter_boundary_regression_matrix.md",
+            report_paths=(
+                "reports/lab-summary/day94_adapter_boundary_regression_matrix.json",
+                "reports/lab-summary/day94_adapter_boundary_regression_matrix.html",
+            ),
+        ),
     ]
 
 
@@ -1401,6 +1416,8 @@ def ai_intent_safety_boundaries() -> List[str]:
         "Day92 keeps no_real_device_access true, no_ssh true, no_subprocess true, no_socket true, no_real_adapter true, adapter_implementation_added false, and rejected_adapter_invocations 0.",
         "Day93 is a fake-adapter-only boundary audit; it proves guard evaluation happens before fake adapter invocation and does not unlock real adapter execution.",
         "Day93 keeps rejected_adapter_invocations 0, real_adapter_invocations 0, ssh_allowed false, device_access_allowed false, live_command_allowed false, no_config_json_read true, and final_recommendation KEEP_FAKE_ONLY.",
+        "Day94 is a fake-adapter-only regression matrix; it proves rejected rows never invoke fake adapter, real adapter invocations remain 0, and live execution invocations remain 0.",
+        "Day94 keeps adapter_invoked_for_rejected 0, real_adapter_invocations 0, live_execution_invocations 0, no_real_device_access true, no_ssh true, no_config_json_read true, and dashboard action surfaces disabled.",
     ]
 
 

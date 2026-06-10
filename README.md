@@ -2288,6 +2288,8 @@ reports/lab-summary/day93_guarded_fake_adapter_contract.html
 
 Day93 adds `guarded-fake-adapter-contract`, a deterministic fake-adapter-only boundary audit after the executable guard work. It proves every scenario is evaluated by the guard before adapter invocation, allowed read-only scenarios enter only the fake adapter boundary, rejected scenarios never enter the adapter boundary, and every fake adapter invocation has audit evidence. Day93 keeps `rejected_adapter_invocations` at `0`, `real_adapter_invocations` at `0`, `ssh_allowed` false, `device_access_allowed` false, `live_command_allowed` false, `no_config_json_read` true, and `final_recommendation` set to `KEEP_FAKE_ONLY`; it does not unlock real adapter execution, SSH, device access, live command execution, dashboard action surfaces, approval unlocks, OpenAI API calls, or network configuration changes.
 
+Day94 adds `adapter-boundary-regression-matrix`, a deterministic fake-adapter-only regression matrix after Day93. It covers allowed, rejected, live-capable, configuration-mutation, unknown-intent, fake-adapter, and real-adapter-blocked rows; rejected rows never invoke the fake adapter, real adapter invocations remain `0`, live execution invocations remain `0`, and `adapter_invoked_for_rejected` remains `0`. It generates `reports/lab-summary/day94_adapter_boundary_regression_matrix.json` and `.html`, and does not unlock SSH, real device access, live execution, real adapter invocation, dashboard action surfaces, approval unlocks, OpenAI API calls, or network configuration changes.
+
 Validation commands:
 
 ```text

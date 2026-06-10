@@ -79,6 +79,10 @@ from intent_guarded_fake_adapter_contract import (
     run_guarded_fake_adapter_contract,
     write_guarded_fake_adapter_contract_reports,
 )
+from intent_adapter_boundary_regression_matrix import (
+    run_adapter_boundary_regression_matrix,
+    write_adapter_boundary_regression_matrix_reports,
+)
 from intent_runtime_safety_case import build_runtime_safety_case_report
 from intent_runtime_safety_gate import build_runtime_safety_gate_report
 
@@ -385,6 +389,19 @@ DAY93_GUARDED_FAKE_ADAPTER_CONTRACT_JSON = (
 )
 DAY93_GUARDED_FAKE_ADAPTER_CONTRACT_HTML = (
     Path("reports") / "lab-summary" / "day93_guarded_fake_adapter_contract.html"
+)
+DAY94_ADAPTER_BOUNDARY_REGRESSION_MATRIX_TASK_ID = "adapter-boundary-regression-matrix"
+DAY94_ADAPTER_BOUNDARY_REGRESSION_MATRIX_DOC = (
+    Path("docs") / "ai" / "intent_adapter_boundary_regression_matrix.md"
+)
+DAY94_ADAPTER_BOUNDARY_REGRESSION_MATRIX_ROADMAP = (
+    Path("docs") / "roadmap" / "day94_adapter_boundary_regression_matrix.md"
+)
+DAY94_ADAPTER_BOUNDARY_REGRESSION_MATRIX_JSON = (
+    Path("reports") / "lab-summary" / "day94_adapter_boundary_regression_matrix.json"
+)
+DAY94_ADAPTER_BOUNDARY_REGRESSION_MATRIX_HTML = (
+    Path("reports") / "lab-summary" / "day94_adapter_boundary_regression_matrix.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -1218,6 +1235,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY93_GUARDED_FAKE_ADAPTER_CONTRACT_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day94",
+        "title": "Adapter Boundary Regression Matrix",
+        "report_type": "Adapter boundary regression matrix evidence",
+        "safety_label": "fake-adapter-only matrix; no live execution",
+        "description": "Day94 expands Day93 guard-first proof into a matrix: rejected rows never invoke the fake adapter, real_adapter_invocations remains 0, live_execution_invocations remains 0, and allowed fake-adapter rows are evidence-only.",
+        "json_globs": [DAY94_ADAPTER_BOUNDARY_REGRESSION_MATRIX_JSON.as_posix()],
+        "html_globs": [DAY94_ADAPTER_BOUNDARY_REGRESSION_MATRIX_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY94_ADAPTER_BOUNDARY_REGRESSION_MATRIX_TASK_ID}"
         ),
     },
 ]
@@ -3418,6 +3448,34 @@ def list_tasks() -> List[Dict[str, Any]]:
             "related_script": "network_lab.py",
             "notes": "Deterministic fake adapter boundary audit only. Guard evaluation happens before adapter invocation; rejected scenarios keep adapter_invocation_attempted false, adapter_boundary_entered false, and fake_adapter_invoked false; allowed scenarios use adapter_type fake only. real_adapter_invocations remains 0, ssh_allowed remains false, device_access_allowed remains false, live_command_allowed remains false, no config.json is read, and Day93 adds no real adapter, SSH, RouterOS API, socket, subprocess device operation, dashboard action, command input, execution unlock, or device contact.",
         },
+        {
+            "id": DAY94_ADAPTER_BOUNDARY_REGRESSION_MATRIX_TASK_ID,
+            "task_id": "day94_adapter_boundary_regression_matrix",
+            "display_name": "Day94 Adapter Boundary Regression Matrix",
+            "user_display_name": "Adapter Boundary Regression Matrix",
+            "day": "Day94",
+            "category": "ai_planning",
+            "description": "Expands the Day93 fake adapter boundary proof into a deterministic regression matrix covering allowed, rejected, fake-target, real-target-blocked, live-capable, mutation, and unknown intent classes.",
+            "safety_level": "fake-adapter-only",
+            "execution_mode": "guarded-fake-only",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY94_ADAPTER_BOUNDARY_REGRESSION_MATRIX_JSON.as_posix(),
+                DAY94_ADAPTER_BOUNDARY_REGRESSION_MATRIX_HTML.as_posix(),
+                DAY94_ADAPTER_BOUNDARY_REGRESSION_MATRIX_DOC.as_posix(),
+                DAY94_ADAPTER_BOUNDARY_REGRESSION_MATRIX_ROADMAP.as_posix(),
+            ],
+            "report_outputs": [
+                "Day94 JSON/HTML adapter boundary regression matrix evidence",
+                "Day94 fake-adapter-only AI reviewer and roadmap documentation",
+            ],
+            "related_script": "network_lab.py",
+            "notes": "Deterministic matrix evidence only. Rejected rows never invoke the fake adapter; allowed fake-adapter rows may invoke only fake boundary evidence. real_adapter_invocations remains 0, live_execution_invocations remains 0, adapter_invoked_for_rejected remains 0, no config.json is read, and Day94 adds no real adapter, SSH, RouterOS API, socket, subprocess device operation, dashboard action, command input, execution unlock, or device contact.",
+        },
     ]
 
 
@@ -3550,6 +3608,7 @@ wireguard-runner is dry-run by default and delegates to the existing WireGuard s
             DAY91_REAL_ADAPTER_SAFETY_SCAFFOLD_TASK_ID,
             DAY92_REAL_ADAPTER_EXECUTABLE_GUARDS_TASK_ID,
             DAY93_GUARDED_FAKE_ADAPTER_CONTRACT_TASK_ID,
+            DAY94_ADAPTER_BOUNDARY_REGRESSION_MATRIX_TASK_ID,
             WIREGUARD_RUNNER_TASK_ALIAS,
         ],
         help="Task to run.",
@@ -6232,6 +6291,45 @@ def _run_day93_guarded_fake_adapter_contract(project_root: Path) -> int:
     return 1
 
 
+def _run_day94_adapter_boundary_regression_matrix(project_root: Path) -> int:
+    report = run_adapter_boundary_regression_matrix()
+    json_path, html_path = write_adapter_boundary_regression_matrix_reports(project_root, report)
+    summary = report["summary"]
+
+    print(format_heading("Day94 Adapter Boundary Regression Matrix"))
+    print("Task name: adapter-boundary-regression-matrix")
+    print("Mode: FAKE_ADAPTER_BOUNDARY_EVIDENCE_ONLY")
+    print("Safety: fake-adapter-only; no real device access, SSH, real adapter, or live execution")
+    print(f"Result: {report['overall_status']} / {report['mode']}")
+    print(f"Total rows: {summary['total_rows']}")
+    print(f"Allowed rows: {summary['allowed_rows']}")
+    print(f"Rejected rows: {summary['rejected_rows']}")
+    print(f"Fake adapter invocations: {summary['fake_adapter_invocations']}")
+    print(f"adapter_invoked_for_rejected = {summary['adapter_invoked_for_rejected']}")
+    print(f"real_adapter_invocations = {summary['real_adapter_invocations']}")
+    print(f"live_execution_invocations = {summary['live_execution_invocations']}")
+    print(f"JSON report: {_relative_to_project(project_root, json_path)}")
+    print(f"HTML report: {_relative_to_project(project_root, html_path)}")
+
+    if (
+        report["overall_status"] == "PASS"
+        and summary["total_rows"] >= 12
+        and summary["failed_rows"] == 0
+        and summary["adapter_invoked_for_rejected"] == 0
+        and summary["real_adapter_invocations"] == 0
+        and summary["live_execution_invocations"] == 0
+        and not report["validation_errors"]
+    ):
+        print(
+            f"{format_status('PASS')} FAKE_ADAPTER_BOUNDARY_EVIDENCE_ONLY. "
+            "Day94 regression matrix preserved adapter boundary invariants."
+        )
+        return 0
+
+    print(f"{format_status('FAIL')} Day94 adapter boundary regression matrix failed validation.")
+    return 1
+
+
 def _relative_to_project(project_root: Path, path: Path) -> str:
     try:
         return path.resolve().relative_to(project_root.resolve()).as_posix()
@@ -8610,6 +8708,8 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
         return _run_day92_real_adapter_executable_guards(root)
     if args.task == DAY93_GUARDED_FAKE_ADAPTER_CONTRACT_TASK_ID:
         return _run_day93_guarded_fake_adapter_contract(root)
+    if args.task == DAY94_ADAPTER_BOUNDARY_REGRESSION_MATRIX_TASK_ID:
+        return _run_day94_adapter_boundary_regression_matrix(root)
 
     profile_path = _resolve_project_path(root, args.profile)
     try:
