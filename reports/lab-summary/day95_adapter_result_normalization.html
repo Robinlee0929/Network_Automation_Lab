@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Adapter Result Normalization</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 24px; color: #182230; }
+    table { border-collapse: collapse; width: 100%; margin: 12px 0 22px; }
+    th, td { border: 1px solid #d6dee9; padding: 8px 10px; text-align: left; vertical-align: top; }
+    th { background: #edf2f7; }
+    .pass { color: #116329; font-weight: bold; }
+    code { background: #eef2f6; padding: 1px 4px; border-radius: 3px; }
+  </style>
+</head>
+<body>
+  <h1>Day95 Adapter Result Normalization</h1>
+  <p><strong>Overall status:</strong> <span class="pass">PASS</span> / FAKE_ONLY_EVIDENCE_HARDENING</p>
+  <p><strong>Fake-only safety boundary:</strong> deterministic fake adapter result normalization only; no SSH, no device access, no RouterOS connection, no real adapter result, no live execution result, no dashboard action.</p>
+  <h2>Normalized Schema Summary</h2>
+  <p><strong>Schema version:</strong> <code>day95.adapter_result.v1</code></p>
+  <p><strong>Result kind:</strong> <code>normalized_fake_adapter_result</code></p>
+  <p><strong>Required fields:</strong> schema_version, result_kind, adapter_type, source_boundary, scenario_id, guard_decision, adapter_invoked, result_status, result_payload, safety, evidence</p>
+  <p><strong>Result status source:</strong> <code>deterministic_fake_boundary</code>; values: <code>FAKE_RESULT_READY</code></p>
+  <h2>Scenario Evidence</h2>
+  <p><strong>Total scenarios:</strong> 5 | <strong>Allowed:</strong> 2 | <strong>Rejected:</strong> 3 | <strong>Normalized results:</strong> 2</p>
+  <table>
+    <thead><tr><th>Scenario</th><th>Intent</th><th>Command family</th><th>Guard</th><th>Fake adapter invoked</th><th>Adapter result present</th><th>Fake status</th><th>Status</th><th>Reason</th></tr></thead>
+    <tbody><tr><td>D95-S01-readonly-identity</td><td>Normalize fake identity evidence</td><td>readonly_identity</td><td>ALLOW</td><td>true</td><td>true</td><td>FAKE_RESULT_READY</td><td>PASS</td><td>Allowed read-only identity scenario reaches fake boundary.</td></tr><tr><td>D95-S02-readonly-interfaces-multiline</td><td>Normalize fake multi-line interface evidence</td><td>readonly_interfaces</td><td>ALLOW</td><td>true</td><td>true</td><td>FAKE_RESULT_READY</td><td>PASS</td><td>Allowed read-only interface scenario proves multi-line parser-ready payload.</td></tr><tr><td>D95-S03-reject-write-capable</td><td>Set interface address</td><td>write_interface_address</td><td>REJECT</td><td>false</td><td>false</td><td>None</td><td>PASS</td><td>Write-capable request is rejected before adapter result creation.</td></tr><tr><td>D95-S04-reject-live-capable</td><td>Run live command transport</td><td>live_transport_command</td><td>REJECT</td><td>false</td><td>false</td><td>None</td><td>PASS</td><td>Live-capable request is rejected before fake adapter invocation.</td></tr><tr><td>D95-S05-reject-ambiguous-unsafe</td><td>Inspect or repair unknown device state</td><td>ambiguous_unknown</td><td>REJECT</td><td>false</td><td>false</td><td>None</td><td>PASS</td><td>Ambiguous request fails closed and produces no adapter result.</td></tr></tbody>
+  </table>
+  <h2>Evidence Chain</h2>
+  <p>Day93 guarded fake adapter boundary audit: true. Day94 adapter boundary regression matrix: true. Day95 normalization applied: true.</p>
+  <p>Real adapter result count = 0; live execution result count = 0; rejected scenarios with adapter result = 0.</p>
+  <p>Explicit absence statement: real adapter result and live execution result are absent.</p>
+</body>
+</html>

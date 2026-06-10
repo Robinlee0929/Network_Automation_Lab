@@ -1170,6 +1170,21 @@ def ai_intent_reviewer_references() -> List[AIIntentReviewerReference]:
                 "reports/lab-summary/day94_adapter_boundary_regression_matrix.html",
             ),
         ),
+        AIIntentReviewerReference(
+            day="Day95",
+            title="Adapter Result Normalization",
+            summary=(
+                "Normalizes deterministic fake adapter results into one "
+                "parser-ready schema while rejected scenarios produce no "
+                "adapter result and real/live result counts stay at 0."
+            ),
+            doc_path="docs/ai/intent_adapter_result_normalization.md",
+            roadmap_path="docs/roadmap/day95_adapter_result_normalization.md",
+            report_paths=(
+                "reports/lab-summary/day95_adapter_result_normalization.json",
+                "reports/lab-summary/day95_adapter_result_normalization.html",
+            ),
+        ),
     ]
 
 
@@ -1418,6 +1433,8 @@ def ai_intent_safety_boundaries() -> List[str]:
         "Day93 keeps rejected_adapter_invocations 0, real_adapter_invocations 0, ssh_allowed false, device_access_allowed false, live_command_allowed false, no_config_json_read true, and final_recommendation KEEP_FAKE_ONLY.",
         "Day94 is a fake-adapter-only regression matrix; it proves rejected rows never invoke fake adapter, real adapter invocations remain 0, and live execution invocations remain 0.",
         "Day94 keeps adapter_invoked_for_rejected 0, real_adapter_invocations 0, live_execution_invocations 0, no_real_device_access true, no_ssh true, no_config_json_read true, and dashboard action surfaces disabled.",
+        "Day95 is fake-only adapter result normalization; it produces schema_version day95.adapter_result.v1 only for allowed fake boundary results and rejected scenarios have no adapter result.",
+        "Day95 keeps real_adapter_result_count 0, live_execution_result_count 0, result_status_source deterministic_fake_boundary, no SSH, no device access, no dashboard action, no POST route, and no execution unlock.",
     ]
 
 
