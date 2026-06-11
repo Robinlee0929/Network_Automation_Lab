@@ -139,6 +139,10 @@ from intent_parser_consumer_handoff_readiness_matrix import (
     build_parser_consumer_handoff_readiness_matrix_report,
     write_parser_consumer_handoff_readiness_matrix_reports,
 )
+from intent_parser_consumer_final_gate import (
+    build_parser_consumer_final_gate_report,
+    write_parser_consumer_final_gate_reports,
+)
 from intent_codex_agents_instruction_audit import (
     build_codex_agents_instruction_audit_report,
     write_codex_agents_instruction_audit_reports,
@@ -656,6 +660,16 @@ DAY109_PARSER_CONSUMER_HANDOFF_READINESS_MATRIX_JSON = (
 )
 DAY109_PARSER_CONSUMER_HANDOFF_READINESS_MATRIX_HTML = (
     Path("reports") / "lab-summary" / "day109_parser_consumer_handoff_readiness_matrix.html"
+)
+DAY110_PARSER_CONSUMER_FINAL_GATE_TASK_ID = "parser-consumer-final-gate"
+DAY110_PARSER_CONSUMER_FINAL_GATE_DOC = (
+    Path("docs") / "ai-intent" / "day110_parser_consumer_final_gate.md"
+)
+DAY110_PARSER_CONSUMER_FINAL_GATE_JSON = (
+    Path("reports") / "lab-summary" / "day110_parser_consumer_final_gate.json"
+)
+DAY110_PARSER_CONSUMER_FINAL_GATE_HTML = (
+    Path("reports") / "lab-summary" / "day110_parser_consumer_final_gate.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -1697,6 +1711,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY109_PARSER_CONSUMER_HANDOFF_READINESS_MATRIX_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day110",
+        "title": "Parser Consumer Final Gate / Reviewer Decision Summary",
+        "report_type": "Report-only parser consumer final gate",
+        "safety_label": "Consumes Day109 readiness evidence only; includes AGENTS.md pre-read result; REVIEW_ONLY / REPORT_ONLY / NO_LIVE_EXECUTION / NO_SSH / NO_WRITE",
+        "description": "Day110 summarizes Day109 parser consumer readiness into a final reviewer decision gate. Blocked or clarification rows keep next_phase_allowed=false, AGENTS.md pre-read evidence is displayed, and no adapter, broker, runner, live device, SSH, write/config change, OpenAI API, external API, or mapped task execution path is added.",
+        "json_globs": [DAY110_PARSER_CONSUMER_FINAL_GATE_JSON.as_posix()],
+        "html_globs": [DAY110_PARSER_CONSUMER_FINAL_GATE_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY110_PARSER_CONSUMER_FINAL_GATE_TASK_ID}"
         ),
     },
 ]
@@ -4344,6 +4371,33 @@ def list_tasks() -> List[Dict[str, Any]]:
             "related_script": "network_lab.py",
             "notes": "REPORT_ONLY Day109 readiness matrix for Day108 consumer handoff records. Rows include consumer_name, source_day, handoff_status, readiness_status, blocking_reasons, clarification_items, required_consumer_actions, unsafe/live/SSH/write/command/mapped-task flags, and evidence_refs. REVIEW_ONLY, NO_LIVE_EXECUTION, NO_SSH, NO_WRITE, no command execution, no mapped task execution, no OpenAI API, and no external API boundaries remain locked.",
         },
+        {
+            "id": DAY110_PARSER_CONSUMER_FINAL_GATE_TASK_ID,
+            "task_id": "day110_parser_consumer_final_gate",
+            "display_name": "Day110 Parser Consumer Final Gate / Reviewer Decision Summary",
+            "user_display_name": "Parser Consumer Final Gate / Reviewer Decision Summary",
+            "day": "Day110",
+            "category": "ai_planning",
+            "description": "Summarizes Day109 parser consumer readiness into a final reviewer decision gate and displays whether AGENTS.md was read before Day110 work.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY110_PARSER_CONSUMER_FINAL_GATE_JSON.as_posix(),
+                DAY110_PARSER_CONSUMER_FINAL_GATE_HTML.as_posix(),
+                DAY110_PARSER_CONSUMER_FINAL_GATE_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Day110 JSON/HTML parser consumer final gate",
+                "Day110 AI intent documentation",
+            ],
+            "related_script": "network_lab.py",
+            "notes": "REPORT_ONLY Day110 final gate for Day109 parser consumer readiness. Includes agents_md_pre_read_result and agents_md_read_before_day110_work reviewer evidence. Blocked or clarification rows keep next_phase_allowed=false. REVIEW_ONLY, NO_LIVE_EXECUTION, NO_SSH, NO_WRITE, no command execution, no mapped task execution, no adapter, no broker, no runner execution, no OpenAI API, and no external API boundaries remain locked.",
+        },
     ]
 
 
@@ -4492,6 +4546,7 @@ wireguard-runner is dry-run by default and delegates to the existing WireGuard s
             DAY107_PARSER_REVIEWER_EVIDENCE_CONTRACT_TASK_ID,
             DAY108_PARSER_CONTRACT_CONSUMER_HANDOFF_TASK_ID,
             DAY109_PARSER_CONSUMER_HANDOFF_READINESS_MATRIX_TASK_ID,
+            DAY110_PARSER_CONSUMER_FINAL_GATE_TASK_ID,
             WIREGUARD_RUNNER_TASK_ALIAS,
         ],
         help="Task to run.",
@@ -8164,6 +8219,46 @@ def _run_day109_parser_consumer_handoff_readiness_matrix(project_root: Path) -> 
     return 1
 
 
+def _run_day110_parser_consumer_final_gate(project_root: Path) -> int:
+    report = build_parser_consumer_final_gate_report(project_root=project_root, agents_md_pre_read=True)
+    json_path, html_path = write_parser_consumer_final_gate_reports(project_root, report)
+    summary = report["reviewer_decision_summary"]
+    agents_evidence = report["agents_md_pre_read_evidence"]
+
+    print(format_heading("Day110 Parser Consumer Final Gate / Reviewer Decision Summary"))
+    print("Task name: parser-consumer-final-gate")
+    print("Phase: Parser Consumer Final Gate / Reviewer Decision Summary")
+    print("Audit type: REPORT_ONLY")
+    print("Safety: REVIEW_ONLY / REPORT_ONLY / NO_LIVE_EXECUTION / NO_SSH / NO_WRITE; no command execution, mapped task execution, OpenAI API, external API, adapter, broker, runner execution, or live device access")
+    print(f"Source day: {report['source_day']}")
+    print(f"Source task: {report['source_task']}")
+    print(f"overall_status: {report['overall_status']}")
+    print(f"reviewer_status: {report['reviewer_status']}")
+    print(f"final_gate_status: {report['final_gate_status']}")
+    print(f"final_recommendation: {report['final_recommendation']}")
+    print(f"next_phase_allowed: {json.dumps(report['next_phase_allowed'])}")
+    print(f"source_total_records: {summary['source_total_records']}")
+    print(f"ready_count: {summary['ready_count']}")
+    print(f"needs_clarification_count: {summary['needs_clarification_count']}")
+    print(f"blocked_count: {summary['blocked_count']}")
+    print(f"agents_md_read_before_day110_work: {json.dumps(agents_evidence['agents_md_read_before_day110_work'])}")
+    print(f"agents_md_pre_read_result: {agents_evidence['agents_md_pre_read_result']}")
+    print(f"JSON report: {_relative_to_project(project_root, json_path)}")
+    print(f"HTML report: {_relative_to_project(project_root, html_path)}")
+
+    if (
+        report["overall_status"] == "PASS"
+        and report["next_phase_allowed"] is False
+        and agents_evidence["agents_md_pre_read_result"] == "PASS"
+        and not report["validation_errors"]
+    ):
+        print(f"{format_status('PASS')} {report['final_gate_status']}")
+        return 0
+
+    print(f"{format_status('FAIL')} Day110 parser consumer final gate failed validation.")
+    return 1
+
+
 def _relative_to_project(project_root: Path, path: Path) -> str:
     try:
         return path.resolve().relative_to(project_root.resolve()).as_posix()
@@ -10574,6 +10669,8 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
         return _run_day108_parser_contract_consumer_handoff(root)
     if args.task == DAY109_PARSER_CONSUMER_HANDOFF_READINESS_MATRIX_TASK_ID:
         return _run_day109_parser_consumer_handoff_readiness_matrix(root)
+    if args.task == DAY110_PARSER_CONSUMER_FINAL_GATE_TASK_ID:
+        return _run_day110_parser_consumer_final_gate(root)
 
     profile_path = _resolve_project_path(root, args.profile)
     try:

@@ -73,3 +73,9 @@ Day108 consumes the Day107 reviewer evidence contract shape and emits determinis
 - [Day109 Parser Consumer Handoff Readiness Matrix](day109_parser_consumer_handoff_readiness_matrix.md)
 
 Day109 converts Day108 handoff records into a reviewer-facing readiness matrix with `READY`, `NEEDS_CLARIFICATION`, and `BLOCKED` rows. It is REVIEW_ONLY: unsafe, live, SSH, write, command execution, and mapped task execution flags remain blocking conditions, blocked records are preserved as blocked, and no live execution, SSH, write/config change, adapter, broker, OpenAI API, external API, or mapped task execution path is added.
+
+## Day110
+
+- [Day110 Parser Consumer Final Gate / Reviewer Decision Summary](day110_parser_consumer_final_gate.md)
+
+Day110 consumes the Day109 readiness matrix and emits a final reviewer decision summary. It displays whether AGENTS.md was read before Day110 work through `agents_md_read_before_day110_work` and `agents_md_pre_read_result`; blocked or clarification records keep `next_phase_allowed=false`, and no live execution, SSH, write/config change, adapter, broker, runner execution, OpenAI API, external API, or mapped task execution path is added.
