@@ -1,0 +1,117 @@
+{
+  "day": 109,
+  "day_id": "Day109",
+  "task": "parser-consumer-handoff-readiness-matrix",
+  "title": "Day109 Parser Consumer Handoff Readiness Matrix",
+  "created_at": "2026-06-11T00:00:00+08:00",
+  "schema_version": "day109.parser_consumer_handoff_readiness_matrix.v1",
+  "source_day": "Day108",
+  "source_task": "parser-contract-consumer-handoff",
+  "overall_status": "PASS",
+  "reviewer_status": "BLOCKED_RECORDS_PRESENT",
+  "total_records": 3,
+  "ready_count": 1,
+  "needs_clarification_count": 1,
+  "blocked_count": 1,
+  "safety_summary": {
+    "unsafe_flag_count": 0,
+    "live_flag_count": 0,
+    "ssh_flag_count": 0,
+    "write_flag_count": 0,
+    "command_execution_flag_count": 0,
+    "mapped_task_execution_flag_count": 1,
+    "blocking_condition_preserved": true
+  },
+  "safety_invariants": {
+    "review_only": true,
+    "no_live_execution": true,
+    "no_ssh": true,
+    "no_write": true,
+    "no_command_execution": true,
+    "no_mapped_task_execution": true,
+    "openai_api_used": false,
+    "external_api_used": false
+  },
+  "readiness_matrix": [
+    {
+      "record_id": "D108-H001",
+      "consumer_name": "parser_contract_consumer",
+      "source_day": "Day108",
+      "handoff_status": "READY_FOR_REVIEW_HANDOFF",
+      "readiness_status": "READY",
+      "blocking_reasons": [],
+      "clarification_items": [],
+      "required_consumer_actions": [
+        "Continue to reviewer decision handoff as report-only evidence."
+      ],
+      "unsafe_flag": false,
+      "live_flag": false,
+      "ssh_flag": false,
+      "write_flag": false,
+      "command_execution_flag": false,
+      "mapped_task_execution_flag": false,
+      "evidence_refs": [
+        "reports/lab-summary/day108_parser_contract_consumer_handoff.json",
+        "handoff:D108-H001",
+        "evidence_status:ACCEPTABLE_FOR_REVIEW_ONLY_HANDOFF"
+      ]
+    },
+    {
+      "record_id": "D108-H002",
+      "consumer_name": "parser_contract_consumer",
+      "source_day": "Day108",
+      "handoff_status": "NEEDS_REVIEWER_CLARIFICATION",
+      "readiness_status": "NEEDS_CLARIFICATION",
+      "blocking_reasons": [],
+      "clarification_items": [
+        "HANDOFF_NOT_READY_FOR_CONSUMER",
+        "HANDOFF_STATUS_NEEDS_REVIEWER_CLARIFICATION"
+      ],
+      "required_consumer_actions": [
+        "Ask the reviewer to clarify the consumer interpretation before handoff."
+      ],
+      "unsafe_flag": false,
+      "live_flag": false,
+      "ssh_flag": false,
+      "write_flag": false,
+      "command_execution_flag": false,
+      "mapped_task_execution_flag": false,
+      "evidence_refs": [
+        "reports/lab-summary/day108_parser_contract_consumer_handoff.json",
+        "handoff:D108-H002",
+        "evidence_status:NEEDS_REVIEWER_CLARIFICATION"
+      ]
+    },
+    {
+      "record_id": "D108-H003",
+      "consumer_name": "parser_contract_consumer",
+      "source_day": "Day108",
+      "handoff_status": "BLOCKED_UNSAFE_OR_UNSUPPORTED",
+      "readiness_status": "BLOCKED",
+      "blocking_reasons": [
+        "MAPPED_TASK_EXECUTION_FLAG_SET",
+        "RECORD_MARKED_BLOCKED_OR_UNSAFE"
+      ],
+      "clarification_items": [],
+      "required_consumer_actions": [
+        "Block handoff and keep all execution-capable paths closed."
+      ],
+      "unsafe_flag": false,
+      "live_flag": false,
+      "ssh_flag": false,
+      "write_flag": false,
+      "command_execution_flag": false,
+      "mapped_task_execution_flag": true,
+      "evidence_refs": [
+        "reports/lab-summary/day108_parser_contract_consumer_handoff.json",
+        "handoff:D108-H003",
+        "evidence_status:BLOCKED_UNSAFE_OR_UNSUPPORTED"
+      ]
+    }
+  ],
+  "reports": {
+    "json": "reports/lab-summary/day109_parser_consumer_handoff_readiness_matrix.json",
+    "html": "reports/lab-summary/day109_parser_consumer_handoff_readiness_matrix.html"
+  },
+  "validation_errors": []
+}

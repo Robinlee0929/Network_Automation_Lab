@@ -67,3 +67,9 @@ Day107 consolidates Day96-Day105 parser evidence into one deterministic REPORT_O
 - [Day108 Parser Contract Consumer / Reviewer Decision Handoff](day108_parser_contract_consumer_handoff.md)
 
 Day108 consumes the Day107 reviewer evidence contract shape and emits deterministic reviewer decision handoff records. It is REPORT_ONLY: unsafe flags block handoff, degraded evidence requires reviewer clarification, and ready records remain reviewer evidence only. Live execution, SSH, device connection, command execution, write/config change, approval unlock, mapped task execution, OpenAI API, and voice input remain false.
+
+## Day109
+
+- [Day109 Parser Consumer Handoff Readiness Matrix](day109_parser_consumer_handoff_readiness_matrix.md)
+
+Day109 converts Day108 handoff records into a reviewer-facing readiness matrix with `READY`, `NEEDS_CLARIFICATION`, and `BLOCKED` rows. It is REVIEW_ONLY: unsafe, live, SSH, write, command execution, and mapped task execution flags remain blocking conditions, blocked records are preserved as blocked, and no live execution, SSH, write/config change, adapter, broker, OpenAI API, external API, or mapped task execution path is added.
