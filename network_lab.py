@@ -127,6 +127,10 @@ from intent_parser_acceptance_closure import (
     build_parser_acceptance_closure_report,
     write_parser_acceptance_closure_reports,
 )
+from intent_codex_agents_instruction_audit import (
+    build_codex_agents_instruction_audit_report,
+    write_codex_agents_instruction_audit_reports,
+)
 from intent_runtime_safety_case import build_runtime_safety_case_report
 from intent_runtime_safety_gate import build_runtime_safety_gate_report
 
@@ -589,6 +593,19 @@ DAY105_PARSER_ACCEPTANCE_CLOSURE_JSON = (
 )
 DAY105_PARSER_ACCEPTANCE_CLOSURE_HTML = (
     Path("reports") / "lab-summary" / "day105_parser_acceptance_closure.html"
+)
+DAY106_CODEX_AGENTS_INSTRUCTION_AUDIT_TASK_ID = "codex-agents-instruction-audit"
+DAY106_CODEX_AGENTS_INSTRUCTION_AUDIT_DOC = (
+    Path("docs") / "ai-intent" / "day106_codex_agents_instruction_compliance_audit.md"
+)
+DAY106_CODEX_AGENTS_INSTRUCTION_AUDIT_ROADMAP = (
+    Path("docs") / "roadmap" / "day106_codex_agents_instruction_compliance_audit.md"
+)
+DAY106_CODEX_AGENTS_INSTRUCTION_AUDIT_JSON = (
+    Path("reports") / "ai" / "day106_codex_agents_instruction_compliance_audit.json"
+)
+DAY106_CODEX_AGENTS_INSTRUCTION_AUDIT_HTML = (
+    Path("reports") / "ai" / "day106_codex_agents_instruction_compliance_audit.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -1578,6 +1595,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY105_PARSER_ACCEPTANCE_CLOSURE_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day106",
+        "title": "Codex AGENTS.md Instruction Compliance Audit",
+        "report_type": "Report-only Codex instruction compliance audit",
+        "safety_label": "AGENTS.md governance audit only; may read/audit/report, must not modify/stage/commit AGENTS.md",
+        "description": "Day106 evaluates the repository-level AGENTS.md as a durable Codex instruction contract. Codex may read AGENTS.md, audit AGENTS.md, and report findings with proposed wording, but must not modify, stage, or commit AGENTS.md during the governance audit.",
+        "json_globs": [DAY106_CODEX_AGENTS_INSTRUCTION_AUDIT_JSON.as_posix()],
+        "html_globs": [DAY106_CODEX_AGENTS_INSTRUCTION_AUDIT_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY106_CODEX_AGENTS_INSTRUCTION_AUDIT_TASK_ID}"
         ),
     },
 ]
@@ -4114,6 +4144,34 @@ def list_tasks() -> List[Dict[str, Any]]:
             "related_script": "network_lab.py",
             "notes": "SUMMARY_ONLY Day105 closure package for Day96-Day104. final_recommendation remains SAFETY_BLOCKED_REVIEW_ONLY; next_phase_allowed, execution_allowed, live_device_access_allowed, ssh_allowed, config_change_allowed, mapped_task_execution_allowed, openai_api_allowed, voice_input_allowed, and parser_capability_added remain false. A separate branch and separate phase gate are required before any future live-capable discussion.",
         },
+        {
+            "id": DAY106_CODEX_AGENTS_INSTRUCTION_AUDIT_TASK_ID,
+            "task_id": "day106_codex_agents_instruction_compliance_audit",
+            "display_name": "Day106 Codex AGENTS.md Instruction Compliance Audit",
+            "user_display_name": "Codex AGENTS.md Instruction Compliance Audit",
+            "day": "Day106",
+            "category": "ai_planning",
+            "description": "Audits the repository-level AGENTS.md as a Codex instruction contract while preserving report-only safety boundaries.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY106_CODEX_AGENTS_INSTRUCTION_AUDIT_JSON.as_posix(),
+                DAY106_CODEX_AGENTS_INSTRUCTION_AUDIT_HTML.as_posix(),
+                DAY106_CODEX_AGENTS_INSTRUCTION_AUDIT_DOC.as_posix(),
+                DAY106_CODEX_AGENTS_INSTRUCTION_AUDIT_ROADMAP.as_posix(),
+            ],
+            "report_outputs": [
+                "Day106 JSON/HTML Codex AGENTS.md instruction compliance audit",
+                "Day106 AI intent and roadmap documentation",
+            ],
+            "related_script": "network_lab.py",
+            "notes": "REPORT_ONLY Day106 AGENTS.md governance audit. Codex may read AGENTS.md, audit AGENTS.md, and report findings with proposed wording, but codex_must_not_modify_agents_md, codex_must_not_stage_agents_md, and codex_must_not_commit_agents_md remain true. live_execution_allowed, ssh_allowed, device_connection_allowed, config_mutation_allowed, openai_api_allowed, voice_runtime_allowed, push_allowed_without_user_approval, merge_allowed_without_user_approval, and tag_allowed_without_user_approval remain false. The task reads local AGENTS.md only and does not invoke adapters, brokers, subprocess execution paths, devices, SSH, APIs, voice runtime, push, merge, tag, or deployment.",
+        },
     ]
 
 
@@ -4258,6 +4316,7 @@ wireguard-runner is dry-run by default and delegates to the existing WireGuard s
             DAY103_PARSER_EVIDENCE_MATRIX_TASK_ID,
             DAY104_PARSER_REVIEWER_ACCEPTANCE_GATE_TASK_ID,
             DAY105_PARSER_ACCEPTANCE_CLOSURE_TASK_ID,
+            DAY106_CODEX_AGENTS_INSTRUCTION_AUDIT_TASK_ID,
             WIREGUARD_RUNNER_TASK_ALIAS,
         ],
         help="Task to run.",
@@ -7671,6 +7730,94 @@ def _run_day105_parser_acceptance_closure(project_root: Path) -> int:
     return 1
 
 
+def _run_day106_codex_agents_instruction_audit(project_root: Path) -> int:
+    report = build_codex_agents_instruction_audit_report(project_root)
+    json_path, html_path = write_codex_agents_instruction_audit_reports(project_root, report)
+
+    print(format_heading("Day106 Codex AGENTS.md Instruction Compliance Audit"))
+    print("Task name: codex-agents-instruction-audit")
+    print("Phase: Codex AGENTS.md Instruction Compliance Audit")
+    print("Audit type: REPORT_ONLY")
+    print("Safety: reads local AGENTS.md and writes reviewer evidence only; no live device, SSH, config mutation, OpenAI API, voice runtime, push, merge, tag, deploy, or publish")
+    print("AGENTS.md governance: Codex may read AGENTS.md, audit AGENTS.md, and report findings with proposed wording; Codex must not modify, stage, or commit AGENTS.md during this audit")
+    print(f"Result: {report['overall_status']} / {report['reviewer_status']}")
+    print(f"AGENTS.md found: {json.dumps(report['agents_file_found'])}")
+    print(f"Instruction contract status: {report['instruction_contract_status']}")
+    print(f"Safety boundary status: {report['safety_boundary_status']}")
+    print(f"Secrets exposure status: {report['secrets_exposure_status']}")
+    print(f"Repo guidance status: {report['repo_guidance_status']}")
+    print(f"Validation guidance status: {report['validation_guidance_status']}")
+    print(f"Done criteria status: {report['done_criteria_status']}")
+    for flag_name in (
+        "live_execution_allowed",
+        "ssh_allowed",
+        "device_connection_allowed",
+        "config_mutation_allowed",
+        "openai_api_allowed",
+        "voice_runtime_allowed",
+        "push_allowed_without_user_approval",
+        "merge_allowed_without_user_approval",
+        "tag_allowed_without_user_approval",
+    ):
+        print(f"{flag_name} = {json.dumps(report[flag_name])}")
+    for flag_name in (
+        "codex_may_read_agents_md",
+        "codex_may_audit_agents_md",
+        "codex_may_report_findings_and_proposed_changes",
+        "codex_must_not_modify_agents_md",
+        "codex_must_not_stage_agents_md",
+        "codex_must_not_commit_agents_md",
+        "audit_modifies_agents_md",
+        "audit_stages_agents_md",
+        "audit_commits_agents_md",
+    ):
+        print(f"{flag_name} = {json.dumps(report[flag_name])}")
+    print(f"Final recommendation: {report['final_recommendation']}")
+    print(f"JSON report: {_relative_to_project(project_root, json_path)}")
+    print(f"HTML report: {_relative_to_project(project_root, html_path)}")
+
+    if (
+        report["overall_status"] == "PASS"
+        and report["final_recommendation"]
+        == "AGENTS_INSTRUCTION_CONTRACT_ACCEPTABLE_FOR_REVIEW_ONLY_CODEX_WORK"
+        and report["agents_file_found"] is True
+        and report["validation_errors"] == []
+        and all(report[flag_name] is False for flag_name in (
+            "live_execution_allowed",
+            "ssh_allowed",
+            "device_connection_allowed",
+            "config_mutation_allowed",
+            "openai_api_allowed",
+            "voice_runtime_allowed",
+            "push_allowed_without_user_approval",
+            "merge_allowed_without_user_approval",
+            "tag_allowed_without_user_approval",
+        ))
+        and all(report[flag_name] is True for flag_name in (
+            "codex_may_read_agents_md",
+            "codex_may_audit_agents_md",
+            "codex_may_report_findings_and_proposed_changes",
+            "codex_must_not_modify_agents_md",
+            "codex_must_not_stage_agents_md",
+            "codex_must_not_commit_agents_md",
+        ))
+        and all(report[flag_name] is False for flag_name in (
+            "audit_modifies_agents_md",
+            "audit_stages_agents_md",
+            "audit_commits_agents_md",
+        ))
+    ):
+        print(f"{format_status('PASS')} AGENTS_INSTRUCTION_CONTRACT_ACCEPTABLE_FOR_REVIEW_ONLY_CODEX_WORK")
+        return 0
+
+    if report["overall_status"] == "WARN":
+        print(f"{format_status('WARN')} AGENTS.md needs hardening before reuse as the durable instruction contract.")
+        return 0
+
+    print(f"{format_status('FAIL')} Day106 Codex AGENTS.md instruction compliance audit failed.")
+    return 1
+
+
 def _relative_to_project(project_root: Path, path: Path) -> str:
     try:
         return path.resolve().relative_to(project_root.resolve()).as_posix()
@@ -10073,6 +10220,8 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
         return _run_day104_parser_reviewer_acceptance_gate(root)
     if args.task == DAY105_PARSER_ACCEPTANCE_CLOSURE_TASK_ID:
         return _run_day105_parser_acceptance_closure(root)
+    if args.task == DAY106_CODEX_AGENTS_INSTRUCTION_AUDIT_TASK_ID:
+        return _run_day106_codex_agents_instruction_audit(root)
 
     profile_path = _resolve_project_path(root, args.profile)
     try:
