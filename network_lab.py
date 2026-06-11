@@ -155,6 +155,10 @@ from intent_parser_consumer_reviewer_triage_decision_log import (
     build_parser_consumer_reviewer_triage_decision_log_report,
     write_parser_consumer_reviewer_triage_decision_log_reports,
 )
+from intent_parser_consumer_reviewer_triage_evidence_traceability import (
+    build_parser_consumer_reviewer_triage_evidence_traceability_report,
+    write_parser_consumer_reviewer_triage_evidence_traceability_reports,
+)
 from intent_codex_agents_instruction_audit import (
     build_codex_agents_instruction_audit_report,
     write_codex_agents_instruction_audit_reports,
@@ -734,6 +738,24 @@ DAY113_PARSER_CONSUMER_REVIEWER_TRIAGE_DECISION_LOG_JSON = (
 )
 DAY113_PARSER_CONSUMER_REVIEWER_TRIAGE_DECISION_LOG_HTML = (
     Path("reports") / "lab-summary" / "day113_parser_consumer_reviewer_triage_decision_log.html"
+)
+DAY114_PARSER_CONSUMER_REVIEWER_TRIAGE_EVIDENCE_TRACEABILITY_TASK_ID = (
+    "parser-consumer-reviewer-triage-evidence-traceability"
+)
+DAY114_PARSER_CONSUMER_REVIEWER_TRIAGE_EVIDENCE_TRACEABILITY_DOC = (
+    Path("docs") / "ai-intent" / "day114_parser_consumer_reviewer_triage_evidence_traceability.md"
+)
+DAY114_PARSER_CONSUMER_REVIEWER_TRIAGE_EVIDENCE_TRACEABILITY_REVIEWER_DOC = (
+    Path("docs") / "ai-intent" / "reviewer" / "day114_parser_consumer_reviewer_triage_evidence_traceability.md"
+)
+DAY114_PARSER_CONSUMER_REVIEWER_TRIAGE_EVIDENCE_TRACEABILITY_ROADMAP_DOC = (
+    Path("docs") / "roadmap" / "day114_parser_consumer_reviewer_triage_evidence_traceability.md"
+)
+DAY114_PARSER_CONSUMER_REVIEWER_TRIAGE_EVIDENCE_TRACEABILITY_JSON = (
+    Path("reports") / "lab-summary" / "day114_parser_consumer_reviewer_triage_evidence_traceability.json"
+)
+DAY114_PARSER_CONSUMER_REVIEWER_TRIAGE_EVIDENCE_TRACEABILITY_HTML = (
+    Path("reports") / "lab-summary" / "day114_parser_consumer_reviewer_triage_evidence_traceability.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -1827,6 +1849,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY113_PARSER_CONSUMER_REVIEWER_TRIAGE_DECISION_LOG_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day114",
+        "title": "Parser Consumer Reviewer Triage Evidence Traceability / Blocked Record Preservation Audit",
+        "report_type": "Audit-only parser consumer reviewer traceability map",
+        "safety_label": "Links Day112 intake and Day113 triage evidence only; TRACEABILITY_AUDITED_NON_EXECUTABLE / BLOCKED_RECORDS_PRESERVED / NO_NEXT_PHASE_UNLOCK",
+        "description": "Day114 verifies that all Day112 intake records and Day113 triage outcomes remain traceable, blocked records are preserved, no downgrade occurred, and no execution readiness or next phase unlock is inferred. It keeps approval unlock, execution readiness, mapped task execution, adapter/broker/runner invocation, live device access, SSH, OpenAI API, cloud, voice, and next-phase enablement disallowed.",
+        "json_globs": [DAY114_PARSER_CONSUMER_REVIEWER_TRIAGE_EVIDENCE_TRACEABILITY_JSON.as_posix()],
+        "html_globs": [DAY114_PARSER_CONSUMER_REVIEWER_TRIAGE_EVIDENCE_TRACEABILITY_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY114_PARSER_CONSUMER_REVIEWER_TRIAGE_EVIDENCE_TRACEABILITY_TASK_ID}"
         ),
     },
 ]
@@ -4588,6 +4623,35 @@ def list_tasks() -> List[Dict[str, Any]]:
             "related_script": "network_lab.py",
             "notes": "REPORT_ONLY Day113 records the reviewer triage outcome for the Day112 intake package. Includes agents_md_read_before_day113_work, reviewer_status=TRIAGE_OUTCOME_RECORDED_NON_EXECUTABLE, outcome_audit_status=INTAKE_OUTCOME_AUDITED, triage_outcome_status=HOLD_LOGGED_BLOCKED_CONDITIONS_PRESERVED, selected_reviewer_outcome=HOLD_FOR_BLOCKED_RECORDS, outcome_log_entry_count=5, audit_check_pass_count=9, audit_check_total_count=9, failed_check_count=0, approve_next_phase_execution_supported=false, approval_unlock_allowed=false, execution_readiness_allowed=false, next_phase_allowed=false. No SSH, live device access, network command execution, config mutation, mapped task execution, execution broker unlock, adapter invocation, broker invocation, runner invocation, OpenAI API, voice runtime, cloud runtime, approval unlock, or next-phase execution.",
         },
+        {
+            "id": DAY114_PARSER_CONSUMER_REVIEWER_TRIAGE_EVIDENCE_TRACEABILITY_TASK_ID,
+            "task_id": "day114_parser_consumer_reviewer_triage_evidence_traceability",
+            "display_name": "Day114 Parser Consumer Reviewer Triage Evidence Traceability / Blocked Record Preservation Audit",
+            "user_display_name": "Parser Consumer Reviewer Triage Evidence Traceability / Blocked Record Preservation Audit",
+            "day": "Day114",
+            "category": "ai_planning",
+            "description": "Links Day112 intake records, Day113 triage outcomes, blocked records, and final recommendation into a non-executable traceability audit.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY114_PARSER_CONSUMER_REVIEWER_TRIAGE_EVIDENCE_TRACEABILITY_JSON.as_posix(),
+                DAY114_PARSER_CONSUMER_REVIEWER_TRIAGE_EVIDENCE_TRACEABILITY_HTML.as_posix(),
+                DAY114_PARSER_CONSUMER_REVIEWER_TRIAGE_EVIDENCE_TRACEABILITY_DOC.as_posix(),
+                DAY114_PARSER_CONSUMER_REVIEWER_TRIAGE_EVIDENCE_TRACEABILITY_REVIEWER_DOC.as_posix(),
+                DAY114_PARSER_CONSUMER_REVIEWER_TRIAGE_EVIDENCE_TRACEABILITY_ROADMAP_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Day114 JSON/HTML parser consumer reviewer traceability audit",
+                "Day114 AI intent and reviewer documentation",
+            ],
+            "related_script": "network_lab.py",
+            "notes": "AUDIT_ONLY REPORT_ONLY Day114 links Day112 intake records to Day113 triage outcome records. Includes agents_md_read_before_day114_work, reviewer_status=TRACEABILITY_AUDITED_NON_EXECUTABLE, source_day112_intake_linked=true, source_day113_triage_linked=true, blocked_records_preserved=true, missing_trace_count=0, downgrade_detected_count=0, execution_readiness_inferred_count=0, next_phase_allowed_count=0, unsafe_flag_count=0, NO_EXECUTION_READINESS_INFERRED, NO_NEXT_PHASE_UNLOCK, BLOCKED_RECORDS_PRESERVED. No SSH, live device access, network command execution, config mutation, mapped task execution, execution broker unlock, adapter invocation, broker invocation, runner invocation, OpenAI API, voice runtime, cloud runtime, approval unlock, or next-phase execution.",
+        },
     ]
 
 
@@ -4740,6 +4804,7 @@ wireguard-runner is dry-run by default and delegates to the existing WireGuard s
             DAY111_PARSER_CONSUMER_RELEASE_PACKAGE_TASK_ID,
             DAY112_PARSER_CONSUMER_RELEASE_REVIEW_INTAKE_TASK_ID,
             DAY113_PARSER_CONSUMER_REVIEWER_TRIAGE_DECISION_LOG_TASK_ID,
+            DAY114_PARSER_CONSUMER_REVIEWER_TRIAGE_EVIDENCE_TRACEABILITY_TASK_ID,
             WIREGUARD_RUNNER_TASK_ALIAS,
         ],
         help="Task to run.",
@@ -8686,6 +8751,98 @@ def _run_day113_parser_consumer_reviewer_triage_decision_log(project_root: Path)
     return 1
 
 
+def _run_day114_parser_consumer_reviewer_triage_evidence_traceability(project_root: Path) -> int:
+    report = build_parser_consumer_reviewer_triage_evidence_traceability_report(
+        project_root=project_root,
+        agents_md_pre_read=True,
+        agents_md_modified=False,
+    )
+    json_path, html_path = write_parser_consumer_reviewer_triage_evidence_traceability_reports(
+        project_root, report
+    )
+    summary = report["traceability_summary"]
+    safety = report["safety_invariants"]
+
+    print(format_heading("Day114 Parser Consumer Reviewer Triage Evidence Traceability / Blocked Record Preservation Audit"))
+    print("Task name: parser-consumer-reviewer-triage-evidence-traceability")
+    print("Phase: Parser Consumer Reviewer Triage Evidence Traceability / Blocked Record Preservation Audit")
+    print("Audit type: AUDIT_ONLY / REPORT_ONLY")
+    print("Safety: REVIEW_ONLY / REPORT_ONLY / TRACEABILITY_AUDIT_ONLY; no approval unlock, execution readiness, SSH, live device access, network command execution, config mutation, mapped task execution, adapter invocation, broker invocation, runner invocation, OpenAI API, voice runtime, cloud runtime, dashboard execution control, or next-phase execution")
+    print(f"Source Day112 task: {report['source_tasks']['day112']}")
+    print(f"Source Day113 task: {report['source_tasks']['day113']}")
+    print(f"overall_status: {report['overall_status']}")
+    print(f"reviewer_status: {report['reviewer_status']}")
+    print(f"traceability_status: {report['traceability_status']}")
+    print(f"blocked_record_status: {report['blocked_record_status']}")
+    print(f"final_recommendation: {report['final_recommendation']}")
+    print(f"source_day112_intake_linked: {json.dumps(report['source_day112_intake_linked'])}")
+    print(f"source_day113_triage_linked: {json.dumps(report['source_day113_triage_linked'])}")
+    print(f"blocked_records_preserved: {json.dumps(report['blocked_records_preserved'])}")
+    print(f"total_trace_records: {summary['total_trace_records']}")
+    print(f"source_intake_record_count: {summary['source_intake_record_count']}")
+    print(f"linked_day113_outcome_count: {summary['linked_day113_outcome_count']}")
+    print(f"blocked_condition_count: {summary['blocked_condition_count']}")
+    print(f"preserved_blocked_record_count: {summary['preserved_blocked_record_count']}")
+    print(f"missing_trace_count: {summary['missing_trace_count']}")
+    print(f"downgrade_detected_count: {summary['downgrade_detected_count']}")
+    print(f"execution_readiness_inferred_count: {summary['execution_readiness_inferred_count']}")
+    print(f"next_phase_allowed_count: {summary['next_phase_allowed_count']}")
+    print(f"unsafe_flag_count: {summary['unsafe_flag_count']}")
+    print(f"next_phase_allowed: {json.dumps(report['next_phase_allowed'])}")
+    print(f"approval_unlock_allowed: {json.dumps(report['approval_unlock_allowed'])}")
+    print(f"execution_readiness_allowed: {json.dumps(report['execution_readiness_allowed'])}")
+    print(f"agents_md_pre_read_result: {report['agents_md_pre_read_result']}")
+    print(f"agents_md_read_before_day114_work: {json.dumps(report['agents_md_read_before_day114_work'])}")
+    print(f"agents_md_modified: {json.dumps(report['agents_md_modified'])}")
+    for field_name in (
+        "ssh_allowed",
+        "live_device_access_allowed",
+        "network_command_execution_allowed",
+        "config_mutation_allowed",
+        "adapter_invocation_allowed",
+        "broker_invocation_allowed",
+        "runner_invocation_allowed",
+        "approval_unlock_supported",
+        "execution_readiness_supported",
+        "next_phase_allowed",
+        "openai_api_allowed",
+        "voice_runtime_allowed",
+        "cloud_runtime_allowed",
+        "mapped_task_execution_allowed",
+    ):
+        print(f"{field_name}: {json.dumps(safety[field_name])}")
+    print("NO_EXECUTION_READINESS_INFERRED")
+    print("NO_NEXT_PHASE_UNLOCK")
+    print("BLOCKED_RECORDS_PRESERVED")
+    print(f"JSON report: {_relative_to_project(project_root, json_path)}")
+    print(f"HTML report: {_relative_to_project(project_root, html_path)}")
+
+    if (
+        report["overall_status"] == "PASS"
+        and report["reviewer_status"] == "TRACEABILITY_AUDITED_NON_EXECUTABLE"
+        and report["source_day112_intake_linked"] is True
+        and report["source_day113_triage_linked"] is True
+        and report["blocked_records_preserved"] is True
+        and report["next_phase_allowed"] is False
+        and report["approval_unlock_allowed"] is False
+        and report["execution_readiness_allowed"] is False
+        and report["agents_md_pre_read_result"] == "PASS"
+        and report["agents_md_read_before_day114_work"] is True
+        and report["agents_md_modified"] is False
+        and summary["missing_trace_count"] == 0
+        and summary["downgrade_detected_count"] == 0
+        and summary["execution_readiness_inferred_count"] == 0
+        and summary["next_phase_allowed_count"] == 0
+        and summary["unsafe_flag_count"] == 0
+        and not report["validation_errors"]
+    ):
+        print(f"{format_status('PASS')} {report['reviewer_status']}")
+        return 0
+
+    print(f"{format_status('FAIL')} Day114 parser consumer reviewer triage evidence traceability failed validation.")
+    return 1
+
+
 def _relative_to_project(project_root: Path, path: Path) -> str:
     try:
         return path.resolve().relative_to(project_root.resolve()).as_posix()
@@ -11104,6 +11261,8 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
         return _run_day112_parser_consumer_release_review_intake(root)
     if args.task == DAY113_PARSER_CONSUMER_REVIEWER_TRIAGE_DECISION_LOG_TASK_ID:
         return _run_day113_parser_consumer_reviewer_triage_decision_log(root)
+    if args.task == DAY114_PARSER_CONSUMER_REVIEWER_TRIAGE_EVIDENCE_TRACEABILITY_TASK_ID:
+        return _run_day114_parser_consumer_reviewer_triage_evidence_traceability(root)
 
     profile_path = _resolve_project_path(root, args.profile)
     try:

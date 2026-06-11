@@ -5006,3 +5006,32 @@ def test_day103_parser_evidence_matrix_runner_writes_reports_without_live_access
     assert "live_access_allowed_count = 0" in output
     assert "JSON report: reports/ai/day103_parser_evidence_matrix_gap_traceability.json" in output
     assert "HTML report: reports/ai/day103_parser_evidence_matrix_gap_traceability.html" in output
+
+
+def test_day114_parser_consumer_reviewer_triage_traceability_task_catalog_entry():
+    task = next(
+        task
+        for task in network_lab.list_tasks()
+        if task["id"] == "parser-consumer-reviewer-triage-evidence-traceability"
+    )
+
+    assert task["task_id"] == "day114_parser_consumer_reviewer_triage_evidence_traceability"
+    assert task["day"] == "Day114"
+    assert task["display_name"] == (
+        "Day114 Parser Consumer Reviewer Triage Evidence Traceability / "
+        "Blocked Record Preservation Audit"
+    )
+    assert task["safety_level"] == "report-only"
+    assert task["execution_mode"] == "report-only"
+    assert task["requires_live_device"] is False
+    assert task["requires_password"] is False
+    assert "reports/lab-summary/day114_parser_consumer_reviewer_triage_evidence_traceability.json" in task["report_paths"]
+    assert "reports/lab-summary/day114_parser_consumer_reviewer_triage_evidence_traceability.html" in task["report_paths"]
+    assert "docs/ai-intent/day114_parser_consumer_reviewer_triage_evidence_traceability.md" in task["report_paths"]
+    assert "docs/ai-intent/reviewer/day114_parser_consumer_reviewer_triage_evidence_traceability.md" in task["report_paths"]
+    assert "docs/roadmap/day114_parser_consumer_reviewer_triage_evidence_traceability.md" in task["report_paths"]
+    assert "reviewer_status=TRACEABILITY_AUDITED_NON_EXECUTABLE" in task["notes"]
+    assert "missing_trace_count=0" in task["notes"]
+    assert "downgrade_detected_count=0" in task["notes"]
+    assert "execution_readiness_inferred_count=0" in task["notes"]
+    assert "next_phase_allowed_count=0" in task["notes"]
