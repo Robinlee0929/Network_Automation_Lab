@@ -143,6 +143,10 @@ from intent_parser_consumer_final_gate import (
     build_parser_consumer_final_gate_report,
     write_parser_consumer_final_gate_reports,
 )
+from intent_parser_consumer_release_package import (
+    build_parser_consumer_release_package_report,
+    write_parser_consumer_release_package_reports,
+)
 from intent_codex_agents_instruction_audit import (
     build_codex_agents_instruction_audit_report,
     write_codex_agents_instruction_audit_reports,
@@ -670,6 +674,22 @@ DAY110_PARSER_CONSUMER_FINAL_GATE_JSON = (
 )
 DAY110_PARSER_CONSUMER_FINAL_GATE_HTML = (
     Path("reports") / "lab-summary" / "day110_parser_consumer_final_gate.html"
+)
+DAY111_PARSER_CONSUMER_RELEASE_PACKAGE_TASK_ID = "parser-consumer-release-package"
+DAY111_PARSER_CONSUMER_RELEASE_PACKAGE_DOC = (
+    Path("docs") / "ai-intent" / "day111_parser_consumer_release_package.md"
+)
+DAY111_PARSER_CONSUMER_RELEASE_PACKAGE_REVIEWER_DOC = (
+    Path("docs") / "ai-intent" / "reviewer" / "day111_parser_consumer_release_package.md"
+)
+DAY111_PARSER_CONSUMER_RELEASE_PACKAGE_ROADMAP_DOC = (
+    Path("docs") / "roadmap" / "day111_parser_consumer_release_package.md"
+)
+DAY111_PARSER_CONSUMER_RELEASE_PACKAGE_JSON = (
+    Path("reports") / "lab-summary" / "day111_parser_consumer_release_package.json"
+)
+DAY111_PARSER_CONSUMER_RELEASE_PACKAGE_HTML = (
+    Path("reports") / "lab-summary" / "day111_parser_consumer_release_package.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -1724,6 +1744,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY110_PARSER_CONSUMER_FINAL_GATE_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day111",
+        "title": "Parser Consumer Evidence Freeze / Release Package",
+        "report_type": "Report-only parser consumer release package",
+        "safety_label": "Freezes Day107-Day110 evidence; RELEASE_PACKAGE_READY_REVIEW_ONLY / FROZEN / NO_LIVE_EXECUTION / NO_SSH / NO_MAPPED_TASK_EXECUTION",
+        "description": "Day111 freezes Day107-Day110 parser consumer reviewer evidence into one deterministic release package. The package is ready for reviewer release, but Day109 blocked records and the Day110 locked final gate keep next_phase_allowed=false. It adds no live device access, SSH, mapped task execution, adapter, broker, cloud, OpenAI API, voice, approval unlock, or dashboard execution control.",
+        "json_globs": [DAY111_PARSER_CONSUMER_RELEASE_PACKAGE_JSON.as_posix()],
+        "html_globs": [DAY111_PARSER_CONSUMER_RELEASE_PACKAGE_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY111_PARSER_CONSUMER_RELEASE_PACKAGE_TASK_ID}"
         ),
     },
 ]
@@ -4398,6 +4431,35 @@ def list_tasks() -> List[Dict[str, Any]]:
             "related_script": "network_lab.py",
             "notes": "REPORT_ONLY Day110 final gate for Day109 parser consumer readiness. Includes agents_md_pre_read_result and agents_md_read_before_day110_work reviewer evidence. Blocked or clarification rows keep next_phase_allowed=false. REVIEW_ONLY, NO_LIVE_EXECUTION, NO_SSH, NO_WRITE, no command execution, no mapped task execution, no adapter, no broker, no runner execution, no OpenAI API, and no external API boundaries remain locked.",
         },
+        {
+            "id": DAY111_PARSER_CONSUMER_RELEASE_PACKAGE_TASK_ID,
+            "task_id": "day111_parser_consumer_release_package",
+            "display_name": "Day111 Parser Consumer Evidence Freeze / Release Package",
+            "user_display_name": "Parser Consumer Evidence Freeze / Release Package",
+            "day": "Day111",
+            "category": "ai_planning",
+            "description": "Freezes Day107-Day110 parser consumer reviewer evidence into a deterministic release package while preserving the Day109 blocked condition and Day110 final-gate lock.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY111_PARSER_CONSUMER_RELEASE_PACKAGE_JSON.as_posix(),
+                DAY111_PARSER_CONSUMER_RELEASE_PACKAGE_HTML.as_posix(),
+                DAY111_PARSER_CONSUMER_RELEASE_PACKAGE_DOC.as_posix(),
+                DAY111_PARSER_CONSUMER_RELEASE_PACKAGE_REVIEWER_DOC.as_posix(),
+                DAY111_PARSER_CONSUMER_RELEASE_PACKAGE_ROADMAP_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Day111 JSON/HTML parser consumer release package",
+                "Day111 AI intent and reviewer documentation",
+            ],
+            "related_script": "network_lab.py",
+            "notes": "REPORT_ONLY Day111 release package freezes Day107-Day110 evidence. Includes agents_md_read_before_day111_work, agents_md_pre_read_result, agents_md_modified=false, source_day_count=4, frozen_evidence_count=4, blocked_condition_preserved=true, next_phase_allowed=false. RELEASE_PACKAGE_READY_REVIEW_ONLY / FROZEN; no SSH, no live device access, no network command execution, no config mutation, no mapped task execution, no execution broker unlock, no approval unlock, no OpenAI API, no voice runtime, no cloud runtime, and no next-phase execution.",
+        },
     ]
 
 
@@ -4547,6 +4609,7 @@ wireguard-runner is dry-run by default and delegates to the existing WireGuard s
             DAY108_PARSER_CONTRACT_CONSUMER_HANDOFF_TASK_ID,
             DAY109_PARSER_CONSUMER_HANDOFF_READINESS_MATRIX_TASK_ID,
             DAY110_PARSER_CONSUMER_FINAL_GATE_TASK_ID,
+            DAY111_PARSER_CONSUMER_RELEASE_PACKAGE_TASK_ID,
             WIREGUARD_RUNNER_TASK_ALIAS,
         ],
         help="Task to run.",
@@ -8259,6 +8322,69 @@ def _run_day110_parser_consumer_final_gate(project_root: Path) -> int:
     return 1
 
 
+def _run_day111_parser_consumer_release_package(project_root: Path) -> int:
+    report = build_parser_consumer_release_package_report(
+        project_root=project_root,
+        agents_md_pre_read=True,
+        agents_md_modified=False,
+    )
+    json_path, html_path = write_parser_consumer_release_package_reports(project_root, report)
+    manifest = report["release_manifest"]
+    blocked = report["blocked_condition_summary"]
+    traceability = report["traceability_summary"]
+    safety = report["safety_invariants"]
+
+    print(format_heading("Day111 Parser Consumer Evidence Freeze / Release Package"))
+    print("Task name: parser-consumer-release-package")
+    print("Phase: Parser Consumer Evidence Freeze / Release Package")
+    print("Audit type: REPORT_ONLY")
+    print("Safety: REVIEW_ONLY / REPORT_ONLY / FROZEN; no SSH, live device access, network command execution, config mutation, mapped task execution, execution broker unlock, approval unlock, OpenAI API, voice runtime, cloud runtime, dashboard execution control, or next-phase execution")
+    print(f"overall_status: {report['overall_status']}")
+    print(f"reviewer_status: {report['reviewer_status']}")
+    print(f"release_package_status: {report['release_package_status']}")
+    print(f"final_recommendation: {report['final_recommendation']}")
+    print(f"next_phase_allowed: {json.dumps(report['next_phase_allowed'])}")
+    print(f"agents_md_pre_read_result: {report['agents_md_pre_read_result']}")
+    print(f"agents_md_read_before_day111_work: {json.dumps(report['agents_md_read_before_day111_work'])}")
+    print(f"agents_md_modified: {json.dumps(report['agents_md_modified'])}")
+    print(f"source_day_count: {manifest['source_day_count']}")
+    print(f"frozen_evidence_count: {manifest['frozen_evidence_count']}")
+    print(f"blocked_condition_preserved: {json.dumps(blocked['blocked_condition_preserved'])}")
+    print(f"safety_invariant_result: {traceability['safety_invariant_result']}")
+    for field_name in (
+        "ssh_allowed",
+        "live_device_access_allowed",
+        "network_command_execution_allowed",
+        "config_mutation_allowed",
+        "openai_api_allowed",
+        "voice_runtime_allowed",
+        "cloud_runtime_allowed",
+        "approval_unlock_supported",
+        "mapped_task_execution_allowed",
+        "execution_broker_unlock_allowed",
+        "next_phase_execution_allowed",
+    ):
+        print(f"{field_name}: {json.dumps(safety[field_name])}")
+    print(f"JSON report: {_relative_to_project(project_root, json_path)}")
+    print(f"HTML report: {_relative_to_project(project_root, html_path)}")
+
+    if (
+        report["overall_status"] == "PASS"
+        and report["next_phase_allowed"] is False
+        and report["agents_md_pre_read_result"] == "PASS"
+        and report["agents_md_read_before_day111_work"] is True
+        and report["agents_md_modified"] is False
+        and blocked["blocked_condition_preserved"] is True
+        and traceability["safety_invariant_result"] == "PASS"
+        and not report["validation_errors"]
+    ):
+        print(f"{format_status('PASS')} {report['reviewer_status']}")
+        return 0
+
+    print(f"{format_status('FAIL')} Day111 parser consumer release package failed validation.")
+    return 1
+
+
 def _relative_to_project(project_root: Path, path: Path) -> str:
     try:
         return path.resolve().relative_to(project_root.resolve()).as_posix()
@@ -10671,6 +10797,8 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
         return _run_day109_parser_consumer_handoff_readiness_matrix(root)
     if args.task == DAY110_PARSER_CONSUMER_FINAL_GATE_TASK_ID:
         return _run_day110_parser_consumer_final_gate(root)
+    if args.task == DAY111_PARSER_CONSUMER_RELEASE_PACKAGE_TASK_ID:
+        return _run_day111_parser_consumer_release_package(root)
 
     profile_path = _resolve_project_path(root, args.profile)
     try:
