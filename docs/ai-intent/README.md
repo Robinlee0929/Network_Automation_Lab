@@ -79,3 +79,9 @@ Day109 converts Day108 handoff records into a reviewer-facing readiness matrix w
 - [Day110 Parser Consumer Final Gate / Reviewer Decision Summary](day110_parser_consumer_final_gate.md)
 
 Day110 consumes the Day109 readiness matrix and emits a final reviewer decision summary. It displays whether AGENTS.md was read before Day110 work through `agents_md_read_before_day110_work` and `agents_md_pre_read_result`; blocked or clarification records keep `next_phase_allowed=false`, and no live execution, SSH, write/config change, adapter, broker, runner execution, OpenAI API, external API, or mapped task execution path is added.
+
+## Day111
+
+- [Day111 Parser Consumer Evidence Freeze / Release Package](day111_parser_consumer_release_package.md)
+
+Day111 freezes Day107-Day110 parser consumer evidence into a deterministic reviewer release package. It is `RELEASE_PACKAGE_READY_REVIEW_ONLY` and `FROZEN`, but Day109 blocked records and the Day110 locked final gate keep `next_phase_allowed=false`. AGENTS.md pre-read evidence is recorded with `agents_md_read_before_day111_work=true`, `agents_md_pre_read_result=PASS`, and `agents_md_modified=false`; no SSH, live device access, network command execution, configuration mutation, approval unlock, mapped task execution, execution broker unlock, OpenAI API, voice runtime, cloud runtime, or next-phase execution path is added.
