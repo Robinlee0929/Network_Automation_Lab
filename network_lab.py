@@ -123,6 +123,10 @@ from intent_parser_reviewer_acceptance_gate import (
     build_parser_reviewer_acceptance_gate_report,
     write_parser_reviewer_acceptance_gate_reports,
 )
+from intent_parser_acceptance_closure import (
+    build_parser_acceptance_closure_report,
+    write_parser_acceptance_closure_reports,
+)
 from intent_runtime_safety_case import build_runtime_safety_case_report
 from intent_runtime_safety_gate import build_runtime_safety_gate_report
 
@@ -569,6 +573,22 @@ DAY104_PARSER_REVIEWER_ACCEPTANCE_GATE_JSON = (
 )
 DAY104_PARSER_REVIEWER_ACCEPTANCE_GATE_HTML = (
     Path("reports") / "lab-summary" / "day104_parser_reviewer_acceptance_gate.html"
+)
+DAY105_PARSER_ACCEPTANCE_CLOSURE_TASK_ID = "parser-acceptance-closure"
+DAY105_PARSER_ACCEPTANCE_CLOSURE_DOC = (
+    Path("docs") / "ai-intent" / "day105_parser_acceptance_closure.md"
+)
+DAY105_PARSER_ACCEPTANCE_CLOSURE_REVIEWER_DOC = (
+    Path("docs") / "reviewer" / "day105_parser_acceptance_closure.md"
+)
+DAY105_PARSER_ACCEPTANCE_CLOSURE_ROADMAP = (
+    Path("docs") / "roadmap" / "day105_parser_acceptance_closure.md"
+)
+DAY105_PARSER_ACCEPTANCE_CLOSURE_JSON = (
+    Path("reports") / "lab-summary" / "day105_parser_acceptance_closure.json"
+)
+DAY105_PARSER_ACCEPTANCE_CLOSURE_HTML = (
+    Path("reports") / "lab-summary" / "day105_parser_acceptance_closure.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -1545,6 +1565,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY104_PARSER_REVIEWER_ACCEPTANCE_GATE_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day105",
+        "title": "Parser Acceptance Closure / Safety-Blocked Exit Summary",
+        "report_type": "Report-only parser acceptance closure package",
+        "safety_label": "Day96-Day104 closure only; next phase remains blocked and no execution unlock is granted",
+        "description": "Day105 packages Day96-Day104 parser evidence for reviewer inspection. It is SUMMARY_ONLY, keeps final_recommendation=SAFETY_BLOCKED_REVIEW_ONLY, and does not add parser capability, adapter execution, SSH, live access, mapped task execution, OpenAI API, voice input, or configuration change permission.",
+        "json_globs": [DAY105_PARSER_ACCEPTANCE_CLOSURE_JSON.as_posix()],
+        "html_globs": [DAY105_PARSER_ACCEPTANCE_CLOSURE_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY105_PARSER_ACCEPTANCE_CLOSURE_TASK_ID}"
         ),
     },
 ]
@@ -4052,6 +4085,35 @@ def list_tasks() -> List[Dict[str, Any]]:
             "related_script": "network_lab.py",
             "notes": "Report-only Day104 reviewer gate. It maps Day103 TRACE_COMPLETE, REVIEW_REQUIRED, KNOWN_GAP, and BLOCKED_BY_SAFETY_BOUNDARY states to acceptance decisions. Safety boundary blocks dominate acceptance, known gaps prevent next-stage readiness, REVIEW_REQUIRED prevents full acceptance, and all parser capability, execution, broker handoff, adapter, SSH, live access, command, config change, OpenAI API, and voice runtime flags remain false.",
         },
+        {
+            "id": DAY105_PARSER_ACCEPTANCE_CLOSURE_TASK_ID,
+            "task_id": "day105_parser_acceptance_closure",
+            "display_name": "Day105 Parser Acceptance Closure / Safety-Blocked Exit Summary",
+            "user_display_name": "Parser Acceptance Closure / Safety-Blocked Exit Summary",
+            "day": "Day105",
+            "category": "ai_planning",
+            "description": "Packages Day96-Day104 parser evidence into a reviewer-facing closure summary while keeping live execution and next-phase entry safety-blocked.",
+            "safety_level": "fake-adapter-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY105_PARSER_ACCEPTANCE_CLOSURE_JSON.as_posix(),
+                DAY105_PARSER_ACCEPTANCE_CLOSURE_HTML.as_posix(),
+                DAY105_PARSER_ACCEPTANCE_CLOSURE_DOC.as_posix(),
+                DAY105_PARSER_ACCEPTANCE_CLOSURE_REVIEWER_DOC.as_posix(),
+                DAY105_PARSER_ACCEPTANCE_CLOSURE_ROADMAP.as_posix(),
+            ],
+            "report_outputs": [
+                "Day105 JSON/HTML parser acceptance closure package",
+                "Day105 reviewer and roadmap documentation",
+            ],
+            "related_script": "network_lab.py",
+            "notes": "SUMMARY_ONLY Day105 closure package for Day96-Day104. final_recommendation remains SAFETY_BLOCKED_REVIEW_ONLY; next_phase_allowed, execution_allowed, live_device_access_allowed, ssh_allowed, config_change_allowed, mapped_task_execution_allowed, openai_api_allowed, voice_input_allowed, and parser_capability_added remain false. A separate branch and separate phase gate are required before any future live-capable discussion.",
+        },
     ]
 
 
@@ -4195,6 +4257,7 @@ wireguard-runner is dry-run by default and delegates to the existing WireGuard s
             DAY102_PARSER_FIXTURE_EXPANSION_TASK_ID,
             DAY103_PARSER_EVIDENCE_MATRIX_TASK_ID,
             DAY104_PARSER_REVIEWER_ACCEPTANCE_GATE_TASK_ID,
+            DAY105_PARSER_ACCEPTANCE_CLOSURE_TASK_ID,
             WIREGUARD_RUNNER_TASK_ALIAS,
         ],
         help="Task to run.",
@@ -7551,6 +7614,63 @@ def _run_day104_parser_reviewer_acceptance_gate(project_root: Path) -> int:
     return 1
 
 
+def _run_day105_parser_acceptance_closure(project_root: Path) -> int:
+    report = build_parser_acceptance_closure_report()
+    json_path, html_path = write_parser_acceptance_closure_reports(project_root, report)
+    flags = report["execution_flags"]
+
+    print(format_heading("Day105 Parser Acceptance Closure / Safety-Blocked Exit Summary"))
+    print("Task name: parser-acceptance-closure")
+    print("Phase: Parser Acceptance Closure / Safety-Blocked Exit Summary")
+    print("Closure type: SUMMARY_ONLY")
+    print("Safety: report-only Day96-Day104 parser evidence closure; no parser expansion, adapter execution, SSH, live device access, mapped task execution, config change, OpenAI API, voice input, or next-phase unlock")
+    print(f"Result: {report['overall_status']} / {report['reviewer_status']}")
+    print(f"Final recommendation: {report['final_recommendation']}")
+    print(f"Covered days: {report['covered_days']}")
+    print(f"safety_blocked = {json.dumps(report['safety_blocked'])}")
+    print(f"next_phase_allowed = {json.dumps(report['next_phase_allowed'])}")
+    print(f"parser_capability_added = {json.dumps(report['parser_capability_added'])}")
+    print(f"capability_added = {json.dumps(report['capability_added'])}")
+    for flag_name in (
+        "execution_allowed",
+        "live_device_access_allowed",
+        "ssh_allowed",
+        "config_change_allowed",
+        "mapped_task_execution_allowed",
+        "openai_api_allowed",
+        "voice_input_allowed",
+    ):
+        print(f"{flag_name} = {json.dumps(flags[flag_name])}")
+    print(f"Safety-blocking reasons: {len(report['safety_blocking_reasons'])}")
+    print(f"Next-phase entry conditions: {len(report['next_phase_entry_conditions'])}")
+    print(f"JSON report: {_relative_to_project(project_root, json_path)}")
+    print(f"HTML report: {_relative_to_project(project_root, html_path)}")
+
+    if (
+        report["overall_status"] == "PASS"
+        and report["reviewer_status"] == "CLOSURE_READY_REVIEW_ONLY"
+        and report["closure_type"] == "SUMMARY_ONLY"
+        and report["covered_days"] == [96, 97, 98, 99, 100, 101, 102, 103, 104]
+        and report["final_recommendation"] == "SAFETY_BLOCKED_REVIEW_ONLY"
+        and report["safety_blocked"] is True
+        and report["next_phase_allowed"] is False
+        and report["parser_capability_added"] is False
+        and report["capability_added"] is False
+        and all(value is False for value in flags.values())
+        and report["safety_blocking_reasons"]
+        and report["next_phase_entry_conditions"]
+        and not report["validation_errors"]
+    ):
+        print(
+            f"{format_status('PASS')} CLOSURE_READY_REVIEW_ONLY. "
+            "Day105 packaged parser evidence for review without unlocking live execution."
+        )
+        return 0
+
+    print(f"{format_status('FAIL')} Day105 parser acceptance closure failed validation.")
+    return 1
+
+
 def _relative_to_project(project_root: Path, path: Path) -> str:
     try:
         return path.resolve().relative_to(project_root.resolve()).as_posix()
@@ -9951,6 +10071,8 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
         return _run_day103_parser_evidence_matrix(root)
     if args.task == DAY104_PARSER_REVIEWER_ACCEPTANCE_GATE_TASK_ID:
         return _run_day104_parser_reviewer_acceptance_gate(root)
+    if args.task == DAY105_PARSER_ACCEPTANCE_CLOSURE_TASK_ID:
+        return _run_day105_parser_acceptance_closure(root)
 
     profile_path = _resolve_project_path(root, args.profile)
     try:
