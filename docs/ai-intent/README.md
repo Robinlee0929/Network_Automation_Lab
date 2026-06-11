@@ -55,3 +55,9 @@ Day105 packages Day96-Day104 parser evidence for reviewer inspection only. It is
 - [Day106 Codex AGENTS.md Instruction Compliance Audit](day106_codex_agents_instruction_compliance_audit.md)
 
 Day106 audits the repository-level AGENTS.md as a durable Codex instruction contract. It is REPORT_ONLY: Codex may read AGENTS.md, audit AGENTS.md, and report findings with proposed wording, but must not modify, stage, or commit AGENTS.md during the governance audit. Live execution, SSH, device connections, configuration mutation, OpenAI API, voice runtime, push, merge, and tag permission remain false unless a future approved safety gate explicitly changes the project boundary.
+
+## Day107
+
+- [Day107 Parser Reviewer Evidence Contract Consolidation](day107_parser_reviewer_evidence_contract.md)
+
+Day107 consolidates Day96-Day105 parser evidence into one deterministic REPORT_ONLY reviewer contract. It accepts review-only continuation only when every required evidence stage is represented and all safety boundaries remain locked; live execution, SSH, device connection, configuration mutation, OpenAI API, voice runtime, adapter invocation, rejected-intent execution, and live-execution acceptance remain false.

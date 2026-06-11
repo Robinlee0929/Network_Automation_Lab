@@ -127,6 +127,10 @@ from intent_parser_acceptance_closure import (
     build_parser_acceptance_closure_report,
     write_parser_acceptance_closure_reports,
 )
+from intent_parser_reviewer_evidence_contract import (
+    build_parser_reviewer_evidence_contract_report,
+    write_parser_reviewer_evidence_contract_reports,
+)
 from intent_codex_agents_instruction_audit import (
     build_codex_agents_instruction_audit_report,
     write_codex_agents_instruction_audit_reports,
@@ -606,6 +610,19 @@ DAY106_CODEX_AGENTS_INSTRUCTION_AUDIT_JSON = (
 )
 DAY106_CODEX_AGENTS_INSTRUCTION_AUDIT_HTML = (
     Path("reports") / "ai" / "day106_codex_agents_instruction_compliance_audit.html"
+)
+DAY107_PARSER_REVIEWER_EVIDENCE_CONTRACT_TASK_ID = "parser-reviewer-evidence-contract"
+DAY107_PARSER_REVIEWER_EVIDENCE_CONTRACT_DOC = (
+    Path("docs") / "ai-intent" / "day107_parser_reviewer_evidence_contract.md"
+)
+DAY107_PARSER_REVIEWER_EVIDENCE_CONTRACT_ROADMAP = (
+    Path("docs") / "roadmap" / "day107_parser_reviewer_evidence_contract.md"
+)
+DAY107_PARSER_REVIEWER_EVIDENCE_CONTRACT_JSON = (
+    Path("reports") / "lab-summary" / "day107_parser_reviewer_evidence_contract.json"
+)
+DAY107_PARSER_REVIEWER_EVIDENCE_CONTRACT_HTML = (
+    Path("reports") / "lab-summary" / "day107_parser_reviewer_evidence_contract.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -1608,6 +1625,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY106_CODEX_AGENTS_INSTRUCTION_AUDIT_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day107",
+        "title": "Parser Reviewer Evidence Contract Consolidation",
+        "report_type": "Report-only parser reviewer evidence contract",
+        "safety_label": "Day96-Day105 parser evidence contract only; live execution, SSH, device access, adapter invocation, OpenAI API, voice runtime, rejected-intent execution, and config mutation remain locked",
+        "description": "Day107 consolidates Day96-Day105 parser evidence into one deterministic reviewer contract. It accepts review-only continuation only when all required evidence stages are represented and all safety boundaries remain locked, with final_recommendation=PARSER_REVIEWER_EVIDENCE_CONTRACT_ACCEPTED_FOR_REVIEW_ONLY_CONTINUATION on the PASS path.",
+        "json_globs": [DAY107_PARSER_REVIEWER_EVIDENCE_CONTRACT_JSON.as_posix()],
+        "html_globs": [DAY107_PARSER_REVIEWER_EVIDENCE_CONTRACT_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY107_PARSER_REVIEWER_EVIDENCE_CONTRACT_TASK_ID}"
         ),
     },
 ]
@@ -4172,6 +4202,34 @@ def list_tasks() -> List[Dict[str, Any]]:
             "related_script": "network_lab.py",
             "notes": "REPORT_ONLY Day106 AGENTS.md governance audit. Codex may read AGENTS.md, audit AGENTS.md, and report findings with proposed wording, but codex_must_not_modify_agents_md, codex_must_not_stage_agents_md, and codex_must_not_commit_agents_md remain true. live_execution_allowed, ssh_allowed, device_connection_allowed, config_mutation_allowed, openai_api_allowed, voice_runtime_allowed, push_allowed_without_user_approval, merge_allowed_without_user_approval, and tag_allowed_without_user_approval remain false. The task reads local AGENTS.md only and does not invoke adapters, brokers, subprocess execution paths, devices, SSH, APIs, voice runtime, push, merge, tag, or deployment.",
         },
+        {
+            "id": DAY107_PARSER_REVIEWER_EVIDENCE_CONTRACT_TASK_ID,
+            "task_id": "day107_parser_reviewer_evidence_contract",
+            "display_name": "Day107 Parser Reviewer Evidence Contract Consolidation",
+            "user_display_name": "Parser Reviewer Evidence Contract Consolidation",
+            "day": "Day107",
+            "category": "ai_planning",
+            "description": "Consolidates Day96-Day105 parser evidence into one deterministic reviewer evidence contract while keeping all live-capable boundaries locked.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY107_PARSER_REVIEWER_EVIDENCE_CONTRACT_JSON.as_posix(),
+                DAY107_PARSER_REVIEWER_EVIDENCE_CONTRACT_HTML.as_posix(),
+                DAY107_PARSER_REVIEWER_EVIDENCE_CONTRACT_DOC.as_posix(),
+                DAY107_PARSER_REVIEWER_EVIDENCE_CONTRACT_ROADMAP.as_posix(),
+            ],
+            "report_outputs": [
+                "Day107 JSON/HTML parser reviewer evidence contract",
+                "Day107 AI intent and roadmap documentation",
+            ],
+            "related_script": "network_lab.py",
+            "notes": "REPORT_ONLY Day107 parser reviewer evidence contract for Day96-Day105. accepted_for_review_only_continuation can pass only when every required evidence stage is represented and safety boundaries remain locked. accepted_for_live_execution, live_execution_allowed, ssh_allowed, device_connection_allowed, config_mutation_allowed, openai_api_allowed, voice_runtime_allowed, adapter_invocation_allowed, and rejected_intent_execution_allowed remain false. No adapter, broker, runner execution path, live device, SSH, external AI runtime, voice runtime, or configuration mutation is introduced.",
+        },
     ]
 
 
@@ -4317,6 +4375,7 @@ wireguard-runner is dry-run by default and delegates to the existing WireGuard s
             DAY104_PARSER_REVIEWER_ACCEPTANCE_GATE_TASK_ID,
             DAY105_PARSER_ACCEPTANCE_CLOSURE_TASK_ID,
             DAY106_CODEX_AGENTS_INSTRUCTION_AUDIT_TASK_ID,
+            DAY107_PARSER_REVIEWER_EVIDENCE_CONTRACT_TASK_ID,
             WIREGUARD_RUNNER_TASK_ALIAS,
         ],
         help="Task to run.",
@@ -7818,6 +7877,71 @@ def _run_day106_codex_agents_instruction_audit(project_root: Path) -> int:
     return 1
 
 
+def _run_day107_parser_reviewer_evidence_contract(project_root: Path) -> int:
+    report = build_parser_reviewer_evidence_contract_report()
+    json_path, html_path = write_parser_reviewer_evidence_contract_reports(project_root, report)
+
+    print(format_heading("Day107 Parser Reviewer Evidence Contract Consolidation"))
+    print("Task name: parser-reviewer-evidence-contract")
+    print("Phase: Parser Reviewer Evidence Contract Consolidation")
+    print("Audit type: REPORT_ONLY")
+    print("Evidence scope: Day96-Day105")
+    print("Safety: deterministic report-only parser reviewer evidence contract; no live execution, SSH, device connection, adapter invocation, OpenAI API, voice runtime, rejected-intent execution, or config mutation")
+    print(f"Result: {report['overall_status']} / {report['reviewer_contract_status']}")
+    print(f"Final recommendation: {report['final_recommendation']}")
+    print(f"evidence_chain_complete = {json.dumps(report['evidence_chain_complete'])}")
+    print(f"accepted_for_review_only_continuation = {json.dumps(report['accepted_for_review_only_continuation'])}")
+    print(f"accepted_for_live_execution = {json.dumps(report['accepted_for_live_execution'])}")
+    for flag_name in (
+        "live_execution_allowed",
+        "ssh_allowed",
+        "device_connection_allowed",
+        "config_mutation_allowed",
+        "openai_api_allowed",
+        "voice_runtime_allowed",
+        "adapter_invocation_allowed",
+        "rejected_intent_execution_allowed",
+    ):
+        print(f"{flag_name} = {json.dumps(report[flag_name])}")
+    print(f"Missing evidence days: {report['missing_evidence_days']}")
+    print(f"Safety violation fields: {report['safety_violation_fields']}")
+    print(f"JSON report: {json_path.relative_to(project_root).as_posix()}")
+    print(f"HTML report: {html_path.relative_to(project_root).as_posix()}")
+
+    if (
+        report["overall_status"] == "PASS"
+        and report["final_recommendation"]
+        == "PARSER_REVIEWER_EVIDENCE_CONTRACT_ACCEPTED_FOR_REVIEW_ONLY_CONTINUATION"
+        and report["evidence_chain_complete"] is True
+        and report["accepted_for_review_only_continuation"] is True
+        and all(report[flag_name] is False for flag_name in (
+            "accepted_for_live_execution",
+            "live_execution_allowed",
+            "ssh_allowed",
+            "device_connection_allowed",
+            "config_mutation_allowed",
+            "openai_api_allowed",
+            "voice_runtime_allowed",
+            "adapter_invocation_allowed",
+            "rejected_intent_execution_allowed",
+        ))
+        and not report["safety_violation_fields"]
+        and not report["validation_errors"]
+    ):
+        print(
+            f"{format_status('PASS')} "
+            "PARSER_REVIEWER_EVIDENCE_CONTRACT_ACCEPTED_FOR_REVIEW_ONLY_CONTINUATION"
+        )
+        return 0
+
+    if report["overall_status"] == "WARN":
+        print(f"{format_status('WARN')} Day107 parser reviewer evidence contract needs gap review.")
+        return 0
+
+    print(f"{format_status('FAIL')} Day107 parser reviewer evidence contract failed validation.")
+    return 1
+
+
 def _relative_to_project(project_root: Path, path: Path) -> str:
     try:
         return path.resolve().relative_to(project_root.resolve()).as_posix()
@@ -10222,6 +10346,8 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
         return _run_day105_parser_acceptance_closure(root)
     if args.task == DAY106_CODEX_AGENTS_INSTRUCTION_AUDIT_TASK_ID:
         return _run_day106_codex_agents_instruction_audit(root)
+    if args.task == DAY107_PARSER_REVIEWER_EVIDENCE_CONTRACT_TASK_ID:
+        return _run_day107_parser_reviewer_evidence_contract(root)
 
     profile_path = _resolve_project_path(root, args.profile)
     try:
