@@ -135,6 +135,10 @@ from intent_parser_contract_consumer_handoff import (
     build_parser_contract_consumer_handoff_report,
     write_parser_contract_consumer_handoff_reports,
 )
+from intent_parser_consumer_handoff_readiness_matrix import (
+    build_parser_consumer_handoff_readiness_matrix_report,
+    write_parser_consumer_handoff_readiness_matrix_reports,
+)
 from intent_codex_agents_instruction_audit import (
     build_codex_agents_instruction_audit_report,
     write_codex_agents_instruction_audit_reports,
@@ -640,6 +644,18 @@ DAY108_PARSER_CONTRACT_CONSUMER_HANDOFF_JSON = (
 )
 DAY108_PARSER_CONTRACT_CONSUMER_HANDOFF_HTML = (
     Path("reports") / "lab-summary" / "day108_parser_contract_consumer_handoff.html"
+)
+DAY109_PARSER_CONSUMER_HANDOFF_READINESS_MATRIX_TASK_ID = (
+    "parser-consumer-handoff-readiness-matrix"
+)
+DAY109_PARSER_CONSUMER_HANDOFF_READINESS_MATRIX_DOC = (
+    Path("docs") / "ai-intent" / "day109_parser_consumer_handoff_readiness_matrix.md"
+)
+DAY109_PARSER_CONSUMER_HANDOFF_READINESS_MATRIX_JSON = (
+    Path("reports") / "lab-summary" / "day109_parser_consumer_handoff_readiness_matrix.json"
+)
+DAY109_PARSER_CONSUMER_HANDOFF_READINESS_MATRIX_HTML = (
+    Path("reports") / "lab-summary" / "day109_parser_consumer_handoff_readiness_matrix.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -1668,6 +1684,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY108_PARSER_CONTRACT_CONSUMER_HANDOFF_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day109",
+        "title": "Parser Consumer Handoff Readiness Matrix",
+        "report_type": "Report-only parser consumer handoff readiness matrix",
+        "safety_label": "Consumes Day108 handoff records only; REVIEW_ONLY / NO_LIVE_EXECUTION / NO_SSH / NO_WRITE, with command and mapped task execution blocked",
+        "description": "Day109 converts Day108 consumer handoff records into deterministic READY, NEEDS_CLARIFICATION, and BLOCKED reviewer-facing rows. Unsafe, live, SSH, write, command execution, and mapped task execution flags remain blocking conditions and are never rewritten as ready.",
+        "json_globs": [DAY109_PARSER_CONSUMER_HANDOFF_READINESS_MATRIX_JSON.as_posix()],
+        "html_globs": [DAY109_PARSER_CONSUMER_HANDOFF_READINESS_MATRIX_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY109_PARSER_CONSUMER_HANDOFF_READINESS_MATRIX_TASK_ID}"
         ),
     },
 ]
@@ -4288,6 +4317,33 @@ def list_tasks() -> List[Dict[str, Any]]:
             "related_script": "network_lab.py",
             "notes": "REPORT_ONLY Day108 consumer handoff for the Day107 source contract shape. Handoff records include source_contract, source_contract_version, consumer_schema_version, reviewer_decision, evidence_status, safety_flags, and next_stage_recommendation. live_execution_allowed, ssh_allowed, device_connection_allowed, command_execution_allowed, write_or_config_change_allowed, approval_unlock_supported, mapped_task_execution_allowed, openai_api_used, and voice_input_used remain false. Unsafe flags block handoff and no live device, SSH, adapter, broker, runner, OpenAI API, voice input, approval unlock, mapped task execution, or write/config change path is introduced.",
         },
+        {
+            "id": DAY109_PARSER_CONSUMER_HANDOFF_READINESS_MATRIX_TASK_ID,
+            "task_id": "day109_parser_consumer_handoff_readiness_matrix",
+            "display_name": "Day109 Parser Consumer Handoff Readiness Matrix",
+            "user_display_name": "Parser Consumer Handoff Readiness Matrix",
+            "day": "Day109",
+            "category": "ai_planning",
+            "description": "Converts Day108 handoff records into deterministic reviewer-facing READY, NEEDS_CLARIFICATION, and BLOCKED readiness rows while preserving unsafe and execution-capable flags as blocking conditions.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY109_PARSER_CONSUMER_HANDOFF_READINESS_MATRIX_JSON.as_posix(),
+                DAY109_PARSER_CONSUMER_HANDOFF_READINESS_MATRIX_HTML.as_posix(),
+                DAY109_PARSER_CONSUMER_HANDOFF_READINESS_MATRIX_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Day109 JSON/HTML parser consumer handoff readiness matrix",
+                "Day109 AI intent documentation",
+            ],
+            "related_script": "network_lab.py",
+            "notes": "REPORT_ONLY Day109 readiness matrix for Day108 consumer handoff records. Rows include consumer_name, source_day, handoff_status, readiness_status, blocking_reasons, clarification_items, required_consumer_actions, unsafe/live/SSH/write/command/mapped-task flags, and evidence_refs. REVIEW_ONLY, NO_LIVE_EXECUTION, NO_SSH, NO_WRITE, no command execution, no mapped task execution, no OpenAI API, and no external API boundaries remain locked.",
+        },
     ]
 
 
@@ -4435,6 +4491,7 @@ wireguard-runner is dry-run by default and delegates to the existing WireGuard s
             DAY106_CODEX_AGENTS_INSTRUCTION_AUDIT_TASK_ID,
             DAY107_PARSER_REVIEWER_EVIDENCE_CONTRACT_TASK_ID,
             DAY108_PARSER_CONTRACT_CONSUMER_HANDOFF_TASK_ID,
+            DAY109_PARSER_CONSUMER_HANDOFF_READINESS_MATRIX_TASK_ID,
             WIREGUARD_RUNNER_TASK_ALIAS,
         ],
         help="Task to run.",
@@ -8068,6 +8125,45 @@ def _run_day108_parser_contract_consumer_handoff(project_root: Path) -> int:
     return 1
 
 
+def _run_day109_parser_consumer_handoff_readiness_matrix(project_root: Path) -> int:
+    report = build_parser_consumer_handoff_readiness_matrix_report()
+    json_path, html_path = write_parser_consumer_handoff_readiness_matrix_reports(project_root, report)
+    safety_summary = report["safety_summary"]
+
+    print(format_heading("Day109 Parser Consumer Handoff Readiness Matrix"))
+    print("Task name: parser-consumer-handoff-readiness-matrix")
+    print("Phase: Parser Consumer Handoff Readiness Matrix")
+    print("Audit type: REPORT_ONLY")
+    print("Safety: REVIEW_ONLY / NO_LIVE_EXECUTION / NO_SSH / NO_WRITE; no command execution, mapped task execution, OpenAI API, external API, adapter, broker, or live device access")
+    print(f"Source day: {report['source_day']}")
+    print(f"Source task: {report['source_task']}")
+    print(f"overall_status: {report['overall_status']}")
+    print(f"reviewer_status: {report['reviewer_status']}")
+    print(f"total_records: {report['total_records']}")
+    print(f"ready_count: {report['ready_count']}")
+    print(f"needs_clarification_count: {report['needs_clarification_count']}")
+    print(f"blocked_count: {report['blocked_count']}")
+    for field_name in (
+        "unsafe_flag_count",
+        "live_flag_count",
+        "ssh_flag_count",
+        "write_flag_count",
+        "command_execution_flag_count",
+        "mapped_task_execution_flag_count",
+        "blocking_condition_preserved",
+    ):
+        print(f"{field_name}: {json.dumps(safety_summary[field_name])}")
+    print(f"JSON report: {_relative_to_project(project_root, json_path)}")
+    print(f"HTML report: {_relative_to_project(project_root, html_path)}")
+
+    if report["overall_status"] == "PASS" and safety_summary["blocking_condition_preserved"] is True:
+        print(f"{format_status('PASS')} {report['reviewer_status']}")
+        return 0
+
+    print(f"{format_status('FAIL')} Day109 parser consumer handoff readiness matrix failed validation.")
+    return 1
+
+
 def _relative_to_project(project_root: Path, path: Path) -> str:
     try:
         return path.resolve().relative_to(project_root.resolve()).as_posix()
@@ -10476,6 +10572,8 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
         return _run_day107_parser_reviewer_evidence_contract(root)
     if args.task == DAY108_PARSER_CONTRACT_CONSUMER_HANDOFF_TASK_ID:
         return _run_day108_parser_contract_consumer_handoff(root)
+    if args.task == DAY109_PARSER_CONSUMER_HANDOFF_READINESS_MATRIX_TASK_ID:
+        return _run_day109_parser_consumer_handoff_readiness_matrix(root)
 
     profile_path = _resolve_project_path(root, args.profile)
     try:

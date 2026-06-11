@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Day109 Parser Consumer Handoff Readiness Matrix</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2rem; color: #17202a; }
+    table { border-collapse: collapse; width: 100%; margin: 1rem 0 2rem; }
+    th, td { border: 1px solid #d5d8dc; padding: 0.55rem; vertical-align: top; }
+    th { background: #eef2f6; text-align: left; }
+    code { background: #eef2f6; padding: 1px 4px; border-radius: 3px; }
+    .badge { display: inline-block; margin-right: 0.5rem; padding: 0.2rem 0.45rem; border: 1px solid #85929e; }
+  </style>
+</head>
+<body>
+  <h1>Day109 Parser Consumer Handoff Readiness Matrix</h1>
+  <p>
+    <span class="badge">REVIEW_ONLY</span>
+    <span class="badge">NO_LIVE_EXECUTION</span>
+    <span class="badge">NO_SSH</span>
+    <span class="badge">NO_WRITE</span>
+  </p>
+  <p><strong>Source:</strong> Day108 / <code>parser-contract-consumer-handoff</code></p>
+  <p><strong>Status:</strong> PASS / BLOCKED_RECORDS_PRESENT</p>
+  <h2>Summary</h2>
+  <table>
+    <thead><tr><th>Field</th><th>Value</th></tr></thead>
+    <tbody><tr><td><code>overall_status</code></td><td>&quot;PASS&quot;</td></tr><tr><td><code>reviewer_status</code></td><td>&quot;BLOCKED_RECORDS_PRESENT&quot;</td></tr><tr><td><code>total_records</code></td><td>3</td></tr><tr><td><code>ready_count</code></td><td>1</td></tr><tr><td><code>needs_clarification_count</code></td><td>1</td></tr><tr><td><code>blocked_count</code></td><td>1</td></tr><tr><td><code>unsafe_flag_count</code></td><td>0</td></tr><tr><td><code>live_flag_count</code></td><td>0</td></tr><tr><td><code>ssh_flag_count</code></td><td>0</td></tr><tr><td><code>write_flag_count</code></td><td>0</td></tr><tr><td><code>command_execution_flag_count</code></td><td>0</td></tr><tr><td><code>mapped_task_execution_flag_count</code></td><td>1</td></tr><tr><td><code>blocking_condition_preserved</code></td><td>true</td></tr></tbody>
+  </table>
+  <h2>Readiness Status Counts</h2>
+  <table>
+    <thead><tr><th>READY</th><th>NEEDS_CLARIFICATION</th><th>BLOCKED</th></tr></thead>
+    <tbody><tr><td>1</td><td>1</td><td>1</td></tr></tbody>
+  </table>
+  <h2>Per-record Readiness Matrix</h2>
+  <table>
+    <thead><tr><th>Record</th><th>Consumer</th><th>Handoff Status</th><th>Readiness</th><th>Blocking Reason</th><th>Clarification Items</th><th>Required Consumer Actions</th><th>Safety Flags</th><th>Evidence Refs</th></tr></thead>
+    <tbody><tr><td><code>D108-H001</code></td><td>parser_contract_consumer</td><td>READY_FOR_REVIEW_HANDOFF</td><td><strong>READY</strong></td><td>none</td><td>none</td><td>Continue to reviewer decision handoff as report-only evidence.</td><td>{&quot;command_execution_flag&quot;: false, &quot;live_flag&quot;: false, &quot;mapped_task_execution_flag&quot;: false, &quot;ssh_flag&quot;: false, &quot;unsafe_flag&quot;: false, &quot;write_flag&quot;: false}</td><td>reports/lab-summary/day108_parser_contract_consumer_handoff.json, handoff:D108-H001, evidence_status:ACCEPTABLE_FOR_REVIEW_ONLY_HANDOFF</td></tr><tr><td><code>D108-H002</code></td><td>parser_contract_consumer</td><td>NEEDS_REVIEWER_CLARIFICATION</td><td><strong>NEEDS_CLARIFICATION</strong></td><td>none</td><td>HANDOFF_NOT_READY_FOR_CONSUMER, HANDOFF_STATUS_NEEDS_REVIEWER_CLARIFICATION</td><td>Ask the reviewer to clarify the consumer interpretation before handoff.</td><td>{&quot;command_execution_flag&quot;: false, &quot;live_flag&quot;: false, &quot;mapped_task_execution_flag&quot;: false, &quot;ssh_flag&quot;: false, &quot;unsafe_flag&quot;: false, &quot;write_flag&quot;: false}</td><td>reports/lab-summary/day108_parser_contract_consumer_handoff.json, handoff:D108-H002, evidence_status:NEEDS_REVIEWER_CLARIFICATION</td></tr><tr><td><code>D108-H003</code></td><td>parser_contract_consumer</td><td>BLOCKED_UNSAFE_OR_UNSUPPORTED</td><td><strong>BLOCKED</strong></td><td>MAPPED_TASK_EXECUTION_FLAG_SET, RECORD_MARKED_BLOCKED_OR_UNSAFE</td><td>none</td><td>Block handoff and keep all execution-capable paths closed.</td><td>{&quot;command_execution_flag&quot;: false, &quot;live_flag&quot;: false, &quot;mapped_task_execution_flag&quot;: true, &quot;ssh_flag&quot;: false, &quot;unsafe_flag&quot;: false, &quot;write_flag&quot;: false}</td><td>reports/lab-summary/day108_parser_contract_consumer_handoff.json, handoff:D108-H003, evidence_status:BLOCKED_UNSAFE_OR_UNSUPPORTED</td></tr></tbody>
+  </table>
+</body>
+</html>
