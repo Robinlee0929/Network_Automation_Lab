@@ -192,3 +192,21 @@ def test_day41_release_packaging_docs_exist_and_do_not_claim_completed_tag():
         assert "future roadmap only" in text
         assert "not implemented in v0.2" in text
         assert "v0.2 tag created" not in text.lower()
+
+
+def test_day106_codex_agents_instruction_audit_catalog_entry_is_report_only():
+    day106 = next(task for task in network_lab.list_tasks() if task["id"] == "codex-agents-instruction-audit")
+
+    assert day106["task_id"] == "day106_codex_agents_instruction_compliance_audit"
+    assert day106["safety_level"] == "report-only"
+    assert day106["execution_mode"] == "report-only"
+    assert day106["requires_live_device"] is False
+    assert day106["requires_password"] is False
+    assert "reports/ai/day106_codex_agents_instruction_compliance_audit.json" in day106["report_paths"]
+    assert "docs/roadmap/day106_codex_agents_instruction_compliance_audit.md" in day106["report_paths"]
+    assert "push_allowed_without_user_approval" in day106["notes"]
+    assert "merge_allowed_without_user_approval" in day106["notes"]
+    assert "tag_allowed_without_user_approval" in day106["notes"]
+    assert "codex_must_not_modify_agents_md" in day106["notes"]
+    assert "codex_must_not_stage_agents_md" in day106["notes"]
+    assert "codex_must_not_commit_agents_md" in day106["notes"]

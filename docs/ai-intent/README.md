@@ -49,3 +49,9 @@ Day104 converts Day103 matrix trace states into a reviewer acceptance gate. It i
 - [Day105 Parser Acceptance Closure / Safety-Blocked Exit Summary](day105_parser_acceptance_closure.md)
 
 Day105 packages Day96-Day104 parser evidence for reviewer inspection only. It is SUMMARY_ONLY: final_recommendation remains SAFETY_BLOCKED_REVIEW_ONLY, next_phase_allowed remains false, and no parser capability, adapter execution, SSH, live-device access, mapped task execution, OpenAI API, voice input, or configuration change permission is added.
+
+## Day106
+
+- [Day106 Codex AGENTS.md Instruction Compliance Audit](day106_codex_agents_instruction_compliance_audit.md)
+
+Day106 audits the repository-level AGENTS.md as a durable Codex instruction contract. It is REPORT_ONLY: Codex may read AGENTS.md, audit AGENTS.md, and report findings with proposed wording, but must not modify, stage, or commit AGENTS.md during the governance audit. Live execution, SSH, device connections, configuration mutation, OpenAI API, voice runtime, push, merge, and tag permission remain false unless a future approved safety gate explicitly changes the project boundary.
