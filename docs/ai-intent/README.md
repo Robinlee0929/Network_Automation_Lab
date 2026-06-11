@@ -37,3 +37,9 @@ Day102 adds static positive, negative, malformed, ambiguous, and unsafe parser f
 - [Day103 Parser Evidence Matrix / Gap Traceability](day103_parser_evidence_matrix_gap_traceability.md)
 
 Day103 integrates Day96-Day102 parser evidence into one static reviewer matrix: gap, fixture/evidence, expected decision, actual result, report path, and safety boundary. It does not add parser capability, broker handoff, adapter invocation, SSH, live access, dashboard actions, OpenAI API calls, voice runtime, external integrations, or execution unlocks.
+
+## Day104
+
+- [Day104 Parser Reviewer Acceptance Gate / Matrix Decision Review](day104_parser_reviewer_acceptance_gate.md)
+
+Day104 converts Day103 matrix trace states into a reviewer acceptance gate. It is REVIEW_GATE_ONLY / ACCEPTANCE_DECISION_ONLY: safety-boundary blocks dominate, known gaps prevent next-stage readiness, review-required rows require manual sign-off, and no parser, broker, adapter, SSH, live-device, execution, dashboard action, OpenAI API, or voice runtime capability is added.
