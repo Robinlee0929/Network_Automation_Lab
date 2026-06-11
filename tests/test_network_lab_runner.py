@@ -4962,4 +4962,47 @@ def test_day98_report_index_visibility_includes_parser_classification_matrix(tmp
     assert "Parser-only reviewer traceability matrix" in html
     assert "reports/ai/day98_parser_classification_matrix.json" in html
     assert "reports/ai/day98_parser_classification_matrix.html" in html
-    assert "executable_allowed is always false" in html
+
+
+def test_day103_parser_evidence_matrix_task_exists_in_catalog():
+    task = next(task for task in network_lab.list_tasks() if task["id"] == "parser-evidence-matrix-gap-traceability")
+
+    assert task["task_id"] == "day103_parser_evidence_matrix_gap_traceability"
+    assert task["day"] == "Day103"
+    assert task["display_name"] == "Day103 Parser Evidence Matrix / Gap Traceability"
+    assert task["safety_level"] == "fake-adapter-only"
+    assert task["execution_mode"] == "report-only"
+    assert task["requires_live_device"] is False
+    assert task["requires_password"] is False
+    assert "reports/ai/day103_parser_evidence_matrix_gap_traceability.json" in task["report_paths"]
+    assert "reports/ai/day103_parser_evidence_matrix_gap_traceability.html" in task["report_paths"]
+    assert "docs/ai-intent/day103_parser_evidence_matrix_gap_traceability.md" in task["report_paths"]
+
+
+def test_day103_parser_evidence_matrix_runner_writes_reports_without_live_access(
+    tmp_path, capsys, monkeypatch
+):
+    def fail_run(*_args, **_kwargs):
+        raise AssertionError("Day103 parser evidence matrix must not execute subprocess")
+
+    def fail_load(_path):
+        raise AssertionError("Day103 parser evidence matrix must not load profile or config data")
+
+    monkeypatch.setattr(network_lab.subprocess, "run", fail_run)
+    monkeypatch.setattr(network_lab, "load_lab_runner_profile", fail_load)
+
+    exit_code = network_lab.main(
+        ["--task", "parser-evidence-matrix-gap-traceability"], project_root=tmp_path
+    )
+    output = capsys.readouterr().out
+
+    assert exit_code == 0
+    assert "Day103 Parser Evidence Matrix / Gap Traceability" in output
+    assert "Task name: parser-evidence-matrix-gap-traceability" in output
+    assert "PASS / MATRIX_READY" in output
+    assert "execution_allowed_count = 0" in output
+    assert "adapter_invocation_allowed_count = 0" in output
+    assert "broker_handoff_allowed_count = 0" in output
+    assert "live_access_allowed_count = 0" in output
+    assert "JSON report: reports/ai/day103_parser_evidence_matrix_gap_traceability.json" in output
+    assert "HTML report: reports/ai/day103_parser_evidence_matrix_gap_traceability.html" in output
