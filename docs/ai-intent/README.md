@@ -91,3 +91,9 @@ Day111 freezes Day107-Day110 parser consumer evidence into a deterministic revie
 - [Day112 Parser Consumer Release Review Intake / Reviewer Triage Checklist](day112_parser_consumer_release_review_intake.md)
 
 Day112 receives the Day111 frozen release package into reviewer intake. It is `REVIEW_INTAKE_READY_NON_EXECUTABLE` with `intake_status=ACCEPTED_FOR_REVIEW`, `triage_status=BLOCKED_CONDITIONS_PRESERVED`, `blocked_condition_status=PRESERVED`, `checklist_pass_count=10`, `checklist_total_count=10`, `allowed_reviewer_route_count=4`, `forbidden_reviewer_route_count=1`, `approve_next_phase_execution_supported=false`, and `next_phase_allowed=false`.
+
+## Day113
+
+- [Day113 Parser Consumer Reviewer Triage Decision Log / Intake Outcome Audit](day113_parser_consumer_reviewer_triage_decision_log.md)
+
+Day113 records the reviewer triage outcome for the Day112 intake package. It is `TRIAGE_OUTCOME_RECORDED_NON_EXECUTABLE` with `outcome_audit_status=INTAKE_OUTCOME_AUDITED`, `triage_outcome_status=HOLD_LOGGED_BLOCKED_CONDITIONS_PRESERVED`, `selected_reviewer_outcome=HOLD_FOR_BLOCKED_RECORDS`, `outcome_log_entry_count=5`, `audit_check_pass_count=9`, `audit_check_total_count=9`, `approve_next_phase_execution_supported=false`, and `next_phase_allowed=false`.

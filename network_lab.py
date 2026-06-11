@@ -151,6 +151,10 @@ from intent_parser_consumer_release_review_intake import (
     build_parser_consumer_release_review_intake_report,
     write_parser_consumer_release_review_intake_reports,
 )
+from intent_parser_consumer_reviewer_triage_decision_log import (
+    build_parser_consumer_reviewer_triage_decision_log_report,
+    write_parser_consumer_reviewer_triage_decision_log_reports,
+)
 from intent_codex_agents_instruction_audit import (
     build_codex_agents_instruction_audit_report,
     write_codex_agents_instruction_audit_reports,
@@ -712,6 +716,24 @@ DAY112_PARSER_CONSUMER_RELEASE_REVIEW_INTAKE_JSON = (
 )
 DAY112_PARSER_CONSUMER_RELEASE_REVIEW_INTAKE_HTML = (
     Path("reports") / "lab-summary" / "day112_parser_consumer_release_review_intake.html"
+)
+DAY113_PARSER_CONSUMER_REVIEWER_TRIAGE_DECISION_LOG_TASK_ID = (
+    "parser-consumer-reviewer-triage-decision-log"
+)
+DAY113_PARSER_CONSUMER_REVIEWER_TRIAGE_DECISION_LOG_DOC = (
+    Path("docs") / "ai-intent" / "day113_parser_consumer_reviewer_triage_decision_log.md"
+)
+DAY113_PARSER_CONSUMER_REVIEWER_TRIAGE_DECISION_LOG_REVIEWER_DOC = (
+    Path("docs") / "ai-intent" / "reviewer" / "day113_parser_consumer_reviewer_triage_decision_log.md"
+)
+DAY113_PARSER_CONSUMER_REVIEWER_TRIAGE_DECISION_LOG_ROADMAP_DOC = (
+    Path("docs") / "roadmap" / "day113_parser_consumer_reviewer_triage_decision_log.md"
+)
+DAY113_PARSER_CONSUMER_REVIEWER_TRIAGE_DECISION_LOG_JSON = (
+    Path("reports") / "lab-summary" / "day113_parser_consumer_reviewer_triage_decision_log.json"
+)
+DAY113_PARSER_CONSUMER_REVIEWER_TRIAGE_DECISION_LOG_HTML = (
+    Path("reports") / "lab-summary" / "day113_parser_consumer_reviewer_triage_decision_log.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -1792,6 +1814,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY112_PARSER_CONSUMER_RELEASE_REVIEW_INTAKE_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day113",
+        "title": "Parser Consumer Reviewer Triage Decision Log / Intake Outcome Audit",
+        "report_type": "Report-only parser consumer reviewer triage outcome log",
+        "safety_label": "Records Day112 intake outcome for reviewer audit only; TRIAGE_OUTCOME_RECORDED_NON_EXECUTABLE / HOLD_FOR_BLOCKED_RECORDS / NEXT_PHASE_ALLOWED_FALSE",
+        "description": "Day113 records the reviewer triage outcome for the Day112 intake package. It logs the HOLD_FOR_BLOCKED_RECORDS outcome and audits intake result preservation while approval unlock, execution readiness, mapped task execution, adapter/broker/runner invocation, live device access, SSH, OpenAI API, cloud, voice, and next-phase enablement remain disallowed.",
+        "json_globs": [DAY113_PARSER_CONSUMER_REVIEWER_TRIAGE_DECISION_LOG_JSON.as_posix()],
+        "html_globs": [DAY113_PARSER_CONSUMER_REVIEWER_TRIAGE_DECISION_LOG_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY113_PARSER_CONSUMER_REVIEWER_TRIAGE_DECISION_LOG_TASK_ID}"
         ),
     },
 ]
@@ -4524,6 +4559,35 @@ def list_tasks() -> List[Dict[str, Any]]:
             "related_script": "network_lab.py",
             "notes": "REPORT_ONLY Day112 intake consumes the Day111 frozen package for reviewer intake only. Includes agents_md_read_before_day112_work, reviewer_status=REVIEW_INTAKE_READY_NON_EXECUTABLE, intake_status=ACCEPTED_FOR_REVIEW, triage_status=BLOCKED_CONDITIONS_PRESERVED, blocked_condition_status=PRESERVED, checklist_pass_count=10, checklist_total_count=10, allowed_reviewer_route_count=4, forbidden_reviewer_route_count=1, approve_next_phase_execution_supported=false, approval_unlock_allowed=false, execution_readiness_allowed=false, next_phase_allowed=false. No SSH, live device access, network command execution, config mutation, mapped task execution, execution broker unlock, adapter invocation, broker invocation, runner invocation, OpenAI API, voice runtime, cloud runtime, approval unlock, or next-phase execution.",
         },
+        {
+            "id": DAY113_PARSER_CONSUMER_REVIEWER_TRIAGE_DECISION_LOG_TASK_ID,
+            "task_id": "day113_parser_consumer_reviewer_triage_decision_log",
+            "display_name": "Day113 Parser Consumer Reviewer Triage Decision Log / Intake Outcome Audit",
+            "user_display_name": "Parser Consumer Reviewer Triage Decision Log / Intake Outcome Audit",
+            "day": "Day113",
+            "category": "ai_planning",
+            "description": "Records the reviewer triage outcome for the Day112 intake package without enabling approval unlock, execution readiness, or next phase advancement.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY113_PARSER_CONSUMER_REVIEWER_TRIAGE_DECISION_LOG_JSON.as_posix(),
+                DAY113_PARSER_CONSUMER_REVIEWER_TRIAGE_DECISION_LOG_HTML.as_posix(),
+                DAY113_PARSER_CONSUMER_REVIEWER_TRIAGE_DECISION_LOG_DOC.as_posix(),
+                DAY113_PARSER_CONSUMER_REVIEWER_TRIAGE_DECISION_LOG_REVIEWER_DOC.as_posix(),
+                DAY113_PARSER_CONSUMER_REVIEWER_TRIAGE_DECISION_LOG_ROADMAP_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Day113 JSON/HTML parser consumer reviewer triage outcome log",
+                "Day113 AI intent and reviewer documentation",
+            ],
+            "related_script": "network_lab.py",
+            "notes": "REPORT_ONLY Day113 records the reviewer triage outcome for the Day112 intake package. Includes agents_md_read_before_day113_work, reviewer_status=TRIAGE_OUTCOME_RECORDED_NON_EXECUTABLE, outcome_audit_status=INTAKE_OUTCOME_AUDITED, triage_outcome_status=HOLD_LOGGED_BLOCKED_CONDITIONS_PRESERVED, selected_reviewer_outcome=HOLD_FOR_BLOCKED_RECORDS, outcome_log_entry_count=5, audit_check_pass_count=9, audit_check_total_count=9, failed_check_count=0, approve_next_phase_execution_supported=false, approval_unlock_allowed=false, execution_readiness_allowed=false, next_phase_allowed=false. No SSH, live device access, network command execution, config mutation, mapped task execution, execution broker unlock, adapter invocation, broker invocation, runner invocation, OpenAI API, voice runtime, cloud runtime, approval unlock, or next-phase execution.",
+        },
     ]
 
 
@@ -4675,6 +4739,7 @@ wireguard-runner is dry-run by default and delegates to the existing WireGuard s
             DAY110_PARSER_CONSUMER_FINAL_GATE_TASK_ID,
             DAY111_PARSER_CONSUMER_RELEASE_PACKAGE_TASK_ID,
             DAY112_PARSER_CONSUMER_RELEASE_REVIEW_INTAKE_TASK_ID,
+            DAY113_PARSER_CONSUMER_REVIEWER_TRIAGE_DECISION_LOG_TASK_ID,
             WIREGUARD_RUNNER_TASK_ALIAS,
         ],
         help="Task to run.",
@@ -8535,6 +8600,92 @@ def _run_day112_parser_consumer_release_review_intake(project_root: Path) -> int
     return 1
 
 
+def _run_day113_parser_consumer_reviewer_triage_decision_log(project_root: Path) -> int:
+    report = build_parser_consumer_reviewer_triage_decision_log_report(
+        project_root=project_root,
+        agents_md_pre_read=True,
+        agents_md_modified=False,
+    )
+    json_path, html_path = write_parser_consumer_reviewer_triage_decision_log_reports(project_root, report)
+    summary = report["outcome_summary"]
+    safety = report["safety_invariants"]
+
+    print(format_heading("Day113 Parser Consumer Reviewer Triage Decision Log / Intake Outcome Audit"))
+    print("Task name: parser-consumer-reviewer-triage-decision-log")
+    print("Phase: Parser Consumer Reviewer Triage Decision Log / Intake Outcome Audit")
+    print("Audit type: REPORT_ONLY")
+    print("Safety: REVIEW_ONLY / REPORT_ONLY / OUTCOME_AUDIT_ONLY; no approval unlock, execution readiness, SSH, live device access, network command execution, config mutation, mapped task execution, adapter invocation, broker invocation, runner invocation, OpenAI API, voice runtime, cloud runtime, dashboard execution control, or next-phase execution")
+    print(f"Source day: {report['source_day']}")
+    print(f"Source task: {report['source_task']}")
+    print(f"overall_status: {report['overall_status']}")
+    print(f"reviewer_status: {report['reviewer_status']}")
+    print(f"outcome_audit_status: {report['outcome_audit_status']}")
+    print(f"triage_outcome_status: {report['triage_outcome_status']}")
+    print(f"selected_reviewer_outcome: {report['selected_reviewer_outcome']}")
+    print(f"final_recommendation: {report['final_recommendation']}")
+    print(f"next_phase_allowed: {json.dumps(report['next_phase_allowed'])}")
+    print(f"approval_unlock_allowed: {json.dumps(report['approval_unlock_allowed'])}")
+    print(f"execution_readiness_allowed: {json.dumps(report['execution_readiness_allowed'])}")
+    print(f"approve_next_phase_execution_supported: {json.dumps(report['approve_next_phase_execution_supported'])}")
+    print(f"agents_md_pre_read_result: {report['agents_md_pre_read_result']}")
+    print(f"agents_md_read_before_day113_work: {json.dumps(report['agents_md_read_before_day113_work'])}")
+    print(f"agents_md_modified: {json.dumps(report['agents_md_modified'])}")
+    print(f"source_reviewer_status: {summary['source_reviewer_status']}")
+    print(f"source_intake_status: {summary['source_intake_status']}")
+    print(f"source_triage_status: {summary['source_triage_status']}")
+    print(f"source_blocked_condition_status: {summary['source_blocked_condition_status']}")
+    print(f"source_next_phase_allowed: {json.dumps(summary['source_next_phase_allowed'])}")
+    print(f"outcome_log_entry_count: {summary['outcome_log_entry_count']}")
+    print(f"audit_check_pass_count: {summary['audit_check_pass_count']}")
+    print(f"audit_check_total_count: {summary['audit_check_total_count']}")
+    print(f"failed_check_count: {summary['failed_check_count']}")
+    for field_name in (
+        "ssh_allowed",
+        "live_device_access_allowed",
+        "network_command_execution_allowed",
+        "config_mutation_allowed",
+        "openai_api_allowed",
+        "voice_runtime_allowed",
+        "cloud_runtime_allowed",
+        "approval_unlock_supported",
+        "execution_readiness_supported",
+        "approve_next_phase_execution_supported",
+        "mapped_task_execution_allowed",
+        "adapter_invocation_allowed",
+        "broker_invocation_allowed",
+        "execution_broker_unlock_allowed",
+        "runner_invocation_allowed",
+        "next_phase_execution_allowed",
+    ):
+        print(f"{field_name}: {json.dumps(safety[field_name])}")
+    print(f"JSON report: {_relative_to_project(project_root, json_path)}")
+    print(f"HTML report: {_relative_to_project(project_root, html_path)}")
+
+    if (
+        report["overall_status"] == "PASS"
+        and report["next_phase_allowed"] is False
+        and report["approval_unlock_allowed"] is False
+        and report["execution_readiness_allowed"] is False
+        and report["approve_next_phase_execution_supported"] is False
+        and report["agents_md_pre_read_result"] == "PASS"
+        and report["agents_md_read_before_day113_work"] is True
+        and report["agents_md_modified"] is False
+        and report["selected_reviewer_outcome"] == "HOLD_FOR_BLOCKED_RECORDS"
+        and summary["source_next_phase_allowed"] is False
+        and summary["source_blocked_condition_status"] == "PRESERVED"
+        and summary["outcome_log_entry_count"] == 5
+        and summary["audit_check_pass_count"] == 9
+        and summary["audit_check_total_count"] == 9
+        and summary["failed_check_count"] == 0
+        and not report["validation_errors"]
+    ):
+        print(f"{format_status('PASS')} {report['reviewer_status']}")
+        return 0
+
+    print(f"{format_status('FAIL')} Day113 parser consumer reviewer triage decision log failed validation.")
+    return 1
+
+
 def _relative_to_project(project_root: Path, path: Path) -> str:
     try:
         return path.resolve().relative_to(project_root.resolve()).as_posix()
@@ -10951,6 +11102,8 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
         return _run_day111_parser_consumer_release_package(root)
     if args.task == DAY112_PARSER_CONSUMER_RELEASE_REVIEW_INTAKE_TASK_ID:
         return _run_day112_parser_consumer_release_review_intake(root)
+    if args.task == DAY113_PARSER_CONSUMER_REVIEWER_TRIAGE_DECISION_LOG_TASK_ID:
+        return _run_day113_parser_consumer_reviewer_triage_decision_log(root)
 
     profile_path = _resolve_project_path(root, args.profile)
     try:
