@@ -107,6 +107,10 @@ from intent_parser_phase_gate_review import (
     build_parser_phase_gate_review_report,
     write_parser_phase_gate_review_reports,
 )
+from intent_parser_evidence_closure_plan import (
+    build_parser_evidence_closure_plan_report,
+    write_parser_evidence_closure_plan_reports,
+)
 from intent_runtime_safety_case import build_runtime_safety_case_report
 from intent_runtime_safety_gate import build_runtime_safety_gate_report
 
@@ -501,6 +505,19 @@ DAY100_PARSER_PHASE_GATE_REVIEW_JSON = (
 )
 DAY100_PARSER_PHASE_GATE_REVIEW_HTML = (
     Path("reports") / "ai" / "day100_parser_phase_gate_review.html"
+)
+DAY101_PARSER_EVIDENCE_CLOSURE_PLAN_TASK_ID = "parser-evidence-closure-plan"
+DAY101_PARSER_EVIDENCE_CLOSURE_PLAN_DOC = (
+    Path("docs") / "ai-intent" / "day101_parser_evidence_closure_plan.md"
+)
+DAY101_PARSER_EVIDENCE_CLOSURE_PLAN_ROADMAP = (
+    Path("docs") / "roadmap" / "day101_parser_evidence_closure_plan.md"
+)
+DAY101_PARSER_EVIDENCE_CLOSURE_PLAN_JSON = (
+    Path("reports") / "ai" / "day101_parser_evidence_closure_plan.json"
+)
+DAY101_PARSER_EVIDENCE_CLOSURE_PLAN_HTML = (
+    Path("reports") / "ai" / "day101_parser_evidence_closure_plan.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -1425,6 +1442,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY100_PARSER_PHASE_GATE_REVIEW_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day101",
+        "title": "Parser Evidence Closure Plan",
+        "report_type": "Report-only parser evidence closure roadmap",
+        "safety_label": "Day100 closure planning; broker handoff blocked; execution/SSH/live access disabled",
+        "description": "Day101 converts Day100 UNDER_COVERED and REVIEW_ONLY parser findings into a Day102-Day105 evidence closure plan. parser_ready_for_broker and broker_handoff_allowed remain false, and phase_gate_rerun_required remains true.",
+        "json_globs": [DAY101_PARSER_EVIDENCE_CLOSURE_PLAN_JSON.as_posix()],
+        "html_globs": [DAY101_PARSER_EVIDENCE_CLOSURE_PLAN_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY101_PARSER_EVIDENCE_CLOSURE_PLAN_TASK_ID}"
         ),
     },
 ]
@@ -3820,6 +3850,34 @@ def list_tasks() -> List[Dict[str, Any]]:
             "related_script": "network_lab.py",
             "notes": "Report-only Day96-Day99 parser phase-gate review. It formally classifies parser evidence as ADVANCE_READY, REVIEW_ONLY, UNDER_COVERED, or BLOCKED. Parser output is review data only, not execution authorization. broker_boundary_allowed remains false, execution_allowed remains false, adapter_invocation_allowed remains false, executor_invocation_allowed remains false, ssh_allowed remains false, live_access_allowed remains false, no config.json is read, and Day100 opens no broker, executor, adapter invocation, SSH, live access, dashboard action, POST route, command input, execution unlock, OpenAI API, voice runtime, or external service call.",
         },
+        {
+            "id": DAY101_PARSER_EVIDENCE_CLOSURE_PLAN_TASK_ID,
+            "task_id": "day101_parser_evidence_closure_plan",
+            "display_name": "Day101 Parser Evidence Closure Plan",
+            "user_display_name": "Parser Evidence Closure Plan",
+            "day": "Day101",
+            "category": "ai_planning",
+            "description": "Converts Day100 UNDER_COVERED and REVIEW_ONLY parser findings into a Day102-Day105 evidence closure roadmap without approving broker handoff or parser advancement.",
+            "safety_level": "fake-adapter-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY101_PARSER_EVIDENCE_CLOSURE_PLAN_JSON.as_posix(),
+                DAY101_PARSER_EVIDENCE_CLOSURE_PLAN_HTML.as_posix(),
+                DAY101_PARSER_EVIDENCE_CLOSURE_PLAN_DOC.as_posix(),
+                DAY101_PARSER_EVIDENCE_CLOSURE_PLAN_ROADMAP.as_posix(),
+            ],
+            "report_outputs": [
+                "Day101 JSON/HTML parser evidence closure plan",
+                "Day101 closure plan reviewer and roadmap documentation",
+            ],
+            "related_script": "network_lab.py",
+            "notes": "Report-only Day100 parser evidence closure plan. It lists UNDER_COVERED and REVIEW_ONLY categories, closure items, and the Day102-Day105 sequence. parser_ready_for_broker remains false, broker_handoff_allowed remains false, execution_allowed remains false, live_device_access_allowed remains false, ssh_allowed remains false, openai_api_allowed remains false, and phase_gate_rerun_required remains true. Day101 opens no broker, executor, adapter invocation, SSH, live access, dashboard action, POST route, command input, execution unlock, OpenAI API, voice runtime, or external service call.",
+        },
     ]
 
 
@@ -3959,6 +4017,7 @@ wireguard-runner is dry-run by default and delegates to the existing WireGuard s
             DAY98_PARSER_CLASSIFICATION_MATRIX_TASK_ID,
             DAY99_PARSER_EVIDENCE_COVERAGE_AUDIT_TASK_ID,
             DAY100_PARSER_PHASE_GATE_REVIEW_TASK_ID,
+            DAY101_PARSER_EVIDENCE_CLOSURE_PLAN_TASK_ID,
             WIREGUARD_RUNNER_TASK_ALIAS,
         ],
         help="Task to run.",
@@ -7020,6 +7079,81 @@ def _run_day100_parser_phase_gate_review(project_root: Path) -> int:
     return 1
 
 
+def _run_day101_parser_evidence_closure_plan(project_root: Path) -> int:
+    report = build_parser_evidence_closure_plan_report()
+    json_path, html_path = write_parser_evidence_closure_plan_reports(project_root, report)
+    summary = report["summary"]
+    invariants = report["safety_invariants"]
+
+    print(format_heading("Day101 Parser Evidence Closure Plan"))
+    print("Task name: parser-evidence-closure-plan")
+    print("Phase: PARSER_EVIDENCE_CLOSURE_PLANNING")
+    print("Safety: report-only Day100 parser evidence closure planning; no broker handoff, parser gate release, executor, adapter invocation, SSH, live access, RouterOS execution, config.json, dashboard action, OpenAI API, voice runtime, or device contact")
+    print(f"Result: {report['overall_status']} / {report['reviewer_status']}")
+    print(f"Closure item count: {summary['closure_item_count']}")
+    print(f"Blocked category count: {summary['blocked_category_count']}")
+    print(f"UNDER_COVERED category count: {summary['under_covered_category_count']}")
+    print(f"REVIEW_ONLY category count: {summary['review_only_category_count']}")
+    print(f"Recommended next action count: {summary['recommended_next_action_count']}")
+    print(f"Recommended sequence: {' -> '.join(summary['recommended_next_days'])}")
+    print(f"Next phase gate: {report['next_phase_gate']}")
+    print(f"parser_ready_for_broker = {json.dumps(report['parser_ready_for_broker'])}")
+    print(f"broker_handoff_allowed = {json.dumps(report['broker_handoff_allowed'])}")
+    print(f"execution_allowed = {json.dumps(report['execution_allowed'])}")
+    print(f"live_device_access_allowed = {json.dumps(report['live_device_access_allowed'])}")
+    print(f"ssh_allowed = {json.dumps(report['ssh_allowed'])}")
+    print(f"openai_api_allowed = {json.dumps(report['openai_api_allowed'])}")
+    print(f"evidence_closure_required = {json.dumps(report['evidence_closure_required'])}")
+    print(f"phase_gate_rerun_required = {json.dumps(report['phase_gate_rerun_required'])}")
+    print(f"broker_boundary_opened = {json.dumps(invariants['broker_boundary_opened'])}")
+    print(f"broker_connection_attempted = {json.dumps(invariants['broker_connection_attempted'])}")
+    print(f"JSON report: {_relative_to_project(project_root, json_path)}")
+    print(f"HTML report: {_relative_to_project(project_root, html_path)}")
+
+    if (
+        report["overall_status"] == "PASS"
+        and report["reviewer_status"] == "EVIDENCE_CLOSURE_PLAN_READY"
+        and summary["closure_item_count"] > 0
+        and summary["blocked_category_count"] == summary["closure_item_count"]
+        and summary["under_covered_category_count"] > 0
+        and summary["review_only_category_count"] > 0
+        and summary["recommended_next_days"] == ["Day102", "Day103", "Day104", "Day105"]
+        and report["parser_ready_for_broker"] is False
+        and report["broker_handoff_allowed"] is False
+        and report["execution_allowed"] is False
+        and report["live_device_access_allowed"] is False
+        and report["ssh_allowed"] is False
+        and report["openai_api_allowed"] is False
+        and report["evidence_closure_required"] is True
+        and report["phase_gate_rerun_required"] is True
+        and all(invariants[flag] is False for flag in (
+            "parser_ready_for_broker",
+            "broker_handoff_allowed",
+            "execution_allowed",
+            "adapter_invocation_allowed",
+            "executor_invocation_allowed",
+            "ssh_allowed",
+            "live_device_access_allowed",
+            "live_access_allowed",
+            "routeros_execution_allowed",
+            "command_execution_allowed",
+            "dashboard_action_allowed",
+            "approval_unlock_supported",
+            "openai_api_allowed",
+            "voice_runtime_allowed",
+        ))
+        and not report["validation_errors"]
+    ):
+        print(
+            f"{format_status('PASS')} EVIDENCE_CLOSURE_PLAN_READY. "
+            "Day101 planned parser evidence closure without broker handoff, execution, SSH, or live access."
+        )
+        return 0
+
+    print(f"{format_status('FAIL')} Day101 parser evidence closure plan failed validation.")
+    return 1
+
+
 def _relative_to_project(project_root: Path, path: Path) -> str:
     try:
         return path.resolve().relative_to(project_root.resolve()).as_posix()
@@ -9412,6 +9546,8 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
         return _run_day99_parser_evidence_coverage_audit(root)
     if args.task == DAY100_PARSER_PHASE_GATE_REVIEW_TASK_ID:
         return _run_day100_parser_phase_gate_review(root)
+    if args.task == DAY101_PARSER_EVIDENCE_CLOSURE_PLAN_TASK_ID:
+        return _run_day101_parser_evidence_closure_plan(root)
 
     profile_path = _resolve_project_path(root, args.profile)
     try:
