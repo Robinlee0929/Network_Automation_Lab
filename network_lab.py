@@ -103,6 +103,10 @@ from intent_parser_evidence_coverage_audit import (
     build_parser_evidence_coverage_audit_report,
     write_parser_evidence_coverage_audit_reports,
 )
+from intent_parser_phase_gate_review import (
+    build_parser_phase_gate_review_report,
+    write_parser_phase_gate_review_reports,
+)
 from intent_runtime_safety_case import build_runtime_safety_case_report
 from intent_runtime_safety_gate import build_runtime_safety_gate_report
 
@@ -484,6 +488,19 @@ DAY99_PARSER_EVIDENCE_COVERAGE_AUDIT_JSON = (
 )
 DAY99_PARSER_EVIDENCE_COVERAGE_AUDIT_HTML = (
     Path("reports") / "ai" / "day99_parser_evidence_coverage_audit.html"
+)
+DAY100_PARSER_PHASE_GATE_REVIEW_TASK_ID = "parser-phase-gate-review"
+DAY100_PARSER_PHASE_GATE_REVIEW_DOC = (
+    Path("docs") / "ai-intent" / "day100_parser_phase_gate_review.md"
+)
+DAY100_PARSER_PHASE_GATE_REVIEW_ROADMAP = (
+    Path("docs") / "roadmap" / "day100_parser_phase_gate_review_readiness_decision.md"
+)
+DAY100_PARSER_PHASE_GATE_REVIEW_JSON = (
+    Path("reports") / "ai" / "day100_parser_phase_gate_review.json"
+)
+DAY100_PARSER_PHASE_GATE_REVIEW_HTML = (
+    Path("reports") / "ai" / "day100_parser_phase_gate_review.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -1395,6 +1412,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY99_PARSER_EVIDENCE_COVERAGE_AUDIT_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day100",
+        "title": "Parser Phase Gate Review / Readiness Decision",
+        "report_type": "Report-only parser phase gate readiness decision",
+        "safety_label": "static Day96-Day99 review; broker/executor/adapter/SSH/live access disabled",
+        "description": "Day100 grades Day96-Day99 parser evidence into ADVANCE_READY, REVIEW_ONLY, UNDER_COVERED, and BLOCKED decisions. Parser output remains reviewer evidence only: broker_boundary_allowed, execution_allowed, adapter_invocation_allowed, ssh_allowed, and live_access_allowed are always false.",
+        "json_globs": [DAY100_PARSER_PHASE_GATE_REVIEW_JSON.as_posix()],
+        "html_globs": [DAY100_PARSER_PHASE_GATE_REVIEW_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY100_PARSER_PHASE_GATE_REVIEW_TASK_ID}"
         ),
     },
 ]
@@ -3762,6 +3792,34 @@ def list_tasks() -> List[Dict[str, Any]]:
             "related_script": "network_lab.py",
             "notes": "Report-only Day96-Day98 parser evidence coverage audit. UNDER_COVERED categories are allowed and become Day100 review inputs, not Day99 failures. execution_allowed remains false, adapter_path_allowed remains false, broker_path_allowed remains false, ssh_allowed remains false, live_device_path_allowed remains false, routeros_execution_allowed remains false, command_execution_allowed remains false, no config.json is read, and Day99 adds no parser capability, adapter execution, broker execution, SSH, live device path, dashboard action, POST route, command input, execution unlock, OpenAI API, voice runtime, or external service call.",
         },
+        {
+            "id": DAY100_PARSER_PHASE_GATE_REVIEW_TASK_ID,
+            "task_id": "day100_parser_phase_gate_review",
+            "display_name": "Day100 Parser Phase Gate Review / Readiness Decision",
+            "user_display_name": "Parser Phase Gate Review / Readiness Decision",
+            "day": "Day100",
+            "category": "ai_planning",
+            "description": "Grades Day96-Day99 parser evidence into ADVANCE_READY, REVIEW_ONLY, UNDER_COVERED, and BLOCKED readiness decisions without opening broker, executor, adapter, SSH, or live-access paths.",
+            "safety_level": "fake-adapter-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY100_PARSER_PHASE_GATE_REVIEW_JSON.as_posix(),
+                DAY100_PARSER_PHASE_GATE_REVIEW_HTML.as_posix(),
+                DAY100_PARSER_PHASE_GATE_REVIEW_DOC.as_posix(),
+                DAY100_PARSER_PHASE_GATE_REVIEW_ROADMAP.as_posix(),
+            ],
+            "report_outputs": [
+                "Day100 JSON/HTML parser phase-gate readiness decision",
+                "Day100 phase-gate reviewer and roadmap documentation",
+            ],
+            "related_script": "network_lab.py",
+            "notes": "Report-only Day96-Day99 parser phase-gate review. It formally classifies parser evidence as ADVANCE_READY, REVIEW_ONLY, UNDER_COVERED, or BLOCKED. Parser output is review data only, not execution authorization. broker_boundary_allowed remains false, execution_allowed remains false, adapter_invocation_allowed remains false, executor_invocation_allowed remains false, ssh_allowed remains false, live_access_allowed remains false, no config.json is read, and Day100 opens no broker, executor, adapter invocation, SSH, live access, dashboard action, POST route, command input, execution unlock, OpenAI API, voice runtime, or external service call.",
+        },
     ]
 
 
@@ -3900,6 +3958,7 @@ wireguard-runner is dry-run by default and delegates to the existing WireGuard s
             DAY97_PARSER_EVIDENCE_QUALITY_TASK_ID,
             DAY98_PARSER_CLASSIFICATION_MATRIX_TASK_ID,
             DAY99_PARSER_EVIDENCE_COVERAGE_AUDIT_TASK_ID,
+            DAY100_PARSER_PHASE_GATE_REVIEW_TASK_ID,
             WIREGUARD_RUNNER_TASK_ALIAS,
         ],
         help="Task to run.",
@@ -6898,6 +6957,69 @@ def _run_day99_parser_evidence_coverage_audit(project_root: Path) -> int:
     return 1
 
 
+def _run_day100_parser_phase_gate_review(project_root: Path) -> int:
+    report = build_parser_phase_gate_review_report()
+    json_path, html_path = write_parser_phase_gate_review_reports(project_root, report)
+    summary = report["summary"]
+    invariants = report["safety_invariants"]
+
+    print(format_heading("Day100 Parser Phase Gate Review / Readiness Decision"))
+    print("Task name: parser-phase-gate-review")
+    print("Phase: PARSER_PHASE_GATE_REVIEW")
+    print("Safety: report-only Day96-Day99 parser evidence grading; no broker, executor, adapter invocation, SSH, live access, RouterOS execution, config.json, dashboard action, OpenAI API, voice runtime, or device contact")
+    print(f"Result: {report['overall_status']} / {report['reviewer_status']}")
+    print(f"Final readiness decision: {summary['final_readiness_decision']}")
+    print(f"Total decision rows: {summary['total_decision_rows']}")
+    print(f"ADVANCE_READY count: {summary['advance_ready_count']}")
+    print(f"REVIEW_ONLY count: {summary['review_only_count']}")
+    print(f"UNDER_COVERED count: {summary['under_covered_count']}")
+    print(f"BLOCKED count: {summary['blocked_count']}")
+    print(f"source_report_fail_count = {summary['source_report_fail_count']}")
+    print(f"source_runtime_violation_count = {summary['source_runtime_violation_count']}")
+    print(f"safety_violation_count = {summary['safety_violation_count']}")
+    print(f"broker_boundary_allowed = {json.dumps(invariants['broker_boundary_allowed'])}")
+    print(f"execution_allowed = {json.dumps(invariants['execution_allowed'])}")
+    print(f"adapter_invocation_allowed = {json.dumps(invariants['adapter_invocation_allowed'])}")
+    print(f"executor_invocation_allowed = {json.dumps(invariants['executor_invocation_allowed'])}")
+    print(f"ssh_allowed = {json.dumps(invariants['ssh_allowed'])}")
+    print(f"live_access_allowed = {json.dumps(invariants['live_access_allowed'])}")
+    print(f"parser_outputs_are_review_data_only = {json.dumps(summary['parser_outputs_are_review_data_only'])}")
+    print(f"JSON report: {_relative_to_project(project_root, json_path)}")
+    print(f"HTML report: {_relative_to_project(project_root, html_path)}")
+
+    if (
+        report["overall_status"] == "PASS"
+        and report["reviewer_status"] == "PHASE_GATE_REVIEW_READY"
+        and summary["total_decision_rows"] > 0
+        and summary["blocked_count"] == 0
+        and summary["source_report_fail_count"] == 0
+        and summary["source_runtime_violation_count"] == 0
+        and summary["safety_violation_count"] == 0
+        and summary["parser_outputs_are_review_data_only"] is True
+        and all(invariants[flag] is False for flag in (
+            "broker_boundary_allowed",
+            "execution_allowed",
+            "adapter_invocation_allowed",
+            "executor_invocation_allowed",
+            "ssh_allowed",
+            "live_access_allowed",
+            "routeros_execution_allowed",
+            "command_execution_allowed",
+            "dashboard_action_allowed",
+            "approval_unlock_supported",
+        ))
+        and not report["validation_errors"]
+    ):
+        print(
+            f"{format_status('PASS')} PHASE_GATE_REVIEW_READY. "
+            "Day100 graded parser evidence without broker, executor, adapter, SSH, or live access."
+        )
+        return 0
+
+    print(f"{format_status('FAIL')} Day100 parser phase gate review failed validation.")
+    return 1
+
+
 def _relative_to_project(project_root: Path, path: Path) -> str:
     try:
         return path.resolve().relative_to(project_root.resolve()).as_posix()
@@ -9288,6 +9410,8 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
         return _run_day98_parser_classification_matrix(root)
     if args.task == DAY99_PARSER_EVIDENCE_COVERAGE_AUDIT_TASK_ID:
         return _run_day99_parser_evidence_coverage_audit(root)
+    if args.task == DAY100_PARSER_PHASE_GATE_REVIEW_TASK_ID:
+        return _run_day100_parser_phase_gate_review(root)
 
     profile_path = _resolve_project_path(root, args.profile)
     try:
