@@ -115,6 +115,10 @@ from intent_parser_fixture_expansion import (
     build_parser_fixture_expansion_report,
     write_parser_fixture_expansion_reports,
 )
+from intent_parser_evidence_matrix import (
+    build_parser_evidence_matrix_report,
+    write_parser_evidence_matrix_reports,
+)
 from intent_runtime_safety_case import build_runtime_safety_case_report
 from intent_runtime_safety_gate import build_runtime_safety_gate_report
 
@@ -535,6 +539,19 @@ DAY102_PARSER_FIXTURE_EXPANSION_JSON = (
 )
 DAY102_PARSER_FIXTURE_EXPANSION_HTML = (
     Path("reports") / "ai" / "day102_parser_fixture_expansion.html"
+)
+DAY103_PARSER_EVIDENCE_MATRIX_TASK_ID = "parser-evidence-matrix-gap-traceability"
+DAY103_PARSER_EVIDENCE_MATRIX_DOC = (
+    Path("docs") / "ai-intent" / "day103_parser_evidence_matrix_gap_traceability.md"
+)
+DAY103_PARSER_EVIDENCE_MATRIX_ROADMAP = (
+    Path("docs") / "roadmap" / "day103_parser_evidence_matrix_gap_traceability.md"
+)
+DAY103_PARSER_EVIDENCE_MATRIX_JSON = (
+    Path("reports") / "ai" / "day103_parser_evidence_matrix_gap_traceability.json"
+)
+DAY103_PARSER_EVIDENCE_MATRIX_HTML = (
+    Path("reports") / "ai" / "day103_parser_evidence_matrix_gap_traceability.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -1485,6 +1502,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY102_PARSER_FIXTURE_EXPANSION_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day103",
+        "title": "Parser Evidence Matrix / Gap Traceability",
+        "report_type": "Report-only parser evidence matrix and gap traceability",
+        "safety_label": "static Day96-Day102 evidence integration; execution/broker/adapter/SSH/live access disabled",
+        "description": "Day103 integrates Day96-Day102 parser evidence into a reviewer-facing gap traceability matrix: gap, fixture or evidence, expected decision, actual result, report path, and safety boundary. It does not add parser capability, execution, broker handoff, adapter invocation, SSH, live device access, config changes, dashboard actions, OpenAI API usage, voice runtime, or external integrations.",
+        "json_globs": [DAY103_PARSER_EVIDENCE_MATRIX_JSON.as_posix()],
+        "html_globs": [DAY103_PARSER_EVIDENCE_MATRIX_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY103_PARSER_EVIDENCE_MATRIX_TASK_ID}"
         ),
     },
 ]
@@ -3936,6 +3966,34 @@ def list_tasks() -> List[Dict[str, Any]]:
             "related_script": "network_lab.py",
             "notes": "Report-only Day102 parser fixture expansion. It adds positive, negative, malformed, ambiguous, and unsafe static fixtures as evidence only. parser_capability_added remains false, parser_ready_for_broker remains false, broker_handoff_allowed remains false, execution_allowed remains false, live_device_access_allowed remains false, ssh_allowed remains false, config_change_allowed remains false, and adapter_invocation_allowed remains false. Day102 opens no broker, executor, adapter invocation, SSH, live access, dashboard action, POST route, command input, execution unlock, OpenAI API, voice runtime, external service call, or device contact.",
         },
+        {
+            "id": DAY103_PARSER_EVIDENCE_MATRIX_TASK_ID,
+            "task_id": "day103_parser_evidence_matrix_gap_traceability",
+            "display_name": "Day103 Parser Evidence Matrix / Gap Traceability",
+            "user_display_name": "Parser Evidence Matrix / Gap Traceability",
+            "day": "Day103",
+            "category": "ai_planning",
+            "description": "Integrates Day96-Day102 parser evidence into a static reviewer-facing gap traceability matrix without adding parser capability or opening broker, adapter, SSH, or live-device paths.",
+            "safety_level": "fake-adapter-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY103_PARSER_EVIDENCE_MATRIX_JSON.as_posix(),
+                DAY103_PARSER_EVIDENCE_MATRIX_HTML.as_posix(),
+                DAY103_PARSER_EVIDENCE_MATRIX_DOC.as_posix(),
+                DAY103_PARSER_EVIDENCE_MATRIX_ROADMAP.as_posix(),
+            ],
+            "report_outputs": [
+                "Day103 JSON/HTML parser evidence matrix and gap traceability report",
+                "Day103 matrix reviewer and roadmap documentation",
+            ],
+            "related_script": "network_lab.py",
+            "notes": "Report-only Day103 parser evidence matrix. It links Day96-Day102 gap, fixture/evidence, expected decision, actual result, report paths, and safety boundary in one traceability table. parser_capability_added remains false, broker_handoff_allowed remains false, execution_allowed remains false, adapter_invocation_allowed remains false, live_access_allowed remains false, and ssh_allowed remains false. Day103 opens no broker, executor, adapter invocation, SSH, live access, dashboard action, POST route, command input, execution unlock, OpenAI API, voice runtime, external service call, or device contact.",
+        },
     ]
 
 
@@ -4077,6 +4135,7 @@ wireguard-runner is dry-run by default and delegates to the existing WireGuard s
             DAY100_PARSER_PHASE_GATE_REVIEW_TASK_ID,
             DAY101_PARSER_EVIDENCE_CLOSURE_PLAN_TASK_ID,
             DAY102_PARSER_FIXTURE_EXPANSION_TASK_ID,
+            DAY103_PARSER_EVIDENCE_MATRIX_TASK_ID,
             WIREGUARD_RUNNER_TASK_ALIAS,
         ],
         help="Task to run.",
@@ -7302,6 +7361,78 @@ def _run_day102_parser_fixture_expansion(project_root: Path) -> int:
     return 1
 
 
+def _run_day103_parser_evidence_matrix(project_root: Path) -> int:
+    report = build_parser_evidence_matrix_report()
+    json_path, html_path = write_parser_evidence_matrix_reports(project_root, report)
+    summary = report["summary"]
+    invariants = report["safety_invariants"]
+
+    print(format_heading("Day103 Parser Evidence Matrix / Gap Traceability"))
+    print("Task name: parser-evidence-matrix-gap-traceability")
+    print("Phase: PARSER_EVIDENCE_MATRIX_READY")
+    print("Safety: report-only static Day96-Day102 evidence integration; no parser capability, broker handoff, executor, adapter invocation, SSH, live access, RouterOS execution, config change, config.json, dashboard action, OpenAI API, voice runtime, or device contact")
+    print(f"Result: {report['overall_status']} / {report['reviewer_status']}")
+    print(f"Total rows: {summary['total_rows']}")
+    print(f"Total days covered: {summary['total_days_covered']}")
+    print(f"trace_complete_count = {summary['trace_complete_count']}")
+    print(f"review_required_count = {summary['review_required_count']}")
+    print(f"known_gap_count = {summary['known_gap_count']}")
+    print(f"blocked_by_safety_boundary_count = {summary['blocked_by_safety_boundary_count']}")
+    print(f"execution_allowed_count = {summary['execution_allowed_count']}")
+    print(f"adapter_invocation_allowed_count = {summary['adapter_invocation_allowed_count']}")
+    print(f"broker_handoff_allowed_count = {summary['broker_handoff_allowed_count']}")
+    print(f"live_access_allowed_count = {summary['live_access_allowed_count']}")
+    print(f"parser_capability_added_count = {summary['parser_capability_added_count']}")
+    print(f"read_only_evidence_integration = {json.dumps(invariants['read_only_evidence_integration'])}")
+    print(f"JSON report: {_relative_to_project(project_root, json_path)}")
+    print(f"HTML report: {_relative_to_project(project_root, html_path)}")
+
+    if (
+        report["overall_status"] == "PASS"
+        and report["reviewer_status"] == "MATRIX_READY"
+        and summary["days_covered"] == ["Day96", "Day97", "Day98", "Day99", "Day100", "Day101", "Day102"]
+        and summary["total_rows"] >= 7
+        and summary["trace_complete_count"] >= 1
+        and summary["review_required_count"] + summary["known_gap_count"] >= 1
+        and summary["execution_allowed_count"] == 0
+        and summary["adapter_invocation_allowed_count"] == 0
+        and summary["broker_handoff_allowed_count"] == 0
+        and summary["live_access_allowed_count"] == 0
+        and summary["parser_capability_added_count"] == 0
+        and report["parser_capability_added"] is False
+        and report["execution_allowed"] is False
+        and report["adapter_invocation_allowed"] is False
+        and report["broker_handoff_allowed"] is False
+        and report["live_access_allowed"] is False
+        and report["ssh_allowed"] is False
+        and all(
+            invariants[flag] is False
+            for flag in (
+                "parser_capability_added",
+                "execution_allowed",
+                "adapter_invocation_allowed",
+                "broker_handoff_allowed",
+                "live_access_allowed",
+                "ssh_allowed",
+                "executor_invocation_allowed",
+                "routeros_execution_allowed",
+                "config_mutation_allowed",
+                "external_integration_allowed",
+                "execution_unlock_supported",
+            )
+        )
+        and not report["validation_errors"]
+    ):
+        print(
+            f"{format_status('PASS')} MATRIX_READY. "
+            "Day103 linked parser evidence gaps without parser capability, broker handoff, execution, SSH, or live access."
+        )
+        return 0
+
+    print(f"{format_status('FAIL')} Day103 parser evidence matrix failed validation.")
+    return 1
+
+
 def _relative_to_project(project_root: Path, path: Path) -> str:
     try:
         return path.resolve().relative_to(project_root.resolve()).as_posix()
@@ -9698,6 +9829,8 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
         return _run_day101_parser_evidence_closure_plan(root)
     if args.task == DAY102_PARSER_FIXTURE_EXPANSION_TASK_ID:
         return _run_day102_parser_fixture_expansion(root)
+    if args.task == DAY103_PARSER_EVIDENCE_MATRIX_TASK_ID:
+        return _run_day103_parser_evidence_matrix(root)
 
     profile_path = _resolve_project_path(root, args.profile)
     try:
