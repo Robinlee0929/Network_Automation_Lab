@@ -5035,3 +5035,31 @@ def test_day114_parser_consumer_reviewer_triage_traceability_task_catalog_entry(
     assert "downgrade_detected_count=0" in task["notes"]
     assert "execution_readiness_inferred_count=0" in task["notes"]
     assert "next_phase_allowed_count=0" in task["notes"]
+
+
+def test_day115_parser_consumer_reviewer_triage_closure_summary_task_catalog_entry():
+    task = next(
+        task
+        for task in network_lab.list_tasks()
+        if task["id"] == "parser-consumer-reviewer-triage-closure-summary"
+    )
+
+    assert task["task_id"] == "day115_parser_consumer_reviewer_triage_closure_summary"
+    assert task["day"] == "Day115"
+    assert task["display_name"] == (
+        "Day115 Parser Consumer Reviewer Triage Closure Summary / "
+        "Non-Advancement Decision Audit"
+    )
+    assert task["safety_level"] == "report-only"
+    assert task["execution_mode"] == "report-only"
+    assert task["requires_live_device"] is False
+    assert task["requires_password"] is False
+    assert "reports/lab-summary/day115_parser_consumer_reviewer_triage_closure_summary.json" in task["report_paths"]
+    assert "reports/lab-summary/day115_parser_consumer_reviewer_triage_closure_summary.html" in task["report_paths"]
+    assert "docs/ai-intent/day115_parser_consumer_reviewer_triage_closure_summary.md" in task["report_paths"]
+    assert "docs/roadmap/day115_parser_consumer_reviewer_triage_closure_summary.md" in task["report_paths"]
+    assert "reviewer_status=TRIAGE_CLOSURE_AUDITED_NON_ADVANCING" in task["notes"]
+    assert "closure_status=CLOSED_WITH_BLOCKED_RECORDS_PRESERVED" in task["notes"]
+    assert "final_recommendation=DO_NOT_ADVANCE" in task["notes"]
+    assert "next_phase_allowed=false" in task["notes"]
+    assert "execution_readiness_inferred=false" in task["notes"]

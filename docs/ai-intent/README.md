@@ -103,3 +103,9 @@ Day113 records the reviewer triage outcome for the Day112 intake package. It is 
 - [Day114 Parser Consumer Reviewer Triage Evidence Traceability / Blocked Record Preservation Audit](day114_parser_consumer_reviewer_triage_evidence_traceability.md)
 
 Day114 verifies that all Day112 intake records and Day113 triage outcomes remain traceable, blocked records are preserved, no downgrade occurred, and no execution readiness or next phase unlock is inferred. It is `TRACEABILITY_AUDITED_NON_EXECUTABLE` with `source_day112_intake_linked=true`, `source_day113_triage_linked=true`, `blocked_records_preserved=true`, `missing_trace_count=0`, `downgrade_detected_count=0`, `execution_readiness_inferred_count=0`, `next_phase_allowed_count=0`, `unsafe_flag_count=0`, and `next_phase_allowed=false`.
+
+## Day115
+
+- [Day115 Parser Consumer Reviewer Triage Closure Summary / Non-Advancement Decision Audit](day115_parser_consumer_reviewer_triage_closure_summary.md)
+
+Day115 closes the reviewer triage chain from Day112 to Day114 without advancing parser consumer work. It is `TRIAGE_CLOSURE_AUDITED_NON_ADVANCING` with `closure_status=CLOSED_WITH_BLOCKED_RECORDS_PRESERVED`, `final_recommendation=DO_NOT_ADVANCE`, `next_phase_allowed=false`, `execution_readiness_inferred=false`, `TRIAGE_CHAIN_CLOSED_NON_ADVANCING`, `NO_EXECUTION_READINESS_INFERRED`, and `NO_NEXT_PHASE_UNLOCK`.
