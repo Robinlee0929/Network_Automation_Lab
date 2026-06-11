@@ -85,3 +85,9 @@ Day110 consumes the Day109 readiness matrix and emits a final reviewer decision 
 - [Day111 Parser Consumer Evidence Freeze / Release Package](day111_parser_consumer_release_package.md)
 
 Day111 freezes Day107-Day110 parser consumer evidence into a deterministic reviewer release package. It is `RELEASE_PACKAGE_READY_REVIEW_ONLY` and `FROZEN`, but Day109 blocked records and the Day110 locked final gate keep `next_phase_allowed=false`. AGENTS.md pre-read evidence is recorded with `agents_md_read_before_day111_work=true`, `agents_md_pre_read_result=PASS`, and `agents_md_modified=false`; no SSH, live device access, network command execution, configuration mutation, approval unlock, mapped task execution, execution broker unlock, OpenAI API, voice runtime, cloud runtime, or next-phase execution path is added.
+
+## Day112
+
+- [Day112 Parser Consumer Release Review Intake / Reviewer Triage Checklist](day112_parser_consumer_release_review_intake.md)
+
+Day112 receives the Day111 frozen release package into reviewer intake. It is `REVIEW_INTAKE_READY_NON_EXECUTABLE` with `intake_status=ACCEPTED_FOR_REVIEW`, `triage_status=BLOCKED_CONDITIONS_PRESERVED`, `blocked_condition_status=PRESERVED`, `checklist_pass_count=10`, `checklist_total_count=10`, `allowed_reviewer_route_count=4`, `forbidden_reviewer_route_count=1`, `approve_next_phase_execution_supported=false`, and `next_phase_allowed=false`.
