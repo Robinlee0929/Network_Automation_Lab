@@ -119,6 +119,10 @@ from intent_parser_evidence_matrix import (
     build_parser_evidence_matrix_report,
     write_parser_evidence_matrix_reports,
 )
+from intent_parser_reviewer_acceptance_gate import (
+    build_parser_reviewer_acceptance_gate_report,
+    write_parser_reviewer_acceptance_gate_reports,
+)
 from intent_runtime_safety_case import build_runtime_safety_case_report
 from intent_runtime_safety_gate import build_runtime_safety_gate_report
 
@@ -552,6 +556,19 @@ DAY103_PARSER_EVIDENCE_MATRIX_JSON = (
 )
 DAY103_PARSER_EVIDENCE_MATRIX_HTML = (
     Path("reports") / "ai" / "day103_parser_evidence_matrix_gap_traceability.html"
+)
+DAY104_PARSER_REVIEWER_ACCEPTANCE_GATE_TASK_ID = "parser-reviewer-acceptance-gate"
+DAY104_PARSER_REVIEWER_ACCEPTANCE_GATE_DOC = (
+    Path("docs") / "ai-intent" / "day104_parser_reviewer_acceptance_gate.md"
+)
+DAY104_PARSER_REVIEWER_ACCEPTANCE_GATE_ROADMAP = (
+    Path("docs") / "roadmap" / "day104_parser_reviewer_acceptance_gate.md"
+)
+DAY104_PARSER_REVIEWER_ACCEPTANCE_GATE_JSON = (
+    Path("reports") / "lab-summary" / "day104_parser_reviewer_acceptance_gate.json"
+)
+DAY104_PARSER_REVIEWER_ACCEPTANCE_GATE_HTML = (
+    Path("reports") / "lab-summary" / "day104_parser_reviewer_acceptance_gate.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -1515,6 +1532,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY103_PARSER_EVIDENCE_MATRIX_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day104",
+        "title": "Parser Reviewer Acceptance Gate / Matrix Decision Review",
+        "report_type": "Report-only parser reviewer acceptance gate",
+        "safety_label": "Day103 matrix decision review only; parser expansion/execution/broker/adapter/SSH/live access disabled",
+        "description": "Day104 converts Day103 matrix trace states into a reviewer acceptance decision. TRACE_COMPLETE can pass only when all required rows are complete; REVIEW_REQUIRED prevents full acceptance; KNOWN_GAP and BLOCKED_BY_SAFETY_BOUNDARY block next-stage readiness, with safety boundary blocks dominating known gaps.",
+        "json_globs": [DAY104_PARSER_REVIEWER_ACCEPTANCE_GATE_JSON.as_posix()],
+        "html_globs": [DAY104_PARSER_REVIEWER_ACCEPTANCE_GATE_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY104_PARSER_REVIEWER_ACCEPTANCE_GATE_TASK_ID}"
         ),
     },
 ]
@@ -3994,6 +4024,34 @@ def list_tasks() -> List[Dict[str, Any]]:
             "related_script": "network_lab.py",
             "notes": "Report-only Day103 parser evidence matrix. It links Day96-Day102 gap, fixture/evidence, expected decision, actual result, report paths, and safety boundary in one traceability table. parser_capability_added remains false, broker_handoff_allowed remains false, execution_allowed remains false, adapter_invocation_allowed remains false, live_access_allowed remains false, and ssh_allowed remains false. Day103 opens no broker, executor, adapter invocation, SSH, live access, dashboard action, POST route, command input, execution unlock, OpenAI API, voice runtime, external service call, or device contact.",
         },
+        {
+            "id": DAY104_PARSER_REVIEWER_ACCEPTANCE_GATE_TASK_ID,
+            "task_id": "day104_parser_reviewer_acceptance_gate",
+            "display_name": "Day104 Parser Reviewer Acceptance Gate / Matrix Decision Review",
+            "user_display_name": "Parser Reviewer Acceptance Gate / Matrix Decision Review",
+            "day": "Day104",
+            "category": "ai_planning",
+            "description": "Converts Day103 matrix trace states into a reviewer acceptance decision without adding parser capability or opening broker, adapter, SSH, live-device, or execution paths.",
+            "safety_level": "fake-adapter-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY104_PARSER_REVIEWER_ACCEPTANCE_GATE_JSON.as_posix(),
+                DAY104_PARSER_REVIEWER_ACCEPTANCE_GATE_HTML.as_posix(),
+                DAY104_PARSER_REVIEWER_ACCEPTANCE_GATE_DOC.as_posix(),
+                DAY104_PARSER_REVIEWER_ACCEPTANCE_GATE_ROADMAP.as_posix(),
+            ],
+            "report_outputs": [
+                "Day104 JSON/HTML parser reviewer acceptance gate report",
+                "Day104 reviewer gate and roadmap documentation",
+            ],
+            "related_script": "network_lab.py",
+            "notes": "Report-only Day104 reviewer gate. It maps Day103 TRACE_COMPLETE, REVIEW_REQUIRED, KNOWN_GAP, and BLOCKED_BY_SAFETY_BOUNDARY states to acceptance decisions. Safety boundary blocks dominate acceptance, known gaps prevent next-stage readiness, REVIEW_REQUIRED prevents full acceptance, and all parser capability, execution, broker handoff, adapter, SSH, live access, command, config change, OpenAI API, and voice runtime flags remain false.",
+        },
     ]
 
 
@@ -4136,6 +4194,7 @@ wireguard-runner is dry-run by default and delegates to the existing WireGuard s
             DAY101_PARSER_EVIDENCE_CLOSURE_PLAN_TASK_ID,
             DAY102_PARSER_FIXTURE_EXPANSION_TASK_ID,
             DAY103_PARSER_EVIDENCE_MATRIX_TASK_ID,
+            DAY104_PARSER_REVIEWER_ACCEPTANCE_GATE_TASK_ID,
             WIREGUARD_RUNNER_TASK_ALIAS,
         ],
         help="Task to run.",
@@ -7433,6 +7492,65 @@ def _run_day103_parser_evidence_matrix(project_root: Path) -> int:
     return 1
 
 
+def _run_day104_parser_reviewer_acceptance_gate(project_root: Path) -> int:
+    report = build_parser_reviewer_acceptance_gate_report()
+    json_path, html_path = write_parser_reviewer_acceptance_gate_reports(project_root, report)
+    summary = report["summary"]
+    flags = report["safety_flags"]
+
+    print(format_heading("Day104 Parser Reviewer Acceptance Gate / Matrix Decision Review"))
+    print("Task name: parser-reviewer-acceptance-gate")
+    print("Phase: PARSER_REVIEWER_ACCEPTANCE_GATE")
+    print("Mode: REVIEW_GATE_ONLY / ACCEPTANCE_DECISION_ONLY")
+    print("Safety: report-only Day103 matrix decision review; no parser expansion, parser fallback, broker handoff, adapter binding, SSH, live device access, live command, config change, dashboard action, OpenAI API, voice runtime, or device contact")
+    print(f"Result: {report['overall_status']} / {report['reviewer_status']}")
+    print(f"Acceptance decision: {report['acceptance_decision']}")
+    print(f"Acceptance reason: {report['acceptance_reason']}")
+    print(f"next_stage_allowed = {json.dumps(report['next_stage_allowed'])}")
+    print(f"Total rows: {summary['total_rows']}")
+    print(f"Required rows: {summary['required_rows']}")
+    print(f"trace_complete_count = {summary['trace_complete_count']}")
+    print(f"review_required_count = {summary['review_required_count']}")
+    print(f"known_gap_count = {summary['known_gap_count']}")
+    print(f"blocked_by_safety_boundary_count = {summary['blocked_by_safety_boundary_count']}")
+    print(f"blocking_finding_count = {summary['blocking_finding_count']}")
+    print(f"parser_capability_added = {json.dumps(report['parser_capability_added'])}")
+    print(f"execution_unlocked = {json.dumps(report['execution_unlocked'])}")
+    print(f"broker_handoff_enabled = {json.dumps(report['broker_handoff_enabled'])}")
+    print(f"adapter_connected = {json.dumps(report['adapter_connected'])}")
+    print(f"ssh_allowed = {json.dumps(report['ssh_allowed'])}")
+    print(f"live_device_access_allowed = {json.dumps(report['live_device_access_allowed'])}")
+    print(f"live_command_allowed = {json.dumps(report['live_command_allowed'])}")
+    print(f"config_change_allowed = {json.dumps(report['config_change_allowed'])}")
+    print(f"JSON report: {_relative_to_project(project_root, json_path)}")
+    print(f"HTML report: {_relative_to_project(project_root, html_path)}")
+
+    if (
+        report["overall_status"] == "PASS"
+        and report["reviewer_status"] == "REVIEW_GATE_READY"
+        and report["mode"] == "REVIEW_GATE_ONLY"
+        and report["decision_mode"] == "ACCEPTANCE_DECISION_ONLY"
+        and report["acceptance_decision"]
+        in {
+            "ACCEPTABLE_FOR_NEXT_STAGE",
+            "ACCEPTABLE_WITH_REVIEW_NOTES",
+            "NOT_ACCEPTABLE_KNOWN_GAPS",
+            "NOT_ACCEPTABLE_SAFETY_BLOCKED",
+            "REVIEW_REQUIRED",
+        }
+        and all(value is False for value in flags.values())
+        and not report["validation_errors"]
+    ):
+        print(
+            f"{format_status('PASS')} REVIEW_GATE_READY. "
+            "Day104 converted Day103 matrix decisions without parser capability, broker handoff, execution, SSH, or live access."
+        )
+        return 0
+
+    print(f"{format_status('FAIL')} Day104 parser reviewer acceptance gate failed validation.")
+    return 1
+
+
 def _relative_to_project(project_root: Path, path: Path) -> str:
     try:
         return path.resolve().relative_to(project_root.resolve()).as_posix()
@@ -9831,6 +9949,8 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
         return _run_day102_parser_fixture_expansion(root)
     if args.task == DAY103_PARSER_EVIDENCE_MATRIX_TASK_ID:
         return _run_day103_parser_evidence_matrix(root)
+    if args.task == DAY104_PARSER_REVIEWER_ACCEPTANCE_GATE_TASK_ID:
+        return _run_day104_parser_reviewer_acceptance_gate(root)
 
     profile_path = _resolve_project_path(root, args.profile)
     try:
