@@ -111,6 +111,10 @@ from intent_parser_evidence_closure_plan import (
     build_parser_evidence_closure_plan_report,
     write_parser_evidence_closure_plan_reports,
 )
+from intent_parser_fixture_expansion import (
+    build_parser_fixture_expansion_report,
+    write_parser_fixture_expansion_reports,
+)
 from intent_runtime_safety_case import build_runtime_safety_case_report
 from intent_runtime_safety_gate import build_runtime_safety_gate_report
 
@@ -518,6 +522,19 @@ DAY101_PARSER_EVIDENCE_CLOSURE_PLAN_JSON = (
 )
 DAY101_PARSER_EVIDENCE_CLOSURE_PLAN_HTML = (
     Path("reports") / "ai" / "day101_parser_evidence_closure_plan.html"
+)
+DAY102_PARSER_FIXTURE_EXPANSION_TASK_ID = "parser-fixture-expansion"
+DAY102_PARSER_FIXTURE_EXPANSION_DOC = (
+    Path("docs") / "ai-intent" / "day102_parser_fixture_expansion.md"
+)
+DAY102_PARSER_FIXTURE_EXPANSION_ROADMAP = (
+    Path("docs") / "roadmap" / "day102_parser_fixture_expansion.md"
+)
+DAY102_PARSER_FIXTURE_EXPANSION_JSON = (
+    Path("reports") / "ai" / "day102_parser_fixture_expansion.json"
+)
+DAY102_PARSER_FIXTURE_EXPANSION_HTML = (
+    Path("reports") / "ai" / "day102_parser_fixture_expansion.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -1455,6 +1472,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY101_PARSER_EVIDENCE_CLOSURE_PLAN_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day102",
+        "title": "Parser Fixture Expansion",
+        "report_type": "Report-only static parser fixture expansion",
+        "safety_label": "static fixture evidence only; parser capability/broker/adapter/SSH/live access disabled",
+        "description": "Day102 expands parser evidence fixtures across positive, negative, malformed, ambiguous, and unsafe categories. It proves legal read-only/report-only inputs are not rejected, unsupported and malformed inputs have reasons, ambiguous inputs are not silently accepted, and live/mutating/SSH/config-change intents are blocked.",
+        "json_globs": [DAY102_PARSER_FIXTURE_EXPANSION_JSON.as_posix()],
+        "html_globs": [DAY102_PARSER_FIXTURE_EXPANSION_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY102_PARSER_FIXTURE_EXPANSION_TASK_ID}"
         ),
     },
 ]
@@ -3878,6 +3908,34 @@ def list_tasks() -> List[Dict[str, Any]]:
             "related_script": "network_lab.py",
             "notes": "Report-only Day100 parser evidence closure plan. It lists UNDER_COVERED and REVIEW_ONLY categories, closure items, and the Day102-Day105 sequence. parser_ready_for_broker remains false, broker_handoff_allowed remains false, execution_allowed remains false, live_device_access_allowed remains false, ssh_allowed remains false, openai_api_allowed remains false, and phase_gate_rerun_required remains true. Day101 opens no broker, executor, adapter invocation, SSH, live access, dashboard action, POST route, command input, execution unlock, OpenAI API, voice runtime, or external service call.",
         },
+        {
+            "id": DAY102_PARSER_FIXTURE_EXPANSION_TASK_ID,
+            "task_id": "day102_parser_fixture_expansion",
+            "display_name": "Day102 Parser Fixture Expansion",
+            "user_display_name": "Parser Fixture Expansion",
+            "day": "Day102",
+            "category": "ai_planning",
+            "description": "Adds static parser fixture evidence for positive, negative, malformed, ambiguous, and unsafe inputs without adding parser capability or opening broker, adapter, SSH, or live-device paths.",
+            "safety_level": "fake-adapter-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY102_PARSER_FIXTURE_EXPANSION_JSON.as_posix(),
+                DAY102_PARSER_FIXTURE_EXPANSION_HTML.as_posix(),
+                DAY102_PARSER_FIXTURE_EXPANSION_DOC.as_posix(),
+                DAY102_PARSER_FIXTURE_EXPANSION_ROADMAP.as_posix(),
+            ],
+            "report_outputs": [
+                "Day102 JSON/HTML parser fixture expansion evidence",
+                "Day102 fixture expansion reviewer and roadmap documentation",
+            ],
+            "related_script": "network_lab.py",
+            "notes": "Report-only Day102 parser fixture expansion. It adds positive, negative, malformed, ambiguous, and unsafe static fixtures as evidence only. parser_capability_added remains false, parser_ready_for_broker remains false, broker_handoff_allowed remains false, execution_allowed remains false, live_device_access_allowed remains false, ssh_allowed remains false, config_change_allowed remains false, and adapter_invocation_allowed remains false. Day102 opens no broker, executor, adapter invocation, SSH, live access, dashboard action, POST route, command input, execution unlock, OpenAI API, voice runtime, external service call, or device contact.",
+        },
     ]
 
 
@@ -4018,6 +4076,7 @@ wireguard-runner is dry-run by default and delegates to the existing WireGuard s
             DAY99_PARSER_EVIDENCE_COVERAGE_AUDIT_TASK_ID,
             DAY100_PARSER_PHASE_GATE_REVIEW_TASK_ID,
             DAY101_PARSER_EVIDENCE_CLOSURE_PLAN_TASK_ID,
+            DAY102_PARSER_FIXTURE_EXPANSION_TASK_ID,
             WIREGUARD_RUNNER_TASK_ALIAS,
         ],
         help="Task to run.",
@@ -7154,6 +7213,95 @@ def _run_day101_parser_evidence_closure_plan(project_root: Path) -> int:
     return 1
 
 
+def _run_day102_parser_fixture_expansion(project_root: Path) -> int:
+    report = build_parser_fixture_expansion_report()
+    json_path, html_path = write_parser_fixture_expansion_reports(project_root, report)
+    summary = report["summary"]
+    invariants = report["safety_invariants"]
+    counts = summary["category_counts"]
+
+    print(format_heading("Day102 Parser Fixture Expansion"))
+    print("Task name: parser-fixture-expansion")
+    print("Phase: PARSER_FIXTURE_EXPANSION")
+    print("Safety: report-only static parser fixture expansion; no parser capability, broker handoff, executor, adapter invocation, SSH, live access, RouterOS execution, config change, config.json, dashboard action, OpenAI API, voice runtime, or device contact")
+    print(f"Result: {report['overall_status']} / {report['reviewer_status']}")
+    print(f"Total fixtures: {summary['total_fixtures']}")
+    print(f"positive fixtures: {counts['positive']}")
+    print(f"negative fixtures: {counts['negative']}")
+    print(f"malformed fixtures: {counts['malformed']}")
+    print(f"ambiguous fixtures: {counts['ambiguous']}")
+    print(f"unsafe fixtures: {counts['unsafe']}")
+    print(f"accepted_count = {summary['accepted_count']}")
+    print(f"rejected_count = {summary['rejected_count']}")
+    print(f"positive_not_rejected_count = {summary['positive_not_rejected_count']}")
+    print(f"unsupported_clear_rejection_count = {summary['unsupported_clear_rejection_count']}")
+    print(f"malformed_no_crash_count = {summary['malformed_no_crash_count']}")
+    print(f"ambiguous_rejected_count = {summary['ambiguous_rejected_count']}")
+    print(f"unsafe_blocked_count = {summary['unsafe_blocked_count']}")
+    print(f"reason_missing_count = {summary['reason_missing_count']}")
+    print(f"runtime_violation_count = {summary['runtime_violation_count']}")
+    print(f"success_criteria_met = {json.dumps(summary['success_criteria_met'])}")
+    print(f"parser_capability_added = {json.dumps(report['parser_capability_added'])}")
+    print(f"parser_ready_for_broker = {json.dumps(report['parser_ready_for_broker'])}")
+    print(f"broker_handoff_allowed = {json.dumps(report['broker_handoff_allowed'])}")
+    print(f"execution_allowed = {json.dumps(report['execution_allowed'])}")
+    print(f"adapter_invocation_allowed = {json.dumps(report['adapter_invocation_allowed'])}")
+    print(f"live_device_access_allowed = {json.dumps(report['live_device_access_allowed'])}")
+    print(f"ssh_allowed = {json.dumps(report['ssh_allowed'])}")
+    print(f"config_change_allowed = {json.dumps(report['config_change_allowed'])}")
+    print(f"fixture_expansion_only = {json.dumps(invariants['fixture_expansion_only'])}")
+    print(f"JSON report: {_relative_to_project(project_root, json_path)}")
+    print(f"HTML report: {_relative_to_project(project_root, html_path)}")
+
+    if (
+        report["overall_status"] == "PASS"
+        and report["reviewer_status"] == "FIXTURE_EXPANSION_READY"
+        and summary["total_fixtures"] >= 15
+        and all(counts[category] >= 3 for category in ("positive", "negative", "malformed", "ambiguous", "unsafe"))
+        and summary["success_criteria_met"] is True
+        and summary["reason_missing_count"] == 0
+        and summary["runtime_violation_count"] == 0
+        and report["parser_capability_added"] is False
+        and report["parser_ready_for_broker"] is False
+        and report["broker_handoff_allowed"] is False
+        and report["execution_allowed"] is False
+        and report["adapter_invocation_allowed"] is False
+        and report["live_device_access_allowed"] is False
+        and report["ssh_allowed"] is False
+        and report["config_change_allowed"] is False
+        and all(invariants[flag] is False for flag in (
+            "parser_capability_added",
+            "parser_ready_for_broker",
+            "broker_handoff_allowed",
+            "execution_allowed",
+            "adapter_invocation_allowed",
+            "executor_invocation_allowed",
+            "ssh_allowed",
+            "live_device_access_allowed",
+            "live_access_allowed",
+            "routeros_execution_allowed",
+            "command_execution_allowed",
+            "raw_command_allowed",
+            "config_change_allowed",
+            "auth_material_required",
+            "device_contact_allowed",
+            "dashboard_action_allowed",
+            "approval_unlock_supported",
+            "openai_api_allowed",
+            "voice_runtime_allowed",
+        ))
+        and not report["validation_errors"]
+    ):
+        print(
+            f"{format_status('PASS')} FIXTURE_EXPANSION_READY. "
+            "Day102 expanded parser fixtures without parser capability, broker handoff, execution, SSH, or live access."
+        )
+        return 0
+
+    print(f"{format_status('FAIL')} Day102 parser fixture expansion failed validation.")
+    return 1
+
+
 def _relative_to_project(project_root: Path, path: Path) -> str:
     try:
         return path.resolve().relative_to(project_root.resolve()).as_posix()
@@ -9548,6 +9696,8 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
         return _run_day100_parser_phase_gate_review(root)
     if args.task == DAY101_PARSER_EVIDENCE_CLOSURE_PLAN_TASK_ID:
         return _run_day101_parser_evidence_closure_plan(root)
+    if args.task == DAY102_PARSER_FIXTURE_EXPANSION_TASK_ID:
+        return _run_day102_parser_fixture_expansion(root)
 
     profile_path = _resolve_project_path(root, args.profile)
     try:

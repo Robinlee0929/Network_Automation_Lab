@@ -25,3 +25,9 @@ Day100 grades Day96-Day99 parser evidence into ADVANCE_READY, REVIEW_ONLY, UNDER
 - [Day101 Parser Evidence Closure Plan](day101_parser_evidence_closure_plan.md)
 
 Day101 converts Day100 UNDER_COVERED and REVIEW_ONLY parser findings into a Day102-Day105 closure roadmap. It does not approve broker handoff, release the parser gate, add execution capability, use SSH, contact live devices, call OpenAI APIs, or load configuration. parser_ready_for_broker and broker_handoff_allowed stay false; phase_gate_rerun_required stays true.
+
+## Day102
+
+- [Day102 Parser Fixture Expansion](day102_parser_fixture_expansion.md)
+
+Day102 adds static positive, negative, malformed, ambiguous, and unsafe parser fixtures as evidence only. It does not add parser capability, connect adapters, use SSH, contact live devices, change configuration, call OpenAI APIs, or load configuration. parser_capability_added and broker_handoff_allowed stay false.
