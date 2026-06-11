@@ -61,3 +61,9 @@ Day106 audits the repository-level AGENTS.md as a durable Codex instruction cont
 - [Day107 Parser Reviewer Evidence Contract Consolidation](day107_parser_reviewer_evidence_contract.md)
 
 Day107 consolidates Day96-Day105 parser evidence into one deterministic REPORT_ONLY reviewer contract. It accepts review-only continuation only when every required evidence stage is represented and all safety boundaries remain locked; live execution, SSH, device connection, configuration mutation, OpenAI API, voice runtime, adapter invocation, rejected-intent execution, and live-execution acceptance remain false.
+
+## Day108
+
+- [Day108 Parser Contract Consumer / Reviewer Decision Handoff](day108_parser_contract_consumer_handoff.md)
+
+Day108 consumes the Day107 reviewer evidence contract shape and emits deterministic reviewer decision handoff records. It is REPORT_ONLY: unsafe flags block handoff, degraded evidence requires reviewer clarification, and ready records remain reviewer evidence only. Live execution, SSH, device connection, command execution, write/config change, approval unlock, mapped task execution, OpenAI API, and voice input remain false.

@@ -131,6 +131,10 @@ from intent_parser_reviewer_evidence_contract import (
     build_parser_reviewer_evidence_contract_report,
     write_parser_reviewer_evidence_contract_reports,
 )
+from intent_parser_contract_consumer_handoff import (
+    build_parser_contract_consumer_handoff_report,
+    write_parser_contract_consumer_handoff_reports,
+)
 from intent_codex_agents_instruction_audit import (
     build_codex_agents_instruction_audit_report,
     write_codex_agents_instruction_audit_reports,
@@ -623,6 +627,19 @@ DAY107_PARSER_REVIEWER_EVIDENCE_CONTRACT_JSON = (
 )
 DAY107_PARSER_REVIEWER_EVIDENCE_CONTRACT_HTML = (
     Path("reports") / "lab-summary" / "day107_parser_reviewer_evidence_contract.html"
+)
+DAY108_PARSER_CONTRACT_CONSUMER_HANDOFF_TASK_ID = "parser-contract-consumer-handoff"
+DAY108_PARSER_CONTRACT_CONSUMER_HANDOFF_DOC = (
+    Path("docs") / "ai-intent" / "day108_parser_contract_consumer_handoff.md"
+)
+DAY108_PARSER_CONTRACT_CONSUMER_HANDOFF_ROADMAP = (
+    Path("docs") / "roadmap" / "day108_parser_contract_consumer_handoff.md"
+)
+DAY108_PARSER_CONTRACT_CONSUMER_HANDOFF_JSON = (
+    Path("reports") / "lab-summary" / "day108_parser_contract_consumer_handoff.json"
+)
+DAY108_PARSER_CONTRACT_CONSUMER_HANDOFF_HTML = (
+    Path("reports") / "lab-summary" / "day108_parser_contract_consumer_handoff.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -1638,6 +1655,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY107_PARSER_REVIEWER_EVIDENCE_CONTRACT_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day108",
+        "title": "Parser Contract Consumer / Reviewer Decision Handoff",
+        "report_type": "Report-only parser contract consumer handoff",
+        "safety_label": "Consumes the Day107 source contract shape only; live execution, SSH, device access, command execution, approval unlock, mapped task execution, OpenAI API, voice input, and write/config change remain locked",
+        "description": "Day108 consumes Day107-style reviewer evidence contract records and emits deterministic reviewer decision handoff records. Unsafe flags block handoff, degraded evidence requires reviewer clarification, and ready records remain report-only with reviewer_decision=READY_FOR_REVIEW_HANDOFF and reviewer_handoff_status=CONSUMER_HANDOFF_READY_REPORT_ONLY.",
+        "json_globs": [DAY108_PARSER_CONTRACT_CONSUMER_HANDOFF_JSON.as_posix()],
+        "html_globs": [DAY108_PARSER_CONTRACT_CONSUMER_HANDOFF_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY108_PARSER_CONTRACT_CONSUMER_HANDOFF_TASK_ID}"
         ),
     },
 ]
@@ -4230,6 +4260,34 @@ def list_tasks() -> List[Dict[str, Any]]:
             "related_script": "network_lab.py",
             "notes": "REPORT_ONLY Day107 parser reviewer evidence contract for Day96-Day105. accepted_for_review_only_continuation can pass only when every required evidence stage is represented and safety boundaries remain locked. accepted_for_live_execution, live_execution_allowed, ssh_allowed, device_connection_allowed, config_mutation_allowed, openai_api_allowed, voice_runtime_allowed, adapter_invocation_allowed, and rejected_intent_execution_allowed remain false. No adapter, broker, runner execution path, live device, SSH, external AI runtime, voice runtime, or configuration mutation is introduced.",
         },
+        {
+            "id": DAY108_PARSER_CONTRACT_CONSUMER_HANDOFF_TASK_ID,
+            "task_id": "day108_parser_contract_consumer_handoff",
+            "display_name": "Day108 Parser Contract Consumer / Reviewer Decision Handoff",
+            "user_display_name": "Parser Contract Consumer / Reviewer Decision Handoff",
+            "day": "Day108",
+            "category": "ai_planning",
+            "description": "Consumes Day107-style reviewer evidence contract records and emits deterministic reviewer decision handoff records while blocking unsafe or unsupported consumer transitions.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY108_PARSER_CONTRACT_CONSUMER_HANDOFF_JSON.as_posix(),
+                DAY108_PARSER_CONTRACT_CONSUMER_HANDOFF_HTML.as_posix(),
+                DAY108_PARSER_CONTRACT_CONSUMER_HANDOFF_DOC.as_posix(),
+                DAY108_PARSER_CONTRACT_CONSUMER_HANDOFF_ROADMAP.as_posix(),
+            ],
+            "report_outputs": [
+                "Day108 JSON/HTML parser contract consumer handoff",
+                "Day108 AI intent and roadmap documentation",
+            ],
+            "related_script": "network_lab.py",
+            "notes": "REPORT_ONLY Day108 consumer handoff for the Day107 source contract shape. Handoff records include source_contract, source_contract_version, consumer_schema_version, reviewer_decision, evidence_status, safety_flags, and next_stage_recommendation. live_execution_allowed, ssh_allowed, device_connection_allowed, command_execution_allowed, write_or_config_change_allowed, approval_unlock_supported, mapped_task_execution_allowed, openai_api_used, and voice_input_used remain false. Unsafe flags block handoff and no live device, SSH, adapter, broker, runner, OpenAI API, voice input, approval unlock, mapped task execution, or write/config change path is introduced.",
+        },
     ]
 
 
@@ -4376,6 +4434,7 @@ wireguard-runner is dry-run by default and delegates to the existing WireGuard s
             DAY105_PARSER_ACCEPTANCE_CLOSURE_TASK_ID,
             DAY106_CODEX_AGENTS_INSTRUCTION_AUDIT_TASK_ID,
             DAY107_PARSER_REVIEWER_EVIDENCE_CONTRACT_TASK_ID,
+            DAY108_PARSER_CONTRACT_CONSUMER_HANDOFF_TASK_ID,
             WIREGUARD_RUNNER_TASK_ALIAS,
         ],
         help="Task to run.",
@@ -7942,6 +8001,73 @@ def _run_day107_parser_reviewer_evidence_contract(project_root: Path) -> int:
     return 1
 
 
+def _run_day108_parser_contract_consumer_handoff(project_root: Path) -> int:
+    report = build_parser_contract_consumer_handoff_report()
+    json_path, html_path = write_parser_contract_consumer_handoff_reports(project_root, report)
+    summary = report["summary"]
+    source = report["source_contract"]
+    invariants = report["safety_invariants"]
+
+    print(format_heading("Day108 Parser Contract Consumer / Reviewer Decision Handoff"))
+    print("Task name: parser-contract-consumer-handoff")
+    print("Phase: Parser Contract Consumer / Reviewer Decision Handoff")
+    print("Audit type: REPORT_ONLY")
+    print("Safety: deterministic report-only consumer handoff; no live execution, SSH, device connection, command execution, approval unlock, mapped task execution, OpenAI API, voice input, or write/config change")
+    print(f"Source contract: {source['source_contract']}")
+    print(f"source_contract_version = {source['source_contract_version']}")
+    print(f"consumer_schema_version = {report['consumer_schema_version']}")
+    print(f"Result: {report['overall_status']} / {report['reviewer_handoff_status']}")
+    print(f"handoff_record_count = {summary['handoff_record_count']}")
+    print(f"handoff_ready_count = {summary['handoff_ready_count']}")
+    print(f"clarification_required_count = {summary['clarification_required_count']}")
+    print(f"blocked_count = {summary['blocked_count']}")
+    print(f"unsafe_flags_block_handoff = {json.dumps(summary['unsafe_flags_block_handoff'])}")
+    for flag_name in (
+        "report_only",
+        "dry_run_only",
+        "live_execution_allowed",
+        "ssh_allowed",
+        "device_connection_allowed",
+        "command_execution_allowed",
+        "write_or_config_change_allowed",
+        "approval_unlock_supported",
+        "mapped_task_execution_allowed",
+        "openai_api_used",
+        "voice_input_used",
+    ):
+        print(f"{flag_name} = {json.dumps(invariants[flag_name])}")
+    print(f"JSON report: {_relative_to_project(project_root, json_path)}")
+    print(f"HTML report: {_relative_to_project(project_root, html_path)}")
+
+    if (
+        report["overall_status"] == "PASS"
+        and report["reviewer_handoff_status"] == "CONSUMER_HANDOFF_READY_REPORT_ONLY"
+        and source["source_contract"] == "day107.parser_reviewer_evidence_contract"
+        and source["source_contract_version"] == "day107.parser_reviewer_evidence_contract.v1"
+        and summary["handoff_ready_count"] >= 1
+        and summary["unsafe_flags_block_handoff"] is True
+        and invariants["report_only"] is True
+        and invariants["dry_run_only"] is True
+        and all(invariants[flag_name] is False for flag_name in (
+            "live_execution_allowed",
+            "ssh_allowed",
+            "device_connection_allowed",
+            "command_execution_allowed",
+            "write_or_config_change_allowed",
+            "approval_unlock_supported",
+            "mapped_task_execution_allowed",
+            "openai_api_used",
+            "voice_input_used",
+        ))
+        and not report["validation_errors"]
+    ):
+        print(f"{format_status('PASS')} CONSUMER_HANDOFF_READY_REPORT_ONLY")
+        return 0
+
+    print(f"{format_status('FAIL')} Day108 parser contract consumer handoff failed validation.")
+    return 1
+
+
 def _relative_to_project(project_root: Path, path: Path) -> str:
     try:
         return path.resolve().relative_to(project_root.resolve()).as_posix()
@@ -10348,6 +10474,8 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
         return _run_day106_codex_agents_instruction_audit(root)
     if args.task == DAY107_PARSER_REVIEWER_EVIDENCE_CONTRACT_TASK_ID:
         return _run_day107_parser_reviewer_evidence_contract(root)
+    if args.task == DAY108_PARSER_CONTRACT_CONSUMER_HANDOFF_TASK_ID:
+        return _run_day108_parser_contract_consumer_handoff(root)
 
     profile_path = _resolve_project_path(root, args.profile)
     try:
