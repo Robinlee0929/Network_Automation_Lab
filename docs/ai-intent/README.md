@@ -127,3 +127,9 @@ Day117 adds owner role, follow-up type, blocking reason, review sequence, requir
 - [Day118 Deferred Action Review Sequence Runbook / Evidence Intake Checklist](day118_deferred_action_review_sequence_runbook.md)
 
 Day118 converts the seven Day117 deferred ownership matrix records into a reviewer evidence intake checklist and runbook. It is `INTAKE_CHECKLIST_READY_REVIEW_ONLY` with `final_recommendation=REVIEW_ONLY_NON_ADVANCING`, `source_record_count=7`, `checklist_record_count=7`, `review_sequence=1..7`, and no readiness transition, next-stage approval, execution unlock, live device access, SSH, broker, runner, adapter, mapped task execution, OpenAI API, or voice runtime path allowed.
+
+## Day119
+
+- [Day119 Reviewer Evidence Intake Outcome Ledger / Deferred Evidence Collection Log](day119_reviewer_evidence_intake_outcome_ledger.md)
+
+Day119 records intake outcomes for the seven Day118 expected evidence items. It is `INTAKE_LEDGER_READY` with `final_recommendation=REVIEW_ONLY_DEFERRED_EVIDENCE_COLLECTION`, `source_record_count=7`, `ledger_record_count=7`, explicit received, partial, missing, deferred, rejected, and clarification-needed intake states, and all acceptance, reviewer sign-off, safety release, execution, SSH, live command, adapter invocation, broker handoff, parser capability, OpenAI API, and voice runtime flags fixed at false.
