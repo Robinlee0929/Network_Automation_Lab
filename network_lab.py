@@ -167,6 +167,10 @@ from intent_reviewer_deferred_action_register import (
     build_reviewer_deferred_action_register_report,
     write_reviewer_deferred_action_register_reports,
 )
+from intent_deferred_action_traceability_review import (
+    build_deferred_action_traceability_review_report,
+    write_deferred_action_traceability_review_reports,
+)
 from intent_codex_agents_instruction_audit import (
     build_codex_agents_instruction_audit_report,
     write_codex_agents_instruction_audit_reports,
@@ -792,6 +796,19 @@ DAY116_REVIEWER_DEFERRED_ACTION_REGISTER_JSON = (
 )
 DAY116_REVIEWER_DEFERRED_ACTION_REGISTER_HTML = (
     Path("reports") / "lab-summary" / "day116_reviewer_deferred_action_register.html"
+)
+DAY117_DEFERRED_ACTION_TRACEABILITY_REVIEW_TASK_ID = "deferred-action-traceability-review"
+DAY117_DEFERRED_ACTION_TRACEABILITY_REVIEW_DOC = (
+    Path("docs") / "ai-intent" / "day117_deferred_action_traceability_review.md"
+)
+DAY117_DEFERRED_ACTION_TRACEABILITY_REVIEW_ROADMAP_DOC = (
+    Path("docs") / "roadmap" / "day117_deferred_action_traceability_review.md"
+)
+DAY117_DEFERRED_ACTION_TRACEABILITY_REVIEW_JSON = (
+    Path("reports") / "lab-summary" / "day117_deferred_action_traceability_review.json"
+)
+DAY117_DEFERRED_ACTION_TRACEABILITY_REVIEW_HTML = (
+    Path("reports") / "lab-summary" / "day117_deferred_action_traceability_review.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -1924,6 +1941,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY116_REVIEWER_DEFERRED_ACTION_REGISTER_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day117",
+        "title": "Deferred Action Traceability Review / Follow-up Ownership Matrix",
+        "report_type": "Reviewer-only deferred action traceability matrix",
+        "safety_label": "Adds Day116 follow-up ownership traceability only; DEFERRED_ACTION_TRACEABILITY_REVIEW_READY / REVIEW_ONLY_NON_ADVANCING / NO_EXECUTION_UNLOCK",
+        "description": "Day117 tracks owner roles, follow-up types, blocking reasons, review sequence, and evidence requirements for the seven Day116 deferred items. It does not resolve items, advance execution, generate readiness, or enter broker, runner, adapter, SSH, or live access paths.",
+        "json_globs": [DAY117_DEFERRED_ACTION_TRACEABILITY_REVIEW_JSON.as_posix()],
+        "html_globs": [DAY117_DEFERRED_ACTION_TRACEABILITY_REVIEW_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY117_DEFERRED_ACTION_TRACEABILITY_REVIEW_TASK_ID}"
         ),
     },
 ]
@@ -4770,6 +4800,34 @@ def list_tasks() -> List[Dict[str, Any]]:
             "related_script": "network_lab.py",
             "notes": "REVIEWER_ONLY REPORT_ONLY Day116 records a deferred follow-up queue only. Includes agents_md_read_before_day116_work, status=DEFERRED_ACTION_REGISTER_RECORDED, follow_up_queue_status=FOLLOW_UP_QUEUE_RECORDED, day_range=Day112-Day115, register_scope=REVIEWER_DEFERRED_ACTIONS_ONLY, execution_allowed=false, broker_allowed=false, runner_allowed=false, adapter_allowed=false, ssh_allowed=false, live_access_allowed=false, readiness_generated=false, next_stage_allowed=false, readiness_generated_count=0, execution_unlock_count=0, broker_handoff_count=0, runner_handoff_count=0, adapter_handoff_count=0, ssh_access_count=0, live_access_count=0. No item is resolved, approved, released, advanced, handed off, or executed.",
         },
+        {
+            "id": DAY117_DEFERRED_ACTION_TRACEABILITY_REVIEW_TASK_ID,
+            "task_id": "day117_deferred_action_traceability_review",
+            "display_name": "Day117 Deferred Action Traceability Review / Follow-up Ownership Matrix",
+            "user_display_name": "Deferred Action Traceability Review / Follow-up Ownership Matrix",
+            "day": "Day117",
+            "category": "ai_planning",
+            "description": "Adds reviewer-only owner, follow-up type, blocking reason, review sequence, and evidence requirements to the seven Day116 deferred items.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY117_DEFERRED_ACTION_TRACEABILITY_REVIEW_JSON.as_posix(),
+                DAY117_DEFERRED_ACTION_TRACEABILITY_REVIEW_HTML.as_posix(),
+                DAY117_DEFERRED_ACTION_TRACEABILITY_REVIEW_DOC.as_posix(),
+                DAY117_DEFERRED_ACTION_TRACEABILITY_REVIEW_ROADMAP_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Day117 JSON/HTML deferred action traceability review matrix",
+                "Day117 AI intent and roadmap documentation",
+            ],
+            "related_script": "network_lab.py",
+            "notes": "REVIEWER_ONLY REPORT_ONLY NON_ADVANCING Day117 follows the seven Day116 deferred items only. Includes status=DEFERRED_ACTION_TRACEABILITY_REVIEW_READY, final_recommendation=REVIEW_ONLY_NON_ADVANCING, ownership_matrix_status=RECORDED, traceability_status=TRACEABLE_TO_DAY116, total_deferred_items_reviewed=7, review_sequence_count=7, unsafe_flag_count=0, execution_allowed=false, broker_allowed=false, runner_allowed=false, adapter_allowed=false, ssh_allowed=false, live_access_allowed=false, readiness_generated=false, next_stage_allowed=false. No item is resolved, approved, released, advanced, handed off, or executed.",
+        },
     ]
 
 
@@ -4925,6 +4983,7 @@ wireguard-runner is dry-run by default and delegates to the existing WireGuard s
             DAY114_PARSER_CONSUMER_REVIEWER_TRIAGE_EVIDENCE_TRACEABILITY_TASK_ID,
             DAY115_PARSER_CONSUMER_REVIEWER_TRIAGE_CLOSURE_SUMMARY_TASK_ID,
             DAY116_REVIEWER_DEFERRED_ACTION_REGISTER_TASK_ID,
+            DAY117_DEFERRED_ACTION_TRACEABILITY_REVIEW_TASK_ID,
             WIREGUARD_RUNNER_TASK_ALIAS,
         ],
         help="Task to run.",
@@ -9136,6 +9195,70 @@ def _run_day116_reviewer_deferred_action_register(project_root: Path) -> int:
     return 1
 
 
+def _run_day117_deferred_action_traceability_review(project_root: Path) -> int:
+    report = build_deferred_action_traceability_review_report(
+        project_root=project_root,
+        agents_md_pre_read=True,
+        agents_md_modified=False,
+    )
+    json_path, html_path = write_deferred_action_traceability_review_reports(project_root, report)
+    summary = report["matrix_summary"]
+
+    print(format_heading("Day117 Deferred Action Traceability Review / Follow-up Ownership Matrix"))
+    print("Task name: deferred-action-traceability-review")
+    print("Phase: Deferred Action Traceability Review / Follow-up Ownership Matrix")
+    print("Audit type: REVIEWER_ONLY / REPORT_ONLY / NON_ADVANCING")
+    print("Safety: DAY116_DEFERRED_ACTION_TRACEABILITY_ONLY; no item resolution, approval, release, advancement, readiness generation, broker handoff, runner handoff, adapter handoff, SSH access, live access, command execution, or execution unlock")
+    print(f"overall_status: {report['overall_status']}")
+    print(f"status: {report['status']}")
+    print(f"ownership_matrix_status: {summary['ownership_matrix_status']}")
+    print(f"traceability_status: {summary['traceability_status']}")
+    print(f"total_deferred_items_reviewed: {summary['total_deferred_items_reviewed']}")
+    print(f"expected_deferred_item_count: {summary['expected_deferred_item_count']}")
+    print(f"review_sequence_count: {summary['review_sequence_count']}")
+    print(f"unsafe_flag_count: {summary['unsafe_flag_count']}")
+    print(f"execution_allowed: {json.dumps(report['execution_allowed'])}")
+    print(f"broker_allowed: {json.dumps(report['broker_allowed'])}")
+    print(f"runner_allowed: {json.dumps(report['runner_allowed'])}")
+    print(f"adapter_allowed: {json.dumps(report['adapter_allowed'])}")
+    print(f"ssh_allowed: {json.dumps(report['ssh_allowed'])}")
+    print(f"live_access_allowed: {json.dumps(report['live_access_allowed'])}")
+    print(f"readiness_generated: {json.dumps(report['readiness_generated'])}")
+    print(f"next_stage_allowed: {json.dumps(report['next_stage_allowed'])}")
+    print(f"final_recommendation: {report['final_recommendation']}")
+    print(f"agents_md_read_before_day117_work: {json.dumps(report['agents_md_read_before_day117_work'])}")
+    print(f"agents_md_modified: {json.dumps(report['agents_md_modified'])}")
+    print(f"JSON report: {_relative_to_project(project_root, json_path)}")
+    print(f"HTML report: {_relative_to_project(project_root, html_path)}")
+
+    if (
+        report["overall_status"] == "PASS"
+        and report["status"] == "DEFERRED_ACTION_TRACEABILITY_REVIEW_READY"
+        and summary["total_deferred_items_reviewed"] == 7
+        and summary["ownership_matrix_status"] == "RECORDED"
+        and summary["traceability_status"] == "TRACEABLE_TO_DAY116"
+        and summary["review_sequence_count"] == 7
+        and summary["unsafe_flag_count"] == 0
+        and report["execution_allowed"] is False
+        and report["broker_allowed"] is False
+        and report["runner_allowed"] is False
+        and report["adapter_allowed"] is False
+        and report["ssh_allowed"] is False
+        and report["live_access_allowed"] is False
+        and report["readiness_generated"] is False
+        and report["next_stage_allowed"] is False
+        and report["final_recommendation"] == "REVIEW_ONLY_NON_ADVANCING"
+        and report["agents_md_read_before_day117_work"] is True
+        and report["agents_md_modified"] is False
+        and not report["validation_errors"]
+    ):
+        print(f"{format_status('PASS')} {report['status']}")
+        return 0
+
+    print(f"{format_status('FAIL')} Day117 deferred action traceability review failed validation.")
+    return 1
+
+
 def _relative_to_project(project_root: Path, path: Path) -> str:
     try:
         return path.resolve().relative_to(project_root.resolve()).as_posix()
@@ -11560,6 +11683,8 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
         return _run_day115_parser_consumer_reviewer_triage_closure_summary(root)
     if args.task == DAY116_REVIEWER_DEFERRED_ACTION_REGISTER_TASK_ID:
         return _run_day116_reviewer_deferred_action_register(root)
+    if args.task == DAY117_DEFERRED_ACTION_TRACEABILITY_REVIEW_TASK_ID:
+        return _run_day117_deferred_action_traceability_review(root)
 
     profile_path = _resolve_project_path(root, args.profile)
     try:

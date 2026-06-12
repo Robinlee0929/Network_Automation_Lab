@@ -5063,3 +5063,31 @@ def test_day115_parser_consumer_reviewer_triage_closure_summary_task_catalog_ent
     assert "final_recommendation=DO_NOT_ADVANCE" in task["notes"]
     assert "next_phase_allowed=false" in task["notes"]
     assert "execution_readiness_inferred=false" in task["notes"]
+
+
+def test_day117_deferred_action_traceability_review_task_catalog_entry():
+    task = next(
+        task
+        for task in network_lab.list_tasks()
+        if task["id"] == "deferred-action-traceability-review"
+    )
+
+    assert task["task_id"] == "day117_deferred_action_traceability_review"
+    assert task["day"] == "Day117"
+    assert task["display_name"] == (
+        "Day117 Deferred Action Traceability Review / "
+        "Follow-up Ownership Matrix"
+    )
+    assert task["safety_level"] == "report-only"
+    assert task["execution_mode"] == "report-only"
+    assert task["requires_live_device"] is False
+    assert task["requires_password"] is False
+    assert "reports/lab-summary/day117_deferred_action_traceability_review.json" in task["report_paths"]
+    assert "reports/lab-summary/day117_deferred_action_traceability_review.html" in task["report_paths"]
+    assert "docs/ai-intent/day117_deferred_action_traceability_review.md" in task["report_paths"]
+    assert "docs/roadmap/day117_deferred_action_traceability_review.md" in task["report_paths"]
+    assert "status=DEFERRED_ACTION_TRACEABILITY_REVIEW_READY" in task["notes"]
+    assert "final_recommendation=REVIEW_ONLY_NON_ADVANCING" in task["notes"]
+    assert "total_deferred_items_reviewed=7" in task["notes"]
+    assert "unsafe_flag_count=0" in task["notes"]
+    assert "execution_allowed=false" in task["notes"]
