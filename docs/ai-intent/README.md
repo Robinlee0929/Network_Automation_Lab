@@ -109,3 +109,9 @@ Day114 verifies that all Day112 intake records and Day113 triage outcomes remain
 - [Day115 Parser Consumer Reviewer Triage Closure Summary / Non-Advancement Decision Audit](day115_parser_consumer_reviewer_triage_closure_summary.md)
 
 Day115 closes the reviewer triage chain from Day112 to Day114 without advancing parser consumer work. It is `TRIAGE_CLOSURE_AUDITED_NON_ADVANCING` with `closure_status=CLOSED_WITH_BLOCKED_RECORDS_PRESERVED`, `final_recommendation=DO_NOT_ADVANCE`, `next_phase_allowed=false`, `execution_readiness_inferred=false`, `TRIAGE_CHAIN_CLOSED_NON_ADVANCING`, `NO_EXECUTION_READINESS_INFERRED`, and `NO_NEXT_PHASE_UNLOCK`.
+
+## Day116
+
+- [Day116 Reviewer Deferred Action Register / Blocked Follow-up Queue](day116_reviewer_deferred_action_register.md)
+
+Day116 records a reviewer-only deferred follow-up queue for Day112-Day115 blocked, HOLD, and DO_NOT_ADVANCE items. It is `DEFERRED_ACTION_REGISTER_RECORDED` with `register_scope=REVIEWER_DEFERRED_ACTIONS_ONLY`, all execution, broker, runner, adapter, SSH, live access, readiness generation, and next-stage flags fixed at false, and all handoff/access/unlock counts fixed at zero.
