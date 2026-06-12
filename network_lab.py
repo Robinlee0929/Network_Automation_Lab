@@ -163,6 +163,10 @@ from intent_parser_consumer_reviewer_triage_closure_summary import (
     build_parser_consumer_reviewer_triage_closure_summary_report,
     write_parser_consumer_reviewer_triage_closure_summary_reports,
 )
+from intent_reviewer_deferred_action_register import (
+    build_reviewer_deferred_action_register_report,
+    write_reviewer_deferred_action_register_reports,
+)
 from intent_codex_agents_instruction_audit import (
     build_codex_agents_instruction_audit_report,
     write_codex_agents_instruction_audit_reports,
@@ -775,6 +779,19 @@ DAY115_PARSER_CONSUMER_REVIEWER_TRIAGE_CLOSURE_SUMMARY_JSON = (
 )
 DAY115_PARSER_CONSUMER_REVIEWER_TRIAGE_CLOSURE_SUMMARY_HTML = (
     Path("reports") / "lab-summary" / "day115_parser_consumer_reviewer_triage_closure_summary.html"
+)
+DAY116_REVIEWER_DEFERRED_ACTION_REGISTER_TASK_ID = "reviewer-deferred-action-register"
+DAY116_REVIEWER_DEFERRED_ACTION_REGISTER_DOC = (
+    Path("docs") / "ai-intent" / "day116_reviewer_deferred_action_register.md"
+)
+DAY116_REVIEWER_DEFERRED_ACTION_REGISTER_ROADMAP_DOC = (
+    Path("docs") / "roadmap" / "day116_reviewer_deferred_action_register.md"
+)
+DAY116_REVIEWER_DEFERRED_ACTION_REGISTER_JSON = (
+    Path("reports") / "lab-summary" / "day116_reviewer_deferred_action_register.json"
+)
+DAY116_REVIEWER_DEFERRED_ACTION_REGISTER_HTML = (
+    Path("reports") / "lab-summary" / "day116_reviewer_deferred_action_register.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -1894,6 +1911,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY115_PARSER_CONSUMER_REVIEWER_TRIAGE_CLOSURE_SUMMARY_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day116",
+        "title": "Reviewer Deferred Action Register / Blocked Follow-up Queue",
+        "report_type": "Reviewer-only deferred action register",
+        "safety_label": "Records Day112-Day115 deferred follow-up queue only; DEFERRED_ACTION_REGISTER_RECORDED / FOLLOW_UP_QUEUE_RECORDED / NO_EXECUTION_UNLOCK",
+        "description": "Day116 consolidates blocked, held, and do-not-advance records from Day112-Day115 into a reviewer-only follow-up queue. It does not resolve items, advance execution, generate readiness, or enter broker, runner, adapter, SSH, or live access paths.",
+        "json_globs": [DAY116_REVIEWER_DEFERRED_ACTION_REGISTER_JSON.as_posix()],
+        "html_globs": [DAY116_REVIEWER_DEFERRED_ACTION_REGISTER_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY116_REVIEWER_DEFERRED_ACTION_REGISTER_TASK_ID}"
         ),
     },
 ]
@@ -4712,6 +4742,34 @@ def list_tasks() -> List[Dict[str, Any]]:
             "related_script": "network_lab.py",
             "notes": "REPORT_ONLY Day115 closes the Day112-Day114 reviewer triage chain without advancing parser consumer work. Includes agents_md_read_before_day115_work, reviewer_status=TRIAGE_CLOSURE_AUDITED_NON_ADVANCING, closure_status=CLOSED_WITH_BLOCKED_RECORDS_PRESERVED, final_recommendation=DO_NOT_ADVANCE, next_phase_allowed=false, execution_readiness_inferred=false, blocked_records_preserved=true, blocked_records_not_downgraded=true, TRIAGE_CHAIN_CLOSED_NON_ADVANCING, NO_EXECUTION_READINESS_INFERRED, NO_NEXT_PHASE_UNLOCK, NO_BROKER_HANDOFF, NO_RUNNER_EXECUTION, NO_ADAPTER_ACCESS, NO_SSH_ACCESS, NO_LIVE_ACCESS, NO_COMMAND_EXECUTION, NO_MAPPED_TASK_EXECUTION, NO_APPROVAL_UNLOCK. No readiness, broker, runner, adapter, SSH, live access, command execution, mapped task execution, approval unlock, parser capability change, or next-phase advancement.",
         },
+        {
+            "id": DAY116_REVIEWER_DEFERRED_ACTION_REGISTER_TASK_ID,
+            "task_id": "day116_reviewer_deferred_action_register",
+            "display_name": "Day116 Reviewer Deferred Action Register / Blocked Follow-up Queue",
+            "user_display_name": "Reviewer Deferred Action Register / Blocked Follow-up Queue",
+            "day": "Day116",
+            "category": "ai_planning",
+            "description": "Records a reviewer-only deferred follow-up queue for blocked, held, and do-not-advance items from Day112-Day115.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY116_REVIEWER_DEFERRED_ACTION_REGISTER_JSON.as_posix(),
+                DAY116_REVIEWER_DEFERRED_ACTION_REGISTER_HTML.as_posix(),
+                DAY116_REVIEWER_DEFERRED_ACTION_REGISTER_DOC.as_posix(),
+                DAY116_REVIEWER_DEFERRED_ACTION_REGISTER_ROADMAP_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Day116 JSON/HTML reviewer deferred action register",
+                "Day116 AI intent and roadmap documentation",
+            ],
+            "related_script": "network_lab.py",
+            "notes": "REVIEWER_ONLY REPORT_ONLY Day116 records a deferred follow-up queue only. Includes agents_md_read_before_day116_work, status=DEFERRED_ACTION_REGISTER_RECORDED, follow_up_queue_status=FOLLOW_UP_QUEUE_RECORDED, day_range=Day112-Day115, register_scope=REVIEWER_DEFERRED_ACTIONS_ONLY, execution_allowed=false, broker_allowed=false, runner_allowed=false, adapter_allowed=false, ssh_allowed=false, live_access_allowed=false, readiness_generated=false, next_stage_allowed=false, readiness_generated_count=0, execution_unlock_count=0, broker_handoff_count=0, runner_handoff_count=0, adapter_handoff_count=0, ssh_access_count=0, live_access_count=0. No item is resolved, approved, released, advanced, handed off, or executed.",
+        },
     ]
 
 
@@ -4866,6 +4924,7 @@ wireguard-runner is dry-run by default and delegates to the existing WireGuard s
             DAY113_PARSER_CONSUMER_REVIEWER_TRIAGE_DECISION_LOG_TASK_ID,
             DAY114_PARSER_CONSUMER_REVIEWER_TRIAGE_EVIDENCE_TRACEABILITY_TASK_ID,
             DAY115_PARSER_CONSUMER_REVIEWER_TRIAGE_CLOSURE_SUMMARY_TASK_ID,
+            DAY116_REVIEWER_DEFERRED_ACTION_REGISTER_TASK_ID,
             WIREGUARD_RUNNER_TASK_ALIAS,
         ],
         help="Task to run.",
@@ -8998,6 +9057,85 @@ def _run_day115_parser_consumer_reviewer_triage_closure_summary(project_root: Pa
     return 1
 
 
+def _run_day116_reviewer_deferred_action_register(project_root: Path) -> int:
+    report = build_reviewer_deferred_action_register_report(
+        project_root=project_root,
+        agents_md_pre_read=True,
+        agents_md_modified=False,
+    )
+    json_path, html_path = write_reviewer_deferred_action_register_reports(project_root, report)
+    summary = report["register_summary"]
+
+    print(format_heading("Day116 Reviewer Deferred Action Register / Blocked Follow-up Queue"))
+    print("Task name: reviewer-deferred-action-register")
+    print("Phase: Reviewer Deferred Action Register / Blocked Follow-up Queue")
+    print("Audit type: REVIEWER_ONLY / REPORT_ONLY")
+    print("Safety: REVIEWER_DEFERRED_ACTIONS_ONLY; no item resolution, approval, release, advancement, broker handoff, runner handoff, adapter handoff, SSH access, live access, command execution, or execution unlock")
+    print(f"overall_status: {report['overall_status']}")
+    print(f"status: {report['status']}")
+    print(f"follow_up_queue_status: {report['follow_up_queue_status']}")
+    print(f"day_range: {report['day_range']}")
+    print(f"register_scope: {report['register_scope']}")
+    print(f"source_days_reviewed: {summary['source_days_reviewed']}")
+    print(f"source_artifacts_reviewed: {summary['source_artifacts_reviewed']}")
+    print(f"deferred_item_count: {summary['deferred_item_count']}")
+    print(f"blocked_count: {summary['blocked_count']}")
+    print(f"hold_count: {summary['hold_count']}")
+    print(f"do_not_advance_count: {summary['do_not_advance_count']}")
+    print(f"readiness_generated_count: {summary['readiness_generated_count']}")
+    print(f"execution_unlock_count: {summary['execution_unlock_count']}")
+    print(f"broker_handoff_count: {summary['broker_handoff_count']}")
+    print(f"runner_handoff_count: {summary['runner_handoff_count']}")
+    print(f"adapter_handoff_count: {summary['adapter_handoff_count']}")
+    print(f"ssh_access_count: {summary['ssh_access_count']}")
+    print(f"live_access_count: {summary['live_access_count']}")
+    print(f"execution_allowed: {json.dumps(report['execution_allowed'])}")
+    print(f"broker_allowed: {json.dumps(report['broker_allowed'])}")
+    print(f"runner_allowed: {json.dumps(report['runner_allowed'])}")
+    print(f"adapter_allowed: {json.dumps(report['adapter_allowed'])}")
+    print(f"ssh_allowed: {json.dumps(report['ssh_allowed'])}")
+    print(f"live_access_allowed: {json.dumps(report['live_access_allowed'])}")
+    print(f"readiness_generated: {json.dumps(report['readiness_generated'])}")
+    print(f"next_stage_allowed: {json.dumps(report['next_stage_allowed'])}")
+    print(f"agents_md_pre_read_result: {report['agents_md_pre_read_result']}")
+    print(f"agents_md_read_before_day116_work: {json.dumps(report['agents_md_read_before_day116_work'])}")
+    print(f"agents_md_modified: {json.dumps(report['agents_md_modified'])}")
+    print(f"JSON report: {_relative_to_project(project_root, json_path)}")
+    print(f"HTML report: {_relative_to_project(project_root, html_path)}")
+
+    if (
+        report["overall_status"] == "PASS"
+        and report["status"] == "DEFERRED_ACTION_REGISTER_RECORDED"
+        and report["day_range"] == "Day112-Day115"
+        and report["register_scope"] == "REVIEWER_DEFERRED_ACTIONS_ONLY"
+        and report["execution_allowed"] is False
+        and report["broker_allowed"] is False
+        and report["runner_allowed"] is False
+        and report["adapter_allowed"] is False
+        and report["ssh_allowed"] is False
+        and report["live_access_allowed"] is False
+        and report["readiness_generated"] is False
+        and report["next_stage_allowed"] is False
+        and summary["source_days_reviewed"] == 4
+        and summary["readiness_generated_count"] == 0
+        and summary["execution_unlock_count"] == 0
+        and summary["broker_handoff_count"] == 0
+        and summary["runner_handoff_count"] == 0
+        and summary["adapter_handoff_count"] == 0
+        and summary["ssh_access_count"] == 0
+        and summary["live_access_count"] == 0
+        and report["agents_md_pre_read_result"] == "PASS"
+        and report["agents_md_read_before_day116_work"] is True
+        and report["agents_md_modified"] is False
+        and not report["validation_errors"]
+    ):
+        print(f"{format_status('PASS')} {report['status']}")
+        return 0
+
+    print(f"{format_status('FAIL')} Day116 reviewer deferred action register failed validation.")
+    return 1
+
+
 def _relative_to_project(project_root: Path, path: Path) -> str:
     try:
         return path.resolve().relative_to(project_root.resolve()).as_posix()
@@ -11420,6 +11558,8 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
         return _run_day114_parser_consumer_reviewer_triage_evidence_traceability(root)
     if args.task == DAY115_PARSER_CONSUMER_REVIEWER_TRIAGE_CLOSURE_SUMMARY_TASK_ID:
         return _run_day115_parser_consumer_reviewer_triage_closure_summary(root)
+    if args.task == DAY116_REVIEWER_DEFERRED_ACTION_REGISTER_TASK_ID:
+        return _run_day116_reviewer_deferred_action_register(root)
 
     profile_path = _resolve_project_path(root, args.profile)
     try:
