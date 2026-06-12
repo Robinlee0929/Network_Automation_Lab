@@ -121,3 +121,9 @@ Day116 records a reviewer-only deferred follow-up queue for Day112-Day115 blocke
 - [Day117 Deferred Action Traceability Review / Follow-up Ownership Matrix](day117_deferred_action_traceability_review.md)
 
 Day117 adds owner role, follow-up type, blocking reason, review sequence, required evidence, and closure condition fields to the seven Day116 deferred items. It is `DEFERRED_ACTION_TRACEABILITY_REVIEW_READY` with `final_recommendation=REVIEW_ONLY_NON_ADVANCING`, `total_deferred_items_reviewed=7`, `review_sequence_count=7`, `unsafe_flag_count=0`, and all execution, broker, runner, adapter, SSH, live access, readiness generation, and next-stage flags fixed at false.
+
+## Day118
+
+- [Day118 Deferred Action Review Sequence Runbook / Evidence Intake Checklist](day118_deferred_action_review_sequence_runbook.md)
+
+Day118 converts the seven Day117 deferred ownership matrix records into a reviewer evidence intake checklist and runbook. It is `INTAKE_CHECKLIST_READY_REVIEW_ONLY` with `final_recommendation=REVIEW_ONLY_NON_ADVANCING`, `source_record_count=7`, `checklist_record_count=7`, `review_sequence=1..7`, and no readiness transition, next-stage approval, execution unlock, live device access, SSH, broker, runner, adapter, mapped task execution, OpenAI API, or voice runtime path allowed.

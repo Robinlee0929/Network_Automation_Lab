@@ -171,6 +171,10 @@ from intent_deferred_action_traceability_review import (
     build_deferred_action_traceability_review_report,
     write_deferred_action_traceability_review_reports,
 )
+from intent_deferred_action_review_sequence_runbook import (
+    build_deferred_action_review_sequence_runbook_report,
+    write_deferred_action_review_sequence_runbook_reports,
+)
 from intent_codex_agents_instruction_audit import (
     build_codex_agents_instruction_audit_report,
     write_codex_agents_instruction_audit_reports,
@@ -809,6 +813,19 @@ DAY117_DEFERRED_ACTION_TRACEABILITY_REVIEW_JSON = (
 )
 DAY117_DEFERRED_ACTION_TRACEABILITY_REVIEW_HTML = (
     Path("reports") / "lab-summary" / "day117_deferred_action_traceability_review.html"
+)
+DAY118_DEFERRED_ACTION_REVIEW_SEQUENCE_RUNBOOK_TASK_ID = "deferred-action-review-sequence-runbook"
+DAY118_DEFERRED_ACTION_REVIEW_SEQUENCE_RUNBOOK_DOC = (
+    Path("docs") / "ai-intent" / "day118_deferred_action_review_sequence_runbook.md"
+)
+DAY118_DEFERRED_ACTION_REVIEW_SEQUENCE_RUNBOOK_ROADMAP_DOC = (
+    Path("docs") / "roadmap" / "day118_deferred_action_review_sequence_runbook.md"
+)
+DAY118_DEFERRED_ACTION_REVIEW_SEQUENCE_RUNBOOK_JSON = (
+    Path("reports") / "lab-summary" / "day118_deferred_action_review_sequence_runbook.json"
+)
+DAY118_DEFERRED_ACTION_REVIEW_SEQUENCE_RUNBOOK_HTML = (
+    Path("reports") / "lab-summary" / "day118_deferred_action_review_sequence_runbook.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -1954,6 +1971,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY117_DEFERRED_ACTION_TRACEABILITY_REVIEW_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day118",
+        "title": "Deferred Action Review Sequence Runbook / Evidence Intake Checklist",
+        "report_type": "Reviewer-only deferred action evidence intake checklist",
+        "safety_label": "Converts Day117 ownership matrix into intake questions only; INTAKE_CHECKLIST_READY_REVIEW_ONLY / REVIEW_ONLY_NON_ADVANCING / NO_EXECUTION_UNLOCK",
+        "description": "Day118 turns the seven Day117 deferred ownership matrix records into a reviewer sequence runbook and evidence intake checklist. It does not change deferred conclusions, generate readiness, advance next stage, unlock execution, or enter broker, runner, adapter, SSH, live access, mapped task, OpenAI API, or voice runtime paths.",
+        "json_globs": [DAY118_DEFERRED_ACTION_REVIEW_SEQUENCE_RUNBOOK_JSON.as_posix()],
+        "html_globs": [DAY118_DEFERRED_ACTION_REVIEW_SEQUENCE_RUNBOOK_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY118_DEFERRED_ACTION_REVIEW_SEQUENCE_RUNBOOK_TASK_ID}"
         ),
     },
 ]
@@ -4828,6 +4858,34 @@ def list_tasks() -> List[Dict[str, Any]]:
             "related_script": "network_lab.py",
             "notes": "REVIEWER_ONLY REPORT_ONLY NON_ADVANCING Day117 follows the seven Day116 deferred items only. Includes status=DEFERRED_ACTION_TRACEABILITY_REVIEW_READY, final_recommendation=REVIEW_ONLY_NON_ADVANCING, ownership_matrix_status=RECORDED, traceability_status=TRACEABLE_TO_DAY116, total_deferred_items_reviewed=7, review_sequence_count=7, unsafe_flag_count=0, execution_allowed=false, broker_allowed=false, runner_allowed=false, adapter_allowed=false, ssh_allowed=false, live_access_allowed=false, readiness_generated=false, next_stage_allowed=false. No item is resolved, approved, released, advanced, handed off, or executed.",
         },
+        {
+            "id": DAY118_DEFERRED_ACTION_REVIEW_SEQUENCE_RUNBOOK_TASK_ID,
+            "task_id": "day118_deferred_action_review_sequence_runbook",
+            "display_name": "Day118 Deferred Action Review Sequence Runbook / Evidence Intake Checklist",
+            "user_display_name": "Deferred Action Review Sequence Runbook / Evidence Intake Checklist",
+            "day": "Day118",
+            "category": "ai_planning",
+            "description": "Converts the seven Day117 deferred ownership matrix records into reviewer evidence intake questions and a sequence runbook.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY118_DEFERRED_ACTION_REVIEW_SEQUENCE_RUNBOOK_JSON.as_posix(),
+                DAY118_DEFERRED_ACTION_REVIEW_SEQUENCE_RUNBOOK_HTML.as_posix(),
+                DAY118_DEFERRED_ACTION_REVIEW_SEQUENCE_RUNBOOK_DOC.as_posix(),
+                DAY118_DEFERRED_ACTION_REVIEW_SEQUENCE_RUNBOOK_ROADMAP_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Day118 JSON/HTML deferred action evidence intake checklist",
+                "Day118 AI intent and roadmap documentation",
+            ],
+            "related_script": "network_lab.py",
+            "notes": "REVIEW_ONLY REPORT_ONLY NON_ADVANCING Day118 follows the seven Day117 deferred ownership matrix records only. Includes reviewer_status=INTAKE_CHECKLIST_READY_REVIEW_ONLY, final_recommendation=REVIEW_ONLY_NON_ADVANCING, source_record_count=7, checklist_record_count=7, review_sequence=1..7, execution_unlock_supported=false, next_stage_allowed=false, readiness_transition_allowed=false, broker_allowed=false, runner_allowed=false, adapter_allowed=false, ssh_allowed=false, live_access_allowed=false, mapped_task_execution_allowed=false, openai_api_allowed=false, voice_runtime_allowed=false, device_access_allowed=false. No item is made READY, advanced, approved, released, handed off, or executed.",
+        },
     ]
 
 
@@ -4984,6 +5042,7 @@ wireguard-runner is dry-run by default and delegates to the existing WireGuard s
             DAY115_PARSER_CONSUMER_REVIEWER_TRIAGE_CLOSURE_SUMMARY_TASK_ID,
             DAY116_REVIEWER_DEFERRED_ACTION_REGISTER_TASK_ID,
             DAY117_DEFERRED_ACTION_TRACEABILITY_REVIEW_TASK_ID,
+            DAY118_DEFERRED_ACTION_REVIEW_SEQUENCE_RUNBOOK_TASK_ID,
             WIREGUARD_RUNNER_TASK_ALIAS,
         ],
         help="Task to run.",
@@ -9259,6 +9318,73 @@ def _run_day117_deferred_action_traceability_review(project_root: Path) -> int:
     return 1
 
 
+def _run_day118_deferred_action_review_sequence_runbook(project_root: Path) -> int:
+    report = build_deferred_action_review_sequence_runbook_report(project_root=project_root)
+    json_path, html_path = write_deferred_action_review_sequence_runbook_reports(project_root, report)
+    summary = report["reviewer_status_summary"]
+
+    print(format_heading("Day118 Deferred Action Review Sequence Runbook / Evidence Intake Checklist"))
+    print("Task name: deferred-action-review-sequence-runbook")
+    print("Phase: Deferred Action Review Sequence Runbook / Evidence Intake Checklist")
+    print("Audit type: REVIEW_ONLY / REPORT_ONLY / NON_ADVANCING")
+    print("Safety: Day117 evidence intake checklist only; no readiness transition, next-stage advancement, broker, runner, adapter, SSH, live access, mapped task execution, OpenAI API, voice runtime, or execution unlock")
+    print(f"overall_status: {report['overall_status']}")
+    print(f"status: {report['status']}")
+    print(f"reviewer_status: {report['reviewer_status']}")
+    print(f"source_day: {report['source_day']}")
+    print(f"source_record_count: {report['source_record_count']}")
+    print(f"checklist_record_count: {report['checklist_record_count']}")
+    print(f"review_sequence: {summary['review_sequence']}")
+    print(f"completion_state_values: {summary['completion_state_values']}")
+    print(f"review_only: {json.dumps(report['review_only'])}")
+    print(f"non_advancing: {json.dumps(report['non_advancing'])}")
+    print(f"final_recommendation: {report['final_recommendation']}")
+    print(f"execution_unlock_supported: {json.dumps(report['execution_unlock_supported'])}")
+    print(f"next_stage_allowed: {json.dumps(report['next_stage_allowed'])}")
+    print(f"readiness_transition_allowed: {json.dumps(report['readiness_transition_allowed'])}")
+    print(f"broker_allowed: {json.dumps(report['broker_allowed'])}")
+    print(f"runner_allowed: {json.dumps(report['runner_allowed'])}")
+    print(f"adapter_allowed: {json.dumps(report['adapter_allowed'])}")
+    print(f"ssh_allowed: {json.dumps(report['ssh_allowed'])}")
+    print(f"live_access_allowed: {json.dumps(report['live_access_allowed'])}")
+    print(f"mapped_task_execution_allowed: {json.dumps(report['mapped_task_execution_allowed'])}")
+    print(f"openai_api_allowed: {json.dumps(report['openai_api_allowed'])}")
+    print(f"voice_runtime_allowed: {json.dumps(report['voice_runtime_allowed'])}")
+    print(f"device_access_allowed: {json.dumps(report['device_access_allowed'])}")
+    print(f"JSON report: {_relative_to_project(project_root, json_path)}")
+    print(f"HTML report: {_relative_to_project(project_root, html_path)}")
+
+    if (
+        report["overall_status"] == "PASS"
+        and report["reviewer_status"] == "INTAKE_CHECKLIST_READY_REVIEW_ONLY"
+        and report["source_day"] == 117
+        and report["source_record_count"] == 7
+        and report["checklist_record_count"] == 7
+        and summary["review_sequence"] == list(range(1, 8))
+        and report["review_only"] is True
+        and report["non_advancing"] is True
+        and report["final_recommendation"] == "REVIEW_ONLY_NON_ADVANCING"
+        and report["execution_unlock_supported"] is False
+        and report["next_stage_allowed"] is False
+        and report["readiness_transition_allowed"] is False
+        and report["broker_allowed"] is False
+        and report["runner_allowed"] is False
+        and report["adapter_allowed"] is False
+        and report["ssh_allowed"] is False
+        and report["live_access_allowed"] is False
+        and report["mapped_task_execution_allowed"] is False
+        and report["openai_api_allowed"] is False
+        and report["voice_runtime_allowed"] is False
+        and report["device_access_allowed"] is False
+        and not report["validation_errors"]
+    ):
+        print(f"{format_status('PASS')} {report['reviewer_status']}")
+        return 0
+
+    print(f"{format_status('FAIL')} Day118 deferred action review sequence runbook failed validation.")
+    return 1
+
+
 def _relative_to_project(project_root: Path, path: Path) -> str:
     try:
         return path.resolve().relative_to(project_root.resolve()).as_posix()
@@ -11685,6 +11811,8 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
         return _run_day116_reviewer_deferred_action_register(root)
     if args.task == DAY117_DEFERRED_ACTION_TRACEABILITY_REVIEW_TASK_ID:
         return _run_day117_deferred_action_traceability_review(root)
+    if args.task == DAY118_DEFERRED_ACTION_REVIEW_SEQUENCE_RUNBOOK_TASK_ID:
+        return _run_day118_deferred_action_review_sequence_runbook(root)
 
     profile_path = _resolve_project_path(root, args.profile)
     try:
