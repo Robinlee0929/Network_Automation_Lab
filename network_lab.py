@@ -175,6 +175,11 @@ from intent_deferred_action_review_sequence_runbook import (
     build_deferred_action_review_sequence_runbook_report,
     write_deferred_action_review_sequence_runbook_reports,
 )
+from intent_reviewer_evidence_intake_outcome_ledger import (
+    TASK_ALIAS as DAY119_REVIEWER_EVIDENCE_INTAKE_OUTCOME_LEDGER_ALIAS,
+    build_reviewer_evidence_intake_outcome_ledger_report,
+    write_reviewer_evidence_intake_outcome_ledger_reports,
+)
 from intent_codex_agents_instruction_audit import (
     build_codex_agents_instruction_audit_report,
     write_codex_agents_instruction_audit_reports,
@@ -826,6 +831,19 @@ DAY118_DEFERRED_ACTION_REVIEW_SEQUENCE_RUNBOOK_JSON = (
 )
 DAY118_DEFERRED_ACTION_REVIEW_SEQUENCE_RUNBOOK_HTML = (
     Path("reports") / "lab-summary" / "day118_deferred_action_review_sequence_runbook.html"
+)
+DAY119_REVIEWER_EVIDENCE_INTAKE_OUTCOME_LEDGER_TASK_ID = "reviewer-evidence-intake-outcome-ledger"
+DAY119_REVIEWER_EVIDENCE_INTAKE_OUTCOME_LEDGER_DOC = (
+    Path("docs") / "ai-intent" / "day119_reviewer_evidence_intake_outcome_ledger.md"
+)
+DAY119_REVIEWER_EVIDENCE_INTAKE_OUTCOME_LEDGER_ROADMAP_DOC = (
+    Path("docs") / "roadmap" / "day119_reviewer_evidence_intake_outcome_ledger.md"
+)
+DAY119_REVIEWER_EVIDENCE_INTAKE_OUTCOME_LEDGER_JSON = (
+    Path("reports") / "lab-summary" / "day119_reviewer_evidence_intake_outcome_ledger.json"
+)
+DAY119_REVIEWER_EVIDENCE_INTAKE_OUTCOME_LEDGER_HTML = (
+    Path("reports") / "lab-summary" / "day119_reviewer_evidence_intake_outcome_ledger.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -1984,6 +2002,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY118_DEFERRED_ACTION_REVIEW_SEQUENCE_RUNBOOK_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day119",
+        "title": "Reviewer Evidence Intake Outcome Ledger / Deferred Evidence Collection Log",
+        "report_type": "Reviewer-only evidence intake outcome ledger",
+        "safety_label": "Records Day118 evidence intake outcomes only; INTAKE_LEDGER_READY / REVIEW_ONLY_DEFERRED_EVIDENCE_COLLECTION / NO_ACCEPTANCE / NO_EXECUTION_UNLOCK",
+        "description": "Day119 records received, partial, missing, deferred, rejected, and clarification-needed intake outcomes for the seven Day118 expected evidence items. It does not judge acceptance, produce sign-off, release safety boundaries, unlock execution, invoke broker or adapter paths, change parser capability, use SSH, or contact live devices.",
+        "json_globs": [DAY119_REVIEWER_EVIDENCE_INTAKE_OUTCOME_LEDGER_JSON.as_posix()],
+        "html_globs": [DAY119_REVIEWER_EVIDENCE_INTAKE_OUTCOME_LEDGER_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY119_REVIEWER_EVIDENCE_INTAKE_OUTCOME_LEDGER_TASK_ID}"
         ),
     },
 ]
@@ -4886,6 +4917,34 @@ def list_tasks() -> List[Dict[str, Any]]:
             "related_script": "network_lab.py",
             "notes": "REVIEW_ONLY REPORT_ONLY NON_ADVANCING Day118 follows the seven Day117 deferred ownership matrix records only. Includes reviewer_status=INTAKE_CHECKLIST_READY_REVIEW_ONLY, final_recommendation=REVIEW_ONLY_NON_ADVANCING, source_record_count=7, checklist_record_count=7, review_sequence=1..7, execution_unlock_supported=false, next_stage_allowed=false, readiness_transition_allowed=false, broker_allowed=false, runner_allowed=false, adapter_allowed=false, ssh_allowed=false, live_access_allowed=false, mapped_task_execution_allowed=false, openai_api_allowed=false, voice_runtime_allowed=false, device_access_allowed=false. No item is made READY, advanced, approved, released, handed off, or executed.",
         },
+        {
+            "id": DAY119_REVIEWER_EVIDENCE_INTAKE_OUTCOME_LEDGER_TASK_ID,
+            "task_id": "day119_reviewer_evidence_intake_outcome_ledger",
+            "display_name": "Day119 Reviewer Evidence Intake Outcome Ledger / Deferred Evidence Collection Log",
+            "user_display_name": "Reviewer Evidence Intake Outcome Ledger / Deferred Evidence Collection Log",
+            "day": "Day119",
+            "category": "ai_planning",
+            "description": "Records intake outcomes and remaining gaps for each Day118 expected evidence item without acceptance, sign-off, safety release, or execution unlock.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY119_REVIEWER_EVIDENCE_INTAKE_OUTCOME_LEDGER_JSON.as_posix(),
+                DAY119_REVIEWER_EVIDENCE_INTAKE_OUTCOME_LEDGER_HTML.as_posix(),
+                DAY119_REVIEWER_EVIDENCE_INTAKE_OUTCOME_LEDGER_DOC.as_posix(),
+                DAY119_REVIEWER_EVIDENCE_INTAKE_OUTCOME_LEDGER_ROADMAP_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Day119 JSON/HTML reviewer evidence intake outcome ledger",
+                "Day119 AI intent and roadmap documentation",
+            ],
+            "related_script": "network_lab.py",
+            "notes": "REVIEW_ONLY REPORT_ONLY Day119 follows the seven Day118 expected evidence items only. Includes overall_status=INTAKE_LEDGER_READY, final_recommendation=REVIEW_ONLY_DEFERRED_EVIDENCE_COLLECTION, source_record_count=7, ledger_record_count=7, intake statuses RECEIVED/PARTIAL/MISSING/DEFERRED/REJECTED/NEEDS_CLARIFICATION, gap statuses NO_GAP/OPEN_GAP/DEFERRED_GAP/SAFETY_BLOCKED_GAP/CLARIFICATION_REQUIRED, acceptance_decision_made=false, reviewer_signoff_made=false, safety_boundary_released=false, allowed_to_execute=false, ssh_allowed=false, live_command_allowed=false, adapter_invocation_allowed=false, broker_handoff_allowed=false, parser_capability_changed=false. No item is accepted, signed off, released, handed off, executed, or used to expand parser capability.",
+        },
     ]
 
 
@@ -5043,6 +5102,8 @@ wireguard-runner is dry-run by default and delegates to the existing WireGuard s
             DAY116_REVIEWER_DEFERRED_ACTION_REGISTER_TASK_ID,
             DAY117_DEFERRED_ACTION_TRACEABILITY_REVIEW_TASK_ID,
             DAY118_DEFERRED_ACTION_REVIEW_SEQUENCE_RUNBOOK_TASK_ID,
+            DAY119_REVIEWER_EVIDENCE_INTAKE_OUTCOME_LEDGER_TASK_ID,
+            DAY119_REVIEWER_EVIDENCE_INTAKE_OUTCOME_LEDGER_ALIAS,
             WIREGUARD_RUNNER_TASK_ALIAS,
         ],
         help="Task to run.",
@@ -9385,6 +9446,79 @@ def _run_day118_deferred_action_review_sequence_runbook(project_root: Path) -> i
     return 1
 
 
+def _run_day119_reviewer_evidence_intake_outcome_ledger(project_root: Path) -> int:
+    report = build_reviewer_evidence_intake_outcome_ledger_report(project_root=project_root)
+    json_path, html_path = write_reviewer_evidence_intake_outcome_ledger_reports(project_root, report)
+
+    print(format_heading("Day119 Reviewer Evidence Intake Outcome Ledger / Deferred Evidence Collection Log"))
+    print("Task name: reviewer-evidence-intake-outcome-ledger")
+    print("Alias: deferred-evidence-collection-log")
+    print("Phase: Reviewer Evidence Intake Outcome Ledger / Deferred Evidence Collection Log")
+    print("Audit type: REVIEW_ONLY / REPORT_ONLY / EVIDENCE_INTAKE_LOG_ONLY")
+    print("Safety: Day118 evidence intake outcome logging only; no acceptance decision, reviewer sign-off, safety boundary release, execution, SSH, live command, adapter invocation, broker handoff, OpenAI API, voice runtime, or parser capability change")
+    print(f"overall_status: {report['overall_status']}")
+    print(f"status: {report['status']}")
+    print(f"source_day: {report['source_day']}")
+    print(f"source_record_count: {report['source_record_count']}")
+    print(f"ledger_record_count: {report['ledger_record_count']}")
+    print(f"intake_status_counts: {report['intake_status_counts']}")
+    print(f"gap_status_counts: {report['gap_status_counts']}")
+    print(f"open_or_deferred_gap_count: {report['open_or_deferred_gap_count']}")
+    print(f"safety_blocked_gap_count: {report['safety_blocked_gap_count']}")
+    print(f"received_no_gap_count: {report['received_no_gap_count']}")
+    print(f"final_recommendation: {report['final_recommendation']}")
+    for flag_name in (
+        "acceptance_decision_made",
+        "reviewer_signoff_made",
+        "safety_boundary_released",
+        "allowed_to_execute",
+        "ssh_allowed",
+        "live_command_allowed",
+        "adapter_invocation_allowed",
+        "broker_handoff_allowed",
+        "parser_capability_changed",
+        "openai_api_allowed",
+        "voice_runtime_allowed",
+        "live_device_access_allowed",
+        "config_mutation_allowed",
+    ):
+        print(f"{flag_name}: {json.dumps(report[flag_name])}")
+    print(f"JSON report: {_relative_to_project(project_root, json_path)}")
+    print(f"HTML report: {_relative_to_project(project_root, html_path)}")
+
+    if (
+        report["overall_status"] == "INTAKE_LEDGER_READY"
+        and report["status"] == "INTAKE_LEDGER_READY"
+        and report["source_day"] == 118
+        and report["source_record_count"] == 7
+        and report["ledger_record_count"] == 7
+        and report["open_or_deferred_gap_count"] >= 1
+        and report["safety_blocked_gap_count"] >= 1
+        and report["final_recommendation"] == "REVIEW_ONLY_DEFERRED_EVIDENCE_COLLECTION"
+        and all(report[flag_name] is False for flag_name in (
+            "acceptance_decision_made",
+            "reviewer_signoff_made",
+            "safety_boundary_released",
+            "allowed_to_execute",
+            "ssh_allowed",
+            "live_command_allowed",
+            "adapter_invocation_allowed",
+            "broker_handoff_allowed",
+            "parser_capability_changed",
+            "openai_api_allowed",
+            "voice_runtime_allowed",
+            "live_device_access_allowed",
+            "config_mutation_allowed",
+        ))
+        and not report["validation_errors"]
+    ):
+        print(f"{format_status('PASS')} {report['overall_status']}")
+        return 0
+
+    print(f"{format_status('FAIL')} Day119 reviewer evidence intake outcome ledger failed validation.")
+    return 1
+
+
 def _relative_to_project(project_root: Path, path: Path) -> str:
     try:
         return path.resolve().relative_to(project_root.resolve()).as_posix()
@@ -11813,6 +11947,11 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
         return _run_day117_deferred_action_traceability_review(root)
     if args.task == DAY118_DEFERRED_ACTION_REVIEW_SEQUENCE_RUNBOOK_TASK_ID:
         return _run_day118_deferred_action_review_sequence_runbook(root)
+    if args.task in {
+        DAY119_REVIEWER_EVIDENCE_INTAKE_OUTCOME_LEDGER_TASK_ID,
+        DAY119_REVIEWER_EVIDENCE_INTAKE_OUTCOME_LEDGER_ALIAS,
+    }:
+        return _run_day119_reviewer_evidence_intake_outcome_ledger(root)
 
     profile_path = _resolve_project_path(root, args.profile)
     try:
