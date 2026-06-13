@@ -1,0 +1,98 @@
+{
+  "day": "Day124",
+  "day_number": 124,
+  "task": "safety-invariant-helper-review",
+  "title": "Safety Invariant Helper Consolidation",
+  "full_title": "Day124 Safety Invariant Helper Consolidation",
+  "created_at": "2026-06-14T00:00:00+08:00",
+  "schema_version": "day124.safety_invariant_helper_consolidation.v1",
+  "mode": "REVIEW_ONLY",
+  "overall_status": "PASS",
+  "status": "PASS",
+  "reviewer_status": "SAFETY_INVARIANT_HELPER_CONSOLIDATED",
+  "execution_allowed": false,
+  "final_recommendation": "KEEP_REVIEW_ONLY_SAFETY_INVARIANTS",
+  "safety_invariants": {
+    "execution_allowed": false,
+    "openai_api_allowed": false,
+    "voice_input_allowed": false,
+    "ssh_allowed": false,
+    "live_device_allowed": false,
+    "live_command_allowed": false,
+    "runtime_unlock_supported": false,
+    "dashboard_post_allowed": false,
+    "broker_execution_allowed": false,
+    "mapped_task_execution_allowed": false,
+    "write_operation_allowed": false,
+    "configuration_change_allowed": false
+  },
+  "blocked_capabilities": {
+    "openai_api": false,
+    "voice_input": false,
+    "ssh": false,
+    "live_device_connection": false,
+    "live_command_execution": false,
+    "runtime_unlock": false,
+    "dashboard_post_or_action_endpoint": false,
+    "broker_execution": false,
+    "mapped_task_execution": false,
+    "write_operation": false,
+    "configuration_change": false
+  },
+  "helper_contract": {
+    "module": "intent_safety_invariant_helpers.py",
+    "default_builder": "build_default_safety_invariants",
+    "blocked_capability_builder": "build_blocked_execution_capabilities",
+    "validator": "assert_review_only_safety_invariants",
+    "review_builder": "build_safety_invariant_helper_review",
+    "contract_scope": "AI intent, reviewer, provider, dry-run, and report-only tasks",
+    "deterministic": true,
+    "review_only": true,
+    "report_only": true,
+    "runtime_provider_enabled": false,
+    "execution_unlock_supported": false,
+    "dangerous_flag_count": 12,
+    "dangerous_false_count": 12,
+    "blocked_capability_count": 11
+  },
+  "source_evidence": [
+    {
+      "source": "AGENTS.md",
+      "evidence": "Project safety rules require dry-run, mock-only, report-only, documentation-only, and design-only tasks to remain non-executing."
+    },
+    {
+      "source": "Day120 task registry extraction",
+      "evidence": "Task registration remains metadata and dispatch naming only."
+    },
+    {
+      "source": "Day121 CLI dispatch responsibility split",
+      "evidence": "CLI routing remains thin and does not introduce execution capability."
+    },
+    {
+      "source": "Day122 report-index responsibility split",
+      "evidence": "Report index scans and renders local files only."
+    },
+    {
+      "source": "Day123 safety boundary regression matrix",
+      "evidence": "Safety-critical mock, review-only, report-only, dry-run-only, fake-adapter-only, locked, and disabled surfaces remain non-executing."
+    }
+  ],
+  "reviewer_notes": [
+    "Day124 consolidates common dangerous capability flags into one reusable helper contract.",
+    "The helper is deterministic and does not read secrets, local private configuration, network devices, or external services.",
+    "All OpenAI API, voice input, SSH, live device, live command, runtime unlock, dashboard POST/action, broker, mapped task, write, and configuration change flags remain false.",
+    "The final recommendation keeps the project in review-only safety invariant mode."
+  ],
+  "dangerous_flag_summary": {
+    "total_flags": 12,
+    "false_flags": 12,
+    "unsafe_true_flags": 0,
+    "blocked_capabilities": 11,
+    "unblocked_capabilities": 0
+  },
+  "report_paths": {
+    "json": "reports/lab-summary/day124_safety_invariant_helper_review.json",
+    "html": "reports/lab-summary/day124_safety_invariant_helper_review.html"
+  },
+  "validation_errors": []
+}
