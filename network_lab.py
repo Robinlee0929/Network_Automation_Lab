@@ -179,6 +179,10 @@ from intent_reviewer_evidence_intake_outcome_ledger import (
     build_reviewer_evidence_intake_outcome_ledger_report,
     write_reviewer_evidence_intake_outcome_ledger_reports,
 )
+from intent_safety_boundary_regression_matrix import (
+    build_safety_boundary_regression_matrix_report,
+    write_safety_boundary_regression_matrix_reports,
+)
 from intent_codex_agents_instruction_audit import (
     build_codex_agents_instruction_audit_report,
     write_codex_agents_instruction_audit_reports,
@@ -840,6 +844,19 @@ DAY119_REVIEWER_EVIDENCE_INTAKE_OUTCOME_LEDGER_JSON = (
 )
 DAY119_REVIEWER_EVIDENCE_INTAKE_OUTCOME_LEDGER_HTML = (
     Path("reports") / "lab-summary" / "day119_reviewer_evidence_intake_outcome_ledger.html"
+)
+DAY123_SAFETY_BOUNDARY_REGRESSION_MATRIX_TASK_ID = "safety-boundary-regression-matrix"
+DAY123_SAFETY_BOUNDARY_REGRESSION_MATRIX_DOC = (
+    Path("docs") / "ai-intent" / "day123_safety_boundary_regression_matrix.md"
+)
+DAY123_SAFETY_BOUNDARY_REGRESSION_MATRIX_ROADMAP_DOC = (
+    Path("docs") / "roadmap" / "day123_safety_boundary_regression_matrix.md"
+)
+DAY123_SAFETY_BOUNDARY_REGRESSION_MATRIX_JSON = (
+    Path("reports") / "lab-summary" / "day123_safety_boundary_regression_matrix.json"
+)
+DAY123_SAFETY_BOUNDARY_REGRESSION_MATRIX_HTML = (
+    Path("reports") / "lab-summary" / "day123_safety_boundary_regression_matrix.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -2011,6 +2028,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY119_REVIEWER_EVIDENCE_INTAKE_OUTCOME_LEDGER_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day123",
+        "title": "Safety Boundary Regression Matrix",
+        "report_type": "Report-only safety boundary regression matrix",
+        "safety_label": "REPORT_ONLY_SAFETY_BOUNDARY_REGRESSION; no execution, SSH, live commands, mutation, unlock, adapter/broker/runner invocation, OpenAI API, voice runtime, or dashboard POST actions",
+        "description": "Day123 verifies that safety-critical mock, review-only, report-only, dry-run-only, fake-adapter-only, locked, disabled, and Day120-Day122 refactor-boundary surfaces remain non-executing after the registry, CLI dispatch, and report-index responsibility splits.",
+        "json_globs": [DAY123_SAFETY_BOUNDARY_REGRESSION_MATRIX_JSON.as_posix()],
+        "html_globs": [DAY123_SAFETY_BOUNDARY_REGRESSION_MATRIX_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY123_SAFETY_BOUNDARY_REGRESSION_MATRIX_TASK_ID}"
         ),
     },
 ]
@@ -4940,6 +4970,34 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "network_lab.py",
             "notes": "REVIEW_ONLY REPORT_ONLY Day119 follows the seven Day118 expected evidence items only. Includes overall_status=INTAKE_LEDGER_READY, final_recommendation=REVIEW_ONLY_DEFERRED_EVIDENCE_COLLECTION, source_record_count=7, ledger_record_count=7, intake statuses RECEIVED/PARTIAL/MISSING/DEFERRED/REJECTED/NEEDS_CLARIFICATION, gap statuses NO_GAP/OPEN_GAP/DEFERRED_GAP/SAFETY_BLOCKED_GAP/CLARIFICATION_REQUIRED, acceptance_decision_made=false, reviewer_signoff_made=false, safety_boundary_released=false, allowed_to_execute=false, ssh_allowed=false, live_command_allowed=false, adapter_invocation_allowed=false, broker_handoff_allowed=false, parser_capability_changed=false. No item is accepted, signed off, released, handed off, executed, or used to expand parser capability.",
+        },
+        {
+            "id": DAY123_SAFETY_BOUNDARY_REGRESSION_MATRIX_TASK_ID,
+            "task_id": "day123_safety_boundary_regression_matrix",
+            "display_name": "Day123 Safety Boundary Regression Matrix",
+            "user_display_name": "Safety Boundary Regression Matrix",
+            "day": "Day123",
+            "category": "ai_planning",
+            "description": "Builds a report-only regression matrix proving safety-critical task families and Day120-Day122 refactor seams remain non-executing.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY123_SAFETY_BOUNDARY_REGRESSION_MATRIX_JSON.as_posix(),
+                DAY123_SAFETY_BOUNDARY_REGRESSION_MATRIX_HTML.as_posix(),
+                DAY123_SAFETY_BOUNDARY_REGRESSION_MATRIX_DOC.as_posix(),
+                DAY123_SAFETY_BOUNDARY_REGRESSION_MATRIX_ROADMAP_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Day123 JSON/HTML safety boundary regression matrix",
+                "Day123 AI intent and roadmap documentation",
+            ],
+            "related_script": "network_lab.py",
+            "notes": "REPORT_ONLY Day123 reviews mock-only, review-only, report-only, dry-run-only, fake-adapter-only, locked, disabled, parser-only, design-only, planning-only, scaffold-only, registry, CLI dispatch, and report-index boundaries. Includes overall_status=PASS, final_recommendation=KEEP_BOUNDARIES_LOCKED, execution_allowed=false, ssh_allowed=false, live_command_allowed=false, mutation_allowed=false, unlock_supported=false, adapter_invocation_allowed=false, broker_invocation_allowed=false, runner_invocation_allowed=false, openai_api_allowed=false, voice_runtime_allowed=false, dashboard_post_action_allowed=false. No reviewed task is executed.",
         },
     ]
 
@@ -9334,6 +9392,70 @@ def _run_day119_reviewer_evidence_intake_outcome_ledger(project_root: Path) -> i
         return 0
 
     print(f"{format_status('FAIL')} Day119 reviewer evidence intake outcome ledger failed validation.")
+    return 1
+
+
+def _run_day123_safety_boundary_regression_matrix(project_root: Path) -> int:
+    report = build_safety_boundary_regression_matrix_report(task_catalog=list_tasks())
+    json_path, html_path = write_safety_boundary_regression_matrix_reports(project_root, report)
+    summary = report["summary"]
+
+    print(format_heading("Day123 Safety Boundary Regression Matrix"))
+    print("Task name: safety-boundary-regression-matrix")
+    print("Mode: REPORT_ONLY_SAFETY_BOUNDARY_REGRESSION")
+    print("Safety: report-only; no reviewed task execution, SSH, live commands, mutation, unlock, adapter/broker/runner invocation, OpenAI API, voice runtime, or dashboard POST action")
+    print(f"overall_status: {report['overall_status']}")
+    print(f"status: {report['status']}")
+    print(f"total_rows: {summary['total_rows']}")
+    print(f"passed_rows: {summary['passed_rows']}")
+    print(f"failed_rows: {summary['failed_rows']}")
+    print(f"missing_catalog_rows: {summary['missing_catalog_rows']}")
+    for count_name in (
+        "execution_allowed_count",
+        "ssh_allowed_count",
+        "live_command_allowed_count",
+        "mutation_allowed_count",
+        "unlock_supported_count",
+        "adapter_invocation_allowed_count",
+        "broker_invocation_allowed_count",
+        "runner_invocation_allowed_count",
+        "openai_api_allowed_count",
+        "voice_runtime_allowed_count",
+        "dashboard_post_action_allowed_count",
+    ):
+        print(f"{count_name}: {summary[count_name]}")
+    print(f"final_recommendation: {report['final_recommendation']}")
+    print(f"JSON report: {_relative_to_project(project_root, json_path)}")
+    print(f"HTML report: {_relative_to_project(project_root, html_path)}")
+
+    if (
+        report["overall_status"] == "PASS"
+        and report["status"] == "PASS"
+        and summary["total_rows"] >= 24
+        and summary["failed_rows"] == 0
+        and summary["missing_catalog_rows"] == 0
+        and all(
+            summary[count_name] == 0
+            for count_name in (
+                "execution_allowed_count",
+                "ssh_allowed_count",
+                "live_command_allowed_count",
+                "mutation_allowed_count",
+                "unlock_supported_count",
+                "adapter_invocation_allowed_count",
+                "broker_invocation_allowed_count",
+                "runner_invocation_allowed_count",
+                "openai_api_allowed_count",
+                "voice_runtime_allowed_count",
+                "dashboard_post_action_allowed_count",
+            )
+        )
+        and not report["validation_errors"]
+    ):
+        print(f"{format_status('PASS')} SAFETY_BOUNDARY_REGRESSION_MATRIX_READY")
+        return 0
+
+    print(f"{format_status('FAIL')} Day123 safety boundary regression matrix blocked by a safety regression.")
     return 1
 
 

@@ -36,6 +36,7 @@ def _build_parser(lab: ModuleType) -> argparse.ArgumentParser:
   python network_lab.py --task intent-mapping-prototype --intent-text "show me the latest reports"
   python network_lab.py --task intent-safety-review --intent-text "do VRRP failover test"
   python network_lab.py --task intent-policy-matrix
+  python network_lab.py --task safety-boundary-regression-matrix
   python network_lab.py --task intent-workflow-demo
   python network_lab.py --task offline-mock-runtime
   python network_lab.py --task offline-mock-runtime-contract
@@ -82,6 +83,7 @@ readonly-executor-adapter-design defines deterministic Day88 real read-only exec
 real-adapter-safety-boundary-spec locks the Day89 pre-implementation safety boundary for any future real adapter; it remains DESIGN_ONLY, does not implement SSH or RouterOS connection, does not execute commands, and does not add dashboard actions.
 real-adapter-implementation-plan produces the Day90 implementation-entry decision report; it remains PLANNING_ONLY and does not implement SSH, RouterOS commands, live adapter access, or automatic apply.
 real-adapter-safety-scaffold produces the Day91 scaffold-only safety evidence after Day90 CONDITIONAL_GO; dangerous actions are denied, read-only candidates are future-only, and live-read remains blocked.
+safety-boundary-regression-matrix writes a Day123 report-only safety regression matrix over mock, review-only, report-only, dry-run-only, fake-adapter-only, locked, disabled, parser-only, and Day120-Day122 refactor boundaries without executing reviewed tasks, SSH, live commands, mutation, unlocks, OpenAI API, voice runtime, or dashboard actions.
 wireguard-runner is dry-run by default and delegates to the existing WireGuard script only after explicit --allow-live-wireguard."""
     parser = argparse.ArgumentParser(
         description=f"Day14 {lab.DAY14_NAME}.",
@@ -231,6 +233,7 @@ def _build_task_handlers(args: argparse.Namespace, root: Path, lab: ModuleType) 
         lab.DAY117_DEFERRED_ACTION_TRACEABILITY_REVIEW_TASK_ID: lambda: lab._run_day117_deferred_action_traceability_review(root),
         lab.DAY118_DEFERRED_ACTION_REVIEW_SEQUENCE_RUNBOOK_TASK_ID: lambda: lab._run_day118_deferred_action_review_sequence_runbook(root),
         lab.DAY119_REVIEWER_EVIDENCE_INTAKE_OUTCOME_LEDGER_TASK_ID: lambda: lab._run_day119_reviewer_evidence_intake_outcome_ledger(root),
+        lab.DAY123_SAFETY_BOUNDARY_REGRESSION_MATRIX_TASK_ID: lambda: lab._run_day123_safety_boundary_regression_matrix(root),
         lab.WIREGUARD_RUNNER_TASK_ALIAS: lambda: lab._run_wireguard_runner(
             root,
             dry_run=args.dry_run,

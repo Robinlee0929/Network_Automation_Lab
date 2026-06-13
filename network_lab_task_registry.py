@@ -72,6 +72,7 @@ CANONICAL_TASK_NAMES: Tuple[str, ...] = (
     "deferred-action-traceability-review",
     "deferred-action-review-sequence-runbook",
     "reviewer-evidence-intake-outcome-ledger",
+    "safety-boundary-regression-matrix",
     "wireguard-runner",
 )
 

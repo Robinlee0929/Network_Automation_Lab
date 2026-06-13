@@ -133,3 +133,9 @@ Day118 converts the seven Day117 deferred ownership matrix records into a review
 - [Day119 Reviewer Evidence Intake Outcome Ledger / Deferred Evidence Collection Log](day119_reviewer_evidence_intake_outcome_ledger.md)
 
 Day119 records intake outcomes for the seven Day118 expected evidence items. It is `INTAKE_LEDGER_READY` with `final_recommendation=REVIEW_ONLY_DEFERRED_EVIDENCE_COLLECTION`, `source_record_count=7`, `ledger_record_count=7`, explicit received, partial, missing, deferred, rejected, and clarification-needed intake states, and all acceptance, reviewer sign-off, safety release, execution, SSH, live command, adapter invocation, broker handoff, parser capability, OpenAI API, and voice runtime flags fixed at false.
+
+## Day123
+
+- [Day123 Safety Boundary Regression Matrix](day123_safety_boundary_regression_matrix.md)
+
+Day123 verifies that mock, review-only, report-only, dry-run-only, fake-adapter-only, locked, disabled, parser-only, design-only, planning-only, scaffold-only, task registry, CLI dispatch, and report-index boundaries remain non-executing after Day120-Day122. It is `REPORT_ONLY_SAFETY_BOUNDARY_REGRESSION` with `final_recommendation=KEEP_BOUNDARIES_LOCKED`; execution, SSH, live command, mutation, unlock, adapter/broker/runner invocation, OpenAI API, voice runtime, and dashboard POST action flags remain false.
