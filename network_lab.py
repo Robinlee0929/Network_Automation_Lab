@@ -183,6 +183,10 @@ from intent_safety_boundary_regression_matrix import (
     build_safety_boundary_regression_matrix_report,
     write_safety_boundary_regression_matrix_reports,
 )
+from intent_safety_invariant_helpers import (
+    build_safety_invariant_helper_review,
+    write_safety_invariant_helper_review_reports,
+)
 from intent_codex_agents_instruction_audit import (
     build_codex_agents_instruction_audit_report,
     write_codex_agents_instruction_audit_reports,
@@ -857,6 +861,19 @@ DAY123_SAFETY_BOUNDARY_REGRESSION_MATRIX_JSON = (
 )
 DAY123_SAFETY_BOUNDARY_REGRESSION_MATRIX_HTML = (
     Path("reports") / "lab-summary" / "day123_safety_boundary_regression_matrix.html"
+)
+DAY124_SAFETY_INVARIANT_HELPER_REVIEW_TASK_ID = "safety-invariant-helper-review"
+DAY124_SAFETY_INVARIANT_HELPER_REVIEW_DOC = (
+    Path("docs") / "ai-intent" / "day124_safety_invariant_helper_consolidation.md"
+)
+DAY124_SAFETY_INVARIANT_HELPER_REVIEW_ROADMAP_DOC = (
+    Path("docs") / "roadmap" / "day124_safety_invariant_helper_consolidation.md"
+)
+DAY124_SAFETY_INVARIANT_HELPER_REVIEW_JSON = (
+    Path("reports") / "lab-summary" / "day124_safety_invariant_helper_review.json"
+)
+DAY124_SAFETY_INVARIANT_HELPER_REVIEW_HTML = (
+    Path("reports") / "lab-summary" / "day124_safety_invariant_helper_review.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -2041,6 +2058,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY123_SAFETY_BOUNDARY_REGRESSION_MATRIX_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day124",
+        "title": "Safety Invariant Helper Consolidation",
+        "report_type": "Review-only safety invariant helper consolidation",
+        "safety_label": "REVIEW_ONLY; execution_allowed=false; OpenAI API, voice input, SSH, live device, live command, runtime unlock, dashboard POST/action, broker, mapped task, write, and configuration change flags remain false",
+        "description": "Day124 consolidates common deterministic safety invariant helpers for AI intent, reviewer, provider, dry-run, and report-only tasks without adding execution capability.",
+        "json_globs": [DAY124_SAFETY_INVARIANT_HELPER_REVIEW_JSON.as_posix()],
+        "html_globs": [DAY124_SAFETY_INVARIANT_HELPER_REVIEW_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY124_SAFETY_INVARIANT_HELPER_REVIEW_TASK_ID}"
         ),
     },
 ]
@@ -4998,6 +5028,34 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "network_lab.py",
             "notes": "REPORT_ONLY Day123 reviews mock-only, review-only, report-only, dry-run-only, fake-adapter-only, locked, disabled, parser-only, design-only, planning-only, scaffold-only, registry, CLI dispatch, and report-index boundaries. Includes overall_status=PASS, final_recommendation=KEEP_BOUNDARIES_LOCKED, execution_allowed=false, ssh_allowed=false, live_command_allowed=false, mutation_allowed=false, unlock_supported=false, adapter_invocation_allowed=false, broker_invocation_allowed=false, runner_invocation_allowed=false, openai_api_allowed=false, voice_runtime_allowed=false, dashboard_post_action_allowed=false. No reviewed task is executed.",
+        },
+        {
+            "id": DAY124_SAFETY_INVARIANT_HELPER_REVIEW_TASK_ID,
+            "task_id": "day124_safety_invariant_helper_review",
+            "display_name": "Day124 Safety Invariant Helper Consolidation",
+            "user_display_name": "Safety Invariant Helper Consolidation",
+            "day": "Day124",
+            "category": "ai_planning",
+            "description": "Builds a review-only report proving shared safety invariant helpers keep dangerous execution capability flags false.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY124_SAFETY_INVARIANT_HELPER_REVIEW_JSON.as_posix(),
+                DAY124_SAFETY_INVARIANT_HELPER_REVIEW_HTML.as_posix(),
+                DAY124_SAFETY_INVARIANT_HELPER_REVIEW_DOC.as_posix(),
+                DAY124_SAFETY_INVARIANT_HELPER_REVIEW_ROADMAP_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Day124 JSON/HTML safety invariant helper review",
+                "Day124 AI intent and roadmap documentation",
+            ],
+            "related_script": "network_lab.py",
+            "notes": "REVIEW_ONLY REPORT_ONLY Day124 consolidates deterministic safety invariant helpers. Includes overall_status=PASS, mode=REVIEW_ONLY, execution_allowed=false, final_recommendation=KEEP_REVIEW_ONLY_SAFETY_INVARIANTS, openai_api_allowed=false, voice_input_allowed=false, ssh_allowed=false, live_device_allowed=false, live_command_allowed=false, runtime_unlock_supported=false, dashboard_post_allowed=false, broker_execution_allowed=false, mapped_task_execution_allowed=false, write_operation_allowed=false, configuration_change_allowed=false. No runtime, provider, dashboard POST/action, broker, mapped task, SSH, live execution, or configuration-changing path is added.",
         },
     ]
 
@@ -9456,6 +9514,44 @@ def _run_day123_safety_boundary_regression_matrix(project_root: Path) -> int:
         return 0
 
     print(f"{format_status('FAIL')} Day123 safety boundary regression matrix blocked by a safety regression.")
+    return 1
+
+
+def _run_day124_safety_invariant_helper_review(project_root: Path) -> int:
+    report = build_safety_invariant_helper_review()
+    json_path, html_path = write_safety_invariant_helper_review_reports(project_root, report)
+    summary = report["dangerous_flag_summary"]
+
+    print(format_heading("Day124 Safety Invariant Helper Consolidation"))
+    print("Task name: safety-invariant-helper-review")
+    print("Mode: REVIEW_ONLY")
+    print("Safety: review-only; no OpenAI API, voice input, SSH, live device, live command, runtime unlock, dashboard POST/action endpoint, broker execution, mapped task execution, write operation, or configuration change")
+    print(f"overall_status: {report['overall_status']}")
+    print(f"reviewer_status: {report['reviewer_status']}")
+    print(f"mode: {report['mode']}")
+    print(f"execution_allowed: {str(report['execution_allowed']).lower()}")
+    print(f"final_recommendation: {report['final_recommendation']}")
+    print(f"dangerous_flags_false: {summary['false_flags']}/{summary['total_flags']}")
+    print(f"unsafe_true_flags: {summary['unsafe_true_flags']}")
+    print(f"unblocked_capabilities: {summary['unblocked_capabilities']}")
+    for flag, value in report["safety_invariants"].items():
+        print(f"{flag}: {str(value).lower()}")
+    print(f"JSON report: {_relative_to_project(project_root, json_path)}")
+    print(f"HTML report: {_relative_to_project(project_root, html_path)}")
+
+    if (
+        report["overall_status"] == "PASS"
+        and report["mode"] == "REVIEW_ONLY"
+        and report["execution_allowed"] is False
+        and report["final_recommendation"] == "KEEP_REVIEW_ONLY_SAFETY_INVARIANTS"
+        and summary["unsafe_true_flags"] == 0
+        and summary["unblocked_capabilities"] == 0
+        and not report["validation_errors"]
+    ):
+        print(f"{format_status('PASS')} SAFETY_INVARIANT_HELPER_CONSOLIDATED")
+        return 0
+
+    print(f"{format_status('FAIL')} Day124 safety invariant helper review blocked by an unsafe flag.")
     return 1
 
 

@@ -139,3 +139,9 @@ Day119 records intake outcomes for the seven Day118 expected evidence items. It 
 - [Day123 Safety Boundary Regression Matrix](day123_safety_boundary_regression_matrix.md)
 
 Day123 verifies that mock, review-only, report-only, dry-run-only, fake-adapter-only, locked, disabled, parser-only, design-only, planning-only, scaffold-only, task registry, CLI dispatch, and report-index boundaries remain non-executing after Day120-Day122. It is `REPORT_ONLY_SAFETY_BOUNDARY_REGRESSION` with `final_recommendation=KEEP_BOUNDARIES_LOCKED`; execution, SSH, live command, mutation, unlock, adapter/broker/runner invocation, OpenAI API, voice runtime, and dashboard POST action flags remain false.
+
+## Day124
+
+- [Day124 Safety Invariant Helper Consolidation](day124_safety_invariant_helper_consolidation.md)
+
+Day124 consolidates common deterministic safety invariant helpers for future AI intent, reviewer, provider, dry-run, and report-only tasks. It is a refactor/consolidation task only: mode remains `REVIEW_ONLY`, `execution_allowed=false`, `final_recommendation=KEEP_REVIEW_ONLY_SAFETY_INVARIANTS`, and OpenAI API, voice input, SSH, live device, live command, runtime unlock, dashboard POST/action, broker execution, mapped task execution, write operation, and configuration change flags remain false.
