@@ -145,3 +145,9 @@ Day123 verifies that mock, review-only, report-only, dry-run-only, fake-adapter-
 - [Day124 Safety Invariant Helper Consolidation](day124_safety_invariant_helper_consolidation.md)
 
 Day124 consolidates common deterministic safety invariant helpers for future AI intent, reviewer, provider, dry-run, and report-only tasks. It is a refactor/consolidation task only: mode remains `REVIEW_ONLY`, `execution_allowed=false`, `final_recommendation=KEEP_REVIEW_ONLY_SAFETY_INVARIANTS`, and OpenAI API, voice input, SSH, live device, live command, runtime unlock, dashboard POST/action, broker execution, mapped task execution, write operation, and configuration change flags remain false.
+
+## Day125
+
+- [Day125 Thin CLI Regression Gate](day125_thin_cli_regression_gate.md)
+
+Day125 adds a report-only regression gate for Day120-Day124 split work. It records AGENTS.md pre-read evidence, verifies thin CLI delegation, registry resolution, dispatch wiring, report/formatter shape, Day124 safety helper invariants, and representative smoke task resolution. `allowed_to_execute`, `ssh_allowed`, `live_command_allowed`, `next_phase_allowed`, live execution, OpenAI API, SSH, and dashboard action endpoints remain false.

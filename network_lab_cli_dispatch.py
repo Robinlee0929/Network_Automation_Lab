@@ -38,6 +38,7 @@ def _build_parser(lab: ModuleType) -> argparse.ArgumentParser:
   python network_lab.py --task intent-policy-matrix
   python network_lab.py --task safety-boundary-regression-matrix
   python network_lab.py --task safety-invariant-helper-review
+  python network_lab.py --task thin-cli-regression-gate
   python network_lab.py --task intent-workflow-demo
   python network_lab.py --task offline-mock-runtime
   python network_lab.py --task offline-mock-runtime-contract
@@ -86,6 +87,7 @@ real-adapter-implementation-plan produces the Day90 implementation-entry decisio
 real-adapter-safety-scaffold produces the Day91 scaffold-only safety evidence after Day90 CONDITIONAL_GO; dangerous actions are denied, read-only candidates are future-only, and live-read remains blocked.
 safety-boundary-regression-matrix writes a Day123 report-only safety regression matrix over mock, review-only, report-only, dry-run-only, fake-adapter-only, locked, disabled, parser-only, and Day120-Day122 refactor boundaries without executing reviewed tasks, SSH, live commands, mutation, unlocks, OpenAI API, voice runtime, or dashboard actions.
 safety-invariant-helper-review writes a Day124 review-only helper consolidation report with all OpenAI API, voice input, SSH, live device, live command, runtime unlock, dashboard POST/action endpoint, broker, mapped task, write, and configuration change flags fixed false.
+thin-cli-regression-gate writes a Day125 report-only regression gate proving thin CLI, registry, dispatch, report/formatter, safety helper, and smoke task behavior remained stable after Day120-Day124 without live execution, SSH, OpenAI API, or dashboard action endpoints.
 wireguard-runner is dry-run by default and delegates to the existing WireGuard script only after explicit --allow-live-wireguard."""
     parser = argparse.ArgumentParser(
         description=f"Day14 {lab.DAY14_NAME}.",
@@ -237,6 +239,7 @@ def _build_task_handlers(args: argparse.Namespace, root: Path, lab: ModuleType) 
         lab.DAY119_REVIEWER_EVIDENCE_INTAKE_OUTCOME_LEDGER_TASK_ID: lambda: lab._run_day119_reviewer_evidence_intake_outcome_ledger(root),
         lab.DAY123_SAFETY_BOUNDARY_REGRESSION_MATRIX_TASK_ID: lambda: lab._run_day123_safety_boundary_regression_matrix(root),
         lab.DAY124_SAFETY_INVARIANT_HELPER_REVIEW_TASK_ID: lambda: lab._run_day124_safety_invariant_helper_review(root),
+        lab.DAY125_THIN_CLI_REGRESSION_GATE_TASK_ID: lambda: lab._run_day125_thin_cli_regression_gate(root),
         lab.WIREGUARD_RUNNER_TASK_ALIAS: lambda: lab._run_wireguard_runner(
             root,
             dry_run=args.dry_run,

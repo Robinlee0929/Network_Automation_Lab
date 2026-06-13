@@ -74,6 +74,7 @@ CANONICAL_TASK_NAMES: Tuple[str, ...] = (
     "reviewer-evidence-intake-outcome-ledger",
     "safety-boundary-regression-matrix",
     "safety-invariant-helper-review",
+    "thin-cli-regression-gate",
     "wireguard-runner",
 )
 

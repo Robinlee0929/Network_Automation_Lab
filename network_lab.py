@@ -187,6 +187,7 @@ from intent_safety_invariant_helpers import (
     build_safety_invariant_helper_review,
     write_safety_invariant_helper_review_reports,
 )
+from intent_thin_cli_regression_gate import run_thin_cli_regression_gate
 from intent_codex_agents_instruction_audit import (
     build_codex_agents_instruction_audit_report,
     write_codex_agents_instruction_audit_reports,
@@ -874,6 +875,19 @@ DAY124_SAFETY_INVARIANT_HELPER_REVIEW_JSON = (
 )
 DAY124_SAFETY_INVARIANT_HELPER_REVIEW_HTML = (
     Path("reports") / "lab-summary" / "day124_safety_invariant_helper_review.html"
+)
+DAY125_THIN_CLI_REGRESSION_GATE_TASK_ID = "thin-cli-regression-gate"
+DAY125_THIN_CLI_REGRESSION_GATE_DOC = (
+    Path("docs") / "ai-intent" / "day125_thin_cli_regression_gate.md"
+)
+DAY125_THIN_CLI_REGRESSION_GATE_ROADMAP_DOC = (
+    Path("docs") / "roadmap" / "day125_thin_cli_regression_gate.md"
+)
+DAY125_THIN_CLI_REGRESSION_GATE_JSON = (
+    Path("reports") / "lab-summary" / "day125_thin_cli_regression_gate.json"
+)
+DAY125_THIN_CLI_REGRESSION_GATE_HTML = (
+    Path("reports") / "lab-summary" / "day125_thin_cli_regression_gate.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -2071,6 +2085,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY124_SAFETY_INVARIANT_HELPER_REVIEW_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day125",
+        "title": "Thin CLI Regression Gate",
+        "report_type": "Report-only thin CLI regression gate",
+        "safety_label": "REPORT_ONLY; allowed_to_execute=false; SSH, live command, OpenAI API, dashboard action endpoint, and next phase unlock remain false",
+        "description": "Day125 verifies that registry, dispatch, report visibility, formatter, and safety helper behavior did not regress after Day120-Day124 while keeping network_lab.py as a thin CLI entrypoint wrapper.",
+        "json_globs": [DAY125_THIN_CLI_REGRESSION_GATE_JSON.as_posix()],
+        "html_globs": [DAY125_THIN_CLI_REGRESSION_GATE_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY125_THIN_CLI_REGRESSION_GATE_TASK_ID}"
         ),
     },
 ]
@@ -5056,6 +5083,34 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "network_lab.py",
             "notes": "REVIEW_ONLY REPORT_ONLY Day124 consolidates deterministic safety invariant helpers. Includes overall_status=PASS, mode=REVIEW_ONLY, execution_allowed=false, final_recommendation=KEEP_REVIEW_ONLY_SAFETY_INVARIANTS, openai_api_allowed=false, voice_input_allowed=false, ssh_allowed=false, live_device_allowed=false, live_command_allowed=false, runtime_unlock_supported=false, dashboard_post_allowed=false, broker_execution_allowed=false, mapped_task_execution_allowed=false, write_operation_allowed=false, configuration_change_allowed=false. No runtime, provider, dashboard POST/action, broker, mapped task, SSH, live execution, or configuration-changing path is added.",
+        },
+        {
+            "id": DAY125_THIN_CLI_REGRESSION_GATE_TASK_ID,
+            "task_id": "day125_thin_cli_regression_gate",
+            "display_name": "Day125 Thin CLI Regression Gate",
+            "user_display_name": "Thin CLI Regression Gate",
+            "day": "Day125",
+            "category": "ai_planning",
+            "description": "Builds a report-only regression gate proving the Day120-Day124 registry, dispatch, report, formatter, and safety helper splits remain stable.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY125_THIN_CLI_REGRESSION_GATE_JSON.as_posix(),
+                DAY125_THIN_CLI_REGRESSION_GATE_HTML.as_posix(),
+                DAY125_THIN_CLI_REGRESSION_GATE_DOC.as_posix(),
+                DAY125_THIN_CLI_REGRESSION_GATE_ROADMAP_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Day125 JSON/HTML thin CLI regression gate",
+                "Day125 AI intent and roadmap documentation",
+            ],
+            "related_script": "intent_thin_cli_regression_gate.py",
+            "notes": "REPORT_ONLY Day125 verifies AGENTS.md pre-read evidence, thin CLI delegation, registry resolution, dispatch wiring, report-index readability, Day124 safety helper invariants, and representative smoke tasks. It keeps allowed_to_execute=false, ssh_allowed=false, live_command_allowed=false, next_phase_allowed=false, live_execution_added=false, ssh_added=false, openai_api_added=false, and dashboard_execution_endpoint_added=false.",
         },
     ]
 
@@ -9553,6 +9608,15 @@ def _run_day124_safety_invariant_helper_review(project_root: Path) -> int:
 
     print(f"{format_status('FAIL')} Day124 safety invariant helper review blocked by an unsafe flag.")
     return 1
+
+
+def _run_day125_thin_cli_regression_gate(project_root: Path) -> int:
+    return run_thin_cli_regression_gate(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
 
 
 def _relative_to_project(project_root: Path, path: Path) -> str:
