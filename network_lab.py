@@ -176,7 +176,6 @@ from intent_deferred_action_review_sequence_runbook import (
     write_deferred_action_review_sequence_runbook_reports,
 )
 from intent_reviewer_evidence_intake_outcome_ledger import (
-    TASK_ALIAS as DAY119_REVIEWER_EVIDENCE_INTAKE_OUTCOME_LEDGER_ALIAS,
     build_reviewer_evidence_intake_outcome_ledger_report,
     write_reviewer_evidence_intake_outcome_ledger_reports,
 )
@@ -186,6 +185,11 @@ from intent_codex_agents_instruction_audit import (
 )
 from intent_runtime_safety_case import build_runtime_safety_case_report
 from intent_runtime_safety_gate import build_runtime_safety_gate_report
+from network_lab_task_registry import (
+    UnknownTaskError,
+    get_cli_task_choices,
+    resolve_task_handler,
+)
 
 
 DAY14_NAME = "Unified Lab Runner and Report Index"
@@ -332,7 +336,6 @@ DAY80_READONLY_EXECUTION_BROKER_ROADMAP = (
 DAY80_READONLY_EXECUTION_BROKER_JSON = Path("reports") / "lab-summary" / "day80_readonly_execution_broker.json"
 DAY80_READONLY_EXECUTION_BROKER_HTML = Path("reports") / "lab-summary" / "day80_readonly_execution_broker.html"
 DAY81_BROKER_REVIEW_QUEUE_TASK_ID = "broker-review-queue"
-DAY81_BROKER_REVIEW_QUEUE_DECISION_STATE_TASK_ALIAS = "broker-review-queue-decision-state"
 DAY81_BROKER_REVIEW_QUEUE_DOC = Path("docs") / "ai" / "intent_broker_review_queue.md"
 DAY81_BROKER_REVIEW_QUEUE_ROADMAP = Path("docs") / "roadmap" / "day81_broker_review_queue.md"
 DAY81_BROKER_REVIEW_QUEUE_JSON = Path("reports") / "lab-summary" / "day81_broker_review_queue.json"
@@ -5035,77 +5038,7 @@ wireguard-runner is dry-run by default and delegates to the existing WireGuard s
     )
     parser.add_argument(
         "--task",
-        choices=[
-            "report-index",
-            "portfolio-finalize",
-            "demo-flow",
-            "day4-baseline",
-            "iperf3-performance",
-            DAY32_VRRP_PRECHECK_TASK_ID,
-            DAY33_VRRP_DRY_RUN_TASK_ID,
-            DAY34_VRRP_STAGED_PLAN_TASK_ID,
-            DAY35_VRRP_FAILOVER_TASK_ID,
-            DAY39_VRRP_EVIDENCE_TASK_ID,
-            DAY40_DEMO_READINESS_TASK_ID,
-            DAY41_RELEASE_PACKAGING_TASK_ID,
-            DAY57_INTENT_MAPPING_TASK_ID,
-            DAY58_INTENT_SAFETY_REVIEW_TASK_ID,
-            DAY59_INTENT_POLICY_MATRIX_TASK_ID,
-            DAY60_INTENT_WORKFLOW_DEMO_TASK_ID,
-            DAY66_OFFLINE_MOCK_RUNTIME_TASK_ID,
-            DAY67_OFFLINE_MOCK_RUNTIME_CONTRACT_TASK_ID,
-            DAY68_OFFLINE_MOCK_RUNTIME_REVIEW_TASK_ID,
-            DAY73_MOCK_AI_DECISION_PIPELINE_TASK_ID,
-            DAY74_DRY_RUN_PLAN_BUILDER_TASK_ID,
-            DAY75_MANUAL_REVIEW_APPROVAL_ENVELOPE_TASK_ID,
-            DAY76_RUNTIME_AUDIT_TRAIL_TASK_ID,
-            DAY77_RUNTIME_SAFETY_GATE_TASK_ID,
-            DAY78_RUNTIME_SAFETY_CASE_TASK_ID,
-            DAY79_READONLY_TASK_CONTRACT_TASK_ID,
-            DAY80_READONLY_EXECUTION_BROKER_TASK_ID,
-            DAY81_BROKER_REVIEW_QUEUE_TASK_ID,
-            DAY81_BROKER_REVIEW_QUEUE_DECISION_STATE_TASK_ALIAS,
-            DAY82_REVIEWER_DECISION_AUDIT_TASK_ID,
-            DAY83_READONLY_EXECUTOR_READINESS_GATE_TASK_ID,
-            DAY84_READONLY_EXECUTOR_ADAPTER_CONTRACT_TASK_ID,
-            DAY85_MOCK_ADAPTER_EVIDENCE_BINDING_TASK_ID,
-            DAY86_CONTROLLED_RUNNER_HARNESS_TASK_ID,
-            DAY87_READONLY_EXECUTOR_PHASE_GATE_REVIEW_TASK_ID,
-            DAY88_REAL_READONLY_EXECUTOR_ADAPTER_DESIGN_TASK_ID,
-            DAY89_REAL_ADAPTER_SAFETY_BOUNDARY_SPEC_TASK_ID,
-            DAY90_REAL_ADAPTER_IMPLEMENTATION_PLAN_TASK_ID,
-            DAY91_REAL_ADAPTER_SAFETY_SCAFFOLD_TASK_ID,
-            DAY92_REAL_ADAPTER_EXECUTABLE_GUARDS_TASK_ID,
-            DAY93_GUARDED_FAKE_ADAPTER_CONTRACT_TASK_ID,
-            DAY94_ADAPTER_BOUNDARY_REGRESSION_MATRIX_TASK_ID,
-            DAY95_ADAPTER_RESULT_NORMALIZATION_TASK_ID,
-            DAY96_READONLY_OUTPUT_PARSER_PROTOTYPE_TASK_ID,
-            DAY97_PARSER_EVIDENCE_QUALITY_TASK_ID,
-            DAY98_PARSER_CLASSIFICATION_MATRIX_TASK_ID,
-            DAY99_PARSER_EVIDENCE_COVERAGE_AUDIT_TASK_ID,
-            DAY100_PARSER_PHASE_GATE_REVIEW_TASK_ID,
-            DAY101_PARSER_EVIDENCE_CLOSURE_PLAN_TASK_ID,
-            DAY102_PARSER_FIXTURE_EXPANSION_TASK_ID,
-            DAY103_PARSER_EVIDENCE_MATRIX_TASK_ID,
-            DAY104_PARSER_REVIEWER_ACCEPTANCE_GATE_TASK_ID,
-            DAY105_PARSER_ACCEPTANCE_CLOSURE_TASK_ID,
-            DAY106_CODEX_AGENTS_INSTRUCTION_AUDIT_TASK_ID,
-            DAY107_PARSER_REVIEWER_EVIDENCE_CONTRACT_TASK_ID,
-            DAY108_PARSER_CONTRACT_CONSUMER_HANDOFF_TASK_ID,
-            DAY109_PARSER_CONSUMER_HANDOFF_READINESS_MATRIX_TASK_ID,
-            DAY110_PARSER_CONSUMER_FINAL_GATE_TASK_ID,
-            DAY111_PARSER_CONSUMER_RELEASE_PACKAGE_TASK_ID,
-            DAY112_PARSER_CONSUMER_RELEASE_REVIEW_INTAKE_TASK_ID,
-            DAY113_PARSER_CONSUMER_REVIEWER_TRIAGE_DECISION_LOG_TASK_ID,
-            DAY114_PARSER_CONSUMER_REVIEWER_TRIAGE_EVIDENCE_TRACEABILITY_TASK_ID,
-            DAY115_PARSER_CONSUMER_REVIEWER_TRIAGE_CLOSURE_SUMMARY_TASK_ID,
-            DAY116_REVIEWER_DEFERRED_ACTION_REGISTER_TASK_ID,
-            DAY117_DEFERRED_ACTION_TRACEABILITY_REVIEW_TASK_ID,
-            DAY118_DEFERRED_ACTION_REVIEW_SEQUENCE_RUNBOOK_TASK_ID,
-            DAY119_REVIEWER_EVIDENCE_INTAKE_OUTCOME_LEDGER_TASK_ID,
-            DAY119_REVIEWER_EVIDENCE_INTAKE_OUTCOME_LEDGER_ALIAS,
-            WIREGUARD_RUNNER_TASK_ALIAS,
-        ],
+        choices=get_cli_task_choices(),
         help="Task to run.",
     )
     parser.add_argument("--profile", default=str(DEFAULT_PROFILE), help="Path to the Day14 lab runner profile JSON.")
@@ -11817,6 +11750,115 @@ def run_interactive_menu(
             print("Please enter a number from 0 to 8.")
 
 
+LATE_INTERACTIVE_TASK_NAMES = {
+    "report-index",
+    "day4-baseline",
+    "iperf3-performance",
+    DAY32_VRRP_PRECHECK_TASK_ID,
+    DAY33_VRRP_DRY_RUN_TASK_ID,
+    DAY34_VRRP_STAGED_PLAN_TASK_ID,
+    DAY35_VRRP_FAILOVER_TASK_ID,
+    WIREGUARD_RUNNER_TASK_ALIAS,
+}
+
+
+def _run_profile_backed_cli_task(project_root: Path, args: argparse.Namespace, runner: Any) -> int:
+    profile_path = _resolve_project_path(project_root, args.profile)
+    try:
+        profile = load_lab_runner_profile(profile_path)
+    except ValueError as exc:
+        print(f"ERROR: {exc}", file=sys.stderr)
+        return 2
+    return runner(profile, profile_path)
+
+
+def _build_task_handlers(args: argparse.Namespace, root: Path) -> Dict[str, Any]:
+    return {
+        "report-index": lambda: _run_profile_backed_cli_task(
+            root,
+            args,
+            lambda profile, profile_path: _run_report_index(
+                profile,
+                root,
+                profile_path,
+                dry_run=args.dry_run,
+            ),
+        ),
+        "portfolio-finalize": lambda: _run_portfolio_finalization(root),
+        "demo-flow": lambda: _run_day24_demo_flow(root),
+        "day4-baseline": lambda: _run_day4_baseline(root, dry_run=args.dry_run),
+        "iperf3-performance": lambda: _run_day8_performance(root, dry_run=args.dry_run),
+        DAY32_VRRP_PRECHECK_TASK_ID: lambda: _run_day32_vrrp_precheck(root, dry_run=args.dry_run),
+        DAY33_VRRP_DRY_RUN_TASK_ID: lambda: _run_day33_vrrp_dry_run(root),
+        DAY34_VRRP_STAGED_PLAN_TASK_ID: lambda: _run_day34_vrrp_staged_plan(root),
+        DAY35_VRRP_FAILOVER_TASK_ID: lambda: _run_day35_vrrp_failover_validation(root, dry_run=args.dry_run),
+        DAY39_VRRP_EVIDENCE_TASK_ID: lambda: _run_day39_vrrp_evidence_dashboard_integration(root),
+        DAY40_DEMO_READINESS_TASK_ID: lambda: _run_day40_demo_readiness_review(root),
+        DAY41_RELEASE_PACKAGING_TASK_ID: lambda: _run_day41_release_packaging(root),
+        DAY57_INTENT_MAPPING_TASK_ID: lambda: _run_day57_intent_mapping_prototype(args.intent_text),
+        DAY58_INTENT_SAFETY_REVIEW_TASK_ID: lambda: _run_day58_intent_safety_review(root, args.intent_text),
+        DAY59_INTENT_POLICY_MATRIX_TASK_ID: lambda: _run_day59_intent_policy_matrix(root),
+        DAY60_INTENT_WORKFLOW_DEMO_TASK_ID: lambda: _run_day60_intent_workflow_demo(root),
+        DAY66_OFFLINE_MOCK_RUNTIME_TASK_ID: lambda: _run_day66_offline_mock_runtime(root),
+        DAY67_OFFLINE_MOCK_RUNTIME_CONTRACT_TASK_ID: lambda: _run_day67_offline_mock_runtime_contract(root),
+        DAY68_OFFLINE_MOCK_RUNTIME_REVIEW_TASK_ID: lambda: _run_day68_offline_mock_runtime_review(root),
+        DAY73_MOCK_AI_DECISION_PIPELINE_TASK_ID: lambda: _run_day73_mock_ai_decision_pipeline(root),
+        DAY74_DRY_RUN_PLAN_BUILDER_TASK_ID: lambda: _run_day74_dry_run_plan_builder(root),
+        DAY75_MANUAL_REVIEW_APPROVAL_ENVELOPE_TASK_ID: lambda: _run_day75_manual_review_approval_envelope(root),
+        DAY76_RUNTIME_AUDIT_TRAIL_TASK_ID: lambda: _run_day76_runtime_audit_trail(root),
+        DAY77_RUNTIME_SAFETY_GATE_TASK_ID: lambda: _run_day77_runtime_safety_gate(root),
+        DAY78_RUNTIME_SAFETY_CASE_TASK_ID: lambda: _run_day78_runtime_safety_case(root),
+        DAY79_READONLY_TASK_CONTRACT_TASK_ID: lambda: _run_day79_readonly_task_contract(root),
+        DAY80_READONLY_EXECUTION_BROKER_TASK_ID: lambda: _run_day80_readonly_execution_broker(root),
+        DAY81_BROKER_REVIEW_QUEUE_TASK_ID: lambda: _run_day81_broker_review_queue(root),
+        DAY82_REVIEWER_DECISION_AUDIT_TASK_ID: lambda: _run_day82_reviewer_decision_audit_summary(root),
+        DAY83_READONLY_EXECUTOR_READINESS_GATE_TASK_ID: lambda: _run_day83_readonly_executor_readiness_gate(root),
+        DAY84_READONLY_EXECUTOR_ADAPTER_CONTRACT_TASK_ID: lambda: _run_day84_readonly_executor_adapter_contract(root),
+        DAY85_MOCK_ADAPTER_EVIDENCE_BINDING_TASK_ID: lambda: _run_day85_mock_adapter_evidence_binding(root),
+        DAY86_CONTROLLED_RUNNER_HARNESS_TASK_ID: lambda: _run_day86_controlled_runner_harness(root),
+        DAY87_READONLY_EXECUTOR_PHASE_GATE_REVIEW_TASK_ID: lambda: _run_day87_readonly_executor_phase_gate_review(root),
+        DAY88_REAL_READONLY_EXECUTOR_ADAPTER_DESIGN_TASK_ID: lambda: _run_day88_real_readonly_executor_adapter_design(root),
+        DAY89_REAL_ADAPTER_SAFETY_BOUNDARY_SPEC_TASK_ID: lambda: _run_day89_real_adapter_safety_boundary_spec(root),
+        DAY90_REAL_ADAPTER_IMPLEMENTATION_PLAN_TASK_ID: lambda: _run_day90_real_adapter_implementation_plan(root),
+        DAY91_REAL_ADAPTER_SAFETY_SCAFFOLD_TASK_ID: lambda: _run_day91_real_adapter_safety_scaffold(root),
+        DAY92_REAL_ADAPTER_EXECUTABLE_GUARDS_TASK_ID: lambda: _run_day92_real_adapter_executable_guards(root),
+        DAY93_GUARDED_FAKE_ADAPTER_CONTRACT_TASK_ID: lambda: _run_day93_guarded_fake_adapter_contract(root),
+        DAY94_ADAPTER_BOUNDARY_REGRESSION_MATRIX_TASK_ID: lambda: _run_day94_adapter_boundary_regression_matrix(root),
+        DAY95_ADAPTER_RESULT_NORMALIZATION_TASK_ID: lambda: _run_day95_adapter_result_normalization(root),
+        DAY96_READONLY_OUTPUT_PARSER_PROTOTYPE_TASK_ID: lambda: _run_day96_readonly_output_parser_prototype(root),
+        DAY97_PARSER_EVIDENCE_QUALITY_TASK_ID: lambda: _run_day97_parser_evidence_quality(root),
+        DAY98_PARSER_CLASSIFICATION_MATRIX_TASK_ID: lambda: _run_day98_parser_classification_matrix(root),
+        DAY99_PARSER_EVIDENCE_COVERAGE_AUDIT_TASK_ID: lambda: _run_day99_parser_evidence_coverage_audit(root),
+        DAY100_PARSER_PHASE_GATE_REVIEW_TASK_ID: lambda: _run_day100_parser_phase_gate_review(root),
+        DAY101_PARSER_EVIDENCE_CLOSURE_PLAN_TASK_ID: lambda: _run_day101_parser_evidence_closure_plan(root),
+        DAY102_PARSER_FIXTURE_EXPANSION_TASK_ID: lambda: _run_day102_parser_fixture_expansion(root),
+        DAY103_PARSER_EVIDENCE_MATRIX_TASK_ID: lambda: _run_day103_parser_evidence_matrix(root),
+        DAY104_PARSER_REVIEWER_ACCEPTANCE_GATE_TASK_ID: lambda: _run_day104_parser_reviewer_acceptance_gate(root),
+        DAY105_PARSER_ACCEPTANCE_CLOSURE_TASK_ID: lambda: _run_day105_parser_acceptance_closure(root),
+        DAY106_CODEX_AGENTS_INSTRUCTION_AUDIT_TASK_ID: lambda: _run_day106_codex_agents_instruction_audit(root),
+        DAY107_PARSER_REVIEWER_EVIDENCE_CONTRACT_TASK_ID: lambda: _run_day107_parser_reviewer_evidence_contract(root),
+        DAY108_PARSER_CONTRACT_CONSUMER_HANDOFF_TASK_ID: lambda: _run_day108_parser_contract_consumer_handoff(root),
+        DAY109_PARSER_CONSUMER_HANDOFF_READINESS_MATRIX_TASK_ID: lambda: _run_day109_parser_consumer_handoff_readiness_matrix(root),
+        DAY110_PARSER_CONSUMER_FINAL_GATE_TASK_ID: lambda: _run_day110_parser_consumer_final_gate(root),
+        DAY111_PARSER_CONSUMER_RELEASE_PACKAGE_TASK_ID: lambda: _run_day111_parser_consumer_release_package(root),
+        DAY112_PARSER_CONSUMER_RELEASE_REVIEW_INTAKE_TASK_ID: lambda: _run_day112_parser_consumer_release_review_intake(root),
+        DAY113_PARSER_CONSUMER_REVIEWER_TRIAGE_DECISION_LOG_TASK_ID: lambda: _run_day113_parser_consumer_reviewer_triage_decision_log(root),
+        DAY114_PARSER_CONSUMER_REVIEWER_TRIAGE_EVIDENCE_TRACEABILITY_TASK_ID: lambda: _run_day114_parser_consumer_reviewer_triage_evidence_traceability(root),
+        DAY115_PARSER_CONSUMER_REVIEWER_TRIAGE_CLOSURE_SUMMARY_TASK_ID: lambda: _run_day115_parser_consumer_reviewer_triage_closure_summary(root),
+        DAY116_REVIEWER_DEFERRED_ACTION_REGISTER_TASK_ID: lambda: _run_day116_reviewer_deferred_action_register(root),
+        DAY117_DEFERRED_ACTION_TRACEABILITY_REVIEW_TASK_ID: lambda: _run_day117_deferred_action_traceability_review(root),
+        DAY118_DEFERRED_ACTION_REVIEW_SEQUENCE_RUNBOOK_TASK_ID: lambda: _run_day118_deferred_action_review_sequence_runbook(root),
+        DAY119_REVIEWER_EVIDENCE_INTAKE_OUTCOME_LEDGER_TASK_ID: lambda: _run_day119_reviewer_evidence_intake_outcome_ledger(root),
+        WIREGUARD_RUNNER_TASK_ALIAS: lambda: _run_wireguard_runner(
+            root,
+            dry_run=args.dry_run,
+            allow_live_wireguard=args.allow_live_wireguard,
+            config_path=args.wireguard_config,
+            run_iperf=args.run_iperf,
+        ),
+    }
+
+
 def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) -> int:
     parser = _build_parser()
     args = parser.parse_args(argv)
@@ -11829,129 +11871,16 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
         return _run_report_visibility_index(root)
     if args.portfolio_finalize:
         return _run_portfolio_finalization(root)
-    if args.task == "portfolio-finalize":
-        return _run_portfolio_finalization(root)
-    if args.task == "demo-flow":
-        return _run_day24_demo_flow(root)
-    if args.task == DAY39_VRRP_EVIDENCE_TASK_ID:
-        return _run_day39_vrrp_evidence_dashboard_integration(root)
-    if args.task == DAY40_DEMO_READINESS_TASK_ID:
-        return _run_day40_demo_readiness_review(root)
-    if args.task == DAY41_RELEASE_PACKAGING_TASK_ID:
-        return _run_day41_release_packaging(root)
-    if args.task == DAY57_INTENT_MAPPING_TASK_ID:
-        return _run_day57_intent_mapping_prototype(args.intent_text)
-    if args.task == DAY58_INTENT_SAFETY_REVIEW_TASK_ID:
-        return _run_day58_intent_safety_review(root, args.intent_text)
-    if args.task == DAY59_INTENT_POLICY_MATRIX_TASK_ID:
-        return _run_day59_intent_policy_matrix(root)
-    if args.task == DAY60_INTENT_WORKFLOW_DEMO_TASK_ID:
-        return _run_day60_intent_workflow_demo(root)
-    if args.task == DAY66_OFFLINE_MOCK_RUNTIME_TASK_ID:
-        return _run_day66_offline_mock_runtime(root)
-    if args.task == DAY67_OFFLINE_MOCK_RUNTIME_CONTRACT_TASK_ID:
-        return _run_day67_offline_mock_runtime_contract(root)
-    if args.task == DAY68_OFFLINE_MOCK_RUNTIME_REVIEW_TASK_ID:
-        return _run_day68_offline_mock_runtime_review(root)
-    if args.task == DAY73_MOCK_AI_DECISION_PIPELINE_TASK_ID:
-        return _run_day73_mock_ai_decision_pipeline(root)
-    if args.task == DAY74_DRY_RUN_PLAN_BUILDER_TASK_ID:
-        return _run_day74_dry_run_plan_builder(root)
-    if args.task == DAY75_MANUAL_REVIEW_APPROVAL_ENVELOPE_TASK_ID:
-        return _run_day75_manual_review_approval_envelope(root)
-    if args.task == DAY76_RUNTIME_AUDIT_TRAIL_TASK_ID:
-        return _run_day76_runtime_audit_trail(root)
-    if args.task == DAY77_RUNTIME_SAFETY_GATE_TASK_ID:
-        return _run_day77_runtime_safety_gate(root)
-    if args.task == DAY78_RUNTIME_SAFETY_CASE_TASK_ID:
-        return _run_day78_runtime_safety_case(root)
-    if args.task == DAY79_READONLY_TASK_CONTRACT_TASK_ID:
-        return _run_day79_readonly_task_contract(root)
-    if args.task == DAY80_READONLY_EXECUTION_BROKER_TASK_ID:
-        return _run_day80_readonly_execution_broker(root)
-    if args.task == DAY81_BROKER_REVIEW_QUEUE_TASK_ID:
-        return _run_day81_broker_review_queue(root)
-    if args.task == DAY81_BROKER_REVIEW_QUEUE_DECISION_STATE_TASK_ALIAS:
-        return _run_day81_broker_review_queue(root)
-    if args.task == DAY82_REVIEWER_DECISION_AUDIT_TASK_ID:
-        return _run_day82_reviewer_decision_audit_summary(root)
-    if args.task == DAY83_READONLY_EXECUTOR_READINESS_GATE_TASK_ID:
-        return _run_day83_readonly_executor_readiness_gate(root)
-    if args.task == DAY84_READONLY_EXECUTOR_ADAPTER_CONTRACT_TASK_ID:
-        return _run_day84_readonly_executor_adapter_contract(root)
-    if args.task == DAY85_MOCK_ADAPTER_EVIDENCE_BINDING_TASK_ID:
-        return _run_day85_mock_adapter_evidence_binding(root)
-    if args.task == DAY86_CONTROLLED_RUNNER_HARNESS_TASK_ID:
-        return _run_day86_controlled_runner_harness(root)
-    if args.task == DAY87_READONLY_EXECUTOR_PHASE_GATE_REVIEW_TASK_ID:
-        return _run_day87_readonly_executor_phase_gate_review(root)
-    if args.task == DAY88_REAL_READONLY_EXECUTOR_ADAPTER_DESIGN_TASK_ID:
-        return _run_day88_real_readonly_executor_adapter_design(root)
-    if args.task == DAY89_REAL_ADAPTER_SAFETY_BOUNDARY_SPEC_TASK_ID:
-        return _run_day89_real_adapter_safety_boundary_spec(root)
-    if args.task == DAY90_REAL_ADAPTER_IMPLEMENTATION_PLAN_TASK_ID:
-        return _run_day90_real_adapter_implementation_plan(root)
-    if args.task == DAY91_REAL_ADAPTER_SAFETY_SCAFFOLD_TASK_ID:
-        return _run_day91_real_adapter_safety_scaffold(root)
-    if args.task == DAY92_REAL_ADAPTER_EXECUTABLE_GUARDS_TASK_ID:
-        return _run_day92_real_adapter_executable_guards(root)
-    if args.task == DAY93_GUARDED_FAKE_ADAPTER_CONTRACT_TASK_ID:
-        return _run_day93_guarded_fake_adapter_contract(root)
-    if args.task == DAY94_ADAPTER_BOUNDARY_REGRESSION_MATRIX_TASK_ID:
-        return _run_day94_adapter_boundary_regression_matrix(root)
-    if args.task == DAY95_ADAPTER_RESULT_NORMALIZATION_TASK_ID:
-        return _run_day95_adapter_result_normalization(root)
-    if args.task == DAY96_READONLY_OUTPUT_PARSER_PROTOTYPE_TASK_ID:
-        return _run_day96_readonly_output_parser_prototype(root)
-    if args.task == DAY97_PARSER_EVIDENCE_QUALITY_TASK_ID:
-        return _run_day97_parser_evidence_quality(root)
-    if args.task == DAY98_PARSER_CLASSIFICATION_MATRIX_TASK_ID:
-        return _run_day98_parser_classification_matrix(root)
-    if args.task == DAY99_PARSER_EVIDENCE_COVERAGE_AUDIT_TASK_ID:
-        return _run_day99_parser_evidence_coverage_audit(root)
-    if args.task == DAY100_PARSER_PHASE_GATE_REVIEW_TASK_ID:
-        return _run_day100_parser_phase_gate_review(root)
-    if args.task == DAY101_PARSER_EVIDENCE_CLOSURE_PLAN_TASK_ID:
-        return _run_day101_parser_evidence_closure_plan(root)
-    if args.task == DAY102_PARSER_FIXTURE_EXPANSION_TASK_ID:
-        return _run_day102_parser_fixture_expansion(root)
-    if args.task == DAY103_PARSER_EVIDENCE_MATRIX_TASK_ID:
-        return _run_day103_parser_evidence_matrix(root)
-    if args.task == DAY104_PARSER_REVIEWER_ACCEPTANCE_GATE_TASK_ID:
-        return _run_day104_parser_reviewer_acceptance_gate(root)
-    if args.task == DAY105_PARSER_ACCEPTANCE_CLOSURE_TASK_ID:
-        return _run_day105_parser_acceptance_closure(root)
-    if args.task == DAY106_CODEX_AGENTS_INSTRUCTION_AUDIT_TASK_ID:
-        return _run_day106_codex_agents_instruction_audit(root)
-    if args.task == DAY107_PARSER_REVIEWER_EVIDENCE_CONTRACT_TASK_ID:
-        return _run_day107_parser_reviewer_evidence_contract(root)
-    if args.task == DAY108_PARSER_CONTRACT_CONSUMER_HANDOFF_TASK_ID:
-        return _run_day108_parser_contract_consumer_handoff(root)
-    if args.task == DAY109_PARSER_CONSUMER_HANDOFF_READINESS_MATRIX_TASK_ID:
-        return _run_day109_parser_consumer_handoff_readiness_matrix(root)
-    if args.task == DAY110_PARSER_CONSUMER_FINAL_GATE_TASK_ID:
-        return _run_day110_parser_consumer_final_gate(root)
-    if args.task == DAY111_PARSER_CONSUMER_RELEASE_PACKAGE_TASK_ID:
-        return _run_day111_parser_consumer_release_package(root)
-    if args.task == DAY112_PARSER_CONSUMER_RELEASE_REVIEW_INTAKE_TASK_ID:
-        return _run_day112_parser_consumer_release_review_intake(root)
-    if args.task == DAY113_PARSER_CONSUMER_REVIEWER_TRIAGE_DECISION_LOG_TASK_ID:
-        return _run_day113_parser_consumer_reviewer_triage_decision_log(root)
-    if args.task == DAY114_PARSER_CONSUMER_REVIEWER_TRIAGE_EVIDENCE_TRACEABILITY_TASK_ID:
-        return _run_day114_parser_consumer_reviewer_triage_evidence_traceability(root)
-    if args.task == DAY115_PARSER_CONSUMER_REVIEWER_TRIAGE_CLOSURE_SUMMARY_TASK_ID:
-        return _run_day115_parser_consumer_reviewer_triage_closure_summary(root)
-    if args.task == DAY116_REVIEWER_DEFERRED_ACTION_REGISTER_TASK_ID:
-        return _run_day116_reviewer_deferred_action_register(root)
-    if args.task == DAY117_DEFERRED_ACTION_TRACEABILITY_REVIEW_TASK_ID:
-        return _run_day117_deferred_action_traceability_review(root)
-    if args.task == DAY118_DEFERRED_ACTION_REVIEW_SEQUENCE_RUNBOOK_TASK_ID:
-        return _run_day118_deferred_action_review_sequence_runbook(root)
-    if args.task in {
-        DAY119_REVIEWER_EVIDENCE_INTAKE_OUTCOME_LEDGER_TASK_ID,
-        DAY119_REVIEWER_EVIDENCE_INTAKE_OUTCOME_LEDGER_ALIAS,
-    }:
-        return _run_day119_reviewer_evidence_intake_outcome_ledger(root)
+    handlers = _build_task_handlers(args, root)
+    resolved_task = None
+    if args.task:
+        try:
+            resolved_task = resolve_task_handler(args.task, handlers)
+        except UnknownTaskError as exc:
+            print(f"ERROR: {exc}", file=sys.stderr)
+            return 2
+        if resolved_task.canonical_name not in LATE_INTERACTIVE_TASK_NAMES:
+            return resolved_task.handler()
 
     profile_path = _resolve_project_path(root, args.profile)
     try:
@@ -11963,28 +11892,8 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
     if args.interactive or not args.task:
         return run_interactive_menu(profile, root, profile_path, wireguard_config=args.wireguard_config)
 
-    if args.task == "report-index":
-        return _run_report_index(profile, root, profile_path, dry_run=args.dry_run)
-    if args.task == "day4-baseline":
-        return _run_day4_baseline(root, dry_run=args.dry_run)
-    if args.task == "iperf3-performance":
-        return _run_day8_performance(root, dry_run=args.dry_run)
-    if args.task == DAY32_VRRP_PRECHECK_TASK_ID:
-        return _run_day32_vrrp_precheck(root, dry_run=args.dry_run)
-    if args.task == DAY33_VRRP_DRY_RUN_TASK_ID:
-        return _run_day33_vrrp_dry_run(root)
-    if args.task == DAY34_VRRP_STAGED_PLAN_TASK_ID:
-        return _run_day34_vrrp_staged_plan(root)
-    if args.task == DAY35_VRRP_FAILOVER_TASK_ID:
-        return _run_day35_vrrp_failover_validation(root, dry_run=args.dry_run)
-    if args.task == WIREGUARD_RUNNER_TASK_ALIAS:
-        return _run_wireguard_runner(
-            root,
-            dry_run=args.dry_run,
-            allow_live_wireguard=args.allow_live_wireguard,
-            config_path=args.wireguard_config,
-            run_iperf=args.run_iperf,
-        )
+    if resolved_task:
+        return resolved_task.handler()
 
     return 2
 
