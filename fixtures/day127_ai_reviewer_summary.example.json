@@ -1,0 +1,63 @@
+{
+  "schema_version": "day127.ai_reviewer_summary_schema_contract.v1",
+  "summary_id": "day127-example-ai-reviewer-summary",
+  "summary_kind": "AI_REVIEWER_SUMMARY_CONTRACT_FIXTURE",
+  "contract_revision": 1,
+  "source_report_refs": [
+    {
+      "ref_id": "day126-compatibility-pack",
+      "day": "Day126",
+      "title": "Post-Refactor Compatibility Evidence Pack",
+      "path": "reports/lab-summary/day126_post_refactor_compatibility_evidence_pack.json",
+      "required": true
+    }
+  ],
+  "status_rollup": {
+    "overall_status": "REVIEW_ONLY",
+    "pass_count": 1,
+    "warn_count": 0,
+    "fail_count": 0,
+    "blocked_count": 0,
+    "locked_count": 1
+  },
+  "reviewer_findings": [
+    {
+      "finding_id": "DAY127-SCHEMA-001",
+      "severity": "INFO",
+      "status": "REVIEW_ONLY",
+      "title": "AI reviewer summary data contract is available for review.",
+      "evidence_ref_ids": [
+        "day127-schema-contract"
+      ],
+      "requires_human_review": true
+    }
+  ],
+  "evidence_refs": [
+    {
+      "ref_id": "day127-schema-contract",
+      "kind": "schema_contract",
+      "path": "docs/ai-intent/day127_ai_reviewer_summary_schema_contract.md",
+      "description": "Reviewer-facing schema contract evidence."
+    }
+  ],
+  "safety_boundary": {
+    "renderer_implemented": false,
+    "prompt_text_contract_implemented": false,
+    "redaction_policy_implemented": false,
+    "openai_api_allowed": false,
+    "voice_runtime_allowed": false,
+    "ssh_allowed": false,
+    "live_device_allowed": false,
+    "live_command_allowed": false,
+    "mapped_task_execution_allowed": false,
+    "dashboard_action_endpoint_allowed": false,
+    "execution_unlock_added": false,
+    "next_phase_allowed": false
+  },
+  "non_goals": [
+    "Day128 renderer is not implemented.",
+    "Day129 prompt text contract is not implemented.",
+    "Day130 redaction policy is not implemented.",
+    "No execution unlock is added."
+  ]
+}

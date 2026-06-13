@@ -157,3 +157,9 @@ Day125 adds a report-only regression gate for Day120-Day124 split work. It recor
 - [Day126 Post-Refactor Compatibility Evidence Pack](day126_post_refactor_compatibility_evidence_pack.md)
 
 Day126 packages Day120-Day125 compatibility evidence as a report-only, reviewer-only evidence pack. It uses one Day125 thin CLI snapshot only and explicitly does not add a thin CLI budget gate, numeric thresholds, budget enforcement, or future-work blocking policy. Live execution, SSH, OpenAI/voice runtime, mapped task execution, dashboard action endpoints, execution unlocks, and next-phase approval remain false.
+
+## Day127
+
+- [Day127 AI Reviewer Summary Schema Contract Integration](day127_ai_reviewer_summary_schema_contract.md)
+
+Day127 integrates the AI reviewer summary data structure contract with schema validation, a static example fixture, CLI task evidence, tests, and documentation. It does not implement Day128 renderer, Day129 prompt text contract, Day130 redaction policy, OpenAI/voice runtime, live execution, SSH, mapped task execution, dashboard action endpoints, execution unlocks, or next-phase approval.

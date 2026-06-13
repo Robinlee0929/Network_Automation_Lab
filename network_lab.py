@@ -191,6 +191,9 @@ from intent_thin_cli_regression_gate import run_thin_cli_regression_gate
 from intent_post_refactor_compatibility_evidence_pack import (
     run_post_refactor_compatibility_evidence_pack,
 )
+from intent_ai_reviewer_summary_schema_contract import (
+    run_ai_reviewer_summary_schema_contract,
+)
 from intent_codex_agents_instruction_audit import (
     build_codex_agents_instruction_audit_report,
     write_codex_agents_instruction_audit_reports,
@@ -906,6 +909,19 @@ DAY126_POST_REFACTOR_COMPATIBILITY_EVIDENCE_PACK_JSON = (
 )
 DAY126_POST_REFACTOR_COMPATIBILITY_EVIDENCE_PACK_HTML = (
     Path("reports") / "lab-summary" / "day126_post_refactor_compatibility_evidence_pack.html"
+)
+DAY127_AI_REVIEWER_SUMMARY_SCHEMA_CONTRACT_TASK_ID = "ai-reviewer-summary-schema-contract"
+DAY127_AI_REVIEWER_SUMMARY_SCHEMA_CONTRACT_DOC = (
+    Path("docs") / "ai-intent" / "day127_ai_reviewer_summary_schema_contract.md"
+)
+DAY127_AI_REVIEWER_SUMMARY_SCHEMA_CONTRACT_ROADMAP_DOC = (
+    Path("docs") / "roadmap" / "day127_ai_reviewer_summary_schema_contract.md"
+)
+DAY127_AI_REVIEWER_SUMMARY_SCHEMA_CONTRACT_JSON = (
+    Path("reports") / "lab-summary" / "day127_ai_reviewer_summary_schema_contract.json"
+)
+DAY127_AI_REVIEWER_SUMMARY_SCHEMA_CONTRACT_HTML = (
+    Path("reports") / "lab-summary" / "day127_ai_reviewer_summary_schema_contract.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -2129,6 +2145,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY126_POST_REFACTOR_COMPATIBILITY_EVIDENCE_PACK_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day127",
+        "title": "AI Reviewer Summary Schema Contract Integration",
+        "report_type": "Report-only AI reviewer summary data structure contract",
+        "safety_label": "REPORT_ONLY; REVIEWER_ONLY; schema/validation/fixture only; no Day128 renderer, Day129 prompt text, Day130 redaction policy, SSH, live command, OpenAI API, voice runtime, mapped task execution, dashboard action endpoint, or execution unlock",
+        "description": "Day127 integrates the AI reviewer summary data structure contract with validation, an example fixture, CLI task evidence, tests, and documentation while explicitly leaving renderer, prompt text, and redaction policy work for later days.",
+        "json_globs": [DAY127_AI_REVIEWER_SUMMARY_SCHEMA_CONTRACT_JSON.as_posix()],
+        "html_globs": [DAY127_AI_REVIEWER_SUMMARY_SCHEMA_CONTRACT_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY127_AI_REVIEWER_SUMMARY_SCHEMA_CONTRACT_TASK_ID}"
         ),
     },
 ]
@@ -5170,6 +5199,36 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "intent_post_refactor_compatibility_evidence_pack.py",
             "notes": "REPORT_ONLY REVIEWER_ONLY Day126 verifies Day120 task registry, Day121 CLI dispatch, Day122 report-index/report registry, Day123 formatter/output, Day124 safety helper, and a single Day125 thin CLI snapshot. It does not add a thin CLI budget gate, numeric budget thresholds, budget enforcement, live execution, SSH, OpenAI API, voice runtime, mapped task execution, dashboard action endpoint, or execution unlock.",
+        },
+        {
+            "id": DAY127_AI_REVIEWER_SUMMARY_SCHEMA_CONTRACT_TASK_ID,
+            "task_id": "day127_ai_reviewer_summary_schema_contract",
+            "display_name": "Day127 AI Reviewer Summary Schema Contract Integration",
+            "user_display_name": "AI Reviewer Summary Schema Contract",
+            "day": "Day127",
+            "category": "ai_planning",
+            "description": "Builds a report-only AI reviewer summary data structure contract with schema validation and a static example fixture.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY127_AI_REVIEWER_SUMMARY_SCHEMA_CONTRACT_JSON.as_posix(),
+                DAY127_AI_REVIEWER_SUMMARY_SCHEMA_CONTRACT_HTML.as_posix(),
+                DAY127_AI_REVIEWER_SUMMARY_SCHEMA_CONTRACT_DOC.as_posix(),
+                DAY127_AI_REVIEWER_SUMMARY_SCHEMA_CONTRACT_ROADMAP_DOC.as_posix(),
+                "fixtures/day127_ai_reviewer_summary.example.json",
+            ],
+            "report_outputs": [
+                "Day127 JSON/HTML AI reviewer summary schema contract",
+                "Day127 AI intent and roadmap documentation",
+                "Day127 static example fixture",
+            ],
+            "related_script": "intent_ai_reviewer_summary_schema_contract.py",
+            "notes": "REPORT_ONLY REVIEWER_ONLY Day127 integrates schema, validation, example fixture, CLI task, tests, and documentation evidence for the AI reviewer summary data contract. It does not implement Day128 renderer, Day129 prompt text contract, Day130 redaction policy, live execution, SSH, OpenAI API, voice runtime, mapped task execution, dashboard action endpoint, or execution unlock.",
         },
     ]
 
@@ -9680,6 +9739,15 @@ def _run_day125_thin_cli_regression_gate(project_root: Path) -> int:
 
 def _run_day126_post_refactor_compatibility_evidence_pack(project_root: Path) -> int:
     return run_post_refactor_compatibility_evidence_pack(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_day127_ai_reviewer_summary_schema_contract(project_root: Path) -> int:
+    return run_ai_reviewer_summary_schema_contract(
         project_root,
         format_heading_func=format_heading,
         format_status_func=format_status,
