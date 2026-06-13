@@ -151,3 +151,9 @@ Day124 consolidates common deterministic safety invariant helpers for future AI 
 - [Day125 Thin CLI Regression Gate](day125_thin_cli_regression_gate.md)
 
 Day125 adds a report-only regression gate for Day120-Day124 split work. It records AGENTS.md pre-read evidence, verifies thin CLI delegation, registry resolution, dispatch wiring, report/formatter shape, Day124 safety helper invariants, and representative smoke task resolution. `allowed_to_execute`, `ssh_allowed`, `live_command_allowed`, `next_phase_allowed`, live execution, OpenAI API, SSH, and dashboard action endpoints remain false.
+
+## Day126
+
+- [Day126 Post-Refactor Compatibility Evidence Pack](day126_post_refactor_compatibility_evidence_pack.md)
+
+Day126 packages Day120-Day125 compatibility evidence as a report-only, reviewer-only evidence pack. It uses one Day125 thin CLI snapshot only and explicitly does not add a thin CLI budget gate, numeric thresholds, budget enforcement, or future-work blocking policy. Live execution, SSH, OpenAI/voice runtime, mapped task execution, dashboard action endpoints, execution unlocks, and next-phase approval remain false.

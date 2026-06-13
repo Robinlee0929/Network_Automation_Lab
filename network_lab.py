@@ -188,6 +188,9 @@ from intent_safety_invariant_helpers import (
     write_safety_invariant_helper_review_reports,
 )
 from intent_thin_cli_regression_gate import run_thin_cli_regression_gate
+from intent_post_refactor_compatibility_evidence_pack import (
+    run_post_refactor_compatibility_evidence_pack,
+)
 from intent_codex_agents_instruction_audit import (
     build_codex_agents_instruction_audit_report,
     write_codex_agents_instruction_audit_reports,
@@ -888,6 +891,21 @@ DAY125_THIN_CLI_REGRESSION_GATE_JSON = (
 )
 DAY125_THIN_CLI_REGRESSION_GATE_HTML = (
     Path("reports") / "lab-summary" / "day125_thin_cli_regression_gate.html"
+)
+DAY126_POST_REFACTOR_COMPATIBILITY_EVIDENCE_PACK_TASK_ID = (
+    "post-refactor-compatibility-evidence-pack"
+)
+DAY126_POST_REFACTOR_COMPATIBILITY_EVIDENCE_PACK_DOC = (
+    Path("docs") / "ai-intent" / "day126_post_refactor_compatibility_evidence_pack.md"
+)
+DAY126_POST_REFACTOR_COMPATIBILITY_EVIDENCE_PACK_ROADMAP_DOC = (
+    Path("docs") / "roadmap" / "day126_post_refactor_compatibility_evidence_pack.md"
+)
+DAY126_POST_REFACTOR_COMPATIBILITY_EVIDENCE_PACK_JSON = (
+    Path("reports") / "lab-summary" / "day126_post_refactor_compatibility_evidence_pack.json"
+)
+DAY126_POST_REFACTOR_COMPATIBILITY_EVIDENCE_PACK_HTML = (
+    Path("reports") / "lab-summary" / "day126_post_refactor_compatibility_evidence_pack.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -2098,6 +2116,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY125_THIN_CLI_REGRESSION_GATE_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day126",
+        "title": "Post-Refactor Compatibility Evidence Pack",
+        "report_type": "Report-only post-refactor compatibility evidence pack",
+        "safety_label": "REPORT_ONLY; REVIEWER_ONLY; Day125 thin CLI is snapshot-only; no budget gate, SSH, live command, OpenAI API, voice runtime, mapped task execution, dashboard action endpoint, or next phase unlock",
+        "description": "Day126 packages compatibility evidence for Day120-Day125 responsibility-split work while keeping the Day125 thin CLI regression gate represented only as one snapshot, not a budget gate or numeric enforcement mechanism.",
+        "json_globs": [DAY126_POST_REFACTOR_COMPATIBILITY_EVIDENCE_PACK_JSON.as_posix()],
+        "html_globs": [DAY126_POST_REFACTOR_COMPATIBILITY_EVIDENCE_PACK_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY126_POST_REFACTOR_COMPATIBILITY_EVIDENCE_PACK_TASK_ID}"
         ),
     },
 ]
@@ -5111,6 +5142,34 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "intent_thin_cli_regression_gate.py",
             "notes": "REPORT_ONLY Day125 verifies AGENTS.md pre-read evidence, thin CLI delegation, registry resolution, dispatch wiring, report-index readability, Day124 safety helper invariants, and representative smoke tasks. It keeps allowed_to_execute=false, ssh_allowed=false, live_command_allowed=false, next_phase_allowed=false, live_execution_added=false, ssh_added=false, openai_api_added=false, and dashboard_execution_endpoint_added=false.",
+        },
+        {
+            "id": DAY126_POST_REFACTOR_COMPATIBILITY_EVIDENCE_PACK_TASK_ID,
+            "task_id": "day126_post_refactor_compatibility_evidence_pack",
+            "display_name": "Day126 Post-Refactor Compatibility Evidence Pack",
+            "user_display_name": "Post-Refactor Compatibility Evidence Pack",
+            "day": "Day126",
+            "category": "ai_planning",
+            "description": "Builds a report-only compatibility evidence pack for Day120-Day125 responsibility-split work with the Day125 thin CLI gate represented as one snapshot only.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY126_POST_REFACTOR_COMPATIBILITY_EVIDENCE_PACK_JSON.as_posix(),
+                DAY126_POST_REFACTOR_COMPATIBILITY_EVIDENCE_PACK_HTML.as_posix(),
+                DAY126_POST_REFACTOR_COMPATIBILITY_EVIDENCE_PACK_DOC.as_posix(),
+                DAY126_POST_REFACTOR_COMPATIBILITY_EVIDENCE_PACK_ROADMAP_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Day126 JSON/HTML post-refactor compatibility evidence pack",
+                "Day126 AI intent and roadmap documentation",
+            ],
+            "related_script": "intent_post_refactor_compatibility_evidence_pack.py",
+            "notes": "REPORT_ONLY REVIEWER_ONLY Day126 verifies Day120 task registry, Day121 CLI dispatch, Day122 report-index/report registry, Day123 formatter/output, Day124 safety helper, and a single Day125 thin CLI snapshot. It does not add a thin CLI budget gate, numeric budget thresholds, budget enforcement, live execution, SSH, OpenAI API, voice runtime, mapped task execution, dashboard action endpoint, or execution unlock.",
         },
     ]
 
@@ -9612,6 +9671,15 @@ def _run_day124_safety_invariant_helper_review(project_root: Path) -> int:
 
 def _run_day125_thin_cli_regression_gate(project_root: Path) -> int:
     return run_thin_cli_regression_gate(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_day126_post_refactor_compatibility_evidence_pack(project_root: Path) -> int:
+    return run_post_refactor_compatibility_evidence_pack(
         project_root,
         format_heading_func=format_heading,
         format_status_func=format_status,
