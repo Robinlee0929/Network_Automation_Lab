@@ -9366,68 +9366,99 @@ def _report_device_label(path: Optional[Path], report_title: str) -> str:
     return parent
 
 
-def discover_report_visibility(project_root: Path) -> List[Dict[str, Any]]:
+def _scan_report_catalog_item(project_root: Path, report_type: Dict[str, Any]) -> Dict[str, List[Path]]:
+    return {
+        "json_paths": _collect_report_paths(project_root, report_type["json_globs"]),
+        "html_paths": _collect_report_paths(project_root, report_type["html_globs"]),
+    }
+
+
+def _missing_report_visibility_row(report_type: Dict[str, Any]) -> Dict[str, Any]:
+    return {
+        "day": report_type["day"],
+        "title": report_type["title"],
+        "report_type": report_type.get("report_type", "Report evidence"),
+        "device": _report_device_label(None, report_type["title"]),
+        "status": "MISSING",
+        "safety": report_type.get("safety_label", "report-only evidence"),
+        "description": report_type.get("description", ""),
+        "json": "",
+        "html": "",
+        "notes": report_type.get("missing_note", "Expected report was not found."),
+    }
+
+
+def _found_report_visibility_row(
+    project_root: Path,
+    report_type: Dict[str, Any],
+    json_path: Optional[Path],
+    html_path: Optional[Path],
+) -> Dict[str, Any]:
+    label_path = json_path or html_path
+    return {
+        "day": report_type["day"],
+        "title": report_type["title"],
+        "report_type": report_type.get("report_type", "Report evidence"),
+        "device": _report_device_label(label_path, report_type["title"]),
+        "status": "FOUND" if json_path or html_path else "MISSING",
+        "safety": report_type.get("safety_label", "report-only evidence"),
+        "description": report_type.get("description", ""),
+        "json": _relative_to_project(project_root, json_path) if json_path else "MISSING",
+        "html": _relative_to_project(project_root, html_path) if html_path else "MISSING",
+        "notes": "",
+    }
+
+
+def _normalize_report_visibility_rows(
+    project_root: Path,
+    report_type: Dict[str, Any],
+    scanned_paths: Dict[str, List[Path]],
+) -> List[Dict[str, Any]]:
+    json_paths = scanned_paths["json_paths"]
+    html_paths = scanned_paths["html_paths"]
+    if not json_paths and not html_paths:
+        return [_missing_report_visibility_row(report_type)]
+
     rows: List[Dict[str, Any]] = []
-    for report_type in REPORT_CATALOG:
-        json_paths = _collect_report_paths(project_root, report_type["json_globs"])
-        html_paths = _collect_report_paths(project_root, report_type["html_globs"])
-        if not json_paths and not html_paths:
-            rows.append(
-                {
-                    "day": report_type["day"],
-                    "title": report_type["title"],
-                    "report_type": report_type.get("report_type", "Report evidence"),
-                    "device": _report_device_label(None, report_type["title"]),
-                    "status": "MISSING",
-                    "safety": report_type.get("safety_label", "report-only evidence"),
-                    "description": report_type.get("description", ""),
-                    "json": "",
-                    "html": "",
-                    "notes": report_type.get("missing_note", "Expected report was not found."),
-                }
-            )
-            continue
+    max_count = max(len(json_paths), len(html_paths))
+    for index in range(max_count):
+        json_path = json_paths[index] if index < len(json_paths) else None
+        html_path = html_paths[index] if index < len(html_paths) else None
+        rows.append(_found_report_visibility_row(project_root, report_type, json_path, html_path))
+    return rows
 
-        max_count = max(len(json_paths), len(html_paths))
-        for index in range(max_count):
-            json_path = json_paths[index] if index < len(json_paths) else None
-            html_path = html_paths[index] if index < len(html_paths) else None
-            label_path = json_path or html_path
-            rows.append(
-                {
-                    "day": report_type["day"],
-                    "title": report_type["title"],
-                    "report_type": report_type.get("report_type", "Report evidence"),
-                    "device": _report_device_label(label_path, report_type["title"]),
-                    "status": "FOUND" if json_path or html_path else "MISSING",
-                    "safety": report_type.get("safety_label", "report-only evidence"),
-                    "description": report_type.get("description", ""),
-                    "json": _relative_to_project(project_root, json_path) if json_path else "MISSING",
-                    "html": _relative_to_project(project_root, html_path) if html_path else "MISSING",
-                    "notes": "",
-                }
-            )
 
+def _attach_day18_runner_evidence(rows: List[Dict[str, Any]], project_root: Path) -> None:
     day18_evidence = build_day18_runner_evidence(project_root)
     for row in rows:
         if row.get("day") == "Day18" and row.get("title") == WIREGUARD_RUNNER_DISPLAY_NAME:
             row["day18_evidence"] = day18_evidence
             row["notes"] = _format_day18_console_note(day18_evidence)
 
-    rows.append(
-        {
-            "day": "Day13",
-            "title": "Day13 WireGuard Live Execution",
-            "report_type": "Disabled live workflow",
-            "device": "Runner guardrail",
-            "status": "DISABLED FOR DAY18",
-            "safety": "disabled guardrail",
-            "description": "Day13 live execution is intentionally not exposed through the Day18 runner safety layer.",
-            "json": "",
-            "html": "",
-            "notes": "Day13 live WireGuard execution remains disabled until its own runner safety layer is implemented.",
-        }
-    )
+
+def _disabled_day13_live_execution_row() -> Dict[str, Any]:
+    return {
+        "day": "Day13",
+        "title": "Day13 WireGuard Live Execution",
+        "report_type": "Disabled live workflow",
+        "device": "Runner guardrail",
+        "status": "DISABLED FOR DAY18",
+        "safety": "disabled guardrail",
+        "description": "Day13 live execution is intentionally not exposed through the Day18 runner safety layer.",
+        "json": "",
+        "html": "",
+        "notes": "Day13 live WireGuard execution remains disabled until its own runner safety layer is implemented.",
+    }
+
+
+def discover_report_visibility(project_root: Path) -> List[Dict[str, Any]]:
+    rows: List[Dict[str, Any]] = []
+    for report_type in REPORT_CATALOG:
+        scanned_paths = _scan_report_catalog_item(project_root, report_type)
+        rows.extend(_normalize_report_visibility_rows(project_root, report_type, scanned_paths))
+
+    _attach_day18_runner_evidence(rows, project_root)
+    rows.append(_disabled_day13_live_execution_row())
     return rows
 
 
@@ -10541,15 +10572,23 @@ def _run_portfolio_finalization(project_root: Path) -> int:
     return 0
 
 
-def _run_report_visibility_index(project_root: Path) -> int:
-    rows = discover_report_visibility(project_root)
-    output_path = project_root / DAY17_REPORT_INDEX_HTML
+def _render_report_visibility_index(
+    rows: List[Dict[str, Any]],
+    project_root: Path,
+    output_path: Path,
+) -> None:
     output_path_text = _relative_to_project(project_root, output_path)
     _print_report_visibility(rows, output_path_text)
     write_report_index_html(list_tasks(), rows, output_path, project_root)
     print()
     print(f"{format_status('PASS')} HTML report index: {output_path_text}")
     print("Day18 WireGuard runner integration uses dry-run and explicit confirmation guardrails.")
+
+
+def _run_report_visibility_index(project_root: Path) -> int:
+    rows = discover_report_visibility(project_root)
+    output_path = project_root / DAY17_REPORT_INDEX_HTML
+    _render_report_visibility_index(rows, project_root, output_path)
     return 0
 
 

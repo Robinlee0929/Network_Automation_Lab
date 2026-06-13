@@ -817,6 +817,53 @@ def test_report_index_does_not_print_config_json_secret_content(tmp_path, capsys
     assert "config.json" not in output
 
 
+def test_report_index_scan_and_normalize_responsibilities_are_separate(tmp_path):
+    report_type = {
+        "day": "Day122",
+        "title": "Report Index Responsibility Split",
+        "json_globs": ["reports/day122/*.json"],
+        "html_globs": ["reports/day122/*.html"],
+        "report_type": "Responsibility evidence",
+        "safety_label": "report-only evidence",
+        "description": "Test-only report-index responsibility fixture.",
+        "missing_note": "Expected Day122 report fixture was not found.",
+    }
+
+    scanned_paths = network_lab._scan_report_catalog_item(tmp_path, report_type)
+    rows = network_lab._normalize_report_visibility_rows(tmp_path, report_type, scanned_paths)
+
+    assert scanned_paths == {"json_paths": [], "html_paths": []}
+    assert rows == [
+        {
+            "day": "Day122",
+            "title": "Report Index Responsibility Split",
+            "report_type": "Responsibility evidence",
+            "device": "Expected report",
+            "status": "MISSING",
+            "safety": "report-only evidence",
+            "description": "Test-only report-index responsibility fixture.",
+            "json": "",
+            "html": "",
+            "notes": "Expected Day122 report fixture was not found.",
+        }
+    ]
+
+    write_json(tmp_path / "reports/day122/report.json", {"status": "PASS"})
+    (tmp_path / "reports/day122/report.html").write_text("<html></html>", encoding="utf-8")
+    write_json(tmp_path / "reports/day122/config.json", {"password": "super-secret-password"})
+
+    scanned_paths = network_lab._scan_report_catalog_item(tmp_path, report_type)
+    rows = network_lab._normalize_report_visibility_rows(tmp_path, report_type, scanned_paths)
+
+    assert [path.name for path in scanned_paths["json_paths"]] == ["report.json"]
+    assert [path.name for path in scanned_paths["html_paths"]] == ["report.html"]
+    assert rows[0]["status"] == "FOUND"
+    assert rows[0]["device"] == "day122"
+    assert rows[0]["json"] == "reports/day122/report.json"
+    assert rows[0]["html"] == "reports/day122/report.html"
+    assert rows[0]["notes"] == ""
+
+
 def test_cli_task_report_index_dry_run_exits_zero(tmp_path):
     profile_path = tmp_path / "profile.json"
     write_json(profile_path, profile())

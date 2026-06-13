@@ -88,6 +88,25 @@ def test_cli_dispatch_preserves_report_index_flag(tmp_path):
     assert (tmp_path / "reports/report_index.html").exists()
 
 
+def test_cli_dispatch_report_index_flag_stays_on_visibility_runner(tmp_path, monkeypatch):
+    calls = []
+
+    def fake_visibility_runner(project_root):
+        calls.append(project_root)
+        return 0
+
+    def fail_profile_load(_profile_path):
+        raise AssertionError("--report-index should not load the profile-backed task runner")
+
+    monkeypatch.setattr(network_lab, "_run_report_visibility_index", fake_visibility_runner)
+    monkeypatch.setattr(network_lab, "load_lab_runner_profile", fail_profile_load)
+
+    exit_code = network_lab.main(["--report-index"], project_root=tmp_path)
+
+    assert exit_code == 0
+    assert calls == [tmp_path.resolve()]
+
+
 def test_cli_dispatch_preserves_lightweight_existing_task(tmp_path, capsys):
     exit_code = network_lab.main(
         ["--task", "intent-mapping-prototype", "--intent-text", "show me the latest reports"],
