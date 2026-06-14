@@ -1,0 +1,56 @@
+[
+  {
+    "fixture_id": "day130-safe-reviewer-summary",
+    "category": "safe_text",
+    "input_text": "Reviewer summary: Day129 prompt contract remains report-only and has no live execution.",
+    "expect_secret_like": false
+  },
+  {
+    "fixture_id": "day130-already-redacted-reviewer-summary",
+    "category": "redacted_text",
+    "input_text": "Reviewer summary: credential field is [REDACTED:TOKEN] and remains safe to display.",
+    "expect_secret_like": false
+  },
+  {
+    "fixture_id": "day130-api-key-like-text",
+    "category": "secret_like_text",
+    "input_text": "Reviewer note includes api_key=day130_fake_api_key_value_000000000000.",
+    "expect_secret_like": true
+  },
+  {
+    "fixture_id": "day130-bearer-token-like-text",
+    "category": "secret_like_text",
+    "input_text": "Authorization header preview: Bearer day130.fake.bearer.token.value.000000",
+    "expect_secret_like": true
+  },
+  {
+    "fixture_id": "day130-password-like-text",
+    "category": "secret_like_text",
+    "input_text": "Operator note accidentally wrote password=day130_fake_password_value.",
+    "expect_secret_like": true
+  },
+  {
+    "fixture_id": "day130-private-key-block-like-text",
+    "category": "secret_like_text",
+    "input_text": "Captured block:\n-----BEGIN PRIVATE KEY-----\nday130-fake-private-key-material-not-real\n-----END PRIVATE KEY-----",
+    "expect_secret_like": true
+  },
+  {
+    "fixture_id": "day130-ssh-key-like-text",
+    "category": "secret_like_text",
+    "input_text": "SSH public key sample: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDAY130FAKEKEY000000000 reviewer@example",
+    "expect_secret_like": true
+  },
+  {
+    "fixture_id": "day130-env-secret-like-text",
+    "category": "secret_like_text",
+    "input_text": "Environment preview: OPENAI_API_KEY=sk-day130-example-not-real-token-000000",
+    "expect_secret_like": true
+  },
+  {
+    "fixture_id": "day130-token-like-text",
+    "category": "secret_like_text",
+    "input_text": "Summary metadata accidentally included access_token=day130_fake_access_token_000000.",
+    "expect_secret_like": true
+  }
+]

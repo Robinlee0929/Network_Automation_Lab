@@ -200,6 +200,9 @@ from intent_ai_reviewer_summary_fixture_renderer import (
 from intent_ai_summary_prompt_contract import (
     run_ai_summary_prompt_contract,
 )
+from intent_ai_summary_redaction_policy import (
+    run_ai_summary_redaction_policy,
+)
 from intent_codex_agents_instruction_audit import (
     build_codex_agents_instruction_audit_report,
     write_codex_agents_instruction_audit_reports,
@@ -957,6 +960,22 @@ DAY129_AI_SUMMARY_PROMPT_CONTRACT_JSON = (
 )
 DAY129_AI_SUMMARY_PROMPT_CONTRACT_HTML = (
     Path("reports") / "lab-summary" / "day129_ai_summary_prompt_contract.html"
+)
+DAY130_AI_SUMMARY_REDACTION_POLICY_TASK_ID = "ai-summary-redaction-and-no-secret-policy"
+DAY130_AI_SUMMARY_REDACTION_POLICY_DOC = (
+    Path("docs") / "ai-intent" / "day130_ai_summary_redaction_and_no_secret_policy.md"
+)
+DAY130_AI_SUMMARY_REDACTION_POLICY_ROADMAP_DOC = (
+    Path("docs") / "roadmap" / "day130_ai_summary_redaction_and_no_secret_policy.md"
+)
+DAY130_AI_SUMMARY_REDACTION_POLICY_FIXTURE = (
+    Path("fixtures") / "day130_ai_summary_redaction_policy.example.json"
+)
+DAY130_AI_SUMMARY_REDACTION_POLICY_JSON = (
+    Path("reports") / "lab-summary" / "day130_ai_summary_redaction_and_no_secret_policy.json"
+)
+DAY130_AI_SUMMARY_REDACTION_POLICY_HTML = (
+    Path("reports") / "lab-summary" / "day130_ai_summary_redaction_and_no_secret_policy.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -2219,6 +2238,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY129_AI_SUMMARY_PROMPT_CONTRACT_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day130",
+        "title": "AI Summary Redaction and No-Secret Policy",
+        "report_type": "Report-only deterministic local redaction policy",
+        "safety_label": "REPORT_ONLY; REVIEW_ONLY; LOCAL_ONLY; deterministic redaction/no-secret policy; no execution, provider/API access, OpenAI API call, network calls, AI decision, reviewer approval inference, audit trail binding, mock provider behavior, or next phase unlock",
+        "description": "Day130 checks and redacts obvious secret-like reviewer summary text before any future AI audit, approval, or provider flow exists, without advancing Day131-Day133 scope.",
+        "json_globs": [DAY130_AI_SUMMARY_REDACTION_POLICY_JSON.as_posix()],
+        "html_globs": [DAY130_AI_SUMMARY_REDACTION_POLICY_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY130_AI_SUMMARY_REDACTION_POLICY_TASK_ID}"
         ),
     },
 ]
@@ -5349,6 +5381,36 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "intent_ai_summary_prompt_contract.py",
             "notes": "REPORT_ONLY PROMPT_CONTRACT_ONLY REVIEWER_TEXT_ONLY Day129 defines what a future prompt may ask for. It does not implement Day130 redaction policy, Day131 audit trail binding, Day132 reviewer approval gate, Day133 mock provider boundary, OpenAI API calls, provider/API configuration, tool calling, execution, AI decisions, pass/fail decisions, next-phase approval, or execution unlock.",
+        },
+        {
+            "id": DAY130_AI_SUMMARY_REDACTION_POLICY_TASK_ID,
+            "task_id": "day130_ai_summary_redaction_and_no_secret_policy",
+            "display_name": "Day130 AI Summary Redaction and No-Secret Policy",
+            "user_display_name": "AI Summary Redaction Policy",
+            "day": "Day130",
+            "category": "ai_planning",
+            "description": "Applies deterministic local redaction checks to reviewer summary text and reports no-secret policy evidence.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY130_AI_SUMMARY_REDACTION_POLICY_JSON.as_posix(),
+                DAY130_AI_SUMMARY_REDACTION_POLICY_HTML.as_posix(),
+                DAY130_AI_SUMMARY_REDACTION_POLICY_DOC.as_posix(),
+                DAY130_AI_SUMMARY_REDACTION_POLICY_ROADMAP_DOC.as_posix(),
+                DAY130_AI_SUMMARY_REDACTION_POLICY_FIXTURE.as_posix(),
+            ],
+            "report_outputs": [
+                "Day130 JSON/HTML AI summary redaction policy",
+                "Day130 AI intent and roadmap documentation",
+                "Day130 fake local redaction fixtures",
+            ],
+            "related_script": "intent_ai_summary_redaction_policy.py",
+            "notes": "REPORT_ONLY REVIEW_ONLY LOCAL_ONLY Day130 enforces deterministic redaction and no-secret policy evidence for reviewer summary text. It is not Day131 audit trail binding, Day132 reviewer approval gate, or Day133 mock provider boundary, and does not enable execution, provider/API configuration, OpenAI API calls, network calls, AI decisions, reviewer approval inference, SSH, live device access, real adapter/broker/runner execution behavior, next-phase approval, or execution unlock.",
         },
     ]
 
@@ -9886,6 +9948,15 @@ def _run_day128_ai_reviewer_summary_fixture_renderer(project_root: Path) -> int:
 
 def _run_day129_ai_summary_prompt_contract(project_root: Path) -> int:
     return run_ai_summary_prompt_contract(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_day130_ai_summary_redaction_policy(project_root: Path) -> int:
+    return run_ai_summary_redaction_policy(
         project_root,
         format_heading_func=format_heading,
         format_status_func=format_status,
