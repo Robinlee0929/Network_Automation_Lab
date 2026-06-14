@@ -77,6 +77,7 @@ CANONICAL_TASK_NAMES: Tuple[str, ...] = (
     "thin-cli-regression-gate",
     "post-refactor-compatibility-evidence-pack",
     "ai-reviewer-summary-schema-contract",
+    "ai-reviewer-summary-fixture-renderer",
     "wireguard-runner",
 )
 

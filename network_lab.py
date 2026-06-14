@@ -194,6 +194,9 @@ from intent_post_refactor_compatibility_evidence_pack import (
 from intent_ai_reviewer_summary_schema_contract import (
     run_ai_reviewer_summary_schema_contract,
 )
+from intent_ai_reviewer_summary_fixture_renderer import (
+    run_ai_reviewer_summary_fixture_renderer,
+)
 from intent_codex_agents_instruction_audit import (
     build_codex_agents_instruction_audit_report,
     write_codex_agents_instruction_audit_reports,
@@ -922,6 +925,22 @@ DAY127_AI_REVIEWER_SUMMARY_SCHEMA_CONTRACT_JSON = (
 )
 DAY127_AI_REVIEWER_SUMMARY_SCHEMA_CONTRACT_HTML = (
     Path("reports") / "lab-summary" / "day127_ai_reviewer_summary_schema_contract.html"
+)
+DAY128_AI_REVIEWER_SUMMARY_FIXTURE_RENDERER_TASK_ID = "ai-reviewer-summary-fixture-renderer"
+DAY128_AI_REVIEWER_SUMMARY_FIXTURE_RENDERER_DOC = (
+    Path("docs") / "ai-intent" / "day128_ai_reviewer_summary_fixture_renderer.md"
+)
+DAY128_AI_REVIEWER_SUMMARY_FIXTURE_RENDERER_ROADMAP_DOC = (
+    Path("docs") / "roadmap" / "day128_ai_reviewer_summary_fixture_renderer.md"
+)
+DAY128_AI_REVIEWER_SUMMARY_FIXTURE_RENDERER_JSON = (
+    Path("reports") / "lab-summary" / "day128_ai_reviewer_summary_fixture_renderer.json"
+)
+DAY128_AI_REVIEWER_SUMMARY_FIXTURE_RENDERER_HTML = (
+    Path("reports") / "lab-summary" / "day128_ai_reviewer_summary_fixture_renderer.html"
+)
+DAY128_AI_REVIEWER_SUMMARY_FIXTURE_RENDERER_TXT = (
+    Path("reports") / "lab-summary" / "day128_ai_reviewer_summary_fixture_renderer.txt"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -2158,6 +2177,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY127_AI_REVIEWER_SUMMARY_SCHEMA_CONTRACT_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day128",
+        "title": "AI Reviewer Summary Fixture Renderer",
+        "report_type": "Report-only Day127 schema fixture renderer",
+        "safety_label": "REPORT_ONLY; FIXTURE_ONLY; NON_EXECUTABLE; renders Day127 schema fixture only; no AI decision, prompt contract, redaction policy, SSH, live command, OpenAI API, provider, API enablement, execution unlock, next-day feature, or next-phase approval",
+        "description": "Day128 renders the existing Day127 AI reviewer summary schema fixture into deterministic reviewer-facing text/HTML/JSON evidence without redefining schema or advancing Day129-Day131 scope.",
+        "json_globs": [DAY128_AI_REVIEWER_SUMMARY_FIXTURE_RENDERER_JSON.as_posix()],
+        "html_globs": [DAY128_AI_REVIEWER_SUMMARY_FIXTURE_RENDERER_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY128_AI_REVIEWER_SUMMARY_FIXTURE_RENDERER_TASK_ID}"
         ),
     },
 ]
@@ -5229,6 +5261,37 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "intent_ai_reviewer_summary_schema_contract.py",
             "notes": "REPORT_ONLY REVIEWER_ONLY Day127 integrates schema, validation, example fixture, CLI task, tests, and documentation evidence for the AI reviewer summary data contract. It does not implement Day128 renderer, Day129 prompt text contract, Day130 redaction policy, live execution, SSH, OpenAI API, voice runtime, mapped task execution, dashboard action endpoint, or execution unlock.",
+        },
+        {
+            "id": DAY128_AI_REVIEWER_SUMMARY_FIXTURE_RENDERER_TASK_ID,
+            "task_id": "day128_ai_reviewer_summary_fixture_renderer",
+            "display_name": "Day128 AI Reviewer Summary Fixture Renderer",
+            "user_display_name": "AI Reviewer Summary Fixture Renderer",
+            "day": "Day128",
+            "category": "ai_planning",
+            "description": "Renders the existing Day127 AI reviewer summary schema fixture into deterministic reviewer-facing evidence.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY128_AI_REVIEWER_SUMMARY_FIXTURE_RENDERER_JSON.as_posix(),
+                DAY128_AI_REVIEWER_SUMMARY_FIXTURE_RENDERER_HTML.as_posix(),
+                DAY128_AI_REVIEWER_SUMMARY_FIXTURE_RENDERER_TXT.as_posix(),
+                DAY128_AI_REVIEWER_SUMMARY_FIXTURE_RENDERER_DOC.as_posix(),
+                DAY128_AI_REVIEWER_SUMMARY_FIXTURE_RENDERER_ROADMAP_DOC.as_posix(),
+                "fixtures/day127_ai_reviewer_summary.example.json",
+            ],
+            "report_outputs": [
+                "Day128 JSON/HTML/text AI reviewer summary fixture render",
+                "Day128 AI intent and roadmap documentation",
+                "Day127 static example fixture reused as source",
+            ],
+            "related_script": "intent_ai_reviewer_summary_fixture_renderer.py",
+            "notes": "REPORT_ONLY FIXTURE_ONLY NON_EXECUTABLE Day128 renders only the existing Day127 schema fixture. It does not redefine schema, make an AI decision, add a prompt contract, add redaction policy, call OpenAI API, enable a provider/API, add live execution, SSH, mapped execution, execution unlock, next-day feature, or next-phase approval.",
         },
     ]
 
@@ -9748,6 +9811,15 @@ def _run_day126_post_refactor_compatibility_evidence_pack(project_root: Path) ->
 
 def _run_day127_ai_reviewer_summary_schema_contract(project_root: Path) -> int:
     return run_ai_reviewer_summary_schema_contract(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_day128_ai_reviewer_summary_fixture_renderer(project_root: Path) -> int:
+    return run_ai_reviewer_summary_fixture_renderer(
         project_root,
         format_heading_func=format_heading,
         format_status_func=format_status,
