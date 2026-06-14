@@ -163,3 +163,9 @@ Day126 packages Day120-Day125 compatibility evidence as a report-only, reviewer-
 - [Day127 AI Reviewer Summary Schema Contract Integration](day127_ai_reviewer_summary_schema_contract.md)
 
 Day127 integrates the AI reviewer summary data structure contract with schema validation, a static example fixture, CLI task evidence, tests, and documentation. It does not implement Day128 renderer, Day129 prompt text contract, Day130 redaction policy, OpenAI/voice runtime, live execution, SSH, mapped task execution, dashboard action endpoints, execution unlocks, or next-phase approval.
+
+## Day128
+
+- [Day128 AI Reviewer Summary Fixture Renderer](day128_ai_reviewer_summary_fixture_renderer.md)
+
+Day128 is fixture renderer only. It renders the existing Day127 schema fixture into deterministic reviewer-facing text, JSON, and HTML evidence. It is not next-day feature work, does not redefine schema, does not make an AI decision, does not define a prompt contract, does not define redaction policy, does not call OpenAI API, does not open execution/provider/API behavior, does not add execution unlock, and does not allow the next phase.
