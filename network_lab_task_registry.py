@@ -83,6 +83,7 @@ CANONICAL_TASK_NAMES: Tuple[str, ...] = (
     "ai-summary-audit-trail-binding",
     "ai-summary-dashboard-card-integration",
     "disabled-ai-provider-interface-boundary",
+    "disabled-ai-provider-adapter-contract",
     "wireguard-runner",
 )
 

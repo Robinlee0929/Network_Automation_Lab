@@ -47,6 +47,7 @@ def _build_parser(lab: ModuleType) -> argparse.ArgumentParser:
   python network_lab.py --task ai-summary-audit-trail-binding
   python network_lab.py --task ai-summary-dashboard-card-integration
   python network_lab.py --task disabled-ai-provider-interface-boundary
+  python network_lab.py --task disabled-ai-provider-adapter-contract
   python network_lab.py --task intent-workflow-demo
   python network_lab.py --task offline-mock-runtime
   python network_lab.py --task offline-mock-runtime-contract
@@ -104,6 +105,7 @@ ai-summary-redaction-and-no-secret-policy writes a Day130 deterministic local-on
 ai-summary-audit-trail-binding writes a Day131 deterministic review-only audit binding over Day127-Day130 AI summary evidence; it does not call providers/APIs, execute AI, make AI decisions, infer reviewer approval, add Day133 mock provider behavior, invoke SSH/device/broker/runner/adapter paths, or unlock the next phase.
 ai-summary-dashboard-card-integration writes a Day132 display-only dashboard card over Day127-Day131 AI summary evidence; it does not add Day133 provider boundary work, Day134 adapter contract work, providers/APIs, AI execution, AI decisions, reviewer approval, SSH/device/broker/runner/adapter paths, or next-phase unlocks.
 disabled-ai-provider-interface-boundary writes a Day133 disabled AI provider interface boundary only; it is not Day134 adapter contract work and does not enable execution/provider/API, provider adapters, SDKs, external APIs, API keys, secrets, network calls, live AI calls, prompt submission, model selection, async jobs, retry, rate limit, or timeout provider behavior.
+disabled-ai-provider-adapter-contract writes a Day134 disabled AI provider adapter contract shape only; it is not the next day's feature and does not enable provider/API/model/network/execution paths, SDK imports, API key handling, environment provider config, HTTP requests, async clients, subprocess providers, broker/runner/adapter execution, live backends, or next-phase unlocks.
 wireguard-runner is dry-run by default and delegates to the existing WireGuard script only after explicit --allow-live-wireguard."""
     parser = argparse.ArgumentParser(
         description=f"Day14 {lab.DAY14_NAME}.",
@@ -264,6 +266,7 @@ def _build_task_handlers(args: argparse.Namespace, root: Path, lab: ModuleType) 
         lab.DAY131_AI_SUMMARY_AUDIT_TRAIL_BINDING_TASK_ID: lambda: lab._run_day131_ai_summary_audit_trail_binding(root),
         lab.DAY132_AI_SUMMARY_DASHBOARD_CARD_INTEGRATION_TASK_ID: lambda: lab._run_day132_ai_summary_dashboard_card_integration(root),
         lab.DAY133_DISABLED_AI_PROVIDER_INTERFACE_BOUNDARY_TASK_ID: lambda: lab._run_day133_disabled_ai_provider_interface_boundary(root),
+        lab.DAY134_DISABLED_AI_PROVIDER_ADAPTER_CONTRACT_TASK_ID: lambda: lab._run_day134_disabled_ai_provider_adapter_contract(root),
         lab.WIREGUARD_RUNNER_TASK_ALIAS: lambda: lab._run_wireguard_runner(
             root,
             dry_run=args.dry_run,
