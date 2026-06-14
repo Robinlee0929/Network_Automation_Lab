@@ -215,6 +215,9 @@ from disabled_ai_provider_interface_boundary import (
 from disabled_ai_provider_adapter_contract import (
     run_disabled_ai_provider_adapter_contract,
 )
+from ai_provider_disabled_by_default_safety_regression import (
+    run_ai_provider_disabled_by_default_safety_regression,
+)
 from intent_codex_agents_instruction_audit import (
     build_codex_agents_instruction_audit_report,
     write_codex_agents_instruction_audit_reports,
@@ -1040,6 +1043,21 @@ DAY134_DISABLED_AI_PROVIDER_ADAPTER_CONTRACT_JSON = (
 )
 DAY134_DISABLED_AI_PROVIDER_ADAPTER_CONTRACT_HTML = (
     Path("reports") / "lab-summary" / "day134_disabled_ai_provider_adapter_contract.html"
+)
+DAY135_AI_PROVIDER_DISABLED_BY_DEFAULT_SAFETY_REGRESSION_TASK_ID = (
+    "ai-provider-disabled-by-default-safety-regression"
+)
+DAY135_AI_PROVIDER_DISABLED_BY_DEFAULT_SAFETY_REGRESSION_DOC = (
+    Path("docs") / "ai-intent" / "day135_ai_provider_disabled_by_default_safety_regression.md"
+)
+DAY135_AI_PROVIDER_DISABLED_BY_DEFAULT_SAFETY_REGRESSION_ROADMAP_DOC = (
+    Path("docs") / "roadmap" / "day135_ai_provider_disabled_by_default_safety_regression.md"
+)
+DAY135_AI_PROVIDER_DISABLED_BY_DEFAULT_SAFETY_REGRESSION_JSON = (
+    Path("reports") / "lab-summary" / "day135_ai_provider_disabled_by_default_safety_regression.json"
+)
+DAY135_AI_PROVIDER_DISABLED_BY_DEFAULT_SAFETY_REGRESSION_HTML = (
+    Path("reports") / "lab-summary" / "day135_ai_provider_disabled_by_default_safety_regression.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -2367,6 +2385,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY134_DISABLED_AI_PROVIDER_ADAPTER_CONTRACT_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day135",
+        "title": "AI Provider Disabled-by-Default Safety Regression",
+        "report_type": "Review-only disabled-by-default AI provider safety regression",
+        "safety_label": "DISABLED_BY_DEFAULT_PRESERVED; REVIEW_ONLY; not Day136; not the next day's feature; Day134 evidence read-only; no provider/API/model/network/execution path, registry activation, CLI activation, report activation, or next-phase unlock",
+        "description": "Day135 verifies disabled-by-default AI provider safety over Day134 evidence while keeping consumer read as a read-only regression case.",
+        "json_globs": [DAY135_AI_PROVIDER_DISABLED_BY_DEFAULT_SAFETY_REGRESSION_JSON.as_posix()],
+        "html_globs": [DAY135_AI_PROVIDER_DISABLED_BY_DEFAULT_SAFETY_REGRESSION_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY135_AI_PROVIDER_DISABLED_BY_DEFAULT_SAFETY_REGRESSION_TASK_ID}"
         ),
     },
 ]
@@ -5639,6 +5670,33 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "disabled_ai_provider_adapter_contract.py",
             "notes": "DISABLED_AI_PROVIDER_ADAPTER_CONTRACT_READY REVIEW_ONLY REPORT_ONLY Day134 defines the disabled AI provider adapter contract shape only. It is not the next day's feature and does not enable provider/API/model/network/execution paths, provider SDK imports, API key handling, environment provider config, HTTP requests, async provider clients, subprocess providers, broker/runner/adapter execution, live backends, prompt submission, model selection, next-phase approval, or execution unlock.",
+        },
+        {
+            "id": DAY135_AI_PROVIDER_DISABLED_BY_DEFAULT_SAFETY_REGRESSION_TASK_ID,
+            "task_id": "day135_ai_provider_disabled_by_default_safety_regression",
+            "display_name": "Day135 AI Provider Disabled-by-Default Safety Regression",
+            "user_display_name": "AI Provider Disabled-by-Default Safety Regression",
+            "day": "Day135",
+            "category": "ai_planning",
+            "description": "Verifies disabled-by-default AI provider safety over Day134 evidence without activating provider, API, execution, model, network, registry, CLI, report, or next-phase paths.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY135_AI_PROVIDER_DISABLED_BY_DEFAULT_SAFETY_REGRESSION_JSON.as_posix(),
+                DAY135_AI_PROVIDER_DISABLED_BY_DEFAULT_SAFETY_REGRESSION_HTML.as_posix(),
+                DAY135_AI_PROVIDER_DISABLED_BY_DEFAULT_SAFETY_REGRESSION_DOC.as_posix(),
+                DAY135_AI_PROVIDER_DISABLED_BY_DEFAULT_SAFETY_REGRESSION_ROADMAP_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Day135 JSON/HTML disabled-by-default safety regression",
+                "Day135 AI intent and roadmap documentation",
+            ],
+            "related_script": "ai_provider_disabled_by_default_safety_regression.py",
+            "notes": "DISABLED_BY_DEFAULT_PRESERVED REVIEW_ONLY REPORT_ONLY Day135 is not Day136 and not the next day's feature. It treats consumer read of Day134 disabled evidence as one read-only regression case and does not instantiate providers, call APIs, invoke execution, enable model/network paths, allow registry/CLI/report activation, or unlock next phase.",
         },
     ]
 
@@ -10221,6 +10279,15 @@ def _run_day133_disabled_ai_provider_interface_boundary(project_root: Path) -> i
 
 def _run_day134_disabled_ai_provider_adapter_contract(project_root: Path) -> int:
     return run_disabled_ai_provider_adapter_contract(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_day135_ai_provider_disabled_by_default_safety_regression(project_root: Path) -> int:
+    return run_ai_provider_disabled_by_default_safety_regression(
         project_root,
         format_heading_func=format_heading,
         format_status_func=format_status,

@@ -48,6 +48,7 @@ def _build_parser(lab: ModuleType) -> argparse.ArgumentParser:
   python network_lab.py --task ai-summary-dashboard-card-integration
   python network_lab.py --task disabled-ai-provider-interface-boundary
   python network_lab.py --task disabled-ai-provider-adapter-contract
+  python network_lab.py --task ai-provider-disabled-by-default-safety-regression
   python network_lab.py --task intent-workflow-demo
   python network_lab.py --task offline-mock-runtime
   python network_lab.py --task offline-mock-runtime-contract
@@ -106,6 +107,7 @@ ai-summary-audit-trail-binding writes a Day131 deterministic review-only audit b
 ai-summary-dashboard-card-integration writes a Day132 display-only dashboard card over Day127-Day131 AI summary evidence; it does not add Day133 provider boundary work, Day134 adapter contract work, providers/APIs, AI execution, AI decisions, reviewer approval, SSH/device/broker/runner/adapter paths, or next-phase unlocks.
 disabled-ai-provider-interface-boundary writes a Day133 disabled AI provider interface boundary only; it is not Day134 adapter contract work and does not enable execution/provider/API, provider adapters, SDKs, external APIs, API keys, secrets, network calls, live AI calls, prompt submission, model selection, async jobs, retry, rate limit, or timeout provider behavior.
 disabled-ai-provider-adapter-contract writes a Day134 disabled AI provider adapter contract shape only; it is not the next day's feature and does not enable provider/API/model/network/execution paths, SDK imports, API key handling, environment provider config, HTTP requests, async clients, subprocess providers, broker/runner/adapter execution, live backends, or next-phase unlocks.
+ai-provider-disabled-by-default-safety-regression writes a Day135 disabled-by-default safety regression over Day134 evidence; consumer read is one read-only regression case and it does not instantiate providers, call APIs, invoke execution, activate registry/CLI/report paths, implement Day136, or unlock the next phase.
 wireguard-runner is dry-run by default and delegates to the existing WireGuard script only after explicit --allow-live-wireguard."""
     parser = argparse.ArgumentParser(
         description=f"Day14 {lab.DAY14_NAME}.",
@@ -267,6 +269,7 @@ def _build_task_handlers(args: argparse.Namespace, root: Path, lab: ModuleType) 
         lab.DAY132_AI_SUMMARY_DASHBOARD_CARD_INTEGRATION_TASK_ID: lambda: lab._run_day132_ai_summary_dashboard_card_integration(root),
         lab.DAY133_DISABLED_AI_PROVIDER_INTERFACE_BOUNDARY_TASK_ID: lambda: lab._run_day133_disabled_ai_provider_interface_boundary(root),
         lab.DAY134_DISABLED_AI_PROVIDER_ADAPTER_CONTRACT_TASK_ID: lambda: lab._run_day134_disabled_ai_provider_adapter_contract(root),
+        lab.DAY135_AI_PROVIDER_DISABLED_BY_DEFAULT_SAFETY_REGRESSION_TASK_ID: lambda: lab._run_day135_ai_provider_disabled_by_default_safety_regression(root),
         lab.WIREGUARD_RUNNER_TASK_ALIAS: lambda: lab._run_wireguard_runner(
             root,
             dry_run=args.dry_run,
