@@ -169,3 +169,9 @@ Day127 integrates the AI reviewer summary data structure contract with schema va
 - [Day128 AI Reviewer Summary Fixture Renderer](day128_ai_reviewer_summary_fixture_renderer.md)
 
 Day128 is fixture renderer only. It renders the existing Day127 schema fixture into deterministic reviewer-facing text, JSON, and HTML evidence. It is not next-day feature work, does not redefine schema, does not make an AI decision, does not define a prompt contract, does not define redaction policy, does not call OpenAI API, does not open execution/provider/API behavior, does not add execution unlock, and does not allow the next phase.
+
+## Day129
+
+- [Day129 AI Summary Prompt Contract for Reviewer Text Only](day129_ai_summary_prompt_contract.md)
+
+Day129 is prompt contract only. It defines deterministic wording boundaries for reviewer summary text only and references Day127 schema plus Day128 renderer expectations. It is not the next day's feature, does not enable execution / provider / API, does not call OpenAI API, does not implement redaction policy, does not implement audit trail binding, does not make AI decisions, and does not unlock next phase.
