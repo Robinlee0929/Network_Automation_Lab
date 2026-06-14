@@ -51,6 +51,7 @@ def _build_parser(lab: ModuleType) -> argparse.ArgumentParser:
   python network_lab.py --task ai-provider-disabled-by-default-safety-regression
   python network_lab.py --task ai-reviewer-export-package-integration
   python network_lab.py --task project-folder-organization-decision-gate
+  python network_lab.py --task project-folder-organization-dry-run-inventory-gate
   python network_lab.py --task intent-workflow-demo
   python network_lab.py --task offline-mock-runtime
   python network_lab.py --task offline-mock-runtime-contract
@@ -112,6 +113,7 @@ disabled-ai-provider-adapter-contract writes a Day134 disabled AI provider adapt
 ai-provider-disabled-by-default-safety-regression writes a Day135 disabled-by-default safety regression over Day134 evidence; consumer read is one read-only regression case and it does not instantiate providers, call APIs, invoke execution, activate registry/CLI/report paths, implement Day136, or unlock the next phase.
 ai-reviewer-export-package-integration writes a Day136 deterministic review-only export package over Day127-Day135 AI reviewer evidence; this is not next-day functionality and execution / provider / API remain disabled.
 project-folder-organization-decision-gate writes a Day137 decision-only project folder organization gate; it does not move, delete, rename, rewrite imports, enable execution/provider/API, or implement the deferred AI Assistance Review Demo Package.
+project-folder-organization-dry-run-inventory-gate writes a Day138 dry-run-only project folder inventory; it does not move, delete, rename, change import paths, enable execution/provider/API, allow SSH/live commands, invoke adapters/brokers/runners, or unlock the next phase.
 wireguard-runner is dry-run by default and delegates to the existing WireGuard script only after explicit --allow-live-wireguard."""
     parser = argparse.ArgumentParser(
         description=f"Day14 {lab.DAY14_NAME}.",
@@ -276,6 +278,7 @@ def _build_task_handlers(args: argparse.Namespace, root: Path, lab: ModuleType) 
         lab.DAY135_AI_PROVIDER_DISABLED_BY_DEFAULT_SAFETY_REGRESSION_TASK_ID: lambda: lab._run_day135_ai_provider_disabled_by_default_safety_regression(root),
         lab.DAY136_AI_REVIEWER_EXPORT_PACKAGE_INTEGRATION_TASK_ID: lambda: lab._run_day136_ai_reviewer_export_package_integration(root),
         lab.DAY137_PROJECT_FOLDER_ORGANIZATION_DECISION_GATE_TASK_ID: lambda: lab._run_day137_project_folder_organization_decision_gate(root),
+        lab.DAY138_PROJECT_FOLDER_ORGANIZATION_DRY_RUN_INVENTORY_GATE_TASK_ID: lambda: lab._run_day138_project_folder_organization_dry_run_inventory_gate(root),
         lab.WIREGUARD_RUNNER_TASK_ALIAS: lambda: lab._run_wireguard_runner(
             root,
             dry_run=args.dry_run,

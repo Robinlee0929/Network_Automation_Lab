@@ -224,6 +224,9 @@ from ai_reviewer_export_package_integration import (
 from project_folder_organization_decision_gate import (
     run_project_folder_organization_decision_gate,
 )
+from intent_project_folder_organization_dry_run_inventory_gate import (
+    run_project_folder_organization_dry_run_inventory_gate,
+)
 from intent_codex_agents_instruction_audit import (
     build_codex_agents_instruction_audit_report,
     write_codex_agents_instruction_audit_reports,
@@ -1084,6 +1087,21 @@ DAY137_PROJECT_FOLDER_ORGANIZATION_DECISION_GATE_JSON = (
 )
 DAY137_PROJECT_FOLDER_ORGANIZATION_DECISION_GATE_HTML = (
     Path("reports") / "lab-summary" / "day137_project_folder_organization_decision_gate.html"
+)
+DAY138_PROJECT_FOLDER_ORGANIZATION_DRY_RUN_INVENTORY_GATE_TASK_ID = (
+    "project-folder-organization-dry-run-inventory-gate"
+)
+DAY138_PROJECT_FOLDER_ORGANIZATION_DRY_RUN_INVENTORY_GATE_ROADMAP_DOC = (
+    Path("docs") / "roadmap" / "day138_project_folder_organization_dry_run_inventory_gate.md"
+)
+DAY138_PROJECT_FOLDER_ORGANIZATION_DRY_RUN_INVENTORY_GATE_AI_INTENT_DOC = (
+    Path("docs") / "ai-intent" / "day138_project_folder_organization_dry_run_inventory_gate.md"
+)
+DAY138_PROJECT_FOLDER_ORGANIZATION_DRY_RUN_INVENTORY_GATE_JSON = (
+    Path("reports") / "lab-summary" / "day138_project_folder_organization_dry_run_inventory_gate.json"
+)
+DAY138_PROJECT_FOLDER_ORGANIZATION_DRY_RUN_INVENTORY_GATE_HTML = (
+    Path("reports") / "lab-summary" / "day138_project_folder_organization_dry_run_inventory_gate.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -2450,6 +2468,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY137_PROJECT_FOLDER_ORGANIZATION_DECISION_GATE_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day138",
+        "title": "Project Folder Organization Dry-Run Inventory Gate",
+        "report_type": "Dry-run-only project folder organization inventory gate",
+        "safety_label": "DRY_RUN_INVENTORY_ONLY; KEEP_DRY_RUN_INVENTORY_ONLY; no move/delete/rename/import path change; not next day's feature; execution/provider/API disabled; SSH/live command not allowed",
+        "description": "Day138 inventories current repo file groups for future organization planning without moving files or enabling any execution, provider, API, SSH, adapter, broker, runner, or mapped execution path.",
+        "json_globs": [DAY138_PROJECT_FOLDER_ORGANIZATION_DRY_RUN_INVENTORY_GATE_JSON.as_posix()],
+        "html_globs": [DAY138_PROJECT_FOLDER_ORGANIZATION_DRY_RUN_INVENTORY_GATE_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY138_PROJECT_FOLDER_ORGANIZATION_DRY_RUN_INVENTORY_GATE_TASK_ID}"
         ),
     },
 ]
@@ -5801,6 +5832,34 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "project_folder_organization_decision_gate.py",
             "notes": "DECISION_ONLY REPORT_ONLY DO_NOT_REORGANIZE_YET_DECISION_ONLY. Does not move, delete, rename, or change import paths. This is not the next day's feature and does not implement the original Day137 AI Assistance Review Demo Package. Execution/provider/API/SSH/live command paths remain disabled; Day134-Day136 AI reviewer/export/package stability is preserved.",
+        },
+        {
+            "id": DAY138_PROJECT_FOLDER_ORGANIZATION_DRY_RUN_INVENTORY_GATE_TASK_ID,
+            "task_id": "day138_project_folder_organization_dry_run_inventory_gate",
+            "display_name": "Day138 Project Folder Organization Dry-Run Inventory Gate",
+            "user_display_name": "Project Folder Organization Dry-Run Inventory Gate",
+            "day": "Day138",
+            "category": "project_organization",
+            "description": "Produces a dry-run-only inventory of current repo file groups before any future folder organization proposal.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY138_PROJECT_FOLDER_ORGANIZATION_DRY_RUN_INVENTORY_GATE_JSON.as_posix(),
+                DAY138_PROJECT_FOLDER_ORGANIZATION_DRY_RUN_INVENTORY_GATE_HTML.as_posix(),
+                DAY138_PROJECT_FOLDER_ORGANIZATION_DRY_RUN_INVENTORY_GATE_ROADMAP_DOC.as_posix(),
+                DAY138_PROJECT_FOLDER_ORGANIZATION_DRY_RUN_INVENTORY_GATE_AI_INTENT_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Day138 JSON/HTML project folder organization dry-run inventory",
+                "Day138 roadmap documentation",
+                "Day138 AI intent documentation",
+            ],
+            "related_script": "intent_project_folder_organization_dry_run_inventory_gate.py",
+            "notes": "DRY_RUN_INVENTORY_ONLY REPORT_ONLY KEEP_DRY_RUN_INVENTORY_ONLY. Does not move, delete, rename, change import paths, enable execution/provider/API, allow SSH/live commands, invoke adapters/brokers/runners, or unlock the next phase. This is not the next day's feature.",
         },
     ]
 
@@ -10410,6 +10469,15 @@ def _run_day136_ai_reviewer_export_package_integration(project_root: Path) -> in
 
 def _run_day137_project_folder_organization_decision_gate(project_root: Path) -> int:
     return run_project_folder_organization_decision_gate(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_day138_project_folder_organization_dry_run_inventory_gate(project_root: Path) -> int:
+    return run_project_folder_organization_dry_run_inventory_gate(
         project_root,
         format_heading_func=format_heading,
         format_status_func=format_status,
