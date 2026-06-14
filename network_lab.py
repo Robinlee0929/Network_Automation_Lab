@@ -212,6 +212,9 @@ from intent_ai_summary_dashboard_card_integration import (
 from disabled_ai_provider_interface_boundary import (
     run_disabled_ai_provider_interface_boundary,
 )
+from disabled_ai_provider_adapter_contract import (
+    run_disabled_ai_provider_adapter_contract,
+)
 from intent_codex_agents_instruction_audit import (
     build_codex_agents_instruction_audit_report,
     write_codex_agents_instruction_audit_reports,
@@ -1024,6 +1027,19 @@ DAY133_DISABLED_AI_PROVIDER_INTERFACE_BOUNDARY_JSON = (
 )
 DAY133_DISABLED_AI_PROVIDER_INTERFACE_BOUNDARY_HTML = (
     Path("reports") / "lab-summary" / "day133_disabled_ai_provider_interface_boundary.html"
+)
+DAY134_DISABLED_AI_PROVIDER_ADAPTER_CONTRACT_TASK_ID = "disabled-ai-provider-adapter-contract"
+DAY134_DISABLED_AI_PROVIDER_ADAPTER_CONTRACT_DOC = (
+    Path("docs") / "ai-intent" / "day134_disabled_ai_provider_adapter_contract.md"
+)
+DAY134_DISABLED_AI_PROVIDER_ADAPTER_CONTRACT_ROADMAP_DOC = (
+    Path("docs") / "roadmap" / "day134_disabled_ai_provider_adapter_contract.md"
+)
+DAY134_DISABLED_AI_PROVIDER_ADAPTER_CONTRACT_JSON = (
+    Path("reports") / "lab-summary" / "day134_disabled_ai_provider_adapter_contract.json"
+)
+DAY134_DISABLED_AI_PROVIDER_ADAPTER_CONTRACT_HTML = (
+    Path("reports") / "lab-summary" / "day134_disabled_ai_provider_adapter_contract.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -2338,6 +2354,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY133_DISABLED_AI_PROVIDER_INTERFACE_BOUNDARY_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day134",
+        "title": "Disabled AI Provider Adapter Contract",
+        "report_type": "Report-only disabled AI provider adapter contract",
+        "safety_label": "DISABLED_AI_PROVIDER_ADAPTER_CONTRACT_READY; REVIEW_ONLY; contract shape only; not the next day's feature; no provider/API/model/network/execution path, SDK import, API key handling, environment provider config, HTTP request, async client, subprocess provider, broker/runner/adapter execution, live backend, or next-phase unlock",
+        "description": "Day134 defines the disabled AI provider adapter contract shape while keeping every provider/API/model/network/execution path disabled.",
+        "json_globs": [DAY134_DISABLED_AI_PROVIDER_ADAPTER_CONTRACT_JSON.as_posix()],
+        "html_globs": [DAY134_DISABLED_AI_PROVIDER_ADAPTER_CONTRACT_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY134_DISABLED_AI_PROVIDER_ADAPTER_CONTRACT_TASK_ID}"
         ),
     },
 ]
@@ -5582,6 +5611,34 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "disabled_ai_provider_interface_boundary.py",
             "notes": "AI_PROVIDER_INTERFACE_DISABLED REVIEW_ONLY NON_ADVANCING Day133 creates the disabled AI provider interface boundary only. It is not Day134 adapter contract, does not enable execution/provider/API, and does not implement provider adapters, OpenAI/Gemini/Claude providers, vendor SDK integration, external API calls, API key reads, secrets, live provider execution, async jobs, prompt submission, model selection, network calls, retry/rate-limit/timeout provider behavior, or execution/provider/API switches.",
+        },
+        {
+            "id": DAY134_DISABLED_AI_PROVIDER_ADAPTER_CONTRACT_TASK_ID,
+            "task_id": "day134_disabled_ai_provider_adapter_contract",
+            "display_name": "Day134 Disabled AI Provider Adapter Contract",
+            "user_display_name": "Disabled AI Provider Adapter Contract",
+            "day": "Day134",
+            "category": "ai_planning",
+            "description": "Defines the disabled AI provider adapter contract shape while keeping all provider execution disabled.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY134_DISABLED_AI_PROVIDER_ADAPTER_CONTRACT_JSON.as_posix(),
+                DAY134_DISABLED_AI_PROVIDER_ADAPTER_CONTRACT_HTML.as_posix(),
+                DAY134_DISABLED_AI_PROVIDER_ADAPTER_CONTRACT_DOC.as_posix(),
+                DAY134_DISABLED_AI_PROVIDER_ADAPTER_CONTRACT_ROADMAP_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Day134 JSON/HTML disabled AI provider adapter contract",
+                "Day134 AI intent and roadmap documentation",
+            ],
+            "related_script": "disabled_ai_provider_adapter_contract.py",
+            "notes": "DISABLED_AI_PROVIDER_ADAPTER_CONTRACT_READY REVIEW_ONLY REPORT_ONLY Day134 defines the disabled AI provider adapter contract shape only. It is not the next day's feature and does not enable provider/API/model/network/execution paths, provider SDK imports, API key handling, environment provider config, HTTP requests, async provider clients, subprocess providers, broker/runner/adapter execution, live backends, prompt submission, model selection, next-phase approval, or execution unlock.",
         },
     ]
 
@@ -10155,6 +10212,15 @@ def _run_day132_ai_summary_dashboard_card_integration(project_root: Path) -> int
 
 def _run_day133_disabled_ai_provider_interface_boundary(project_root: Path) -> int:
     return run_disabled_ai_provider_interface_boundary(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_day134_disabled_ai_provider_adapter_contract(project_root: Path) -> int:
+    return run_disabled_ai_provider_adapter_contract(
         project_root,
         format_heading_func=format_heading,
         format_status_func=format_status,
