@@ -31,7 +31,7 @@ Day129 does not make AI decisions.
 Day129 does not unlock next phase.
 
 Day129 does not implement Day130 redaction policy, Day131 audit trail binding,
-Day132 reviewer approval gate, or Day133 mock provider boundary.
+Day132 AI Summary Dashboard Card Integration, or Day133 mock provider boundary.
 
 ## Deliverables
 
@@ -73,3 +73,4 @@ python network_lab.py --task ai-summary-prompt-contract
 python network_lab.py --task report-index
 git status --short --branch
 ```
+

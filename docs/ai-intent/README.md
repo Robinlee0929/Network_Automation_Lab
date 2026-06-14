@@ -180,10 +180,17 @@ Day129 is prompt contract only. It defines deterministic wording boundaries for 
 
 - [Day130 AI Summary Redaction and No-Secret Policy](day130_ai_summary_redaction_and_no_secret_policy.md)
 
-Day130 is deterministic local-only redaction/no-secret policy evidence for reviewer summary text. It is not Day131 audit trail binding, not Day132 reviewer approval gate, not Day133 mock provider boundary, does not enable execution / provider / API, does not call OpenAI API, does not make AI decisions, and does not unlock next phase.
+Day130 is deterministic local-only redaction/no-secret policy evidence for reviewer summary text. It is not Day131 audit trail binding, not Day132 AI Summary Dashboard Card Integration, not Day133 mock provider boundary, does not enable execution / provider / API, does not call OpenAI API, does not make AI decisions, and does not unlock next phase.
 
 ## Day131
 
 - [Day131 AI Summary Audit Trail Binding](day131_ai_summary_audit_trail_binding.md)
 
-Day131 binds existing Day127-Day130 AI summary evidence into deterministic reviewer-visible audit records. It is REVIEW_ONLY / NON_ADVANCING, not Day132 reviewer approval gate, not Day133 mock provider boundary, does not enable provider/API access, does not execute AI, does not make AI decisions, does not invoke SSH/device/broker/runner/adapter paths, and does not unlock next phase.
+Day131 binds existing Day127-Day130 AI summary evidence into deterministic reviewer-visible audit records. It is REVIEW_ONLY / NON_ADVANCING, not Day132 AI Summary Dashboard Card Integration, not Day133 mock provider boundary, does not enable provider/API access, does not execute AI, does not make AI decisions, does not invoke SSH/device/broker/runner/adapter paths, and does not unlock next phase.
+
+## Day132
+
+- [Day132 AI Summary Dashboard Card Integration](day132_ai_summary_dashboard_card_integration.md)
+
+Day132 exposes deterministic display-only dashboard card data for the Day127-Day131 AI summary review chain. It records `AGENTS.md status: FOUND_AND_READ`, remains REVIEW_ONLY / NON_ADVANCING, is not Day133 Disabled AI Provider Interface Boundary, is not Day134 Offline AI Provider Adapter Contract, does not enable provider/API access, does not execute AI, does not make AI decisions, does not infer reviewer approval, does not invoke SSH/device/broker/runner/adapter paths, and does not unlock next phase.
+

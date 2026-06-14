@@ -136,7 +136,7 @@ def test_day131_task_catalog_and_registry_wiring():
     assert task["requires_live_device"] is False
     assert task["requires_password"] is False
     assert task["related_script"] == "intent_ai_summary_audit_trail_binding.py"
-    assert "Day132 reviewer approval gate" in task["notes"]
+    assert "Day132 AI Summary Dashboard Card Integration" in task["notes"]
     assert "Day133 mock provider boundary" in task["notes"]
     assert "provider/API" in task["notes"]
     assert "AI execution" in task["notes"]
@@ -180,10 +180,12 @@ def test_day131_docs_exist_and_preserve_boundaries():
         text = doc.read_text(encoding="utf-8").lower()
         assert "review-only" in text
         assert "non-advancing" in text
-        assert "not day132 reviewer approval gate" in text
+        assert "not day132 ai summary dashboard card integration" in text
         assert "not day133 mock provider boundary" in text
         assert "does not enable execution / provider / api" in text
         assert "does not call openai api" in text
         assert "does not invoke ssh, device, broker, runner, or adapter paths" in text
         assert "does not infer reviewer approval" in text
         assert "does not unlock" in text
+
+

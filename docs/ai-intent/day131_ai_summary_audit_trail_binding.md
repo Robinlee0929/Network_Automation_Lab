@@ -24,7 +24,7 @@ It records:
 
 ## Boundaries
 
-Day131 is not Day132 reviewer approval gate.
+Day131 is not Day132 AI Summary Dashboard Card Integration.
 
 Day131 is not Day133 mock provider boundary.
 
@@ -79,3 +79,4 @@ adapter_invocation_enabled=false
 
 The audit binding contains references only. It does not copy Day130 source text
 or introduce secret-like placeholders.
+

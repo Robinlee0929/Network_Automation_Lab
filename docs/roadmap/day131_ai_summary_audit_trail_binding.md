@@ -8,7 +8,7 @@ deterministic non-advancing audit records for reviewer inspection.
 
 ## Hard Boundary
 
-Day131 is not Day132 reviewer approval gate.
+Day131 is not Day132 AI Summary Dashboard Card Integration.
 
 Day131 is not Day133 mock provider boundary.
 
@@ -55,3 +55,4 @@ Day131 does not unlock `next_phase_allowed`.
 - `mock_provider_enabled=false`
 - `live_execution_enabled=false`
 - SSH/device/broker/runner/adapter invocation flags remain false
+

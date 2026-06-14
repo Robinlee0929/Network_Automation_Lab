@@ -146,7 +146,7 @@ def test_day130_task_catalog_and_registry_wiring():
     assert task["requires_password"] is False
     assert task["related_script"] == "intent_ai_summary_redaction_policy.py"
     assert "Day131 audit trail binding" in task["notes"]
-    assert "Day132 reviewer approval gate" in task["notes"]
+    assert "Day132 AI Summary Dashboard Card Integration" in task["notes"]
     assert "Day133 mock provider boundary" in task["notes"]
     assert "OpenAI API calls" in task["notes"]
     assert "execution unlock" in task["notes"]
@@ -189,9 +189,11 @@ def test_day130_docs_exist_and_preserve_boundaries():
         assert "deterministic" in text.lower()
         assert "local-only" in text.lower()
         assert "not day131 audit trail binding" in text.lower()
-        assert "not day132 reviewer approval gate" in text.lower()
+        assert "not day132 ai summary dashboard card integration" in text.lower()
         assert "not day133 mock provider boundary" in text.lower()
         assert "does not enable execution / provider / api" in text.lower()
         assert "does not call openai api" in text.lower()
         assert "does not make ai decisions" in text.lower()
         assert "does not unlock" in text.lower()
+
+

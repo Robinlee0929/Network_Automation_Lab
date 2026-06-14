@@ -17,7 +17,7 @@ contract work, but it only adds redaction and no-secret policy checks.
 
 Day130 is not Day131 audit trail binding.
 
-Day130 is not Day132 reviewer approval gate.
+Day130 is not Day132 AI Summary Dashboard Card Integration.
 
 Day130 is not Day133 mock provider boundary.
 
@@ -74,3 +74,4 @@ python network_lab.py --task ai-summary-redaction-and-no-secret-policy
 python network_lab.py --task report-index
 git status --short --branch
 ```
+

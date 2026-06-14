@@ -33,7 +33,7 @@ Day130 is a redaction and no-secret policy only.
 
 Day130 is not Day131 audit trail binding.
 
-Day130 is not Day132 reviewer approval gate.
+Day130 is not Day132 AI Summary Dashboard Card Integration.
 
 Day130 is not Day133 mock provider boundary.
 
@@ -76,3 +76,4 @@ python -m pytest
 python network_lab.py --task ai-summary-redaction-and-no-secret-policy
 python network_lab.py --task report-index
 ```
+

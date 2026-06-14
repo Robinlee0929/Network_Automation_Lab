@@ -45,6 +45,7 @@ def _build_parser(lab: ModuleType) -> argparse.ArgumentParser:
   python network_lab.py --task ai-summary-prompt-contract
   python network_lab.py --task ai-summary-redaction-and-no-secret-policy
   python network_lab.py --task ai-summary-audit-trail-binding
+  python network_lab.py --task ai-summary-dashboard-card-integration
   python network_lab.py --task intent-workflow-demo
   python network_lab.py --task offline-mock-runtime
   python network_lab.py --task offline-mock-runtime-contract
@@ -98,8 +99,9 @@ post-refactor-compatibility-evidence-pack writes a Day126 report-only compatibil
 ai-reviewer-summary-schema-contract writes a Day127 report-only AI reviewer summary data structure contract with schema validation and an example fixture; it does not implement Day128 renderer, Day129 prompt text, Day130 redaction policy, or execution unlocks.
 ai-reviewer-summary-fixture-renderer writes a Day128 report-only fixture renderer for the existing Day127 schema fixture; it does not redefine schema, make AI decisions, define prompt or redaction policy, call OpenAI API, enable providers/APIs, or add execution unlocks.
 ai-summary-prompt-contract writes a Day129 report-only prompt contract limited to reviewer summary text only; it does not call OpenAI API, add provider/API config, request tools, enable execution, implement Day130 redaction, implement Day131 audit binding, make AI decisions, or unlock the next phase.
-ai-summary-redaction-and-no-secret-policy writes a Day130 deterministic local-only redaction report for reviewer summary text; it does not call OpenAI API, enable providers/APIs, add network calls, execute tools, bind Day131 audit trails, infer Day132 approval, add Day133 mock provider behavior, make AI decisions, or unlock the next phase.
-ai-summary-audit-trail-binding writes a Day131 deterministic review-only audit binding over Day127-Day130 AI summary evidence; it does not call providers/APIs, execute AI, make AI decisions, infer Day132 approval, add Day133 mock provider behavior, invoke SSH/device/broker/runner/adapter paths, or unlock the next phase.
+ai-summary-redaction-and-no-secret-policy writes a Day130 deterministic local-only redaction report for reviewer summary text; it does not call OpenAI API, enable providers/APIs, add network calls, execute tools, bind Day131 audit trails, infer reviewer approval, add Day133 mock provider behavior, make AI decisions, or unlock the next phase.
+ai-summary-audit-trail-binding writes a Day131 deterministic review-only audit binding over Day127-Day130 AI summary evidence; it does not call providers/APIs, execute AI, make AI decisions, infer reviewer approval, add Day133 mock provider behavior, invoke SSH/device/broker/runner/adapter paths, or unlock the next phase.
+ai-summary-dashboard-card-integration writes a Day132 display-only dashboard card over Day127-Day131 AI summary evidence; it does not add Day133 provider boundary work, Day134 adapter contract work, providers/APIs, AI execution, AI decisions, reviewer approval, SSH/device/broker/runner/adapter paths, or next-phase unlocks.
 wireguard-runner is dry-run by default and delegates to the existing WireGuard script only after explicit --allow-live-wireguard."""
     parser = argparse.ArgumentParser(
         description=f"Day14 {lab.DAY14_NAME}.",
@@ -258,6 +260,7 @@ def _build_task_handlers(args: argparse.Namespace, root: Path, lab: ModuleType) 
         lab.DAY129_AI_SUMMARY_PROMPT_CONTRACT_TASK_ID: lambda: lab._run_day129_ai_summary_prompt_contract(root),
         lab.DAY130_AI_SUMMARY_REDACTION_POLICY_TASK_ID: lambda: lab._run_day130_ai_summary_redaction_policy(root),
         lab.DAY131_AI_SUMMARY_AUDIT_TRAIL_BINDING_TASK_ID: lambda: lab._run_day131_ai_summary_audit_trail_binding(root),
+        lab.DAY132_AI_SUMMARY_DASHBOARD_CARD_INTEGRATION_TASK_ID: lambda: lab._run_day132_ai_summary_dashboard_card_integration(root),
         lab.WIREGUARD_RUNNER_TASK_ALIAS: lambda: lab._run_wireguard_runner(
             root,
             dry_run=args.dry_run,
@@ -318,3 +321,4 @@ def main(
         return resolved_task.handler()
 
     return 2
+

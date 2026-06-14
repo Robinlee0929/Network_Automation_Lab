@@ -206,6 +206,9 @@ from intent_ai_summary_redaction_policy import (
 from intent_ai_summary_audit_trail_binding import (
     run_ai_summary_audit_trail_binding,
 )
+from intent_ai_summary_dashboard_card_integration import (
+    run_ai_summary_dashboard_card_integration,
+)
 from intent_codex_agents_instruction_audit import (
     build_codex_agents_instruction_audit_report,
     write_codex_agents_instruction_audit_reports,
@@ -992,6 +995,19 @@ DAY131_AI_SUMMARY_AUDIT_TRAIL_BINDING_JSON = (
 )
 DAY131_AI_SUMMARY_AUDIT_TRAIL_BINDING_HTML = (
     Path("reports") / "lab-summary" / "day131_ai_summary_audit_trail_binding.html"
+)
+DAY132_AI_SUMMARY_DASHBOARD_CARD_INTEGRATION_TASK_ID = "ai-summary-dashboard-card-integration"
+DAY132_AI_SUMMARY_DASHBOARD_CARD_INTEGRATION_DOC = (
+    Path("docs") / "ai-intent" / "day132_ai_summary_dashboard_card_integration.md"
+)
+DAY132_AI_SUMMARY_DASHBOARD_CARD_INTEGRATION_ROADMAP_DOC = (
+    Path("docs") / "roadmap" / "day132_ai_summary_dashboard_card_integration.md"
+)
+DAY132_AI_SUMMARY_DASHBOARD_CARD_INTEGRATION_JSON = (
+    Path("reports") / "lab-summary" / "day132_ai_summary_dashboard_card_integration.json"
+)
+DAY132_AI_SUMMARY_DASHBOARD_CARD_INTEGRATION_HTML = (
+    Path("reports") / "lab-summary" / "day132_ai_summary_dashboard_card_integration.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -2280,6 +2296,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY131_AI_SUMMARY_AUDIT_TRAIL_BINDING_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day132",
+        "title": "AI Summary Dashboard Card Integration",
+        "report_type": "Report-only deterministic dashboard card integration",
+        "safety_label": "DISPLAY_ONLY; REVIEW_ONLY; NON_ADVANCING; dashboard card data only; no provider/API, AI execution, AI decision, reviewer approval, mock provider, SSH, device, broker, runner, adapter, live execution, or next phase unlock",
+        "description": "Day132 exposes deterministic dashboard card data for the Day127-Day131 AI summary review chain without advancing Day133-Day134 scope.",
+        "json_globs": [DAY132_AI_SUMMARY_DASHBOARD_CARD_INTEGRATION_JSON.as_posix()],
+        "html_globs": [DAY132_AI_SUMMARY_DASHBOARD_CARD_INTEGRATION_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY132_AI_SUMMARY_DASHBOARD_CARD_INTEGRATION_TASK_ID}"
         ),
     },
 ]
@@ -5409,7 +5438,7 @@ def list_tasks() -> List[Dict[str, Any]]:
                 "Day129 AI intent and roadmap documentation",
             ],
             "related_script": "intent_ai_summary_prompt_contract.py",
-            "notes": "REPORT_ONLY PROMPT_CONTRACT_ONLY REVIEWER_TEXT_ONLY Day129 defines what a future prompt may ask for. It does not implement Day130 redaction policy, Day131 audit trail binding, Day132 reviewer approval gate, Day133 mock provider boundary, OpenAI API calls, provider/API configuration, tool calling, execution, AI decisions, pass/fail decisions, next-phase approval, or execution unlock.",
+            "notes": "REPORT_ONLY PROMPT_CONTRACT_ONLY REVIEWER_TEXT_ONLY Day129 defines what a future prompt may ask for. It does not implement Day130 redaction policy, Day131 audit trail binding, Day132 AI Summary Dashboard Card Integration, Day133 mock provider boundary, OpenAI API calls, provider/API configuration, tool calling, execution, AI decisions, pass/fail decisions, next-phase approval, or execution unlock.",
         },
         {
             "id": DAY130_AI_SUMMARY_REDACTION_POLICY_TASK_ID,
@@ -5439,7 +5468,7 @@ def list_tasks() -> List[Dict[str, Any]]:
                 "Day130 fake local redaction fixtures",
             ],
             "related_script": "intent_ai_summary_redaction_policy.py",
-            "notes": "REPORT_ONLY REVIEW_ONLY LOCAL_ONLY Day130 enforces deterministic redaction and no-secret policy evidence for reviewer summary text. It is not Day131 audit trail binding, Day132 reviewer approval gate, or Day133 mock provider boundary, and does not enable execution, provider/API configuration, OpenAI API calls, network calls, AI decisions, reviewer approval inference, SSH, live device access, real adapter/broker/runner execution behavior, next-phase approval, or execution unlock.",
+            "notes": "REPORT_ONLY REVIEW_ONLY LOCAL_ONLY Day130 enforces deterministic redaction and no-secret policy evidence for reviewer summary text. It is not Day131 audit trail binding, Day132 AI Summary Dashboard Card Integration, or Day133 mock provider boundary, and does not enable execution, provider/API configuration, OpenAI API calls, network calls, AI decisions, reviewer approval inference, SSH, live device access, real adapter/broker/runner execution behavior, next-phase approval, or execution unlock.",
         },
         {
             "id": DAY131_AI_SUMMARY_AUDIT_TRAIL_BINDING_TASK_ID,
@@ -5467,7 +5496,35 @@ def list_tasks() -> List[Dict[str, Any]]:
                 "Day131 AI intent and roadmap documentation",
             ],
             "related_script": "intent_ai_summary_audit_trail_binding.py",
-            "notes": "REPORT_ONLY REVIEW_ONLY NON_ADVANCING Day131 binds Day127 schema, Day128 fixture renderer, Day129 prompt contract, and Day130 redaction/no-secret policy evidence into deterministic audit records. It is not Day132 reviewer approval gate or Day133 mock provider boundary, and does not enable provider/API configuration, OpenAI API calls, AI execution, AI decisions, reviewer approval, mock provider behavior, SSH, live device access, broker/runner/adapter invocation, next-phase approval, or execution unlock.",
+            "notes": "REPORT_ONLY REVIEW_ONLY NON_ADVANCING Day131 binds Day127 schema, Day128 fixture renderer, Day129 prompt contract, and Day130 redaction/no-secret policy evidence into deterministic audit records. It is not Day132 AI Summary Dashboard Card Integration or Day133 mock provider boundary, and does not enable provider/API configuration, OpenAI API calls, AI execution, AI decisions, reviewer approval, mock provider behavior, SSH, live device access, broker/runner/adapter invocation, next-phase approval, or execution unlock.",
+        },
+        {
+            "id": DAY132_AI_SUMMARY_DASHBOARD_CARD_INTEGRATION_TASK_ID,
+            "task_id": "day132_ai_summary_dashboard_card_integration",
+            "display_name": "Day132 AI Summary Dashboard Card Integration",
+            "user_display_name": "AI Summary Dashboard Card Integration",
+            "day": "Day132",
+            "category": "ai_planning",
+            "description": "Exposes deterministic display-only dashboard card data for the Day127-Day131 AI summary review chain.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY132_AI_SUMMARY_DASHBOARD_CARD_INTEGRATION_JSON.as_posix(),
+                DAY132_AI_SUMMARY_DASHBOARD_CARD_INTEGRATION_HTML.as_posix(),
+                DAY132_AI_SUMMARY_DASHBOARD_CARD_INTEGRATION_DOC.as_posix(),
+                DAY132_AI_SUMMARY_DASHBOARD_CARD_INTEGRATION_ROADMAP_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Day132 JSON/HTML AI summary dashboard card integration",
+                "Day132 AI intent and roadmap documentation",
+            ],
+            "related_script": "intent_ai_summary_dashboard_card_integration.py",
+            "notes": "DISPLAY_ONLY REVIEW_ONLY NON_ADVANCING Day132 records dashboard card data for Day127-Day131 references only. It is not Day133 Disabled AI Provider Interface Boundary or Day134 Offline AI Provider Adapter Contract, and does not enable provider/API configuration, OpenAI API calls, AI execution, AI decision-making, reviewer approval, mock provider behavior, SSH, live device access, broker/runner/adapter invocation, next-phase approval, or execution unlock.",
         },
     ]
 
@@ -10030,6 +10087,15 @@ def _run_day131_ai_summary_audit_trail_binding(project_root: Path) -> int:
     )
 
 
+def _run_day132_ai_summary_dashboard_card_integration(project_root: Path) -> int:
+    return run_ai_summary_dashboard_card_integration(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
 def _relative_to_project(project_root: Path, path: Path) -> str:
     try:
         return path.resolve().relative_to(project_root.resolve()).as_posix()
@@ -12387,3 +12453,4 @@ def main(argv: Optional[List[str]] = None, project_root: Optional[Path] = None) 
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
