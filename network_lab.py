@@ -221,6 +221,9 @@ from ai_provider_disabled_by_default_safety_regression import (
 from ai_reviewer_export_package_integration import (
     run_ai_reviewer_export_package_integration,
 )
+from project_folder_organization_decision_gate import (
+    run_project_folder_organization_decision_gate,
+)
 from intent_codex_agents_instruction_audit import (
     build_codex_agents_instruction_audit_report,
     write_codex_agents_instruction_audit_reports,
@@ -1071,6 +1074,16 @@ DAY136_AI_REVIEWER_EXPORT_PACKAGE_INTEGRATION_JSON = (
 )
 DAY136_AI_REVIEWER_EXPORT_PACKAGE_INTEGRATION_HTML = (
     Path("reports") / "lab-summary" / "day136_ai_reviewer_export_package_integration.html"
+)
+DAY137_PROJECT_FOLDER_ORGANIZATION_DECISION_GATE_TASK_ID = "project-folder-organization-decision-gate"
+DAY137_PROJECT_FOLDER_ORGANIZATION_DECISION_GATE_ROADMAP_DOC = (
+    Path("docs") / "roadmap" / "day137_project_folder_organization_decision_gate.md"
+)
+DAY137_PROJECT_FOLDER_ORGANIZATION_DECISION_GATE_JSON = (
+    Path("reports") / "lab-summary" / "day137_project_folder_organization_decision_gate.json"
+)
+DAY137_PROJECT_FOLDER_ORGANIZATION_DECISION_GATE_HTML = (
+    Path("reports") / "lab-summary" / "day137_project_folder_organization_decision_gate.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -2424,6 +2437,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY136_AI_REVIEWER_EXPORT_PACKAGE_INTEGRATION_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day137",
+        "title": "Project Folder Organization Decision Gate",
+        "report_type": "Decision-only project folder organization gate",
+        "safety_label": "DECISION_ONLY; DO_NOT_REORGANIZE_YET_DECISION_ONLY; no file moves/deletes/renames/import path changes; not next feature; execution/provider/API disabled; original AI Assistance Review Demo Package deferred",
+        "description": "Day137 records reviewer-visible evidence for why folder restructuring is not ready yet and preserves Day134-Day136 AI reviewer/export/package stability.",
+        "json_globs": [DAY137_PROJECT_FOLDER_ORGANIZATION_DECISION_GATE_JSON.as_posix()],
+        "html_globs": [DAY137_PROJECT_FOLDER_ORGANIZATION_DECISION_GATE_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY137_PROJECT_FOLDER_ORGANIZATION_DECISION_GATE_TASK_ID}"
         ),
     },
 ]
@@ -5749,6 +5775,32 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "ai_reviewer_export_package_integration.py",
             "notes": "AI_REVIEWER_EXPORT_PACKAGE_READY REVIEW_ONLY REPORT_ONLY This is not next-day functionality. Execution / provider / API remain disabled. Uses local Day127-Day135 evidence only and does not read secrets/env/API keys, call external networks, instantiate providers, or invoke execution/adapter/broker/runner paths.",
+        },
+        {
+            "id": DAY137_PROJECT_FOLDER_ORGANIZATION_DECISION_GATE_TASK_ID,
+            "task_id": "day137_project_folder_organization_decision_gate",
+            "display_name": "Day137 Project Folder Organization Decision Gate",
+            "user_display_name": "Project Folder Organization Decision Gate",
+            "day": "Day137",
+            "category": "project_organization",
+            "description": "Records decision-only evidence for future folder organization without moving files or implementing the deferred AI Assistance Review Demo Package.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY137_PROJECT_FOLDER_ORGANIZATION_DECISION_GATE_JSON.as_posix(),
+                DAY137_PROJECT_FOLDER_ORGANIZATION_DECISION_GATE_HTML.as_posix(),
+                DAY137_PROJECT_FOLDER_ORGANIZATION_DECISION_GATE_ROADMAP_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Day137 JSON/HTML project folder organization decision evidence",
+                "Day137 roadmap decision documentation",
+            ],
+            "related_script": "project_folder_organization_decision_gate.py",
+            "notes": "DECISION_ONLY REPORT_ONLY DO_NOT_REORGANIZE_YET_DECISION_ONLY. Does not move, delete, rename, or change import paths. This is not the next day's feature and does not implement the original Day137 AI Assistance Review Demo Package. Execution/provider/API/SSH/live command paths remain disabled; Day134-Day136 AI reviewer/export/package stability is preserved.",
         },
     ]
 
@@ -10349,6 +10401,15 @@ def _run_day135_ai_provider_disabled_by_default_safety_regression(project_root: 
 
 def _run_day136_ai_reviewer_export_package_integration(project_root: Path) -> int:
     return run_ai_reviewer_export_package_integration(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_day137_project_folder_organization_decision_gate(project_root: Path) -> int:
+    return run_project_folder_organization_decision_gate(
         project_root,
         format_heading_func=format_heading,
         format_status_func=format_status,
