@@ -44,6 +44,7 @@ def _build_parser(lab: ModuleType) -> argparse.ArgumentParser:
   python network_lab.py --task ai-reviewer-summary-fixture-renderer
   python network_lab.py --task ai-summary-prompt-contract
   python network_lab.py --task ai-summary-redaction-and-no-secret-policy
+  python network_lab.py --task ai-summary-audit-trail-binding
   python network_lab.py --task intent-workflow-demo
   python network_lab.py --task offline-mock-runtime
   python network_lab.py --task offline-mock-runtime-contract
@@ -98,6 +99,7 @@ ai-reviewer-summary-schema-contract writes a Day127 report-only AI reviewer summ
 ai-reviewer-summary-fixture-renderer writes a Day128 report-only fixture renderer for the existing Day127 schema fixture; it does not redefine schema, make AI decisions, define prompt or redaction policy, call OpenAI API, enable providers/APIs, or add execution unlocks.
 ai-summary-prompt-contract writes a Day129 report-only prompt contract limited to reviewer summary text only; it does not call OpenAI API, add provider/API config, request tools, enable execution, implement Day130 redaction, implement Day131 audit binding, make AI decisions, or unlock the next phase.
 ai-summary-redaction-and-no-secret-policy writes a Day130 deterministic local-only redaction report for reviewer summary text; it does not call OpenAI API, enable providers/APIs, add network calls, execute tools, bind Day131 audit trails, infer Day132 approval, add Day133 mock provider behavior, make AI decisions, or unlock the next phase.
+ai-summary-audit-trail-binding writes a Day131 deterministic review-only audit binding over Day127-Day130 AI summary evidence; it does not call providers/APIs, execute AI, make AI decisions, infer Day132 approval, add Day133 mock provider behavior, invoke SSH/device/broker/runner/adapter paths, or unlock the next phase.
 wireguard-runner is dry-run by default and delegates to the existing WireGuard script only after explicit --allow-live-wireguard."""
     parser = argparse.ArgumentParser(
         description=f"Day14 {lab.DAY14_NAME}.",
@@ -255,6 +257,7 @@ def _build_task_handlers(args: argparse.Namespace, root: Path, lab: ModuleType) 
         lab.DAY128_AI_REVIEWER_SUMMARY_FIXTURE_RENDERER_TASK_ID: lambda: lab._run_day128_ai_reviewer_summary_fixture_renderer(root),
         lab.DAY129_AI_SUMMARY_PROMPT_CONTRACT_TASK_ID: lambda: lab._run_day129_ai_summary_prompt_contract(root),
         lab.DAY130_AI_SUMMARY_REDACTION_POLICY_TASK_ID: lambda: lab._run_day130_ai_summary_redaction_policy(root),
+        lab.DAY131_AI_SUMMARY_AUDIT_TRAIL_BINDING_TASK_ID: lambda: lab._run_day131_ai_summary_audit_trail_binding(root),
         lab.WIREGUARD_RUNNER_TASK_ALIAS: lambda: lab._run_wireguard_runner(
             root,
             dry_run=args.dry_run,

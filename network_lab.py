@@ -203,6 +203,9 @@ from intent_ai_summary_prompt_contract import (
 from intent_ai_summary_redaction_policy import (
     run_ai_summary_redaction_policy,
 )
+from intent_ai_summary_audit_trail_binding import (
+    run_ai_summary_audit_trail_binding,
+)
 from intent_codex_agents_instruction_audit import (
     build_codex_agents_instruction_audit_report,
     write_codex_agents_instruction_audit_reports,
@@ -976,6 +979,19 @@ DAY130_AI_SUMMARY_REDACTION_POLICY_JSON = (
 )
 DAY130_AI_SUMMARY_REDACTION_POLICY_HTML = (
     Path("reports") / "lab-summary" / "day130_ai_summary_redaction_and_no_secret_policy.html"
+)
+DAY131_AI_SUMMARY_AUDIT_TRAIL_BINDING_TASK_ID = "ai-summary-audit-trail-binding"
+DAY131_AI_SUMMARY_AUDIT_TRAIL_BINDING_DOC = (
+    Path("docs") / "ai-intent" / "day131_ai_summary_audit_trail_binding.md"
+)
+DAY131_AI_SUMMARY_AUDIT_TRAIL_BINDING_ROADMAP_DOC = (
+    Path("docs") / "roadmap" / "day131_ai_summary_audit_trail_binding.md"
+)
+DAY131_AI_SUMMARY_AUDIT_TRAIL_BINDING_JSON = (
+    Path("reports") / "lab-summary" / "day131_ai_summary_audit_trail_binding.json"
+)
+DAY131_AI_SUMMARY_AUDIT_TRAIL_BINDING_HTML = (
+    Path("reports") / "lab-summary" / "day131_ai_summary_audit_trail_binding.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -2251,6 +2267,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY130_AI_SUMMARY_REDACTION_POLICY_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day131",
+        "title": "AI Summary Audit Trail Binding",
+        "report_type": "Report-only deterministic audit trail binding",
+        "safety_label": "REPORT_ONLY; REVIEW_ONLY; NON_ADVANCING; binds Day127-Day130 evidence only; no provider/API, AI execution, AI decision, reviewer approval gate, mock provider boundary, SSH, device, broker, runner, adapter, live execution, or next phase unlock",
+        "description": "Day131 binds existing Day127-Day130 AI summary schema, fixture renderer, prompt contract, and redaction/no-secret policy references into deterministic reviewer-visible audit records without advancing Day132-Day133 scope.",
+        "json_globs": [DAY131_AI_SUMMARY_AUDIT_TRAIL_BINDING_JSON.as_posix()],
+        "html_globs": [DAY131_AI_SUMMARY_AUDIT_TRAIL_BINDING_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY131_AI_SUMMARY_AUDIT_TRAIL_BINDING_TASK_ID}"
         ),
     },
 ]
@@ -5411,6 +5440,34 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "intent_ai_summary_redaction_policy.py",
             "notes": "REPORT_ONLY REVIEW_ONLY LOCAL_ONLY Day130 enforces deterministic redaction and no-secret policy evidence for reviewer summary text. It is not Day131 audit trail binding, Day132 reviewer approval gate, or Day133 mock provider boundary, and does not enable execution, provider/API configuration, OpenAI API calls, network calls, AI decisions, reviewer approval inference, SSH, live device access, real adapter/broker/runner execution behavior, next-phase approval, or execution unlock.",
+        },
+        {
+            "id": DAY131_AI_SUMMARY_AUDIT_TRAIL_BINDING_TASK_ID,
+            "task_id": "day131_ai_summary_audit_trail_binding",
+            "display_name": "Day131 AI Summary Audit Trail Binding",
+            "user_display_name": "AI Summary Audit Trail Binding",
+            "day": "Day131",
+            "category": "ai_planning",
+            "description": "Binds Day127-Day130 AI summary artifacts into deterministic reviewer-visible audit records.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY131_AI_SUMMARY_AUDIT_TRAIL_BINDING_JSON.as_posix(),
+                DAY131_AI_SUMMARY_AUDIT_TRAIL_BINDING_HTML.as_posix(),
+                DAY131_AI_SUMMARY_AUDIT_TRAIL_BINDING_DOC.as_posix(),
+                DAY131_AI_SUMMARY_AUDIT_TRAIL_BINDING_ROADMAP_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Day131 JSON/HTML AI summary audit trail binding",
+                "Day131 AI intent and roadmap documentation",
+            ],
+            "related_script": "intent_ai_summary_audit_trail_binding.py",
+            "notes": "REPORT_ONLY REVIEW_ONLY NON_ADVANCING Day131 binds Day127 schema, Day128 fixture renderer, Day129 prompt contract, and Day130 redaction/no-secret policy evidence into deterministic audit records. It is not Day132 reviewer approval gate or Day133 mock provider boundary, and does not enable provider/API configuration, OpenAI API calls, AI execution, AI decisions, reviewer approval, mock provider behavior, SSH, live device access, broker/runner/adapter invocation, next-phase approval, or execution unlock.",
         },
     ]
 
@@ -9957,6 +10014,15 @@ def _run_day129_ai_summary_prompt_contract(project_root: Path) -> int:
 
 def _run_day130_ai_summary_redaction_policy(project_root: Path) -> int:
     return run_ai_summary_redaction_policy(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_day131_ai_summary_audit_trail_binding(project_root: Path) -> int:
+    return run_ai_summary_audit_trail_binding(
         project_root,
         format_heading_func=format_heading,
         format_status_func=format_status,

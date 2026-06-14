@@ -175,3 +175,15 @@ Day128 is fixture renderer only. It renders the existing Day127 schema fixture i
 - [Day129 AI Summary Prompt Contract for Reviewer Text Only](day129_ai_summary_prompt_contract.md)
 
 Day129 is prompt contract only. It defines deterministic wording boundaries for reviewer summary text only and references Day127 schema plus Day128 renderer expectations. It is not the next day's feature, does not enable execution / provider / API, does not call OpenAI API, does not implement redaction policy, does not implement audit trail binding, does not make AI decisions, and does not unlock next phase.
+
+## Day130
+
+- [Day130 AI Summary Redaction and No-Secret Policy](day130_ai_summary_redaction_and_no_secret_policy.md)
+
+Day130 is deterministic local-only redaction/no-secret policy evidence for reviewer summary text. It is not Day131 audit trail binding, not Day132 reviewer approval gate, not Day133 mock provider boundary, does not enable execution / provider / API, does not call OpenAI API, does not make AI decisions, and does not unlock next phase.
+
+## Day131
+
+- [Day131 AI Summary Audit Trail Binding](day131_ai_summary_audit_trail_binding.md)
+
+Day131 binds existing Day127-Day130 AI summary evidence into deterministic reviewer-visible audit records. It is REVIEW_ONLY / NON_ADVANCING, not Day132 reviewer approval gate, not Day133 mock provider boundary, does not enable provider/API access, does not execute AI, does not make AI decisions, does not invoke SSH/device/broker/runner/adapter paths, and does not unlock next phase.
