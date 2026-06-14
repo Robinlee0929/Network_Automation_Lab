@@ -197,6 +197,9 @@ from intent_ai_reviewer_summary_schema_contract import (
 from intent_ai_reviewer_summary_fixture_renderer import (
     run_ai_reviewer_summary_fixture_renderer,
 )
+from intent_ai_summary_prompt_contract import (
+    run_ai_summary_prompt_contract,
+)
 from intent_codex_agents_instruction_audit import (
     build_codex_agents_instruction_audit_report,
     write_codex_agents_instruction_audit_reports,
@@ -941,6 +944,19 @@ DAY128_AI_REVIEWER_SUMMARY_FIXTURE_RENDERER_HTML = (
 )
 DAY128_AI_REVIEWER_SUMMARY_FIXTURE_RENDERER_TXT = (
     Path("reports") / "lab-summary" / "day128_ai_reviewer_summary_fixture_renderer.txt"
+)
+DAY129_AI_SUMMARY_PROMPT_CONTRACT_TASK_ID = "ai-summary-prompt-contract"
+DAY129_AI_SUMMARY_PROMPT_CONTRACT_DOC = (
+    Path("docs") / "ai-intent" / "day129_ai_summary_prompt_contract.md"
+)
+DAY129_AI_SUMMARY_PROMPT_CONTRACT_ROADMAP_DOC = (
+    Path("docs") / "roadmap" / "day129_ai_summary_prompt_contract.md"
+)
+DAY129_AI_SUMMARY_PROMPT_CONTRACT_JSON = (
+    Path("reports") / "lab-summary" / "day129_ai_summary_prompt_contract.json"
+)
+DAY129_AI_SUMMARY_PROMPT_CONTRACT_HTML = (
+    Path("reports") / "lab-summary" / "day129_ai_summary_prompt_contract.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -2190,6 +2206,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY128_AI_REVIEWER_SUMMARY_FIXTURE_RENDERER_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day129",
+        "title": "AI Summary Prompt Contract for Reviewer Text Only",
+        "report_type": "Report-only reviewer-text-only prompt contract",
+        "safety_label": "REPORT_ONLY; PROMPT_CONTRACT_ONLY; REVIEWER_TEXT_ONLY; no execution, provider/API access, tool calls, secrets, redaction policy, audit trail binding, AI approval, pass/fail decision, next phase unlock, or OpenAI API call",
+        "description": "Day129 defines the deterministic prompt contract for future AI reviewer summary text only, referencing Day127 schema and Day128 renderer expectations without advancing Day130-Day133 scope.",
+        "json_globs": [DAY129_AI_SUMMARY_PROMPT_CONTRACT_JSON.as_posix()],
+        "html_globs": [DAY129_AI_SUMMARY_PROMPT_CONTRACT_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY129_AI_SUMMARY_PROMPT_CONTRACT_TASK_ID}"
         ),
     },
 ]
@@ -5292,6 +5321,34 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "intent_ai_reviewer_summary_fixture_renderer.py",
             "notes": "REPORT_ONLY FIXTURE_ONLY NON_EXECUTABLE Day128 renders only the existing Day127 schema fixture. It does not redefine schema, make an AI decision, add a prompt contract, add redaction policy, call OpenAI API, enable a provider/API, add live execution, SSH, mapped execution, execution unlock, next-day feature, or next-phase approval.",
+        },
+        {
+            "id": DAY129_AI_SUMMARY_PROMPT_CONTRACT_TASK_ID,
+            "task_id": "day129_ai_summary_prompt_contract",
+            "display_name": "Day129 AI Summary Prompt Contract for Reviewer Text Only",
+            "user_display_name": "AI Summary Prompt Contract",
+            "day": "Day129",
+            "category": "ai_planning",
+            "description": "Defines a deterministic prompt contract limited to reviewer summary text only.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY129_AI_SUMMARY_PROMPT_CONTRACT_JSON.as_posix(),
+                DAY129_AI_SUMMARY_PROMPT_CONTRACT_HTML.as_posix(),
+                DAY129_AI_SUMMARY_PROMPT_CONTRACT_DOC.as_posix(),
+                DAY129_AI_SUMMARY_PROMPT_CONTRACT_ROADMAP_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Day129 JSON/HTML AI summary prompt contract",
+                "Day129 AI intent and roadmap documentation",
+            ],
+            "related_script": "intent_ai_summary_prompt_contract.py",
+            "notes": "REPORT_ONLY PROMPT_CONTRACT_ONLY REVIEWER_TEXT_ONLY Day129 defines what a future prompt may ask for. It does not implement Day130 redaction policy, Day131 audit trail binding, Day132 reviewer approval gate, Day133 mock provider boundary, OpenAI API calls, provider/API configuration, tool calling, execution, AI decisions, pass/fail decisions, next-phase approval, or execution unlock.",
         },
     ]
 
@@ -9820,6 +9877,15 @@ def _run_day127_ai_reviewer_summary_schema_contract(project_root: Path) -> int:
 
 def _run_day128_ai_reviewer_summary_fixture_renderer(project_root: Path) -> int:
     return run_ai_reviewer_summary_fixture_renderer(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_day129_ai_summary_prompt_contract(project_root: Path) -> int:
+    return run_ai_summary_prompt_contract(
         project_root,
         format_heading_func=format_heading,
         format_status_func=format_status,

@@ -42,6 +42,7 @@ def _build_parser(lab: ModuleType) -> argparse.ArgumentParser:
   python network_lab.py --task post-refactor-compatibility-evidence-pack
   python network_lab.py --task ai-reviewer-summary-schema-contract
   python network_lab.py --task ai-reviewer-summary-fixture-renderer
+  python network_lab.py --task ai-summary-prompt-contract
   python network_lab.py --task intent-workflow-demo
   python network_lab.py --task offline-mock-runtime
   python network_lab.py --task offline-mock-runtime-contract
@@ -94,6 +95,7 @@ thin-cli-regression-gate writes a Day125 report-only regression gate proving thi
 post-refactor-compatibility-evidence-pack writes a Day126 report-only compatibility evidence pack for Day120-Day125; Day125 thin CLI evidence is one snapshot only, not a thin CLI budget gate or numeric enforcement mechanism.
 ai-reviewer-summary-schema-contract writes a Day127 report-only AI reviewer summary data structure contract with schema validation and an example fixture; it does not implement Day128 renderer, Day129 prompt text, Day130 redaction policy, or execution unlocks.
 ai-reviewer-summary-fixture-renderer writes a Day128 report-only fixture renderer for the existing Day127 schema fixture; it does not redefine schema, make AI decisions, define prompt or redaction policy, call OpenAI API, enable providers/APIs, or add execution unlocks.
+ai-summary-prompt-contract writes a Day129 report-only prompt contract limited to reviewer summary text only; it does not call OpenAI API, add provider/API config, request tools, enable execution, implement Day130 redaction, implement Day131 audit binding, make AI decisions, or unlock the next phase.
 wireguard-runner is dry-run by default and delegates to the existing WireGuard script only after explicit --allow-live-wireguard."""
     parser = argparse.ArgumentParser(
         description=f"Day14 {lab.DAY14_NAME}.",
@@ -249,6 +251,7 @@ def _build_task_handlers(args: argparse.Namespace, root: Path, lab: ModuleType) 
         lab.DAY126_POST_REFACTOR_COMPATIBILITY_EVIDENCE_PACK_TASK_ID: lambda: lab._run_day126_post_refactor_compatibility_evidence_pack(root),
         lab.DAY127_AI_REVIEWER_SUMMARY_SCHEMA_CONTRACT_TASK_ID: lambda: lab._run_day127_ai_reviewer_summary_schema_contract(root),
         lab.DAY128_AI_REVIEWER_SUMMARY_FIXTURE_RENDERER_TASK_ID: lambda: lab._run_day128_ai_reviewer_summary_fixture_renderer(root),
+        lab.DAY129_AI_SUMMARY_PROMPT_CONTRACT_TASK_ID: lambda: lab._run_day129_ai_summary_prompt_contract(root),
         lab.WIREGUARD_RUNNER_TASK_ALIAS: lambda: lab._run_wireguard_runner(
             root,
             dry_run=args.dry_run,
