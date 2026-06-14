@@ -218,6 +218,9 @@ from disabled_ai_provider_adapter_contract import (
 from ai_provider_disabled_by_default_safety_regression import (
     run_ai_provider_disabled_by_default_safety_regression,
 )
+from ai_reviewer_export_package_integration import (
+    run_ai_reviewer_export_package_integration,
+)
 from intent_codex_agents_instruction_audit import (
     build_codex_agents_instruction_audit_report,
     write_codex_agents_instruction_audit_reports,
@@ -1058,6 +1061,16 @@ DAY135_AI_PROVIDER_DISABLED_BY_DEFAULT_SAFETY_REGRESSION_JSON = (
 )
 DAY135_AI_PROVIDER_DISABLED_BY_DEFAULT_SAFETY_REGRESSION_HTML = (
     Path("reports") / "lab-summary" / "day135_ai_provider_disabled_by_default_safety_regression.html"
+)
+DAY136_AI_REVIEWER_EXPORT_PACKAGE_INTEGRATION_TASK_ID = "ai-reviewer-export-package-integration"
+DAY136_AI_REVIEWER_EXPORT_PACKAGE_INTEGRATION_ROADMAP_DOC = (
+    Path("docs") / "roadmap" / "day136_ai_reviewer_export_package_integration.md"
+)
+DAY136_AI_REVIEWER_EXPORT_PACKAGE_INTEGRATION_JSON = (
+    Path("reports") / "lab-summary" / "day136_ai_reviewer_export_package_integration.json"
+)
+DAY136_AI_REVIEWER_EXPORT_PACKAGE_INTEGRATION_HTML = (
+    Path("reports") / "lab-summary" / "day136_ai_reviewer_export_package_integration.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -2398,6 +2411,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY135_AI_PROVIDER_DISABLED_BY_DEFAULT_SAFETY_REGRESSION_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day136",
+        "title": "AI Reviewer Export Package Integration",
+        "report_type": "Review-only AI reviewer export package integration",
+        "safety_label": "AI_REVIEWER_EXPORT_PACKAGE_READY; REVIEW_ONLY; This is not next-day functionality.; Execution / provider / API remain disabled.; no provider/API/execution/live action/SSH/device/adapter/broker/runner path",
+        "description": "Day136 packages existing Day127-Day135 AI reviewer evidence for reviewer export without enabling providers, APIs, execution, or live actions.",
+        "json_globs": [DAY136_AI_REVIEWER_EXPORT_PACKAGE_INTEGRATION_JSON.as_posix()],
+        "html_globs": [DAY136_AI_REVIEWER_EXPORT_PACKAGE_INTEGRATION_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY136_AI_REVIEWER_EXPORT_PACKAGE_INTEGRATION_TASK_ID}"
         ),
     },
 ]
@@ -5697,6 +5723,32 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "ai_provider_disabled_by_default_safety_regression.py",
             "notes": "DISABLED_BY_DEFAULT_PRESERVED REVIEW_ONLY REPORT_ONLY Day135 is not Day136 and not the next day's feature. It treats consumer read of Day134 disabled evidence as one read-only regression case and does not instantiate providers, call APIs, invoke execution, enable model/network paths, allow registry/CLI/report activation, or unlock next phase.",
+        },
+        {
+            "id": DAY136_AI_REVIEWER_EXPORT_PACKAGE_INTEGRATION_TASK_ID,
+            "task_id": "day136_ai_reviewer_export_package_integration",
+            "display_name": "Day136 AI Reviewer Export Package Integration",
+            "user_display_name": "AI Reviewer Export Package Integration",
+            "day": "Day136",
+            "category": "ai_planning",
+            "description": "Packages existing Day127-Day135 AI reviewer evidence into a deterministic review-only export package without enabling provider, API, execution, live action, SSH, device, adapter, broker, or runner paths.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY136_AI_REVIEWER_EXPORT_PACKAGE_INTEGRATION_JSON.as_posix(),
+                DAY136_AI_REVIEWER_EXPORT_PACKAGE_INTEGRATION_HTML.as_posix(),
+                DAY136_AI_REVIEWER_EXPORT_PACKAGE_INTEGRATION_ROADMAP_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Day136 JSON/HTML AI reviewer export package",
+                "Day136 roadmap documentation",
+            ],
+            "related_script": "ai_reviewer_export_package_integration.py",
+            "notes": "AI_REVIEWER_EXPORT_PACKAGE_READY REVIEW_ONLY REPORT_ONLY This is not next-day functionality. Execution / provider / API remain disabled. Uses local Day127-Day135 evidence only and does not read secrets/env/API keys, call external networks, instantiate providers, or invoke execution/adapter/broker/runner paths.",
         },
     ]
 
@@ -10288,6 +10340,15 @@ def _run_day134_disabled_ai_provider_adapter_contract(project_root: Path) -> int
 
 def _run_day135_ai_provider_disabled_by_default_safety_regression(project_root: Path) -> int:
     return run_ai_provider_disabled_by_default_safety_regression(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_day136_ai_reviewer_export_package_integration(project_root: Path) -> int:
+    return run_ai_reviewer_export_package_integration(
         project_root,
         format_heading_func=format_heading,
         format_status_func=format_status,
