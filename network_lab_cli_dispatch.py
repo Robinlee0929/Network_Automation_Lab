@@ -49,6 +49,7 @@ def _build_parser(lab: ModuleType) -> argparse.ArgumentParser:
   python network_lab.py --task disabled-ai-provider-interface-boundary
   python network_lab.py --task disabled-ai-provider-adapter-contract
   python network_lab.py --task ai-provider-disabled-by-default-safety-regression
+  python network_lab.py --task ai-reviewer-export-package-integration
   python network_lab.py --task intent-workflow-demo
   python network_lab.py --task offline-mock-runtime
   python network_lab.py --task offline-mock-runtime-contract
@@ -108,6 +109,7 @@ ai-summary-dashboard-card-integration writes a Day132 display-only dashboard car
 disabled-ai-provider-interface-boundary writes a Day133 disabled AI provider interface boundary only; it is not Day134 adapter contract work and does not enable execution/provider/API, provider adapters, SDKs, external APIs, API keys, secrets, network calls, live AI calls, prompt submission, model selection, async jobs, retry, rate limit, or timeout provider behavior.
 disabled-ai-provider-adapter-contract writes a Day134 disabled AI provider adapter contract shape only; it is not the next day's feature and does not enable provider/API/model/network/execution paths, SDK imports, API key handling, environment provider config, HTTP requests, async clients, subprocess providers, broker/runner/adapter execution, live backends, or next-phase unlocks.
 ai-provider-disabled-by-default-safety-regression writes a Day135 disabled-by-default safety regression over Day134 evidence; consumer read is one read-only regression case and it does not instantiate providers, call APIs, invoke execution, activate registry/CLI/report paths, implement Day136, or unlock the next phase.
+ai-reviewer-export-package-integration writes a Day136 deterministic review-only export package over Day127-Day135 AI reviewer evidence; this is not next-day functionality and execution / provider / API remain disabled.
 wireguard-runner is dry-run by default and delegates to the existing WireGuard script only after explicit --allow-live-wireguard."""
     parser = argparse.ArgumentParser(
         description=f"Day14 {lab.DAY14_NAME}.",
@@ -270,6 +272,7 @@ def _build_task_handlers(args: argparse.Namespace, root: Path, lab: ModuleType) 
         lab.DAY133_DISABLED_AI_PROVIDER_INTERFACE_BOUNDARY_TASK_ID: lambda: lab._run_day133_disabled_ai_provider_interface_boundary(root),
         lab.DAY134_DISABLED_AI_PROVIDER_ADAPTER_CONTRACT_TASK_ID: lambda: lab._run_day134_disabled_ai_provider_adapter_contract(root),
         lab.DAY135_AI_PROVIDER_DISABLED_BY_DEFAULT_SAFETY_REGRESSION_TASK_ID: lambda: lab._run_day135_ai_provider_disabled_by_default_safety_regression(root),
+        lab.DAY136_AI_REVIEWER_EXPORT_PACKAGE_INTEGRATION_TASK_ID: lambda: lab._run_day136_ai_reviewer_export_package_integration(root),
         lab.WIREGUARD_RUNNER_TASK_ALIAS: lambda: lab._run_wireguard_runner(
             root,
             dry_run=args.dry_run,
