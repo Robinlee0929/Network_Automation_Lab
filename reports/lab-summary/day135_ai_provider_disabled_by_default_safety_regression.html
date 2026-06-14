@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Day135 AI Provider Disabled-by-Default Safety Regression</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2rem; color: #17202a; }
+    table { border-collapse: collapse; width: 100%; margin: 1rem 0 2rem; }
+    th, td { border: 1px solid #d5d8dc; padding: 0.55rem; text-align: left; vertical-align: top; }
+    th { background: #eef2f6; }
+    code { background: #eef2f6; padding: 1px 4px; border-radius: 3px; }
+  </style>
+</head>
+<body>
+  <h1>Day135 AI Provider Disabled-by-Default Safety Regression</h1>
+  <p><strong>Mode:</strong> REVIEW_ONLY</p>
+  <p><strong>Scope:</strong> DISABLED_BY_DEFAULT_SAFETY_REGRESSION</p>
+  <p><strong>Regression verdict:</strong> DISABLED_BY_DEFAULT_PRESERVED</p>
+  <h2>Disabled-by-Default Summary</h2>
+  <table><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody><tr><td>day</td><td>135</td></tr><tr><td>task</td><td>ai-provider-disabled-by-default-safety-regression</td></tr><tr><td>mode</td><td>REVIEW_ONLY</td></tr><tr><td>scope</td><td>DISABLED_BY_DEFAULT_SAFETY_REGRESSION</td></tr><tr><td>is_next_day_feature</td><td>false</td></tr><tr><td>is_day136</td><td>false</td></tr><tr><td>opens_execution_provider_or_api</td><td>false</td></tr><tr><td>agents_md_pre_read</td><td>YES</td></tr><tr><td>agents_md_path</td><td>AGENTS.md</td></tr><tr><td>agents_md_modified</td><td>false</td></tr><tr><td>source_contract_day</td><td>134</td></tr><tr><td>source_contract_read</td><td>true</td></tr><tr><td>source_contract_read_only</td><td>true</td></tr><tr><td>consumer_read_allowed</td><td>true</td></tr><tr><td>provider_enabled</td><td>false</td></tr><tr><td>api_enabled</td><td>false</td></tr><tr><td>execution_enabled</td><td>false</td></tr><tr><td>model_invocation_enabled</td><td>false</td></tr><tr><td>network_enabled</td><td>false</td></tr><tr><td>provider_instantiated</td><td>false</td></tr><tr><td>api_called</td><td>false</td></tr><tr><td>execution_invoked</td><td>false</td></tr><tr><td>registry_activation_allowed</td><td>false</td></tr><tr><td>cli_activation_allowed</td><td>false</td></tr><tr><td>report_activation_allowed</td><td>false</td></tr><tr><td>next_phase_allowed</td><td>false</td></tr><tr><td>regression_verdict</td><td>DISABLED_BY_DEFAULT_PRESERVED</td></tr><tr><td>overall_status</td><td>PASS</td></tr></tbody></table>
+  <h2>Regression Cases</h2>
+  <table><thead><tr><th>Case</th><th>Status</th><th>Accepted</th><th>Rejected</th><th>Next Phase Allowed</th><th>Errors</th></tr></thead><tbody><tr><td>baseline_day134_disabled_provider_contract</td><td>PASS</td><td>true</td><td>false</td><td>false</td><td>none</td></tr><tr><td>consumer_read_only_inspection</td><td>PASS</td><td>true</td><td>false</td><td>false</td><td>none</td></tr><tr><td>provider_enabled_true_rejected</td><td>PASS</td><td>false</td><td>true</td><td>false</td><td>Day134 source field provider_enabled must be false.</td></tr><tr><td>api_enabled_true_rejected</td><td>PASS</td><td>false</td><td>true</td><td>false</td><td>Day134 source field api_enabled must be false.</td></tr><tr><td>execution_enabled_true_rejected</td><td>PASS</td><td>false</td><td>true</td><td>false</td><td>Day134 source field execution_enabled must be false.</td></tr><tr><td>model_invocation_enabled_true_rejected</td><td>PASS</td><td>false</td><td>true</td><td>false</td><td>Day134 source field model_invocation_enabled must be false.</td></tr><tr><td>network_enabled_true_rejected</td><td>PASS</td><td>false</td><td>true</td><td>false</td><td>Day134 source field network_enabled must be false.</td></tr><tr><td>provider_instantiated_true_rejected</td><td>PASS</td><td>false</td><td>true</td><td>false</td><td>provider_instantiated must be false; Day134 evidence must not show provider invocation.</td></tr><tr><td>api_called_true_rejected</td><td>PASS</td><td>false</td><td>true</td><td>false</td><td>api_called must be false; Day134 evidence must not show API calls.</td></tr><tr><td>execution_invoked_true_rejected</td><td>PASS</td><td>false</td><td>true</td><td>false</td><td>execution_invoked must be false; Day134 evidence must not show execution path reachability.</td></tr><tr><td>missing_or_unreadable_day134_evidence_rejected</td><td>PASS</td><td>false</td><td>true</td><td>false</td><td>Day134 evidence was not readable.</td></tr><tr><td>cli_report_registry_paths_do_not_activate_provider_api_execution</td><td>PASS</td><td>true</td><td>false</td><td>false</td><td>none</td></tr></tbody></table>
+</body>
+</html>

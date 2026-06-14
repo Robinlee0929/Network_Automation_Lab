@@ -1,0 +1,197 @@
+{
+  "day": 135,
+  "day_label": "Day135",
+  "task": "ai-provider-disabled-by-default-safety-regression",
+  "title": "AI Provider Disabled-by-Default Safety Regression",
+  "full_title": "Day135 AI Provider Disabled-by-Default Safety Regression",
+  "mode": "REVIEW_ONLY",
+  "scope": "DISABLED_BY_DEFAULT_SAFETY_REGRESSION",
+  "is_next_day_feature": false,
+  "is_day136": false,
+  "opens_execution_provider_or_api": false,
+  "agents_md_pre_read": "YES",
+  "agents_md_path": "AGENTS.md",
+  "agents_md_modified": false,
+  "agents_md_status": "FOUND_AND_READ",
+  "agents_md_read_error": "",
+  "source_contract_day": 134,
+  "source_contract_path": "reports/lab-summary/day134_disabled_ai_provider_adapter_contract.json",
+  "source_contract_read": true,
+  "source_contract_read_only": true,
+  "source_contract_read_error": "",
+  "source_contract_validation_errors": [],
+  "consumer_read_allowed": true,
+  "provider_enabled": false,
+  "api_enabled": false,
+  "execution_enabled": false,
+  "model_invocation_enabled": false,
+  "network_enabled": false,
+  "provider_instantiated": false,
+  "api_called": false,
+  "execution_invoked": false,
+  "registry_activation_allowed": false,
+  "cli_activation_allowed": false,
+  "report_activation_allowed": false,
+  "next_phase_allowed": false,
+  "regression_verdict": "DISABLED_BY_DEFAULT_PRESERVED",
+  "overall_status": "PASS",
+  "regression_cases": [
+    {
+      "case": "baseline_day134_disabled_provider_contract",
+      "description": "Baseline Day134 disabled provider contract is accepted as read-only evidence.",
+      "read_only": false,
+      "accepted": true,
+      "rejected": false,
+      "next_phase_allowed": false,
+      "status": "PASS",
+      "errors": []
+    },
+    {
+      "case": "consumer_read_only_inspection",
+      "description": "Consumer-style read is allowed only as read-only inspection.",
+      "read_only": true,
+      "accepted": true,
+      "rejected": false,
+      "next_phase_allowed": false,
+      "status": "PASS",
+      "errors": []
+    },
+    {
+      "case": "provider_enabled_true_rejected",
+      "description": "provider_enabled=true fails the disabled-by-default regression.",
+      "read_only": false,
+      "accepted": false,
+      "rejected": true,
+      "next_phase_allowed": false,
+      "status": "PASS",
+      "errors": [
+        "Day134 source field provider_enabled must be false."
+      ]
+    },
+    {
+      "case": "api_enabled_true_rejected",
+      "description": "api_enabled=true fails the disabled-by-default regression.",
+      "read_only": false,
+      "accepted": false,
+      "rejected": true,
+      "next_phase_allowed": false,
+      "status": "PASS",
+      "errors": [
+        "Day134 source field api_enabled must be false."
+      ]
+    },
+    {
+      "case": "execution_enabled_true_rejected",
+      "description": "execution_enabled=true fails the disabled-by-default regression.",
+      "read_only": false,
+      "accepted": false,
+      "rejected": true,
+      "next_phase_allowed": false,
+      "status": "PASS",
+      "errors": [
+        "Day134 source field execution_enabled must be false."
+      ]
+    },
+    {
+      "case": "model_invocation_enabled_true_rejected",
+      "description": "model_invocation_enabled=true fails the disabled-by-default regression.",
+      "read_only": false,
+      "accepted": false,
+      "rejected": true,
+      "next_phase_allowed": false,
+      "status": "PASS",
+      "errors": [
+        "Day134 source field model_invocation_enabled must be false."
+      ]
+    },
+    {
+      "case": "network_enabled_true_rejected",
+      "description": "network_enabled=true fails the disabled-by-default regression.",
+      "read_only": false,
+      "accepted": false,
+      "rejected": true,
+      "next_phase_allowed": false,
+      "status": "PASS",
+      "errors": [
+        "Day134 source field network_enabled must be false."
+      ]
+    },
+    {
+      "case": "provider_instantiated_true_rejected",
+      "description": "provider_instantiated=true fails the disabled-by-default regression.",
+      "read_only": false,
+      "accepted": false,
+      "rejected": true,
+      "next_phase_allowed": false,
+      "status": "PASS",
+      "errors": [
+        "provider_instantiated must be false; Day134 evidence must not show provider invocation."
+      ]
+    },
+    {
+      "case": "api_called_true_rejected",
+      "description": "api_called=true fails the disabled-by-default regression.",
+      "read_only": false,
+      "accepted": false,
+      "rejected": true,
+      "next_phase_allowed": false,
+      "status": "PASS",
+      "errors": [
+        "api_called must be false; Day134 evidence must not show API calls."
+      ]
+    },
+    {
+      "case": "execution_invoked_true_rejected",
+      "description": "execution_invoked=true fails the disabled-by-default regression.",
+      "read_only": false,
+      "accepted": false,
+      "rejected": true,
+      "next_phase_allowed": false,
+      "status": "PASS",
+      "errors": [
+        "execution_invoked must be false; Day134 evidence must not show execution path reachability."
+      ]
+    },
+    {
+      "case": "missing_or_unreadable_day134_evidence_rejected",
+      "description": "Missing or unreadable Day134 evidence must not advance.",
+      "read_only": false,
+      "accepted": false,
+      "rejected": true,
+      "next_phase_allowed": false,
+      "status": "PASS",
+      "errors": [
+        "Day134 evidence was not readable."
+      ]
+    },
+    {
+      "case": "cli_report_registry_paths_do_not_activate_provider_api_execution",
+      "description": "CLI/report/registry paths must not activate provider/API/execution.",
+      "registry_activation_allowed": false,
+      "cli_activation_allowed": false,
+      "report_activation_allowed": false,
+      "provider_instantiated": false,
+      "api_called": false,
+      "execution_invoked": false,
+      "accepted": true,
+      "rejected": false,
+      "next_phase_allowed": false,
+      "status": "PASS",
+      "errors": []
+    }
+  ],
+  "explicit_non_goals": [
+    "This is not the next day's feature.",
+    "This is not Day136.",
+    "No provider, API, model, network, or execution path is opened.",
+    "No provider object is instantiated.",
+    "No API is called.",
+    "No execution is invoked.",
+    "No next phase is unlocked."
+  ],
+  "report_paths": {
+    "json": "reports/lab-summary/day135_ai_provider_disabled_by_default_safety_regression.json",
+    "html": "reports/lab-summary/day135_ai_provider_disabled_by_default_safety_regression.html"
+  },
+  "validation_errors": []
+}
