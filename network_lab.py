@@ -1103,6 +1103,19 @@ DAY138_PROJECT_FOLDER_ORGANIZATION_DRY_RUN_INVENTORY_GATE_JSON = (
 DAY138_PROJECT_FOLDER_ORGANIZATION_DRY_RUN_INVENTORY_GATE_HTML = (
     Path("reports") / "lab-summary" / "day138_project_folder_organization_dry_run_inventory_gate.html"
 )
+DAY139_DOCS_ONLY_MOVE_DRY_RUN_EVIDENCE_PLAN_TASK_ID = "docs-only-move-dry-run-evidence-plan"
+DAY139_DOCS_ONLY_MOVE_DRY_RUN_EVIDENCE_PLAN_ROADMAP_DOC = (
+    Path("docs") / "roadmap" / "day139_docs_only_move_dry_run_evidence_plan.md"
+)
+DAY139_DOCS_ONLY_MOVE_DRY_RUN_EVIDENCE_PLAN_AI_INTENT_DOC = (
+    Path("docs") / "ai-intent" / "day139_docs_only_move_dry_run_evidence_plan.md"
+)
+DAY139_DOCS_ONLY_MOVE_DRY_RUN_EVIDENCE_PLAN_JSON = (
+    Path("reports") / "lab-summary" / "day139_docs_only_move_dry_run_evidence_plan.json"
+)
+DAY139_DOCS_ONLY_MOVE_DRY_RUN_EVIDENCE_PLAN_HTML = (
+    Path("reports") / "lab-summary" / "day139_docs_only_move_dry_run_evidence_plan.html"
+)
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
 WIREGUARD_RUNNER_DISPLAY_NAME = "WireGuard Runner Safety Layer"
@@ -2481,6 +2494,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY138_PROJECT_FOLDER_ORGANIZATION_DRY_RUN_INVENTORY_GATE_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day139",
+        "title": "Docs-Only Move Dry-Run Evidence Plan",
+        "report_type": "Review-only docs-only move dry-run evidence plan",
+        "safety_label": "REVIEW_ONLY; KEEP_DRY_RUN_ONLY_DO_NOT_MOVE_DOCS_YET; docs-only; no move/rename/import modification/source import path change; not next-day feature; not Day140; execution/provider/API disabled; adapter/SSH/live command disabled",
+        "description": "Day139 records docs-only dry-run move evidence based on Day138 docs candidates without moving files, renaming files, modifying imports, changing source import paths, enabling execution/provider/API, or unlocking Day140.",
+        "json_globs": [DAY139_DOCS_ONLY_MOVE_DRY_RUN_EVIDENCE_PLAN_JSON.as_posix()],
+        "html_globs": [DAY139_DOCS_ONLY_MOVE_DRY_RUN_EVIDENCE_PLAN_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY139_DOCS_ONLY_MOVE_DRY_RUN_EVIDENCE_PLAN_TASK_ID}"
         ),
     },
 ]
@@ -5860,6 +5886,34 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "intent_project_folder_organization_dry_run_inventory_gate.py",
             "notes": "DRY_RUN_INVENTORY_ONLY REPORT_ONLY KEEP_DRY_RUN_INVENTORY_ONLY. Does not move, delete, rename, change import paths, enable execution/provider/API, allow SSH/live commands, invoke adapters/brokers/runners, or unlock the next phase. This is not the next day's feature.",
+        },
+        {
+            "id": DAY139_DOCS_ONLY_MOVE_DRY_RUN_EVIDENCE_PLAN_TASK_ID,
+            "task_id": "day139_docs_only_move_dry_run_evidence_plan",
+            "display_name": "Day139 Docs-Only Move Dry-Run Evidence Plan",
+            "user_display_name": "Docs-Only Move Dry-Run Evidence Plan",
+            "day": "Day139",
+            "category": "project_organization",
+            "description": "Produces a review-only docs-only dry-run move evidence plan based on Day138 docs organization candidates.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY139_DOCS_ONLY_MOVE_DRY_RUN_EVIDENCE_PLAN_JSON.as_posix(),
+                DAY139_DOCS_ONLY_MOVE_DRY_RUN_EVIDENCE_PLAN_HTML.as_posix(),
+                DAY139_DOCS_ONLY_MOVE_DRY_RUN_EVIDENCE_PLAN_ROADMAP_DOC.as_posix(),
+                DAY139_DOCS_ONLY_MOVE_DRY_RUN_EVIDENCE_PLAN_AI_INTENT_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Day139 JSON/HTML docs-only move dry-run evidence",
+                "Day139 roadmap documentation",
+                "Day139 AI intent documentation",
+            ],
+            "related_script": "intent_docs_only_move_dry_run_evidence_plan.py",
+            "notes": "REVIEW_ONLY REPORT_ONLY DOCS_ONLY docs-only KEEP_DRY_RUN_ONLY_DO_NOT_MOVE_DOCS_YET. Based on Day138 docs candidates; not Day140 and not Folder Move Compatibility Gate. Does not move files, rename files, modify imports, modify source import paths, enable execution/provider/API, allow adapter/SSH/live commands, invoke brokers/runners/mapped execution, decide migration is allowed, or unlock the next phase.",
         },
     ]
 
@@ -10478,6 +10532,16 @@ def _run_day137_project_folder_organization_decision_gate(project_root: Path) ->
 
 def _run_day138_project_folder_organization_dry_run_inventory_gate(project_root: Path) -> int:
     return run_project_folder_organization_dry_run_inventory_gate(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_day139_docs_only_move_dry_run_evidence_plan(project_root: Path) -> int:
+    day139 = __import__("intent_docs_only_move_dry_run_evidence_plan")
+    return day139.run_docs_only_move_dry_run_evidence_plan(
         project_root,
         format_heading_func=format_heading,
         format_status_func=format_status,
