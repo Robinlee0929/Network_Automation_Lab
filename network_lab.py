@@ -224,6 +224,9 @@ from ai_reviewer_export_package_integration import (
 from day141_ai_assistance_review_demo_package import (
     run_day141_ai_assistance_review_demo_package,
 )
+from day142_ai_summary_to_dry_run_draft_display_contract import (
+    run_day142_ai_summary_to_dry_run_draft_display_contract,
+)
 from project_folder_organization_decision_gate import (
     run_project_folder_organization_decision_gate,
 )
@@ -1147,6 +1150,21 @@ DAY141_AI_ASSISTANCE_REVIEW_DEMO_PACKAGE_JSON = (
 )
 DAY141_AI_ASSISTANCE_REVIEW_DEMO_PACKAGE_HTML = (
     Path("reports") / "lab-summary" / "day141_ai_assistance_review_demo_package.html"
+)
+DAY142_AI_SUMMARY_TO_DRY_RUN_DRAFT_DISPLAY_CONTRACT_TASK_ID = (
+    "ai-summary-to-dry-run-draft-display-contract"
+)
+DAY142_AI_SUMMARY_TO_DRY_RUN_DRAFT_DISPLAY_CONTRACT_ROADMAP_DOC = (
+    Path("docs") / "roadmap" / "day142_ai_summary_to_dry_run_draft_display_contract.md"
+)
+DAY142_AI_SUMMARY_TO_DRY_RUN_DRAFT_DISPLAY_CONTRACT_AI_INTENT_DOC = (
+    Path("docs") / "ai-intent" / "day142_ai_summary_to_dry_run_draft_display_contract.md"
+)
+DAY142_AI_SUMMARY_TO_DRY_RUN_DRAFT_DISPLAY_CONTRACT_JSON = (
+    Path("reports") / "lab-summary" / "day142_ai_summary_to_dry_run_draft_display_contract.json"
+)
+DAY142_AI_SUMMARY_TO_DRY_RUN_DRAFT_DISPLAY_CONTRACT_HTML = (
+    Path("reports") / "lab-summary" / "day142_ai_summary_to_dry_run_draft_display_contract.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -2565,6 +2583,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY141_AI_ASSISTANCE_REVIEW_DEMO_PACKAGE_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day142",
+        "title": "AI Summary to Dry-run Draft Display Contract",
+        "report_type": "Review-only dry-run draft display contract",
+        "safety_label": "REVIEW_ONLY; DISPLAY_ONLY; already-produced AI summary metadata only; provider_enabled=false; api_enabled=false; model_invocation_enabled=false; execution_enabled=false; SSH/NETCONF/RESTCONF/live device/config write/apply disabled; adapter_invoked=false; next_phase_allowed=false; not a Day141 redo",
+        "description": "Day142 maps an existing AI reviewer summary into deterministic dry-run draft display data without providers, APIs, model invocation, execution, SSH, NETCONF, RESTCONF, live-device access, config write/apply, adapters, or next-phase unlock.",
+        "json_globs": [DAY142_AI_SUMMARY_TO_DRY_RUN_DRAFT_DISPLAY_CONTRACT_JSON.as_posix()],
+        "html_globs": [DAY142_AI_SUMMARY_TO_DRY_RUN_DRAFT_DISPLAY_CONTRACT_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY142_AI_SUMMARY_TO_DRY_RUN_DRAFT_DISPLAY_CONTRACT_TASK_ID}"
         ),
     },
 ]
@@ -6029,6 +6060,35 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "day141_ai_assistance_review_demo_package.py",
             "notes": "REVIEW_ONLY REPORT_ONLY demo package only. Day141 is not the next day's feature, not Day142, not a folder-move continuation, and not a tmp cleanup continuation. source_execution_allowed=false, execution_allowed=false, provider_allowed=false, api_allowed=false, openai_api_called=false, ai_provider_called=false, ai_decision_allowed=false, live_device_access_allowed=false, ssh_allowed=false, next_phase_allowed=false.",
+        },
+        {
+            "id": DAY142_AI_SUMMARY_TO_DRY_RUN_DRAFT_DISPLAY_CONTRACT_TASK_ID,
+            "task_id": "day142_ai_summary_to_dry_run_draft_display_contract",
+            "display_name": "Day142 AI Summary to Dry-run Draft Display Contract",
+            "user_display_name": "AI Summary to Dry-run Draft Display Contract",
+            "day": "Day142",
+            "category": "ai_planning",
+            "description": "Maps already-produced AI reviewer summary text/metadata into a deterministic display-only dry-run draft payload without providers, APIs, model invocation, execution, live-device access, config write/apply, adapters, or next-phase unlock.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY142_AI_SUMMARY_TO_DRY_RUN_DRAFT_DISPLAY_CONTRACT_JSON.as_posix(),
+                DAY142_AI_SUMMARY_TO_DRY_RUN_DRAFT_DISPLAY_CONTRACT_HTML.as_posix(),
+                DAY142_AI_SUMMARY_TO_DRY_RUN_DRAFT_DISPLAY_CONTRACT_ROADMAP_DOC.as_posix(),
+                DAY142_AI_SUMMARY_TO_DRY_RUN_DRAFT_DISPLAY_CONTRACT_AI_INTENT_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Day142 JSON/HTML AI summary to dry-run draft display contract",
+                "Day142 roadmap documentation",
+                "Day142 AI-intent documentation",
+            ],
+            "related_script": "day142_ai_summary_to_dry_run_draft_display_contract.py",
+            "notes": "REVIEW_ONLY REPORT_ONLY display-only dry-run draft contract. Treats AI summary input as already produced reviewer text/metadata; does not redo Day141. provider_enabled=false, api_enabled=false, model_invocation_enabled=false, execution_enabled=false, ssh_allowed=false, netconf_allowed=false, restconf_allowed=false, live_device_allowed=false, config_write_allowed=false, command_apply_allowed=false, adapter_invoked=false, next_phase_allowed=false.",
         },
     ]
 
@@ -10675,6 +10735,15 @@ def _run_day140_folder_move_compatibility_gate(project_root: Path) -> int:
 
 def _run_day141_ai_assistance_review_demo_package(project_root: Path) -> int:
     return run_day141_ai_assistance_review_demo_package(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_day142_ai_summary_to_dry_run_draft_display_contract(project_root: Path) -> int:
+    return run_day142_ai_summary_to_dry_run_draft_display_contract(
         project_root,
         format_heading_func=format_heading,
         format_status_func=format_status,
