@@ -254,3 +254,9 @@ Day152 audits post-Day151 README, docs, registry, CLI, task catalog, and report-
 
 Day153 statically scans post-closure v0.4 AI Assistance review/report artifacts for forbidden capability references as `POST_CLOSURE_FORBIDDEN_CAPABILITY_REFERENCE_SCAN_REVIEWED`. It is `REVIEW_ONLY`, `REPORT_ONLY`, and not next-day functionality; no project source code, pytest, `network_lab.py`, provider, API, model, SSH, live device, adapter broker, runner, or execution path is run, and risky enablement references are not found in the Day153 scan scope.
 
+## Day154
+
+- [Day154 Post-Closure Evidence Baseline Lock Review](day154_post_closure_evidence_baseline_lock_review.md)
+
+Day154 records the post-closure evidence baseline lock after Day145-Day153 and adds an SDD Operating Contract Draft as `POST_CLOSURE_EVIDENCE_BASELINE_LOCK_REVIEW_READY`. It is review-only / report-only, not a Day153 supplement, and not next-day functionality; execution, provider, API, model call, live device access, SSH, adapters, brokers, runners, secrets, and next phase remain blocked with `next_phase_allowed=false`.
+

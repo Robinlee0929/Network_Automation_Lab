@@ -257,6 +257,9 @@ from day151_v04_ai_assistance_closure_evidence_index import (
 from day152_post_closure_reference_integrity_audit import (
     run_day152_post_closure_reference_integrity_audit,
 )
+from day154_post_closure_evidence_baseline_lock_review import (
+    run_day154_post_closure_evidence_baseline_lock_review,
+)
 from project_folder_organization_decision_gate import (
     run_project_folder_organization_decision_gate,
 )
@@ -1335,6 +1338,21 @@ DAY152_POST_CLOSURE_REFERENCE_INTEGRITY_AUDIT_JSON = (
 )
 DAY152_POST_CLOSURE_REFERENCE_INTEGRITY_AUDIT_HTML = (
     Path("reports") / "lab-summary" / "day152_post_closure_reference_integrity_audit.html"
+)
+DAY154_POST_CLOSURE_EVIDENCE_BASELINE_LOCK_REVIEW_TASK_ID = (
+    "post-closure-evidence-baseline-lock-review"
+)
+DAY154_POST_CLOSURE_EVIDENCE_BASELINE_LOCK_REVIEW_ROADMAP_DOC = (
+    Path("docs") / "roadmap" / "day154_post_closure_evidence_baseline_lock_review.md"
+)
+DAY154_POST_CLOSURE_EVIDENCE_BASELINE_LOCK_REVIEW_AI_INTENT_DOC = (
+    Path("docs") / "ai-intent" / "day154_post_closure_evidence_baseline_lock_review.md"
+)
+DAY154_POST_CLOSURE_EVIDENCE_BASELINE_LOCK_REVIEW_JSON = (
+    Path("reports") / "lab-summary" / "day154_post_closure_evidence_baseline_lock_review.json"
+)
+DAY154_POST_CLOSURE_EVIDENCE_BASELINE_LOCK_REVIEW_HTML = (
+    Path("reports") / "lab-summary" / "day154_post_closure_evidence_baseline_lock_review.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -2896,6 +2914,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY152_POST_CLOSURE_REFERENCE_INTEGRITY_AUDIT_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day154",
+        "title": "Post-Closure Evidence Baseline Lock Review + SDD Operating Contract Draft",
+        "report_type": "Review-only post-closure evidence baseline lock review",
+        "safety_label": "POST_CLOSURE_EVIDENCE_BASELINE_LOCK_REVIEW_READY; SDD_OPERATING_CONTRACT_DRAFT; REVIEW_ONLY; REPORT_ONLY; day153_supplement=false; next_day_feature=false; touches_execution=false; touches_provider=false; touches_api=false; touches_model_call=false; touches_live_device=false; next_phase_allowed=false",
+        "description": "Day154 records the post-closure evidence baseline after Day145-Day153 and drafts SDD operating rules without supplementing Day153, implementing future-day functionality, or enabling execution/provider/API/model/live-device paths.",
+        "json_globs": [DAY154_POST_CLOSURE_EVIDENCE_BASELINE_LOCK_REVIEW_JSON.as_posix()],
+        "html_globs": [DAY154_POST_CLOSURE_EVIDENCE_BASELINE_LOCK_REVIEW_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY154_POST_CLOSURE_EVIDENCE_BASELINE_LOCK_REVIEW_TASK_ID}"
         ),
     },
 ]
@@ -6673,6 +6704,35 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "day152_post_closure_reference_integrity_audit.py",
             "notes": "REVIEW_ONLY REPORT_ONLY POST_CLOSURE_REFERENCE_INTEGRITY_AUDITED DAY151_CLOSURE_INDEX_AUTHORITY_PRESERVED PHASE_GATE_CLOSED_REVIEW_ONLY NEXT_PHASE_ALLOWED_FALSE. Audits README/docs/registry/CLI/task catalog/report-index references only after Day151 merge. redoes_day145_day151_safety_judgment=false, source_task_rerun=false, execution_enabled=false, provider_enabled=false, api_enabled=false, model_calls_enabled=false, device_access_enabled=false, ssh_enabled=false, netconf_enabled=false, restconf_enabled=false, secrets_enabled=false, live_network_io_enabled=false, next_phase_allowed=false.",
+        },
+        {
+            "id": DAY154_POST_CLOSURE_EVIDENCE_BASELINE_LOCK_REVIEW_TASK_ID,
+            "task_id": "day154_post_closure_evidence_baseline_lock_review",
+            "display_name": "Day154 Post-Closure Evidence Baseline Lock Review",
+            "user_display_name": "Post-Closure Evidence Baseline Lock Review",
+            "day": "Day154",
+            "category": "ai_planning",
+            "description": "Day154 records the post-closure evidence baseline after Day145-Day153 and drafts the current SDD operating contract. It is not a Day153 supplement and not a next-day feature.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY154_POST_CLOSURE_EVIDENCE_BASELINE_LOCK_REVIEW_JSON.as_posix(),
+                DAY154_POST_CLOSURE_EVIDENCE_BASELINE_LOCK_REVIEW_HTML.as_posix(),
+                DAY154_POST_CLOSURE_EVIDENCE_BASELINE_LOCK_REVIEW_ROADMAP_DOC.as_posix(),
+                DAY154_POST_CLOSURE_EVIDENCE_BASELINE_LOCK_REVIEW_AI_INTENT_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Day154 JSON/HTML post-closure evidence baseline lock review",
+                "Day154 roadmap documentation",
+                "Day154 AI-intent documentation",
+                "SDD Operating Contract Draft",
+            ],
+            "related_script": "day154_post_closure_evidence_baseline_lock_review.py",
+            "notes": "REVIEW_ONLY REPORT_ONLY POST_CLOSURE_EVIDENCE_BASELINE_LOCK_REVIEW_READY SDD_OPERATING_CONTRACT_DRAFT NEXT_PHASE_ALLOWED_FALSE. Records Day145-Day153 frozen/preserved evidence only. continues_day153=true, day153_supplement=false, next_day_feature=false, new_feature=false, touches_execution=false, touches_provider=false, touches_api=false, touches_model_call=false, touches_live_device=false, execution_allowed=false, provider_allowed=false, api_allowed=false, model_call_allowed=false, live_device_allowed=false, next_phase_allowed=false.",
         },
     ]
 
@@ -11418,6 +11478,15 @@ def _run_day151_v04_ai_assistance_closure_evidence_index(project_root: Path) -> 
 
 def _run_day152_post_closure_reference_integrity_audit(project_root: Path) -> int:
     return run_day152_post_closure_reference_integrity_audit(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_day154_post_closure_evidence_baseline_lock_review(project_root: Path) -> int:
+    return run_day154_post_closure_evidence_baseline_lock_review(
         project_root,
         format_heading_func=format_heading,
         format_status_func=format_status,
