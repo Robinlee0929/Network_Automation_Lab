@@ -98,6 +98,7 @@ CANONICAL_TASK_NAMES: Tuple[str, ...] = (
     "v0.4-ai-assistance-non-advancement-gate",
     "ai-assistance-deferred-risk-register",
     "ai-assistance-demo-export-draft-display-consistency-audit",
+    "ai-assistance-docs-registry-report-index-consistency-audit",
     "wireguard-runner",
 )
 
