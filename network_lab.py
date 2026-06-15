@@ -248,6 +248,9 @@ from day148_ai_assistance_display_consistency_audit import (
 from day149_ai_assistance_docs_registry_report_index_consistency_audit import (
     run_day149_ai_assistance_docs_registry_report_index_consistency_audit,
 )
+from day150_v04_ai_assistance_phase_gate_closure_review import (
+    run_day150_v04_ai_assistance_phase_gate_closure_review,
+)
 from project_folder_organization_decision_gate import (
     run_project_folder_organization_decision_gate,
 )
@@ -1281,6 +1284,21 @@ DAY149_AI_ASSISTANCE_DOCS_REGISTRY_REPORT_INDEX_CONSISTENCY_AUDIT_JSON = (
 )
 DAY149_AI_ASSISTANCE_DOCS_REGISTRY_REPORT_INDEX_CONSISTENCY_AUDIT_HTML = (
     Path("reports") / "lab-summary" / "day149_ai_assistance_docs_registry_report_index_consistency_audit.html"
+)
+DAY150_V04_AI_ASSISTANCE_PHASE_GATE_CLOSURE_REVIEW_TASK_ID = (
+    "v04-ai-assistance-phase-gate-closure-review"
+)
+DAY150_V04_AI_ASSISTANCE_PHASE_GATE_CLOSURE_REVIEW_ROADMAP_DOC = (
+    Path("docs") / "roadmap" / "day150_v04_ai_assistance_phase_gate_closure_review.md"
+)
+DAY150_V04_AI_ASSISTANCE_PHASE_GATE_CLOSURE_REVIEW_AI_INTENT_DOC = (
+    Path("docs") / "ai-intent" / "day150_v04_ai_assistance_phase_gate_closure_review.md"
+)
+DAY150_V04_AI_ASSISTANCE_PHASE_GATE_CLOSURE_REVIEW_JSON = (
+    Path("reports") / "lab-summary" / "day150_v04_ai_assistance_phase_gate_closure_review.json"
+)
+DAY150_V04_AI_ASSISTANCE_PHASE_GATE_CLOSURE_REVIEW_HTML = (
+    Path("reports") / "lab-summary" / "day150_v04_ai_assistance_phase_gate_closure_review.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -2803,6 +2821,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY149_AI_ASSISTANCE_DOCS_REGISTRY_REPORT_INDEX_CONSISTENCY_AUDIT_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day150",
+        "title": "v0.4 AI Assistance Phase Gate Closure Review",
+        "report_type": "Review-only v0.4 AI Assistance phase gate closure review",
+        "safety_label": "PHASE_GATE_CLOSED_REVIEW_ONLY; NEXT_PHASE_ALLOWED_FALSE; REVIEW_ONLY; REPORT_ONLY; scope=Day145-Day149; execution/provider/API/model/device/SSH/NETCONF/RESTCONF/secrets/live network I/O disabled; future explicit safety gate required",
+        "description": "Day150 closes the current v0.4 AI Assistance phase gate as review-only by preserving Day145-Day149 conclusions, confirming README status-summary-only boundaries, and keeping execution, provider, API, model calls, device access, SSH, NETCONF, RESTCONF, secrets, live network I/O, adapters, brokers, runners, and next phase disabled.",
+        "json_globs": [DAY150_V04_AI_ASSISTANCE_PHASE_GATE_CLOSURE_REVIEW_JSON.as_posix()],
+        "html_globs": [DAY150_V04_AI_ASSISTANCE_PHASE_GATE_CLOSURE_REVIEW_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY150_V04_AI_ASSISTANCE_PHASE_GATE_CLOSURE_REVIEW_TASK_ID}"
         ),
     },
 ]
@@ -6496,6 +6527,34 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "day149_ai_assistance_docs_registry_report_index_consistency_audit.py",
             "notes": "REVIEW_ONLY REPORT_ONLY AUDIT_ONLY CONSISTENCY_AUDITED_REVIEW_ONLY. NOT_NEXT_DAY_FUNCTIONALITY; EXECUTION_PROVIDER_API_DISABLED; AGENTS_MD_FOUND_AND_READ; AGENTS_MD_NOT_MODIFIED. Audits Day145-Day149 docs/registry/report-index consistency only; execution_enabled=false, provider_enabled=false, api_enabled=false, model_call_enabled=false, network_device_live_access_enabled=false, adapter_broker_runner_enabled=false, secrets_required=false, next_phase_allowed=false.",
+        },
+        {
+            "id": DAY150_V04_AI_ASSISTANCE_PHASE_GATE_CLOSURE_REVIEW_TASK_ID,
+            "task_id": "day150_v04_ai_assistance_phase_gate_closure_review",
+            "display_name": "Day150 v0.4 AI Assistance Phase Gate Closure Review",
+            "user_display_name": "v0.4 AI Assistance Phase Gate Closure Review",
+            "day": "Day150",
+            "category": "ai_planning",
+            "description": "Day150 closes the current v0.4 AI Assistance phase gate as review-only. It preserves Day145-Day149 conclusions, confirms README status-summary-only boundaries, and keeps the next phase blocked pending a future explicit safety gate.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY150_V04_AI_ASSISTANCE_PHASE_GATE_CLOSURE_REVIEW_JSON.as_posix(),
+                DAY150_V04_AI_ASSISTANCE_PHASE_GATE_CLOSURE_REVIEW_HTML.as_posix(),
+                DAY150_V04_AI_ASSISTANCE_PHASE_GATE_CLOSURE_REVIEW_ROADMAP_DOC.as_posix(),
+                DAY150_V04_AI_ASSISTANCE_PHASE_GATE_CLOSURE_REVIEW_AI_INTENT_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Day150 JSON/HTML v0.4 AI Assistance phase gate closure review",
+                "Day150 roadmap documentation",
+                "Day150 AI-intent documentation",
+            ],
+            "related_script": "day150_v04_ai_assistance_phase_gate_closure_review.py",
+            "notes": "REVIEW_ONLY REPORT_ONLY CLOSURE_REVIEW_ONLY PHASE_GATE_CLOSED_REVIEW_ONLY NEXT_PHASE_ALLOWED_FALSE. Preserves Day145 evidence freeze, Day146 non-advancement gate, Day147 deferred risk register, Day148 display consistency, Day149 docs/registry/report-index consistency, and README status-summary-only boundaries. execution_enabled=false, provider_enabled=false, api_enabled=false, model_calls_enabled=false, device_access_enabled=false, ssh_enabled=false, netconf_enabled=false, restconf_enabled=false, secrets_enabled=false, live_network_io_enabled=false, next_phase_allowed=false.",
         },
     ]
 
@@ -11214,6 +11273,15 @@ def _run_day148_ai_assistance_display_consistency_audit(project_root: Path) -> i
 
 def _run_day149_ai_assistance_docs_registry_report_index_consistency_audit(project_root: Path) -> int:
     return run_day149_ai_assistance_docs_registry_report_index_consistency_audit(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_day150_v04_ai_assistance_phase_gate_closure_review(project_root: Path) -> int:
+    return run_day150_v04_ai_assistance_phase_gate_closure_review(
         project_root,
         format_heading_func=format_heading,
         format_status_func=format_status,
