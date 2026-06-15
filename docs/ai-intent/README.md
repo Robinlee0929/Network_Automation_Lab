@@ -248,3 +248,9 @@ Day151 indexes the closed v0.4 AI Assistance evidence chain as `CLOSURE_EVIDENCE
 
 Day152 audits post-Day151 README, docs, registry, CLI, task catalog, and report-index references as `POST_CLOSURE_REFERENCE_INTEGRITY_AUDITED`. Day151 remains the closure evidence index authority; Day152 treats Day145-Day150 indexed, unsafe flags false, next phase blocked, and Day151 report-index visibility as already confirmed, without rerunning source tasks or redoing Day145-Day151 safety judgments.
 
+## Day153
+
+- [Day153 Post-Closure Forbidden Capability Reference Scan](day153_post_closure_forbidden_capability_reference_scan.md)
+
+Day153 statically scans post-closure v0.4 AI Assistance review/report artifacts for forbidden capability references as `POST_CLOSURE_FORBIDDEN_CAPABILITY_REFERENCE_SCAN_REVIEWED`. It is `REVIEW_ONLY`, `REPORT_ONLY`, and not next-day functionality; no project source code, pytest, `network_lab.py`, provider, API, model, SSH, live device, adapter broker, runner, or execution path is run, and risky enablement references are not found in the Day153 scan scope.
+
