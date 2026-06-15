@@ -233,6 +233,9 @@ from intent_dry_run_draft_safety_diff_viewer import (
 from day144_v04_ai_assistance_compatibility_review import (
     run_day144_v04_ai_assistance_compatibility_review,
 )
+from day145_v04_ai_assistance_evidence_freeze_package import (
+    run_day145_v04_ai_assistance_evidence_freeze_package,
+)
 from project_folder_organization_decision_gate import (
     run_project_folder_organization_decision_gate,
 )
@@ -1197,6 +1200,19 @@ DAY144_V04_AI_ASSISTANCE_COMPATIBILITY_REVIEW_JSON = (
 )
 DAY144_V04_AI_ASSISTANCE_COMPATIBILITY_REVIEW_HTML = (
     Path("reports") / "lab-summary" / "day144_v04_ai_assistance_compatibility_review.html"
+)
+DAY145_V04_AI_ASSISTANCE_EVIDENCE_FREEZE_PACKAGE_TASK_ID = "v0.4-ai-assistance-evidence-freeze-package"
+DAY145_V04_AI_ASSISTANCE_EVIDENCE_FREEZE_PACKAGE_ROADMAP_DOC = (
+    Path("docs") / "roadmap" / "day145_v04_ai_assistance_evidence_freeze_package.md"
+)
+DAY145_V04_AI_ASSISTANCE_EVIDENCE_FREEZE_PACKAGE_AI_INTENT_DOC = (
+    Path("docs") / "ai-intent" / "day145_v04_ai_assistance_evidence_freeze_package.md"
+)
+DAY145_V04_AI_ASSISTANCE_EVIDENCE_FREEZE_PACKAGE_JSON = (
+    Path("reports") / "lab-summary" / "day145_v04_ai_assistance_evidence_freeze_package.json"
+)
+DAY145_V04_AI_ASSISTANCE_EVIDENCE_FREEZE_PACKAGE_HTML = (
+    Path("reports") / "lab-summary" / "day145_v04_ai_assistance_evidence_freeze_package.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -2654,6 +2670,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY144_V04_AI_ASSISTANCE_COMPATIBILITY_REVIEW_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day145",
+        "title": "v0.4 AI Assistance Evidence Freeze Package",
+        "report_type": "Review-only v0.4 AI assistance evidence freeze package",
+        "safety_label": "REVIEW_ONLY; REPORT_ONLY; EVIDENCE_ONLY; Day127-Day144 frozen scope; Day144 untouched; no folder move; no cleanup; execution/provider/API/OpenAI/model/live device/SSH disabled; next_phase_allowed=false",
+        "description": "Day145 freezes the Day127-Day144 v0.4 AI assistance evidence package at the recorded Day144 commit without modifying Day144, moving folders, cleaning files, enabling providers/APIs/models, using SSH or live devices, or advancing phase.",
+        "json_globs": [DAY145_V04_AI_ASSISTANCE_EVIDENCE_FREEZE_PACKAGE_JSON.as_posix()],
+        "html_globs": [DAY145_V04_AI_ASSISTANCE_EVIDENCE_FREEZE_PACKAGE_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY145_V04_AI_ASSISTANCE_EVIDENCE_FREEZE_PACKAGE_TASK_ID}"
         ),
     },
 ]
@@ -6205,6 +6234,35 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "day144_v04_ai_assistance_compatibility_review.py",
             "notes": "REVIEW_ONLY REPORT_ONLY compatibility review only. Keeps final task name exactly v0.4 AI Assistance Compatibility Review; not Day145; execution_allowed=false, provider_allowed=false, api_allowed=false, openai_api_called=false, live_device_access_allowed=false, ssh_allowed=false, netconf_allowed=false, restconf_allowed=false, routeros_allowed=false, next_phase_allowed=false, folder_move_compatibility_gate_redone=false, folder_move_performed=false.",
+        },
+        {
+            "id": DAY145_V04_AI_ASSISTANCE_EVIDENCE_FREEZE_PACKAGE_TASK_ID,
+            "task_id": "day145_v04_ai_assistance_evidence_freeze_package",
+            "display_name": "Day145 v0.4 AI Assistance Evidence Freeze Package",
+            "user_display_name": "v0.4 AI Assistance Evidence Freeze Package",
+            "day": "Day145",
+            "category": "ai_planning",
+            "description": "Freezes the Day127-Day144 v0.4 AI assistance evidence package without modifying Day144 or opening any execution/provider/API path.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY145_V04_AI_ASSISTANCE_EVIDENCE_FREEZE_PACKAGE_JSON.as_posix(),
+                DAY145_V04_AI_ASSISTANCE_EVIDENCE_FREEZE_PACKAGE_HTML.as_posix(),
+                DAY145_V04_AI_ASSISTANCE_EVIDENCE_FREEZE_PACKAGE_ROADMAP_DOC.as_posix(),
+                DAY145_V04_AI_ASSISTANCE_EVIDENCE_FREEZE_PACKAGE_AI_INTENT_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Day145 JSON/HTML v0.4 AI assistance evidence freeze package",
+                "Day145 roadmap documentation",
+                "Day145 AI-intent documentation",
+            ],
+            "related_script": "day145_v04_ai_assistance_evidence_freeze_package.py",
+            "notes": "REVIEW_ONLY REPORT_ONLY EVIDENCE_ONLY freeze package. Covers Day127-Day144; Day144 frozen input only; day144_modified=false, day144_rerun=false, folder_move_performed=false, cleanup_performed=false, provider_allowed=false, api_allowed=false, openai_api_called=false, model_invocation_allowed=false, live_device_access_allowed=false, ssh_allowed=false, next_phase_allowed=false.",
         },
     ]
 
@@ -10878,6 +10936,15 @@ def _run_day143_dry_run_draft_safety_diff_viewer(project_root: Path) -> int:
 
 def _run_day144_v04_ai_assistance_compatibility_review(project_root: Path) -> int:
     return run_day144_v04_ai_assistance_compatibility_review(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_day145_v04_ai_assistance_evidence_freeze_package(project_root: Path) -> int:
+    return run_day145_v04_ai_assistance_evidence_freeze_package(
         project_root,
         format_heading_func=format_heading,
         format_status_func=format_status,
