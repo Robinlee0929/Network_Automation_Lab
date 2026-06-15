@@ -236,3 +236,9 @@ Day149 audits Day145-Day149 documentation discoverability, task registry and CLI
 
 Day150 closes the current v0.4 AI Assistance phase gate as `PHASE_GATE_CLOSED_REVIEW_ONLY` and keeps `NEXT_PHASE_ALLOWED_FALSE`. It preserves Day145-Day149 conclusions, confirms README remains a status summary only, and keeps execution, provider, API, model calls, device access, SSH, NETCONF, RESTCONF, secrets, live network I/O, and next phase disabled pending a future explicit safety gate.
 
+## Day151
+
+- [Day151 v0.4 AI Assistance Closure Evidence Index](day151_v04_ai_assistance_closure_evidence_index.md)
+
+Day151 indexes the closed v0.4 AI Assistance evidence chain as `CLOSURE_EVIDENCE_INDEX_READY` while preserving `PHASE_GATE_CLOSED_REVIEW_ONLY` and `NEXT_PHASE_ALLOWED_FALSE`. It links Day145-Day150 artifacts for reviewer use only, does not rerun source tasks, and keeps execution, provider, API, model calls, device access, SSH, NETCONF, RESTCONF, secrets, live network I/O, adapters, brokers, runners, and next phase disabled.
+

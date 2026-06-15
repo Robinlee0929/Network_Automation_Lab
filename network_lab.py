@@ -251,6 +251,9 @@ from day149_ai_assistance_docs_registry_report_index_consistency_audit import (
 from day150_v04_ai_assistance_phase_gate_closure_review import (
     run_day150_v04_ai_assistance_phase_gate_closure_review,
 )
+from day151_v04_ai_assistance_closure_evidence_index import (
+    run_day151_v04_ai_assistance_closure_evidence_index,
+)
 from project_folder_organization_decision_gate import (
     run_project_folder_organization_decision_gate,
 )
@@ -1299,6 +1302,21 @@ DAY150_V04_AI_ASSISTANCE_PHASE_GATE_CLOSURE_REVIEW_JSON = (
 )
 DAY150_V04_AI_ASSISTANCE_PHASE_GATE_CLOSURE_REVIEW_HTML = (
     Path("reports") / "lab-summary" / "day150_v04_ai_assistance_phase_gate_closure_review.html"
+)
+DAY151_V04_AI_ASSISTANCE_CLOSURE_EVIDENCE_INDEX_TASK_ID = (
+    "v04-ai-assistance-closure-evidence-index"
+)
+DAY151_V04_AI_ASSISTANCE_CLOSURE_EVIDENCE_INDEX_ROADMAP_DOC = (
+    Path("docs") / "roadmap" / "day151_v04_ai_assistance_closure_evidence_index.md"
+)
+DAY151_V04_AI_ASSISTANCE_CLOSURE_EVIDENCE_INDEX_AI_INTENT_DOC = (
+    Path("docs") / "ai-intent" / "day151_v04_ai_assistance_closure_evidence_index.md"
+)
+DAY151_V04_AI_ASSISTANCE_CLOSURE_EVIDENCE_INDEX_JSON = (
+    Path("reports") / "lab-summary" / "day151_v04_ai_assistance_closure_evidence_index.json"
+)
+DAY151_V04_AI_ASSISTANCE_CLOSURE_EVIDENCE_INDEX_HTML = (
+    Path("reports") / "lab-summary" / "day151_v04_ai_assistance_closure_evidence_index.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -2834,6 +2852,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY150_V04_AI_ASSISTANCE_PHASE_GATE_CLOSURE_REVIEW_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day151",
+        "title": "v0.4 AI Assistance Closure Evidence Index",
+        "report_type": "Review-only v0.4 AI Assistance closure evidence index",
+        "safety_label": "CLOSURE_EVIDENCE_INDEX_READY; PHASE_GATE_CLOSED_REVIEW_ONLY; NEXT_PHASE_ALLOWED_FALSE; REVIEW_ONLY; REPORT_ONLY; scope=Day145-Day150; source_task_rerun=false; execution/provider/API/model/device/SSH/NETCONF/RESTCONF/secrets/live network I/O disabled; future explicit safety gate required",
+        "description": "Day151 indexes the v0.4 AI Assistance closure evidence chain for reviewer use only by linking Day145-Day150 artifacts without rerunning source tasks or enabling execution, provider, API, model calls, device access, SSH, NETCONF, RESTCONF, secrets, live network I/O, adapters, brokers, runners, or next phase.",
+        "json_globs": [DAY151_V04_AI_ASSISTANCE_CLOSURE_EVIDENCE_INDEX_JSON.as_posix()],
+        "html_globs": [DAY151_V04_AI_ASSISTANCE_CLOSURE_EVIDENCE_INDEX_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY151_V04_AI_ASSISTANCE_CLOSURE_EVIDENCE_INDEX_TASK_ID}"
         ),
     },
 ]
@@ -6555,6 +6586,34 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "day150_v04_ai_assistance_phase_gate_closure_review.py",
             "notes": "REVIEW_ONLY REPORT_ONLY CLOSURE_REVIEW_ONLY PHASE_GATE_CLOSED_REVIEW_ONLY NEXT_PHASE_ALLOWED_FALSE. Preserves Day145 evidence freeze, Day146 non-advancement gate, Day147 deferred risk register, Day148 display consistency, Day149 docs/registry/report-index consistency, and README status-summary-only boundaries. execution_enabled=false, provider_enabled=false, api_enabled=false, model_calls_enabled=false, device_access_enabled=false, ssh_enabled=false, netconf_enabled=false, restconf_enabled=false, secrets_enabled=false, live_network_io_enabled=false, next_phase_allowed=false.",
+        },
+        {
+            "id": DAY151_V04_AI_ASSISTANCE_CLOSURE_EVIDENCE_INDEX_TASK_ID,
+            "task_id": "day151_v04_ai_assistance_closure_evidence_index",
+            "display_name": "Day151 v0.4 AI Assistance Closure Evidence Index",
+            "user_display_name": "v0.4 AI Assistance Closure Evidence Index",
+            "day": "Day151",
+            "category": "ai_planning",
+            "description": "Day151 indexes the v0.4 AI Assistance closure evidence chain for reviewer use only. It links Day145-Day150 artifacts without rerunning source tasks and keeps the Day150 phase gate closed.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY151_V04_AI_ASSISTANCE_CLOSURE_EVIDENCE_INDEX_JSON.as_posix(),
+                DAY151_V04_AI_ASSISTANCE_CLOSURE_EVIDENCE_INDEX_HTML.as_posix(),
+                DAY151_V04_AI_ASSISTANCE_CLOSURE_EVIDENCE_INDEX_ROADMAP_DOC.as_posix(),
+                DAY151_V04_AI_ASSISTANCE_CLOSURE_EVIDENCE_INDEX_AI_INTENT_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Day151 JSON/HTML v0.4 AI Assistance closure evidence index",
+                "Day151 roadmap documentation",
+                "Day151 AI-intent documentation",
+            ],
+            "related_script": "day151_v04_ai_assistance_closure_evidence_index.py",
+            "notes": "REVIEW_ONLY REPORT_ONLY CLOSURE_EVIDENCE_INDEX_ONLY CLOSURE_EVIDENCE_INDEX_READY PHASE_GATE_CLOSED_REVIEW_ONLY NEXT_PHASE_ALLOWED_FALSE. Indexes Day145 evidence freeze, Day146 non-advancement gate, Day147 deferred risk register, Day148 display consistency, Day149 docs/registry/report-index consistency, and Day150 phase gate closure. source_task_rerun=false, execution_enabled=false, provider_enabled=false, api_enabled=false, model_calls_enabled=false, device_access_enabled=false, ssh_enabled=false, netconf_enabled=false, restconf_enabled=false, secrets_enabled=false, live_network_io_enabled=false, next_phase_allowed=false.",
         },
     ]
 
@@ -11282,6 +11341,15 @@ def _run_day149_ai_assistance_docs_registry_report_index_consistency_audit(proje
 
 def _run_day150_v04_ai_assistance_phase_gate_closure_review(project_root: Path) -> int:
     return run_day150_v04_ai_assistance_phase_gate_closure_review(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_day151_v04_ai_assistance_closure_evidence_index(project_root: Path) -> int:
+    return run_day151_v04_ai_assistance_closure_evidence_index(
         project_root,
         format_heading_func=format_heading,
         format_status_func=format_status,
