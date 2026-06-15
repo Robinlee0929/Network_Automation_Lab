@@ -230,6 +230,9 @@ from day142_ai_summary_to_dry_run_draft_display_contract import (
 from intent_dry_run_draft_safety_diff_viewer import (
     run_dry_run_draft_safety_diff_viewer,
 )
+from day144_v04_ai_assistance_compatibility_review import (
+    run_day144_v04_ai_assistance_compatibility_review,
+)
 from project_folder_organization_decision_gate import (
     run_project_folder_organization_decision_gate,
 )
@@ -1181,6 +1184,19 @@ DAY143_DRY_RUN_DRAFT_SAFETY_DIFF_VIEWER_JSON = (
 )
 DAY143_DRY_RUN_DRAFT_SAFETY_DIFF_VIEWER_HTML = (
     Path("reports") / "lab-summary" / "day143_dry_run_draft_safety_diff_viewer.html"
+)
+DAY144_V04_AI_ASSISTANCE_COMPATIBILITY_REVIEW_TASK_ID = "v0.4-ai-assistance-compatibility-review"
+DAY144_V04_AI_ASSISTANCE_COMPATIBILITY_REVIEW_ROADMAP_DOC = (
+    Path("docs") / "roadmap" / "day144_v04_ai_assistance_compatibility_review.md"
+)
+DAY144_V04_AI_ASSISTANCE_COMPATIBILITY_REVIEW_AI_INTENT_DOC = (
+    Path("docs") / "ai-intent" / "day144_v04_ai_assistance_compatibility_review.md"
+)
+DAY144_V04_AI_ASSISTANCE_COMPATIBILITY_REVIEW_JSON = (
+    Path("reports") / "lab-summary" / "day144_v04_ai_assistance_compatibility_review.json"
+)
+DAY144_V04_AI_ASSISTANCE_COMPATIBILITY_REVIEW_HTML = (
+    Path("reports") / "lab-summary" / "day144_v04_ai_assistance_compatibility_review.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -2625,6 +2641,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY143_DRY_RUN_DRAFT_SAFETY_DIFF_VIEWER_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day144",
+        "title": "v0.4 AI Assistance Compatibility Review",
+        "report_type": "Review-only v0.4 AI assistance compatibility review",
+        "safety_label": "REVIEW_ONLY; REPORT_ONLY; Day127-Day143 compatibility evidence only; not Day145; execution/provider/API/OpenAI/live device/SSH/NETCONF/RESTCONF/RouterOS disabled; folder move compatibility gate not redone; next_phase_allowed=false",
+        "description": "Day144 reviews existing Day127-Day143 AI assistance artifacts for compatibility with a future v0.4 review package without implementing Day145, opening execution/provider/API, calling OpenAI API or providers, using live devices, redoing folder move compatibility, or unlocking next phase.",
+        "json_globs": [DAY144_V04_AI_ASSISTANCE_COMPATIBILITY_REVIEW_JSON.as_posix()],
+        "html_globs": [DAY144_V04_AI_ASSISTANCE_COMPATIBILITY_REVIEW_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY144_V04_AI_ASSISTANCE_COMPATIBILITY_REVIEW_TASK_ID}"
         ),
     },
 ]
@@ -6147,6 +6176,35 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "intent_dry_run_draft_safety_diff_viewer.py",
             "notes": "REVIEW_ONLY DISPLAY_ONLY diff viewer only. Compares existing display payloads; not_day142_redo=true, not_next_day_feature=true, not_day144=true, execution_enabled=false, provider_enabled=false, api_enabled=false, openai_api_called=false, live_device_enabled=false, ssh_enabled=false, draft_applied=false, draft_saved=false, next_phase_allowed=false.",
+        },
+        {
+            "id": DAY144_V04_AI_ASSISTANCE_COMPATIBILITY_REVIEW_TASK_ID,
+            "task_id": "day144_v04_ai_assistance_compatibility_review",
+            "display_name": "Day144 v0.4 AI Assistance Compatibility Review",
+            "user_display_name": "v0.4 AI Assistance Compatibility Review",
+            "day": "Day144",
+            "category": "ai_planning",
+            "description": "Reviews existing Day127-Day143 AI assistance artifacts for compatibility with a future v0.4 review package without implementing Day145 or opening any execution/provider/API path.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY144_V04_AI_ASSISTANCE_COMPATIBILITY_REVIEW_JSON.as_posix(),
+                DAY144_V04_AI_ASSISTANCE_COMPATIBILITY_REVIEW_HTML.as_posix(),
+                DAY144_V04_AI_ASSISTANCE_COMPATIBILITY_REVIEW_ROADMAP_DOC.as_posix(),
+                DAY144_V04_AI_ASSISTANCE_COMPATIBILITY_REVIEW_AI_INTENT_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Day144 JSON/HTML v0.4 AI assistance compatibility review",
+                "Day144 roadmap documentation",
+                "Day144 AI-intent documentation",
+            ],
+            "related_script": "day144_v04_ai_assistance_compatibility_review.py",
+            "notes": "REVIEW_ONLY REPORT_ONLY compatibility review only. Keeps final task name exactly v0.4 AI Assistance Compatibility Review; not Day145; execution_allowed=false, provider_allowed=false, api_allowed=false, openai_api_called=false, live_device_access_allowed=false, ssh_allowed=false, netconf_allowed=false, restconf_allowed=false, routeros_allowed=false, next_phase_allowed=false, folder_move_compatibility_gate_redone=false, folder_move_performed=false.",
         },
     ]
 
@@ -10811,6 +10869,15 @@ def _run_day142_ai_summary_to_dry_run_draft_display_contract(project_root: Path)
 
 def _run_day143_dry_run_draft_safety_diff_viewer(project_root: Path) -> int:
     return run_dry_run_draft_safety_diff_viewer(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_day144_v04_ai_assistance_compatibility_review(project_root: Path) -> int:
+    return run_day144_v04_ai_assistance_compatibility_review(
         project_root,
         format_heading_func=format_heading,
         format_status_func=format_status,

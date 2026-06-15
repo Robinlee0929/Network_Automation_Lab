@@ -93,6 +93,7 @@ CANONICAL_TASK_NAMES: Tuple[str, ...] = (
     "ai-assistance-review-demo-package",
     "ai-summary-to-dry-run-draft-display-contract",
     "dry-run-draft-safety-diff-viewer",
+    "v0.4-ai-assistance-compatibility-review",
     "wireguard-runner",
 )
 
