@@ -239,6 +239,9 @@ from day145_v04_ai_assistance_evidence_freeze_package import (
 from day146_v04_ai_assistance_non_advancement_gate import (
     run_day146_v04_ai_assistance_non_advancement_gate,
 )
+from day147_ai_assistance_deferred_risk_register import (
+    run_day147_ai_assistance_deferred_risk_register,
+)
 from project_folder_organization_decision_gate import (
     run_project_folder_organization_decision_gate,
 )
@@ -1229,6 +1232,19 @@ DAY146_V04_AI_ASSISTANCE_NON_ADVANCEMENT_GATE_JSON = (
 )
 DAY146_V04_AI_ASSISTANCE_NON_ADVANCEMENT_GATE_HTML = (
     Path("reports") / "lab-summary" / "day146_v04_ai_assistance_non_advancement_gate.html"
+)
+DAY147_AI_ASSISTANCE_DEFERRED_RISK_REGISTER_TASK_ID = "ai-assistance-deferred-risk-register"
+DAY147_AI_ASSISTANCE_DEFERRED_RISK_REGISTER_ROADMAP_DOC = (
+    Path("docs") / "roadmap" / "day147_ai_assistance_deferred_risk_register.md"
+)
+DAY147_AI_ASSISTANCE_DEFERRED_RISK_REGISTER_AI_INTENT_DOC = (
+    Path("docs") / "ai-intent" / "day147_ai_assistance_deferred_risk_register.md"
+)
+DAY147_AI_ASSISTANCE_DEFERRED_RISK_REGISTER_JSON = (
+    Path("reports") / "lab-summary" / "day147_ai_assistance_deferred_risk_register.json"
+)
+DAY147_AI_ASSISTANCE_DEFERRED_RISK_REGISTER_HTML = (
+    Path("reports") / "lab-summary" / "day147_ai_assistance_deferred_risk_register.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -2712,6 +2728,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY146_V04_AI_ASSISTANCE_NON_ADVANCEMENT_GATE_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day147",
+        "title": "AI Assistance Deferred Risk Register",
+        "report_type": "Review-only deferred AI Assistance risk register",
+        "safety_label": "REVIEW_ONLY; REPORT_ONLY; RISK_REGISTER_ONLY; Day145 freeze preserved; Day146 non-advancement authoritative; provider/API/model/execution/network/live-device paths disabled; next_phase_allowed=false",
+        "description": "Day147 records deferred risks and blocked AI Assistance items only after the Day145 evidence freeze and Day146 non-advancement gate. It does not enable providers, APIs, model decisions, execution paths, SSH, live network/device operations, secrets, Day148, Day149, or next phase.",
+        "json_globs": [DAY147_AI_ASSISTANCE_DEFERRED_RISK_REGISTER_JSON.as_posix()],
+        "html_globs": [DAY147_AI_ASSISTANCE_DEFERRED_RISK_REGISTER_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY147_AI_ASSISTANCE_DEFERRED_RISK_REGISTER_TASK_ID}"
         ),
     },
 ]
@@ -6320,6 +6349,35 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "day146_v04_ai_assistance_non_advancement_gate.py",
             "notes": "REVIEW_ONLY REPORT_ONLY GATE_ONLY non-advancement gate. Covers Day127-Day145; Day145 frozen input only; day145_modified=false, day145_rerun=false, day147_implemented=false, ai_assistance_advanced_beyond_v04=false, provider_allowed=false, api_allowed=false, openai_api_called=false, model_invocation_allowed=false, mapped_task_execution_allowed=false, live_device_access_allowed=false, ssh_allowed=false, next_phase_allowed=false.",
+        },
+        {
+            "id": DAY147_AI_ASSISTANCE_DEFERRED_RISK_REGISTER_TASK_ID,
+            "task_id": "day147_ai_assistance_deferred_risk_register",
+            "display_name": "Day147 AI Assistance Deferred Risk Register",
+            "user_display_name": "AI Assistance Deferred Risk Register",
+            "day": "Day147",
+            "category": "ai_planning",
+            "description": "Day147 records a review-only deferred risk register after the Day145 evidence freeze and Day146 non-advancement gate. It documents blocked risks only and does not enable providers, APIs, models, execution, network, live-device, SSH, secrets, Day148, Day149, or next phase.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY147_AI_ASSISTANCE_DEFERRED_RISK_REGISTER_JSON.as_posix(),
+                DAY147_AI_ASSISTANCE_DEFERRED_RISK_REGISTER_HTML.as_posix(),
+                DAY147_AI_ASSISTANCE_DEFERRED_RISK_REGISTER_ROADMAP_DOC.as_posix(),
+                DAY147_AI_ASSISTANCE_DEFERRED_RISK_REGISTER_AI_INTENT_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Day147 JSON/HTML AI assistance deferred risk register",
+                "Day147 roadmap documentation",
+                "Day147 AI-intent documentation",
+            ],
+            "related_script": "day147_ai_assistance_deferred_risk_register.py",
+            "notes": "REVIEW_ONLY REPORT_ONLY RISK_REGISTER_ONLY deferred blocked-item register. Day145 freeze preserved; Day146 authoritative; provider_enabled=false, api_call_enabled=false, execution_enabled=false, model_decision_enabled=false, live_network_enabled=false, secrets_required=false, next_phase_allowed=false, day148_implemented=false, day149_implemented=false.",
         },
     ]
 
@@ -11011,6 +11069,15 @@ def _run_day145_v04_ai_assistance_evidence_freeze_package(project_root: Path) ->
 
 def _run_day146_v04_ai_assistance_non_advancement_gate(project_root: Path) -> int:
     return run_day146_v04_ai_assistance_non_advancement_gate(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_day147_ai_assistance_deferred_risk_register(project_root: Path) -> int:
+    return run_day147_ai_assistance_deferred_risk_register(
         project_root,
         format_heading_func=format_heading,
         format_status_func=format_status,
