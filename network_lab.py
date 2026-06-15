@@ -227,6 +227,9 @@ from project_folder_organization_decision_gate import (
 from intent_project_folder_organization_dry_run_inventory_gate import (
     run_project_folder_organization_dry_run_inventory_gate,
 )
+from intent_folder_move_compatibility_gate import (
+    run_folder_move_compatibility_gate,
+)
 from intent_codex_agents_instruction_audit import (
     build_codex_agents_instruction_audit_report,
     write_codex_agents_instruction_audit_reports,
@@ -1115,6 +1118,19 @@ DAY139_DOCS_ONLY_MOVE_DRY_RUN_EVIDENCE_PLAN_JSON = (
 )
 DAY139_DOCS_ONLY_MOVE_DRY_RUN_EVIDENCE_PLAN_HTML = (
     Path("reports") / "lab-summary" / "day139_docs_only_move_dry_run_evidence_plan.html"
+)
+DAY140_FOLDER_MOVE_COMPATIBILITY_GATE_TASK_ID = "folder-move-compatibility-gate"
+DAY140_FOLDER_MOVE_COMPATIBILITY_GATE_ROADMAP_DOC = (
+    Path("docs") / "roadmap" / "day140_folder_move_compatibility_gate.md"
+)
+DAY140_FOLDER_MOVE_COMPATIBILITY_GATE_AI_INTENT_DOC = (
+    Path("docs") / "ai-intent" / "day140_folder_move_compatibility_gate.md"
+)
+DAY140_FOLDER_MOVE_COMPATIBILITY_GATE_JSON = (
+    Path("reports") / "lab-summary" / "day140_folder_move_compatibility_gate.json"
+)
+DAY140_FOLDER_MOVE_COMPATIBILITY_GATE_HTML = (
+    Path("reports") / "lab-summary" / "day140_folder_move_compatibility_gate.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -2507,6 +2523,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY139_DOCS_ONLY_MOVE_DRY_RUN_EVIDENCE_PLAN_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day140",
+        "title": "Folder Move Compatibility Gate",
+        "report_type": "Review-only docs-only future move-review compatibility gate",
+        "safety_label": "REVIEW_ONLY; future docs-only move review decision only; files moved count 0; folders moved count 0; imports modified count 0; execution/provider/API disabled; SSH/NETCONF/RESTCONF/live command disabled; adapter/broker/runner execution disabled; not next-day feature",
+        "description": "Day140 decides whether the repository is compatible with entering a future first-batch docs-only move review without moving files, renaming folders, changing imports, enabling execution/provider/API, or allowing live-device behavior.",
+        "json_globs": [DAY140_FOLDER_MOVE_COMPATIBILITY_GATE_JSON.as_posix()],
+        "html_globs": [DAY140_FOLDER_MOVE_COMPATIBILITY_GATE_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY140_FOLDER_MOVE_COMPATIBILITY_GATE_TASK_ID}"
         ),
     },
 ]
@@ -5914,6 +5943,34 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "intent_docs_only_move_dry_run_evidence_plan.py",
             "notes": "REVIEW_ONLY REPORT_ONLY DOCS_ONLY docs-only KEEP_DRY_RUN_ONLY_DO_NOT_MOVE_DOCS_YET. Based on Day138 docs candidates; not Day140 and not Folder Move Compatibility Gate. Does not move files, rename files, modify imports, modify source import paths, enable execution/provider/API, allow adapter/SSH/live commands, invoke brokers/runners/mapped execution, decide migration is allowed, or unlock the next phase.",
+        },
+        {
+            "id": DAY140_FOLDER_MOVE_COMPATIBILITY_GATE_TASK_ID,
+            "task_id": "day140_folder_move_compatibility_gate",
+            "display_name": "Day140 Folder Move Compatibility Gate",
+            "user_display_name": "Folder Move Compatibility Gate",
+            "day": "Day140",
+            "category": "project_organization",
+            "description": "Produces a review-only compatibility decision for entering a future first-batch docs-only move review.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY140_FOLDER_MOVE_COMPATIBILITY_GATE_JSON.as_posix(),
+                DAY140_FOLDER_MOVE_COMPATIBILITY_GATE_HTML.as_posix(),
+                DAY140_FOLDER_MOVE_COMPATIBILITY_GATE_ROADMAP_DOC.as_posix(),
+                DAY140_FOLDER_MOVE_COMPATIBILITY_GATE_AI_INTENT_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Day140 JSON/HTML folder move compatibility gate",
+                "Day140 roadmap documentation",
+                "Day140 AI intent documentation",
+            ],
+            "related_script": "intent_folder_move_compatibility_gate.py",
+            "notes": "REVIEW_ONLY REPORT_ONLY DOCS_ONLY compatibility decision only. Allows only a future docs-only move review decision, never a move now. files_moved_count=0 folders_moved_count=0 imports_modified_count=0; execution/provider/API, SSH/NETCONF/RESTCONF/live command, adapter/broker/runner execution remain disabled; next-day feature is not implemented.",
         },
     ]
 
@@ -10542,6 +10599,15 @@ def _run_day138_project_folder_organization_dry_run_inventory_gate(project_root:
 def _run_day139_docs_only_move_dry_run_evidence_plan(project_root: Path) -> int:
     day139 = __import__("intent_docs_only_move_dry_run_evidence_plan")
     return day139.run_docs_only_move_dry_run_evidence_plan(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_day140_folder_move_compatibility_gate(project_root: Path) -> int:
+    return run_folder_move_compatibility_gate(
         project_root,
         format_heading_func=format_heading,
         format_status_func=format_status,

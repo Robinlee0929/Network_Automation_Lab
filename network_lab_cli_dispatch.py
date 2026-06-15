@@ -53,6 +53,7 @@ def _build_parser(lab: ModuleType) -> argparse.ArgumentParser:
   python network_lab.py --task project-folder-organization-decision-gate
   python network_lab.py --task project-folder-organization-dry-run-inventory-gate
   python network_lab.py --task docs-only-move-dry-run-evidence-plan
+  python network_lab.py --task folder-move-compatibility-gate
   python network_lab.py --task intent-workflow-demo
   python network_lab.py --task offline-mock-runtime
   python network_lab.py --task offline-mock-runtime-contract
@@ -116,6 +117,7 @@ ai-reviewer-export-package-integration writes a Day136 deterministic review-only
 project-folder-organization-decision-gate writes a Day137 decision-only project folder organization gate; it does not move, delete, rename, rewrite imports, enable execution/provider/API, or implement the deferred AI Assistance Review Demo Package.
 project-folder-organization-dry-run-inventory-gate writes a Day138 dry-run-only project folder inventory; it does not move, delete, rename, change import paths, enable execution/provider/API, allow SSH/live commands, invoke adapters/brokers/runners, or unlock the next phase.
 docs-only-move-dry-run-evidence-plan writes a Day139 docs-only move dry-run evidence plan based on Day138 docs candidates; it does not move, rename, modify imports, enable execution/provider/API, allow SSH/live commands, invoke adapters/brokers/runners, decide migration is allowed, or implement Day140.
+folder-move-compatibility-gate writes a Day140 review-only compatibility gate for entering a future first-batch docs-only move review; it does not move files/folders, modify imports, enable execution/provider/API, allow SSH/NETCONF/RESTCONF/live commands, invoke adapters/brokers/runners, or implement the next-day feature.
 wireguard-runner is dry-run by default and delegates to the existing WireGuard script only after explicit --allow-live-wireguard."""
     parser = argparse.ArgumentParser(
         description=f"Day14 {lab.DAY14_NAME}.",
@@ -282,6 +284,7 @@ def _build_task_handlers(args: argparse.Namespace, root: Path, lab: ModuleType) 
         lab.DAY137_PROJECT_FOLDER_ORGANIZATION_DECISION_GATE_TASK_ID: lambda: lab._run_day137_project_folder_organization_decision_gate(root),
         lab.DAY138_PROJECT_FOLDER_ORGANIZATION_DRY_RUN_INVENTORY_GATE_TASK_ID: lambda: lab._run_day138_project_folder_organization_dry_run_inventory_gate(root),
         lab.DAY139_DOCS_ONLY_MOVE_DRY_RUN_EVIDENCE_PLAN_TASK_ID: lambda: lab._run_day139_docs_only_move_dry_run_evidence_plan(root),
+        lab.DAY140_FOLDER_MOVE_COMPATIBILITY_GATE_TASK_ID: lambda: lab._run_day140_folder_move_compatibility_gate(root),
         lab.WIREGUARD_RUNNER_TASK_ALIAS: lambda: lab._run_wireguard_runner(
             root,
             dry_run=args.dry_run,
