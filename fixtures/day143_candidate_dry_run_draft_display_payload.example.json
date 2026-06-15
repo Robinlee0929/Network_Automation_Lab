@@ -1,0 +1,35 @@
+{
+  "payload_id": "day143-existing-baseline-display-payload",
+  "payload_kind": "dry_run_draft_display_payload",
+  "review_only": true,
+  "display_only": true,
+  "dry_run_only": true,
+  "draft_title": "Existing Dry-run Draft Display Payload",
+  "draft_sections": [
+    {
+      "section_id": "summary",
+      "heading": "Summary",
+      "body": "Existing display payload fixture for Day143 comparison."
+    },
+    {
+      "section_id": "safety",
+      "heading": "Safety",
+      "body": "All execution, provider, API, live device, SSH, draft apply/save, side-effect, and next-phase paths remain disabled."
+    }
+  ],
+  "reviewer_display_metadata": {
+    "source": "provided Day143 fixture",
+    "note_count": 1
+  },
+  "execution_enabled": false,
+  "provider_enabled": false,
+  "api_enabled": false,
+  "openai_api_called": false,
+  "live_device_enabled": false,
+  "ssh_enabled": false,
+  "draft_applied": false,
+  "draft_saved": false,
+  "side_effect_allowed": false,
+  "secrets_present": false,
+  "next_phase_allowed": false
+}

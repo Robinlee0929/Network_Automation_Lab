@@ -56,6 +56,7 @@ def _build_parser(lab: ModuleType) -> argparse.ArgumentParser:
   python network_lab.py --task folder-move-compatibility-gate
   python network_lab.py --task ai-assistance-review-demo-package
   python network_lab.py --task ai-summary-to-dry-run-draft-display-contract
+  python network_lab.py --task dry-run-draft-safety-diff-viewer
   python network_lab.py --task intent-workflow-demo
   python network_lab.py --task offline-mock-runtime
   python network_lab.py --task offline-mock-runtime-contract
@@ -122,6 +123,7 @@ docs-only-move-dry-run-evidence-plan writes a Day139 docs-only move dry-run evid
 folder-move-compatibility-gate writes a Day140 review-only compatibility gate for entering a future first-batch docs-only move review; it does not move files/folders, modify imports, enable execution/provider/API, allow SSH/NETCONF/RESTCONF/live commands, invoke adapters/brokers/runners, or implement the next-day feature.
 ai-assistance-review-demo-package writes a Day141 review-only AI assistance review demo package over existing Day127-Day140 artifacts; it does not execute source, open execution/provider/API, call OpenAI API, call AI providers, make AI decisions, access live devices, use SSH, implement Day142, continue folder moves, clean tmp folders, or unlock the next phase.
 ai-summary-to-dry-run-draft-display-contract writes a Day142 display-only contract that maps already-produced AI reviewer summary text/metadata into a dry-run draft display payload without enabling providers, APIs, model invocation, execution, SSH, NETCONF, RESTCONF, live-device access, config write/apply, adapters, or next phase.
+dry-run-draft-safety-diff-viewer writes a Day143 review-only/display-only diff over two existing dry-run draft display payload fixtures; it does not redo Day142, implement Day144, call providers/APIs, execute commands, access live devices, use SSH, save/apply drafts, or unlock the next phase.
 wireguard-runner is dry-run by default and delegates to the existing WireGuard script only after explicit --allow-live-wireguard."""
     parser = argparse.ArgumentParser(
         description=f"Day14 {lab.DAY14_NAME}.",
@@ -291,6 +293,7 @@ def _build_task_handlers(args: argparse.Namespace, root: Path, lab: ModuleType) 
         lab.DAY140_FOLDER_MOVE_COMPATIBILITY_GATE_TASK_ID: lambda: lab._run_day140_folder_move_compatibility_gate(root),
         lab.DAY141_AI_ASSISTANCE_REVIEW_DEMO_PACKAGE_TASK_ID: lambda: lab._run_day141_ai_assistance_review_demo_package(root),
         lab.DAY142_AI_SUMMARY_TO_DRY_RUN_DRAFT_DISPLAY_CONTRACT_TASK_ID: lambda: lab._run_day142_ai_summary_to_dry_run_draft_display_contract(root),
+        lab.DAY143_DRY_RUN_DRAFT_SAFETY_DIFF_VIEWER_TASK_ID: lambda: lab._run_day143_dry_run_draft_safety_diff_viewer(root),
         lab.WIREGUARD_RUNNER_TASK_ALIAS: lambda: lab._run_wireguard_runner(
             root,
             dry_run=args.dry_run,

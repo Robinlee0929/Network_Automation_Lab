@@ -227,6 +227,9 @@ from day141_ai_assistance_review_demo_package import (
 from day142_ai_summary_to_dry_run_draft_display_contract import (
     run_day142_ai_summary_to_dry_run_draft_display_contract,
 )
+from intent_dry_run_draft_safety_diff_viewer import (
+    run_dry_run_draft_safety_diff_viewer,
+)
 from project_folder_organization_decision_gate import (
     run_project_folder_organization_decision_gate,
 )
@@ -1165,6 +1168,19 @@ DAY142_AI_SUMMARY_TO_DRY_RUN_DRAFT_DISPLAY_CONTRACT_JSON = (
 )
 DAY142_AI_SUMMARY_TO_DRY_RUN_DRAFT_DISPLAY_CONTRACT_HTML = (
     Path("reports") / "lab-summary" / "day142_ai_summary_to_dry_run_draft_display_contract.html"
+)
+DAY143_DRY_RUN_DRAFT_SAFETY_DIFF_VIEWER_TASK_ID = "dry-run-draft-safety-diff-viewer"
+DAY143_DRY_RUN_DRAFT_SAFETY_DIFF_VIEWER_ROADMAP_DOC = (
+    Path("docs") / "roadmap" / "day143_dry_run_draft_safety_diff_viewer.md"
+)
+DAY143_DRY_RUN_DRAFT_SAFETY_DIFF_VIEWER_AI_INTENT_DOC = (
+    Path("docs") / "ai-intent" / "day143_dry_run_draft_safety_diff_viewer.md"
+)
+DAY143_DRY_RUN_DRAFT_SAFETY_DIFF_VIEWER_JSON = (
+    Path("reports") / "lab-summary" / "day143_dry_run_draft_safety_diff_viewer.json"
+)
+DAY143_DRY_RUN_DRAFT_SAFETY_DIFF_VIEWER_HTML = (
+    Path("reports") / "lab-summary" / "day143_dry_run_draft_safety_diff_viewer.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -2596,6 +2612,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY142_AI_SUMMARY_TO_DRY_RUN_DRAFT_DISPLAY_CONTRACT_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day143",
+        "title": "Dry-run Draft Safety Diff Viewer",
+        "report_type": "Review-only display payload safety diff",
+        "safety_label": "REVIEW_ONLY; DISPLAY_ONLY; compares existing dry-run draft display payloads only; not_day142_redo=true; not_day144=true; not_next_day_feature=true; execution/provider/API/OpenAI/live device/SSH/draft apply/save/next phase disabled",
+        "description": "Day143 compares two already-existing dry-run draft display payloads and reports added, removed, changed, unchanged safety flags, safety regressions, and blocked unsafe transitions without rebuilding Day142, implementing Day144, calling providers/APIs, executing commands, using SSH, accessing live devices, saving/applying drafts, or unlocking the next phase.",
+        "json_globs": [DAY143_DRY_RUN_DRAFT_SAFETY_DIFF_VIEWER_JSON.as_posix()],
+        "html_globs": [DAY143_DRY_RUN_DRAFT_SAFETY_DIFF_VIEWER_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY143_DRY_RUN_DRAFT_SAFETY_DIFF_VIEWER_TASK_ID}"
         ),
     },
 ]
@@ -6089,6 +6118,35 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "day142_ai_summary_to_dry_run_draft_display_contract.py",
             "notes": "REVIEW_ONLY REPORT_ONLY display-only dry-run draft contract. Treats AI summary input as already produced reviewer text/metadata; does not redo Day141. provider_enabled=false, api_enabled=false, model_invocation_enabled=false, execution_enabled=false, ssh_allowed=false, netconf_allowed=false, restconf_allowed=false, live_device_allowed=false, config_write_allowed=false, command_apply_allowed=false, adapter_invoked=false, next_phase_allowed=false.",
+        },
+        {
+            "id": DAY143_DRY_RUN_DRAFT_SAFETY_DIFF_VIEWER_TASK_ID,
+            "task_id": "day143_dry_run_draft_safety_diff_viewer",
+            "display_name": "Day143 Dry-run Draft Safety Diff Viewer",
+            "user_display_name": "Dry-run Draft Safety Diff Viewer",
+            "day": "Day143",
+            "category": "ai_planning",
+            "description": "Compares two existing dry-run draft display payloads and reports deterministic display-only safety diffs without rebuilding Day142 or opening any future execution/provider/API path.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "status": "implemented",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY143_DRY_RUN_DRAFT_SAFETY_DIFF_VIEWER_JSON.as_posix(),
+                DAY143_DRY_RUN_DRAFT_SAFETY_DIFF_VIEWER_HTML.as_posix(),
+                DAY143_DRY_RUN_DRAFT_SAFETY_DIFF_VIEWER_ROADMAP_DOC.as_posix(),
+                DAY143_DRY_RUN_DRAFT_SAFETY_DIFF_VIEWER_AI_INTENT_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Day143 JSON/HTML dry-run draft safety diff viewer",
+                "Day143 roadmap documentation",
+                "Day143 AI-intent documentation",
+            ],
+            "related_script": "intent_dry_run_draft_safety_diff_viewer.py",
+            "notes": "REVIEW_ONLY DISPLAY_ONLY diff viewer only. Compares existing display payloads; not_day142_redo=true, not_next_day_feature=true, not_day144=true, execution_enabled=false, provider_enabled=false, api_enabled=false, openai_api_called=false, live_device_enabled=false, ssh_enabled=false, draft_applied=false, draft_saved=false, next_phase_allowed=false.",
         },
     ]
 
@@ -10744,6 +10802,15 @@ def _run_day141_ai_assistance_review_demo_package(project_root: Path) -> int:
 
 def _run_day142_ai_summary_to_dry_run_draft_display_contract(project_root: Path) -> int:
     return run_day142_ai_summary_to_dry_run_draft_display_contract(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_day143_dry_run_draft_safety_diff_viewer(project_root: Path) -> int:
+    return run_dry_run_draft_safety_diff_viewer(
         project_root,
         format_heading_func=format_heading,
         format_status_func=format_status,
