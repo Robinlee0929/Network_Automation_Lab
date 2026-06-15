@@ -242,6 +242,9 @@ from day146_v04_ai_assistance_non_advancement_gate import (
 from day147_ai_assistance_deferred_risk_register import (
     run_day147_ai_assistance_deferred_risk_register,
 )
+from day148_ai_assistance_display_consistency_audit import (
+    run_day148_ai_assistance_display_consistency_audit,
+)
 from project_folder_organization_decision_gate import (
     run_project_folder_organization_decision_gate,
 )
@@ -1245,6 +1248,21 @@ DAY147_AI_ASSISTANCE_DEFERRED_RISK_REGISTER_JSON = (
 )
 DAY147_AI_ASSISTANCE_DEFERRED_RISK_REGISTER_HTML = (
     Path("reports") / "lab-summary" / "day147_ai_assistance_deferred_risk_register.html"
+)
+DAY148_AI_ASSISTANCE_DISPLAY_CONSISTENCY_AUDIT_TASK_ID = (
+    "ai-assistance-demo-export-draft-display-consistency-audit"
+)
+DAY148_AI_ASSISTANCE_DISPLAY_CONSISTENCY_AUDIT_ROADMAP_DOC = (
+    Path("docs") / "roadmap" / "day148_ai_assistance_display_consistency_audit.md"
+)
+DAY148_AI_ASSISTANCE_DISPLAY_CONSISTENCY_AUDIT_AI_INTENT_DOC = (
+    Path("docs") / "ai-intent" / "day148_ai_assistance_display_consistency_audit.md"
+)
+DAY148_AI_ASSISTANCE_DISPLAY_CONSISTENCY_AUDIT_JSON = (
+    Path("reports") / "lab-summary" / "day148_ai_assistance_display_consistency_audit.json"
+)
+DAY148_AI_ASSISTANCE_DISPLAY_CONSISTENCY_AUDIT_HTML = (
+    Path("reports") / "lab-summary" / "day148_ai_assistance_display_consistency_audit.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -2741,6 +2759,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY147_AI_ASSISTANCE_DEFERRED_RISK_REGISTER_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day148",
+        "title": "AI Assistance Demo / Export / Draft Display Consistency Audit",
+        "report_type": "Review-only AI Assistance display consistency audit",
+        "safety_label": "REVIEW_ONLY; AUDIT_ONLY; NOT_NEXT_DAY_FUNCTIONALITY; scope=Day141,Day136,Day142,Day143; execution/provider/API/model/device/SSH/NETCONF/RESTCONF/CLI live execution/adapter/broker/runner disabled; next_phase_allowed=false",
+        "description": "Day148 audits display wording and safety semantics across the Day141 demo, Day136 export package, Day142 dry-run draft, and Day143 diff viewer. It records mismatch findings only and does not enable providers, APIs, model calls, execution paths, live devices, SSH, adapters, brokers, runners, or next phase.",
+        "json_globs": [DAY148_AI_ASSISTANCE_DISPLAY_CONSISTENCY_AUDIT_JSON.as_posix()],
+        "html_globs": [DAY148_AI_ASSISTANCE_DISPLAY_CONSISTENCY_AUDIT_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY148_AI_ASSISTANCE_DISPLAY_CONSISTENCY_AUDIT_TASK_ID}"
         ),
     },
 ]
@@ -6378,6 +6409,34 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "day147_ai_assistance_deferred_risk_register.py",
             "notes": "REVIEW_ONLY REPORT_ONLY RISK_REGISTER_ONLY deferred blocked-item register. Day145 freeze preserved; Day146 authoritative; provider_enabled=false, api_call_enabled=false, execution_enabled=false, model_decision_enabled=false, live_network_enabled=false, secrets_required=false, next_phase_allowed=false, day148_implemented=false, day149_implemented=false.",
+        },
+        {
+            "id": DAY148_AI_ASSISTANCE_DISPLAY_CONSISTENCY_AUDIT_TASK_ID,
+            "task_id": "day148_ai_assistance_display_consistency_audit",
+            "display_name": "Day148 AI Assistance Demo / Export / Draft Display Consistency Audit",
+            "user_display_name": "AI Assistance Demo / Export / Draft Display Consistency Audit",
+            "day": "Day148",
+            "category": "ai_planning",
+            "description": "Day148 audits display wording and safety semantics across the Day141 demo, Day136 export package, Day142 dry-run draft, and Day143 diff viewer. It records mismatch findings only and does not enable providers, APIs, model calls, execution, live devices, SSH, adapters, brokers, runners, or next phase.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY148_AI_ASSISTANCE_DISPLAY_CONSISTENCY_AUDIT_JSON.as_posix(),
+                DAY148_AI_ASSISTANCE_DISPLAY_CONSISTENCY_AUDIT_HTML.as_posix(),
+                DAY148_AI_ASSISTANCE_DISPLAY_CONSISTENCY_AUDIT_ROADMAP_DOC.as_posix(),
+                DAY148_AI_ASSISTANCE_DISPLAY_CONSISTENCY_AUDIT_AI_INTENT_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Day148 JSON/HTML AI assistance display consistency audit",
+                "Day148 roadmap documentation",
+                "Day148 AI-intent documentation",
+            ],
+            "related_script": "day148_ai_assistance_display_consistency_audit.py",
+            "notes": "REVIEW_ONLY AUDIT_ONLY DISPLAY_CONSISTENCY_ONLY. Audits Day141 demo, Day136 export package, Day142 dry-run draft, and Day143 diff viewer; records mismatches only; is_next_day_functionality=false, execution_enabled=false, provider_enabled=false, api_enabled=false, device_access_enabled=false, ssh_enabled=false, netconf_enabled=false, restconf_enabled=false, cli_live_execution_enabled=false, model_call_enabled=false, adapter_invoked=false, broker_invoked=false, runner_invoked=false, next_phase_allowed=false.",
         },
     ]
 
@@ -11078,6 +11137,15 @@ def _run_day146_v04_ai_assistance_non_advancement_gate(project_root: Path) -> in
 
 def _run_day147_ai_assistance_deferred_risk_register(project_root: Path) -> int:
     return run_day147_ai_assistance_deferred_risk_register(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_day148_ai_assistance_display_consistency_audit(project_root: Path) -> int:
+    return run_day148_ai_assistance_display_consistency_audit(
         project_root,
         format_heading_func=format_heading,
         format_status_func=format_status,
