@@ -438,6 +438,40 @@ def test_report_visibility_index_finds_partial_reports_and_marks_missing(tmp_pat
     assert "guarded-live performance evidence" in html
 
 
+def test_report_visibility_index_finds_canonical_cisco_switch_report(tmp_path, capsys):
+    write_json(
+        tmp_path / "reports" / "cisco-switch" / "switch_topology_report.json",
+        {"overall_result": "PASS"},
+    )
+    write_text(
+        tmp_path / "reports" / "cisco-switch" / "switch_topology_report.html",
+        "<html>cisco</html>",
+    )
+
+    exit_code = network_lab.main(["--report-index"], project_root=tmp_path)
+
+    output = capsys.readouterr().out
+    assert exit_code == 0
+    assert "Day5 Cisco Switch Topology" in output
+    assert "JSON: reports/cisco-switch/switch_topology_report.json" in output
+    assert "HTML: reports/cisco-switch/switch_topology_report.html" in output
+    assert "Expected Cisco switch report was not found in local reports folder." not in output
+
+
+def test_day14_profile_uses_day6_generator_output_path():
+    profile_path = Path("topology_profiles/day14_lab_runner_profile.json")
+    profile_data = json.loads(profile_path.read_text(encoding="utf-8"))
+
+    day6 = next(
+        report
+        for report in profile_data["lab_summary_reports"]
+        if report["name"] == "Day6 Lab Topology Summary"
+    )
+
+    assert day6["json"] == "reports/day6_lab_topology_summary.json"
+    assert day6["html"] == "reports/day6_lab_topology_summary.html"
+
+
 def test_lab_overview_infers_day35_overall_status_as_pass(tmp_path, capsys):
     prof = profile(required=False)
     prof["devices"] = []

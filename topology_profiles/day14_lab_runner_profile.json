@@ -84,8 +84,8 @@
   "lab_summary_reports": [
     {
       "name": "Day6 Lab Topology Summary",
-      "json": "reports/lab-summary/day6_lab_topology_summary.json",
-      "html": "reports/lab-summary/day6_lab_topology_summary.html",
+      "json": "reports/day6_lab_topology_summary.json",
+      "html": "reports/day6_lab_topology_summary.html",
       "required": false
     },
     {

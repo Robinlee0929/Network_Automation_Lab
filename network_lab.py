@@ -1828,8 +1828,18 @@ REPORT_CATALOG = [
         "report_type": "Topology validation report",
         "safety_label": "read-only evidence",
         "description": "Cisco switch topology validation evidence when local reports are available.",
-        "json_globs": ["reports/**/*day5*cisco*.json", "reports/**/*cisco*topology*.json"],
-        "html_globs": ["reports/**/*day5*cisco*.html", "reports/**/*cisco*topology*.html"],
+        "json_globs": [
+            "reports/cisco-switch/switch_topology_report.json",
+            "reports/**/*switch_topology_report.json",
+            "reports/**/*day5*cisco*.json",
+            "reports/**/*cisco*topology*.json",
+        ],
+        "html_globs": [
+            "reports/cisco-switch/switch_topology_report.html",
+            "reports/**/*switch_topology_report.html",
+            "reports/**/*day5*cisco*.html",
+            "reports/**/*cisco*topology*.html",
+        ],
         "missing_note": "Expected Cisco switch report was not found in local reports folder.",
     },
     {
