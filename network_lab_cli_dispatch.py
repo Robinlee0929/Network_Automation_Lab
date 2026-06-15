@@ -61,6 +61,7 @@ def _build_parser(lab: ModuleType) -> argparse.ArgumentParser:
   python network_lab.py --task v0.4-ai-assistance-evidence-freeze-package
   python network_lab.py --task v0.4-ai-assistance-non-advancement-gate
   python network_lab.py --task ai-assistance-deferred-risk-register
+  python network_lab.py --task ai-assistance-demo-export-draft-display-consistency-audit
   python network_lab.py --task intent-workflow-demo
   python network_lab.py --task offline-mock-runtime
   python network_lab.py --task offline-mock-runtime-contract
@@ -132,6 +133,7 @@ v0.4-ai-assistance-compatibility-review writes a Day144 review-only compatibilit
 v0.4-ai-assistance-evidence-freeze-package writes a Day145 review-only evidence freeze package over Day127-Day144; Day144 remains frozen and untouched, no folders move, no cleanup runs, providers/APIs/models/SSH/live devices remain disabled, and next_phase_allowed=false.
 v0.4-ai-assistance-non-advancement-gate writes a Day146 review-only gate over Day127-Day145; Day145 remains frozen and untouched, Day147 and next phase stay blocked, no providers/APIs/models/runtimes/mapped tasks/SSH/live devices/folder moves/cleanup run, and next_phase_allowed=false.
 ai-assistance-deferred-risk-register writes a Day147 review-only deferred risk register; Day145 freeze and Day146 non-advancement remain authoritative, provider/API/model/execution/network/live-device paths stay disabled, and next_phase_allowed=false.
+ai-assistance-demo-export-draft-display-consistency-audit writes a Day148 review-only consistency audit over Day141 demo, Day136 export package, Day142 dry-run draft, and Day143 diff viewer display wording and safety semantics without enabling execution/provider/API/model/device/adapter/broker/runner paths or next-phase advancement.
 wireguard-runner is dry-run by default and delegates to the existing WireGuard script only after explicit --allow-live-wireguard."""
     parser = argparse.ArgumentParser(
         description=f"Day14 {lab.DAY14_NAME}.",
@@ -306,6 +308,7 @@ def _build_task_handlers(args: argparse.Namespace, root: Path, lab: ModuleType) 
         lab.DAY145_V04_AI_ASSISTANCE_EVIDENCE_FREEZE_PACKAGE_TASK_ID: lambda: lab._run_day145_v04_ai_assistance_evidence_freeze_package(root),
         lab.DAY146_V04_AI_ASSISTANCE_NON_ADVANCEMENT_GATE_TASK_ID: lambda: lab._run_day146_v04_ai_assistance_non_advancement_gate(root),
         lab.DAY147_AI_ASSISTANCE_DEFERRED_RISK_REGISTER_TASK_ID: lambda: lab._run_day147_ai_assistance_deferred_risk_register(root),
+        lab.DAY148_AI_ASSISTANCE_DISPLAY_CONSISTENCY_AUDIT_TASK_ID: lambda: lab._run_day148_ai_assistance_display_consistency_audit(root),
         lab.WIREGUARD_RUNNER_TASK_ALIAS: lambda: lab._run_wireguard_runner(
             root,
             dry_run=args.dry_run,

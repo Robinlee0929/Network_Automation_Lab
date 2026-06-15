@@ -1,0 +1,268 @@
+{
+  "day": 148,
+  "day_label": "Day148",
+  "task": "ai-assistance-demo-export-draft-display-consistency-audit",
+  "title": "AI Assistance Demo / Export / Draft Display Consistency Audit",
+  "full_title": "Day148 AI Assistance Demo / Export / Draft Display Consistency Audit",
+  "mode": "REVIEW_ONLY_CONSISTENCY_AUDIT",
+  "overall_status": "PASS",
+  "status": "AI_ASSISTANCE_DISPLAY_CONSISTENCY_AUDIT_READY",
+  "agents_md_pre_read": "YES",
+  "agents_md_pre_read_result": "PASS",
+  "agents_md_read_before_day148_work": true,
+  "agents_md_modified": false,
+  "agents_md_path": "AGENTS.md",
+  "agents_md_status": "FOUND_AND_READ",
+  "review_only": true,
+  "audit_only": true,
+  "report_only": true,
+  "local_only": true,
+  "deterministic_static_data_only": true,
+  "consistency_check_only": true,
+  "mismatch_findings_recorded": true,
+  "not_next_day_functionality_confirmed": true,
+  "is_next_day_functionality": false,
+  "execution_enabled": false,
+  "provider_enabled": false,
+  "api_enabled": false,
+  "device_access_enabled": false,
+  "ssh_enabled": false,
+  "netconf_enabled": false,
+  "restconf_enabled": false,
+  "cli_live_execution_enabled": false,
+  "model_call_enabled": false,
+  "model_api_call_performed": false,
+  "adapter_invoked": false,
+  "broker_invoked": false,
+  "runner_invoked": false,
+  "openai_api_called": false,
+  "external_service_called": false,
+  "live_network_enabled": false,
+  "configuration_change_allowed": false,
+  "draft_applied": false,
+  "draft_saved": false,
+  "next_phase_allowed": false,
+  "safety_gate_advanced": false,
+  "provider_runtime_unlocked": false,
+  "execution_path_created": false,
+  "reviewer_approval_inferred": false,
+  "day149_implemented": false,
+  "audit_scope": [
+    "Day141",
+    "Day136",
+    "Day142",
+    "Day143"
+  ],
+  "audit_scope_label": "Day141, Day136, Day142, Day143",
+  "artifact_audits": [
+    {
+      "day": "Day141",
+      "artifact_kind": "demo",
+      "expected_title": "AI Assistance Review Demo Package",
+      "review_label": "review-only demo package",
+      "json_path": "reports/lab-summary/day141_ai_assistance_review_demo_package.json",
+      "paths": [
+        {
+          "path": "day141_ai_assistance_review_demo_package.py",
+          "path_exists": true,
+          "read_only": true
+        },
+        {
+          "path": "docs/roadmap/day141_ai_assistance_review_demo_package.md",
+          "path_exists": true,
+          "read_only": true
+        },
+        {
+          "path": "docs/ai-intent/day141_ai_assistance_review_demo_package.md",
+          "path_exists": true,
+          "read_only": true
+        },
+        {
+          "path": "reports/lab-summary/day141_ai_assistance_review_demo_package.json",
+          "path_exists": true,
+          "read_only": true
+        },
+        {
+          "path": "reports/lab-summary/day141_ai_assistance_review_demo_package.html",
+          "path_exists": true,
+          "read_only": true
+        }
+      ],
+      "all_paths_exist": true,
+      "loaded": true,
+      "read_error": "",
+      "display_consistency": "PASS",
+      "safety_semantics": "PASS",
+      "review_only_wording_present": true,
+      "not_next_day_or_non_advancement_present": true,
+      "no_misleading_execution_wording": true,
+      "mismatch_findings": [],
+      "mismatch_count": 0
+    },
+    {
+      "day": "Day136",
+      "artifact_kind": "export",
+      "expected_title": "AI Reviewer Export Package Integration",
+      "review_label": "review-only export package",
+      "json_path": "reports/lab-summary/day136_ai_reviewer_export_package_integration.json",
+      "paths": [
+        {
+          "path": "ai_reviewer_export_package_integration.py",
+          "path_exists": true,
+          "read_only": true
+        },
+        {
+          "path": "docs/roadmap/day136_ai_reviewer_export_package_integration.md",
+          "path_exists": true,
+          "read_only": true
+        },
+        {
+          "path": "reports/lab-summary/day136_ai_reviewer_export_package_integration.json",
+          "path_exists": true,
+          "read_only": true
+        },
+        {
+          "path": "reports/lab-summary/day136_ai_reviewer_export_package_integration.html",
+          "path_exists": true,
+          "read_only": true
+        }
+      ],
+      "all_paths_exist": true,
+      "loaded": true,
+      "read_error": "",
+      "display_consistency": "PASS",
+      "safety_semantics": "PASS",
+      "review_only_wording_present": true,
+      "not_next_day_or_non_advancement_present": true,
+      "no_misleading_execution_wording": true,
+      "mismatch_findings": [],
+      "mismatch_count": 0
+    },
+    {
+      "day": "Day142",
+      "artifact_kind": "dry-run draft",
+      "expected_title": "AI Summary to Dry-run Draft Display Contract",
+      "review_label": "review-only/display-only dry-run draft display contract",
+      "json_path": "reports/lab-summary/day142_ai_summary_to_dry_run_draft_display_contract.json",
+      "paths": [
+        {
+          "path": "day142_ai_summary_to_dry_run_draft_display_contract.py",
+          "path_exists": true,
+          "read_only": true
+        },
+        {
+          "path": "docs/roadmap/day142_ai_summary_to_dry_run_draft_display_contract.md",
+          "path_exists": true,
+          "read_only": true
+        },
+        {
+          "path": "docs/ai-intent/day142_ai_summary_to_dry_run_draft_display_contract.md",
+          "path_exists": true,
+          "read_only": true
+        },
+        {
+          "path": "reports/lab-summary/day142_ai_summary_to_dry_run_draft_display_contract.json",
+          "path_exists": true,
+          "read_only": true
+        },
+        {
+          "path": "reports/lab-summary/day142_ai_summary_to_dry_run_draft_display_contract.html",
+          "path_exists": true,
+          "read_only": true
+        }
+      ],
+      "all_paths_exist": true,
+      "loaded": true,
+      "read_error": "",
+      "display_consistency": "PASS",
+      "safety_semantics": "PASS",
+      "review_only_wording_present": true,
+      "not_next_day_or_non_advancement_present": true,
+      "no_misleading_execution_wording": true,
+      "mismatch_findings": [],
+      "mismatch_count": 0
+    },
+    {
+      "day": "Day143",
+      "artifact_kind": "diff viewer",
+      "expected_title": "Dry-run Draft Safety Diff Viewer",
+      "review_label": "review-only/display-only diff viewer",
+      "json_path": "reports/lab-summary/day143_dry_run_draft_safety_diff_viewer.json",
+      "paths": [
+        {
+          "path": "intent_dry_run_draft_safety_diff_viewer.py",
+          "path_exists": true,
+          "read_only": true
+        },
+        {
+          "path": "docs/roadmap/day143_dry_run_draft_safety_diff_viewer.md",
+          "path_exists": true,
+          "read_only": true
+        },
+        {
+          "path": "docs/ai-intent/day143_dry_run_draft_safety_diff_viewer.md",
+          "path_exists": true,
+          "read_only": true
+        },
+        {
+          "path": "reports/lab-summary/day143_dry_run_draft_safety_diff_viewer.json",
+          "path_exists": true,
+          "read_only": true
+        },
+        {
+          "path": "reports/lab-summary/day143_dry_run_draft_safety_diff_viewer.html",
+          "path_exists": true,
+          "read_only": true
+        }
+      ],
+      "all_paths_exist": true,
+      "loaded": true,
+      "read_error": "",
+      "display_consistency": "PASS",
+      "safety_semantics": "PASS",
+      "review_only_wording_present": true,
+      "not_next_day_or_non_advancement_present": true,
+      "no_misleading_execution_wording": true,
+      "mismatch_findings": [],
+      "mismatch_count": 0
+    }
+  ],
+  "artifact_count": 4,
+  "consistency_summary": {
+    "result_status": "PASS",
+    "audit_scope": "Day141, Day136, Day142, Day143",
+    "checked_artifact_count": 4,
+    "mismatch_finding_count": 0,
+    "display_consistency": "PASS",
+    "safety_semantic_consistency": "PASS",
+    "day141_demo_language_implies_execution": false,
+    "day136_export_package_remains_review_only": true,
+    "day142_dry_run_draft_remains_draft_only": true,
+    "day143_diff_viewer_remains_display_review_only": true,
+    "execution_provider_api_remain_disabled": true,
+    "no_device_access": true,
+    "no_ssh_netconf_restconf_cli_live_command": true,
+    "no_model_call": true,
+    "no_adapter_broker_runner_invocation": true,
+    "next_phase_allowed": false,
+    "not_next_day_functionality": true,
+    "summary_text": "No blocking display or safety-semantic mismatches were found across Day141, Day136, Day142, and Day143."
+  },
+  "mismatch_findings": [],
+  "mismatch_finding_count": 0,
+  "explicit_boundary_statements": [
+    "Day148 is not next-day functionality.",
+    "Day148 is a review-only consistency audit over existing display/export/draft/diff artifacts.",
+    "Day148 keeps execution, provider, API, device access, SSH, NETCONF, RESTCONF, CLI live execution, model calls, adapters, brokers, runners, and next-phase advancement disabled.",
+    "Day148 records any mismatch findings as audit evidence and does not silently correct prior artifacts.",
+    "Day148 returns PASS only when checked artifacts preserve review-only safety semantics."
+  ],
+  "blocked_non_advancement_statement": "Day148 blocks advancement: no provider/API/model/execution/device path is enabled and next_phase_allowed=false.",
+  "reviewer_next_action": "Review the consistency audit findings only; do not enable provider, API, execution, model, device access, adapter, broker, runner, or next phase.",
+  "final_recommendation": "KEEP_AI_ASSISTANCE_REVIEW_ONLY_AND_NEXT_PHASE_FALSE",
+  "report_paths": {
+    "json": "reports/lab-summary/day148_ai_assistance_display_consistency_audit.json",
+    "html": "reports/lab-summary/day148_ai_assistance_display_consistency_audit.html"
+  },
+  "validation_errors": []
+}
