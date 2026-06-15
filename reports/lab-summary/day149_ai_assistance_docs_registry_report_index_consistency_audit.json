@@ -1,0 +1,408 @@
+{
+  "day": 149,
+  "day_label": "Day149",
+  "task": "ai-assistance-docs-registry-report-index-consistency-audit",
+  "title": "AI Assistance Docs / Registry / Report Index Consistency Audit",
+  "full_title": "Day149 AI Assistance Docs / Registry / Report Index Consistency Audit",
+  "mode": "REVIEW_ONLY_REPORT_ONLY_CONSISTENCY_AUDIT",
+  "overall_status": "PASS",
+  "status": "CONSISTENCY_AUDITED_REVIEW_ONLY",
+  "agents_md_pre_read_result": "PASS",
+  "agents_md_read_before_day149_work": true,
+  "agents_md_found_and_read": true,
+  "agents_md_not_modified": true,
+  "agents_md_modified": false,
+  "agents_md_path": "AGENTS.md",
+  "agents_md_status": "AGENTS_MD_FOUND_AND_READ",
+  "review_only": true,
+  "report_only": true,
+  "audit_only": true,
+  "local_only": true,
+  "deterministic_static_data_only": true,
+  "not_next_day_functionality_confirmed": true,
+  "docs_registry_report_index_consistency_audited": true,
+  "is_next_day_functionality": false,
+  "execution_enabled": false,
+  "provider_enabled": false,
+  "api_enabled": false,
+  "model_call_enabled": false,
+  "network_device_live_access_enabled": false,
+  "adapter_broker_runner_enabled": false,
+  "ssh_enabled": false,
+  "netconf_enabled": false,
+  "restconf_enabled": false,
+  "openai_api_called": false,
+  "external_api_called": false,
+  "secrets_required": false,
+  "environment_token_loading_enabled": false,
+  "configuration_change_allowed": false,
+  "next_phase_allowed": false,
+  "future_day_functionality_implied": false,
+  "day150_implemented": false,
+  "required_concepts": [
+    "NOT_NEXT_DAY_FUNCTIONALITY",
+    "EXECUTION_PROVIDER_API_DISABLED",
+    "REVIEW_ONLY",
+    "REPORT_ONLY",
+    "AGENTS_MD_FOUND_AND_READ",
+    "AGENTS_MD_NOT_MODIFIED"
+  ],
+  "required_concept_status": {
+    "NOT_NEXT_DAY_FUNCTIONALITY": "PRESENT",
+    "EXECUTION_PROVIDER_API_DISABLED": "PRESENT",
+    "REVIEW_ONLY": "PRESENT",
+    "REPORT_ONLY": "PRESENT",
+    "AGENTS_MD_FOUND_AND_READ": "PRESENT",
+    "AGENTS_MD_NOT_MODIFIED": "PRESENT"
+  },
+  "audit_scope": [
+    "Day145",
+    "Day146",
+    "Day147",
+    "Day148",
+    "Day149"
+  ],
+  "day_records": [
+    {
+      "day": 145,
+      "day_label": "Day145",
+      "task": "v0.4-ai-assistance-evidence-freeze-package",
+      "task_id": "day145_v04_ai_assistance_evidence_freeze_package",
+      "title": "v0.4 AI Assistance Evidence Freeze Package",
+      "expected_status": "V0_4_AI_ASSISTANCE_EVIDENCE_FREEZE_READY",
+      "paths": [
+        {
+          "path": "day145_v04_ai_assistance_evidence_freeze_package.py",
+          "path_exists": true,
+          "current_task_output": false,
+          "exists_or_current_task_output": true
+        },
+        {
+          "path": "docs/roadmap/day145_v04_ai_assistance_evidence_freeze_package.md",
+          "path_exists": true,
+          "current_task_output": false,
+          "exists_or_current_task_output": true
+        },
+        {
+          "path": "docs/ai-intent/day145_v04_ai_assistance_evidence_freeze_package.md",
+          "path_exists": true,
+          "current_task_output": false,
+          "exists_or_current_task_output": true
+        },
+        {
+          "path": "reports/lab-summary/day145_v04_ai_assistance_evidence_freeze_package.json",
+          "path_exists": true,
+          "current_task_output": false,
+          "exists_or_current_task_output": true
+        },
+        {
+          "path": "reports/lab-summary/day145_v04_ai_assistance_evidence_freeze_package.html",
+          "path_exists": true,
+          "current_task_output": false,
+          "exists_or_current_task_output": true
+        }
+      ],
+      "documentation_discoverable": true,
+      "all_referenced_paths_exist_or_current_output": true,
+      "day_label_consistency": "PASS",
+      "review_only": true,
+      "report_only": true,
+      "next_phase_allowed": false,
+      "mismatch_findings": [],
+      "mismatch_count": 0
+    },
+    {
+      "day": 146,
+      "day_label": "Day146",
+      "task": "v0.4-ai-assistance-non-advancement-gate",
+      "task_id": "day146_v04_ai_assistance_non_advancement_gate",
+      "title": "v0.4 AI Assistance Non-Advancement Gate",
+      "expected_status": "V0_4_AI_ASSISTANCE_NON_ADVANCEMENT_GATE_READY",
+      "paths": [
+        {
+          "path": "day146_v04_ai_assistance_non_advancement_gate.py",
+          "path_exists": true,
+          "current_task_output": false,
+          "exists_or_current_task_output": true
+        },
+        {
+          "path": "docs/roadmap/day146_v04_ai_assistance_non_advancement_gate.md",
+          "path_exists": true,
+          "current_task_output": false,
+          "exists_or_current_task_output": true
+        },
+        {
+          "path": "docs/ai-intent/day146_v04_ai_assistance_non_advancement_gate.md",
+          "path_exists": true,
+          "current_task_output": false,
+          "exists_or_current_task_output": true
+        },
+        {
+          "path": "reports/lab-summary/day146_v04_ai_assistance_non_advancement_gate.json",
+          "path_exists": true,
+          "current_task_output": false,
+          "exists_or_current_task_output": true
+        },
+        {
+          "path": "reports/lab-summary/day146_v04_ai_assistance_non_advancement_gate.html",
+          "path_exists": true,
+          "current_task_output": false,
+          "exists_or_current_task_output": true
+        }
+      ],
+      "documentation_discoverable": true,
+      "all_referenced_paths_exist_or_current_output": true,
+      "day_label_consistency": "PASS",
+      "review_only": true,
+      "report_only": true,
+      "next_phase_allowed": false,
+      "mismatch_findings": [],
+      "mismatch_count": 0
+    },
+    {
+      "day": 147,
+      "day_label": "Day147",
+      "task": "ai-assistance-deferred-risk-register",
+      "task_id": "day147_ai_assistance_deferred_risk_register",
+      "title": "AI Assistance Deferred Risk Register",
+      "expected_status": "AI_ASSISTANCE_DEFERRED_RISK_REGISTER_READY",
+      "paths": [
+        {
+          "path": "day147_ai_assistance_deferred_risk_register.py",
+          "path_exists": true,
+          "current_task_output": false,
+          "exists_or_current_task_output": true
+        },
+        {
+          "path": "docs/roadmap/day147_ai_assistance_deferred_risk_register.md",
+          "path_exists": true,
+          "current_task_output": false,
+          "exists_or_current_task_output": true
+        },
+        {
+          "path": "docs/ai-intent/day147_ai_assistance_deferred_risk_register.md",
+          "path_exists": true,
+          "current_task_output": false,
+          "exists_or_current_task_output": true
+        },
+        {
+          "path": "reports/lab-summary/day147_ai_assistance_deferred_risk_register.json",
+          "path_exists": true,
+          "current_task_output": false,
+          "exists_or_current_task_output": true
+        },
+        {
+          "path": "reports/lab-summary/day147_ai_assistance_deferred_risk_register.html",
+          "path_exists": true,
+          "current_task_output": false,
+          "exists_or_current_task_output": true
+        }
+      ],
+      "documentation_discoverable": true,
+      "all_referenced_paths_exist_or_current_output": true,
+      "day_label_consistency": "PASS",
+      "review_only": true,
+      "report_only": true,
+      "next_phase_allowed": false,
+      "mismatch_findings": [],
+      "mismatch_count": 0
+    },
+    {
+      "day": 148,
+      "day_label": "Day148",
+      "task": "ai-assistance-demo-export-draft-display-consistency-audit",
+      "task_id": "day148_ai_assistance_display_consistency_audit",
+      "title": "AI Assistance Demo / Export / Draft Display Consistency Audit",
+      "expected_status": "AI_ASSISTANCE_DISPLAY_CONSISTENCY_AUDIT_READY",
+      "paths": [
+        {
+          "path": "day148_ai_assistance_display_consistency_audit.py",
+          "path_exists": true,
+          "current_task_output": false,
+          "exists_or_current_task_output": true
+        },
+        {
+          "path": "docs/roadmap/day148_ai_assistance_display_consistency_audit.md",
+          "path_exists": true,
+          "current_task_output": false,
+          "exists_or_current_task_output": true
+        },
+        {
+          "path": "docs/ai-intent/day148_ai_assistance_display_consistency_audit.md",
+          "path_exists": true,
+          "current_task_output": false,
+          "exists_or_current_task_output": true
+        },
+        {
+          "path": "reports/lab-summary/day148_ai_assistance_display_consistency_audit.json",
+          "path_exists": true,
+          "current_task_output": false,
+          "exists_or_current_task_output": true
+        },
+        {
+          "path": "reports/lab-summary/day148_ai_assistance_display_consistency_audit.html",
+          "path_exists": true,
+          "current_task_output": false,
+          "exists_or_current_task_output": true
+        }
+      ],
+      "documentation_discoverable": true,
+      "all_referenced_paths_exist_or_current_output": true,
+      "day_label_consistency": "PASS",
+      "review_only": true,
+      "report_only": true,
+      "next_phase_allowed": false,
+      "mismatch_findings": [],
+      "mismatch_count": 0
+    },
+    {
+      "day": 149,
+      "day_label": "Day149",
+      "task": "ai-assistance-docs-registry-report-index-consistency-audit",
+      "task_id": "day149_ai_assistance_docs_registry_report_index_consistency_audit",
+      "title": "AI Assistance Docs / Registry / Report Index Consistency Audit",
+      "expected_status": "CONSISTENCY_AUDITED_REVIEW_ONLY",
+      "paths": [
+        {
+          "path": "day149_ai_assistance_docs_registry_report_index_consistency_audit.py",
+          "path_exists": true,
+          "current_task_output": false,
+          "exists_or_current_task_output": true
+        },
+        {
+          "path": "docs/roadmap/day149_ai_assistance_docs_registry_report_index_consistency_audit.md",
+          "path_exists": true,
+          "current_task_output": false,
+          "exists_or_current_task_output": true
+        },
+        {
+          "path": "docs/ai-intent/day149_ai_assistance_docs_registry_report_index_consistency_audit.md",
+          "path_exists": true,
+          "current_task_output": false,
+          "exists_or_current_task_output": true
+        },
+        {
+          "path": "reports/lab-summary/day149_ai_assistance_docs_registry_report_index_consistency_audit.json",
+          "path_exists": true,
+          "current_task_output": true,
+          "exists_or_current_task_output": true
+        },
+        {
+          "path": "reports/lab-summary/day149_ai_assistance_docs_registry_report_index_consistency_audit.html",
+          "path_exists": true,
+          "current_task_output": true,
+          "exists_or_current_task_output": true
+        }
+      ],
+      "documentation_discoverable": true,
+      "all_referenced_paths_exist_or_current_output": true,
+      "day_label_consistency": "PASS",
+      "review_only": true,
+      "report_only": true,
+      "next_phase_allowed": false,
+      "mismatch_findings": [],
+      "mismatch_count": 0
+    }
+  ],
+  "consistency_checks": [
+    {
+      "check_id": "DAY149-CONSISTENCY-001",
+      "name": "Day145-Day149 documentation references are discoverable",
+      "status": "PASS",
+      "checked_days": [
+        "Day145",
+        "Day146",
+        "Day147",
+        "Day148",
+        "Day149"
+      ],
+      "review_only": true
+    },
+    {
+      "check_id": "DAY149-CONSISTENCY-002",
+      "name": "Task registry names and CLI task names are consistent",
+      "status": "PASS",
+      "canonical_tasks": [
+        "v0.4-ai-assistance-evidence-freeze-package",
+        "v0.4-ai-assistance-non-advancement-gate",
+        "ai-assistance-deferred-risk-register",
+        "ai-assistance-demo-export-draft-display-consistency-audit",
+        "ai-assistance-docs-registry-report-index-consistency-audit"
+      ],
+      "review_only": true
+    },
+    {
+      "check_id": "DAY149-CONSISTENCY-003",
+      "name": "Task catalog task ids and report paths are present",
+      "status": "PASS",
+      "task_ids": [
+        "day145_v04_ai_assistance_evidence_freeze_package",
+        "day146_v04_ai_assistance_non_advancement_gate",
+        "day147_ai_assistance_deferred_risk_register",
+        "day148_ai_assistance_display_consistency_audit",
+        "day149_ai_assistance_docs_registry_report_index_consistency_audit"
+      ],
+      "review_only": true
+    },
+    {
+      "check_id": "DAY149-CONSISTENCY-004",
+      "name": "Report index registration includes the Day149 report",
+      "status": "PASS",
+      "json_report": "reports/lab-summary/day149_ai_assistance_docs_registry_report_index_consistency_audit.json",
+      "html_report": "reports/lab-summary/day149_ai_assistance_docs_registry_report_index_consistency_audit.html",
+      "review_only": true
+    },
+    {
+      "check_id": "DAY149-CONSISTENCY-005",
+      "name": "Report paths referenced by registry or documentation exist or are current task outputs",
+      "status": "PASS",
+      "review_only": true
+    },
+    {
+      "check_id": "DAY149-CONSISTENCY-006",
+      "name": "No mismatched Day labels exist for Day145-Day149",
+      "status": "PASS",
+      "review_only": true
+    },
+    {
+      "check_id": "DAY149-CONSISTENCY-007",
+      "name": "No future-day or next-day functionality is implied",
+      "status": "PASS",
+      "NOT_NEXT_DAY_FUNCTIONALITY": true,
+      "next_phase_allowed": false
+    },
+    {
+      "check_id": "DAY149-CONSISTENCY-008",
+      "name": "AI Assistance execution provider API safety flags remain disabled",
+      "status": "PASS",
+      "EXECUTION_PROVIDER_API_DISABLED": true,
+      "execution_enabled": false,
+      "provider_enabled": false,
+      "api_enabled": false,
+      "model_call_enabled": false,
+      "network_device_live_access_enabled": false,
+      "adapter_broker_runner_enabled": false,
+      "secrets_required": false
+    }
+  ],
+  "mismatch_findings": [],
+  "mismatch_finding_count": 0,
+  "conclusion": "CONSISTENCY_AUDITED_REVIEW_ONLY",
+  "explicit_boundary_statements": [
+    "NOT_NEXT_DAY_FUNCTIONALITY",
+    "EXECUTION_PROVIDER_API_DISABLED",
+    "REVIEW_ONLY",
+    "REPORT_ONLY",
+    "AGENTS_MD_FOUND_AND_READ",
+    "AGENTS_MD_NOT_MODIFIED",
+    "Day149 audits documentation, registry, CLI, and report-index references only.",
+    "Day149 does not enable execution, providers, APIs, model calls, live devices, SSH, NETCONF, RESTCONF, adapters, brokers, runners, secrets, or Day150."
+  ],
+  "report_paths": {
+    "json": "reports/lab-summary/day149_ai_assistance_docs_registry_report_index_consistency_audit.json",
+    "html": "reports/lab-summary/day149_ai_assistance_docs_registry_report_index_consistency_audit.html"
+  },
+  "reviewer_next_action": "Review Day149 consistency evidence only; do not enable provider, API, execution, model, live-device, adapter, broker, runner, secrets, or next phase.",
+  "final_recommendation": "KEEP_AI_ASSISTANCE_DOCS_REGISTRY_REPORT_INDEX_REVIEW_ONLY_AND_NEXT_PHASE_FALSE",
+  "validation_errors": []
+}

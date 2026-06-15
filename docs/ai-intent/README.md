@@ -200,3 +200,33 @@ Day132 exposes deterministic display-only dashboard card data for the Day127-Day
 
 Day133 creates deterministic reviewer-facing evidence for a disabled AI provider interface boundary only. It records `AGENTS.md status: FOUND_AND_READ`, remains REVIEW_ONLY / NON_ADVANCING, is not Day134 adapter contract, and does not enable execution/provider/API access, provider adapters, vendor SDKs, external APIs, API key reads, secrets, network calls, live AI calls, prompt submission, model selection, async jobs, retry/rate-limit/timeout provider behavior, or next-day feature work.
 
+## Day145
+
+- [Day145 v0.4 AI Assistance Evidence Freeze Package](day145_v04_ai_assistance_evidence_freeze_package.md)
+
+Day145 freezes Day127-Day144 AI Assistance evidence as REVIEW_ONLY / REPORT_ONLY reviewer evidence. It does not rerun Day144, move folders, clean files, enable providers/APIs/models, use SSH/live devices, or unlock next phase.
+
+## Day146
+
+- [Day146 v0.4 AI Assistance Non-Advancement Gate](day146_v04_ai_assistance_non_advancement_gate.md)
+
+Day146 verifies the Day127-Day145 v0.4 AI Assistance evidence chain remains frozen and non-advancing. Provider/API/model/runtime/mapped task/SSH/live-device/folder-move/cleanup paths remain disabled and `next_phase_allowed=false`.
+
+## Day147
+
+- [Day147 AI Assistance Deferred Risk Register](day147_ai_assistance_deferred_risk_register.md)
+
+Day147 records deferred AI Assistance risks and blocked follow-up items only. Day145 freeze and Day146 non-advancement remain authoritative; providers, APIs, models, execution, network/live-device access, secrets, Day148, Day149, and next phase remain disabled.
+
+## Day148
+
+- [Day148 AI Assistance Demo / Export / Draft Display Consistency Audit](day148_ai_assistance_display_consistency_audit.md)
+
+Day148 audits display wording and safety semantics across Day141 demo, Day136 export package, Day142 dry-run draft, and Day143 diff viewer evidence. It records mismatches only and does not enable execution/provider/API/model/device/adapter/broker/runner paths or next-phase advancement.
+
+## Day149
+
+- [Day149 AI Assistance Docs / Registry / Report Index Consistency Audit](day149_ai_assistance_docs_registry_report_index_consistency_audit.md)
+
+Day149 audits Day145-Day149 documentation discoverability, task registry and CLI task-name consistency, report-index registration, report paths, day labels, and disabled execution/provider/API flags. It is `NOT_NEXT_DAY_FUNCTIONALITY`, `REVIEW_ONLY`, and `REPORT_ONLY`; `EXECUTION_PROVIDER_API_DISABLED`, `AGENTS_MD_FOUND_AND_READ`, and `AGENTS_MD_NOT_MODIFIED` remain explicit.
+
