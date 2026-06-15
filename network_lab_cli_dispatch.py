@@ -63,6 +63,7 @@ def _build_parser(lab: ModuleType) -> argparse.ArgumentParser:
   python network_lab.py --task ai-assistance-deferred-risk-register
   python network_lab.py --task ai-assistance-demo-export-draft-display-consistency-audit
   python network_lab.py --task ai-assistance-docs-registry-report-index-consistency-audit
+  python network_lab.py --task v04-ai-assistance-phase-gate-closure-review
   python network_lab.py --task intent-workflow-demo
   python network_lab.py --task offline-mock-runtime
   python network_lab.py --task offline-mock-runtime-contract
@@ -136,6 +137,7 @@ v0.4-ai-assistance-non-advancement-gate writes a Day146 review-only gate over Da
 ai-assistance-deferred-risk-register writes a Day147 review-only deferred risk register; Day145 freeze and Day146 non-advancement remain authoritative, provider/API/model/execution/network/live-device paths stay disabled, and next_phase_allowed=false.
 ai-assistance-demo-export-draft-display-consistency-audit writes a Day148 review-only consistency audit over Day141 demo, Day136 export package, Day142 dry-run draft, and Day143 diff viewer display wording and safety semantics without enabling execution/provider/API/model/device/adapter/broker/runner paths or next-phase advancement.
 ai-assistance-docs-registry-report-index-consistency-audit writes a Day149 review-only/report-only consistency audit over Day145-Day149 AI Assistance docs, task registry, CLI task names, report-index registration, report paths, day labels, and disabled execution/provider/API flags without enabling providers, APIs, model calls, execution paths, live devices, SSH, adapters, brokers, runners, secrets, Day150, or next phase.
+v04-ai-assistance-phase-gate-closure-review writes a Day150 review-only/report-only closure review for the v0.4 AI Assistance phase gate; it preserves Day145-Day149 conclusions, keeps README as a status summary only, and keeps execution, provider, API, model calls, device access, SSH, NETCONF, RESTCONF, secrets, live network I/O, and next phase disabled.
 wireguard-runner is dry-run by default and delegates to the existing WireGuard script only after explicit --allow-live-wireguard."""
     parser = argparse.ArgumentParser(
         description=f"Day14 {lab.DAY14_NAME}.",
@@ -312,6 +314,7 @@ def _build_task_handlers(args: argparse.Namespace, root: Path, lab: ModuleType) 
         lab.DAY147_AI_ASSISTANCE_DEFERRED_RISK_REGISTER_TASK_ID: lambda: lab._run_day147_ai_assistance_deferred_risk_register(root),
         lab.DAY148_AI_ASSISTANCE_DISPLAY_CONSISTENCY_AUDIT_TASK_ID: lambda: lab._run_day148_ai_assistance_display_consistency_audit(root),
         lab.DAY149_AI_ASSISTANCE_DOCS_REGISTRY_REPORT_INDEX_CONSISTENCY_AUDIT_TASK_ID: lambda: lab._run_day149_ai_assistance_docs_registry_report_index_consistency_audit(root),
+        lab.DAY150_V04_AI_ASSISTANCE_PHASE_GATE_CLOSURE_REVIEW_TASK_ID: lambda: lab._run_day150_v04_ai_assistance_phase_gate_closure_review(root),
         lab.WIREGUARD_RUNNER_TASK_ALIAS: lambda: lab._run_wireguard_runner(
             root,
             dry_run=args.dry_run,
