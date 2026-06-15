@@ -59,6 +59,7 @@ def _build_parser(lab: ModuleType) -> argparse.ArgumentParser:
   python network_lab.py --task dry-run-draft-safety-diff-viewer
   python network_lab.py --task v0.4-ai-assistance-compatibility-review
   python network_lab.py --task v0.4-ai-assistance-evidence-freeze-package
+  python network_lab.py --task v0.4-ai-assistance-non-advancement-gate
   python network_lab.py --task intent-workflow-demo
   python network_lab.py --task offline-mock-runtime
   python network_lab.py --task offline-mock-runtime-contract
@@ -128,6 +129,7 @@ ai-summary-to-dry-run-draft-display-contract writes a Day142 display-only contra
 dry-run-draft-safety-diff-viewer writes a Day143 review-only/display-only diff over two existing dry-run draft display payload fixtures; it does not redo Day142, implement Day144, call providers/APIs, execute commands, access live devices, use SSH, save/apply drafts, or unlock the next phase.
 v0.4-ai-assistance-compatibility-review writes a Day144 review-only compatibility review for existing Day127-Day143 AI assistance artifacts against a future v0.4 review package; it is not Day145, does not open execution/provider/API, does not call OpenAI API or any provider, does not use SSH/NETCONF/RESTCONF/RouterOS/live devices, does not redo folder move compatibility, and keeps next_phase_allowed=false.
 v0.4-ai-assistance-evidence-freeze-package writes a Day145 review-only evidence freeze package over Day127-Day144; Day144 remains frozen and untouched, no folders move, no cleanup runs, providers/APIs/models/SSH/live devices remain disabled, and next_phase_allowed=false.
+v0.4-ai-assistance-non-advancement-gate writes a Day146 review-only gate over Day127-Day145; Day145 remains frozen and untouched, Day147 and next phase stay blocked, no providers/APIs/models/runtimes/mapped tasks/SSH/live devices/folder moves/cleanup run, and next_phase_allowed=false.
 wireguard-runner is dry-run by default and delegates to the existing WireGuard script only after explicit --allow-live-wireguard."""
     parser = argparse.ArgumentParser(
         description=f"Day14 {lab.DAY14_NAME}.",
@@ -300,6 +302,7 @@ def _build_task_handlers(args: argparse.Namespace, root: Path, lab: ModuleType) 
         lab.DAY143_DRY_RUN_DRAFT_SAFETY_DIFF_VIEWER_TASK_ID: lambda: lab._run_day143_dry_run_draft_safety_diff_viewer(root),
         lab.DAY144_V04_AI_ASSISTANCE_COMPATIBILITY_REVIEW_TASK_ID: lambda: lab._run_day144_v04_ai_assistance_compatibility_review(root),
         lab.DAY145_V04_AI_ASSISTANCE_EVIDENCE_FREEZE_PACKAGE_TASK_ID: lambda: lab._run_day145_v04_ai_assistance_evidence_freeze_package(root),
+        lab.DAY146_V04_AI_ASSISTANCE_NON_ADVANCEMENT_GATE_TASK_ID: lambda: lab._run_day146_v04_ai_assistance_non_advancement_gate(root),
         lab.WIREGUARD_RUNNER_TASK_ALIAS: lambda: lab._run_wireguard_runner(
             root,
             dry_run=args.dry_run,

@@ -236,6 +236,9 @@ from day144_v04_ai_assistance_compatibility_review import (
 from day145_v04_ai_assistance_evidence_freeze_package import (
     run_day145_v04_ai_assistance_evidence_freeze_package,
 )
+from day146_v04_ai_assistance_non_advancement_gate import (
+    run_day146_v04_ai_assistance_non_advancement_gate,
+)
 from project_folder_organization_decision_gate import (
     run_project_folder_organization_decision_gate,
 )
@@ -1213,6 +1216,19 @@ DAY145_V04_AI_ASSISTANCE_EVIDENCE_FREEZE_PACKAGE_JSON = (
 )
 DAY145_V04_AI_ASSISTANCE_EVIDENCE_FREEZE_PACKAGE_HTML = (
     Path("reports") / "lab-summary" / "day145_v04_ai_assistance_evidence_freeze_package.html"
+)
+DAY146_V04_AI_ASSISTANCE_NON_ADVANCEMENT_GATE_TASK_ID = "v0.4-ai-assistance-non-advancement-gate"
+DAY146_V04_AI_ASSISTANCE_NON_ADVANCEMENT_GATE_ROADMAP_DOC = (
+    Path("docs") / "roadmap" / "day146_v04_ai_assistance_non_advancement_gate.md"
+)
+DAY146_V04_AI_ASSISTANCE_NON_ADVANCEMENT_GATE_AI_INTENT_DOC = (
+    Path("docs") / "ai-intent" / "day146_v04_ai_assistance_non_advancement_gate.md"
+)
+DAY146_V04_AI_ASSISTANCE_NON_ADVANCEMENT_GATE_JSON = (
+    Path("reports") / "lab-summary" / "day146_v04_ai_assistance_non_advancement_gate.json"
+)
+DAY146_V04_AI_ASSISTANCE_NON_ADVANCEMENT_GATE_HTML = (
+    Path("reports") / "lab-summary" / "day146_v04_ai_assistance_non_advancement_gate.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -2683,6 +2699,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY145_V04_AI_ASSISTANCE_EVIDENCE_FREEZE_PACKAGE_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day146",
+        "title": "v0.4 AI Assistance Non-Advancement Gate",
+        "report_type": "Review-only v0.4 AI assistance non-advancement gate",
+        "safety_label": "REVIEW_ONLY; REPORT_ONLY; GATE_ONLY; Day127-Day145 frozen scope; Day145 untouched; no Day147; execution/provider/API/OpenAI/model/runtime/live device/SSH disabled; next_phase_allowed=false",
+        "description": "Day146 proves the Day127-Day145 v0.4 AI assistance evidence chain remains frozen and does not advance into Day147, next phase, providers/APIs/models, runtime execution, mapped tasks, SSH, live devices, folder moves, cleanup, or inferred approval.",
+        "json_globs": [DAY146_V04_AI_ASSISTANCE_NON_ADVANCEMENT_GATE_JSON.as_posix()],
+        "html_globs": [DAY146_V04_AI_ASSISTANCE_NON_ADVANCEMENT_GATE_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY146_V04_AI_ASSISTANCE_NON_ADVANCEMENT_GATE_TASK_ID}"
         ),
     },
 ]
@@ -6263,6 +6292,34 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "day145_v04_ai_assistance_evidence_freeze_package.py",
             "notes": "REVIEW_ONLY REPORT_ONLY EVIDENCE_ONLY freeze package. Covers Day127-Day144; Day144 frozen input only; day144_modified=false, day144_rerun=false, folder_move_performed=false, cleanup_performed=false, provider_allowed=false, api_allowed=false, openai_api_called=false, model_invocation_allowed=false, live_device_access_allowed=false, ssh_allowed=false, next_phase_allowed=false.",
+        },
+        {
+            "id": DAY146_V04_AI_ASSISTANCE_NON_ADVANCEMENT_GATE_TASK_ID,
+            "task_id": "day146_v04_ai_assistance_non_advancement_gate",
+            "display_name": "Day146 v0.4 AI Assistance Non-Advancement Gate",
+            "user_display_name": "v0.4 AI Assistance Non-Advancement Gate",
+            "day": "Day146",
+            "category": "ai_planning",
+            "description": "Day146 verifies the Day127-Day145 v0.4 AI assistance evidence chain remains frozen and does not advance into Day147, next phase, providers/APIs/models, runtime execution, mapped tasks, SSH, live devices, folder moves, cleanup, or inferred approval.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY146_V04_AI_ASSISTANCE_NON_ADVANCEMENT_GATE_JSON.as_posix(),
+                DAY146_V04_AI_ASSISTANCE_NON_ADVANCEMENT_GATE_HTML.as_posix(),
+                DAY146_V04_AI_ASSISTANCE_NON_ADVANCEMENT_GATE_ROADMAP_DOC.as_posix(),
+                DAY146_V04_AI_ASSISTANCE_NON_ADVANCEMENT_GATE_AI_INTENT_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Day146 JSON/HTML v0.4 AI assistance non-advancement gate",
+                "Day146 roadmap documentation",
+                "Day146 AI-intent documentation",
+            ],
+            "related_script": "day146_v04_ai_assistance_non_advancement_gate.py",
+            "notes": "REVIEW_ONLY REPORT_ONLY GATE_ONLY non-advancement gate. Covers Day127-Day145; Day145 frozen input only; day145_modified=false, day145_rerun=false, day147_implemented=false, ai_assistance_advanced_beyond_v04=false, provider_allowed=false, api_allowed=false, openai_api_called=false, model_invocation_allowed=false, mapped_task_execution_allowed=false, live_device_access_allowed=false, ssh_allowed=false, next_phase_allowed=false.",
         },
     ]
 
@@ -10945,6 +11002,15 @@ def _run_day144_v04_ai_assistance_compatibility_review(project_root: Path) -> in
 
 def _run_day145_v04_ai_assistance_evidence_freeze_package(project_root: Path) -> int:
     return run_day145_v04_ai_assistance_evidence_freeze_package(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_day146_v04_ai_assistance_non_advancement_gate(project_root: Path) -> int:
+    return run_day146_v04_ai_assistance_non_advancement_gate(
         project_root,
         format_heading_func=format_heading,
         format_status_func=format_status,
