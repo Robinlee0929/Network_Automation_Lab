@@ -90,6 +90,7 @@ CANONICAL_TASK_NAMES: Tuple[str, ...] = (
     "project-folder-organization-dry-run-inventory-gate",
     "docs-only-move-dry-run-evidence-plan",
     "folder-move-compatibility-gate",
+    "ai-assistance-review-demo-package",
     "wireguard-runner",
 )
 

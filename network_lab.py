@@ -221,6 +221,9 @@ from ai_provider_disabled_by_default_safety_regression import (
 from ai_reviewer_export_package_integration import (
     run_ai_reviewer_export_package_integration,
 )
+from day141_ai_assistance_review_demo_package import (
+    run_day141_ai_assistance_review_demo_package,
+)
 from project_folder_organization_decision_gate import (
     run_project_folder_organization_decision_gate,
 )
@@ -1131,6 +1134,19 @@ DAY140_FOLDER_MOVE_COMPATIBILITY_GATE_JSON = (
 )
 DAY140_FOLDER_MOVE_COMPATIBILITY_GATE_HTML = (
     Path("reports") / "lab-summary" / "day140_folder_move_compatibility_gate.html"
+)
+DAY141_AI_ASSISTANCE_REVIEW_DEMO_PACKAGE_TASK_ID = "ai-assistance-review-demo-package"
+DAY141_AI_ASSISTANCE_REVIEW_DEMO_PACKAGE_ROADMAP_DOC = (
+    Path("docs") / "roadmap" / "day141_ai_assistance_review_demo_package.md"
+)
+DAY141_AI_ASSISTANCE_REVIEW_DEMO_PACKAGE_AI_INTENT_DOC = (
+    Path("docs") / "ai-intent" / "day141_ai_assistance_review_demo_package.md"
+)
+DAY141_AI_ASSISTANCE_REVIEW_DEMO_PACKAGE_JSON = (
+    Path("reports") / "lab-summary" / "day141_ai_assistance_review_demo_package.json"
+)
+DAY141_AI_ASSISTANCE_REVIEW_DEMO_PACKAGE_HTML = (
+    Path("reports") / "lab-summary" / "day141_ai_assistance_review_demo_package.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -2536,6 +2552,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY140_FOLDER_MOVE_COMPATIBILITY_GATE_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day141",
+        "title": "AI Assistance Review Demo Package",
+        "report_type": "Review-only AI assistance demo package",
+        "safety_label": "REVIEW_ONLY; demo package only; source_execution_allowed=false; execution/provider/API disabled; OpenAI API called false; AI provider called false; AI decision disabled; live device and SSH disabled; not next-day feature; not Day142; not folder-move continuation; not tmp cleanup continuation; next_phase_allowed=false",
+        "description": "Day141 packages existing Day127-Day140 AI assistance review artifacts for human review only without source execution, providers, APIs, AI decisions, live access, SSH, folder moves, tmp cleanup, or future-day functionality.",
+        "json_globs": [DAY141_AI_ASSISTANCE_REVIEW_DEMO_PACKAGE_JSON.as_posix()],
+        "html_globs": [DAY141_AI_ASSISTANCE_REVIEW_DEMO_PACKAGE_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY141_AI_ASSISTANCE_REVIEW_DEMO_PACKAGE_TASK_ID}"
         ),
     },
 ]
@@ -5971,6 +6000,32 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "intent_folder_move_compatibility_gate.py",
             "notes": "REVIEW_ONLY REPORT_ONLY DOCS_ONLY compatibility decision only. Allows only a future docs-only move review decision, never a move now. files_moved_count=0 folders_moved_count=0 imports_modified_count=0; execution/provider/API, SSH/NETCONF/RESTCONF/live command, adapter/broker/runner execution remain disabled; next-day feature is not implemented.",
+        },
+        {
+            "id": DAY141_AI_ASSISTANCE_REVIEW_DEMO_PACKAGE_TASK_ID,
+            "task_id": "day141_ai_assistance_review_demo_package",
+            "display_name": "Day141 AI Assistance Review Demo Package",
+            "user_display_name": "AI Assistance Review Demo Package",
+            "day": "Day141",
+            "category": "ai_planning",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY141_AI_ASSISTANCE_REVIEW_DEMO_PACKAGE_JSON.as_posix(),
+                DAY141_AI_ASSISTANCE_REVIEW_DEMO_PACKAGE_HTML.as_posix(),
+                DAY141_AI_ASSISTANCE_REVIEW_DEMO_PACKAGE_ROADMAP_DOC.as_posix(),
+                DAY141_AI_ASSISTANCE_REVIEW_DEMO_PACKAGE_AI_INTENT_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Day141 JSON/HTML AI assistance review demo package",
+                "Day141 roadmap documentation",
+                "Day141 AI-intent documentation",
+            ],
+            "related_script": "day141_ai_assistance_review_demo_package.py",
+            "notes": "REVIEW_ONLY REPORT_ONLY demo package only. Day141 is not the next day's feature, not Day142, not a folder-move continuation, and not a tmp cleanup continuation. source_execution_allowed=false, execution_allowed=false, provider_allowed=false, api_allowed=false, openai_api_called=false, ai_provider_called=false, ai_decision_allowed=false, live_device_access_allowed=false, ssh_allowed=false, next_phase_allowed=false.",
         },
     ]
 
@@ -10608,6 +10663,15 @@ def _run_day139_docs_only_move_dry_run_evidence_plan(project_root: Path) -> int:
 
 def _run_day140_folder_move_compatibility_gate(project_root: Path) -> int:
     return run_folder_move_compatibility_gate(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_day141_ai_assistance_review_demo_package(project_root: Path) -> int:
+    return run_day141_ai_assistance_review_demo_package(
         project_root,
         format_heading_func=format_heading,
         format_status_func=format_status,
