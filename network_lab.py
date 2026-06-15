@@ -254,6 +254,9 @@ from day150_v04_ai_assistance_phase_gate_closure_review import (
 from day151_v04_ai_assistance_closure_evidence_index import (
     run_day151_v04_ai_assistance_closure_evidence_index,
 )
+from day152_post_closure_reference_integrity_audit import (
+    run_day152_post_closure_reference_integrity_audit,
+)
 from project_folder_organization_decision_gate import (
     run_project_folder_organization_decision_gate,
 )
@@ -1317,6 +1320,21 @@ DAY151_V04_AI_ASSISTANCE_CLOSURE_EVIDENCE_INDEX_JSON = (
 )
 DAY151_V04_AI_ASSISTANCE_CLOSURE_EVIDENCE_INDEX_HTML = (
     Path("reports") / "lab-summary" / "day151_v04_ai_assistance_closure_evidence_index.html"
+)
+DAY152_POST_CLOSURE_REFERENCE_INTEGRITY_AUDIT_TASK_ID = (
+    "post-closure-reference-integrity-audit"
+)
+DAY152_POST_CLOSURE_REFERENCE_INTEGRITY_AUDIT_ROADMAP_DOC = (
+    Path("docs") / "roadmap" / "day152_post_closure_reference_integrity_audit.md"
+)
+DAY152_POST_CLOSURE_REFERENCE_INTEGRITY_AUDIT_AI_INTENT_DOC = (
+    Path("docs") / "ai-intent" / "day152_post_closure_reference_integrity_audit.md"
+)
+DAY152_POST_CLOSURE_REFERENCE_INTEGRITY_AUDIT_JSON = (
+    Path("reports") / "lab-summary" / "day152_post_closure_reference_integrity_audit.json"
+)
+DAY152_POST_CLOSURE_REFERENCE_INTEGRITY_AUDIT_HTML = (
+    Path("reports") / "lab-summary" / "day152_post_closure_reference_integrity_audit.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -2865,6 +2883,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY151_V04_AI_ASSISTANCE_CLOSURE_EVIDENCE_INDEX_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day152",
+        "title": "Post-Closure Reference Integrity Audit",
+        "report_type": "Review-only post-closure reference integrity audit",
+        "safety_label": "POST_CLOSURE_REFERENCE_INTEGRITY_AUDITED; DAY151_CLOSURE_INDEX_AUTHORITY_PRESERVED; PHASE_GATE_CLOSED_REVIEW_ONLY; NEXT_PHASE_ALLOWED_FALSE; REVIEW_ONLY; REPORT_ONLY; source_task_rerun=false; redoes_day145_day151_safety_judgment=false; execution/provider/API/model/device/SSH/NETCONF/RESTCONF/secrets/live network I/O disabled",
+        "description": "Day152 audits post-Day151 README, documentation, task registry, CLI, task catalog, and report-index references for consistency without redoing Day145-Day151 safety judgments or rerunning source tasks.",
+        "json_globs": [DAY152_POST_CLOSURE_REFERENCE_INTEGRITY_AUDIT_JSON.as_posix()],
+        "html_globs": [DAY152_POST_CLOSURE_REFERENCE_INTEGRITY_AUDIT_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY152_POST_CLOSURE_REFERENCE_INTEGRITY_AUDIT_TASK_ID}"
         ),
     },
 ]
@@ -6614,6 +6645,34 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "day151_v04_ai_assistance_closure_evidence_index.py",
             "notes": "REVIEW_ONLY REPORT_ONLY CLOSURE_EVIDENCE_INDEX_ONLY CLOSURE_EVIDENCE_INDEX_READY PHASE_GATE_CLOSED_REVIEW_ONLY NEXT_PHASE_ALLOWED_FALSE. Indexes Day145 evidence freeze, Day146 non-advancement gate, Day147 deferred risk register, Day148 display consistency, Day149 docs/registry/report-index consistency, and Day150 phase gate closure. source_task_rerun=false, execution_enabled=false, provider_enabled=false, api_enabled=false, model_calls_enabled=false, device_access_enabled=false, ssh_enabled=false, netconf_enabled=false, restconf_enabled=false, secrets_enabled=false, live_network_io_enabled=false, next_phase_allowed=false.",
+        },
+        {
+            "id": DAY152_POST_CLOSURE_REFERENCE_INTEGRITY_AUDIT_TASK_ID,
+            "task_id": "day152_post_closure_reference_integrity_audit",
+            "display_name": "Day152 Post-Closure Reference Integrity Audit",
+            "user_display_name": "Post-Closure Reference Integrity Audit",
+            "day": "Day152",
+            "category": "ai_planning",
+            "description": "Day152 audits post-Day151 README, docs, registry, CLI, task catalog, and report-index references for consistency. It treats Day151 closure facts as already confirmed and does not rerun source tasks.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY152_POST_CLOSURE_REFERENCE_INTEGRITY_AUDIT_JSON.as_posix(),
+                DAY152_POST_CLOSURE_REFERENCE_INTEGRITY_AUDIT_HTML.as_posix(),
+                DAY152_POST_CLOSURE_REFERENCE_INTEGRITY_AUDIT_ROADMAP_DOC.as_posix(),
+                DAY152_POST_CLOSURE_REFERENCE_INTEGRITY_AUDIT_AI_INTENT_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Day152 JSON/HTML post-closure reference integrity audit",
+                "Day152 roadmap documentation",
+                "Day152 AI-intent documentation",
+            ],
+            "related_script": "day152_post_closure_reference_integrity_audit.py",
+            "notes": "REVIEW_ONLY REPORT_ONLY POST_CLOSURE_REFERENCE_INTEGRITY_AUDITED DAY151_CLOSURE_INDEX_AUTHORITY_PRESERVED PHASE_GATE_CLOSED_REVIEW_ONLY NEXT_PHASE_ALLOWED_FALSE. Audits README/docs/registry/CLI/task catalog/report-index references only after Day151 merge. redoes_day145_day151_safety_judgment=false, source_task_rerun=false, execution_enabled=false, provider_enabled=false, api_enabled=false, model_calls_enabled=false, device_access_enabled=false, ssh_enabled=false, netconf_enabled=false, restconf_enabled=false, secrets_enabled=false, live_network_io_enabled=false, next_phase_allowed=false.",
         },
     ]
 
@@ -11350,6 +11409,15 @@ def _run_day150_v04_ai_assistance_phase_gate_closure_review(project_root: Path) 
 
 def _run_day151_v04_ai_assistance_closure_evidence_index(project_root: Path) -> int:
     return run_day151_v04_ai_assistance_closure_evidence_index(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_day152_post_closure_reference_integrity_audit(project_root: Path) -> int:
+    return run_day152_post_closure_reference_integrity_audit(
         project_root,
         format_heading_func=format_heading,
         format_status_func=format_status,

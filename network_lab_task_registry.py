@@ -101,6 +101,7 @@ CANONICAL_TASK_NAMES: Tuple[str, ...] = (
     "ai-assistance-docs-registry-report-index-consistency-audit",
     "v04-ai-assistance-phase-gate-closure-review",
     "v04-ai-assistance-closure-evidence-index",
+    "post-closure-reference-integrity-audit",
     "wireguard-runner",
 )
 

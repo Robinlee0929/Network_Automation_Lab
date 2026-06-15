@@ -242,3 +242,9 @@ Day150 closes the current v0.4 AI Assistance phase gate as `PHASE_GATE_CLOSED_RE
 
 Day151 indexes the closed v0.4 AI Assistance evidence chain as `CLOSURE_EVIDENCE_INDEX_READY` while preserving `PHASE_GATE_CLOSED_REVIEW_ONLY` and `NEXT_PHASE_ALLOWED_FALSE`. It links Day145-Day150 artifacts for reviewer use only, does not rerun source tasks, and keeps execution, provider, API, model calls, device access, SSH, NETCONF, RESTCONF, secrets, live network I/O, adapters, brokers, runners, and next phase disabled.
 
+## Day152
+
+- [Day152 Post-Closure Reference Integrity Audit](day152_post_closure_reference_integrity_audit.md)
+
+Day152 audits post-Day151 README, docs, registry, CLI, task catalog, and report-index references as `POST_CLOSURE_REFERENCE_INTEGRITY_AUDITED`. Day151 remains the closure evidence index authority; Day152 treats Day145-Day150 indexed, unsafe flags false, next phase blocked, and Day151 report-index visibility as already confirmed, without rerunning source tasks or redoing Day145-Day151 safety judgments.
+

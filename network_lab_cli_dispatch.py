@@ -65,6 +65,7 @@ def _build_parser(lab: ModuleType) -> argparse.ArgumentParser:
   python network_lab.py --task ai-assistance-docs-registry-report-index-consistency-audit
   python network_lab.py --task v04-ai-assistance-phase-gate-closure-review
   python network_lab.py --task v04-ai-assistance-closure-evidence-index
+  python network_lab.py --task post-closure-reference-integrity-audit
   python network_lab.py --task intent-workflow-demo
   python network_lab.py --task offline-mock-runtime
   python network_lab.py --task offline-mock-runtime-contract
@@ -140,6 +141,7 @@ ai-assistance-demo-export-draft-display-consistency-audit writes a Day148 review
 ai-assistance-docs-registry-report-index-consistency-audit writes a Day149 review-only/report-only consistency audit over Day145-Day149 AI Assistance docs, task registry, CLI task names, report-index registration, report paths, day labels, and disabled execution/provider/API flags without enabling providers, APIs, model calls, execution paths, live devices, SSH, adapters, brokers, runners, secrets, Day150, or next phase.
 v04-ai-assistance-phase-gate-closure-review writes a Day150 review-only/report-only closure review for the v0.4 AI Assistance phase gate; it preserves Day145-Day149 conclusions, keeps README as a status summary only, and keeps execution, provider, API, model calls, device access, SSH, NETCONF, RESTCONF, secrets, live network I/O, and next phase disabled.
 v04-ai-assistance-closure-evidence-index writes a Day151 review-only/report-only closure evidence index over Day145-Day150 artifacts without rerunning source tasks or enabling execution, providers, APIs, model calls, device access, SSH, NETCONF, RESTCONF, secrets, live network I/O, adapters, brokers, runners, or next phase.
+post-closure-reference-integrity-audit writes a Day152 review-only/report-only reference integrity audit over README, docs, registry, CLI, task catalog, and report-index references after Day151 merge without redoing Day145-Day151 safety judgments, rerunning source tasks, or enabling execution/provider/API/model/device/SSH/NETCONF/RESTCONF/live paths.
 wireguard-runner is dry-run by default and delegates to the existing WireGuard script only after explicit --allow-live-wireguard."""
     parser = argparse.ArgumentParser(
         description=f"Day14 {lab.DAY14_NAME}.",
@@ -318,6 +320,7 @@ def _build_task_handlers(args: argparse.Namespace, root: Path, lab: ModuleType) 
         lab.DAY149_AI_ASSISTANCE_DOCS_REGISTRY_REPORT_INDEX_CONSISTENCY_AUDIT_TASK_ID: lambda: lab._run_day149_ai_assistance_docs_registry_report_index_consistency_audit(root),
         lab.DAY150_V04_AI_ASSISTANCE_PHASE_GATE_CLOSURE_REVIEW_TASK_ID: lambda: lab._run_day150_v04_ai_assistance_phase_gate_closure_review(root),
         lab.DAY151_V04_AI_ASSISTANCE_CLOSURE_EVIDENCE_INDEX_TASK_ID: lambda: lab._run_day151_v04_ai_assistance_closure_evidence_index(root),
+        lab.DAY152_POST_CLOSURE_REFERENCE_INTEGRITY_AUDIT_TASK_ID: lambda: lab._run_day152_post_closure_reference_integrity_audit(root),
         lab.WIREGUARD_RUNNER_TASK_ALIAS: lambda: lab._run_wireguard_runner(
             root,
             dry_run=args.dry_run,
