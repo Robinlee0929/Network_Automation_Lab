@@ -103,6 +103,12 @@ CANONICAL_TASK_NAMES: Tuple[str, ...] = (
     "v04-ai-assistance-closure-evidence-index",
     "post-closure-reference-integrity-audit",
     "post-closure-evidence-baseline-lock-review",
+    "v05-ai-assistance-reopen-rationale",
+    "v05-ai-assistance-input-boundary-contract",
+    "v05-ai-assistance-output-template-contract",
+    "v05-ai-assistance-reviewer-only-fixture-renderer",
+    "v05-ai-assistance-safety-regression-matrix",
+    "v05-ai-assistance-phase-gate-review",
     "wireguard-runner",
 )
 

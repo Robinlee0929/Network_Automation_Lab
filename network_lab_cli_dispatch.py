@@ -67,6 +67,12 @@ def _build_parser(lab: ModuleType) -> argparse.ArgumentParser:
   python network_lab.py --task v04-ai-assistance-closure-evidence-index
   python network_lab.py --task post-closure-reference-integrity-audit
   python network_lab.py --task post-closure-evidence-baseline-lock-review
+  python network_lab.py --task v05-ai-assistance-reopen-rationale
+  python network_lab.py --task v05-ai-assistance-input-boundary-contract
+  python network_lab.py --task v05-ai-assistance-output-template-contract
+  python network_lab.py --task v05-ai-assistance-reviewer-only-fixture-renderer
+  python network_lab.py --task v05-ai-assistance-safety-regression-matrix
+  python network_lab.py --task v05-ai-assistance-phase-gate-review
   python network_lab.py --task intent-workflow-demo
   python network_lab.py --task offline-mock-runtime
   python network_lab.py --task offline-mock-runtime-contract
@@ -144,6 +150,12 @@ v04-ai-assistance-phase-gate-closure-review writes a Day150 review-only/report-o
 v04-ai-assistance-closure-evidence-index writes a Day151 review-only/report-only closure evidence index over Day145-Day150 artifacts without rerunning source tasks or enabling execution, providers, APIs, model calls, device access, SSH, NETCONF, RESTCONF, secrets, live network I/O, adapters, brokers, runners, or next phase.
 post-closure-reference-integrity-audit writes a Day152 review-only/report-only reference integrity audit over README, docs, registry, CLI, task catalog, and report-index references after Day151 merge without redoing Day145-Day151 safety judgments, rerunning source tasks, or enabling execution/provider/API/model/device/SSH/NETCONF/RESTCONF/live paths.
 post-closure-evidence-baseline-lock-review writes a Day154 review-only/report-only post-closure evidence baseline lock review plus SDD operating contract draft after Day153 without supplementing Day153, implementing next-day features, or enabling execution/provider/API/model/live-device paths.
+v05-ai-assistance-reopen-rationale writes a Day155 docs-only/rationale-only/review-only reopen rationale for v0.5 AI Assistance without enabling providers, APIs, model calls, direct commands, executor unlocks, secrets, live devices, or next phase.
+v05-ai-assistance-input-boundary-contract writes a Day156 review-only/report-only input boundary contract without reading secrets, config.json, live devices, providers, APIs, voice input, or next phase.
+v05-ai-assistance-output-template-contract writes a Day157 review-only/report-only fixed output template contract without command, executor, provider, secret, approval unlock, or next phase fields.
+v05-ai-assistance-reviewer-only-fixture-renderer writes a Day158 deterministic reviewer-only fixture renderer without provider/API/model/runtime/live-device behavior.
+v05-ai-assistance-safety-regression-matrix writes a Day159 review-only/report-only safety regression matrix with unsafe capability flags kept false.
+v05-ai-assistance-phase-gate-review writes a Day160 phase gate review package only; it is not phase gate approval and keeps next_phase_allowed=false.
 wireguard-runner is dry-run by default and delegates to the existing WireGuard script only after explicit --allow-live-wireguard."""
     parser = argparse.ArgumentParser(
         description=f"Day14 {lab.DAY14_NAME}.",
@@ -324,6 +336,12 @@ def _build_task_handlers(args: argparse.Namespace, root: Path, lab: ModuleType) 
         lab.DAY151_V04_AI_ASSISTANCE_CLOSURE_EVIDENCE_INDEX_TASK_ID: lambda: lab._run_day151_v04_ai_assistance_closure_evidence_index(root),
         lab.DAY152_POST_CLOSURE_REFERENCE_INTEGRITY_AUDIT_TASK_ID: lambda: lab._run_day152_post_closure_reference_integrity_audit(root),
         lab.DAY154_POST_CLOSURE_EVIDENCE_BASELINE_LOCK_REVIEW_TASK_ID: lambda: lab._run_day154_post_closure_evidence_baseline_lock_review(root),
+        lab.DAY155_V05_AI_ASSISTANCE_REOPEN_RATIONALE_TASK_ID: lambda: lab._run_day155_v05_ai_assistance_reopen_rationale(root),
+        lab.DAY156_V05_AI_ASSISTANCE_INPUT_BOUNDARY_CONTRACT_TASK_ID: lambda: lab._run_day156_v05_ai_assistance_input_boundary_contract(root),
+        lab.DAY157_V05_AI_ASSISTANCE_OUTPUT_TEMPLATE_CONTRACT_TASK_ID: lambda: lab._run_day157_v05_ai_assistance_output_template_contract(root),
+        lab.DAY158_V05_AI_ASSISTANCE_REVIEWER_ONLY_FIXTURE_RENDERER_TASK_ID: lambda: lab._run_day158_v05_ai_assistance_reviewer_only_fixture_renderer(root),
+        lab.DAY159_V05_AI_ASSISTANCE_SAFETY_REGRESSION_MATRIX_TASK_ID: lambda: lab._run_day159_v05_ai_assistance_safety_regression_matrix(root),
+        lab.DAY160_V05_AI_ASSISTANCE_PHASE_GATE_REVIEW_TASK_ID: lambda: lab._run_day160_v05_ai_assistance_phase_gate_review(root),
         lab.WIREGUARD_RUNNER_TASK_ALIAS: lambda: lab._run_wireguard_runner(
             root,
             dry_run=args.dry_run,

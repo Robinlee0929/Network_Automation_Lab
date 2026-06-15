@@ -260,3 +260,39 @@ Day153 statically scans post-closure v0.4 AI Assistance review/report artifacts 
 
 Day154 records the post-closure evidence baseline lock after Day145-Day153 and adds an SDD Operating Contract Draft as `POST_CLOSURE_EVIDENCE_BASELINE_LOCK_REVIEW_READY`. It is review-only / report-only, not a Day153 supplement, and not next-day functionality; execution, provider, API, model call, live device access, SSH, adapters, brokers, runners, secrets, and next phase remain blocked with `next_phase_allowed=false`.
 
+## Day155
+
+- [Day155 v0.5 AI Assistance Reopen Rationale](../ai/day155_v05_ai_assistance_reopen_rationale.md)
+
+Day155 documents whether and how v0.5 AI Assistance may be reopened after the Day154 closure baseline lock as `V05_AI_ASSISTANCE_REOPEN_RATIONALE_REVIEW_READY`. It is docs-only, rationale-only, review-only, and non-executable; reviewer assistance is allowed only as a bounded rationale concept, executor support is recommendation-only, and execution, provider/API/model calls, direct command generation, secrets access, live device access, phase gate approval, and next phase remain blocked with `next_phase_allowed=false`.
+
+## Day156
+
+- [Day156 v0.5 AI Assistance Input Boundary Contract](../ai/day156_v05_ai_assistance_input_boundary_contract.md)
+
+Day156 defines `V05_AI_ASSISTANCE_INPUT_BOUNDARY_CONTRACT_REVIEW_READY`. It allows only static reviewer evidence such as repo reports, evidence files, pytest results, report-index results, task registry metadata, roadmap/docs, dry-run outputs, and mock-only fixtures. It forbids secrets, credentials, `config.json`, live device configs, microphone/voice input, unauthorized API responses, provider/API/model activation, device access, command execution, and `next_phase_allowed=true`.
+
+## Day157
+
+- [Day157 v0.5 AI Assistance Output Template Contract](../ai/day157_v05_ai_assistance_output_template_contract.md)
+
+Day157 defines `V05_AI_ASSISTANCE_OUTPUT_TEMPLATE_CONTRACT_REVIEW_READY`. It fixes reviewer-only output fields and forbids live command fields, command templates, executor action fields, provider activation fields, secret/credential fields, approval unlocks, phase gate approval, and next phase advancement.
+
+## Day158
+
+- [Day158 v0.5 AI Assistance Reviewer-Only Fixture Renderer](../ai/day158_v05_ai_assistance_reviewer_only_fixture_renderer.md)
+
+Day158 defines `V05_AI_ASSISTANCE_REVIEWER_ONLY_FIXTURE_RENDERER_REVIEW_READY`. It renders deterministic reviewer-only fixtures for safe report summaries, optional missing evidence, and blocked live-action requests without provider/API/model/runtime behavior, executor unlock, device access, secrets, or next phase advancement.
+
+## Day159
+
+- [Day159 v0.5 AI Assistance Safety Regression Matrix](../ai/day159_v05_ai_assistance_safety_regression_matrix.md)
+
+Day159 defines `V05_AI_ASSISTANCE_SAFETY_REGRESSION_MATRIX_REVIEW_READY`. It maps safety invariants for provider/API/model disabled behavior, live-device and command disabled behavior, secret/private input blocking, and reviewer authority while keeping `next_phase_allowed=false`.
+
+## Day160
+
+- [Day160 v0.5 AI Assistance Phase Gate Review](../ai/day160_v05_ai_assistance_phase_gate_review.md)
+
+Day160 defines `V05_AI_ASSISTANCE_PHASE_GATE_REVIEW_READY`. It reviews Day155-Day159 as a phase gate review package only; it is not phase gate approval, does not unlock execution/provider/API/model/live-device paths, and keeps `next_phase_allowed=false`.
+

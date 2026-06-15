@@ -260,6 +260,24 @@ from day152_post_closure_reference_integrity_audit import (
 from day154_post_closure_evidence_baseline_lock_review import (
     run_day154_post_closure_evidence_baseline_lock_review,
 )
+from day155_v05_ai_assistance_reopen_rationale import (
+    run_day155_v05_ai_assistance_reopen_rationale,
+)
+from day156_v05_ai_assistance_input_boundary_contract import (
+    run_day156_v05_ai_assistance_input_boundary_contract,
+)
+from day157_v05_ai_assistance_output_template_contract import (
+    run_day157_v05_ai_assistance_output_template_contract,
+)
+from day158_v05_ai_assistance_reviewer_only_fixture_renderer import (
+    run_day158_v05_ai_assistance_reviewer_only_fixture_renderer,
+)
+from day159_v05_ai_assistance_safety_regression_matrix import (
+    run_day159_v05_ai_assistance_safety_regression_matrix,
+)
+from day160_v05_ai_assistance_phase_gate_review import (
+    run_day160_v05_ai_assistance_phase_gate_review,
+)
 from project_folder_organization_decision_gate import (
     run_project_folder_organization_decision_gate,
 )
@@ -1353,6 +1371,96 @@ DAY154_POST_CLOSURE_EVIDENCE_BASELINE_LOCK_REVIEW_JSON = (
 )
 DAY154_POST_CLOSURE_EVIDENCE_BASELINE_LOCK_REVIEW_HTML = (
     Path("reports") / "lab-summary" / "day154_post_closure_evidence_baseline_lock_review.html"
+)
+DAY155_V05_AI_ASSISTANCE_REOPEN_RATIONALE_TASK_ID = (
+    "v05-ai-assistance-reopen-rationale"
+)
+DAY155_V05_AI_ASSISTANCE_REOPEN_RATIONALE_ROADMAP_DOC = (
+    Path("docs") / "roadmap" / "day155_v05_ai_assistance_reopen_rationale.md"
+)
+DAY155_V05_AI_ASSISTANCE_REOPEN_RATIONALE_AI_DOC = (
+    Path("docs") / "ai" / "day155_v05_ai_assistance_reopen_rationale.md"
+)
+DAY155_V05_AI_ASSISTANCE_REOPEN_RATIONALE_JSON = (
+    Path("reports") / "lab-summary" / "day155_v05_ai_assistance_reopen_rationale.json"
+)
+DAY155_V05_AI_ASSISTANCE_REOPEN_RATIONALE_HTML = (
+    Path("reports") / "lab-summary" / "day155_v05_ai_assistance_reopen_rationale.html"
+)
+DAY156_V05_AI_ASSISTANCE_INPUT_BOUNDARY_CONTRACT_TASK_ID = (
+    "v05-ai-assistance-input-boundary-contract"
+)
+DAY156_V05_AI_ASSISTANCE_INPUT_BOUNDARY_CONTRACT_ROADMAP_DOC = (
+    Path("docs") / "roadmap" / "day156_v05_ai_assistance_input_boundary_contract.md"
+)
+DAY156_V05_AI_ASSISTANCE_INPUT_BOUNDARY_CONTRACT_AI_DOC = (
+    Path("docs") / "ai" / "day156_v05_ai_assistance_input_boundary_contract.md"
+)
+DAY156_V05_AI_ASSISTANCE_INPUT_BOUNDARY_CONTRACT_JSON = (
+    Path("reports") / "lab-summary" / "day156_v05_ai_assistance_input_boundary_contract.json"
+)
+DAY156_V05_AI_ASSISTANCE_INPUT_BOUNDARY_CONTRACT_HTML = (
+    Path("reports") / "lab-summary" / "day156_v05_ai_assistance_input_boundary_contract.html"
+)
+DAY157_V05_AI_ASSISTANCE_OUTPUT_TEMPLATE_CONTRACT_TASK_ID = (
+    "v05-ai-assistance-output-template-contract"
+)
+DAY157_V05_AI_ASSISTANCE_OUTPUT_TEMPLATE_CONTRACT_ROADMAP_DOC = (
+    Path("docs") / "roadmap" / "day157_v05_ai_assistance_output_template_contract.md"
+)
+DAY157_V05_AI_ASSISTANCE_OUTPUT_TEMPLATE_CONTRACT_AI_DOC = (
+    Path("docs") / "ai" / "day157_v05_ai_assistance_output_template_contract.md"
+)
+DAY157_V05_AI_ASSISTANCE_OUTPUT_TEMPLATE_CONTRACT_JSON = (
+    Path("reports") / "lab-summary" / "day157_v05_ai_assistance_output_template_contract.json"
+)
+DAY157_V05_AI_ASSISTANCE_OUTPUT_TEMPLATE_CONTRACT_HTML = (
+    Path("reports") / "lab-summary" / "day157_v05_ai_assistance_output_template_contract.html"
+)
+DAY158_V05_AI_ASSISTANCE_REVIEWER_ONLY_FIXTURE_RENDERER_TASK_ID = (
+    "v05-ai-assistance-reviewer-only-fixture-renderer"
+)
+DAY158_V05_AI_ASSISTANCE_REVIEWER_ONLY_FIXTURE_RENDERER_ROADMAP_DOC = (
+    Path("docs") / "roadmap" / "day158_v05_ai_assistance_reviewer_only_fixture_renderer.md"
+)
+DAY158_V05_AI_ASSISTANCE_REVIEWER_ONLY_FIXTURE_RENDERER_AI_DOC = (
+    Path("docs") / "ai" / "day158_v05_ai_assistance_reviewer_only_fixture_renderer.md"
+)
+DAY158_V05_AI_ASSISTANCE_REVIEWER_ONLY_FIXTURE_RENDERER_JSON = (
+    Path("reports") / "lab-summary" / "day158_v05_ai_assistance_reviewer_only_fixture_renderer.json"
+)
+DAY158_V05_AI_ASSISTANCE_REVIEWER_ONLY_FIXTURE_RENDERER_HTML = (
+    Path("reports") / "lab-summary" / "day158_v05_ai_assistance_reviewer_only_fixture_renderer.html"
+)
+DAY159_V05_AI_ASSISTANCE_SAFETY_REGRESSION_MATRIX_TASK_ID = (
+    "v05-ai-assistance-safety-regression-matrix"
+)
+DAY159_V05_AI_ASSISTANCE_SAFETY_REGRESSION_MATRIX_ROADMAP_DOC = (
+    Path("docs") / "roadmap" / "day159_v05_ai_assistance_safety_regression_matrix.md"
+)
+DAY159_V05_AI_ASSISTANCE_SAFETY_REGRESSION_MATRIX_AI_DOC = (
+    Path("docs") / "ai" / "day159_v05_ai_assistance_safety_regression_matrix.md"
+)
+DAY159_V05_AI_ASSISTANCE_SAFETY_REGRESSION_MATRIX_JSON = (
+    Path("reports") / "lab-summary" / "day159_v05_ai_assistance_safety_regression_matrix.json"
+)
+DAY159_V05_AI_ASSISTANCE_SAFETY_REGRESSION_MATRIX_HTML = (
+    Path("reports") / "lab-summary" / "day159_v05_ai_assistance_safety_regression_matrix.html"
+)
+DAY160_V05_AI_ASSISTANCE_PHASE_GATE_REVIEW_TASK_ID = (
+    "v05-ai-assistance-phase-gate-review"
+)
+DAY160_V05_AI_ASSISTANCE_PHASE_GATE_REVIEW_ROADMAP_DOC = (
+    Path("docs") / "roadmap" / "day160_v05_ai_assistance_phase_gate_review.md"
+)
+DAY160_V05_AI_ASSISTANCE_PHASE_GATE_REVIEW_AI_DOC = (
+    Path("docs") / "ai" / "day160_v05_ai_assistance_phase_gate_review.md"
+)
+DAY160_V05_AI_ASSISTANCE_PHASE_GATE_REVIEW_JSON = (
+    Path("reports") / "lab-summary" / "day160_v05_ai_assistance_phase_gate_review.json"
+)
+DAY160_V05_AI_ASSISTANCE_PHASE_GATE_REVIEW_HTML = (
+    Path("reports") / "lab-summary" / "day160_v05_ai_assistance_phase_gate_review.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -2927,6 +3035,84 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY154_POST_CLOSURE_EVIDENCE_BASELINE_LOCK_REVIEW_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day155",
+        "title": "v0.5 AI Assistance Reopen Rationale",
+        "report_type": "Docs-only v0.5 AI Assistance reopen rationale",
+        "safety_label": "V05_AI_ASSISTANCE_REOPEN_RATIONALE_REVIEW_READY; DOCS_ONLY; RATIONALE_ONLY; REVIEW_ONLY; NON_EXECUTABLE; reviewer_assistance_only=true; executor_recommendation_only=true; execution_allowed=false; executor_unlock_allowed=false; provider_allowed=false; api_allowed=false; openai_api_call_allowed=false; external_api_call_allowed=false; live_device_allowed=false; command_execution_allowed=false; next_phase_allowed=false",
+        "description": "Day155 documents whether and how v0.5 AI Assistance may be reopened after the Day154 closure baseline lock without enabling providers, APIs, model calls, direct commands, executor unlocks, secrets, live devices, or next phase.",
+        "json_globs": [DAY155_V05_AI_ASSISTANCE_REOPEN_RATIONALE_JSON.as_posix()],
+        "html_globs": [DAY155_V05_AI_ASSISTANCE_REOPEN_RATIONALE_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY155_V05_AI_ASSISTANCE_REOPEN_RATIONALE_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day156",
+        "title": "v0.5 AI Assistance Input Boundary Contract",
+        "report_type": "Review-only v0.5 AI Assistance input boundary contract",
+        "safety_label": "V05_AI_ASSISTANCE_INPUT_BOUNDARY_CONTRACT_REVIEW_READY; REVIEW_ONLY; REPORT_ONLY; NON_EXECUTABLE; config_json_read_allowed=false; credential_read_allowed=false; execution_allowed=false; provider_allowed=false; api_allowed=false; live_device_allowed=false; next_phase_allowed=false",
+        "description": "Day156 defines allowed static reviewer evidence inputs and forbidden private/live data sources without enabling providers, APIs, models, live collection, secrets, or execution.",
+        "json_globs": [DAY156_V05_AI_ASSISTANCE_INPUT_BOUNDARY_CONTRACT_JSON.as_posix()],
+        "html_globs": [DAY156_V05_AI_ASSISTANCE_INPUT_BOUNDARY_CONTRACT_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY156_V05_AI_ASSISTANCE_INPUT_BOUNDARY_CONTRACT_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day157",
+        "title": "v0.5 AI Assistance Output Template Contract",
+        "report_type": "Review-only v0.5 AI Assistance output template contract",
+        "safety_label": "V05_AI_ASSISTANCE_OUTPUT_TEMPLATE_CONTRACT_REVIEW_READY; REVIEW_ONLY; REPORT_ONLY; NON_EXECUTABLE; command_execution_allowed=false; direct_command_generation_allowed=false; executor_unlock_allowed=false; provider_allowed=false; api_allowed=false; next_phase_allowed=false",
+        "description": "Day157 defines fixed reviewer-only output fields and forbids live command, executor action, provider activation, secret, credential, and approval-unlock fields.",
+        "json_globs": [DAY157_V05_AI_ASSISTANCE_OUTPUT_TEMPLATE_CONTRACT_JSON.as_posix()],
+        "html_globs": [DAY157_V05_AI_ASSISTANCE_OUTPUT_TEMPLATE_CONTRACT_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY157_V05_AI_ASSISTANCE_OUTPUT_TEMPLATE_CONTRACT_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day158",
+        "title": "v0.5 AI Assistance Reviewer-Only Fixture Renderer",
+        "report_type": "Review-only v0.5 AI Assistance fixture renderer",
+        "safety_label": "V05_AI_ASSISTANCE_REVIEWER_ONLY_FIXTURE_RENDERER_REVIEW_READY; REVIEW_ONLY; REPORT_ONLY; NON_EXECUTABLE; fixture_only=true; provider_allowed=false; api_allowed=false; model_call_allowed=false; execution_allowed=false; next_phase_allowed=false",
+        "description": "Day158 renders deterministic reviewer-only fixtures for safe report summaries, optional missing evidence, and blocked live-action requests without provider/API/model/runtime behavior.",
+        "json_globs": [DAY158_V05_AI_ASSISTANCE_REVIEWER_ONLY_FIXTURE_RENDERER_JSON.as_posix()],
+        "html_globs": [DAY158_V05_AI_ASSISTANCE_REVIEWER_ONLY_FIXTURE_RENDERER_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY158_V05_AI_ASSISTANCE_REVIEWER_ONLY_FIXTURE_RENDERER_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day159",
+        "title": "v0.5 AI Assistance Safety Regression Matrix",
+        "report_type": "Review-only v0.5 AI Assistance safety regression matrix",
+        "safety_label": "V05_AI_ASSISTANCE_SAFETY_REGRESSION_MATRIX_REVIEW_READY; REVIEW_ONLY; REPORT_ONLY; NON_EXECUTABLE; provider_allowed=false; api_allowed=false; model_call_allowed=false; live_device_allowed=false; command_execution_allowed=false; secrets_allowed=false; next_phase_allowed=false",
+        "description": "Day159 maps v0.5 AI Assistance safety invariants for provider/API/model, live-device/command, secret/private input, and reviewer authority boundaries.",
+        "json_globs": [DAY159_V05_AI_ASSISTANCE_SAFETY_REGRESSION_MATRIX_JSON.as_posix()],
+        "html_globs": [DAY159_V05_AI_ASSISTANCE_SAFETY_REGRESSION_MATRIX_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY159_V05_AI_ASSISTANCE_SAFETY_REGRESSION_MATRIX_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Day160",
+        "title": "v0.5 AI Assistance Phase Gate Review",
+        "report_type": "Review-only v0.5 AI Assistance phase gate review",
+        "safety_label": "V05_AI_ASSISTANCE_PHASE_GATE_REVIEW_READY; REVIEW_ONLY; REPORT_ONLY; NON_EXECUTABLE; phase_gate_approval=false; execution_allowed=false; executor_unlock_allowed=false; provider_allowed=false; api_allowed=false; live_device_allowed=false; next_phase_allowed=false",
+        "description": "Day160 reviews Day155-Day159 v0.5 evidence as phase-gate-review ready only; it does not approve execution or next phase.",
+        "json_globs": [DAY160_V05_AI_ASSISTANCE_PHASE_GATE_REVIEW_JSON.as_posix()],
+        "html_globs": [DAY160_V05_AI_ASSISTANCE_PHASE_GATE_REVIEW_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{DAY160_V05_AI_ASSISTANCE_PHASE_GATE_REVIEW_TASK_ID}"
         ),
     },
 ]
@@ -6733,6 +6919,174 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "day154_post_closure_evidence_baseline_lock_review.py",
             "notes": "REVIEW_ONLY REPORT_ONLY POST_CLOSURE_EVIDENCE_BASELINE_LOCK_REVIEW_READY SDD_OPERATING_CONTRACT_DRAFT NEXT_PHASE_ALLOWED_FALSE. Records Day145-Day153 frozen/preserved evidence only. continues_day153=true, day153_supplement=false, next_day_feature=false, new_feature=false, touches_execution=false, touches_provider=false, touches_api=false, touches_model_call=false, touches_live_device=false, execution_allowed=false, provider_allowed=false, api_allowed=false, model_call_allowed=false, live_device_allowed=false, next_phase_allowed=false.",
+        },
+        {
+            "id": DAY155_V05_AI_ASSISTANCE_REOPEN_RATIONALE_TASK_ID,
+            "task_id": "day155_v05_ai_assistance_reopen_rationale",
+            "display_name": "Day155 v0.5 AI Assistance Reopen Rationale",
+            "user_display_name": "v0.5 AI Assistance Reopen Rationale",
+            "day": "Day155",
+            "category": "ai_planning",
+            "description": "Day155 documents whether and how v0.5 AI Assistance may be reopened after the Day154 closure baseline lock. It is docs-only, rationale-only, review-only, and non-executable.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY155_V05_AI_ASSISTANCE_REOPEN_RATIONALE_JSON.as_posix(),
+                DAY155_V05_AI_ASSISTANCE_REOPEN_RATIONALE_HTML.as_posix(),
+                DAY155_V05_AI_ASSISTANCE_REOPEN_RATIONALE_ROADMAP_DOC.as_posix(),
+                DAY155_V05_AI_ASSISTANCE_REOPEN_RATIONALE_AI_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Day155 JSON/HTML v0.5 AI Assistance reopen rationale",
+                "Day155 roadmap documentation",
+                "Day155 AI documentation",
+            ],
+            "related_script": "day155_v05_ai_assistance_reopen_rationale.py",
+            "notes": "DOCS_ONLY RATIONALE_ONLY REVIEW_ONLY NON_EXECUTABLE V05_AI_ASSISTANCE_REOPEN_RATIONALE_REVIEW_READY NEXT_PHASE_ALLOWED_FALSE. reviewer_assistance_only=true, executor_recommendation_only=true, fixed_output_template_required=true, human_reviewer_final_authority=true, execution_allowed=false, executor_unlock_allowed=false, provider_allowed=false, api_allowed=false, openai_api_call_allowed=false, external_api_call_allowed=false, model_call_allowed=false, live_device_allowed=false, ssh_allowed=false, netconf_allowed=false, restconf_allowed=false, routeros_allowed=false, command_execution_allowed=false, live_command_template_allowed=false, secrets_allowed=false, direct_command_generation_allowed=false, phase_gate_approval=false, next_phase_allowed=false.",
+        },
+        {
+            "id": DAY156_V05_AI_ASSISTANCE_INPUT_BOUNDARY_CONTRACT_TASK_ID,
+            "task_id": "day156_v05_ai_assistance_input_boundary_contract",
+            "display_name": "Day156 v0.5 AI Assistance Input Boundary Contract",
+            "user_display_name": "v0.5 AI Assistance Input Boundary Contract",
+            "day": "Day156",
+            "category": "ai_planning",
+            "description": "Day156 defines static reviewer evidence input boundaries and forbidden private/live data sources for v0.5 AI Assistance.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY156_V05_AI_ASSISTANCE_INPUT_BOUNDARY_CONTRACT_JSON.as_posix(),
+                DAY156_V05_AI_ASSISTANCE_INPUT_BOUNDARY_CONTRACT_HTML.as_posix(),
+                DAY156_V05_AI_ASSISTANCE_INPUT_BOUNDARY_CONTRACT_ROADMAP_DOC.as_posix(),
+                DAY156_V05_AI_ASSISTANCE_INPUT_BOUNDARY_CONTRACT_AI_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Day156 JSON/HTML v0.5 AI Assistance input boundary contract",
+                "Day156 roadmap documentation",
+                "Day156 AI documentation",
+            ],
+            "related_script": "day156_v05_ai_assistance_input_boundary_contract.py",
+            "notes": "REVIEW_ONLY REPORT_ONLY NON_EXECUTABLE V05_AI_ASSISTANCE_INPUT_BOUNDARY_CONTRACT_REVIEW_READY NEXT_PHASE_ALLOWED_FALSE. config_json_read_allowed=false, credential_read_allowed=false, execution_allowed=false, executor_unlock_allowed=false, provider_allowed=false, api_allowed=false, openai_api_call_allowed=false, external_api_call_allowed=false, live_device_allowed=false, command_execution_allowed=false, secrets_allowed=false, microphone_allowed=false, voice_input_allowed=false, phase_gate_approval=false, next_phase_allowed=false.",
+        },
+        {
+            "id": DAY157_V05_AI_ASSISTANCE_OUTPUT_TEMPLATE_CONTRACT_TASK_ID,
+            "task_id": "day157_v05_ai_assistance_output_template_contract",
+            "display_name": "Day157 v0.5 AI Assistance Output Template Contract",
+            "user_display_name": "v0.5 AI Assistance Output Template Contract",
+            "day": "Day157",
+            "category": "ai_planning",
+            "description": "Day157 defines fixed reviewer-only output template fields and forbids executable command/provider/executor fields.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY157_V05_AI_ASSISTANCE_OUTPUT_TEMPLATE_CONTRACT_JSON.as_posix(),
+                DAY157_V05_AI_ASSISTANCE_OUTPUT_TEMPLATE_CONTRACT_HTML.as_posix(),
+                DAY157_V05_AI_ASSISTANCE_OUTPUT_TEMPLATE_CONTRACT_ROADMAP_DOC.as_posix(),
+                DAY157_V05_AI_ASSISTANCE_OUTPUT_TEMPLATE_CONTRACT_AI_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Day157 JSON/HTML v0.5 AI Assistance output template contract",
+                "Day157 roadmap documentation",
+                "Day157 AI documentation",
+            ],
+            "related_script": "day157_v05_ai_assistance_output_template_contract.py",
+            "notes": "REVIEW_ONLY REPORT_ONLY NON_EXECUTABLE V05_AI_ASSISTANCE_OUTPUT_TEMPLATE_CONTRACT_REVIEW_READY NEXT_PHASE_ALLOWED_FALSE. command_execution_allowed=false, direct_command_generation_allowed=false, execution_allowed=false, executor_unlock_allowed=false, provider_allowed=false, api_allowed=false, live_device_allowed=false, secrets_allowed=false, phase_gate_approval=false, next_phase_allowed=false.",
+        },
+        {
+            "id": DAY158_V05_AI_ASSISTANCE_REVIEWER_ONLY_FIXTURE_RENDERER_TASK_ID,
+            "task_id": "day158_v05_ai_assistance_reviewer_only_fixture_renderer",
+            "display_name": "Day158 v0.5 AI Assistance Reviewer-Only Fixture Renderer",
+            "user_display_name": "v0.5 AI Assistance Reviewer-Only Fixture Renderer",
+            "day": "Day158",
+            "category": "ai_planning",
+            "description": "Day158 renders deterministic reviewer-only fixtures for v0.5 AI Assistance review scenarios.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY158_V05_AI_ASSISTANCE_REVIEWER_ONLY_FIXTURE_RENDERER_JSON.as_posix(),
+                DAY158_V05_AI_ASSISTANCE_REVIEWER_ONLY_FIXTURE_RENDERER_HTML.as_posix(),
+                DAY158_V05_AI_ASSISTANCE_REVIEWER_ONLY_FIXTURE_RENDERER_ROADMAP_DOC.as_posix(),
+                DAY158_V05_AI_ASSISTANCE_REVIEWER_ONLY_FIXTURE_RENDERER_AI_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Day158 JSON/HTML v0.5 AI Assistance reviewer-only fixture renderer",
+                "Day158 roadmap documentation",
+                "Day158 AI documentation",
+            ],
+            "related_script": "day158_v05_ai_assistance_reviewer_only_fixture_renderer.py",
+            "notes": "REVIEW_ONLY REPORT_ONLY NON_EXECUTABLE V05_AI_ASSISTANCE_REVIEWER_ONLY_FIXTURE_RENDERER_REVIEW_READY NEXT_PHASE_ALLOWED_FALSE. fixture_only=true, provider_allowed=false, api_allowed=false, model_call_allowed=false, execution_allowed=false, executor_unlock_allowed=false, live_device_allowed=false, command_execution_allowed=false, secrets_allowed=false, phase_gate_approval=false, next_phase_allowed=false.",
+        },
+        {
+            "id": DAY159_V05_AI_ASSISTANCE_SAFETY_REGRESSION_MATRIX_TASK_ID,
+            "task_id": "day159_v05_ai_assistance_safety_regression_matrix",
+            "display_name": "Day159 v0.5 AI Assistance Safety Regression Matrix",
+            "user_display_name": "v0.5 AI Assistance Safety Regression Matrix",
+            "day": "Day159",
+            "category": "ai_planning",
+            "description": "Day159 records deterministic v0.5 AI Assistance safety regression matrix evidence.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY159_V05_AI_ASSISTANCE_SAFETY_REGRESSION_MATRIX_JSON.as_posix(),
+                DAY159_V05_AI_ASSISTANCE_SAFETY_REGRESSION_MATRIX_HTML.as_posix(),
+                DAY159_V05_AI_ASSISTANCE_SAFETY_REGRESSION_MATRIX_ROADMAP_DOC.as_posix(),
+                DAY159_V05_AI_ASSISTANCE_SAFETY_REGRESSION_MATRIX_AI_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Day159 JSON/HTML v0.5 AI Assistance safety regression matrix",
+                "Day159 roadmap documentation",
+                "Day159 AI documentation",
+            ],
+            "related_script": "day159_v05_ai_assistance_safety_regression_matrix.py",
+            "notes": "REVIEW_ONLY REPORT_ONLY NON_EXECUTABLE V05_AI_ASSISTANCE_SAFETY_REGRESSION_MATRIX_REVIEW_READY NEXT_PHASE_ALLOWED_FALSE. provider_allowed=false, api_allowed=false, model_call_allowed=false, live_device_allowed=false, ssh_allowed=false, command_execution_allowed=false, secrets_allowed=false, phase_gate_approval=false, next_phase_allowed=false.",
+        },
+        {
+            "id": DAY160_V05_AI_ASSISTANCE_PHASE_GATE_REVIEW_TASK_ID,
+            "task_id": "day160_v05_ai_assistance_phase_gate_review",
+            "display_name": "Day160 v0.5 AI Assistance Phase Gate Review",
+            "user_display_name": "v0.5 AI Assistance Phase Gate Review",
+            "day": "Day160",
+            "category": "ai_planning",
+            "description": "Day160 reviews Day155-Day159 v0.5 AI Assistance evidence as phase-gate-review ready only without approving execution or next phase.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                DAY160_V05_AI_ASSISTANCE_PHASE_GATE_REVIEW_JSON.as_posix(),
+                DAY160_V05_AI_ASSISTANCE_PHASE_GATE_REVIEW_HTML.as_posix(),
+                DAY160_V05_AI_ASSISTANCE_PHASE_GATE_REVIEW_ROADMAP_DOC.as_posix(),
+                DAY160_V05_AI_ASSISTANCE_PHASE_GATE_REVIEW_AI_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Day160 JSON/HTML v0.5 AI Assistance phase gate review",
+                "Day160 roadmap documentation",
+                "Day160 AI documentation",
+            ],
+            "related_script": "day160_v05_ai_assistance_phase_gate_review.py",
+            "notes": "REVIEW_ONLY REPORT_ONLY NON_EXECUTABLE V05_AI_ASSISTANCE_PHASE_GATE_REVIEW_READY NEXT_PHASE_ALLOWED_FALSE. phase_gate_approval=false, execution_allowed=false, executor_unlock_allowed=false, provider_allowed=false, api_allowed=false, model_call_allowed=false, live_device_allowed=false, command_execution_allowed=false, secrets_allowed=false, next_phase_allowed=false.",
         },
     ]
 
@@ -11487,6 +11841,60 @@ def _run_day152_post_closure_reference_integrity_audit(project_root: Path) -> in
 
 def _run_day154_post_closure_evidence_baseline_lock_review(project_root: Path) -> int:
     return run_day154_post_closure_evidence_baseline_lock_review(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_day155_v05_ai_assistance_reopen_rationale(project_root: Path) -> int:
+    return run_day155_v05_ai_assistance_reopen_rationale(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_day156_v05_ai_assistance_input_boundary_contract(project_root: Path) -> int:
+    return run_day156_v05_ai_assistance_input_boundary_contract(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_day157_v05_ai_assistance_output_template_contract(project_root: Path) -> int:
+    return run_day157_v05_ai_assistance_output_template_contract(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_day158_v05_ai_assistance_reviewer_only_fixture_renderer(project_root: Path) -> int:
+    return run_day158_v05_ai_assistance_reviewer_only_fixture_renderer(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_day159_v05_ai_assistance_safety_regression_matrix(project_root: Path) -> int:
+    return run_day159_v05_ai_assistance_safety_regression_matrix(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_day160_v05_ai_assistance_phase_gate_review(project_root: Path) -> int:
+    return run_day160_v05_ai_assistance_phase_gate_review(
         project_root,
         format_heading_func=format_heading,
         format_status_func=format_status,
