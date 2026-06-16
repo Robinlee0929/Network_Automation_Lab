@@ -284,6 +284,9 @@ from phase2a_readonly_job_runner_framework import (
 from phase_2a_03_dry_run_job_plan_gate import (
     run_phase_2a_03_dry_run_job_plan_gate,
 )
+from phase_2a_04_plan_evidence_ledger import (
+    run_phase_2a_04_plan_evidence_ledger,
+)
 from project_folder_organization_decision_gate import (
     run_project_folder_organization_decision_gate,
 )
@@ -1485,6 +1488,16 @@ PHASE_2A_03_DRY_RUN_JOB_PLAN_GATE_JSON = (
 )
 PHASE_2A_03_DRY_RUN_JOB_PLAN_GATE_HTML = (
     Path("reports") / "lab-summary" / "phase_2a_03_dry_run_job_plan_gate.html"
+)
+PHASE_2A_04_PLAN_EVIDENCE_LEDGER_TASK_ID = "phase2a-04-plan-evidence-ledger"
+PHASE_2A_04_PLAN_EVIDENCE_LEDGER_DOC = (
+    Path("docs") / "phase_2a" / "phase_2a_04_plan_evidence_ledger.md"
+)
+PHASE_2A_04_PLAN_EVIDENCE_LEDGER_JSON = (
+    Path("reports") / "lab-summary" / "phase_2a_04_plan_evidence_ledger.json"
+)
+PHASE_2A_04_PLAN_EVIDENCE_LEDGER_HTML = (
+    Path("reports") / "lab-summary" / "phase_2a_04_plan_evidence_ledger.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -3173,6 +3186,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{PHASE_2A_03_DRY_RUN_JOB_PLAN_GATE_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Phase 2A",
+        "title": "Phase 2A-04 Dry-Run Job Plan Evidence Binding / Traceability Ledger",
+        "report_type": "Dry-run plan evidence binding and traceability ledger",
+        "safety_label": "PHASE_2A_04_PLAN_EVIDENCE_LEDGER_READY; PHASE_2A_03_DRY_RUN_PLANS_BOUND; REJECTED_REQUESTS_BOUND_TO_TRACEABILITY_RECORDS; EVIDENCE_PAYLOAD_SANITIZED; NON_EXECUTION_PROOF_PRESENT; RUNNER_INVOKED_FALSE; ADAPTER_INVOKED_FALSE; LIVE_EXECUTION_OPENED_FALSE; PHASE_2B_AUTHORIZED_FALSE; REAL_EXECUTION_AUTHORIZED_FALSE; NEXT_PHASE_ALLOWED_FALSE",
+        "description": "Phase 2A-04 binds Phase 2A-03 dry-run plans and rejected unsafe requests to sanitized traceability evidence records. It is report-only and does not invoke runners, adapters, live execution, SSH, NETCONF, RESTCONF, provider/API/model calls, backup_config, arbitrary commands, scriptPath behavior, Phase 2B, or real execution.",
+        "json_globs": [PHASE_2A_04_PLAN_EVIDENCE_LEDGER_JSON.as_posix()],
+        "html_globs": [PHASE_2A_04_PLAN_EVIDENCE_LEDGER_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{PHASE_2A_04_PLAN_EVIDENCE_LEDGER_TASK_ID}"
         ),
     },
 ]
@@ -7199,6 +7225,32 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "phase_2a_03_dry_run_job_plan_gate.py",
             "notes": "PHASE_2A_03_DRY_RUN_PLAN_GATE_READY AGENTS_MD_FOUND_AND_READ AGENTS_MD_NOT_MODIFIED REQUEST_NORMALIZATION_REPORT_ONLY DRY_RUN_PLAN_NON_EXECUTABLE REJECTED_REQUESTS_BEFORE_PLAN_GENERATION RUNNER_INVOKED_FALSE ADAPTER_INVOKED_FALSE LIVE_EXECUTION_OPENED_FALSE NEXT_PHASE_ALLOWED_FALSE. Normalization/validation/plan/evidence only; no live execution, SSH, NETCONF, RESTCONF, provider/API/model calls, backup_config, config changes, arbitrary commands, scriptPath execution, adapters, brokers, runners, Phase 2B authorization, or real execution authorization.",
+        },
+        {
+            "id": PHASE_2A_04_PLAN_EVIDENCE_LEDGER_TASK_ID,
+            "task_id": "phase_2a_04_plan_evidence_ledger",
+            "display_name": "Phase 2A-04 Dry-Run Job Plan Evidence Binding / Traceability Ledger",
+            "user_display_name": "Phase 2A-04 Dry-Run Job Plan Evidence Binding / Traceability Ledger",
+            "day": "Phase 2A",
+            "category": "runner_framework",
+            "description": "Phase 2A-04 binds Phase 2A-03 accepted dry-run plans and rejected unsafe requests to sanitized traceability evidence records without opening execution.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                PHASE_2A_04_PLAN_EVIDENCE_LEDGER_JSON.as_posix(),
+                PHASE_2A_04_PLAN_EVIDENCE_LEDGER_HTML.as_posix(),
+                PHASE_2A_04_PLAN_EVIDENCE_LEDGER_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Phase 2A-04 JSON/HTML dry-run plan evidence ledger",
+                "Phase 2A-04 plan evidence ledger documentation",
+            ],
+            "related_script": "phase_2a_04_plan_evidence_ledger.py",
+            "notes": "PHASE_2A_04_PLAN_EVIDENCE_LEDGER_READY AGENTS_MD_FOUND_AND_READ AGENTS_MD_NOT_MODIFIED PHASE_2A_03_DRY_RUN_PLANS_BOUND REJECTED_REQUESTS_BOUND_TO_TRACEABILITY_RECORDS EVIDENCE_PAYLOAD_SANITIZED NON_EXECUTION_PROOF_PRESENT RUNNER_INVOKED_FALSE ADAPTER_INVOKED_FALSE LIVE_EXECUTION_OPENED_FALSE PHASE_2B_AUTHORIZED_FALSE REAL_EXECUTION_AUTHORIZED_FALSE NEXT_PHASE_ALLOWED_FALSE. Evidence-binding/traceability ledger only; no live execution, SSH, NETCONF, RESTCONF, provider/API/model calls, backup_config, config changes, arbitrary commands, scriptPath execution, adapters, brokers, runners, Phase 2B authorization, or real execution authorization.",
         },
     ]
 
@@ -12025,6 +12077,15 @@ def _run_phase2a_readonly_job_runner_framework(project_root: Path) -> int:
 
 def _run_phase_2a_03_dry_run_job_plan_gate(project_root: Path) -> int:
     return run_phase_2a_03_dry_run_job_plan_gate(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_phase_2a_04_plan_evidence_ledger(project_root: Path) -> int:
+    return run_phase_2a_04_plan_evidence_ledger(
         project_root,
         format_heading_func=format_heading,
         format_status_func=format_status,
