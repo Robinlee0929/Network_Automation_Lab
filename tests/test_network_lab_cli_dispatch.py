@@ -16,6 +16,14 @@ def test_cli_dispatch_module_is_importable_and_builds_parser():
     assert args.dry_run is True
 
 
+def test_cli_dispatch_parser_accepts_positional_report_index():
+    parser = network_lab_cli_dispatch._build_parser(network_lab)
+    args = parser.parse_args(["report-index", "--dry-run"])
+
+    assert args.positional_task == "report-index"
+    assert args.dry_run is True
+
+
 def test_network_lab_script_help_entrypoint_works():
     result = subprocess.run(
         [sys.executable, "network_lab.py", "--help"],
@@ -74,6 +82,44 @@ def test_cli_dispatch_preserves_report_index_task(tmp_path):
 
     exit_code = network_lab.main(
         ["--task", "report-index", "--profile", str(profile_path)],
+        project_root=tmp_path,
+    )
+
+    assert exit_code == 0
+    assert (tmp_path / "reports/lab-summary/latest_lab_overview.html").exists()
+
+
+def test_cli_dispatch_preserves_positional_report_index_task(tmp_path):
+    profile_path = tmp_path / "profile.json"
+    profile_path.write_text(
+        json.dumps(
+            {
+                "lab_name": "Positional Dispatch Test Lab",
+                "overview_output": {
+                    "json": "reports/lab-summary/latest_lab_overview.json",
+                    "html": "reports/lab-summary/latest_lab_overview.html",
+                },
+                "devices": [],
+                "lab_summary_reports": [
+                    {
+                        "name": "Lab Summary",
+                        "json": "reports/lab-summary/summary.json",
+                        "html": "reports/lab-summary/summary.html",
+                        "required": False,
+                    }
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+    (tmp_path / "reports/lab-summary").mkdir(parents=True)
+    (tmp_path / "reports/lab-summary/summary.json").write_text(
+        json.dumps({"summary": {"result": "PASS"}}),
+        encoding="utf-8",
+    )
+
+    exit_code = network_lab.main(
+        ["report-index", "--profile", str(profile_path)],
         project_root=tmp_path,
     )
 

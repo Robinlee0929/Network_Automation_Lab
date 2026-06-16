@@ -19,6 +19,7 @@ def _build_parser(lab: ModuleType) -> argparse.ArgumentParser:
   python network_lab.py --list-tasks --verbose
   python network_lab.py --report-index
   python network_lab.py --portfolio-finalize
+  python network_lab.py report-index
   python network_lab.py --task demo-flow
   python network_lab.py --task report-index --dry-run
   python network_lab.py --task report-index
@@ -74,6 +75,7 @@ def _build_parser(lab: ModuleType) -> argparse.ArgumentParser:
   python network_lab.py --task v05-ai-assistance-safety-regression-matrix
   python network_lab.py --task v05-ai-assistance-phase-gate-review
   python network_lab.py --task phase2a-readonly-job-runner-framework
+  python network_lab.py --task phase2a-03-dry-run-job-plan-gate
   python network_lab.py --task intent-workflow-demo
   python network_lab.py --task offline-mock-runtime
   python network_lab.py --task offline-mock-runtime-contract
@@ -158,6 +160,7 @@ v05-ai-assistance-reviewer-only-fixture-renderer writes a Day158 deterministic r
 v05-ai-assistance-safety-regression-matrix writes a Day159 review-only/report-only safety regression matrix with unsafe capability flags kept false.
 v05-ai-assistance-phase-gate-review writes a Day160 phase gate review package only; it is not phase gate approval and keeps next_phase_allowed=false.
 phase2a-readonly-job-runner-framework writes the Phase 2A-02 job spec contract validator and negative input matrix evidence with allowlisted schemas as the primary boundary; it does not enable live execution, SSH, NETCONF, RESTCONF, RouterOS, external APIs, AI providers/model calls, backup_config, config changes, arbitrary commands, shell, or script paths.
+phase2a-03-dry-run-job-plan-gate writes the Phase 2A-03 request normalization and dry-run plan gate evidence; it creates only non-executable dry-run plans for allowed mock/local/read-only requests and rejects unsafe requests before runner or adapter invocation.
 wireguard-runner is dry-run by default and delegates to the existing WireGuard script only after explicit --allow-live-wireguard."""
     parser = argparse.ArgumentParser(
         description=f"Day14 {lab.DAY14_NAME}.",
@@ -176,6 +179,13 @@ wireguard-runner is dry-run by default and delegates to the existing WireGuard s
         "--task",
         choices=get_cli_task_choices(),
         help="Task to run.",
+    )
+    parser.add_argument(
+        "positional_task",
+        nargs="?",
+        choices=get_cli_task_choices(),
+        metavar="task",
+        help="Compatibility task name. Equivalent to --task when --task is omitted.",
     )
     parser.add_argument("--profile", default=str(lab.DEFAULT_PROFILE), help="Path to the Day14 lab runner profile JSON.")
     parser.add_argument("--dry-run", action="store_true", help="Show report-index inputs and outputs without writing reports.")
@@ -345,6 +355,7 @@ def _build_task_handlers(args: argparse.Namespace, root: Path, lab: ModuleType) 
         lab.DAY159_V05_AI_ASSISTANCE_SAFETY_REGRESSION_MATRIX_TASK_ID: lambda: lab._run_day159_v05_ai_assistance_safety_regression_matrix(root),
         lab.DAY160_V05_AI_ASSISTANCE_PHASE_GATE_REVIEW_TASK_ID: lambda: lab._run_day160_v05_ai_assistance_phase_gate_review(root),
         lab.PHASE2A_READONLY_JOB_RUNNER_FRAMEWORK_TASK_ID: lambda: lab._run_phase2a_readonly_job_runner_framework(root),
+        lab.PHASE_2A_03_DRY_RUN_JOB_PLAN_GATE_TASK_ID: lambda: lab._run_phase_2a_03_dry_run_job_plan_gate(root),
         lab.WIREGUARD_RUNNER_TASK_ALIAS: lambda: lab._run_wireguard_runner(
             root,
             dry_run=args.dry_run,
@@ -365,6 +376,10 @@ def main(
 
     parser = _build_parser(lab_module)
     args = parser.parse_args(argv)
+    if args.task and args.positional_task:
+        parser.error("use either positional task or --task, not both")
+    if args.positional_task:
+        args.task = args.positional_task
     root = Path(project_root or Path.cwd()).resolve()
 
     if args.list_tasks:

@@ -110,6 +110,7 @@ CANONICAL_TASK_NAMES: Tuple[str, ...] = (
     "v05-ai-assistance-safety-regression-matrix",
     "v05-ai-assistance-phase-gate-review",
     "phase2a-readonly-job-runner-framework",
+    "phase2a-03-dry-run-job-plan-gate",
     "wireguard-runner",
 )
 

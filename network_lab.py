@@ -281,6 +281,9 @@ from day160_v05_ai_assistance_phase_gate_review import (
 from phase2a_readonly_job_runner_framework import (
     run_phase2a_readonly_job_runner_framework,
 )
+from phase_2a_03_dry_run_job_plan_gate import (
+    run_phase_2a_03_dry_run_job_plan_gate,
+)
 from project_folder_organization_decision_gate import (
     run_project_folder_organization_decision_gate,
 )
@@ -1472,6 +1475,16 @@ PHASE2A_READONLY_JOB_RUNNER_FRAMEWORK_JSON = (
 )
 PHASE2A_READONLY_JOB_RUNNER_FRAMEWORK_HTML = (
     Path("reports") / "lab-summary" / "phase2a_readonly_job_runner_framework.html"
+)
+PHASE_2A_03_DRY_RUN_JOB_PLAN_GATE_TASK_ID = "phase2a-03-dry-run-job-plan-gate"
+PHASE_2A_03_DRY_RUN_JOB_PLAN_GATE_DOC = (
+    Path("docs") / "phase_2a" / "phase_2a_03_dry_run_job_plan_gate.md"
+)
+PHASE_2A_03_DRY_RUN_JOB_PLAN_GATE_JSON = (
+    Path("reports") / "lab-summary" / "phase_2a_03_dry_run_job_plan_gate.json"
+)
+PHASE_2A_03_DRY_RUN_JOB_PLAN_GATE_HTML = (
+    Path("reports") / "lab-summary" / "phase_2a_03_dry_run_job_plan_gate.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -3147,6 +3160,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{PHASE2A_READONLY_JOB_RUNNER_FRAMEWORK_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Phase 2A",
+        "title": "Phase 2A-03 Job Request Normalization and Dry-Run Plan Gate",
+        "report_type": "Dry-run job plan gate and request normalization evidence",
+        "safety_label": "PHASE_2A_03_DRY_RUN_PLAN_GATE_READY; DRY_RUN_PLAN_NON_EXECUTABLE; REJECTED_REQUESTS_BEFORE_PLAN_GENERATION; RUNNER_INVOKED_FALSE; ADAPTER_INVOKED_FALSE; LIVE_EXECUTION_OPENED_FALSE; NEXT_PHASE_ALLOWED_FALSE",
+        "description": "Phase 2A-03 normalizes allowed mock/local/read-only job requests into non-executable dry-run plans and rejects live-capable or dangerous requests before any runner or adapter invocation. It does not enable live execution, SSH, NETCONF, RESTCONF, provider/API/model calls, backup_config, config changes, arbitrary commands, or scriptPath behavior.",
+        "json_globs": [PHASE_2A_03_DRY_RUN_JOB_PLAN_GATE_JSON.as_posix()],
+        "html_globs": [PHASE_2A_03_DRY_RUN_JOB_PLAN_GATE_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{PHASE_2A_03_DRY_RUN_JOB_PLAN_GATE_TASK_ID}"
         ),
     },
 ]
@@ -7147,6 +7173,32 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "phase2a_readonly_job_runner_framework.py",
             "notes": "PHASE_2A_STARTED JOB_SPEC_CONTRACT_VALIDATOR_READY ALLOWLIST_SCHEMA_PRIMARY_TRUE DENYLIST_EVIDENCE_ONLY_TRUE INVALID_JOB_SPECS_REJECTED_BEFORE_RUNNER_TRUE RUNNER_INVOKED_FALSE_FOR_REJECTIONS_TRUE SAFE_ARTIFACT_PATHS_ONLY_TRUE NEXT_PHASE_ALLOWED_FALSE. Validator/contract/matrix/evidence only; no live execution, SSH, NETCONF, RESTCONF, RouterOS, external APIs, AI provider/model calls, arbitrary commands, arbitrary shell, arbitrary script paths, backup_config, config changes, adapters, brokers, or real runner integration.",
+        },
+        {
+            "id": PHASE_2A_03_DRY_RUN_JOB_PLAN_GATE_TASK_ID,
+            "task_id": "phase_2a_03_dry_run_job_plan_gate",
+            "display_name": "Phase 2A-03 Job Request Normalization and Dry-Run Plan Gate",
+            "user_display_name": "Phase 2A-03 Job Request Normalization and Dry-Run Plan Gate",
+            "day": "Phase 2A",
+            "category": "runner_framework",
+            "description": "Phase 2A-03 normalizes allowed mock/local/read-only job requests into non-executable dry-run plans and rejects dangerous requests before any runner or adapter invocation.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                PHASE_2A_03_DRY_RUN_JOB_PLAN_GATE_JSON.as_posix(),
+                PHASE_2A_03_DRY_RUN_JOB_PLAN_GATE_HTML.as_posix(),
+                PHASE_2A_03_DRY_RUN_JOB_PLAN_GATE_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Phase 2A-03 JSON/HTML dry-run job plan gate evidence",
+                "Phase 2A-03 dry-run job plan gate documentation",
+            ],
+            "related_script": "phase_2a_03_dry_run_job_plan_gate.py",
+            "notes": "PHASE_2A_03_DRY_RUN_PLAN_GATE_READY AGENTS_MD_FOUND_AND_READ AGENTS_MD_NOT_MODIFIED REQUEST_NORMALIZATION_REPORT_ONLY DRY_RUN_PLAN_NON_EXECUTABLE REJECTED_REQUESTS_BEFORE_PLAN_GENERATION RUNNER_INVOKED_FALSE ADAPTER_INVOKED_FALSE LIVE_EXECUTION_OPENED_FALSE NEXT_PHASE_ALLOWED_FALSE. Normalization/validation/plan/evidence only; no live execution, SSH, NETCONF, RESTCONF, provider/API/model calls, backup_config, config changes, arbitrary commands, scriptPath execution, adapters, brokers, runners, Phase 2B authorization, or real execution authorization.",
         },
     ]
 
@@ -11964,6 +12016,15 @@ def _run_day160_v05_ai_assistance_phase_gate_review(project_root: Path) -> int:
 
 def _run_phase2a_readonly_job_runner_framework(project_root: Path) -> int:
     return run_phase2a_readonly_job_runner_framework(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_phase_2a_03_dry_run_job_plan_gate(project_root: Path) -> int:
+    return run_phase_2a_03_dry_run_job_plan_gate(
         project_root,
         format_heading_func=format_heading,
         format_status_func=format_status,
