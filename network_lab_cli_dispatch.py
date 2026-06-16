@@ -157,7 +157,7 @@ v05-ai-assistance-output-template-contract writes a Day157 review-only/report-on
 v05-ai-assistance-reviewer-only-fixture-renderer writes a Day158 deterministic reviewer-only fixture renderer without provider/API/model/runtime/live-device behavior.
 v05-ai-assistance-safety-regression-matrix writes a Day159 review-only/report-only safety regression matrix with unsafe capability flags kept false.
 v05-ai-assistance-phase-gate-review writes a Day160 phase gate review package only; it is not phase gate approval and keeps next_phase_allowed=false.
-phase2a-readonly-job-runner-framework writes a framework-only mock/local/read-only Phase 2A scaffold report with fixed job types and safe rejections; it does not enable live execution, SSH, NETCONF, RESTCONF, external APIs, AI providers/model calls, backup_config, config changes, arbitrary commands, or arbitrary script paths.
+phase2a-readonly-job-runner-framework writes the Phase 2A-02 job spec contract validator and negative input matrix evidence with allowlisted schemas as the primary boundary; it does not enable live execution, SSH, NETCONF, RESTCONF, RouterOS, external APIs, AI providers/model calls, backup_config, config changes, arbitrary commands, shell, or script paths.
 wireguard-runner is dry-run by default and delegates to the existing WireGuard script only after explicit --allow-live-wireguard."""
     parser = argparse.ArgumentParser(
         description=f"Day14 {lab.DAY14_NAME}.",

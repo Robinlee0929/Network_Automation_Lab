@@ -3138,10 +3138,10 @@ REPORT_CATALOG = [
     },
     {
         "day": "Phase 2A",
-        "title": "Phase 2A Read-only Job Runner Framework",
-        "report_type": "Mock/local read-only job runner framework scaffold",
-        "safety_label": "PHASE_2A_STARTED; READ_ONLY_JOB_RUNNER_FRAMEWORK_SCAFFOLD_READY; MOCK_ONLY_TRUE; LOCAL_ONLY_TRUE; LIVE_DEVICE_ACCESS_FALSE; SSH_ENABLED_FALSE; ARBITRARY_COMMAND_ALLOWED_FALSE; ARBITRARY_SCRIPT_PATH_ALLOWED_FALSE; BACKUP_CONFIG_RUN_ALLOWED_FALSE; CONFIG_CHANGE_ALLOWED_FALSE",
-        "description": "Phase 2A starts a framework-only mock/local read-only job runner scaffold with fixed job types, explicit denials, and no live execution, SSH, NETCONF, RESTCONF, external API, AI provider/model call, backup_config, config change, arbitrary command, or arbitrary script path support.",
+        "title": "Phase 2A-02 Job Spec Contract Validator + Negative Input Matrix",
+        "report_type": "Job spec contract validator and negative input matrix",
+        "safety_label": "PHASE_2A_STARTED; JOB_SPEC_CONTRACT_VALIDATOR_READY; ALLOWLIST_SCHEMA_PRIMARY_TRUE; DENYLIST_EVIDENCE_ONLY_TRUE; INVALID_JOB_SPECS_REJECTED_BEFORE_RUNNER_TRUE; RUNNER_INVOKED_FALSE_FOR_REJECTIONS_TRUE; SAFE_ARTIFACT_PATHS_ONLY_TRUE; NEXT_PHASE_ALLOWED_FALSE",
+        "description": "Phase 2A-02 validates job specs with positive allowlisted schemas before any mock/local review-only runner invocation and records negative input matrix evidence. It does not enable live execution, SSH, NETCONF, RESTCONF, RouterOS, external API, AI provider/model calls, backup_config, config change, arbitrary command, shell, or scriptPath support.",
         "json_globs": [PHASE2A_READONLY_JOB_RUNNER_FRAMEWORK_JSON.as_posix()],
         "html_globs": [PHASE2A_READONLY_JOB_RUNNER_FRAMEWORK_HTML.as_posix()],
         "missing_note": (
@@ -7125,11 +7125,11 @@ def list_tasks() -> List[Dict[str, Any]]:
         {
             "id": PHASE2A_READONLY_JOB_RUNNER_FRAMEWORK_TASK_ID,
             "task_id": "phase2a_readonly_job_runner_framework",
-            "display_name": "Phase 2A Read-only Job Runner Framework",
-            "user_display_name": "Phase 2A Read-only Job Runner Framework",
+            "display_name": "Phase 2A-02 Job Spec Contract Validator + Negative Input Matrix",
+            "user_display_name": "Phase 2A-02 Job Spec Contract Validator + Negative Input Matrix",
             "day": "Phase 2A",
             "category": "runner_framework",
-            "description": "Phase 2A starts a framework-only mock/local read-only job runner scaffold with fixed allowed job types and explicit safe rejections.",
+            "description": "Phase 2A-02 validates job specs with positive allowlisted schemas and records a negative input matrix before any mock/local review-only runner invocation.",
             "safety_level": "report-only",
             "execution_mode": "report-only",
             "enabled": True,
@@ -7142,11 +7142,11 @@ def list_tasks() -> List[Dict[str, Any]]:
                 PHASE2A_READONLY_JOB_RUNNER_FRAMEWORK_DOC.as_posix(),
             ],
             "report_outputs": [
-                "Phase 2A JSON/HTML read-only job runner framework scaffold evidence",
-                "Phase 2A read-only job runner framework documentation",
+                "Phase 2A-02 JSON/HTML job spec validator and negative input matrix evidence",
+                "Phase 2A-02 job spec contract validator documentation",
             ],
             "related_script": "phase2a_readonly_job_runner_framework.py",
-            "notes": "PHASE_2A_STARTED READ_ONLY_JOB_RUNNER_FRAMEWORK_SCAFFOLD_READY MOCK_ONLY_TRUE LOCAL_ONLY_TRUE LIVE_DEVICE_ACCESS_FALSE SSH_ENABLED_FALSE ARBITRARY_COMMAND_ALLOWED_FALSE ARBITRARY_SCRIPT_PATH_ALLOWED_FALSE BACKUP_CONFIG_RUN_ALLOWED_FALSE CONFIG_CHANGE_ALLOWED_FALSE. Framework-only mock/local/read-only scaffold; no live execution, SSH, NETCONF, RESTCONF, external APIs, AI provider/model calls, arbitrary commands, arbitrary script paths, backup_config, or config changes.",
+            "notes": "PHASE_2A_STARTED JOB_SPEC_CONTRACT_VALIDATOR_READY ALLOWLIST_SCHEMA_PRIMARY_TRUE DENYLIST_EVIDENCE_ONLY_TRUE INVALID_JOB_SPECS_REJECTED_BEFORE_RUNNER_TRUE RUNNER_INVOKED_FALSE_FOR_REJECTIONS_TRUE SAFE_ARTIFACT_PATHS_ONLY_TRUE NEXT_PHASE_ALLOWED_FALSE. Validator/contract/matrix/evidence only; no live execution, SSH, NETCONF, RESTCONF, RouterOS, external APIs, AI provider/model calls, arbitrary commands, arbitrary shell, arbitrary script paths, backup_config, config changes, adapters, brokers, or real runner integration.",
         },
     ]
 
