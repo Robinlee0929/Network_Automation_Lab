@@ -115,6 +115,337 @@ The v0.1 portfolio package covers Day 1 through Day 30 post-tag verification. Th
 
 The project is designed as a practical QA Automation / SDET portfolio project for network infrastructure. It focuses on repeatable validation, structured test evidence, and readable JSON / HTML reports rather than one-off manual checks.
 
+## Network Automation AI Node
+
+The current AI workbench is now connected to the Day1-Day160 Router/Switch automation platform as a Network Automation AI Node. It is not a general chatbot. It reads existing reviewer-facing evidence such as `reports/`, `summary/`, inventory-shaped JSON pasted by the user, topology context, and raw report text, then returns structured JSON for downstream platform steps.
+
+The AI Node can:
+
+- Import Day result evidence from JSON and TXT reports.
+- Analyze report text into summary, findings, warnings, possible causes, recommended actions, risk level, and approval flags.
+- Parse natural-language network requests into an intent, target device, vendor, interface, VLAN, allowlisted action ID, missing fields, and safety flags.
+- Create a platform job record through the Job Runner Adapter.
+
+The AI Node cannot:
+
+- SSH to routers or switches.
+- Call device APIs.
+- Execute generated CLI.
+- Run reset, reboot, remove, disable, enable, or configuration-changing operations.
+- Bypass manual approval for config-change intent.
+
+### Network AI Setup
+
+Create `.env.local` locally:
+
+```env
+OPENAI_API_KEY=your_api_key_here
+OPENAI_MODEL=gpt-5-mini
+```
+
+`OPENAI_API_KEY` and `OPENAI_MODEL` are read only from `process.env` in server-side API routes. The front end never receives the API key. `.env.example` stays committed as a blank template:
+
+```env
+OPENAI_API_KEY=
+OPENAI_MODEL=gpt-5-mini
+```
+
+### Import Day1-Day160 Reports
+
+Place or keep existing report evidence under:
+
+```text
+reports/
+summary/
+```
+
+The Day Result Importer scans JSON and TXT files and normalizes each report into:
+
+```json
+{
+  "id": "string",
+  "sourceDay": "Day160",
+  "deviceName": "string or null",
+  "vendor": "mikrotik | cisco | unknown",
+  "checkType": "string",
+  "status": "PASS | WARN | FAIL | UNKNOWN",
+  "rawOutput": "string",
+  "parsedResult": {},
+  "createdAt": "ISO timestamp"
+}
+```
+
+Open the workbench:
+
+```text
+http://localhost:3000/network/day-results
+http://localhost:3000/network/ai-actions
+http://localhost:3000/network/reports
+http://localhost:3000/network/jobs
+```
+
+### Network AI APIs
+
+```text
+POST /api/network/ai/analyze-report
+POST /api/network/ai/parse-request
+POST /api/network/jobs/create
+GET  /api/network/actions
+GET  /api/network/day-results
+GET  /api/network/reports
+GET  /api/network/jobs
+```
+
+`/api/network/ai/analyze-report` accepts:
+
+```json
+{
+  "reportText": "string",
+  "deviceContext": {}
+}
+```
+
+`/api/network/ai/parse-request` accepts:
+
+```json
+{
+  "userRequest": "string",
+  "deviceInventory": {},
+  "availableActions": {}
+}
+```
+
+AI output is validated against JSON Schema-shaped runtime contracts before it is returned to the UI. Unknown action IDs are removed. Config-change intent always sets `requiresApproval=true`.
+
+### AI Analyze Persistence
+
+AI Analyze results are saved as server-side analysis records in:
+
+```text
+data/network-ai/analyses.json
+```
+
+The UI does not rely only on front-end React state. When `/network/day-results` loads or when a user selects a report, it calls:
+
+```text
+GET /api/network/reports/{reportId}/analysis/latest
+```
+
+If a latest analysis exists, the page displays the persisted analysis record with the analysis ID, creation time, model, job-creation safety flag, safety reason, and validated AI JSON. This keeps the analysis visible after navigating to AI Actions, Reports, or Jobs and returning to Day Results.
+
+Each analysis record stores the report ID, source day, result kind, target device, check type, model, prompt version, input hash, validated output, safety metadata, and creation time. The runtime store is ignored by Git so local analysis history is not accidentally committed.
+
+Non-device reports such as `phase_gate_report`, `summary_report`, and `test_report` are reviewer evidence only. Their `recommendedExistingActionIds` are removed during server-side sanitize, `jobCreationAllowed=false`, and job creation is not allowed because there is no concrete target device for the platform Job Runner.
+
+### Available Action Bridge
+
+The AI Node can recommend only these existing platform action IDs:
+
+- `baseline_check`
+- `wan_lan_check`
+- `interface_status_check`
+- `backup_config`
+- `environment_check`
+
+If no action matches, the parser returns `recommendedActionId: null`, includes `recommendedActionId` in `missingFields`, and marks the request blocked instead of inventing an action.
+
+### Job Runner Adapter Flow
+
+Current safe flow:
+
+```text
+parse -> recommend -> validate -> create job -> approve -> execute
+```
+
+The first Job Runner Adapter implementation only creates job records:
+
+- Low-risk read-only checks become `ready`.
+- Medium/high-risk or future config-change actions become `pending_approval`.
+- No device command is executed by the AI route or UI.
+
+Future execution must be added behind a separate safety gate and routed through the platform Job Runner. Configuration changes must remain manually approved before any live-capable execution path is introduced.
+
+### Wrapping Existing Scripts As Actions
+
+To wrap old Day1-Day160 scripts safely:
+
+1. Add a stable action ID to the allowlist in `lib/network-ai/actions.ts`.
+2. Map it to an existing script only inside a future Job Runner layer, not inside the AI parser.
+3. Mark whether the action is read-only or config-changing.
+4. Add negative tests proving rejected or unknown intents do not reach adapters, brokers, runners, SSH, or execution paths.
+5. Keep script output as JSON/TXT reviewer evidence so it can be imported by the Day Result Importer.
+
+## AI Project Assistant MVP
+
+This repository also includes a separate Next.js App Router MVP at `/ai` for internal project drafting:
+
+- AI meeting summaries
+- AI requirement analysis
+- AI knowledge-base Q&A from pasted SOP or document text
+
+This MVP is intentionally separate from the Network Automation Lab runner and the `/ai-intent-reviewer` evidence chain. It does not execute network tasks, does not call SSH, does not access routers or switches, does not read device config files, and does not unlock the historical AI Assistance provider/API phase gates for network automation. It only sends user-pasted text from server-side API routes to OpenAI after the user configures an API key.
+
+### Install
+
+```bash
+npm install
+```
+
+Python validation remains available separately:
+
+```bash
+python -m pytest
+python network_lab.py --task report-index
+```
+
+### Configure API Key
+
+Create `.env.local` locally:
+
+```env
+OPENAI_API_KEY=your_api_key_here
+OPENAI_MODEL=gpt-5-mini
+```
+
+The app reads `OPENAI_API_KEY` and `OPENAI_MODEL` from `process.env` on the server. `.env.local` is ignored by Git; do not commit real API keys, tokens, credentials, or secrets. `.env.example` is committed only as a blank template.
+
+### Start
+
+```bash
+npm run dev
+```
+
+Open:
+
+```text
+http://localhost:3000/ai
+```
+
+### Use The Three MVP Tools
+
+1. Meeting summary: paste meeting notes or a transcript, then click `產生摘要`. Output includes meeting highlights, decisions, owners, due dates, risks, blockers, and next-meeting suggestions.
+2. Requirement analysis: paste raw requirements, then click `整理需求`. Output includes a requirement summary, modules, user stories, acceptance criteria, missing information, priority guidance, and risk notes.
+3. Knowledge-base Q&A: paste SOP or document content, enter a question, then click `回答問題`. The assistant is prompted to answer only from the pasted document and to say when the provided content is insufficient.
+
+All generated output is labeled `AI 草稿，需人工確認`; project members should review before copying results to Jira, Notion, GitHub Issues, Confluence, or any internal system.
+
+## Automation AI Nodes MVP
+
+The Next.js app also includes workflow-ready AI Action Node demos at `/automation/ai-nodes`. These nodes are designed for automation pipelines rather than open-ended chat. Each node returns JSON that can be passed to a future workflow engine step such as a trigger handler, task creation, notification, or approval flow.
+
+Server-side endpoints:
+
+```text
+POST /api/automation/ai/meeting-summary
+POST /api/automation/ai/requirement-analysis
+POST /api/automation/ai/kb-qa
+```
+
+### Node Inputs And Outputs
+
+Meeting Summary Node input:
+
+```json
+{
+  "meetingText": "meeting transcript or notes"
+}
+```
+
+Output fields:
+
+```json
+{
+  "summary": "string",
+  "decisions": ["string"],
+  "tasks": [
+    {
+      "title": "string",
+      "owner": "string",
+      "dueDate": "string",
+      "status": "string"
+    }
+  ],
+  "risks": ["string"],
+  "followUpQuestions": ["string"],
+  "needsHumanReview": true
+}
+```
+
+Requirement Analysis Node input:
+
+```json
+{
+  "requirementText": "raw requirement"
+}
+```
+
+Output fields:
+
+```json
+{
+  "summary": "string",
+  "modules": ["string"],
+  "userStories": ["string"],
+  "acceptanceCriteria": ["string"],
+  "missingInfo": ["string"],
+  "priority": "High | Medium | Low",
+  "risks": ["string"],
+  "needsHumanReview": true
+}
+```
+
+Knowledge QA Node input:
+
+```json
+{
+  "documentText": "SOP or document content",
+  "question": "question"
+}
+```
+
+Output fields:
+
+```json
+{
+  "answer": "string",
+  "evidence": ["string"],
+  "insufficientInfo": true,
+  "suggestedNextStep": "string",
+  "needsHumanReview": true
+}
+```
+
+Each endpoint returns a wrapper with `nodeType`, `draftNotice`, `model`, `output`, and `rawJson`. The `rawJson` field is intentionally preserved so a later workflow engine can pass the AI node result into downstream automation without scraping UI text.
+
+### Automation Node Setup
+
+Use the same installation and environment setup:
+
+```bash
+npm install
+```
+
+Create `.env.local` locally:
+
+```env
+OPENAI_API_KEY=your_api_key_here
+OPENAI_MODEL=gpt-5-mini
+```
+
+Start the app:
+
+```bash
+npm run dev
+```
+
+Open:
+
+```text
+http://localhost:3000/automation/ai-nodes
+```
+
+API keys are supplied by the user and must not be committed to Git. The front end never receives `OPENAI_API_KEY`; all OpenAI calls run inside server-side API routes. The nodes remain draft generators for human review and do not execute network automation tasks, SSH, device commands, or configuration changes.
+
 ## Public Reviewer Start Here
 
 If you are reviewing this repository from GitHub or from a fresh local checkout, start with:
