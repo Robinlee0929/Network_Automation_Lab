@@ -77,6 +77,7 @@ def _build_parser(lab: ModuleType) -> argparse.ArgumentParser:
   python network_lab.py --task phase2a-readonly-job-runner-framework
   python network_lab.py --task phase2a-03-dry-run-job-plan-gate
   python network_lab.py --task phase2a-04-plan-evidence-ledger
+  python network_lab.py --task phase2a-05-dry-run-result-envelope-renderer
   python network_lab.py --task intent-workflow-demo
   python network_lab.py --task offline-mock-runtime
   python network_lab.py --task offline-mock-runtime-contract
@@ -163,6 +164,7 @@ v05-ai-assistance-phase-gate-review writes a Day160 phase gate review package on
 phase2a-readonly-job-runner-framework writes the Phase 2A-02 job spec contract validator and negative input matrix evidence with allowlisted schemas as the primary boundary; it does not enable live execution, SSH, NETCONF, RESTCONF, RouterOS, external APIs, AI providers/model calls, backup_config, config changes, arbitrary commands, shell, or script paths.
 phase2a-03-dry-run-job-plan-gate writes the Phase 2A-03 request normalization and dry-run plan gate evidence; it creates only non-executable dry-run plans for allowed mock/local/read-only requests and rejects unsafe requests before runner or adapter invocation.
 phase2a-04-plan-evidence-ledger writes the Phase 2A-04 report-only traceability ledger binding Phase 2A-03 dry-run plans and rejected unsafe requests to sanitized evidence records; it does not invoke runners, adapters, live execution, provider/API/model calls, Phase 2B, or real execution.
+phase2a-05-dry-run-result-envelope-renderer writes the Phase 2A-05 result envelope and renderer over the existing Phase 2A-04 report interface; result_envelope and render_outputs remain separate, and it does not rebuild planner or ledger behavior.
 wireguard-runner is dry-run by default and delegates to the existing WireGuard script only after explicit --allow-live-wireguard."""
     parser = argparse.ArgumentParser(
         description=f"Day14 {lab.DAY14_NAME}.",
@@ -359,6 +361,7 @@ def _build_task_handlers(args: argparse.Namespace, root: Path, lab: ModuleType) 
         lab.PHASE2A_READONLY_JOB_RUNNER_FRAMEWORK_TASK_ID: lambda: lab._run_phase2a_readonly_job_runner_framework(root),
         lab.PHASE_2A_03_DRY_RUN_JOB_PLAN_GATE_TASK_ID: lambda: lab._run_phase_2a_03_dry_run_job_plan_gate(root),
         lab.PHASE_2A_04_PLAN_EVIDENCE_LEDGER_TASK_ID: lambda: lab._run_phase_2a_04_plan_evidence_ledger(root),
+        lab.PHASE_2A_05_DRY_RUN_RESULT_ENVELOPE_RENDERER_TASK_ID: lambda: lab._run_phase_2a_05_dry_run_result_envelope_renderer(root),
         lab.WIREGUARD_RUNNER_TASK_ALIAS: lambda: lab._run_wireguard_runner(
             root,
             dry_run=args.dry_run,
