@@ -1,5 +1,8 @@
 import json
+from copy import deepcopy
 from pathlib import Path
+
+import pytest
 
 import network_lab
 import network_lab_cli_dispatch
@@ -23,8 +26,18 @@ FORBIDDEN_ACTIONS = (
 )
 
 
-def test_day138_dry_run_inventory_gate_contains_required_safety_fields():
-    report = day138.build_project_folder_organization_dry_run_inventory_gate_report(PROJECT_ROOT)
+@pytest.fixture(scope="module")
+def day138_report_cache():
+    return day138.build_project_folder_organization_dry_run_inventory_gate_report(PROJECT_ROOT)
+
+
+@pytest.fixture
+def day138_report(day138_report_cache):
+    return deepcopy(day138_report_cache)
+
+
+def test_day138_dry_run_inventory_gate_contains_required_safety_fields(day138_report):
+    report = day138_report
 
     assert report["overall_status"] == "PASS"
     assert report["status"] == "PROJECT_FOLDER_ORGANIZATION_DRY_RUN_INVENTORY_RECORDED"
@@ -46,8 +59,8 @@ def test_day138_dry_run_inventory_gate_contains_required_safety_fields():
         assert report["explicit_no_change_proof"][action] is False
 
 
-def test_day138_inventory_groups_include_required_groups_and_risk_levels():
-    report = day138.build_project_folder_organization_dry_run_inventory_gate_report(PROJECT_ROOT)
+def test_day138_inventory_groups_include_required_groups_and_risk_levels(day138_report):
+    report = day138_report
     groups = {group["group_name"]: group for group in report["inventory_groups"]}
 
     for group_name in day138.REQUIRED_GROUPS:
@@ -72,6 +85,7 @@ def test_day138_inventory_groups_include_required_groups_and_risk_levels():
 
 
 def test_day138_cli_report_and_registry_paths_do_not_activate_execution_provider_api_or_runners(
+    day138_report,
     monkeypatch,
     capsys,
 ):
@@ -83,6 +97,11 @@ def test_day138_cli_report_and_registry_paths_do_not_activate_execution_provider
 
     monkeypatch.setattr(network_lab.subprocess, "run", fail_subprocess)
     monkeypatch.setattr(network_lab, "load_lab_runner_profile", fail_profile_load)
+    monkeypatch.setattr(
+        day138,
+        "build_project_folder_organization_dry_run_inventory_gate_report",
+        lambda project_root: deepcopy(day138_report),
+    )
 
     exit_code = network_lab.main(
         ["--task", "project-folder-organization-dry-run-inventory-gate"],
@@ -130,8 +149,8 @@ def test_day138_task_catalog_and_dispatch_are_registered_without_activation():
     assert "Does not move, delete, rename, change import paths" in task["notes"]
 
 
-def test_day138_write_reports_and_report_index_visibility(tmp_path):
-    report = day138.build_project_folder_organization_dry_run_inventory_gate_report(PROJECT_ROOT)
+def test_day138_write_reports_and_report_index_visibility(day138_report, tmp_path):
+    report = day138_report
     json_path, html_path = day138.write_project_folder_organization_dry_run_inventory_gate_reports(
         tmp_path,
         report,
