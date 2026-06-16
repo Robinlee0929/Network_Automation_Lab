@@ -278,6 +278,9 @@ from day159_v05_ai_assistance_safety_regression_matrix import (
 from day160_v05_ai_assistance_phase_gate_review import (
     run_day160_v05_ai_assistance_phase_gate_review,
 )
+from phase2a_readonly_job_runner_framework import (
+    run_phase2a_readonly_job_runner_framework,
+)
 from project_folder_organization_decision_gate import (
     run_project_folder_organization_decision_gate,
 )
@@ -1461,6 +1464,14 @@ DAY160_V05_AI_ASSISTANCE_PHASE_GATE_REVIEW_JSON = (
 )
 DAY160_V05_AI_ASSISTANCE_PHASE_GATE_REVIEW_HTML = (
     Path("reports") / "lab-summary" / "day160_v05_ai_assistance_phase_gate_review.html"
+)
+PHASE2A_READONLY_JOB_RUNNER_FRAMEWORK_TASK_ID = "phase2a-readonly-job-runner-framework"
+PHASE2A_READONLY_JOB_RUNNER_FRAMEWORK_DOC = Path("docs") / "phase2a_readonly_job_runner_framework.md"
+PHASE2A_READONLY_JOB_RUNNER_FRAMEWORK_JSON = (
+    Path("reports") / "lab-summary" / "phase2a_readonly_job_runner_framework.json"
+)
+PHASE2A_READONLY_JOB_RUNNER_FRAMEWORK_HTML = (
+    Path("reports") / "lab-summary" / "phase2a_readonly_job_runner_framework.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -3123,6 +3134,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{DAY160_V05_AI_ASSISTANCE_PHASE_GATE_REVIEW_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Phase 2A",
+        "title": "Phase 2A Read-only Job Runner Framework",
+        "report_type": "Mock/local read-only job runner framework scaffold",
+        "safety_label": "PHASE_2A_STARTED; READ_ONLY_JOB_RUNNER_FRAMEWORK_SCAFFOLD_READY; MOCK_ONLY_TRUE; LOCAL_ONLY_TRUE; LIVE_DEVICE_ACCESS_FALSE; SSH_ENABLED_FALSE; ARBITRARY_COMMAND_ALLOWED_FALSE; ARBITRARY_SCRIPT_PATH_ALLOWED_FALSE; BACKUP_CONFIG_RUN_ALLOWED_FALSE; CONFIG_CHANGE_ALLOWED_FALSE",
+        "description": "Phase 2A starts a framework-only mock/local read-only job runner scaffold with fixed job types, explicit denials, and no live execution, SSH, NETCONF, RESTCONF, external API, AI provider/model call, backup_config, config change, arbitrary command, or arbitrary script path support.",
+        "json_globs": [PHASE2A_READONLY_JOB_RUNNER_FRAMEWORK_JSON.as_posix()],
+        "html_globs": [PHASE2A_READONLY_JOB_RUNNER_FRAMEWORK_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{PHASE2A_READONLY_JOB_RUNNER_FRAMEWORK_TASK_ID}"
         ),
     },
 ]
@@ -7097,6 +7121,32 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "day160_v05_ai_assistance_phase_gate_review.py",
             "notes": "REVIEW_ONLY REPORT_ONLY NON_EXECUTABLE V05_AI_ASSISTANCE_PHASE_GATE_REVIEW_READY NEXT_PHASE_ALLOWED_FALSE. phase_gate_approval=false, execution_allowed=false, executor_unlock_allowed=false, provider_allowed=false, api_allowed=false, model_call_allowed=false, live_device_allowed=false, command_execution_allowed=false, secrets_allowed=false, next_phase_allowed=false.",
+        },
+        {
+            "id": PHASE2A_READONLY_JOB_RUNNER_FRAMEWORK_TASK_ID,
+            "task_id": "phase2a_readonly_job_runner_framework",
+            "display_name": "Phase 2A Read-only Job Runner Framework",
+            "user_display_name": "Phase 2A Read-only Job Runner Framework",
+            "day": "Phase 2A",
+            "category": "runner_framework",
+            "description": "Phase 2A starts a framework-only mock/local read-only job runner scaffold with fixed allowed job types and explicit safe rejections.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                PHASE2A_READONLY_JOB_RUNNER_FRAMEWORK_JSON.as_posix(),
+                PHASE2A_READONLY_JOB_RUNNER_FRAMEWORK_HTML.as_posix(),
+                PHASE2A_READONLY_JOB_RUNNER_FRAMEWORK_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Phase 2A JSON/HTML read-only job runner framework scaffold evidence",
+                "Phase 2A read-only job runner framework documentation",
+            ],
+            "related_script": "phase2a_readonly_job_runner_framework.py",
+            "notes": "PHASE_2A_STARTED READ_ONLY_JOB_RUNNER_FRAMEWORK_SCAFFOLD_READY MOCK_ONLY_TRUE LOCAL_ONLY_TRUE LIVE_DEVICE_ACCESS_FALSE SSH_ENABLED_FALSE ARBITRARY_COMMAND_ALLOWED_FALSE ARBITRARY_SCRIPT_PATH_ALLOWED_FALSE BACKUP_CONFIG_RUN_ALLOWED_FALSE CONFIG_CHANGE_ALLOWED_FALSE. Framework-only mock/local/read-only scaffold; no live execution, SSH, NETCONF, RESTCONF, external APIs, AI provider/model calls, arbitrary commands, arbitrary script paths, backup_config, or config changes.",
         },
     ]
 
@@ -11905,6 +11955,15 @@ def _run_day159_v05_ai_assistance_safety_regression_matrix(project_root: Path) -
 
 def _run_day160_v05_ai_assistance_phase_gate_review(project_root: Path) -> int:
     return run_day160_v05_ai_assistance_phase_gate_review(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_phase2a_readonly_job_runner_framework(project_root: Path) -> int:
+    return run_phase2a_readonly_job_runner_framework(
         project_root,
         format_heading_func=format_heading,
         format_status_func=format_status,

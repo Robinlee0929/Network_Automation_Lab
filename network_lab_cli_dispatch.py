@@ -73,6 +73,7 @@ def _build_parser(lab: ModuleType) -> argparse.ArgumentParser:
   python network_lab.py --task v05-ai-assistance-reviewer-only-fixture-renderer
   python network_lab.py --task v05-ai-assistance-safety-regression-matrix
   python network_lab.py --task v05-ai-assistance-phase-gate-review
+  python network_lab.py --task phase2a-readonly-job-runner-framework
   python network_lab.py --task intent-workflow-demo
   python network_lab.py --task offline-mock-runtime
   python network_lab.py --task offline-mock-runtime-contract
@@ -156,6 +157,7 @@ v05-ai-assistance-output-template-contract writes a Day157 review-only/report-on
 v05-ai-assistance-reviewer-only-fixture-renderer writes a Day158 deterministic reviewer-only fixture renderer without provider/API/model/runtime/live-device behavior.
 v05-ai-assistance-safety-regression-matrix writes a Day159 review-only/report-only safety regression matrix with unsafe capability flags kept false.
 v05-ai-assistance-phase-gate-review writes a Day160 phase gate review package only; it is not phase gate approval and keeps next_phase_allowed=false.
+phase2a-readonly-job-runner-framework writes a framework-only mock/local/read-only Phase 2A scaffold report with fixed job types and safe rejections; it does not enable live execution, SSH, NETCONF, RESTCONF, external APIs, AI providers/model calls, backup_config, config changes, arbitrary commands, or arbitrary script paths.
 wireguard-runner is dry-run by default and delegates to the existing WireGuard script only after explicit --allow-live-wireguard."""
     parser = argparse.ArgumentParser(
         description=f"Day14 {lab.DAY14_NAME}.",
@@ -342,6 +344,7 @@ def _build_task_handlers(args: argparse.Namespace, root: Path, lab: ModuleType) 
         lab.DAY158_V05_AI_ASSISTANCE_REVIEWER_ONLY_FIXTURE_RENDERER_TASK_ID: lambda: lab._run_day158_v05_ai_assistance_reviewer_only_fixture_renderer(root),
         lab.DAY159_V05_AI_ASSISTANCE_SAFETY_REGRESSION_MATRIX_TASK_ID: lambda: lab._run_day159_v05_ai_assistance_safety_regression_matrix(root),
         lab.DAY160_V05_AI_ASSISTANCE_PHASE_GATE_REVIEW_TASK_ID: lambda: lab._run_day160_v05_ai_assistance_phase_gate_review(root),
+        lab.PHASE2A_READONLY_JOB_RUNNER_FRAMEWORK_TASK_ID: lambda: lab._run_phase2a_readonly_job_runner_framework(root),
         lab.WIREGUARD_RUNNER_TASK_ALIAS: lambda: lab._run_wireguard_runner(
             root,
             dry_run=args.dry_run,
