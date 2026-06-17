@@ -9,6 +9,12 @@ def test_vrrp_mock_evidence_validation_detects_expected_outcomes():
 
     assert report["phase"] == "2A-07"
     assert report["status"] == "PASS"
+    assert report["summary"]["artifact_reference_groups_inspected"] == 6
+    assert report["summary"]["mapped_job_candidates"] == 6
+    assert report["summary"]["safe_job_candidates"] == 4
+    assert report["summary"]["blocked_or_planning_only_job_candidates"] == 2
+    assert report["summary"]["required_job_types_mapped"] == 6
+    assert report["summary"]["vrrp_role_after_correction"] == "first_concrete_example_job"
     assert report["summary"]["vrrp_mock_records"] == 5
     assert report["summary"]["pass_records"] == 1
     assert report["summary"]["mismatch_records"] == 2
@@ -38,6 +44,42 @@ def test_vrrp_mock_evidence_validation_detects_expected_outcomes():
         assert proof["device_connection_attempted"] is False
         assert proof["command_payload_present"] is False
         assert proof["network_io_attempted"] is False
+
+
+def test_day1_day160_artifact_patterns_map_to_required_jobs_with_vrrp_as_example():
+    report = pack.build_phase_2a_07_vrrp_dry_run_validation_pack_report()
+    mapping = report["artifact_to_jobs_mapping"]
+    jobs = {job["job_type"]: job for job in mapping["job_candidates"]}
+
+    assert mapping["artifact_references_inspected"] is True
+    assert set(pack.REQUIRED_JOB_TYPES) == set(jobs)
+    assert jobs["baseline_check"]["allowed_mode"] == "dry_run_mock_local_report_only"
+    assert jobs["interface_status_check"]["allowed_mode"] == "dry_run_mock_local_report_only"
+    assert jobs["wan_lan_check"]["allowed_mode"] == "dry_run_mock_local_report_only"
+    assert jobs["vrrp_validation"]["allowed_mode"] == "dry_run_mock_local_report_only"
+    assert jobs["vrrp_validation"]["vrrp_concrete_example"] is True
+    assert jobs["vrrp_validation"]["candidate_status"] == "IMPLEMENTED_AS_LOCAL_MOCK_EXAMPLE"
+    assert jobs["backup_config_plan"]["blocked_or_planning_only"] is True
+    assert jobs["backup_config_plan"]["candidate_status"] == "BLOCKED_FROM_EXECUTION"
+    assert jobs["blocked_config_change_request"]["blocked_or_planning_only"] is True
+    assert jobs["blocked_config_change_request"]["candidate_status"] == "BLOCKED_NON_EXECUTING"
+
+    for job in jobs.values():
+        boundary = job["safety_boundary"]
+        assert boundary["dry_run_only"] is True
+        assert boundary["mock_only"] is True
+        assert boundary["local_only"] is True
+        assert boundary["report_only"] is True
+        assert boundary["live_device_access_enabled"] is False
+        assert boundary["ssh_enabled"] is False
+        assert boundary["netconf_enabled"] is False
+        assert boundary["restconf_enabled"] is False
+        assert boundary["provider_api_model_enabled"] is False
+        assert boundary["adapter_broker_runner_enabled"] is False
+        assert boundary["secrets_enabled"] is False
+        assert boundary["real_network_io_enabled"] is False
+        assert boundary["config_change_enabled"] is False
+        assert boundary["next_phase_allowed"] is False
 
 
 def test_unsafe_vrrp_requests_are_rejected_redacted_and_non_executing():
@@ -71,12 +113,14 @@ def test_validator_fails_if_safety_boundary_or_detection_is_weakened():
     report = pack.build_phase_2a_07_vrrp_dry_run_validation_pack_report()
     report["ssh_enabled"] = True
     report["vrrp_validation_pack"]["validations"][0]["expected_outcome_matched"] = False
+    report["artifact_to_jobs_mapping"]["job_candidates"][0]["safety_boundary"]["ssh_enabled"] = True
 
     validation = pack.validate_phase_2a_07_report(report)
 
     assert validation["valid"] is False
     assert "SAFETY_FLAG_NOT_FALSE:ssh_enabled" in validation["errors"]
     assert any(error.startswith("VRRP_EXPECTED_OUTCOME_NOT_DETECTED") for error in validation["errors"])
+    assert any(error.startswith("JOB_SAFETY_BOUNDARY_FAILED") for error in validation["errors"])
 
 
 def test_cli_writes_vrrp_validation_pack_without_execution_paths(tmp_path, capsys, monkeypatch):
@@ -93,8 +137,14 @@ def test_cli_writes_vrrp_validation_pack_without_execution_paths(tmp_path, capsy
     output = capsys.readouterr().out
 
     assert exit_code == 0
-    assert "Phase 2A-07 VRRP Dry-Run / Mock Evidence Validation Pack" in output
+    assert "Phase 2A-07 Day1-Day160 Artifact-to-Jobs Dry-Run Validation Pack" in output
     assert "Task name: phase2a-07-vrrp-dry-run-validation-pack" in output
+    assert "Artifact reference groups inspected: 6" in output
+    assert "Mapped job candidates: 6" in output
+    assert "Safe job candidates: 4" in output
+    assert "Blocked/planning-only job candidates: 2" in output
+    assert "Required job types mapped: 6" in output
+    assert "VRRP role after correction: first_concrete_example_job" in output
     assert "VRRP mock records: 5" in output
     assert "Expected outcomes detected: 5" in output
     assert "Unsafe requests rejected: 9" in output
@@ -110,7 +160,7 @@ def test_cli_writes_vrrp_validation_pack_without_execution_paths(tmp_path, capsy
     assert "adapter_broker_runner_enabled: false" in output
     assert "config_change_enabled: false" in output
     assert "next_phase_allowed: false" in output
-    assert "[PASS] PHASE_2A_07_VRRP_DRY_RUN_VALIDATION_PACK_READY" in output
+    assert "[PASS] PHASE_2A_07_ARTIFACT_TO_JOBS_DRY_RUN_VALIDATION_PACK_READY" in output
     assert (tmp_path / pack.REPORT_JSON).exists()
     assert (tmp_path / pack.REPORT_HTML).exists()
 
@@ -128,6 +178,9 @@ def test_task_catalog_and_report_index_visibility(tmp_path):
     assert pack.REPORT_HTML.as_posix() in task["report_paths"]
     assert pack.DOC_PATH.as_posix() in task["report_paths"]
     assert pack.FIXTURE_PATH.as_posix() in task["report_paths"]
+    assert "DAY1_DAY160_ARTIFACT_REFERENCES_INSPECTED" in task["notes"]
+    assert "ARTIFACT_PATTERNS_MAPPED_TO_JOB_CANDIDATES" in task["notes"]
+    assert "VRRP_VALIDATION_RETAINED_AS_FIRST_CONCRETE_EXAMPLE_JOB" in task["notes"]
     assert "VRRP_MOCK_EVIDENCE_ONLY" in task["notes"]
     assert "UNSAFE_VRRP_REQUESTS_REJECTED" in task["notes"]
     assert "NEXT_PHASE_ALLOWED_FALSE" in task["notes"]
@@ -135,5 +188,5 @@ def test_task_catalog_and_report_index_visibility(tmp_path):
     assert network_lab.main(["--task", pack.TASK_NAME], project_root=tmp_path) == 0
     assert network_lab.main(["--report-index"], project_root=tmp_path) == 0
     html = (tmp_path / "reports/report_index.html").read_text(encoding="utf-8")
-    assert "Phase 2A-07 VRRP Dry-Run / Mock Evidence Validation Pack" in html
+    assert "Phase 2A-07 Day1-Day160 Artifact-to-Jobs Dry-Run Validation Pack" in html
     assert "phase_2a_07_vrrp_dry_run_validation_pack.json" in html

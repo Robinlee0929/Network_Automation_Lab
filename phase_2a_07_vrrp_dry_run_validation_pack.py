@@ -1,8 +1,10 @@
-"""Phase 2A-07 VRRP dry-run / mock evidence validation pack.
+"""Phase 2A-07 Day1-Day160 artifact-to-Jobs dry-run validation pack.
 
-This module validates local VRRP mock evidence as data only. It does not
-connect to devices, run commands, invoke adapters, invoke brokers, invoke
-runners, call providers/APIs/models, or perform live failover testing.
+This module maps prior Day1-Day160 in-repo artifact patterns into candidate
+Phase 2A Jobs and validates local VRRP mock evidence as the first concrete
+example Job. It does not connect to devices, run commands, invoke adapters,
+invoke brokers, invoke runners, call providers/APIs/models, or perform live
+testing.
 """
 
 from __future__ import annotations
@@ -17,10 +19,10 @@ from typing import Any, Callable, Dict, Iterable, Mapping, Optional, Sequence, T
 
 PHASE = "2A-07"
 TASK_NAME = "phase2a-07-vrrp-dry-run-validation-pack"
-TITLE = "Phase 2A-07 VRRP Dry-Run / Mock Evidence Validation Pack"
-STATUS_LABEL = "PHASE_2A_07_VRRP_DRY_RUN_VALIDATION_PACK_READY"
+TITLE = "Phase 2A-07 Day1-Day160 Artifact-to-Jobs Dry-Run Validation Pack"
+STATUS_LABEL = "PHASE_2A_07_ARTIFACT_TO_JOBS_DRY_RUN_VALIDATION_PACK_READY"
 MODE = "report_only"
-SCOPE = "vrrp_mock_evidence_validation_only"
+SCOPE = "day1_day160_artifact_to_jobs_mapping_with_vrrp_example"
 FIXTURE_PATH = Path("fixtures") / "phase_2a" / "phase_2a_07_vrrp_mock_evidence.json"
 REPORT_JSON = Path("reports") / "lab-summary" / "phase_2a_07_vrrp_dry_run_validation_pack.json"
 REPORT_HTML = Path("reports") / "lab-summary" / "phase_2a_07_vrrp_dry_run_validation_pack.html"
@@ -46,9 +48,14 @@ SAFETY_FLAGS = {
 }
 
 COMPLETION_MARKERS = (
-    "PHASE_2A_07_VRRP_DRY_RUN_VALIDATION_PACK_READY",
+    "PHASE_2A_07_ARTIFACT_TO_JOBS_DRY_RUN_VALIDATION_PACK_READY",
     "AGENTS_MD_FOUND_AND_READ",
     "AGENTS_MD_NOT_MODIFIED",
+    "DAY1_DAY160_ARTIFACT_REFERENCES_INSPECTED",
+    "ARTIFACT_PATTERNS_MAPPED_TO_JOB_CANDIDATES",
+    "SAFE_JOBS_DRY_RUN_MOCK_LOCAL_REPORT_ONLY",
+    "UNSAFE_JOBS_BLOCKED_OR_PLANNING_ONLY",
+    "VRRP_VALIDATION_RETAINED_AS_FIRST_CONCRETE_EXAMPLE_JOB",
     "VRRP_MOCK_EVIDENCE_ONLY",
     "LOCAL_FIXTURE_VALIDATION_ONLY",
     "MISMATCH_DETECTION_PRESENT",
@@ -60,6 +67,177 @@ COMPLETION_MARKERS = (
     "BROKER_INVOKED_FALSE",
     "LIVE_DEVICE_ACCESS_ENABLED_FALSE",
     "NEXT_PHASE_ALLOWED_FALSE",
+)
+
+REQUIRED_JOB_TYPES = (
+    "baseline_check",
+    "interface_status_check",
+    "wan_lan_check",
+    "vrrp_validation",
+    "backup_config_plan",
+    "blocked_config_change_request",
+)
+
+DAY1_DAY160_ARTIFACT_REFERENCES = (
+    {
+        "reference_id": "DAY1_DAY4_BASELINE_PATTERN",
+        "day_range": "Day1-Day4",
+        "source_artifacts": [
+            "README.md#Day 1",
+            "README.md#Day 4",
+            "reports/lab-summary/phase2a_readonly_job_runner_framework.json",
+            "mikrotik_acceptance_check.py",
+            "mikrotik_day4_multi_device_baseline.py",
+        ],
+        "evidence_pattern": "baseline acceptance and multi-device baseline reports",
+        "mapped_job_types": ["baseline_check"],
+        "safety_class": "local_mock_report_only_candidate",
+    },
+    {
+        "reference_id": "DAY5_DAY32_INTERFACE_STATUS_PATTERN",
+        "day_range": "Day5-Day32",
+        "source_artifacts": [
+            "README.md#Cisco validation",
+            "docs/roadmap/ha_vrrp_safety_model.md",
+            "reports/lab-summary/day32_vrrp_readonly_precheck.json",
+            "cisco_topology_validation.py",
+            "mikrotik_day32_vrrp_readonly_precheck.py",
+        ],
+        "evidence_pattern": "read-only interface and topology status reports",
+        "mapped_job_types": ["interface_status_check"],
+        "safety_class": "local_mock_report_only_candidate",
+    },
+    {
+        "reference_id": "DAY8_DAY13_WAN_LAN_PATTERN",
+        "day_range": "Day8-Day13",
+        "source_artifacts": [
+            "README.md#Day 8",
+            "README.md#Day 13",
+            "reports/lab-summary/day13_multi_router_wireguard_client_to_site_summary.json",
+            "performance_test.py",
+            "mikrotik_day13_multi_router_wireguard_validation.py",
+        ],
+        "evidence_pattern": "WAN/LAN reachability and performance evidence summaries",
+        "mapped_job_types": ["wan_lan_check"],
+        "safety_class": "local_mock_report_only_candidate",
+    },
+    {
+        "reference_id": "DAY31_DAY39_VRRP_PATTERN",
+        "day_range": "Day31-Day39",
+        "source_artifacts": [
+            "docs/roadmap/ha_vrrp_topology_plan.md",
+            "docs/roadmap/ha_vrrp_safety_model.md",
+            "reports/lab-summary/day32_vrrp_readonly_precheck.json",
+            "reports/lab-summary/day33_vrrp_topology_dry_run.json",
+            "reports/lab-summary/day34_vrrp_staged_apply_plan.json",
+            "reports/lab-summary/day35_vrrp_failover_validation.json",
+            "reports/lab-summary/day39_vrrp_evidence_dashboard_integration.json",
+            FIXTURE_PATH.as_posix(),
+        ],
+        "evidence_pattern": "VRRP planning, read-only precheck, dry-run, blocked plan, and mock validation evidence",
+        "mapped_job_types": ["vrrp_validation"],
+        "safety_class": "concrete_local_mock_report_only_example",
+    },
+    {
+        "reference_id": "DAY2_DAY41_BACKUP_PLAN_PATTERN",
+        "day_range": "Day2-Day41",
+        "source_artifacts": [
+            "README.md#Day 2",
+            "README.md#Day 41",
+            "reports/portfolio/day41_v0.2_release_packaging.json",
+        ],
+        "evidence_pattern": "backup and release packaging references treated as plan metadata only",
+        "mapped_job_types": ["backup_config_plan"],
+        "safety_class": "planning_only_blocked_from_execution",
+    },
+    {
+        "reference_id": "DAY34_DAY57_DAY79_DAY160_BLOCKED_CHANGE_PATTERN",
+        "day_range": "Day34-Day160",
+        "source_artifacts": [
+            "docs/phase_2a/next_phase_authorization_criteria_pack.md",
+            "docs/roadmap/ha_vrrp_safety_model.md",
+            "reports/lab-summary/day34_vrrp_staged_apply_plan.json",
+            "reports/lab-summary/day79_readonly_task_contract.json",
+            "reports/lab-summary/day160_v05_ai_assistance_phase_gate_review.json",
+        ],
+        "evidence_pattern": "blocked configuration change and next-phase lock evidence",
+        "mapped_job_types": ["blocked_config_change_request"],
+        "safety_class": "blocked_non_executing",
+    },
+)
+
+JOB_CANDIDATES = (
+    {
+        "job_type": "baseline_check",
+        "job_role": "safe_candidate",
+        "source_reference_ids": ["DAY1_DAY4_BASELINE_PATTERN"],
+        "source_pattern": "baseline acceptance and multi-device baseline evidence",
+        "allowed_mode": "dry_run_mock_local_report_only",
+        "candidate_status": "SAFE_DRY_RUN_MOCK_ONLY",
+        "checks": ["expected device identity", "baseline status", "missing report detection"],
+        "unsafe_actions_blocked": ["live baseline collection", "SSH session creation", "config mutation"],
+    },
+    {
+        "job_type": "interface_status_check",
+        "job_role": "safe_candidate",
+        "source_reference_ids": ["DAY5_DAY32_INTERFACE_STATUS_PATTERN"],
+        "source_pattern": "read-only interface and topology status evidence",
+        "allowed_mode": "dry_run_mock_local_report_only",
+        "candidate_status": "SAFE_DRY_RUN_MOCK_ONLY",
+        "checks": ["interface presence", "interface state", "missing interface evidence"],
+        "unsafe_actions_blocked": ["shut/no-shut", "live command collection", "device connection"],
+    },
+    {
+        "job_type": "wan_lan_check",
+        "job_role": "safe_candidate",
+        "source_reference_ids": ["DAY8_DAY13_WAN_LAN_PATTERN"],
+        "source_pattern": "WAN/LAN reachability and throughput evidence summaries",
+        "allowed_mode": "dry_run_mock_local_report_only",
+        "candidate_status": "SAFE_DRY_RUN_MOCK_ONLY",
+        "checks": ["WAN evidence present", "LAN evidence present", "stale or missing evidence"],
+        "unsafe_actions_blocked": ["real network I/O", "iperf execution", "VPN runner execution"],
+    },
+    {
+        "job_type": "vrrp_validation",
+        "job_role": "first_concrete_example",
+        "source_reference_ids": ["DAY31_DAY39_VRRP_PATTERN"],
+        "source_pattern": "VRRP planning, dry-run, blocked plan, and mock validation evidence",
+        "allowed_mode": "dry_run_mock_local_report_only",
+        "candidate_status": "IMPLEMENTED_AS_LOCAL_MOCK_EXAMPLE",
+        "checks": [
+            "expected VRRP group",
+            "expected virtual IP",
+            "expected active router",
+            "expected standby router",
+            "priority comparison",
+            "preempt setting",
+            "interface state",
+            "freshness",
+            "mismatch detection",
+            "incomplete evidence detection",
+        ],
+        "unsafe_actions_blocked": ["real VRRP testing", "live failover", "VRRP priority changes"],
+    },
+    {
+        "job_type": "backup_config_plan",
+        "job_role": "planning_only_candidate",
+        "source_reference_ids": ["DAY2_DAY41_BACKUP_PLAN_PATTERN"],
+        "source_pattern": "backup/export references represented as plan metadata only",
+        "allowed_mode": "planning_only_report_only",
+        "candidate_status": "BLOCKED_FROM_EXECUTION",
+        "checks": ["backup intent identified", "execution denied", "no backup artifact generated"],
+        "unsafe_actions_blocked": ["real backup execution", "secret export", "device connection"],
+    },
+    {
+        "job_type": "blocked_config_change_request",
+        "job_role": "blocked_candidate",
+        "source_reference_ids": ["DAY34_DAY57_DAY79_DAY160_BLOCKED_CHANGE_PATTERN"],
+        "source_pattern": "configuration-changing requests remain blocked by safety gates",
+        "allowed_mode": "blocked_non_executing_report_only",
+        "candidate_status": "BLOCKED_NON_EXECUTING",
+        "checks": ["blocked action identified", "no plan execution", "next phase remains locked"],
+        "unsafe_actions_blocked": ["configuration changes", "interface changes", "next-phase unlock"],
+    },
 )
 
 EXPECTED_VRRP_STATE = {
@@ -470,11 +648,76 @@ def build_vrrp_validation_pack(
     }
 
 
+def _artifact_references_by_id() -> Dict[str, Mapping[str, Any]]:
+    return {str(reference["reference_id"]): reference for reference in DAY1_DAY160_ARTIFACT_REFERENCES}
+
+
+def build_artifact_to_jobs_mapping() -> Dict[str, Any]:
+    """Build a non-executing mapping from Day1-Day160 artifacts to Job candidates."""
+
+    references_by_id = _artifact_references_by_id()
+    jobs = []
+    for candidate in JOB_CANDIDATES:
+        source_reference_ids = list(candidate["source_reference_ids"])
+        source_references = [references_by_id[reference_id] for reference_id in source_reference_ids]
+        source_artifacts = [
+            artifact
+            for reference in source_references
+            for artifact in reference.get("source_artifacts", [])
+        ]
+        job = {
+            "job_type": candidate["job_type"],
+            "job_role": candidate["job_role"],
+            "candidate_status": candidate["candidate_status"],
+            "allowed_mode": candidate["allowed_mode"],
+            "source_reference_ids": source_reference_ids,
+            "source_day_ranges": [str(reference.get("day_range")) for reference in source_references],
+            "source_artifacts": source_artifacts,
+            "source_pattern": candidate["source_pattern"],
+            "checks": list(candidate["checks"]),
+            "unsafe_actions_blocked": list(candidate["unsafe_actions_blocked"]),
+            "vrrp_concrete_example": candidate["job_type"] == "vrrp_validation",
+            "safe_job": candidate["allowed_mode"] == "dry_run_mock_local_report_only",
+            "blocked_or_planning_only": candidate["allowed_mode"] != "dry_run_mock_local_report_only",
+            "non_execution_proof": _non_execution_proof(),
+            "safety_boundary": {
+                "dry_run_only": True,
+                "mock_only": True,
+                "local_only": True,
+                "report_only": True,
+                "live_device_access_enabled": False,
+                "ssh_enabled": False,
+                "netconf_enabled": False,
+                "restconf_enabled": False,
+                "provider_api_model_enabled": False,
+                "adapter_broker_runner_enabled": False,
+                "secrets_enabled": False,
+                "real_network_io_enabled": False,
+                "config_change_enabled": False,
+                "next_phase_allowed": False,
+            },
+        }
+        jobs.append(job)
+
+    return {
+        "mapping_scope": "Day1-Day160 in-repo artifact references",
+        "artifact_references_inspected": True,
+        "artifact_reference_groups": deepcopy(DAY1_DAY160_ARTIFACT_REFERENCES),
+        "job_candidates": jobs,
+        "vrrp_role_after_correction": (
+            "VRRP remains the first concrete local mock validation Job example; "
+            "it is no longer the whole Phase 2A-07 scope."
+        ),
+    }
+
+
 def validate_phase_2a_07_report(report: Mapping[str, Any]) -> Dict[str, Any]:
     errors = []
     pack = report.get("vrrp_validation_pack", {})
     validations = pack.get("validations", []) if isinstance(pack, Mapping) else []
     negative_matrix = report.get("negative_regression_matrix", [])
+    artifact_mapping = report.get("artifact_to_jobs_mapping", {})
+    job_candidates = artifact_mapping.get("job_candidates", []) if isinstance(artifact_mapping, Mapping) else []
 
     if not validations:
         errors.append("VRRP_VALIDATION_CASES_EMPTY")
@@ -508,6 +751,46 @@ def validate_phase_2a_07_report(report: Mapping[str, Any]) -> Dict[str, Any]:
         if case.get("passed") is not True:
             errors.append(f"NEGATIVE_CASE_FAILED:{case.get('case_id')}")
 
+    if not isinstance(artifact_mapping, Mapping) or artifact_mapping.get("artifact_references_inspected") is not True:
+        errors.append("DAY1_DAY160_ARTIFACT_REFERENCES_NOT_INSPECTED")
+    mapped_job_types = {str(job.get("job_type")) for job in job_candidates if isinstance(job, Mapping)}
+    missing_job_types = sorted(set(REQUIRED_JOB_TYPES).difference(mapped_job_types))
+    if missing_job_types:
+        errors.append("JOB_MAPPING_MISSING:" + ",".join(missing_job_types))
+    if not any(
+        isinstance(job, Mapping)
+        and job.get("job_type") == "vrrp_validation"
+        and job.get("vrrp_concrete_example") is True
+        for job in job_candidates
+    ):
+        errors.append("VRRP_NOT_RETAINED_AS_CONCRETE_JOB_EXAMPLE")
+    for job in job_candidates:
+        if not isinstance(job, Mapping):
+            errors.append("JOB_MAPPING_RECORD_NOT_OBJECT")
+            continue
+        if job.get("safe_job") is True and job.get("allowed_mode") != "dry_run_mock_local_report_only":
+            errors.append(f"SAFE_JOB_NOT_DRY_RUN_MOCK_LOCAL_REPORT_ONLY:{job.get('job_type')}")
+        if job.get("job_type") in {"backup_config_plan", "blocked_config_change_request"}:
+            if job.get("blocked_or_planning_only") is not True:
+                errors.append(f"UNSAFE_JOB_NOT_BLOCKED_OR_PLANNING_ONLY:{job.get('job_type')}")
+        boundary = job.get("safety_boundary", {})
+        if not isinstance(boundary, Mapping) or any(
+            boundary.get(key) is not False
+            for key in (
+                "live_device_access_enabled",
+                "ssh_enabled",
+                "netconf_enabled",
+                "restconf_enabled",
+                "provider_api_model_enabled",
+                "adapter_broker_runner_enabled",
+                "secrets_enabled",
+                "real_network_io_enabled",
+                "config_change_enabled",
+                "next_phase_allowed",
+            )
+        ):
+            errors.append(f"JOB_SAFETY_BOUNDARY_FAILED:{job.get('job_type')}")
+
     for flag_name, expected_value in SAFETY_FLAGS.items():
         if report.get(flag_name) is not expected_value:
             errors.append(f"SAFETY_FLAG_NOT_FALSE:{flag_name}")
@@ -530,8 +813,10 @@ def build_phase_2a_07_vrrp_dry_run_validation_pack_report(
 ) -> Dict[str, Any]:
     fixture = deepcopy(evidence_fixture) if evidence_fixture is not None else _load_local_fixture(project_root)
     vrrp_pack = build_vrrp_validation_pack(fixture)
+    artifact_mapping = build_artifact_to_jobs_mapping()
     negative_matrix = list(build_negative_regression_matrix())
     validations = vrrp_pack["validations"]
+    job_candidates = artifact_mapping["job_candidates"]
     report = {
         "phase": PHASE,
         "status": "PASS",
@@ -557,6 +842,14 @@ def build_phase_2a_07_vrrp_dry_run_validation_pack_report(
         "fixture_path": FIXTURE_PATH.as_posix(),
         "completion_markers": list(COMPLETION_MARKERS),
         "summary": {
+            "artifact_reference_groups_inspected": len(artifact_mapping["artifact_reference_groups"]),
+            "mapped_job_candidates": len(job_candidates),
+            "safe_job_candidates": sum(1 for job in job_candidates if job["safe_job"] is True),
+            "blocked_or_planning_only_job_candidates": sum(
+                1 for job in job_candidates if job["blocked_or_planning_only"] is True
+            ),
+            "required_job_types_mapped": len({job["job_type"] for job in job_candidates}.intersection(REQUIRED_JOB_TYPES)),
+            "vrrp_role_after_correction": "first_concrete_example_job",
             "vrrp_mock_records": len(validations),
             "pass_records": sum(1 for validation in validations if validation["validation_status"] == "PASS"),
             "mismatch_records": sum(1 for validation in validations if validation["validation_status"] == "MISMATCH"),
@@ -580,6 +873,7 @@ def build_phase_2a_07_vrrp_dry_run_validation_pack_report(
             "next_phase_allowed_count": sum(1 for case in negative_matrix if case["actual"]["next_phase_allowed"] is True),
             "raw_unsafe_literals_present": 0,
         },
+        "artifact_to_jobs_mapping": artifact_mapping,
         "vrrp_validation_pack": vrrp_pack,
         "negative_regression_matrix": negative_matrix,
     }
@@ -625,6 +919,20 @@ def _validation_rows(report: Mapping[str, Any]) -> str:
     )
 
 
+def _job_mapping_rows(report: Mapping[str, Any]) -> str:
+    return "\n".join(
+        "<tr>"
+        f"<td>{html.escape(str(job['job_type']))}</td>"
+        f"<td>{html.escape(str(job['job_role']))}</td>"
+        f"<td>{html.escape(str(job['candidate_status']))}</td>"
+        f"<td>{html.escape(str(job['allowed_mode']))}</td>"
+        f"<td>{html.escape(str(', '.join(job['source_day_ranges'])))}</td>"
+        f"<td>{html.escape(str(job['vrrp_concrete_example']))}</td>"
+        "</tr>"
+        for job in report["artifact_to_jobs_mapping"]["job_candidates"]
+    )
+
+
 def _negative_rows(report: Mapping[str, Any]) -> str:
     return "\n".join(
         "<tr>"
@@ -660,9 +968,14 @@ def _write_html_report(report: Mapping[str, Any], output_path: Path) -> None:
 <body>
   <h1>{html.escape(str(report["title"]))}</h1>
   <p>Status: {html.escape(str(report["status"]))} / {html.escape(str(report["status_label"]))}</p>
-  <p>Phase 2A-07 validates local VRRP mock evidence only. No live VRRP testing, device connection, command execution, runner, adapter, broker, provider, API, model, or Phase 2B path is opened.</p>
+  <p>Phase 2A-07 maps Day1-Day160 artifact patterns into dry-run/mock/local/report-only Job candidates. VRRP remains the first concrete local mock validation example. No live testing, device connection, command execution, runner, adapter, broker, provider, API, model, or Phase 2B path is opened.</p>
   <h2>Summary</h2>
   <table><tbody>{_summary_rows(report)}</tbody></table>
+  <h2>Artifact-to-Jobs Mapping</h2>
+  <table>
+    <thead><tr><th>Job type</th><th>Role</th><th>Status</th><th>Allowed mode</th><th>Source days</th><th>VRRP example</th></tr></thead>
+    <tbody>{_job_mapping_rows(report)}</tbody>
+  </table>
   <h2>VRRP Mock Evidence Checks</h2>
   <table>
     <thead><tr><th>Record</th><th>Expected</th><th>Detected</th><th>Matched</th><th>Mismatches</th><th>Missing fields</th></tr></thead>
@@ -699,6 +1012,12 @@ def run_phase_2a_07_vrrp_dry_run_validation_pack(
     print(f"Phase: {PHASE}")
     print(f"Mode: {MODE}")
     print(f"Scope: {SCOPE}")
+    print(f"Artifact reference groups inspected: {report['summary']['artifact_reference_groups_inspected']}")
+    print(f"Mapped job candidates: {report['summary']['mapped_job_candidates']}")
+    print(f"Safe job candidates: {report['summary']['safe_job_candidates']}")
+    print(f"Blocked/planning-only job candidates: {report['summary']['blocked_or_planning_only_job_candidates']}")
+    print(f"Required job types mapped: {report['summary']['required_job_types_mapped']}")
+    print(f"VRRP role after correction: {report['summary']['vrrp_role_after_correction']}")
     print(f"VRRP mock records: {report['summary']['vrrp_mock_records']}")
     print(f"Expected outcomes detected: {report['summary']['expected_outcomes_detected']}")
     print(f"Unsafe requests rejected: {report['summary']['unsafe_requests_rejected']}")

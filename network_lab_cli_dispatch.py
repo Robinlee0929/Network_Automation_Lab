@@ -168,7 +168,7 @@ phase2a-03-dry-run-job-plan-gate writes the Phase 2A-03 request normalization an
 phase2a-04-plan-evidence-ledger writes the Phase 2A-04 report-only traceability ledger binding Phase 2A-03 dry-run plans and rejected unsafe requests to sanitized evidence records; it does not invoke runners, adapters, live execution, provider/API/model calls, Phase 2B, or real execution.
 phase2a-05-dry-run-result-envelope-renderer writes the Phase 2A-05 result envelope and renderer over the existing Phase 2A-04 report interface; result_envelope and render_outputs remain separate, and it does not rebuild planner or ledger behavior.
 phase2a-06-negative-regression-matrix writes the Phase 2A-06 negative regression matrix only; unsafe inputs remain rejected, redacted, and non-executing, and next-phase authorization remains false.
-phase2a-07-vrrp-dry-run-validation-pack writes the Phase 2A-07 VRRP dry-run/mock evidence validation pack only; it validates local fixtures, rejects live VRRP requests, and keeps live access, execution, and next-phase authorization false.
+phase2a-07-vrrp-dry-run-validation-pack writes the Phase 2A-07 Day1-Day160 artifact-to-Jobs dry-run validation pack; it maps local artifact patterns to Jobs, keeps VRRP as the first concrete mock example, rejects live VRRP requests, and keeps live access, execution, and next-phase authorization false.
 wireguard-runner is dry-run by default and delegates to the existing WireGuard script only after explicit --allow-live-wireguard."""
     parser = argparse.ArgumentParser(
         description=f"Day14 {lab.DAY14_NAME}.",

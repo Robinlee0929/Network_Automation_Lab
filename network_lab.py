@@ -3274,10 +3274,10 @@ REPORT_CATALOG = [
     },
     {
         "day": "Phase 2A",
-        "title": "Phase 2A-07 VRRP Dry-Run / Mock Evidence Validation Pack",
-        "report_type": "VRRP mock evidence validation pack",
-        "safety_label": "PHASE_2A_07_VRRP_DRY_RUN_VALIDATION_PACK_READY; VRRP_MOCK_EVIDENCE_ONLY; LOCAL_FIXTURE_VALIDATION_ONLY; MISMATCH_DETECTION_PRESENT; INCOMPLETE_EVIDENCE_DETECTION_PRESENT; UNSAFE_VRRP_REQUESTS_REJECTED; RUNNER_INVOKED_FALSE; ADAPTER_INVOKED_FALSE; BROKER_INVOKED_FALSE; LIVE_DEVICE_ACCESS_ENABLED_FALSE; NEXT_PHASE_ALLOWED_FALSE",
-        "description": "Phase 2A-07 validates local VRRP mock evidence for expected group, virtual IP, active/standby roles, priority, preempt, interface state, freshness, mismatch, and incomplete evidence detection. It rejects live-oriented VRRP requests without invoking runners, adapters, brokers, SSH, live device access, providers, APIs, models, commands, or Phase 2B.",
+        "title": "Phase 2A-07 Day1-Day160 Artifact-to-Jobs Dry-Run Validation Pack",
+        "report_type": "Artifact-to-Jobs dry-run validation pack",
+        "safety_label": "PHASE_2A_07_ARTIFACT_TO_JOBS_DRY_RUN_VALIDATION_PACK_READY; DAY1_DAY160_ARTIFACT_REFERENCES_INSPECTED; ARTIFACT_PATTERNS_MAPPED_TO_JOB_CANDIDATES; SAFE_JOBS_DRY_RUN_MOCK_LOCAL_REPORT_ONLY; UNSAFE_JOBS_BLOCKED_OR_PLANNING_ONLY; VRRP_VALIDATION_RETAINED_AS_FIRST_CONCRETE_EXAMPLE_JOB; RUNNER_INVOKED_FALSE; ADAPTER_INVOKED_FALSE; BROKER_INVOKED_FALSE; LIVE_DEVICE_ACCESS_ENABLED_FALSE; NEXT_PHASE_ALLOWED_FALSE",
+        "description": "Phase 2A-07 maps Day1-Day160 in-repo artifact patterns into dry-run/mock/local/report-only Job candidates including baseline_check, interface_status_check, wan_lan_check, vrrp_validation, backup_config_plan, and blocked_config_change_request. VRRP remains the first concrete local mock validation example; no execution, live access, provider/API/model path, or Phase 2B path is opened.",
         "json_globs": [PHASE_2A_07_VRRP_DRY_RUN_VALIDATION_PACK_JSON.as_posix()],
         "html_globs": [PHASE_2A_07_VRRP_DRY_RUN_VALIDATION_PACK_HTML.as_posix()],
         "missing_note": (
@@ -7392,11 +7392,11 @@ def list_tasks() -> List[Dict[str, Any]]:
         {
             "id": PHASE_2A_07_VRRP_DRY_RUN_VALIDATION_PACK_TASK_ID,
             "task_id": "phase_2a_07_vrrp_dry_run_validation_pack",
-            "display_name": "Phase 2A-07 VRRP Dry-Run / Mock Evidence Validation Pack",
-            "user_display_name": "Phase 2A-07 VRRP Dry-Run / Mock Evidence Validation Pack",
+            "display_name": "Phase 2A-07 Day1-Day160 Artifact-to-Jobs Dry-Run Validation Pack",
+            "user_display_name": "Phase 2A-07 Day1-Day160 Artifact-to-Jobs Dry-Run Validation Pack",
             "day": "Phase 2A",
             "category": "runner_framework",
-            "description": "Phase 2A-07 validates local VRRP mock evidence and rejects live-oriented VRRP requests without opening execution paths.",
+            "description": "Phase 2A-07 maps Day1-Day160 artifacts into dry-run/mock/local/report-only Job candidates and keeps VRRP as the first concrete local mock validation example.",
             "safety_level": "report-only",
             "execution_mode": "report-only",
             "enabled": True,
@@ -7410,12 +7410,12 @@ def list_tasks() -> List[Dict[str, Any]]:
                 PHASE_2A_07_VRRP_DRY_RUN_VALIDATION_PACK_FIXTURE.as_posix(),
             ],
             "report_outputs": [
-                "Phase 2A-07 JSON/HTML VRRP dry-run validation pack",
+                "Phase 2A-07 JSON/HTML Day1-Day160 artifact-to-Jobs dry-run validation pack",
                 "Phase 2A-07 local VRRP mock evidence fixture",
                 "Phase 2A-07 validation pack documentation",
             ],
             "related_script": "phase_2a_07_vrrp_dry_run_validation_pack.py",
-            "notes": "PHASE_2A_07_VRRP_DRY_RUN_VALIDATION_PACK_READY AGENTS_MD_FOUND_AND_READ AGENTS_MD_NOT_MODIFIED VRRP_MOCK_EVIDENCE_ONLY LOCAL_FIXTURE_VALIDATION_ONLY MISMATCH_DETECTION_PRESENT INCOMPLETE_EVIDENCE_DETECTION_PRESENT UNSAFE_VRRP_REQUESTS_REJECTED UNSAFE_INPUT_VALUES_REDACTED RUNNER_INVOKED_FALSE ADAPTER_INVOKED_FALSE BROKER_INVOKED_FALSE LIVE_DEVICE_ACCESS_ENABLED_FALSE SSH_ENABLED_FALSE NETCONF_ENABLED_FALSE RESTCONF_ENABLED_FALSE PROVIDER_API_MODEL_ENABLED_FALSE CONFIG_CHANGE_ENABLED_FALSE PHASE_2B_AUTHORIZED_FALSE NEXT_PHASE_ALLOWED_FALSE. Local fixture validation only; no real VRRP test, live device access, SSH, NETCONF, RESTCONF, provider/API/model calls, adapter execution, broker execution, runner execution, secrets, real network I/O, real commands, real backup execution, real failover testing, config changes, custom scripts, Phase 2B authorization, or next-phase unlock.",
+            "notes": "PHASE_2A_07_ARTIFACT_TO_JOBS_DRY_RUN_VALIDATION_PACK_READY AGENTS_MD_FOUND_AND_READ AGENTS_MD_NOT_MODIFIED DAY1_DAY160_ARTIFACT_REFERENCES_INSPECTED ARTIFACT_PATTERNS_MAPPED_TO_JOB_CANDIDATES SAFE_JOBS_DRY_RUN_MOCK_LOCAL_REPORT_ONLY UNSAFE_JOBS_BLOCKED_OR_PLANNING_ONLY VRRP_VALIDATION_RETAINED_AS_FIRST_CONCRETE_EXAMPLE_JOB VRRP_MOCK_EVIDENCE_ONLY LOCAL_FIXTURE_VALIDATION_ONLY MISMATCH_DETECTION_PRESENT INCOMPLETE_EVIDENCE_DETECTION_PRESENT UNSAFE_VRRP_REQUESTS_REJECTED UNSAFE_INPUT_VALUES_REDACTED RUNNER_INVOKED_FALSE ADAPTER_INVOKED_FALSE BROKER_INVOKED_FALSE LIVE_DEVICE_ACCESS_ENABLED_FALSE SSH_ENABLED_FALSE NETCONF_ENABLED_FALSE RESTCONF_ENABLED_FALSE PROVIDER_API_MODEL_ENABLED_FALSE CONFIG_CHANGE_ENABLED_FALSE PHASE_2B_AUTHORIZED_FALSE NEXT_PHASE_ALLOWED_FALSE. Day1-Day160 artifact-to-Jobs mapping and local fixture validation only; no real VRRP test, live device access, SSH, NETCONF, RESTCONF, provider/API/model calls, adapter execution, broker execution, runner execution, secrets, real network I/O, real commands, real backup execution, real failover testing, config changes, custom scripts, Phase 2B authorization, or next-phase unlock.",
         },
     ]
 
