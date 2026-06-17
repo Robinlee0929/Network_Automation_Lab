@@ -290,6 +290,9 @@ from phase_2a_04_plan_evidence_ledger import (
 from phase_2a_05_dry_run_result_envelope_renderer import (
     run_phase_2a_05_dry_run_result_envelope_renderer,
 )
+from phase_2a_06_negative_regression_matrix import (
+    run_phase_2a_06_negative_regression_matrix,
+)
 from project_folder_organization_decision_gate import (
     run_project_folder_organization_decision_gate,
 )
@@ -1514,6 +1517,16 @@ PHASE_2A_05_DRY_RUN_RESULT_ENVELOPE_RENDERER_HTML = (
 )
 PHASE_2A_05_DRY_RUN_RESULT_ENVELOPE_RENDERER_TXT = (
     Path("reports") / "lab-summary" / "phase_2a_05_dry_run_result_envelope_renderer.txt"
+)
+PHASE_2A_06_NEGATIVE_REGRESSION_MATRIX_TASK_ID = "phase2a-06-negative-regression-matrix"
+PHASE_2A_06_NEGATIVE_REGRESSION_MATRIX_DOC = (
+    Path("docs") / "phase_2a" / "phase_2a_06_negative_regression_matrix.md"
+)
+PHASE_2A_06_NEGATIVE_REGRESSION_MATRIX_JSON = (
+    Path("reports") / "lab-summary" / "phase_2a_06_negative_regression_matrix.json"
+)
+PHASE_2A_06_NEGATIVE_REGRESSION_MATRIX_HTML = (
+    Path("reports") / "lab-summary" / "phase_2a_06_negative_regression_matrix.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -3228,6 +3241,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{PHASE_2A_05_DRY_RUN_RESULT_ENVELOPE_RENDERER_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Phase 2A",
+        "title": "Phase 2A-06 Negative Regression Matrix",
+        "report_type": "Negative regression matrix",
+        "safety_label": "PHASE_2A_06_NEGATIVE_REGRESSION_MATRIX_READY; NEGATIVE_REGRESSION_MATRIX_ONLY; UNSAFE_INPUTS_REJECTED; UNSAFE_INPUT_VALUES_REDACTED; REJECTED_INPUTS_NON_EXECUTING; RUNNER_INVOKED_FALSE; ADAPTER_INVOKED_FALSE; LIVE_EXECUTION_OPENED_FALSE; PHASE_2B_AUTHORIZED_FALSE; NEXT_PHASE_ALLOWED_FALSE",
+        "description": "Phase 2A-06 replays fixed unsafe input shapes against the existing validator, plan gate, and evidence binding layers. It proves unsafe inputs remain rejected, redacted, and non-executing, and it does not authorize Phase 2B or the next Phase 2A step.",
+        "json_globs": [PHASE_2A_06_NEGATIVE_REGRESSION_MATRIX_JSON.as_posix()],
+        "html_globs": [PHASE_2A_06_NEGATIVE_REGRESSION_MATRIX_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{PHASE_2A_06_NEGATIVE_REGRESSION_MATRIX_TASK_ID}"
         ),
     },
 ]
@@ -7307,6 +7333,32 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "phase_2a_05_dry_run_result_envelope_renderer.py",
             "notes": "PHASE_2A_05_DRY_RUN_RESULT_ENVELOPE_RENDERER_READY AGENTS_MD_FOUND_AND_READ AGENTS_MD_NOT_MODIFIED PHASE_2A_04_IMPLEMENTATION_SEARCHED_AND_CONSUMED PHASE_2A_04_REPORT_INTERFACE_CONSUMED RESULT_ENVELOPE_RENDER_OUTPUTS_SEPARATED JSON_SELF_RECURSION_PREVENTED PLANNER_NOT_REBUILT LEDGER_NOT_REBUILT RENDERER_ONLY RUNNER_INVOKED_FALSE ADAPTER_INVOKED_FALSE LIVE_EXECUTION_OPENED_FALSE PHASE_2B_AUTHORIZED_FALSE REAL_EXECUTION_AUTHORIZED_FALSE NEXT_PHASE_ALLOWED_FALSE. Result envelope and renderer only; no planner rebuild, ledger rebuild, live execution, SSH, NETCONF, RESTCONF, provider/API/model calls, backup_config, config changes, arbitrary commands, scriptPath execution, adapters, brokers, runners, Phase 2B authorization, or real execution authorization.",
+        },
+        {
+            "id": PHASE_2A_06_NEGATIVE_REGRESSION_MATRIX_TASK_ID,
+            "task_id": "phase_2a_06_negative_regression_matrix",
+            "display_name": "Phase 2A-06 Negative Regression Matrix",
+            "user_display_name": "Phase 2A-06 Negative Regression Matrix",
+            "day": "Phase 2A",
+            "category": "runner_framework",
+            "description": "Phase 2A-06 replays fixed unsafe input shapes and records that existing Phase 2A layers still reject, redact, and avoid execution.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                PHASE_2A_06_NEGATIVE_REGRESSION_MATRIX_JSON.as_posix(),
+                PHASE_2A_06_NEGATIVE_REGRESSION_MATRIX_HTML.as_posix(),
+                PHASE_2A_06_NEGATIVE_REGRESSION_MATRIX_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Phase 2A-06 JSON/HTML negative regression matrix",
+                "Phase 2A-06 negative regression matrix documentation",
+            ],
+            "related_script": "phase_2a_06_negative_regression_matrix.py",
+            "notes": "PHASE_2A_06_NEGATIVE_REGRESSION_MATRIX_READY AGENTS_MD_FOUND_AND_READ AGENTS_MD_NOT_MODIFIED NEGATIVE_REGRESSION_MATRIX_ONLY UNSAFE_INPUTS_REJECTED UNSAFE_INPUT_VALUES_REDACTED REJECTED_INPUTS_NON_EXECUTING PHASE_2A_02_VALIDATOR_REUSED PHASE_2A_03_PLAN_GATE_REUSED PHASE_2A_04_EVIDENCE_BINDING_REUSED RUNNER_INVOKED_FALSE ADAPTER_INVOKED_FALSE LIVE_EXECUTION_OPENED_FALSE PHASE_2B_AUTHORIZED_FALSE PHASE_2A_07_AUTHORIZED_FALSE NEXT_PHASE_ALLOWED_FALSE. Negative regression matrix only; no live execution, SSH, NETCONF, RESTCONF, provider/API/model calls, backup_config execution, config changes, arbitrary commands, scriptPath execution, adapters, brokers, runners, Phase 2B authorization, Phase 2A-07 authorization, or real execution authorization.",
         },
     ]
 
@@ -12151,6 +12203,15 @@ def _run_phase_2a_04_plan_evidence_ledger(project_root: Path) -> int:
 
 def _run_phase_2a_05_dry_run_result_envelope_renderer(project_root: Path) -> int:
     return run_phase_2a_05_dry_run_result_envelope_renderer(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_phase_2a_06_negative_regression_matrix(project_root: Path) -> int:
+    return run_phase_2a_06_negative_regression_matrix(
         project_root,
         format_heading_func=format_heading,
         format_status_func=format_status,

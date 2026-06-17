@@ -113,6 +113,7 @@ CANONICAL_TASK_NAMES: Tuple[str, ...] = (
     "phase2a-03-dry-run-job-plan-gate",
     "phase2a-04-plan-evidence-ledger",
     "phase2a-05-dry-run-result-envelope-renderer",
+    "phase2a-06-negative-regression-matrix",
     "wireguard-runner",
 )
 
