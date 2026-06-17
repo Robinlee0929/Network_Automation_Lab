@@ -293,6 +293,9 @@ from phase_2a_05_dry_run_result_envelope_renderer import (
 from phase_2a_06_negative_regression_matrix import (
     run_phase_2a_06_negative_regression_matrix,
 )
+from phase_2a_07_vrrp_dry_run_validation_pack import (
+    run_phase_2a_07_vrrp_dry_run_validation_pack,
+)
 from project_folder_organization_decision_gate import (
     run_project_folder_organization_decision_gate,
 )
@@ -1527,6 +1530,19 @@ PHASE_2A_06_NEGATIVE_REGRESSION_MATRIX_JSON = (
 )
 PHASE_2A_06_NEGATIVE_REGRESSION_MATRIX_HTML = (
     Path("reports") / "lab-summary" / "phase_2a_06_negative_regression_matrix.html"
+)
+PHASE_2A_07_VRRP_DRY_RUN_VALIDATION_PACK_TASK_ID = "phase2a-07-vrrp-dry-run-validation-pack"
+PHASE_2A_07_VRRP_DRY_RUN_VALIDATION_PACK_DOC = (
+    Path("docs") / "phase_2a" / "phase_2a_07_vrrp_dry_run_validation_pack.md"
+)
+PHASE_2A_07_VRRP_DRY_RUN_VALIDATION_PACK_FIXTURE = (
+    Path("fixtures") / "phase_2a" / "phase_2a_07_vrrp_mock_evidence.json"
+)
+PHASE_2A_07_VRRP_DRY_RUN_VALIDATION_PACK_JSON = (
+    Path("reports") / "lab-summary" / "phase_2a_07_vrrp_dry_run_validation_pack.json"
+)
+PHASE_2A_07_VRRP_DRY_RUN_VALIDATION_PACK_HTML = (
+    Path("reports") / "lab-summary" / "phase_2a_07_vrrp_dry_run_validation_pack.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -3254,6 +3270,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{PHASE_2A_06_NEGATIVE_REGRESSION_MATRIX_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Phase 2A",
+        "title": "Phase 2A-07 VRRP Dry-Run / Mock Evidence Validation Pack",
+        "report_type": "VRRP mock evidence validation pack",
+        "safety_label": "PHASE_2A_07_VRRP_DRY_RUN_VALIDATION_PACK_READY; VRRP_MOCK_EVIDENCE_ONLY; LOCAL_FIXTURE_VALIDATION_ONLY; MISMATCH_DETECTION_PRESENT; INCOMPLETE_EVIDENCE_DETECTION_PRESENT; UNSAFE_VRRP_REQUESTS_REJECTED; RUNNER_INVOKED_FALSE; ADAPTER_INVOKED_FALSE; BROKER_INVOKED_FALSE; LIVE_DEVICE_ACCESS_ENABLED_FALSE; NEXT_PHASE_ALLOWED_FALSE",
+        "description": "Phase 2A-07 validates local VRRP mock evidence for expected group, virtual IP, active/standby roles, priority, preempt, interface state, freshness, mismatch, and incomplete evidence detection. It rejects live-oriented VRRP requests without invoking runners, adapters, brokers, SSH, live device access, providers, APIs, models, commands, or Phase 2B.",
+        "json_globs": [PHASE_2A_07_VRRP_DRY_RUN_VALIDATION_PACK_JSON.as_posix()],
+        "html_globs": [PHASE_2A_07_VRRP_DRY_RUN_VALIDATION_PACK_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{PHASE_2A_07_VRRP_DRY_RUN_VALIDATION_PACK_TASK_ID}"
         ),
     },
 ]
@@ -7359,6 +7388,34 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "phase_2a_06_negative_regression_matrix.py",
             "notes": "PHASE_2A_06_NEGATIVE_REGRESSION_MATRIX_READY AGENTS_MD_FOUND_AND_READ AGENTS_MD_NOT_MODIFIED NEGATIVE_REGRESSION_MATRIX_ONLY UNSAFE_INPUTS_REJECTED UNSAFE_INPUT_VALUES_REDACTED REJECTED_INPUTS_NON_EXECUTING PHASE_2A_02_VALIDATOR_REUSED PHASE_2A_03_PLAN_GATE_REUSED PHASE_2A_04_EVIDENCE_BINDING_REUSED RUNNER_INVOKED_FALSE ADAPTER_INVOKED_FALSE LIVE_EXECUTION_OPENED_FALSE PHASE_2B_AUTHORIZED_FALSE PHASE_2A_07_AUTHORIZED_FALSE NEXT_PHASE_ALLOWED_FALSE. Negative regression matrix only; no live execution, SSH, NETCONF, RESTCONF, provider/API/model calls, backup_config execution, config changes, arbitrary commands, scriptPath execution, adapters, brokers, runners, Phase 2B authorization, Phase 2A-07 authorization, or real execution authorization.",
+        },
+        {
+            "id": PHASE_2A_07_VRRP_DRY_RUN_VALIDATION_PACK_TASK_ID,
+            "task_id": "phase_2a_07_vrrp_dry_run_validation_pack",
+            "display_name": "Phase 2A-07 VRRP Dry-Run / Mock Evidence Validation Pack",
+            "user_display_name": "Phase 2A-07 VRRP Dry-Run / Mock Evidence Validation Pack",
+            "day": "Phase 2A",
+            "category": "runner_framework",
+            "description": "Phase 2A-07 validates local VRRP mock evidence and rejects live-oriented VRRP requests without opening execution paths.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                PHASE_2A_07_VRRP_DRY_RUN_VALIDATION_PACK_JSON.as_posix(),
+                PHASE_2A_07_VRRP_DRY_RUN_VALIDATION_PACK_HTML.as_posix(),
+                PHASE_2A_07_VRRP_DRY_RUN_VALIDATION_PACK_DOC.as_posix(),
+                PHASE_2A_07_VRRP_DRY_RUN_VALIDATION_PACK_FIXTURE.as_posix(),
+            ],
+            "report_outputs": [
+                "Phase 2A-07 JSON/HTML VRRP dry-run validation pack",
+                "Phase 2A-07 local VRRP mock evidence fixture",
+                "Phase 2A-07 validation pack documentation",
+            ],
+            "related_script": "phase_2a_07_vrrp_dry_run_validation_pack.py",
+            "notes": "PHASE_2A_07_VRRP_DRY_RUN_VALIDATION_PACK_READY AGENTS_MD_FOUND_AND_READ AGENTS_MD_NOT_MODIFIED VRRP_MOCK_EVIDENCE_ONLY LOCAL_FIXTURE_VALIDATION_ONLY MISMATCH_DETECTION_PRESENT INCOMPLETE_EVIDENCE_DETECTION_PRESENT UNSAFE_VRRP_REQUESTS_REJECTED UNSAFE_INPUT_VALUES_REDACTED RUNNER_INVOKED_FALSE ADAPTER_INVOKED_FALSE BROKER_INVOKED_FALSE LIVE_DEVICE_ACCESS_ENABLED_FALSE SSH_ENABLED_FALSE NETCONF_ENABLED_FALSE RESTCONF_ENABLED_FALSE PROVIDER_API_MODEL_ENABLED_FALSE CONFIG_CHANGE_ENABLED_FALSE PHASE_2B_AUTHORIZED_FALSE NEXT_PHASE_ALLOWED_FALSE. Local fixture validation only; no real VRRP test, live device access, SSH, NETCONF, RESTCONF, provider/API/model calls, adapter execution, broker execution, runner execution, secrets, real network I/O, real commands, real backup execution, real failover testing, config changes, custom scripts, Phase 2B authorization, or next-phase unlock.",
         },
     ]
 
@@ -12212,6 +12269,15 @@ def _run_phase_2a_05_dry_run_result_envelope_renderer(project_root: Path) -> int
 
 def _run_phase_2a_06_negative_regression_matrix(project_root: Path) -> int:
     return run_phase_2a_06_negative_regression_matrix(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_phase_2a_07_vrrp_dry_run_validation_pack(project_root: Path) -> int:
+    return run_phase_2a_07_vrrp_dry_run_validation_pack(
         project_root,
         format_heading_func=format_heading,
         format_status_func=format_status,
