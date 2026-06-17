@@ -299,6 +299,9 @@ from phase_2a_07_vrrp_dry_run_validation_pack import (
 from phase_2a_08_jobs_catalog_ui_readiness_planning_pack import (
     run_phase_2a_08_jobs_catalog_ui_readiness_planning_pack,
 )
+from phase_2a_09_jobs_ui_display_contract_mock_screen_readiness_pack import (
+    run_phase_2a_09_jobs_ui_display_contract_mock_screen_readiness_pack,
+)
 from project_folder_organization_decision_gate import (
     run_project_folder_organization_decision_gate,
 )
@@ -1558,6 +1561,18 @@ PHASE_2A_08_JOBS_CATALOG_UI_READINESS_PLANNING_PACK_JSON = (
 )
 PHASE_2A_08_JOBS_CATALOG_UI_READINESS_PLANNING_PACK_HTML = (
     Path("reports") / "lab-summary" / "phase_2a_08_jobs_catalog_ui_readiness_planning_pack.html"
+)
+PHASE_2A_09_JOBS_UI_DISPLAY_CONTRACT_MOCK_SCREEN_READINESS_PACK_TASK_ID = (
+    "phase2a-09-jobs-ui-display-contract-mock-screen-readiness-pack"
+)
+PHASE_2A_09_JOBS_UI_DISPLAY_CONTRACT_MOCK_SCREEN_READINESS_PACK_DOC = (
+    Path("docs") / "phase_2a" / "phase_2a_09_jobs_ui_display_contract_mock_screen_readiness_pack.md"
+)
+PHASE_2A_09_JOBS_UI_DISPLAY_CONTRACT_MOCK_SCREEN_READINESS_PACK_JSON = (
+    Path("reports") / "lab-summary" / "phase_2a_09_jobs_ui_display_contract_mock_screen_readiness_pack.json"
+)
+PHASE_2A_09_JOBS_UI_DISPLAY_CONTRACT_MOCK_SCREEN_READINESS_PACK_HTML = (
+    Path("reports") / "lab-summary" / "phase_2a_09_jobs_ui_display_contract_mock_screen_readiness_pack.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -3311,6 +3326,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{PHASE_2A_08_JOBS_CATALOG_UI_READINESS_PLANNING_PACK_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Phase 2A",
+        "title": "Phase 2A-09 Jobs UI Display Contract / Mock Screen Readiness Pack",
+        "report_type": "Jobs UI display contract and mock screen readiness pack",
+        "safety_label": "PHASE_2A_09_JOBS_UI_DISPLAY_CONTRACT_MOCK_SCREEN_READINESS_PACK_READY; MULTI_JOB_SCOPE_CONFIRMED; PHASE_2A_08_JOBS_CATALOG_REFERENCED; JOB_LIST_VIEW_CONTRACT_DEFINED; JOB_DETAIL_VIEW_CONTRACT_DEFINED; BADGE_RULES_DEFINED; EMPTY_STATE_CONTRACT_DEFINED; ERROR_STATE_CONTRACT_DEFINED; SAFETY_DISPLAY_CONTRACT_DEFINED; RUNNER_INTRODUCED_FALSE; ADAPTER_INTRODUCED_FALSE; SSH_INTRODUCED_FALSE; NETCONF_INTRODUCED_FALSE; RESTCONF_INTRODUCED_FALSE; LIVE_DEVICE_INTRODUCED_FALSE; REAL_BACKUP_INTRODUCED_FALSE; REAL_VRRP_EXECUTION_INTRODUCED_FALSE; REAL_FRONTEND_API_INTEGRATION_INTRODUCED_FALSE; PHASE_2B_INTRODUCED_FALSE",
+        "description": "Phase 2A-09 defines future /network/jobs list/detail display contracts, badge rules, empty/error states, safety display rules, and mock screen data over the full Phase 2A-08 Jobs Catalog. It remains planning-only/mock-only/local-only and opens no runner, adapter, broker, SSH, NETCONF, RESTCONF, live device, backup, VRRP execution, real frontend API integration, provider/API/model, or Phase 2B path.",
+        "json_globs": [PHASE_2A_09_JOBS_UI_DISPLAY_CONTRACT_MOCK_SCREEN_READINESS_PACK_JSON.as_posix()],
+        "html_globs": [PHASE_2A_09_JOBS_UI_DISPLAY_CONTRACT_MOCK_SCREEN_READINESS_PACK_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{PHASE_2A_09_JOBS_UI_DISPLAY_CONTRACT_MOCK_SCREEN_READINESS_PACK_TASK_ID}"
         ),
     },
 ]
@@ -7470,6 +7498,32 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "phase_2a_08_jobs_catalog_ui_readiness_planning_pack.py",
             "notes": "PHASE_2A_08_JOBS_CATALOG_UI_READINESS_PLANNING_PACK_READY AGENTS_MD_FOUND_AND_READ AGENTS_MD_NOT_MODIFIED MULTI_JOB_SCOPE_CONFIRMED PHASE_2A_07_ARTIFACT_MAPPING_REFERENCED JOBS_CATALOG_JSON_UI_READY JOB_CARD_FIELDS_RENDERED BACKUP_CONFIG_PLAN_PLANNING_ONLY BLOCKED_CONFIG_CHANGE_REQUEST_BLOCKED RUNNER_ENABLED_FALSE ADAPTER_ENABLED_FALSE BROKER_ENABLED_FALSE SSH_ENABLED_FALSE NETCONF_ENABLED_FALSE RESTCONF_ENABLED_FALSE LIVE_DEVICE_ACCESS_ENABLED_FALSE PROVIDER_API_MODEL_ENABLED_FALSE SECRETS_ENABLED_FALSE REAL_BACKUP_ENABLED_FALSE REAL_VRRP_TEST_ENABLED_FALSE PHASE_2B_AUTHORIZED_FALSE NEXT_PHASE_ALLOWED_FALSE. Planning-only UI readiness pack across baseline_check, interface_status_check, wan_lan_check, vrrp_validation, backup_config_plan, and blocked_config_change_request; no Phase 2B, runner, adapter, broker, SSH, NETCONF, RESTCONF, live device, provider/API/model, secrets, real backup, real VRRP test, config change, command execution, or executable blocked job.",
+        },
+        {
+            "id": PHASE_2A_09_JOBS_UI_DISPLAY_CONTRACT_MOCK_SCREEN_READINESS_PACK_TASK_ID,
+            "task_id": "phase_2a_09_jobs_ui_display_contract_mock_screen_readiness_pack",
+            "display_name": "Phase 2A-09 Jobs UI Display Contract / Mock Screen Readiness Pack",
+            "user_display_name": "Phase 2A-09 Jobs UI Display Contract / Mock Screen Readiness Pack",
+            "day": "Phase 2A",
+            "category": "runner_framework",
+            "description": "Phase 2A-09 defines future /network/jobs display contracts, mock list/detail screens, badge rules, empty states, error states, and safety display rules over the full Phase 2A-08 Jobs Catalog without enabling execution.",
+            "safety_level": "report-only",
+            "execution_mode": "planning-only",
+            "enabled": True,
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                PHASE_2A_09_JOBS_UI_DISPLAY_CONTRACT_MOCK_SCREEN_READINESS_PACK_JSON.as_posix(),
+                PHASE_2A_09_JOBS_UI_DISPLAY_CONTRACT_MOCK_SCREEN_READINESS_PACK_HTML.as_posix(),
+                PHASE_2A_09_JOBS_UI_DISPLAY_CONTRACT_MOCK_SCREEN_READINESS_PACK_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Phase 2A-09 JSON/HTML Jobs UI display contract mock screen readiness pack",
+                "Phase 2A-09 Jobs UI display contract documentation",
+            ],
+            "related_script": "phase_2a_09_jobs_ui_display_contract_mock_screen_readiness_pack.py",
+            "notes": "PHASE_2A_09_JOBS_UI_DISPLAY_CONTRACT_MOCK_SCREEN_READINESS_PACK_READY AGENTS_MD_FOUND_AND_READ AGENTS_MD_NOT_MODIFIED MULTI_JOB_SCOPE_CONFIRMED PHASE_2A_08_JOBS_CATALOG_REFERENCED JOB_LIST_VIEW_CONTRACT_DEFINED JOB_DETAIL_VIEW_CONTRACT_DEFINED BADGE_RULES_DEFINED EMPTY_STATE_CONTRACT_DEFINED ERROR_STATE_CONTRACT_DEFINED MOCK_SCREEN_FIXTURES_DEFINED SAFETY_DISPLAY_CONTRACT_DEFINED RUNNER_INTRODUCED_FALSE ADAPTER_INTRODUCED_FALSE SSH_INTRODUCED_FALSE NETCONF_INTRODUCED_FALSE RESTCONF_INTRODUCED_FALSE LIVE_DEVICE_INTRODUCED_FALSE REAL_BACKUP_INTRODUCED_FALSE REAL_VRRP_EXECUTION_INTRODUCED_FALSE REAL_FRONTEND_API_INTEGRATION_INTRODUCED_FALSE PHASE_2B_INTRODUCED_FALSE NEXT_PHASE_ALLOWED_FALSE. Planning-only UI display contract and mock screen data for the full Phase 2A-08 Jobs Catalog; no Phase 2B, runner, adapter, broker, scheduler, queue worker, SSH, NETCONF, RESTCONF, live device, provider/API/model, secrets, real backup, real VRRP execution, config change, command execution, or real frontend API integration.",
         },
     ]
 
@@ -12341,6 +12395,15 @@ def _run_phase_2a_07_vrrp_dry_run_validation_pack(project_root: Path) -> int:
 
 def _run_phase_2a_08_jobs_catalog_ui_readiness_planning_pack(project_root: Path) -> int:
     return run_phase_2a_08_jobs_catalog_ui_readiness_planning_pack(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_phase_2a_09_jobs_ui_display_contract_mock_screen_readiness_pack(project_root: Path) -> int:
+    return run_phase_2a_09_jobs_ui_display_contract_mock_screen_readiness_pack(
         project_root,
         format_heading_func=format_heading,
         format_status_func=format_status,
