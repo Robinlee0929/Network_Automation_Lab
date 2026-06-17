@@ -296,6 +296,9 @@ from phase_2a_06_negative_regression_matrix import (
 from phase_2a_07_vrrp_dry_run_validation_pack import (
     run_phase_2a_07_vrrp_dry_run_validation_pack,
 )
+from phase_2a_08_jobs_catalog_ui_readiness_planning_pack import (
+    run_phase_2a_08_jobs_catalog_ui_readiness_planning_pack,
+)
 from project_folder_organization_decision_gate import (
     run_project_folder_organization_decision_gate,
 )
@@ -1543,6 +1546,18 @@ PHASE_2A_07_VRRP_DRY_RUN_VALIDATION_PACK_JSON = (
 )
 PHASE_2A_07_VRRP_DRY_RUN_VALIDATION_PACK_HTML = (
     Path("reports") / "lab-summary" / "phase_2a_07_vrrp_dry_run_validation_pack.html"
+)
+PHASE_2A_08_JOBS_CATALOG_UI_READINESS_PLANNING_PACK_TASK_ID = (
+    "phase2a-08-jobs-catalog-ui-readiness-planning-pack"
+)
+PHASE_2A_08_JOBS_CATALOG_UI_READINESS_PLANNING_PACK_DOC = (
+    Path("docs") / "phase_2a" / "phase_2a_08_jobs_catalog_ui_readiness_planning_pack.md"
+)
+PHASE_2A_08_JOBS_CATALOG_UI_READINESS_PLANNING_PACK_JSON = (
+    Path("reports") / "lab-summary" / "phase_2a_08_jobs_catalog_ui_readiness_planning_pack.json"
+)
+PHASE_2A_08_JOBS_CATALOG_UI_READINESS_PLANNING_PACK_HTML = (
+    Path("reports") / "lab-summary" / "phase_2a_08_jobs_catalog_ui_readiness_planning_pack.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -3283,6 +3298,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{PHASE_2A_07_VRRP_DRY_RUN_VALIDATION_PACK_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Phase 2A",
+        "title": "Phase 2A-08 Jobs Catalog / UI Readiness Planning Pack",
+        "report_type": "Jobs catalog UI readiness planning pack",
+        "safety_label": "PHASE_2A_08_JOBS_CATALOG_UI_READINESS_PLANNING_PACK_READY; MULTI_JOB_SCOPE_CONFIRMED; JOBS_CATALOG_JSON_UI_READY; JOB_CARD_FIELDS_RENDERED; RUNNER_ENABLED_FALSE; ADAPTER_ENABLED_FALSE; BROKER_ENABLED_FALSE; SSH_ENABLED_FALSE; NETCONF_ENABLED_FALSE; RESTCONF_ENABLED_FALSE; LIVE_DEVICE_ACCESS_ENABLED_FALSE; PROVIDER_API_MODEL_ENABLED_FALSE; SECRETS_ENABLED_FALSE; REAL_BACKUP_ENABLED_FALSE; REAL_VRRP_TEST_ENABLED_FALSE; NEXT_PHASE_ALLOWED_FALSE",
+        "description": "Phase 2A-08 renders deterministic Jobs catalog/card data for future /network/jobs UI consumption across baseline_check, interface_status_check, wan_lan_check, vrrp_validation, backup_config_plan, and blocked_config_change_request. It remains planning-only/report-only and opens no runner, adapter, broker, provider/API/model, live device, backup, VRRP test, or Phase 2B path.",
+        "json_globs": [PHASE_2A_08_JOBS_CATALOG_UI_READINESS_PLANNING_PACK_JSON.as_posix()],
+        "html_globs": [PHASE_2A_08_JOBS_CATALOG_UI_READINESS_PLANNING_PACK_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{PHASE_2A_08_JOBS_CATALOG_UI_READINESS_PLANNING_PACK_TASK_ID}"
         ),
     },
 ]
@@ -7416,6 +7444,32 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "phase_2a_07_vrrp_dry_run_validation_pack.py",
             "notes": "PHASE_2A_07_ARTIFACT_TO_JOBS_DRY_RUN_VALIDATION_PACK_READY AGENTS_MD_FOUND_AND_READ AGENTS_MD_NOT_MODIFIED DAY1_DAY160_ARTIFACT_REFERENCES_INSPECTED ARTIFACT_PATTERNS_MAPPED_TO_JOB_CANDIDATES SAFE_JOBS_DRY_RUN_MOCK_LOCAL_REPORT_ONLY UNSAFE_JOBS_BLOCKED_OR_PLANNING_ONLY VRRP_VALIDATION_RETAINED_AS_FIRST_CONCRETE_EXAMPLE_JOB VRRP_MOCK_EVIDENCE_ONLY LOCAL_FIXTURE_VALIDATION_ONLY MISMATCH_DETECTION_PRESENT INCOMPLETE_EVIDENCE_DETECTION_PRESENT UNSAFE_VRRP_REQUESTS_REJECTED UNSAFE_INPUT_VALUES_REDACTED RUNNER_INVOKED_FALSE ADAPTER_INVOKED_FALSE BROKER_INVOKED_FALSE LIVE_DEVICE_ACCESS_ENABLED_FALSE SSH_ENABLED_FALSE NETCONF_ENABLED_FALSE RESTCONF_ENABLED_FALSE PROVIDER_API_MODEL_ENABLED_FALSE CONFIG_CHANGE_ENABLED_FALSE PHASE_2B_AUTHORIZED_FALSE NEXT_PHASE_ALLOWED_FALSE. Day1-Day160 artifact-to-Jobs mapping and local fixture validation only; no real VRRP test, live device access, SSH, NETCONF, RESTCONF, provider/API/model calls, adapter execution, broker execution, runner execution, secrets, real network I/O, real commands, real backup execution, real failover testing, config changes, custom scripts, Phase 2B authorization, or next-phase unlock.",
+        },
+        {
+            "id": PHASE_2A_08_JOBS_CATALOG_UI_READINESS_PLANNING_PACK_TASK_ID,
+            "task_id": "phase_2a_08_jobs_catalog_ui_readiness_planning_pack",
+            "display_name": "Phase 2A-08 Jobs Catalog / UI Readiness Planning Pack",
+            "user_display_name": "Phase 2A-08 Jobs Catalog / UI Readiness Planning Pack",
+            "day": "Phase 2A",
+            "category": "runner_framework",
+            "description": "Phase 2A-08 renders deterministic multi-job catalog/card data for future /network/jobs UI consumption without enabling execution.",
+            "safety_level": "report-only",
+            "execution_mode": "planning-only",
+            "enabled": True,
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                PHASE_2A_08_JOBS_CATALOG_UI_READINESS_PLANNING_PACK_JSON.as_posix(),
+                PHASE_2A_08_JOBS_CATALOG_UI_READINESS_PLANNING_PACK_HTML.as_posix(),
+                PHASE_2A_08_JOBS_CATALOG_UI_READINESS_PLANNING_PACK_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Phase 2A-08 JSON/HTML Jobs catalog UI readiness planning pack",
+                "Phase 2A-08 Jobs catalog UI readiness documentation",
+            ],
+            "related_script": "phase_2a_08_jobs_catalog_ui_readiness_planning_pack.py",
+            "notes": "PHASE_2A_08_JOBS_CATALOG_UI_READINESS_PLANNING_PACK_READY AGENTS_MD_FOUND_AND_READ AGENTS_MD_NOT_MODIFIED MULTI_JOB_SCOPE_CONFIRMED PHASE_2A_07_ARTIFACT_MAPPING_REFERENCED JOBS_CATALOG_JSON_UI_READY JOB_CARD_FIELDS_RENDERED BACKUP_CONFIG_PLAN_PLANNING_ONLY BLOCKED_CONFIG_CHANGE_REQUEST_BLOCKED RUNNER_ENABLED_FALSE ADAPTER_ENABLED_FALSE BROKER_ENABLED_FALSE SSH_ENABLED_FALSE NETCONF_ENABLED_FALSE RESTCONF_ENABLED_FALSE LIVE_DEVICE_ACCESS_ENABLED_FALSE PROVIDER_API_MODEL_ENABLED_FALSE SECRETS_ENABLED_FALSE REAL_BACKUP_ENABLED_FALSE REAL_VRRP_TEST_ENABLED_FALSE PHASE_2B_AUTHORIZED_FALSE NEXT_PHASE_ALLOWED_FALSE. Planning-only UI readiness pack across baseline_check, interface_status_check, wan_lan_check, vrrp_validation, backup_config_plan, and blocked_config_change_request; no Phase 2B, runner, adapter, broker, SSH, NETCONF, RESTCONF, live device, provider/API/model, secrets, real backup, real VRRP test, config change, command execution, or executable blocked job.",
         },
     ]
 
@@ -12278,6 +12332,15 @@ def _run_phase_2a_06_negative_regression_matrix(project_root: Path) -> int:
 
 def _run_phase_2a_07_vrrp_dry_run_validation_pack(project_root: Path) -> int:
     return run_phase_2a_07_vrrp_dry_run_validation_pack(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_phase_2a_08_jobs_catalog_ui_readiness_planning_pack(project_root: Path) -> int:
+    return run_phase_2a_08_jobs_catalog_ui_readiness_planning_pack(
         project_root,
         format_heading_func=format_heading,
         format_status_func=format_status,
