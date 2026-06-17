@@ -1,0 +1,124 @@
+{
+  "fixture_id": "PHASE_2A_07_LOCAL_VRRP_MOCK_FIXTURE",
+  "records": [
+    {
+      "active_router": "edge-a",
+      "description": "Expected VRRP mock state",
+      "evidence_age_minutes": 4,
+      "expected_outcome": "PASS",
+      "group": 10,
+      "observed_at": "2026-06-17T00:00:00Z",
+      "record_id": "VRRP-MOCK-VALID",
+      "routers": [
+        {
+          "interface_state": "up",
+          "name": "edge-a",
+          "preempt": true,
+          "priority": 120
+        },
+        {
+          "interface_state": "up",
+          "name": "edge-b",
+          "preempt": true,
+          "priority": 100
+        }
+      ],
+      "standby_router": "edge-b",
+      "virtual_ip": "192.0.2.254"
+    },
+    {
+      "active_router": "edge-a",
+      "description": "Virtual IP mismatch is detected",
+      "evidence_age_minutes": 3,
+      "expected_outcome": "MISMATCH",
+      "group": 10,
+      "observed_at": "2026-06-17T00:00:00Z",
+      "record_id": "VRRP-MOCK-VIP-MISMATCH",
+      "routers": [
+        {
+          "interface_state": "up",
+          "name": "edge-a",
+          "preempt": true,
+          "priority": 120
+        },
+        {
+          "interface_state": "up",
+          "name": "edge-b",
+          "preempt": true,
+          "priority": 100
+        }
+      ],
+      "standby_router": "edge-b",
+      "virtual_ip": "192.0.2.99"
+    },
+    {
+      "active_router": "edge-a",
+      "description": "Incomplete standby evidence is detected",
+      "evidence_age_minutes": 5,
+      "expected_outcome": "INCOMPLETE",
+      "group": 10,
+      "observed_at": "2026-06-17T00:00:00Z",
+      "record_id": "VRRP-MOCK-MISSING-STANDBY",
+      "routers": [
+        {
+          "interface_state": "up",
+          "name": "edge-a",
+          "preempt": true,
+          "priority": 120
+        }
+      ],
+      "virtual_ip": "192.0.2.254"
+    },
+    {
+      "active_router": "edge-a",
+      "description": "Stale local evidence is detected",
+      "evidence_age_minutes": 42,
+      "expected_outcome": "STALE",
+      "group": 10,
+      "observed_at": "2026-06-16T23:00:00Z",
+      "record_id": "VRRP-MOCK-STALE",
+      "routers": [
+        {
+          "interface_state": "up",
+          "name": "edge-a",
+          "preempt": true,
+          "priority": 120
+        },
+        {
+          "interface_state": "up",
+          "name": "edge-b",
+          "preempt": true,
+          "priority": 100
+        }
+      ],
+      "standby_router": "edge-b",
+      "virtual_ip": "192.0.2.254"
+    },
+    {
+      "active_router": "edge-a",
+      "description": "Interface state mismatch is detected",
+      "evidence_age_minutes": 7,
+      "expected_outcome": "MISMATCH",
+      "group": 10,
+      "observed_at": "2026-06-17T00:00:00Z",
+      "record_id": "VRRP-MOCK-INTERFACE-DOWN",
+      "routers": [
+        {
+          "interface_state": "up",
+          "name": "edge-a",
+          "preempt": true,
+          "priority": 120
+        },
+        {
+          "interface_state": "down",
+          "name": "edge-b",
+          "preempt": true,
+          "priority": 100
+        }
+      ],
+      "standby_router": "edge-b",
+      "virtual_ip": "192.0.2.254"
+    }
+  ],
+  "source": "local_static_mock_data"
+}
