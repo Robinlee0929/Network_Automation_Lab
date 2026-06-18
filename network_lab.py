@@ -314,6 +314,9 @@ from phase_2b_00_authorization_scope_gate_review import (
 from phase_2b_00a_planning_only_owner_authorization_statement import (
     run_phase_2b_00a_planning_only_owner_authorization_statement,
 )
+from phase_2b_01_planning_scope_design_only import (
+    run_phase_2b_01_planning_scope_design_only,
+)
 from project_folder_organization_decision_gate import (
     run_project_folder_organization_decision_gate,
 )
@@ -1633,6 +1636,18 @@ PHASE_2B_00A_PLANNING_ONLY_OWNER_AUTHORIZATION_STATEMENT_JSON = (
 )
 PHASE_2B_00A_PLANNING_ONLY_OWNER_AUTHORIZATION_STATEMENT_HTML = (
     Path("reports") / "lab-summary" / "phase_2b_00a_planning_only_owner_authorization_statement.html"
+)
+PHASE_2B_01_PLANNING_SCOPE_DESIGN_ONLY_TASK_ID = (
+    "phase2b-01-planning-scope-design-only"
+)
+PHASE_2B_01_PLANNING_SCOPE_DESIGN_ONLY_DOC = (
+    Path("docs") / "phase_2b" / "phase_2b_01_planning_scope_design_only.md"
+)
+PHASE_2B_01_PLANNING_SCOPE_DESIGN_ONLY_JSON = (
+    Path("reports") / "lab-summary" / "phase_2b_01_planning_scope_design_only.json"
+)
+PHASE_2B_01_PLANNING_SCOPE_DESIGN_ONLY_HTML = (
+    Path("reports") / "lab-summary" / "phase_2b_01_planning_scope_design_only.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -3451,6 +3466,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{PHASE_2B_00A_PLANNING_ONLY_OWNER_AUTHORIZATION_STATEMENT_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Phase 2B",
+        "title": "Phase 2B-01 Planning Scope Design Only",
+        "report_type": "Planning-only scope design artifact",
+        "safety_label": "PHASE_2B_01_PLANNING_SCOPE_DESIGN_ONLY; PHASE_2B_PLANNING_ONLY_AUTHORIZED_TRUE; PHASE_2B_IMPLEMENTATION_ALLOWED_FALSE; RUNNER_ALLOWED_FALSE; ADAPTER_ALLOWED_FALSE; EXECUTION_ALLOWED_FALSE; FORBIDDEN_CAPABILITIES_ENABLED_FALSE",
+        "description": "Phase 2B-01 defines planning-only Phase 2B scope design, allowed planning artifacts, conceptual architecture boundaries, safety gate requirements, implementation prerequisites, and stop conditions. It does not implement Phase 2B, execution, runners, adapters, brokers, schedulers, queue workers, SSH, NETCONF, RESTCONF, live devices, providers/APIs/models, secrets, frontend API integration, backups, VRRP execution, approval bypass, or safety-gate relaxation.",
+        "json_globs": [PHASE_2B_01_PLANNING_SCOPE_DESIGN_ONLY_JSON.as_posix()],
+        "html_globs": [PHASE_2B_01_PLANNING_SCOPE_DESIGN_ONLY_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{PHASE_2B_01_PLANNING_SCOPE_DESIGN_ONLY_TASK_ID}"
         ),
     },
 ]
@@ -7740,6 +7768,32 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "phase_2b_00a_planning_only_owner_authorization_statement.py",
             "notes": "PHASE_2B_00A_PLANNING_ONLY_OWNER_AUTHORIZATION_RECORDED AGENTS_MD_FOUND_AND_READ AGENTS_MD_NOT_MODIFIED OWNER_AUTHORIZATION_STATEMENT_RECORDED_EXACTLY PHASE_2B_PLANNING_ONLY_AUTHORIZED_TRUE PHASE_2B_IMPLEMENTATION_ALLOWED_FALSE PHASE_2B_01_ALLOWED_FALSE EXAMPLE_JOB_TYPES_TREATED_AS_EXAMPLES_ONLY FORBIDDEN_CAPABILITIES_ENABLED_FALSE NEXT_PHASE_ALLOWED_FALSE. Review-only owner authorization for Phase 2B planning-only scope work across baseline_check, interface_status_check, wan_lan_check, vrrp_validation, backup_config_plan, and blocked_config_change_request as examples only; no Phase 2B implementation, Phase 2B-01, runner, adapter, broker, scheduler, queue worker, SSH, NETCONF, RESTCONF, live device, provider/API/model calls, secrets handling, frontend API integration, real execution, real backup, real VRRP execution, device mutation, approval bypass, config change, command execution, or safety gate weakening.",
+        },
+        {
+            "id": PHASE_2B_01_PLANNING_SCOPE_DESIGN_ONLY_TASK_ID,
+            "task_id": "phase_2b_01_planning_scope_design_only",
+            "display_name": "Phase 2B-01 Planning Scope Design Only",
+            "user_display_name": "Phase 2B-01 Planning Scope Design Only",
+            "day": "Phase 2B",
+            "category": "authorization_scope_gate",
+            "description": "Phase 2B-01 defines planning-only scope design for Phase 2B without enabling implementation or execution paths.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                PHASE_2B_01_PLANNING_SCOPE_DESIGN_ONLY_JSON.as_posix(),
+                PHASE_2B_01_PLANNING_SCOPE_DESIGN_ONLY_HTML.as_posix(),
+                PHASE_2B_01_PLANNING_SCOPE_DESIGN_ONLY_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Phase 2B-01 JSON/HTML planning-only scope design artifact",
+                "Phase 2B-01 review documentation",
+            ],
+            "related_script": "phase_2b_01_planning_scope_design_only.py",
+            "notes": "PHASE_2B_01_PLANNING_SCOPE_DESIGN_ONLY AGENTS_MD_FOUND_AND_READ AGENTS_MD_NOT_MODIFIED PHASE_2B_PLANNING_ONLY_AUTHORIZED_TRUE PHASE_2B_IMPLEMENTATION_ALLOWED_FALSE PHASE_2B_01_ALLOWED_AS_IMPLEMENTATION_FALSE RUNNER_ALLOWED_FALSE ADAPTER_ALLOWED_FALSE EXECUTION_ALLOWED_FALSE EXAMPLE_JOB_TYPES_TREATED_AS_EXAMPLES_ONLY FORBIDDEN_CAPABILITIES_ENABLED_FALSE CONCEPTUAL_ARCHITECTURE_ONLY FUTURE_IMPLEMENTATION_REQUIRES_SEPARATE_GATE. Planning-only scope design across baseline_check, interface_status_check, wan_lan_check, vrrp_validation, backup_config_plan, and blocked_config_change_request as examples only; no Phase 2B implementation, runner, adapter, broker, scheduler, queue worker, SSH, NETCONF, RESTCONF, live device, provider/API/model calls, secrets handling, frontend API integration, real execution, real backup, real VRRP execution, device mutation, approval bypass, config change, command execution, or safety gate weakening.",
         },
     ]
 
@@ -12656,6 +12710,15 @@ def _run_phase_2b_00_authorization_scope_gate_review(project_root: Path) -> int:
 
 def _run_phase_2b_00a_planning_only_owner_authorization_statement(project_root: Path) -> int:
     return run_phase_2b_00a_planning_only_owner_authorization_statement(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_phase_2b_01_planning_scope_design_only(project_root: Path) -> int:
+    return run_phase_2b_01_planning_scope_design_only(
         project_root,
         format_heading_func=format_heading,
         format_status_func=format_status,
