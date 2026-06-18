@@ -302,6 +302,9 @@ from phase_2a_08_jobs_catalog_ui_readiness_planning_pack import (
 from phase_2a_09_jobs_ui_display_contract_mock_screen_readiness_pack import (
     run_phase_2a_09_jobs_ui_display_contract_mock_screen_readiness_pack,
 )
+from phase_2a_10_safe_boundary_implementation_readiness_artifact import (
+    run_phase_2a_10_safe_boundary_implementation_readiness_artifact,
+)
 from project_folder_organization_decision_gate import (
     run_project_folder_organization_decision_gate,
 )
@@ -1573,6 +1576,18 @@ PHASE_2A_09_JOBS_UI_DISPLAY_CONTRACT_MOCK_SCREEN_READINESS_PACK_JSON = (
 )
 PHASE_2A_09_JOBS_UI_DISPLAY_CONTRACT_MOCK_SCREEN_READINESS_PACK_HTML = (
     Path("reports") / "lab-summary" / "phase_2a_09_jobs_ui_display_contract_mock_screen_readiness_pack.html"
+)
+PHASE_2A_10_SAFE_BOUNDARY_IMPLEMENTATION_READINESS_ARTIFACT_TASK_ID = (
+    "phase2a-10-safe-boundary-implementation-readiness-artifact"
+)
+PHASE_2A_10_SAFE_BOUNDARY_IMPLEMENTATION_READINESS_ARTIFACT_DOC = (
+    Path("docs") / "phase_2a" / "phase_2a_10_safe_boundary_implementation_readiness_artifact.md"
+)
+PHASE_2A_10_SAFE_BOUNDARY_IMPLEMENTATION_READINESS_ARTIFACT_JSON = (
+    Path("reports") / "lab-summary" / "phase_2a_10_safe_boundary_implementation_readiness_artifact.json"
+)
+PHASE_2A_10_SAFE_BOUNDARY_IMPLEMENTATION_READINESS_ARTIFACT_HTML = (
+    Path("reports") / "lab-summary" / "phase_2a_10_safe_boundary_implementation_readiness_artifact.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -3339,6 +3354,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{PHASE_2A_09_JOBS_UI_DISPLAY_CONTRACT_MOCK_SCREEN_READINESS_PACK_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Phase 2A",
+        "title": "Phase 2A-10 Safe-Boundary Implementation Readiness Artifact",
+        "report_type": "Safe-boundary implementation readiness artifact",
+        "safety_label": "PHASE_2A_10_SAFE_BOUNDARY_IMPLEMENTATION_READY; PHASE_WIDE_SCOPE_CONFIRMED; EXAMPLE_JOB_TYPES_TREATED_AS_EXAMPLES_ONLY; PRIOR_PHASE_2A_ARTIFACTS_REFERENCED; PHASE_2B_ENABLED_FALSE; REAL_RUNNER_ENABLED_FALSE; ADAPTER_ENABLED_FALSE; BROKER_ENABLED_FALSE; SCHEDULER_ENABLED_FALSE; QUEUE_WORKER_ENABLED_FALSE; SSH_ENABLED_FALSE; NETCONF_ENABLED_FALSE; RESTCONF_ENABLED_FALSE; LIVE_DEVICE_ACCESS_ENABLED_FALSE; REAL_EXECUTION_ENABLED_FALSE; REAL_BACKUP_ENABLED_FALSE; REAL_VRRP_EXECUTION_ENABLED_FALSE; FRONTEND_API_INTEGRATION_ENABLED_FALSE; PROVIDER_CALLS_ENABLED_FALSE; API_CALLS_ENABLED_FALSE; MODEL_CALLS_ENABLED_FALSE; SECRETS_HANDLING_ADDED_FALSE; SAFETY_GATES_WEAKENED_FALSE",
+        "description": "Phase 2A-10 records phase-wide safe-boundary implementation readiness for the existing Phase 2A Jobs workflow. It is documentation/report/test-gated readiness only and opens no Phase 2B, runner, adapter, broker, scheduler, queue worker, SSH, NETCONF, RESTCONF, live device, real execution, real backup, real VRRP execution, frontend API integration, provider/API/model call, secrets handling, or weakened safety gate.",
+        "json_globs": [PHASE_2A_10_SAFE_BOUNDARY_IMPLEMENTATION_READINESS_ARTIFACT_JSON.as_posix()],
+        "html_globs": [PHASE_2A_10_SAFE_BOUNDARY_IMPLEMENTATION_READINESS_ARTIFACT_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{PHASE_2A_10_SAFE_BOUNDARY_IMPLEMENTATION_READINESS_ARTIFACT_TASK_ID}"
         ),
     },
 ]
@@ -7524,6 +7552,32 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "phase_2a_09_jobs_ui_display_contract_mock_screen_readiness_pack.py",
             "notes": "PHASE_2A_09_JOBS_UI_DISPLAY_CONTRACT_MOCK_SCREEN_READINESS_PACK_READY AGENTS_MD_FOUND_AND_READ AGENTS_MD_NOT_MODIFIED MULTI_JOB_SCOPE_CONFIRMED PHASE_2A_08_JOBS_CATALOG_REFERENCED JOB_LIST_VIEW_CONTRACT_DEFINED JOB_DETAIL_VIEW_CONTRACT_DEFINED BADGE_RULES_DEFINED EMPTY_STATE_CONTRACT_DEFINED ERROR_STATE_CONTRACT_DEFINED MOCK_SCREEN_FIXTURES_DEFINED SAFETY_DISPLAY_CONTRACT_DEFINED RUNNER_INTRODUCED_FALSE ADAPTER_INTRODUCED_FALSE SSH_INTRODUCED_FALSE NETCONF_INTRODUCED_FALSE RESTCONF_INTRODUCED_FALSE LIVE_DEVICE_INTRODUCED_FALSE REAL_BACKUP_INTRODUCED_FALSE REAL_VRRP_EXECUTION_INTRODUCED_FALSE REAL_FRONTEND_API_INTEGRATION_INTRODUCED_FALSE PHASE_2B_INTRODUCED_FALSE NEXT_PHASE_ALLOWED_FALSE. Planning-only UI display contract and mock screen data for the full Phase 2A-08 Jobs Catalog; no Phase 2B, runner, adapter, broker, scheduler, queue worker, SSH, NETCONF, RESTCONF, live device, provider/API/model, secrets, real backup, real VRRP execution, config change, command execution, or real frontend API integration.",
+        },
+        {
+            "id": PHASE_2A_10_SAFE_BOUNDARY_IMPLEMENTATION_READINESS_ARTIFACT_TASK_ID,
+            "task_id": "phase_2a_10_safe_boundary_implementation_readiness_artifact",
+            "display_name": "Phase 2A-10 Safe-Boundary Implementation Readiness Artifact",
+            "user_display_name": "Phase 2A-10 Safe-Boundary Implementation Readiness Artifact",
+            "day": "Phase 2A",
+            "category": "runner_framework",
+            "description": "Phase 2A-10 records phase-wide safe-boundary implementation readiness for the existing Phase 2A Jobs workflow without enabling execution.",
+            "safety_level": "report-only",
+            "execution_mode": "planning-only",
+            "enabled": True,
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                PHASE_2A_10_SAFE_BOUNDARY_IMPLEMENTATION_READINESS_ARTIFACT_JSON.as_posix(),
+                PHASE_2A_10_SAFE_BOUNDARY_IMPLEMENTATION_READINESS_ARTIFACT_HTML.as_posix(),
+                PHASE_2A_10_SAFE_BOUNDARY_IMPLEMENTATION_READINESS_ARTIFACT_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Phase 2A-10 JSON/HTML safe-boundary implementation readiness artifact",
+                "Phase 2A-10 implementation readiness documentation",
+            ],
+            "related_script": "phase_2a_10_safe_boundary_implementation_readiness_artifact.py",
+            "notes": "PHASE_2A_10_SAFE_BOUNDARY_IMPLEMENTATION_READY AGENTS_MD_FOUND_AND_READ AGENTS_MD_NOT_MODIFIED PHASE_WIDE_SCOPE_CONFIRMED EXAMPLE_JOB_TYPES_TREATED_AS_EXAMPLES_ONLY PRIOR_PHASE_2A_ARTIFACTS_REFERENCED MOCK_ONLY_PLANNING_ALLOWED READ_ONLY_DRY_RUN_PLANNING_ALLOWED LOCAL_ARTIFACT_VALIDATION_ALLOWED DISPLAY_CONTRACT_READINESS_ALLOWED ENVELOPE_LEDGER_REPORT_CONSISTENCY_ALLOWED PHASE_2B_ENABLED_FALSE REAL_RUNNER_ENABLED_FALSE ADAPTER_ENABLED_FALSE BROKER_ENABLED_FALSE SCHEDULER_ENABLED_FALSE QUEUE_WORKER_ENABLED_FALSE SSH_ENABLED_FALSE NETCONF_ENABLED_FALSE RESTCONF_ENABLED_FALSE LIVE_DEVICE_ACCESS_ENABLED_FALSE REAL_EXECUTION_ENABLED_FALSE REAL_BACKUP_ENABLED_FALSE REAL_VRRP_EXECUTION_ENABLED_FALSE FRONTEND_API_INTEGRATION_ENABLED_FALSE PROVIDER_CALLS_ENABLED_FALSE API_CALLS_ENABLED_FALSE MODEL_CALLS_ENABLED_FALSE SECRETS_HANDLING_ADDED_FALSE SAFETY_GATES_WEAKENED_FALSE NEXT_PHASE_ALLOWED_FALSE. Phase-wide safe-boundary implementation readiness artifact across baseline_check, interface_status_check, wan_lan_check, vrrp_validation, backup_config_plan, and blocked_config_change_request as examples only; no Phase 2B, runner, adapter, broker, scheduler, queue worker, SSH, NETCONF, RESTCONF, live device, real execution, real backup, real VRRP execution, frontend API integration, provider/API/model calls, secrets handling, config change, command execution, or weakened safety gate.",
         },
     ]
 
@@ -12404,6 +12458,15 @@ def _run_phase_2a_08_jobs_catalog_ui_readiness_planning_pack(project_root: Path)
 
 def _run_phase_2a_09_jobs_ui_display_contract_mock_screen_readiness_pack(project_root: Path) -> int:
     return run_phase_2a_09_jobs_ui_display_contract_mock_screen_readiness_pack(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_phase_2a_10_safe_boundary_implementation_readiness_artifact(project_root: Path) -> int:
+    return run_phase_2a_10_safe_boundary_implementation_readiness_artifact(
         project_root,
         format_heading_func=format_heading,
         format_status_func=format_status,

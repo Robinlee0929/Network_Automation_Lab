@@ -82,6 +82,7 @@ def _build_parser(lab: ModuleType) -> argparse.ArgumentParser:
   python network_lab.py --task phase2a-07-vrrp-dry-run-validation-pack
   python network_lab.py --task phase2a-08-jobs-catalog-ui-readiness-planning-pack
   python network_lab.py --task phase2a-09-jobs-ui-display-contract-mock-screen-readiness-pack
+  python network_lab.py --task phase2a-10-safe-boundary-implementation-readiness-artifact
   python network_lab.py --task intent-workflow-demo
   python network_lab.py --task offline-mock-runtime
   python network_lab.py --task offline-mock-runtime-contract
@@ -173,6 +174,7 @@ phase2a-06-negative-regression-matrix writes the Phase 2A-06 negative regression
 phase2a-07-vrrp-dry-run-validation-pack writes the Phase 2A-07 Day1-Day160 artifact-to-Jobs dry-run validation pack; it maps local artifact patterns to Jobs, keeps VRRP as the first concrete mock example, rejects live VRRP requests, and keeps live access, execution, and next-phase authorization false.
 phase2a-08-jobs-catalog-ui-readiness-planning-pack writes the Phase 2A-08 multi-job catalog/card UI readiness planning pack; it is not executable and keeps runners, adapters, brokers, live access, providers/APIs/models, real backup, real VRRP testing, and next-phase authorization false.
 phase2a-09-jobs-ui-display-contract-mock-screen-readiness-pack writes the Phase 2A-09 /network/jobs display contract, badge rules, empty/error states, and mock screen data over the full Phase 2A-08 Jobs Catalog without adding execution or real frontend API integration.
+phase2a-10-safe-boundary-implementation-readiness-artifact writes the Phase 2A-10 phase-wide safe-boundary implementation readiness artifact without adding Phase 2B, execution, runners, adapters, brokers, SSH, NETCONF, RESTCONF, live device access, providers/APIs/models, secrets, or weaker safety gates.
 wireguard-runner is dry-run by default and delegates to the existing WireGuard script only after explicit --allow-live-wireguard."""
     parser = argparse.ArgumentParser(
         description=f"Day14 {lab.DAY14_NAME}.",
@@ -374,6 +376,7 @@ def _build_task_handlers(args: argparse.Namespace, root: Path, lab: ModuleType) 
         lab.PHASE_2A_07_VRRP_DRY_RUN_VALIDATION_PACK_TASK_ID: lambda: lab._run_phase_2a_07_vrrp_dry_run_validation_pack(root),
         lab.PHASE_2A_08_JOBS_CATALOG_UI_READINESS_PLANNING_PACK_TASK_ID: lambda: lab._run_phase_2a_08_jobs_catalog_ui_readiness_planning_pack(root),
         lab.PHASE_2A_09_JOBS_UI_DISPLAY_CONTRACT_MOCK_SCREEN_READINESS_PACK_TASK_ID: lambda: lab._run_phase_2a_09_jobs_ui_display_contract_mock_screen_readiness_pack(root),
+        lab.PHASE_2A_10_SAFE_BOUNDARY_IMPLEMENTATION_READINESS_ARTIFACT_TASK_ID: lambda: lab._run_phase_2a_10_safe_boundary_implementation_readiness_artifact(root),
         lab.WIREGUARD_RUNNER_TASK_ALIAS: lambda: lab._run_wireguard_runner(
             root,
             dry_run=args.dry_run,
