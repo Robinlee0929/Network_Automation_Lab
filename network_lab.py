@@ -305,6 +305,9 @@ from phase_2a_09_jobs_ui_display_contract_mock_screen_readiness_pack import (
 from phase_2a_10_safe_boundary_implementation_readiness_artifact import (
     run_phase_2a_10_safe_boundary_implementation_readiness_artifact,
 )
+from phase_2a_11_phase_closure_final_readiness_review import (
+    run_phase_2a_11_phase_closure_final_readiness_review,
+)
 from project_folder_organization_decision_gate import (
     run_project_folder_organization_decision_gate,
 )
@@ -1588,6 +1591,18 @@ PHASE_2A_10_SAFE_BOUNDARY_IMPLEMENTATION_READINESS_ARTIFACT_JSON = (
 )
 PHASE_2A_10_SAFE_BOUNDARY_IMPLEMENTATION_READINESS_ARTIFACT_HTML = (
     Path("reports") / "lab-summary" / "phase_2a_10_safe_boundary_implementation_readiness_artifact.html"
+)
+PHASE_2A_11_PHASE_CLOSURE_FINAL_READINESS_REVIEW_TASK_ID = (
+    "phase2a-11-phase-closure-final-readiness-review"
+)
+PHASE_2A_11_PHASE_CLOSURE_FINAL_READINESS_REVIEW_DOC = (
+    Path("docs") / "phase_2a" / "phase_2a_11_phase_closure_final_readiness_review.md"
+)
+PHASE_2A_11_PHASE_CLOSURE_FINAL_READINESS_REVIEW_JSON = (
+    Path("reports") / "lab-summary" / "phase_2a_11_phase_closure_final_readiness_review.json"
+)
+PHASE_2A_11_PHASE_CLOSURE_FINAL_READINESS_REVIEW_HTML = (
+    Path("reports") / "lab-summary" / "phase_2a_11_phase_closure_final_readiness_review.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -3367,6 +3382,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{PHASE_2A_10_SAFE_BOUNDARY_IMPLEMENTATION_READINESS_ARTIFACT_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Phase 2A",
+        "title": "Phase 2A-11 Phase Closure / Final Readiness Review",
+        "report_type": "Phase closure and final readiness review",
+        "safety_label": "PHASE_2A_CLOSURE_READY_PHASE_2B_STILL_NOT_AUTHORIZED; PHASE_WIDE_SCOPE_CONFIRMED; EXAMPLE_JOB_TYPES_TREATED_AS_EXAMPLES_ONLY; CLOSURE_DIMENSIONS_CHECKED; LEDGER_ENVELOPE_REPORT_CONSISTENCY_REPRESENTED; UI_DISPLAY_CONTRACT_READINESS_REPRESENTED; NEGATIVE_REGRESSION_LOCK_REPRESENTED; PHASE_2B_AUTHORIZED_FALSE; RUNNER_ENABLED_FALSE; ADAPTER_ENABLED_FALSE; SSH_ENABLED_FALSE; NETCONF_ENABLED_FALSE; RESTCONF_ENABLED_FALSE; LIVE_DEVICE_ACCESS_ENABLED_FALSE; PROVIDER_CALLS_ENABLED_FALSE; API_CALLS_ENABLED_FALSE; MODEL_CALLS_ENABLED_FALSE",
+        "description": "Phase 2A-11 performs a phase-wide closure and final readiness review over the Phase 2A initial read-only framework through Phase 2A-10. It remains report-only, review-only, dry-run only, mock-only, local-only, evidence-first, and non-executing; Phase 2B remains unauthorized.",
+        "json_globs": [PHASE_2A_11_PHASE_CLOSURE_FINAL_READINESS_REVIEW_JSON.as_posix()],
+        "html_globs": [PHASE_2A_11_PHASE_CLOSURE_FINAL_READINESS_REVIEW_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{PHASE_2A_11_PHASE_CLOSURE_FINAL_READINESS_REVIEW_TASK_ID}"
         ),
     },
 ]
@@ -7578,6 +7606,32 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "phase_2a_10_safe_boundary_implementation_readiness_artifact.py",
             "notes": "PHASE_2A_10_SAFE_BOUNDARY_IMPLEMENTATION_READY AGENTS_MD_FOUND_AND_READ AGENTS_MD_NOT_MODIFIED PHASE_WIDE_SCOPE_CONFIRMED EXAMPLE_JOB_TYPES_TREATED_AS_EXAMPLES_ONLY PRIOR_PHASE_2A_ARTIFACTS_REFERENCED MOCK_ONLY_PLANNING_ALLOWED READ_ONLY_DRY_RUN_PLANNING_ALLOWED LOCAL_ARTIFACT_VALIDATION_ALLOWED DISPLAY_CONTRACT_READINESS_ALLOWED ENVELOPE_LEDGER_REPORT_CONSISTENCY_ALLOWED PHASE_2B_ENABLED_FALSE REAL_RUNNER_ENABLED_FALSE ADAPTER_ENABLED_FALSE BROKER_ENABLED_FALSE SCHEDULER_ENABLED_FALSE QUEUE_WORKER_ENABLED_FALSE SSH_ENABLED_FALSE NETCONF_ENABLED_FALSE RESTCONF_ENABLED_FALSE LIVE_DEVICE_ACCESS_ENABLED_FALSE REAL_EXECUTION_ENABLED_FALSE REAL_BACKUP_ENABLED_FALSE REAL_VRRP_EXECUTION_ENABLED_FALSE FRONTEND_API_INTEGRATION_ENABLED_FALSE PROVIDER_CALLS_ENABLED_FALSE API_CALLS_ENABLED_FALSE MODEL_CALLS_ENABLED_FALSE SECRETS_HANDLING_ADDED_FALSE SAFETY_GATES_WEAKENED_FALSE NEXT_PHASE_ALLOWED_FALSE. Phase-wide safe-boundary implementation readiness artifact across baseline_check, interface_status_check, wan_lan_check, vrrp_validation, backup_config_plan, and blocked_config_change_request as examples only; no Phase 2B, runner, adapter, broker, scheduler, queue worker, SSH, NETCONF, RESTCONF, live device, real execution, real backup, real VRRP execution, frontend API integration, provider/API/model calls, secrets handling, config change, command execution, or weakened safety gate.",
+        },
+        {
+            "id": PHASE_2A_11_PHASE_CLOSURE_FINAL_READINESS_REVIEW_TASK_ID,
+            "task_id": "phase_2a_11_phase_closure_final_readiness_review",
+            "display_name": "Phase 2A-11 Phase Closure / Final Readiness Review",
+            "user_display_name": "Phase 2A-11 Phase Closure / Final Readiness Review",
+            "day": "Phase 2A",
+            "category": "runner_framework",
+            "description": "Phase 2A-11 reviews the complete Phase 2A chain from the initial read-only framework through Phase 2A-10 and records a conservative closure verdict without enabling execution.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                PHASE_2A_11_PHASE_CLOSURE_FINAL_READINESS_REVIEW_JSON.as_posix(),
+                PHASE_2A_11_PHASE_CLOSURE_FINAL_READINESS_REVIEW_HTML.as_posix(),
+                PHASE_2A_11_PHASE_CLOSURE_FINAL_READINESS_REVIEW_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Phase 2A-11 JSON/HTML phase closure final readiness review",
+                "Phase 2A-11 closure review documentation",
+            ],
+            "related_script": "phase_2a_11_phase_closure_final_readiness_review.py",
+            "notes": "PHASE_2A_CLOSURE_READY_PHASE_2B_STILL_NOT_AUTHORIZED AGENTS_MD_FOUND_AND_READ AGENTS_MD_NOT_MODIFIED PHASE_WIDE_SCOPE_CONFIRMED EXAMPLE_JOB_TYPES_TREATED_AS_EXAMPLES_ONLY PHASE_2A_CHAIN_REVIEWED CLOSURE_DIMENSIONS_CHECKED JOBS_WORKFLOW_READINESS_REPRESENTED DRY_RUN_MOCK_ONLY_SAFETY_BOUNDARY_REPRESENTED ARTIFACT_TO_JOBS_TRACEABILITY_REPRESENTED PLAN_EVIDENCE_LEDGER_REPRESENTED DRY_RUN_RESULT_ENVELOPE_REPRESENTED REPORT_CONSISTENCY_REPRESENTED UI_DISPLAY_CONTRACT_READINESS_REPRESENTED NEGATIVE_REGRESSION_LOCK_REPRESENTED PHASE_2B_AUTHORIZED_FALSE RUNNER_ENABLED_FALSE ADAPTER_ENABLED_FALSE BROKER_ENABLED_FALSE SCHEDULER_ENABLED_FALSE QUEUE_WORKER_ENABLED_FALSE SSH_ENABLED_FALSE NETCONF_ENABLED_FALSE RESTCONF_ENABLED_FALSE LIVE_DEVICE_ACCESS_ENABLED_FALSE REAL_JOB_EXECUTION_ENABLED_FALSE REAL_CONFIGURATION_BACKUP_ENABLED_FALSE REAL_VRRP_EXECUTION_ENABLED_FALSE PROVIDER_CALLS_ENABLED_FALSE API_CALLS_ENABLED_FALSE MODEL_CALLS_ENABLED_FALSE SECRETS_HANDLING_ENABLED_FALSE FRONTEND_API_INTEGRATION_ENABLED_FALSE APPROVAL_WORKFLOW_EXECUTION_ENABLED_FALSE SAFETY_GATE_RELAXATION_ENABLED_FALSE NEXT_PHASE_ALLOWED_FALSE. Phase-wide closure/final readiness review only across baseline_check, interface_status_check, wan_lan_check, vrrp_validation, backup_config_plan, and blocked_config_change_request as examples only; no Phase 2B, runner, adapter, broker, scheduler, queue worker, SSH, NETCONF, RESTCONF, live device, real execution, real backup, real VRRP execution, frontend API integration, provider/API/model calls, secrets handling, approval execution, config change, command execution, or safety gate relaxation.",
         },
     ]
 
@@ -12467,6 +12521,15 @@ def _run_phase_2a_09_jobs_ui_display_contract_mock_screen_readiness_pack(project
 
 def _run_phase_2a_10_safe_boundary_implementation_readiness_artifact(project_root: Path) -> int:
     return run_phase_2a_10_safe_boundary_implementation_readiness_artifact(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_phase_2a_11_phase_closure_final_readiness_review(project_root: Path) -> int:
+    return run_phase_2a_11_phase_closure_final_readiness_review(
         project_root,
         format_heading_func=format_heading,
         format_status_func=format_status,

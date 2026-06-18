@@ -118,6 +118,7 @@ CANONICAL_TASK_NAMES: Tuple[str, ...] = (
     "phase2a-08-jobs-catalog-ui-readiness-planning-pack",
     "phase2a-09-jobs-ui-display-contract-mock-screen-readiness-pack",
     "phase2a-10-safe-boundary-implementation-readiness-artifact",
+    "phase2a-11-phase-closure-final-readiness-review",
     "wireguard-runner",
 )
 
