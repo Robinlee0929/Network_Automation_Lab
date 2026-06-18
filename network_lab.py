@@ -311,6 +311,9 @@ from phase_2a_11_phase_closure_final_readiness_review import (
 from phase_2b_00_authorization_scope_gate_review import (
     run_phase_2b_00_authorization_scope_gate_review,
 )
+from phase_2b_00a_planning_only_owner_authorization_statement import (
+    run_phase_2b_00a_planning_only_owner_authorization_statement,
+)
 from project_folder_organization_decision_gate import (
     run_project_folder_organization_decision_gate,
 )
@@ -1618,6 +1621,18 @@ PHASE_2B_00_AUTHORIZATION_SCOPE_GATE_REVIEW_JSON = (
 )
 PHASE_2B_00_AUTHORIZATION_SCOPE_GATE_REVIEW_HTML = (
     Path("reports") / "lab-summary" / "phase_2b_00_authorization_scope_gate_review.html"
+)
+PHASE_2B_00A_PLANNING_ONLY_OWNER_AUTHORIZATION_STATEMENT_TASK_ID = (
+    "phase2b-00a-planning-only-owner-authorization-statement"
+)
+PHASE_2B_00A_PLANNING_ONLY_OWNER_AUTHORIZATION_STATEMENT_DOC = (
+    Path("docs") / "phase_2b" / "phase_2b_00a_planning_only_owner_authorization_statement.md"
+)
+PHASE_2B_00A_PLANNING_ONLY_OWNER_AUTHORIZATION_STATEMENT_JSON = (
+    Path("reports") / "lab-summary" / "phase_2b_00a_planning_only_owner_authorization_statement.json"
+)
+PHASE_2B_00A_PLANNING_ONLY_OWNER_AUTHORIZATION_STATEMENT_HTML = (
+    Path("reports") / "lab-summary" / "phase_2b_00a_planning_only_owner_authorization_statement.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -3423,6 +3438,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{PHASE_2B_00_AUTHORIZATION_SCOPE_GATE_REVIEW_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Phase 2B",
+        "title": "Phase 2B-00A Planning-Only Owner Authorization Statement",
+        "report_type": "Planning-only owner authorization statement",
+        "safety_label": "PHASE_2B_00A_PLANNING_ONLY_OWNER_AUTHORIZATION_RECORDED; PHASE_2B_PLANNING_ONLY_AUTHORIZED_TRUE; PHASE_2B_IMPLEMENTATION_ALLOWED_FALSE; PHASE_2B_01_ALLOWED_FALSE; FORBIDDEN_CAPABILITIES_ENABLED_FALSE; NEXT_PHASE_ALLOWED_FALSE",
+        "description": "Phase 2B-00A records the owner authorization for Phase 2B planning-only scope work. It permits review-only, documentation-only, readiness-only, and specification-only scope design artifacts, while forbidding Phase 2B implementation, Phase 2B-01, execution, runners, adapters, brokers, SSH, NETCONF, RESTCONF, live devices, providers/APIs/models, secrets, frontend API integration, backups, VRRP execution, approval bypass, and safety-gate relaxation.",
+        "json_globs": [PHASE_2B_00A_PLANNING_ONLY_OWNER_AUTHORIZATION_STATEMENT_JSON.as_posix()],
+        "html_globs": [PHASE_2B_00A_PLANNING_ONLY_OWNER_AUTHORIZATION_STATEMENT_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{PHASE_2B_00A_PLANNING_ONLY_OWNER_AUTHORIZATION_STATEMENT_TASK_ID}"
         ),
     },
 ]
@@ -7686,6 +7714,32 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "phase_2b_00_authorization_scope_gate_review.py",
             "notes": "PHASE_2B_00_AUTHORIZATION_SCOPE_GATE_REVIEW_ONLY AGENTS_MD_FOUND_AND_READ AGENTS_MD_NOT_MODIFIED PHASE_WIDE_SCOPE_CONFIRMED EXAMPLE_JOB_TYPES_TREATED_AS_EXAMPLES_ONLY PHASE_2A_CLOSURE_REFERENCED NEXT_PHASE_AUTHORIZATION_CRITERIA_REFERENCED IMPLEMENTATION_ALLOWED_FALSE PHASE_2B_STATUS_NOT_AUTHORIZED_YET PHASE_2B_01_ALLOWED_FALSE FORBIDDEN_CAPABILITIES_LOCKED_FALSE NEXT_PHASE_ALLOWED_FALSE. Review-only authorization/scope gate across baseline_check, interface_status_check, wan_lan_check, vrrp_validation, backup_config_plan, and blocked_config_change_request as examples only; no Phase 2B implementation, Phase 2B-01, runner, adapter, broker, scheduler, queue worker, SSH, NETCONF, RESTCONF, live device, provider/API/model calls, secrets handling, frontend API integration, real execution, real backup, real VRRP execution, device mutation, approval bypass, config change, command execution, or safety gate weakening.",
+        },
+        {
+            "id": PHASE_2B_00A_PLANNING_ONLY_OWNER_AUTHORIZATION_STATEMENT_TASK_ID,
+            "task_id": "phase_2b_00a_planning_only_owner_authorization_statement",
+            "display_name": "Phase 2B-00A Planning-Only Owner Authorization Statement",
+            "user_display_name": "Phase 2B-00A Planning-Only Owner Authorization Statement",
+            "day": "Phase 2B",
+            "category": "authorization_scope_gate",
+            "description": "Phase 2B-00A records owner authorization for Phase 2B planning-only scope work without enabling implementation or execution paths.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                PHASE_2B_00A_PLANNING_ONLY_OWNER_AUTHORIZATION_STATEMENT_JSON.as_posix(),
+                PHASE_2B_00A_PLANNING_ONLY_OWNER_AUTHORIZATION_STATEMENT_HTML.as_posix(),
+                PHASE_2B_00A_PLANNING_ONLY_OWNER_AUTHORIZATION_STATEMENT_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Phase 2B-00A JSON/HTML planning-only owner authorization statement",
+                "Phase 2B-00A review documentation",
+            ],
+            "related_script": "phase_2b_00a_planning_only_owner_authorization_statement.py",
+            "notes": "PHASE_2B_00A_PLANNING_ONLY_OWNER_AUTHORIZATION_RECORDED AGENTS_MD_FOUND_AND_READ AGENTS_MD_NOT_MODIFIED OWNER_AUTHORIZATION_STATEMENT_RECORDED_EXACTLY PHASE_2B_PLANNING_ONLY_AUTHORIZED_TRUE PHASE_2B_IMPLEMENTATION_ALLOWED_FALSE PHASE_2B_01_ALLOWED_FALSE EXAMPLE_JOB_TYPES_TREATED_AS_EXAMPLES_ONLY FORBIDDEN_CAPABILITIES_ENABLED_FALSE NEXT_PHASE_ALLOWED_FALSE. Review-only owner authorization for Phase 2B planning-only scope work across baseline_check, interface_status_check, wan_lan_check, vrrp_validation, backup_config_plan, and blocked_config_change_request as examples only; no Phase 2B implementation, Phase 2B-01, runner, adapter, broker, scheduler, queue worker, SSH, NETCONF, RESTCONF, live device, provider/API/model calls, secrets handling, frontend API integration, real execution, real backup, real VRRP execution, device mutation, approval bypass, config change, command execution, or safety gate weakening.",
         },
     ]
 
@@ -12593,6 +12647,15 @@ def _run_phase_2a_11_phase_closure_final_readiness_review(project_root: Path) ->
 
 def _run_phase_2b_00_authorization_scope_gate_review(project_root: Path) -> int:
     return run_phase_2b_00_authorization_scope_gate_review(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_phase_2b_00a_planning_only_owner_authorization_statement(project_root: Path) -> int:
+    return run_phase_2b_00a_planning_only_owner_authorization_statement(
         project_root,
         format_heading_func=format_heading,
         format_status_func=format_status,

@@ -85,6 +85,7 @@ def _build_parser(lab: ModuleType) -> argparse.ArgumentParser:
   python network_lab.py --task phase2a-10-safe-boundary-implementation-readiness-artifact
   python network_lab.py --task phase2a-11-phase-closure-final-readiness-review
   python network_lab.py --task phase2b-00-authorization-scope-gate-review
+  python network_lab.py --task phase2b-00a-planning-only-owner-authorization-statement
   python network_lab.py --task intent-workflow-demo
   python network_lab.py --task offline-mock-runtime
   python network_lab.py --task offline-mock-runtime-contract
@@ -179,6 +180,7 @@ phase2a-09-jobs-ui-display-contract-mock-screen-readiness-pack writes the Phase 
 phase2a-10-safe-boundary-implementation-readiness-artifact writes the Phase 2A-10 phase-wide safe-boundary implementation readiness artifact without adding Phase 2B, execution, runners, adapters, brokers, SSH, NETCONF, RESTCONF, live device access, providers/APIs/models, secrets, or weaker safety gates.
 phase2a-11-phase-closure-final-readiness-review writes the Phase 2A-11 phase-wide closure and final readiness review over the Phase 2A initial read-only framework through Phase 2A-10; Phase 2B remains unauthorized and no execution, runner, adapter, broker, SSH, NETCONF, RESTCONF, live device, provider/API/model, secret, frontend API, approval execution, or safety-gate relaxation is enabled.
 phase2b-00-authorization-scope-gate-review writes the Phase 2B-00 review-only authorization/scope gate over Phase 2A closure and next-phase criteria; Phase 2B remains not authorized and no Phase 2B-01, execution, runner, adapter, broker, scheduler, queue worker, SSH, NETCONF, RESTCONF, live device, provider/API/model, secret, frontend API, backup, VRRP execution, approval bypass, or safety-gate relaxation is enabled.
+phase2b-00a-planning-only-owner-authorization-statement records a review-only owner authorization for Phase 2B planning-only scope work; it permits documentation/readiness/specification scope design only and still forbids Phase 2B implementation, Phase 2B-01, execution, runner, adapter, broker, scheduler, queue worker, SSH, NETCONF, RESTCONF, live device, provider/API/model, secret, frontend API, backup, VRRP execution, approval bypass, and safety-gate relaxation.
 wireguard-runner is dry-run by default and delegates to the existing WireGuard script only after explicit --allow-live-wireguard."""
     parser = argparse.ArgumentParser(
         description=f"Day14 {lab.DAY14_NAME}.",
@@ -383,6 +385,7 @@ def _build_task_handlers(args: argparse.Namespace, root: Path, lab: ModuleType) 
         lab.PHASE_2A_10_SAFE_BOUNDARY_IMPLEMENTATION_READINESS_ARTIFACT_TASK_ID: lambda: lab._run_phase_2a_10_safe_boundary_implementation_readiness_artifact(root),
         lab.PHASE_2A_11_PHASE_CLOSURE_FINAL_READINESS_REVIEW_TASK_ID: lambda: lab._run_phase_2a_11_phase_closure_final_readiness_review(root),
         lab.PHASE_2B_00_AUTHORIZATION_SCOPE_GATE_REVIEW_TASK_ID: lambda: lab._run_phase_2b_00_authorization_scope_gate_review(root),
+        lab.PHASE_2B_00A_PLANNING_ONLY_OWNER_AUTHORIZATION_STATEMENT_TASK_ID: lambda: lab._run_phase_2b_00a_planning_only_owner_authorization_statement(root),
         lab.WIREGUARD_RUNNER_TASK_ALIAS: lambda: lab._run_wireguard_runner(
             root,
             dry_run=args.dry_run,

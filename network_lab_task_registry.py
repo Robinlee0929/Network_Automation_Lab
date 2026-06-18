@@ -120,6 +120,7 @@ CANONICAL_TASK_NAMES: Tuple[str, ...] = (
     "phase2a-10-safe-boundary-implementation-readiness-artifact",
     "phase2a-11-phase-closure-final-readiness-review",
     "phase2b-00-authorization-scope-gate-review",
+    "phase2b-00a-planning-only-owner-authorization-statement",
     "wireguard-runner",
 )
 
