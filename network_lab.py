@@ -308,6 +308,9 @@ from phase_2a_10_safe_boundary_implementation_readiness_artifact import (
 from phase_2a_11_phase_closure_final_readiness_review import (
     run_phase_2a_11_phase_closure_final_readiness_review,
 )
+from phase_2b_00_authorization_scope_gate_review import (
+    run_phase_2b_00_authorization_scope_gate_review,
+)
 from project_folder_organization_decision_gate import (
     run_project_folder_organization_decision_gate,
 )
@@ -1603,6 +1606,18 @@ PHASE_2A_11_PHASE_CLOSURE_FINAL_READINESS_REVIEW_JSON = (
 )
 PHASE_2A_11_PHASE_CLOSURE_FINAL_READINESS_REVIEW_HTML = (
     Path("reports") / "lab-summary" / "phase_2a_11_phase_closure_final_readiness_review.html"
+)
+PHASE_2B_00_AUTHORIZATION_SCOPE_GATE_REVIEW_TASK_ID = (
+    "phase2b-00-authorization-scope-gate-review"
+)
+PHASE_2B_00_AUTHORIZATION_SCOPE_GATE_REVIEW_DOC = (
+    Path("docs") / "phase_2b" / "phase_2b_00_authorization_scope_gate_review.md"
+)
+PHASE_2B_00_AUTHORIZATION_SCOPE_GATE_REVIEW_JSON = (
+    Path("reports") / "lab-summary" / "phase_2b_00_authorization_scope_gate_review.json"
+)
+PHASE_2B_00_AUTHORIZATION_SCOPE_GATE_REVIEW_HTML = (
+    Path("reports") / "lab-summary" / "phase_2b_00_authorization_scope_gate_review.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -3395,6 +3410,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{PHASE_2A_11_PHASE_CLOSURE_FINAL_READINESS_REVIEW_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Phase 2B",
+        "title": "Phase 2B-00 Authorization / Scope Gate Review",
+        "report_type": "Authorization and scope gate review",
+        "safety_label": "PHASE_2B_00_AUTHORIZATION_SCOPE_GATE_REVIEW_ONLY; PHASE_2B_STATUS_NOT_AUTHORIZED_YET; IMPLEMENTATION_ALLOWED_FALSE; PHASE_2B_01_ALLOWED_FALSE; PHASE_WIDE_SCOPE_CONFIRMED; EXAMPLE_JOB_TYPES_TREATED_AS_EXAMPLES_ONLY; FORBIDDEN_CAPABILITIES_LOCKED_FALSE; NEXT_PHASE_ALLOWED_FALSE",
+        "description": "Phase 2B-00 performs a review-only authorization/scope gate over Phase 2A closure and next-phase authorization criteria. It remains report-only and does not open Phase 2B, Phase 2B-01, execution, runners, adapters, brokers, SSH, NETCONF, RESTCONF, live devices, providers/APIs/models, secrets, frontend API integration, backups, VRRP execution, approval bypass, or safety-gate relaxation.",
+        "json_globs": [PHASE_2B_00_AUTHORIZATION_SCOPE_GATE_REVIEW_JSON.as_posix()],
+        "html_globs": [PHASE_2B_00_AUTHORIZATION_SCOPE_GATE_REVIEW_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{PHASE_2B_00_AUTHORIZATION_SCOPE_GATE_REVIEW_TASK_ID}"
         ),
     },
 ]
@@ -7632,6 +7660,32 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "phase_2a_11_phase_closure_final_readiness_review.py",
             "notes": "PHASE_2A_CLOSURE_READY_PHASE_2B_STILL_NOT_AUTHORIZED AGENTS_MD_FOUND_AND_READ AGENTS_MD_NOT_MODIFIED PHASE_WIDE_SCOPE_CONFIRMED EXAMPLE_JOB_TYPES_TREATED_AS_EXAMPLES_ONLY PHASE_2A_CHAIN_REVIEWED CLOSURE_DIMENSIONS_CHECKED JOBS_WORKFLOW_READINESS_REPRESENTED DRY_RUN_MOCK_ONLY_SAFETY_BOUNDARY_REPRESENTED ARTIFACT_TO_JOBS_TRACEABILITY_REPRESENTED PLAN_EVIDENCE_LEDGER_REPRESENTED DRY_RUN_RESULT_ENVELOPE_REPRESENTED REPORT_CONSISTENCY_REPRESENTED UI_DISPLAY_CONTRACT_READINESS_REPRESENTED NEGATIVE_REGRESSION_LOCK_REPRESENTED PHASE_2B_AUTHORIZED_FALSE RUNNER_ENABLED_FALSE ADAPTER_ENABLED_FALSE BROKER_ENABLED_FALSE SCHEDULER_ENABLED_FALSE QUEUE_WORKER_ENABLED_FALSE SSH_ENABLED_FALSE NETCONF_ENABLED_FALSE RESTCONF_ENABLED_FALSE LIVE_DEVICE_ACCESS_ENABLED_FALSE REAL_JOB_EXECUTION_ENABLED_FALSE REAL_CONFIGURATION_BACKUP_ENABLED_FALSE REAL_VRRP_EXECUTION_ENABLED_FALSE PROVIDER_CALLS_ENABLED_FALSE API_CALLS_ENABLED_FALSE MODEL_CALLS_ENABLED_FALSE SECRETS_HANDLING_ENABLED_FALSE FRONTEND_API_INTEGRATION_ENABLED_FALSE APPROVAL_WORKFLOW_EXECUTION_ENABLED_FALSE SAFETY_GATE_RELAXATION_ENABLED_FALSE NEXT_PHASE_ALLOWED_FALSE. Phase-wide closure/final readiness review only across baseline_check, interface_status_check, wan_lan_check, vrrp_validation, backup_config_plan, and blocked_config_change_request as examples only; no Phase 2B, runner, adapter, broker, scheduler, queue worker, SSH, NETCONF, RESTCONF, live device, real execution, real backup, real VRRP execution, frontend API integration, provider/API/model calls, secrets handling, approval execution, config change, command execution, or safety gate relaxation.",
+        },
+        {
+            "id": PHASE_2B_00_AUTHORIZATION_SCOPE_GATE_REVIEW_TASK_ID,
+            "task_id": "phase_2b_00_authorization_scope_gate_review",
+            "display_name": "Phase 2B-00 Authorization / Scope Gate Review",
+            "user_display_name": "Phase 2B-00 Authorization / Scope Gate Review",
+            "day": "Phase 2B",
+            "category": "authorization_scope_gate",
+            "description": "Phase 2B-00 reviews whether Phase 2B can be opened and records a conservative authorization verdict without enabling implementation or execution paths.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                PHASE_2B_00_AUTHORIZATION_SCOPE_GATE_REVIEW_JSON.as_posix(),
+                PHASE_2B_00_AUTHORIZATION_SCOPE_GATE_REVIEW_HTML.as_posix(),
+                PHASE_2B_00_AUTHORIZATION_SCOPE_GATE_REVIEW_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Phase 2B-00 JSON/HTML authorization scope gate review",
+                "Phase 2B-00 review documentation",
+            ],
+            "related_script": "phase_2b_00_authorization_scope_gate_review.py",
+            "notes": "PHASE_2B_00_AUTHORIZATION_SCOPE_GATE_REVIEW_ONLY AGENTS_MD_FOUND_AND_READ AGENTS_MD_NOT_MODIFIED PHASE_WIDE_SCOPE_CONFIRMED EXAMPLE_JOB_TYPES_TREATED_AS_EXAMPLES_ONLY PHASE_2A_CLOSURE_REFERENCED NEXT_PHASE_AUTHORIZATION_CRITERIA_REFERENCED IMPLEMENTATION_ALLOWED_FALSE PHASE_2B_STATUS_NOT_AUTHORIZED_YET PHASE_2B_01_ALLOWED_FALSE FORBIDDEN_CAPABILITIES_LOCKED_FALSE NEXT_PHASE_ALLOWED_FALSE. Review-only authorization/scope gate across baseline_check, interface_status_check, wan_lan_check, vrrp_validation, backup_config_plan, and blocked_config_change_request as examples only; no Phase 2B implementation, Phase 2B-01, runner, adapter, broker, scheduler, queue worker, SSH, NETCONF, RESTCONF, live device, provider/API/model calls, secrets handling, frontend API integration, real execution, real backup, real VRRP execution, device mutation, approval bypass, config change, command execution, or safety gate weakening.",
         },
     ]
 
@@ -12530,6 +12584,15 @@ def _run_phase_2a_10_safe_boundary_implementation_readiness_artifact(project_roo
 
 def _run_phase_2a_11_phase_closure_final_readiness_review(project_root: Path) -> int:
     return run_phase_2a_11_phase_closure_final_readiness_review(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_phase_2b_00_authorization_scope_gate_review(project_root: Path) -> int:
+    return run_phase_2b_00_authorization_scope_gate_review(
         project_root,
         format_heading_func=format_heading,
         format_status_func=format_status,
