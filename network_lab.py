@@ -1679,6 +1679,12 @@ PHASE_2B_04_SAFETY_ARTIFACT_CROSSWALK_GAP_REVIEW_JSON = (
 PHASE_2B_04_SAFETY_ARTIFACT_CROSSWALK_GAP_REVIEW_HTML = (
     Path("reports") / "lab-summary" / "phase_2b_04_safety_artifact_crosswalk_gap_review.html"
 )
+PHASE_2B_05_DAY1_DAY160_SAFETY_DEDUPLICATION_ACCEPTANCE_CRITERIA_TASK_ID = (
+    "phase2b-05-day1-day160-safety-deduplication-acceptance-criteria"
+)
+PHASE_2B_05_DAY1_DAY160_SAFETY_DEDUPLICATION_ACCEPTANCE_CRITERIA_DOC = (
+    Path("docs") / "phase_2b" / "phase_2b_05_day1_day160_safety_deduplication_acceptance_criteria.md"
+)
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
 WIREGUARD_RUNNER_DISPLAY_NAME = "WireGuard Runner Safety Layer"
@@ -7902,6 +7908,29 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "phase_2b_04_safety_artifact_crosswalk_gap_review.py",
             "notes": "PHASE_2B_04_PLANNING_ONLY_CROSSWALK_GAP_REVIEW_COMPLETE AGENTS_MD_FOUND_AND_READ AGENTS_MD_NOT_MODIFIED SCOPE_CONFIRMATION_PASS PHASE_GOAL_CONFIRMED EXAMPLE_JOB_TYPES_TREATED_AS_EXAMPLES_ONLY FORBIDDEN_SCOPE_PRESERVED EXISTING_ARTIFACTS_REFERENCED IMPLEMENTATION_BOUNDARY_PRESERVED NEW_SAFETY_MATRIX_CREATED_FALSE CROSSWALK_CREATED_TRUE GAP_REVIEW_CREATED_TRUE IMPLEMENTATION_STARTED_FALSE RUNNER_ADAPTER_EXECUTION_ENABLED_FALSE PROVIDER_API_MODEL_CALLS_ENABLED_FALSE. Planning-only crosswalk and gap review across Day1-Day160, Phase 2A, and Phase 2B safety artifacts; no new safety matrix, Phase 2B implementation, runner, adapter, broker, scheduler, queue worker, SSH, NETCONF, RESTCONF, live device, provider/API/model calls, secrets handling, frontend API integration, real execution, real backup, real VRRP execution, device mutation, approval bypass, config change, command execution, or safety gate weakening.",
+        },
+        {
+            "id": PHASE_2B_05_DAY1_DAY160_SAFETY_DEDUPLICATION_ACCEPTANCE_CRITERIA_TASK_ID,
+            "task_id": "phase_2b_05_day1_day160_safety_deduplication_acceptance_criteria",
+            "display_name": "Phase 2B-05 Day1-Day160 Safety De-duplication Acceptance Criteria",
+            "user_display_name": "Phase 2B-05 Day1-Day160 Safety De-duplication Acceptance Criteria",
+            "day": "Phase 2B",
+            "category": "authorization_scope_gate",
+            "description": "Phase 2B-05 documents planning-only acceptance criteria for referencing existing Day1-Day160, Phase 2A, and Phase 2B safety controls without duplicating them.",
+            "safety_level": "planning-only",
+            "execution_mode": "planning-only",
+            "enabled": True,
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                PHASE_2B_05_DAY1_DAY160_SAFETY_DEDUPLICATION_ACCEPTANCE_CRITERIA_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Phase 2B-05 planning-only Markdown de-duplication acceptance criteria artifact",
+            ],
+            "related_script": "none_planning_only_markdown_artifact",
+            "notes": "PHASE_2B_05_PLANNING_ONLY_DEDUP_ACCEPTANCE_CRITERIA_READY AGENTS_MD_FOUND_AND_READ AGENTS_MD_NOT_MODIFIED SCOPE_CONFIRMATION_PASS PHASE_GOAL_CONFIRMED EXAMPLE_JOB_TYPES_TREATED_AS_EXAMPLES_ONLY FORBIDDEN_SCOPE_PRESERVED EXISTING_ARTIFACTS_DISCOVERED_NOT_INVENTED DAY1_DAY160_SAFETY_DESIGNS_LISTED PHASE_2B_DUPLICATES_IDENTIFIED REUSABLE_EXISTING_CONTROLS_IDENTIFIED TRUE_GAPS_IDENTIFIED NO_FAKE_GAPS_FROM_DUPLICATES SECOND_PARALLEL_SAFETY_MATRIX_CREATED_FALSE RENAMED_SAFETY_MATRIX_CREATED_FALSE IMPLEMENTATION_STARTED_FALSE RUNNER_ADAPTER_EXECUTION_ENABLED_FALSE PROVIDER_API_MODEL_CALLS_ENABLED_FALSE. Planning-only Markdown artifact only; no Phase 2B implementation, CLI handler, runner, adapter, broker, scheduler, queue worker, SSH, NETCONF, RESTCONF, live device, provider/API/model calls, secrets handling, frontend API integration, real execution, real backup, real config change, device mutation, approval bypass, command execution, new safety matrix, parallel safety matrix, renamed safety matrix, replacement safety framework, or safety gate weakening.",
         },
     ]
 
