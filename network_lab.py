@@ -320,6 +320,9 @@ from phase_2b_01_planning_scope_design_only import (
 from phase_2b_02_safety_gate_design_planning_only import (
     run_phase_2b_02_safety_gate_design_planning_only,
 )
+from phase_2b_04_safety_artifact_crosswalk_gap_review import (
+    run_phase_2b_04_safety_artifact_crosswalk_gap_review,
+)
 from project_folder_organization_decision_gate import (
     run_project_folder_organization_decision_gate,
 )
@@ -1663,6 +1666,18 @@ PHASE_2B_02_SAFETY_GATE_DESIGN_PLANNING_ONLY_JSON = (
 )
 PHASE_2B_02_SAFETY_GATE_DESIGN_PLANNING_ONLY_HTML = (
     Path("reports") / "lab-summary" / "phase_2b_02_safety_gate_design_planning_only.html"
+)
+PHASE_2B_04_SAFETY_ARTIFACT_CROSSWALK_GAP_REVIEW_TASK_ID = (
+    "phase2b-04-safety-artifact-crosswalk-gap-review"
+)
+PHASE_2B_04_SAFETY_ARTIFACT_CROSSWALK_GAP_REVIEW_DOC = (
+    Path("docs") / "phase_2b" / "phase_2b_04_safety_artifact_crosswalk_gap_review.md"
+)
+PHASE_2B_04_SAFETY_ARTIFACT_CROSSWALK_GAP_REVIEW_JSON = (
+    Path("reports") / "lab-summary" / "phase_2b_04_safety_artifact_crosswalk_gap_review.json"
+)
+PHASE_2B_04_SAFETY_ARTIFACT_CROSSWALK_GAP_REVIEW_HTML = (
+    Path("reports") / "lab-summary" / "phase_2b_04_safety_artifact_crosswalk_gap_review.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -3507,6 +3522,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{PHASE_2B_02_SAFETY_GATE_DESIGN_PLANNING_ONLY_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Phase 2B",
+        "title": "Phase 2B-04 Safety Artifact Crosswalk and Gap Review",
+        "report_type": "Planning-only safety artifact crosswalk and gap review",
+        "safety_label": "PHASE_2B_04_PLANNING_ONLY_CROSSWALK_GAP_REVIEW_COMPLETE; NEW_SAFETY_MATRIX_CREATED_FALSE; CROSSWALK_CREATED_TRUE; GAP_REVIEW_CREATED_TRUE; IMPLEMENTATION_STARTED_FALSE; RUNNER_ADAPTER_EXECUTION_ENABLED_FALSE; PROVIDER_API_MODEL_CALLS_ENABLED_FALSE",
+        "description": "Phase 2B-04 maps existing Day1-Day160, Phase 2A, and Phase 2B safety artifacts into a planning-only crosswalk and gap review. It does not create a new safety matrix or implement Phase 2B, execution, runners, adapters, brokers, schedulers, queue workers, SSH, NETCONF, RESTCONF, live devices, providers/APIs/models, secrets, frontend API integration, backups, VRRP execution, approval bypass, or safety-gate relaxation.",
+        "json_globs": [PHASE_2B_04_SAFETY_ARTIFACT_CROSSWALK_GAP_REVIEW_JSON.as_posix()],
+        "html_globs": [PHASE_2B_04_SAFETY_ARTIFACT_CROSSWALK_GAP_REVIEW_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{PHASE_2B_04_SAFETY_ARTIFACT_CROSSWALK_GAP_REVIEW_TASK_ID}"
         ),
     },
 ]
@@ -7848,6 +7876,32 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "phase_2b_02_safety_gate_design_planning_only.py",
             "notes": "PHASE_2B_02_SAFETY_GATE_DESIGN_PLANNING_ONLY AGENTS_MD_FOUND_AND_READ AGENTS_MD_NOT_MODIFIED PHASE_2B_PLANNING_ONLY_AUTHORIZED_TRUE PHASE_2B_IMPLEMENTATION_ALLOWED_FALSE RUNNER_ALLOWED_FALSE ADAPTER_ALLOWED_FALSE EXECUTION_ALLOWED_FALSE SAFETY_GATES_DEFINED FORBIDDEN_CAPABILITIES_ENABLED_FALSE FUTURE_IMPLEMENTATION_REQUIRES_SEPARATE_GATE. Safety gate design planning only across baseline_check, interface_status_check, wan_lan_check, vrrp_validation, backup_config_plan, and blocked_config_change_request as examples only; no Phase 2B implementation, runner, adapter, broker, scheduler, queue worker, SSH, NETCONF, RESTCONF, live device, provider/API/model calls, secrets handling, frontend API integration, real execution, real backup, real VRRP execution, device mutation, approval bypass, config change, command execution, or safety gate weakening.",
+        },
+        {
+            "id": PHASE_2B_04_SAFETY_ARTIFACT_CROSSWALK_GAP_REVIEW_TASK_ID,
+            "task_id": "phase_2b_04_safety_artifact_crosswalk_gap_review",
+            "display_name": "Phase 2B-04 Safety Artifact Crosswalk and Gap Review",
+            "user_display_name": "Phase 2B-04 Safety Artifact Crosswalk and Gap Review",
+            "day": "Phase 2B",
+            "category": "authorization_scope_gate",
+            "description": "Phase 2B-04 creates a planning-only crosswalk and gap review over existing safety artifacts without enabling implementation or execution paths.",
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "enabled": True,
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                PHASE_2B_04_SAFETY_ARTIFACT_CROSSWALK_GAP_REVIEW_JSON.as_posix(),
+                PHASE_2B_04_SAFETY_ARTIFACT_CROSSWALK_GAP_REVIEW_HTML.as_posix(),
+                PHASE_2B_04_SAFETY_ARTIFACT_CROSSWALK_GAP_REVIEW_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Phase 2B-04 JSON/HTML planning-only crosswalk and gap review",
+                "Phase 2B-04 review documentation",
+            ],
+            "related_script": "phase_2b_04_safety_artifact_crosswalk_gap_review.py",
+            "notes": "PHASE_2B_04_PLANNING_ONLY_CROSSWALK_GAP_REVIEW_COMPLETE AGENTS_MD_FOUND_AND_READ AGENTS_MD_NOT_MODIFIED SCOPE_CONFIRMATION_PASS PHASE_GOAL_CONFIRMED EXAMPLE_JOB_TYPES_TREATED_AS_EXAMPLES_ONLY FORBIDDEN_SCOPE_PRESERVED EXISTING_ARTIFACTS_REFERENCED IMPLEMENTATION_BOUNDARY_PRESERVED NEW_SAFETY_MATRIX_CREATED_FALSE CROSSWALK_CREATED_TRUE GAP_REVIEW_CREATED_TRUE IMPLEMENTATION_STARTED_FALSE RUNNER_ADAPTER_EXECUTION_ENABLED_FALSE PROVIDER_API_MODEL_CALLS_ENABLED_FALSE. Planning-only crosswalk and gap review across Day1-Day160, Phase 2A, and Phase 2B safety artifacts; no new safety matrix, Phase 2B implementation, runner, adapter, broker, scheduler, queue worker, SSH, NETCONF, RESTCONF, live device, provider/API/model calls, secrets handling, frontend API integration, real execution, real backup, real VRRP execution, device mutation, approval bypass, config change, command execution, or safety gate weakening.",
         },
     ]
 
@@ -12782,6 +12836,15 @@ def _run_phase_2b_01_planning_scope_design_only(project_root: Path) -> int:
 
 def _run_phase_2b_02_safety_gate_design_planning_only(project_root: Path) -> int:
     return run_phase_2b_02_safety_gate_design_planning_only(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_phase_2b_04_safety_artifact_crosswalk_gap_review(project_root: Path) -> int:
+    return run_phase_2b_04_safety_artifact_crosswalk_gap_review(
         project_root,
         format_heading_func=format_heading,
         format_status_func=format_status,
