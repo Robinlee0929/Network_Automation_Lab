@@ -90,6 +90,7 @@ def _build_parser(lab: ModuleType) -> argparse.ArgumentParser:
   python network_lab.py --task phase2b-02-safety-gate-design-planning-only
   python network_lab.py --task phase2b-04-safety-artifact-crosswalk-gap-review
   python network_lab.py --task phase2b-06-implementation-entry-gate-and-first-slice-readiness-review
+  python network_lab.py --task phase2b-07-first-slice-definition-pack
   python network_lab.py --task intent-workflow-demo
   python network_lab.py --task offline-mock-runtime
   python network_lab.py --task offline-mock-runtime-contract
@@ -189,6 +190,7 @@ phase2b-01-planning-scope-design-only writes the Phase 2B-01 planning-only scope
 phase2b-02-safety-gate-design-planning-only writes the Phase 2B-02 safety gate design planning-only artifact; it defines future owner authorization, scope, forbidden capability, no-execution, no-secret, no-live-device, no-provider/API/model, approval design, traceability, validation, and stop-condition gates while forbidding implementation, execution, runner, adapter, broker, scheduler, queue worker, SSH, NETCONF, RESTCONF, live device, provider/API/model, secret, frontend API, backup, VRRP execution, approval bypass, and safety-gate relaxation.
 phase2b-04-safety-artifact-crosswalk-gap-review writes the Phase 2B-04 planning-only crosswalk and gap review over existing Day1-Day160, Phase 2A, and Phase 2B safety artifacts; it does not create a new safety matrix or enable implementation, execution, runner, adapter, broker, scheduler, queue worker, SSH, NETCONF, RESTCONF, live device, provider/API/model, secret, frontend API, backup, VRRP execution, approval bypass, or safety-gate relaxation.
 phase2b-06-implementation-entry-gate-and-first-slice-readiness-review writes the Phase 2B-06 planning-only implementation entry gate and first-slice readiness review; it may only authorize defining the next first-slice planning artifact and does not implement a slice, create a second safety matrix, or enable implementation, execution, runner, adapter, broker, scheduler, queue worker, SSH, NETCONF, RESTCONF, live device, provider/API/model, secret, frontend API, backup, VRRP execution, approval bypass, or safety-gate relaxation.
+phase2b-07-first-slice-definition-pack writes the Phase 2B-07 planning-only first-slice definition pack; it defines a future local static job-definition and evidence-contract boundary and does not re-run Phase 2B-06, re-create safety gates, implement the slice, create a second safety matrix, or enable implementation, execution, runner, adapter, broker, scheduler, queue worker, SSH, NETCONF, RESTCONF, live device, provider/API/model, secret, frontend integration, backup, validation, command execution, approval bypass, or safety-gate relaxation.
 wireguard-runner is dry-run by default and delegates to the existing WireGuard script only after explicit --allow-live-wireguard."""
     parser = argparse.ArgumentParser(
         description=f"Day14 {lab.DAY14_NAME}.",
@@ -398,6 +400,7 @@ def _build_task_handlers(args: argparse.Namespace, root: Path, lab: ModuleType) 
         lab.PHASE_2B_02_SAFETY_GATE_DESIGN_PLANNING_ONLY_TASK_ID: lambda: lab._run_phase_2b_02_safety_gate_design_planning_only(root),
         lab.PHASE_2B_04_SAFETY_ARTIFACT_CROSSWALK_GAP_REVIEW_TASK_ID: lambda: lab._run_phase_2b_04_safety_artifact_crosswalk_gap_review(root),
         lab.PHASE_2B_06_IMPLEMENTATION_ENTRY_GATE_AND_FIRST_SLICE_READINESS_REVIEW_TASK_ID: lambda: lab._run_phase_2b_06_implementation_entry_gate_and_first_slice_readiness_review(root),
+        lab.PHASE_2B_07_FIRST_SLICE_DEFINITION_PACK_TASK_ID: lambda: lab._run_phase_2b_07_first_slice_definition_pack(root),
         lab.WIREGUARD_RUNNER_TASK_ALIAS: lambda: lab._run_wireguard_runner(
             root,
             dry_run=args.dry_run,

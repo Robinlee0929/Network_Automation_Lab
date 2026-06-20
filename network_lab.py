@@ -326,6 +326,9 @@ from phase_2b_04_safety_artifact_crosswalk_gap_review import (
 from phase_2b_06_implementation_entry_gate_and_first_slice_readiness_review import (
     run_phase_2b_06_implementation_entry_gate_and_first_slice_readiness_review,
 )
+from phase_2b_07_first_slice_definition_pack import (
+    run_phase_2b_07_first_slice_definition_pack,
+)
 from project_folder_organization_decision_gate import (
     run_project_folder_organization_decision_gate,
 )
@@ -1699,6 +1702,18 @@ PHASE_2B_06_IMPLEMENTATION_ENTRY_GATE_AND_FIRST_SLICE_READINESS_REVIEW_JSON = (
 )
 PHASE_2B_06_IMPLEMENTATION_ENTRY_GATE_AND_FIRST_SLICE_READINESS_REVIEW_HTML = (
     Path("reports") / "lab-summary" / "phase_2b_06_implementation_entry_gate_and_first_slice_readiness_review.html"
+)
+PHASE_2B_07_FIRST_SLICE_DEFINITION_PACK_TASK_ID = (
+    "phase2b-07-first-slice-definition-pack"
+)
+PHASE_2B_07_FIRST_SLICE_DEFINITION_PACK_DOC = (
+    Path("docs") / "phase_2b" / "phase_2b_07_first_slice_definition_pack.md"
+)
+PHASE_2B_07_FIRST_SLICE_DEFINITION_PACK_JSON = (
+    Path("reports") / "lab-summary" / "phase_2b_07_first_slice_definition_pack.json"
+)
+PHASE_2B_07_FIRST_SLICE_DEFINITION_PACK_HTML = (
+    Path("reports") / "lab-summary" / "phase_2b_07_first_slice_definition_pack.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -3569,6 +3584,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{PHASE_2B_06_IMPLEMENTATION_ENTRY_GATE_AND_FIRST_SLICE_READINESS_REVIEW_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Phase 2B",
+        "title": "Phase 2B-07 First-Slice Definition Pack",
+        "report_type": "Planning-only first-slice definition pack",
+        "safety_label": "PHASE_2B_07_FIRST_SLICE_DEFINED_PLANNING_ONLY; SAFETY_GATES_RECREATED_FALSE; ENTRY_GATE_REVIEW_RERUN_FALSE; FIRST_SLICE_IMPLEMENTED_FALSE; RUNNER_ADAPTER_EXECUTION_ENABLED_FALSE; PROVIDER_API_MODEL_CALLS_ENABLED_FALSE; LIVE_DEVICE_ACCESS_ENABLED_FALSE",
+        "description": "Phase 2B-07 defines the first minimal safe implementation slice as a future local static job-definition and evidence-contract boundary. It remains planning-only and does not re-run Phase 2B-06, re-create safety gates, implement the slice, or enable runners, adapters, execution, SSH, NETCONF, RESTCONF, live devices, providers/APIs/models, secrets, frontend integration, backups, validation, command execution, or safety-gate relaxation.",
+        "json_globs": [PHASE_2B_07_FIRST_SLICE_DEFINITION_PACK_JSON.as_posix()],
+        "html_globs": [PHASE_2B_07_FIRST_SLICE_DEFINITION_PACK_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{PHASE_2B_07_FIRST_SLICE_DEFINITION_PACK_TASK_ID}"
         ),
     },
 ]
@@ -7985,6 +8013,32 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "phase_2b_06_implementation_entry_gate_and_first_slice_readiness_review.py",
             "notes": "PHASE_2B_06_IMPLEMENTATION_ENTRY_GATE_READY AGENTS_MD_FOUND_AND_READ AGENTS_MD_NOT_MODIFIED SCOPE_CONFIRMATION_PASS PHASE_GOAL_CONFIRMED EXAMPLE_JOB_TYPES_TREATED_AS_EXAMPLES_ONLY FORBIDDEN_SCOPE_PRESERVED EXISTING_ARTIFACTS_REFERENCED IMPLEMENTATION_BOUNDARY_PRESERVED PHASE_2B_05_CONTROLS_SAFETY_DEDUPLICATION SECOND_SAFETY_MATRIX_CREATED_FALSE FIRST_SLICE_IMPLEMENTED_FALSE RUNNER_ADAPTER_EXECUTION_ENABLED_FALSE PROVIDER_API_MODEL_CALLS_ENABLED_FALSE LIVE_DEVICE_ACCESS_ENABLED_FALSE GO_TO_DEFINE_FIRST_SLICE_PLANNING_ONLY. Planning-only implementation entry gate and first-slice readiness review across Phase 2B-00 through Phase 2B-05; no Phase 2B implementation slice, runner, adapter, broker, scheduler, queue worker, SSH, NETCONF, RESTCONF, live device, provider/API/model calls, secrets handling, frontend API integration, real execution, real backup, real config change, real VRRP execution, device mutation, approval bypass, command execution, second safety matrix, or safety gate weakening.",
+        },
+        {
+            "id": PHASE_2B_07_FIRST_SLICE_DEFINITION_PACK_TASK_ID,
+            "task_id": "phase_2b_07_first_slice_definition_pack",
+            "display_name": "Phase 2B-07 First-Slice Definition Pack",
+            "user_display_name": "Phase 2B-07 First-Slice Definition Pack",
+            "day": "Phase 2B",
+            "category": "authorization_scope_gate",
+            "description": "Phase 2B-07 defines the first minimal safe implementation slice as a future local static job-definition and evidence-contract boundary while remaining planning-only.",
+            "safety_level": "planning-only",
+            "execution_mode": "planning-only",
+            "enabled": True,
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                PHASE_2B_07_FIRST_SLICE_DEFINITION_PACK_JSON.as_posix(),
+                PHASE_2B_07_FIRST_SLICE_DEFINITION_PACK_HTML.as_posix(),
+                PHASE_2B_07_FIRST_SLICE_DEFINITION_PACK_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Phase 2B-07 JSON/HTML planning-only first-slice definition pack",
+                "Phase 2B-07 first-slice definition documentation",
+            ],
+            "related_script": "phase_2b_07_first_slice_definition_pack.py",
+            "notes": "PHASE_2B_07_FIRST_SLICE_DEFINED_PLANNING_ONLY AGENTS_MD_FOUND_AND_READ AGENTS_MD_NOT_MODIFIED SCOPE_CONFIRMATION_PASS PHASE_GOAL_CONFIRMED EXAMPLE_JOB_TYPES_TREATED_AS_EXAMPLES_ONLY FORBIDDEN_SCOPE_PRESERVED EXISTING_ARTIFACTS_REFERENCED IMPLEMENTATION_BOUNDARY_PRESERVED SAFETY_GATES_RECREATED_FALSE ENTRY_GATE_REVIEW_RERUN_FALSE FIRST_SLICE_IMPLEMENTED_FALSE RUNNER_ADAPTER_EXECUTION_ENABLED_FALSE PROVIDER_API_MODEL_CALLS_ENABLED_FALSE LIVE_DEVICE_ACCESS_ENABLED_FALSE. Planning-only first-slice definition pack; no Phase 2B implementation slice, readiness review re-run, safety gate recreation, runner, adapter, broker, scheduler, queue worker, SSH, NETCONF, RESTCONF, live device, provider/API/model calls, secrets handling, frontend integration, background execution, real execution, real backup, real config collection, real validation, command execution, second safety matrix, verdict change, approval bypass, or safety gate weakening.",
         },
     ]
 
@@ -12937,6 +12991,15 @@ def _run_phase_2b_04_safety_artifact_crosswalk_gap_review(project_root: Path) ->
 
 def _run_phase_2b_06_implementation_entry_gate_and_first_slice_readiness_review(project_root: Path) -> int:
     return run_phase_2b_06_implementation_entry_gate_and_first_slice_readiness_review(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_phase_2b_07_first_slice_definition_pack(project_root: Path) -> int:
+    return run_phase_2b_07_first_slice_definition_pack(
         project_root,
         format_heading_func=format_heading,
         format_status_func=format_status,
