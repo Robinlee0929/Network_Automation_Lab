@@ -323,6 +323,9 @@ from phase_2b_02_safety_gate_design_planning_only import (
 from phase_2b_04_safety_artifact_crosswalk_gap_review import (
     run_phase_2b_04_safety_artifact_crosswalk_gap_review,
 )
+from phase_2b_06_implementation_entry_gate_and_first_slice_readiness_review import (
+    run_phase_2b_06_implementation_entry_gate_and_first_slice_readiness_review,
+)
 from project_folder_organization_decision_gate import (
     run_project_folder_organization_decision_gate,
 )
@@ -1684,6 +1687,18 @@ PHASE_2B_05_DAY1_DAY160_SAFETY_DEDUPLICATION_ACCEPTANCE_CRITERIA_TASK_ID = (
 )
 PHASE_2B_05_DAY1_DAY160_SAFETY_DEDUPLICATION_ACCEPTANCE_CRITERIA_DOC = (
     Path("docs") / "phase_2b" / "phase_2b_05_day1_day160_safety_deduplication_acceptance_criteria.md"
+)
+PHASE_2B_06_IMPLEMENTATION_ENTRY_GATE_AND_FIRST_SLICE_READINESS_REVIEW_TASK_ID = (
+    "phase2b-06-implementation-entry-gate-and-first-slice-readiness-review"
+)
+PHASE_2B_06_IMPLEMENTATION_ENTRY_GATE_AND_FIRST_SLICE_READINESS_REVIEW_DOC = (
+    Path("docs") / "phase_2b" / "phase_2b_06_implementation_entry_gate_and_first_slice_readiness_review.md"
+)
+PHASE_2B_06_IMPLEMENTATION_ENTRY_GATE_AND_FIRST_SLICE_READINESS_REVIEW_JSON = (
+    Path("reports") / "lab-summary" / "phase_2b_06_implementation_entry_gate_and_first_slice_readiness_review.json"
+)
+PHASE_2B_06_IMPLEMENTATION_ENTRY_GATE_AND_FIRST_SLICE_READINESS_REVIEW_HTML = (
+    Path("reports") / "lab-summary" / "phase_2b_06_implementation_entry_gate_and_first_slice_readiness_review.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -3541,6 +3556,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{PHASE_2B_04_SAFETY_ARTIFACT_CROSSWALK_GAP_REVIEW_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Phase 2B",
+        "title": "Phase 2B-06 Implementation Entry Gate and First-Slice Readiness Review",
+        "report_type": "Planning-only implementation entry gate and first-slice readiness review",
+        "safety_label": "PHASE_2B_06_IMPLEMENTATION_ENTRY_GATE_READY; GO_TO_DEFINE_FIRST_SLICE_PLANNING_ONLY; SECOND_SAFETY_MATRIX_CREATED_FALSE; FIRST_SLICE_IMPLEMENTED_FALSE; RUNNER_ADAPTER_EXECUTION_ENABLED_FALSE; PROVIDER_API_MODEL_CALLS_ENABLED_FALSE; LIVE_DEVICE_ACCESS_ENABLED_FALSE",
+        "description": "Phase 2B-06 consolidates Phase 2B-00 through Phase 2B-05 and decides whether the next planning artifact may define a future first safe implementation slice. It does not authorize implementation, create a second safety matrix, or enable runners, adapters, execution, SSH, NETCONF, RESTCONF, live devices, providers/APIs/models, secrets, frontend API integration, backups, VRRP execution, approval bypass, or safety-gate relaxation.",
+        "json_globs": [PHASE_2B_06_IMPLEMENTATION_ENTRY_GATE_AND_FIRST_SLICE_READINESS_REVIEW_JSON.as_posix()],
+        "html_globs": [PHASE_2B_06_IMPLEMENTATION_ENTRY_GATE_AND_FIRST_SLICE_READINESS_REVIEW_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{PHASE_2B_06_IMPLEMENTATION_ENTRY_GATE_AND_FIRST_SLICE_READINESS_REVIEW_TASK_ID}"
         ),
     },
 ]
@@ -7931,6 +7959,32 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "none_planning_only_markdown_artifact",
             "notes": "PHASE_2B_05_PLANNING_ONLY_DEDUP_ACCEPTANCE_CRITERIA_READY AGENTS_MD_FOUND_AND_READ AGENTS_MD_NOT_MODIFIED SCOPE_CONFIRMATION_PASS PHASE_GOAL_CONFIRMED EXAMPLE_JOB_TYPES_TREATED_AS_EXAMPLES_ONLY FORBIDDEN_SCOPE_PRESERVED EXISTING_ARTIFACTS_DISCOVERED_NOT_INVENTED DAY1_DAY160_SAFETY_DESIGNS_LISTED PHASE_2B_DUPLICATES_IDENTIFIED REUSABLE_EXISTING_CONTROLS_IDENTIFIED TRUE_GAPS_IDENTIFIED NO_FAKE_GAPS_FROM_DUPLICATES SECOND_PARALLEL_SAFETY_MATRIX_CREATED_FALSE RENAMED_SAFETY_MATRIX_CREATED_FALSE IMPLEMENTATION_STARTED_FALSE RUNNER_ADAPTER_EXECUTION_ENABLED_FALSE PROVIDER_API_MODEL_CALLS_ENABLED_FALSE. Planning-only Markdown artifact only; no Phase 2B implementation, CLI handler, runner, adapter, broker, scheduler, queue worker, SSH, NETCONF, RESTCONF, live device, provider/API/model calls, secrets handling, frontend API integration, real execution, real backup, real config change, device mutation, approval bypass, command execution, new safety matrix, parallel safety matrix, renamed safety matrix, replacement safety framework, or safety gate weakening.",
+        },
+        {
+            "id": PHASE_2B_06_IMPLEMENTATION_ENTRY_GATE_AND_FIRST_SLICE_READINESS_REVIEW_TASK_ID,
+            "task_id": "phase_2b_06_implementation_entry_gate_and_first_slice_readiness_review",
+            "display_name": "Phase 2B-06 Implementation Entry Gate and First-Slice Readiness Review",
+            "user_display_name": "Phase 2B-06 Implementation Entry Gate and First-Slice Readiness Review",
+            "day": "Phase 2B",
+            "category": "authorization_scope_gate",
+            "description": "Phase 2B-06 consolidates Phase 2B-00 through Phase 2B-05 and decides whether the next planning artifact may define a future first safe implementation slice.",
+            "safety_level": "planning-only",
+            "execution_mode": "planning-only",
+            "enabled": True,
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                PHASE_2B_06_IMPLEMENTATION_ENTRY_GATE_AND_FIRST_SLICE_READINESS_REVIEW_JSON.as_posix(),
+                PHASE_2B_06_IMPLEMENTATION_ENTRY_GATE_AND_FIRST_SLICE_READINESS_REVIEW_HTML.as_posix(),
+                PHASE_2B_06_IMPLEMENTATION_ENTRY_GATE_AND_FIRST_SLICE_READINESS_REVIEW_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Phase 2B-06 JSON/HTML planning-only implementation entry gate",
+                "Phase 2B-06 readiness review documentation",
+            ],
+            "related_script": "phase_2b_06_implementation_entry_gate_and_first_slice_readiness_review.py",
+            "notes": "PHASE_2B_06_IMPLEMENTATION_ENTRY_GATE_READY AGENTS_MD_FOUND_AND_READ AGENTS_MD_NOT_MODIFIED SCOPE_CONFIRMATION_PASS PHASE_GOAL_CONFIRMED EXAMPLE_JOB_TYPES_TREATED_AS_EXAMPLES_ONLY FORBIDDEN_SCOPE_PRESERVED EXISTING_ARTIFACTS_REFERENCED IMPLEMENTATION_BOUNDARY_PRESERVED PHASE_2B_05_CONTROLS_SAFETY_DEDUPLICATION SECOND_SAFETY_MATRIX_CREATED_FALSE FIRST_SLICE_IMPLEMENTED_FALSE RUNNER_ADAPTER_EXECUTION_ENABLED_FALSE PROVIDER_API_MODEL_CALLS_ENABLED_FALSE LIVE_DEVICE_ACCESS_ENABLED_FALSE GO_TO_DEFINE_FIRST_SLICE_PLANNING_ONLY. Planning-only implementation entry gate and first-slice readiness review across Phase 2B-00 through Phase 2B-05; no Phase 2B implementation slice, runner, adapter, broker, scheduler, queue worker, SSH, NETCONF, RESTCONF, live device, provider/API/model calls, secrets handling, frontend API integration, real execution, real backup, real config change, real VRRP execution, device mutation, approval bypass, command execution, second safety matrix, or safety gate weakening.",
         },
     ]
 
@@ -12874,6 +12928,15 @@ def _run_phase_2b_02_safety_gate_design_planning_only(project_root: Path) -> int
 
 def _run_phase_2b_04_safety_artifact_crosswalk_gap_review(project_root: Path) -> int:
     return run_phase_2b_04_safety_artifact_crosswalk_gap_review(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_phase_2b_06_implementation_entry_gate_and_first_slice_readiness_review(project_root: Path) -> int:
+    return run_phase_2b_06_implementation_entry_gate_and_first_slice_readiness_review(
         project_root,
         format_heading_func=format_heading,
         format_status_func=format_status,
