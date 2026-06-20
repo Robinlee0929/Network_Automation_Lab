@@ -329,6 +329,9 @@ from phase_2b_06_implementation_entry_gate_and_first_slice_readiness_review impo
 from phase_2b_07_first_slice_definition_pack import (
     run_phase_2b_07_first_slice_definition_pack,
 )
+from phase_2b_08_first_slice_implementation_authorization_gate_planning_only import (
+    run_phase_2b_08_first_slice_implementation_authorization_gate,
+)
 from project_folder_organization_decision_gate import (
     run_project_folder_organization_decision_gate,
 )
@@ -1714,6 +1717,18 @@ PHASE_2B_07_FIRST_SLICE_DEFINITION_PACK_JSON = (
 )
 PHASE_2B_07_FIRST_SLICE_DEFINITION_PACK_HTML = (
     Path("reports") / "lab-summary" / "phase_2b_07_first_slice_definition_pack.html"
+)
+PHASE_2B_08_FIRST_SLICE_IMPLEMENTATION_AUTHORIZATION_GATE_TASK_ID = (
+    "phase2b-08-first-slice-implementation-authorization-gate-planning-only"
+)
+PHASE_2B_08_FIRST_SLICE_IMPLEMENTATION_AUTHORIZATION_GATE_DOC = (
+    Path("docs") / "phase_2b" / "phase_2b_08_first_slice_implementation_authorization_gate_planning_only.md"
+)
+PHASE_2B_08_FIRST_SLICE_IMPLEMENTATION_AUTHORIZATION_GATE_JSON = (
+    Path("reports") / "lab-summary" / "phase_2b_08_first_slice_implementation_authorization_gate_planning_only.json"
+)
+PHASE_2B_08_FIRST_SLICE_IMPLEMENTATION_AUTHORIZATION_GATE_HTML = (
+    Path("reports") / "lab-summary" / "phase_2b_08_first_slice_implementation_authorization_gate_planning_only.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -3597,6 +3612,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{PHASE_2B_07_FIRST_SLICE_DEFINITION_PACK_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Phase 2B",
+        "title": "Phase 2B-08 First-Slice Implementation Authorization Gate - Planning Only",
+        "report_type": "Planning-only first-slice authorization gate",
+        "safety_label": "GO_TO_2B_09_PLANNING_ONLY; PHASE_2B_07_CLARITY_CHECK_PASS; SAFETY_GATE_REUSE_CHECK_PASS; FIRST_SLICE_IMPLEMENTED_FALSE; RUNNER_ADAPTER_EXECUTION_ADDED_FALSE; SSH_NETCONF_RESTCONF_TOUCHED_FALSE; LIVE_DEVICE_ACCESS_ADDED_FALSE; PROVIDER_API_MODEL_CALLS_ADDED_FALSE; SECOND_SAFETY_MATRIX_CREATED_FALSE",
+        "description": "Phase 2B-08 evaluates whether the Phase 2B-07 first slice is clear, bounded, safe, reviewable, and eligible to move only to Phase 2B-09 planning. It remains planning-only and does not authorize implementation, re-run Phase 2B-06, rebuild safety gates, create a second safety matrix, or enable runners, adapters, execution, SSH, NETCONF, RESTCONF, live devices, providers/APIs/models, secrets, frontend integration, background work, backups, validation, command execution, or safety-gate relaxation.",
+        "json_globs": [PHASE_2B_08_FIRST_SLICE_IMPLEMENTATION_AUTHORIZATION_GATE_JSON.as_posix()],
+        "html_globs": [PHASE_2B_08_FIRST_SLICE_IMPLEMENTATION_AUTHORIZATION_GATE_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{PHASE_2B_08_FIRST_SLICE_IMPLEMENTATION_AUTHORIZATION_GATE_TASK_ID}"
         ),
     },
 ]
@@ -8039,6 +8067,32 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "phase_2b_07_first_slice_definition_pack.py",
             "notes": "PHASE_2B_07_FIRST_SLICE_DEFINED_PLANNING_ONLY AGENTS_MD_FOUND_AND_READ AGENTS_MD_NOT_MODIFIED SCOPE_CONFIRMATION_PASS PHASE_GOAL_CONFIRMED EXAMPLE_JOB_TYPES_TREATED_AS_EXAMPLES_ONLY FORBIDDEN_SCOPE_PRESERVED EXISTING_ARTIFACTS_REFERENCED IMPLEMENTATION_BOUNDARY_PRESERVED SAFETY_GATES_RECREATED_FALSE ENTRY_GATE_REVIEW_RERUN_FALSE FIRST_SLICE_IMPLEMENTED_FALSE RUNNER_ADAPTER_EXECUTION_ENABLED_FALSE PROVIDER_API_MODEL_CALLS_ENABLED_FALSE LIVE_DEVICE_ACCESS_ENABLED_FALSE. Planning-only first-slice definition pack; no Phase 2B implementation slice, readiness review re-run, safety gate recreation, runner, adapter, broker, scheduler, queue worker, SSH, NETCONF, RESTCONF, live device, provider/API/model calls, secrets handling, frontend integration, background execution, real execution, real backup, real config collection, real validation, command execution, second safety matrix, verdict change, approval bypass, or safety gate weakening.",
+        },
+        {
+            "id": PHASE_2B_08_FIRST_SLICE_IMPLEMENTATION_AUTHORIZATION_GATE_TASK_ID,
+            "task_id": "phase_2b_08_first_slice_implementation_authorization_gate_planning_only",
+            "display_name": "Phase 2B-08 First-Slice Implementation Authorization Gate - Planning Only",
+            "user_display_name": "Phase 2B-08 First-Slice Implementation Authorization Gate - Planning Only",
+            "day": "Phase 2B",
+            "category": "authorization_scope_gate",
+            "description": "Phase 2B-08 evaluates whether the Phase 2B-07 first slice is clear, bounded, safe, reviewable, and eligible to move only to Phase 2B-09 planning.",
+            "safety_level": "planning-only",
+            "execution_mode": "planning-only",
+            "enabled": True,
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                PHASE_2B_08_FIRST_SLICE_IMPLEMENTATION_AUTHORIZATION_GATE_JSON.as_posix(),
+                PHASE_2B_08_FIRST_SLICE_IMPLEMENTATION_AUTHORIZATION_GATE_HTML.as_posix(),
+                PHASE_2B_08_FIRST_SLICE_IMPLEMENTATION_AUTHORIZATION_GATE_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Phase 2B-08 JSON/HTML planning-only first-slice authorization gate",
+                "Phase 2B-08 authorization gate planning documentation",
+            ],
+            "related_script": "phase_2b_08_first_slice_implementation_authorization_gate_planning_only.py",
+            "notes": "PHASE_2B_08_FIRST_SLICE_AUTHORIZATION_GATE_PLANNING_ONLY AGENTS_MD_FOUND_AND_READ AGENTS_MD_NOT_MODIFIED SCOPE_CONFIRMATION_PASS PHASE_GOAL_CONFIRMED EXAMPLE_JOB_TYPES_TREATED_AS_EXAMPLES_ONLY FORBIDDEN_SCOPE_PRESERVED EXISTING_ARTIFACTS_REFERENCED IMPLEMENTATION_BOUNDARY_PRESERVED PHASE_2B_07_CLARITY_CHECK_PASS BOUNDARY_COMPLIANCE_CHECK_PASS SAFETY_GATE_REUSE_CHECK_PASS FUTURE_AUTHORIZATION_CONDITIONS_EXPLICIT SAFETY_GATES_REBUILT_OR_REPLACED_FALSE SECOND_SAFETY_MATRIX_CREATED_FALSE FIRST_SLICE_IMPLEMENTED_FALSE RUNNER_ADAPTER_EXECUTION_ADDED_FALSE SSH_NETCONF_RESTCONF_TOUCHED_FALSE LIVE_DEVICE_ACCESS_ADDED_FALSE PROVIDER_API_MODEL_CALLS_ADDED_FALSE GO_TO_2B_09_PLANNING_ONLY. Planning-only first-slice implementation authorization gate; no Phase 2B implementation slice, Phase 2B-06 re-run or rewrite, safety gate rebuild, safety gate replacement, second safety matrix, runner, adapter, broker, scheduler, queue worker, background worker, SSH, NETCONF, RESTCONF, live device, provider/API/model calls, secrets handling, frontend integration, real execution, real backup, real validation, command execution, approval bypass, or safety gate weakening.",
         },
     ]
 
@@ -13000,6 +13054,15 @@ def _run_phase_2b_06_implementation_entry_gate_and_first_slice_readiness_review(
 
 def _run_phase_2b_07_first_slice_definition_pack(project_root: Path) -> int:
     return run_phase_2b_07_first_slice_definition_pack(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_phase_2b_08_first_slice_implementation_authorization_gate(project_root: Path) -> int:
+    return run_phase_2b_08_first_slice_implementation_authorization_gate(
         project_root,
         format_heading_func=format_heading,
         format_status_func=format_status,
