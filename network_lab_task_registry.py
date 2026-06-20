@@ -127,6 +127,7 @@ CANONICAL_TASK_NAMES: Tuple[str, ...] = (
     "phase2b-06-implementation-entry-gate-and-first-slice-readiness-review",
     "phase2b-07-first-slice-definition-pack",
     "phase2b-08-first-slice-implementation-authorization-gate-planning-only",
+    "phase2b-09-first-slice-implementation-plan-pack-planning-only",
     "wireguard-runner",
 )
 
