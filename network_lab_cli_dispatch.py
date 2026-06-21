@@ -93,6 +93,7 @@ def _build_parser(lab: ModuleType) -> argparse.ArgumentParser:
   python network_lab.py --task phase2b-07-first-slice-definition-pack
   python network_lab.py --task phase2b-08-first-slice-implementation-authorization-gate-planning-only
   python network_lab.py --task phase2b-09-first-slice-implementation-plan-pack-planning-only
+  python network_lab.py --task phase2b-10-day1-day160-reference-mapping-for-future-first-slice-planning-only
   python network_lab.py --task intent-workflow-demo
   python network_lab.py --task offline-mock-runtime
   python network_lab.py --task offline-mock-runtime-contract
@@ -195,6 +196,7 @@ phase2b-06-implementation-entry-gate-and-first-slice-readiness-review writes the
 phase2b-07-first-slice-definition-pack writes the Phase 2B-07 planning-only first-slice definition pack; it defines a future local static job-definition and evidence-contract boundary and does not re-run Phase 2B-06, re-create safety gates, implement the slice, create a second safety matrix, or enable implementation, execution, runner, adapter, broker, scheduler, queue worker, SSH, NETCONF, RESTCONF, live device, provider/API/model, secret, frontend integration, backup, validation, command execution, approval bypass, or safety-gate relaxation.
 phase2b-08-first-slice-implementation-authorization-gate-planning-only writes the Phase 2B-08 planning-only first-slice implementation authorization gate; it may only authorize moving to Phase 2B-09 planning and does not authorize implementation, re-run Phase 2B-06, rebuild safety gates, create a second safety matrix, or enable execution, runner, adapter, broker, scheduler, queue worker, SSH, NETCONF, RESTCONF, live device, provider/API/model, secret, frontend integration, backup, validation, command execution, approval bypass, or safety-gate relaxation.
 phase2b-09-first-slice-implementation-plan-pack-planning-only writes the Phase 2B-09 planning-only first-slice implementation plan pack; it references the Phase 2B-08 GO_TO_2B_09_PLANNING_ONLY gate verdict as input, does not duplicate the gate, and does not implement the slice, create a second safety matrix, or enable execution, runner, adapter, broker, scheduler, queue worker, SSH, NETCONF, RESTCONF, live device, provider/API/model, secret, frontend integration, backup, validation, command execution, approval bypass, or safety-gate relaxation.
+phase2b-10-day1-day160-reference-mapping-for-future-first-slice-planning-only writes the Phase 2B-10 planning-only Day1-Day160 reference mapping for a future first slice; it references existing Day1-Day160, Phase 2A, and Phase 2B controls without copying, rewriting, replacing, creating a second safety matrix, duplicating Phase 2B-05/06/08/09, authorizing implementation, or enabling execution, runner, adapter, broker, scheduler, queue worker, SSH, NETCONF, RESTCONF, live device, provider/API/model, secret, frontend integration, backup, validation, command execution, approval bypass, or safety-gate relaxation.
 wireguard-runner is dry-run by default and delegates to the existing WireGuard script only after explicit --allow-live-wireguard."""
     parser = argparse.ArgumentParser(
         description=f"Day14 {lab.DAY14_NAME}.",
@@ -407,6 +409,7 @@ def _build_task_handlers(args: argparse.Namespace, root: Path, lab: ModuleType) 
         lab.PHASE_2B_07_FIRST_SLICE_DEFINITION_PACK_TASK_ID: lambda: lab._run_phase_2b_07_first_slice_definition_pack(root),
         lab.PHASE_2B_08_FIRST_SLICE_IMPLEMENTATION_AUTHORIZATION_GATE_TASK_ID: lambda: lab._run_phase_2b_08_first_slice_implementation_authorization_gate(root),
         lab.PHASE_2B_09_FIRST_SLICE_IMPLEMENTATION_PLAN_PACK_TASK_ID: lambda: lab._run_phase_2b_09_first_slice_implementation_plan_pack(root),
+        lab.PHASE_2B_10_DAY1_DAY160_REFERENCE_MAPPING_TASK_ID: lambda: lab._run_phase_2b_10_day1_day160_reference_mapping(root),
         lab.WIREGUARD_RUNNER_TASK_ALIAS: lambda: lab._run_wireguard_runner(
             root,
             dry_run=args.dry_run,
