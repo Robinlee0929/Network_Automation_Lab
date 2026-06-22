@@ -341,6 +341,9 @@ from phase_2b_10_day1_day160_reference_mapping_for_future_first_slice import (
 from phase_2b_11_project_consolidation_and_implementation_entry_map import (
     run_phase_2b_11_project_consolidation_entry_map,
 )
+from phase_2b_12_future_implementation_authorization_review import (
+    run_phase_2b_12_future_implementation_authorization_review,
+)
 from project_folder_organization_decision_gate import (
     run_project_folder_organization_decision_gate,
 )
@@ -1774,6 +1777,18 @@ PHASE_2B_11_PROJECT_CONSOLIDATION_ENTRY_MAP_JSON = (
 )
 PHASE_2B_11_PROJECT_CONSOLIDATION_ENTRY_MAP_HTML = (
     Path("reports") / "lab-summary" / "phase_2b_11_project_consolidation_and_implementation_entry_map.html"
+)
+PHASE_2B_12_FUTURE_IMPLEMENTATION_AUTHORIZATION_REVIEW_TASK_ID = (
+    "phase2b-12-future-implementation-authorization-review-planning-only"
+)
+PHASE_2B_12_FUTURE_IMPLEMENTATION_AUTHORIZATION_REVIEW_DOC = (
+    Path("docs") / "phase_2b" / "phase_2b_12_future_implementation_authorization_review.md"
+)
+PHASE_2B_12_FUTURE_IMPLEMENTATION_AUTHORIZATION_REVIEW_JSON = (
+    Path("reports") / "lab-summary" / "phase_2b_12_future_implementation_authorization_review.json"
+)
+PHASE_2B_12_FUTURE_IMPLEMENTATION_AUTHORIZATION_REVIEW_HTML = (
+    Path("reports") / "lab-summary" / "phase_2b_12_future_implementation_authorization_review.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -3709,6 +3724,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{PHASE_2B_11_PROJECT_CONSOLIDATION_ENTRY_MAP_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Phase 2B",
+        "title": "Phase 2B-12 Future Implementation Authorization Review - Planning Only",
+        "report_type": "Planning-only future implementation authorization review",
+        "safety_label": "PHASE_2B_12_PLANNING_ONLY_COMMITTED; FUTURE_IMPLEMENTATION_AUTHORIZED_FALSE; PHASE_2B_REMAINS_PLANNING_ONLY; MISSING_CONDITIONS_LISTED; SCOPE_DRIFT_RISK_REVIEWED; NEEDS_SCOPE_CONFIRMATION_BEHAVIOR_INCLUDED; DAY1_DAY160_REWRITTEN_OR_REPLACED_FALSE; SECOND_SAFETY_MATRIX_CREATED_FALSE; FIRST_SLICE_IMPLEMENTED_FALSE; RUNNER_ADAPTER_EXECUTION_PATH_ADDED_FALSE; SSH_NETCONF_RESTCONF_LIVE_DEVICE_TOUCHED_FALSE; PROVIDER_API_MODEL_SECRETS_TOUCHED_FALSE",
+        "description": "Phase 2B-12 produces a planning-only future implementation authorization review. It states future implementation is not authorized, keeps Phase 2B planning-only, treats job types as examples only, lists missing authorization conditions and scope drift risks, and does not create a first slice, runner, adapter, execution path, SSH, NETCONF, RESTCONF, live device, provider/API/model, secrets, second safety matrix, or Day1-Day160 replacement.",
+        "json_globs": [PHASE_2B_12_FUTURE_IMPLEMENTATION_AUTHORIZATION_REVIEW_JSON.as_posix()],
+        "html_globs": [PHASE_2B_12_FUTURE_IMPLEMENTATION_AUTHORIZATION_REVIEW_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{PHASE_2B_12_FUTURE_IMPLEMENTATION_AUTHORIZATION_REVIEW_TASK_ID}"
         ),
     },
 ]
@@ -8255,6 +8283,32 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "phase_2b_11_project_consolidation_and_implementation_entry_map.py",
             "notes": "PHASE_2B_11_PROJECT_CONSOLIDATION_ENTRY_MAP_PLANNING_ONLY PHASE_2B_11_PROJECT_CONSOLIDATION_ENTRY_MAP_PLANNING_ONLY_DONE FUTURE_PLAN_CREATED FUTURE_PLAN_IS_REVIEW_ONLY FUTURE_IMPLEMENTATION_AUTHORIZED_FALSE FIRST_SLICE_SELECTED_FALSE FIRST_SLICE_IMPLEMENTED_FALSE CURRENT_SCOPE_DRIFT_DETECTED_FALSE FUTURE_SCOPE_DRIFT_ITEMS_LISTED RUNNER_ADAPTER_EXECUTION_PATH_ADDED_FALSE SSH_NETCONF_RESTCONF_LIVE_DEVICE_TOUCHED_FALSE PROVIDER_API_MODEL_SECRETS_TOUCHED_FALSE. Planning-only project consolidation and implementation entry map; no future phase creation, Phase 2B implementation slice, final first-slice selection, Day1-Day160 rewrite or replacement, Phase 2B-10 replacement, second safety matrix, runner, adapter, broker, scheduler, queue worker, background worker, SSH, NETCONF, RESTCONF, live device, provider/API/model calls, token handling, credential handling, secrets handling, frontend integration, real execution, real backup, real validation, command execution, config change, approval bypass, or safety gate weakening.",
+        },
+        {
+            "id": PHASE_2B_12_FUTURE_IMPLEMENTATION_AUTHORIZATION_REVIEW_TASK_ID,
+            "task_id": "phase_2b_12_future_implementation_authorization_review",
+            "display_name": "Phase 2B-12 Future Implementation Authorization Review - Planning Only",
+            "user_display_name": "Phase 2B-12 Future Implementation Authorization Review - Planning Only",
+            "day": "Phase 2B",
+            "category": "authorization_scope_gate",
+            "description": "Phase 2B-12 reviews whether future implementation authorization is currently allowed, keeps Phase 2B planning-only, lists missing conditions, and reviews scope drift risk.",
+            "safety_level": "planning-only",
+            "execution_mode": "planning-only",
+            "enabled": True,
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                PHASE_2B_12_FUTURE_IMPLEMENTATION_AUTHORIZATION_REVIEW_JSON.as_posix(),
+                PHASE_2B_12_FUTURE_IMPLEMENTATION_AUTHORIZATION_REVIEW_HTML.as_posix(),
+                PHASE_2B_12_FUTURE_IMPLEMENTATION_AUTHORIZATION_REVIEW_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Phase 2B-12 JSON/HTML planning-only future implementation authorization review",
+                "Phase 2B-12 future implementation authorization review documentation",
+            ],
+            "related_script": "phase_2b_12_future_implementation_authorization_review.py",
+            "notes": "PHASE_2B_12_FUTURE_IMPLEMENTATION_AUTHORIZATION_REVIEW_PLANNING_ONLY PHASE_2B_12_PLANNING_ONLY_COMMITTED AGENTS_MD_FOUND_AND_READ AGENTS_MD_NOT_MODIFIED SCOPE_CONFIRMATION_PASS PHASE_GOAL_CONFIRMED EXAMPLE_JOB_TYPES_TREATED_AS_EXAMPLES_ONLY FORBIDDEN_SCOPE_PRESERVED EXISTING_ARTIFACTS_REFERENCED IMPLEMENTATION_BOUNDARY_PRESERVED FUTURE_IMPLEMENTATION_AUTHORIZED_FALSE PHASE_2B_REMAINS_PLANNING_ONLY MISSING_CONDITIONS_LISTED SCOPE_DRIFT_RISK_REVIEWED NEEDS_SCOPE_CONFIRMATION_BEHAVIOR_INCLUDED DAY1_DAY160_REWRITTEN_OR_REPLACED_FALSE SECOND_SAFETY_MATRIX_CREATED_FALSE FIRST_SLICE_IMPLEMENTED_FALSE RUNNER_ADAPTER_EXECUTION_PATH_ADDED_FALSE SSH_NETCONF_RESTCONF_LIVE_DEVICE_TOUCHED_FALSE PROVIDER_API_MODEL_SECRETS_TOUCHED_FALSE. Planning-only future implementation authorization review; no Phase 2B implementation slice, single-job narrowing, Day1-Day160 rewrite or replacement, second safety matrix, runner, adapter, broker, scheduler, queue worker, SSH, NETCONF, RESTCONF, live device, provider/API/model calls, secrets handling, frontend integration, real execution, real backup, real validation, command execution, config change, approval bypass, or safety gate weakening.",
         },
     ]
 
@@ -13252,6 +13306,15 @@ def _run_phase_2b_10_day1_day160_reference_mapping(project_root: Path) -> int:
 
 def _run_phase_2b_11_project_consolidation_entry_map(project_root: Path) -> int:
     return run_phase_2b_11_project_consolidation_entry_map(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_phase_2b_12_future_implementation_authorization_review(project_root: Path) -> int:
+    return run_phase_2b_12_future_implementation_authorization_review(
         project_root,
         format_heading_func=format_heading,
         format_status_func=format_status,
