@@ -350,6 +350,9 @@ from phase_2b_13_first_slice_final_selection_gate import (
 from phase_2b_14_first_slice_implementation_kickoff_gate import (
     run_phase_2b_14_first_slice_implementation_kickoff_gate,
 )
+from phase_2c_01_local_static_job_first_slice import (
+    run_phase_2c_01_local_static_job_first_slice,
+)
 from project_folder_organization_decision_gate import (
     run_project_folder_organization_decision_gate,
 )
@@ -1819,6 +1822,16 @@ PHASE_2B_14_FIRST_SLICE_IMPLEMENTATION_KICKOFF_GATE_JSON = (
 )
 PHASE_2B_14_FIRST_SLICE_IMPLEMENTATION_KICKOFF_GATE_HTML = (
     Path("reports") / "lab-summary" / "phase_2b_14_first_slice_implementation_kickoff_gate.html"
+)
+PHASE_2C_01_LOCAL_STATIC_JOB_FIRST_SLICE_TASK_ID = "phase2c-01-local-static-job-first-slice"
+PHASE_2C_01_LOCAL_STATIC_JOB_FIRST_SLICE_DOC = (
+    Path("docs") / "phase_2c" / "phase_2c_01_local_static_job_first_slice.md"
+)
+PHASE_2C_01_LOCAL_STATIC_JOB_FIRST_SLICE_JSON = (
+    Path("reports") / "lab-summary" / "phase_2c_01_local_static_job_first_slice.json"
+)
+PHASE_2C_01_LOCAL_STATIC_JOB_FIRST_SLICE_HTML = (
+    Path("reports") / "lab-summary" / "phase_2c_01_local_static_job_first_slice.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -3793,6 +3806,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{PHASE_2B_14_FIRST_SLICE_IMPLEMENTATION_KICKOFF_GATE_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Phase 2C",
+        "title": "Phase 2C-01 Local Static Job First Slice",
+        "report_type": "Local static first-slice implementation",
+        "safety_label": "PHASE_2C_01_LOCAL_STATIC_JOB_FIRST_SLICE_DONE; AGENTS_MD_FOUND_YES; AGENTS_MD_READ_BEFORE_ACTION_YES; AGENTS_MD_MODIFIED_NO; SCOPE_CONFIRMATION_WRITTEN_YES; PHASE_GOAL_SEPARATED_YES; EXAMPLE_JOB_TYPES_SEPARATED_YES; FORBIDDEN_SCOPE_SEPARATED_YES; EXISTING_ARTIFACTS_TO_REFERENCE_SEPARATED_YES; IMPLEMENTATION_BOUNDARY_SEPARATED_YES; SCOPE_NARROWED_TO_ONE_EXAMPLE_JOB_TYPE_NO; NEEDS_SCOPE_CONFIRMATION_NO; NOT_NEXT_DAY_FEATURE_YES; EXECUTION_OPENED_NO; PROVIDER_API_OPENED_NO; MODEL_OPENED_NO; SECRETS_TOUCHED_NO; LIVE_DEVICE_TOUCHED_NO; SSH_NETCONF_RESTCONF_TOUCHED_NO; DAY1_DAY160_REWRITTEN_OR_REPLACED_NO; SECOND_SAFETY_MATRIX_CREATED_NO; LOCAL_STATIC_JOB_IMPLEMENTED_YES; RUNNER_ADAPTER_EXECUTION_PATH_ADDED_NO",
+        "description": "Phase 2C-01 implements the approved local_static_job first slice as a local-only, static-only, deterministic data contract and reviewer-evidence proof. It does not add runners, adapters, brokers, schedulers, queues, execution paths, shell commands, custom scripts, SSH, NETCONF, RESTCONF, live devices, providers/APIs/models, secrets, backups, config changes, a second safety matrix, or Day1-Day160 replacement.",
+        "json_globs": [PHASE_2C_01_LOCAL_STATIC_JOB_FIRST_SLICE_JSON.as_posix()],
+        "html_globs": [PHASE_2C_01_LOCAL_STATIC_JOB_FIRST_SLICE_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{PHASE_2C_01_LOCAL_STATIC_JOB_FIRST_SLICE_TASK_ID}"
         ),
     },
 ]
@@ -8417,6 +8443,32 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "phase_2b_14_first_slice_implementation_kickoff_gate.py",
             "notes": "PHASE_2B_14_FIRST_SLICE_IMPLEMENTATION_KICKOFF_GATE PHASE_2B_14_KICKOFF_GATE_READY_NOT_IMPLEMENTED AGENTS_MD_FOUND_YES AGENTS_MD_READ_BEFORE_ACTION_YES AGENTS_MD_MODIFIED_NO SCOPE_CONFIRMATION_WRITTEN_YES PHASE_GOAL_SEPARATED_YES EXAMPLE_JOB_TYPES_SEPARATED_YES FORBIDDEN_SCOPE_SEPARATED_YES EXISTING_ARTIFACTS_REFERENCED_YES IMPLEMENTATION_BOUNDARY_SEPARATED_YES SCOPE_NARROWED_TO_SINGLE_EXAMPLE_NO NEEDS_SCOPE_CONFIRMATION_NO FIRST_SLICE_IMPLEMENTED_NO LOCAL_STATIC_JOB_IMPLEMENTED_NO RUNNER_ADAPTER_EXECUTION_PATH_ADDED_NO SSH_NETCONF_RESTCONF_LIVE_DEVICE_TOUCHED_NO PROVIDER_API_MODEL_SECRETS_TOUCHED_NO DAY1_DAY160_REWRITTEN_OR_REPLACED_NO SECOND_SAFETY_MATRIX_CREATED_NO. Authorization kickoff gate only; no first-slice implementation, local_static_job implementation, runner, adapter, broker, scheduler, queue, execution path, SSH, NETCONF, RESTCONF, live device, provider/API/model calls, secrets handling, backup execution, config change execution, custom command/script execution, real device operation, Day1-Day160 rewrite or replacement, second safety matrix, approval bypass, or safety gate weakening.",
+        },
+        {
+            "id": PHASE_2C_01_LOCAL_STATIC_JOB_FIRST_SLICE_TASK_ID,
+            "task_id": "phase_2c_01_local_static_job_first_slice",
+            "display_name": "Phase 2C-01 Local Static Job First Slice",
+            "user_display_name": "Phase 2C-01 Local Static Job First Slice",
+            "day": "Phase 2C",
+            "category": "local_static_implementation",
+            "description": "Phase 2C-01 implements the authorized local_static_job first slice as a local-only, static-only, deterministic data contract and reviewer-evidence proof.",
+            "enabled": True,
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                PHASE_2C_01_LOCAL_STATIC_JOB_FIRST_SLICE_JSON.as_posix(),
+                PHASE_2C_01_LOCAL_STATIC_JOB_FIRST_SLICE_HTML.as_posix(),
+                PHASE_2C_01_LOCAL_STATIC_JOB_FIRST_SLICE_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Phase 2C-01 JSON/HTML local_static_job first-slice evidence",
+                "Phase 2C-01 local_static_job scope confirmation documentation",
+            ],
+            "related_script": "phase_2c_01_local_static_job_first_slice.py",
+            "notes": "PHASE_2C_01_LOCAL_STATIC_JOB_FIRST_SLICE PHASE_2C_01_LOCAL_STATIC_JOB_FIRST_SLICE_DONE AGENTS_MD_FOUND_YES AGENTS_MD_READ_BEFORE_ACTION_YES AGENTS_MD_MODIFIED_NO SCOPE_CONFIRMATION_WRITTEN_YES PHASE_GOAL_SEPARATED_YES EXAMPLE_JOB_TYPES_SEPARATED_YES FORBIDDEN_SCOPE_SEPARATED_YES EXISTING_ARTIFACTS_TO_REFERENCE_SEPARATED_YES IMPLEMENTATION_BOUNDARY_SEPARATED_YES SCOPE_NARROWED_TO_ONE_EXAMPLE_JOB_TYPE_NO NEEDS_SCOPE_CONFIRMATION_NO NOT_NEXT_DAY_FEATURE_YES EXECUTION_OPENED_NO PROVIDER_API_OPENED_NO MODEL_OPENED_NO SECRETS_TOUCHED_NO LIVE_DEVICE_TOUCHED_NO SSH_NETCONF_RESTCONF_TOUCHED_NO DAY1_DAY160_REWRITTEN_OR_REPLACED_NO SECOND_SAFETY_MATRIX_CREATED_NO LOCAL_STATIC_JOB_IMPLEMENTED_YES RUNNER_ADAPTER_EXECUTION_PATH_ADDED_NO. Static-only first-slice implementation; no runner, adapter, broker, scheduler, queue, execution path, shell command, custom script, SSH, NETCONF, RESTCONF, live device, provider/API/model call, secret handling, backup execution, config change execution, Day1-Day160 rewrite or replacement, second safety matrix, approval bypass, or safety gate weakening.",
         },
     ]
 
@@ -13441,6 +13493,15 @@ def _run_phase_2b_13_first_slice_final_selection_gate(project_root: Path) -> int
 
 def _run_phase_2b_14_first_slice_implementation_kickoff_gate(project_root: Path) -> int:
     return run_phase_2b_14_first_slice_implementation_kickoff_gate(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_phase_2c_01_local_static_job_first_slice(project_root: Path) -> int:
+    return run_phase_2c_01_local_static_job_first_slice(
         project_root,
         format_heading_func=format_heading,
         format_status_func=format_status,
