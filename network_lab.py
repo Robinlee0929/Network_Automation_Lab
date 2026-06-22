@@ -371,6 +371,9 @@ from phase_2c_06_next_slice_final_selection_gate import (
 from phase_2c_07_next_slice_implementation_kickoff_gate import (
     run_phase_2c_07_next_slice_implementation_kickoff_gate,
 )
+from phase_2c_08_next_slice_implementation import (
+    run_phase_2c_08_next_slice_implementation,
+)
 from project_folder_organization_decision_gate import (
     run_project_folder_organization_decision_gate,
 )
@@ -1912,6 +1915,16 @@ PHASE_2C_07_NEXT_SLICE_IMPLEMENTATION_KICKOFF_GATE_JSON = (
 )
 PHASE_2C_07_NEXT_SLICE_IMPLEMENTATION_KICKOFF_GATE_HTML = (
     Path("reports") / "lab-summary" / "phase_2c_07_next_slice_implementation_kickoff_gate.html"
+)
+PHASE_2C_08_NEXT_SLICE_IMPLEMENTATION_TASK_ID = "phase2c-08-next-slice-implementation"
+PHASE_2C_08_NEXT_SLICE_IMPLEMENTATION_DOC = (
+    Path("docs") / "phase_2c" / "phase_2c_08_next_slice_implementation.md"
+)
+PHASE_2C_08_NEXT_SLICE_IMPLEMENTATION_JSON = (
+    Path("reports") / "lab-summary" / "phase_2c_08_next_slice_implementation.json"
+)
+PHASE_2C_08_NEXT_SLICE_IMPLEMENTATION_HTML = (
+    Path("reports") / "lab-summary" / "phase_2c_08_next_slice_implementation.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -3977,6 +3990,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{PHASE_2C_07_NEXT_SLICE_IMPLEMENTATION_KICKOFF_GATE_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Phase 2C",
+        "title": "Phase 2C-08 Next-Slice Implementation",
+        "report_type": "Local report-only artifact validation job",
+        "safety_label": "PHASE_2C_08_NEXT_SLICE_IMPLEMENTED_LOCAL_REPORT_ONLY; SELECTED_NEXT_SLICE_ARTIFACT_VALIDATION_JOB; PHASE_GOAL_CONFIRMED_YES; PHASE_2C_06_SELECTION_CONFIRMED_YES; PHASE_2C_07_AUTHORIZATION_CONFIRMED_YES; ARTIFACT_VALIDATION_JOB_IMPLEMENTED_YES; LOCAL_ONLY_YES; DETERMINISTIC_YES; REPORT_ONLY_DRY_RUN_MOCK_ONLY_YES; RUNNER_ADAPTER_EXECUTION_PATH_ADDED_NO; SCHEDULER_QUEUE_BROKER_WORKER_AGENT_LOOP_ADDED_NO; SSH_NETCONF_RESTCONF_LIVE_DEVICE_TOUCHED_NO; PROVIDER_API_MODEL_SECRETS_TOUCHED_NO; CONFIG_BACKUP_OR_CHANGE_ADDED_NO; DAY1_DAY160_REWRITTEN_OR_REPLACED_NO; SECOND_SAFETY_MATRIX_CREATED_NO",
+        "description": "Phase 2C-08 implements the selected artifact_validation_job as a bounded local deterministic artifact validation report over existing repository artifacts and prior Phase 2C evidence. It does not add execution, runners, adapters, schedulers, queues, brokers, workers, agent loops, SSH, NETCONF, RESTCONF, live devices, provider/API/model/secret access, config backup/change behavior, Day1-Day160 replacement, or a second safety matrix.",
+        "json_globs": [PHASE_2C_08_NEXT_SLICE_IMPLEMENTATION_JSON.as_posix()],
+        "html_globs": [PHASE_2C_08_NEXT_SLICE_IMPLEMENTATION_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{PHASE_2C_08_NEXT_SLICE_IMPLEMENTATION_TASK_ID}"
         ),
     },
 ]
@@ -8783,6 +8809,32 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "phase_2c_07_next_slice_implementation_kickoff_gate.py",
             "notes": "PHASE_2C_07_NEXT_SLICE_IMPLEMENTATION_KICKOFF_GATE_AUTHORIZATION_ONLY PHASE_2C_07_AUTHORIZATION_GATE_DONE_PHASE_2C_08_AUTHORIZED_NOT_STARTED AGENTS_MD_FOUND_YES AGENTS_MD_READ_BEFORE_ACTION_YES AGENTS_MD_MODIFIED_NO SCOPE_CONFIRMATION_WRITTEN_YES PHASE_2C_04_READ_YES PHASE_2C_05_READ_YES PHASE_2C_06_READ_YES AUTHORIZATION_GATE_ONLY_YES SELECTED_NEXT_SLICE_ARTIFACT_VALIDATION_JOB NEXT_SLICE_AUTHORIZED_FOR_PHASE_2C_08_YES PHASE_2C_08_STARTED_NO IMPLEMENTATION_ADDED_NO ARTIFACT_VALIDATION_JOB_IMPLEMENTED_NO RUNNER_ADAPTER_EXECUTION_PATH_ADDED_NO SCHEDULER_QUEUE_BROKER_WORKER_AGENT_LOOP_ADDED_NO SSH_NETCONF_RESTCONF_LIVE_DEVICE_TOUCHED_NO PROVIDER_API_MODEL_SECRETS_TOUCHED_NO REAL_COMMAND_EXECUTION_ADDED_NO CONFIG_BACKUP_OR_CHANGE_BEHAVIOR_ADDED_NO DAY1_DAY160_REWRITTEN_OR_REPLACED_NO SECOND_SAFETY_MATRIX_CREATED_NO NEEDS_SCOPE_CONFIRMATION_NO. Report-only authorization gate; authorizes candidate-02 artifact_validation_job for later separate Phase 2C-08 using Phase 2C-04 inventory, Phase 2C-05 safety delta, and Phase 2C-06 final selection evidence, not Phase 2C-08 start, implementation, runner, adapter, broker, scheduler, queue, worker, agent loop, execution path, provider/API/model call, secret handling, SSH, NETCONF, RESTCONF, live device access, real command execution, backup behavior, config change behavior, AGENTS.md modification, Day1-Day160 rewrite or replacement, second safety matrix, approval bypass, or safety gate weakening.",
+        },
+        {
+            "id": PHASE_2C_08_NEXT_SLICE_IMPLEMENTATION_TASK_ID,
+            "task_id": "phase_2c_08_next_slice_implementation",
+            "display_name": "Phase 2C-08 Next-Slice Implementation",
+            "user_display_name": "Phase 2C-08 Next-Slice Implementation",
+            "day": "Phase 2C",
+            "category": "implementation",
+            "description": "Phase 2C-08 implements the selected artifact_validation_job as a bounded local deterministic artifact validation report over existing repository artifacts and prior Phase 2C evidence.",
+            "safety_level": "report-only",
+            "enabled": True,
+            "execution_mode": "report-only",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                PHASE_2C_08_NEXT_SLICE_IMPLEMENTATION_JSON.as_posix(),
+                PHASE_2C_08_NEXT_SLICE_IMPLEMENTATION_HTML.as_posix(),
+                PHASE_2C_08_NEXT_SLICE_IMPLEMENTATION_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Phase 2C-08 JSON/HTML local artifact validation evidence",
+                "Phase 2C-08 next-slice implementation documentation",
+            ],
+            "related_script": "phase_2c_08_next_slice_implementation.py",
+            "notes": "PHASE_2C_08_NEXT_SLICE_IMPLEMENTATION PHASE_2C_08_NEXT_SLICE_IMPLEMENTED_LOCAL_REPORT_ONLY SELECTED_NEXT_SLICE_ARTIFACT_VALIDATION_JOB PHASE_GOAL_CONFIRMED_YES PHASE_2C_06_SELECTION_CONFIRMED_YES PHASE_2C_07_AUTHORIZATION_CONFIRMED_YES SCOPE_NARROWED_TO_ONE_EXAMPLE_NO NEEDS_SCOPE_CONFIRMATION_NO ARTIFACT_VALIDATION_JOB_IMPLEMENTED_YES LOCAL_ONLY_YES DETERMINISTIC_YES REPORT_ONLY_DRY_RUN_MOCK_ONLY_YES VALIDATES_EXISTING_LOCAL_ARTIFACTS_ONLY_YES RUNNER_ADAPTER_EXECUTION_PATH_ADDED_NO SCHEDULER_QUEUE_BROKER_WORKER_AGENT_LOOP_ADDED_NO SSH_NETCONF_RESTCONF_LIVE_DEVICE_TOUCHED_NO PROVIDER_API_MODEL_SECRETS_TOUCHED_NO CONFIG_BACKUP_OR_CHANGE_ADDED_NO DAY1_DAY160_REWRITTEN_OR_REPLACED_NO SECOND_SAFETY_MATRIX_CREATED_NO. Report-only implementation; validates fixed local repository artifacts and prior Phase 2C-06/Phase 2C-07 evidence only, not runner, adapter, broker, scheduler, queue, worker, agent loop, execution path, provider/API/model call, secret handling, SSH, NETCONF, RESTCONF, live device access, real command execution, backup behavior, config change behavior, AGENTS.md modification, Day1-Day160 rewrite or replacement, second safety matrix, approval bypass, or safety gate weakening.",
         },
     ]
 
@@ -13870,6 +13922,15 @@ def _run_phase_2c_06_next_slice_final_selection_gate(project_root: Path) -> int:
 
 def _run_phase_2c_07_next_slice_implementation_kickoff_gate(project_root: Path) -> int:
     return run_phase_2c_07_next_slice_implementation_kickoff_gate(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_phase_2c_08_next_slice_implementation(project_root: Path) -> int:
+    return run_phase_2c_08_next_slice_implementation(
         project_root,
         format_heading_func=format_heading,
         format_status_func=format_status,

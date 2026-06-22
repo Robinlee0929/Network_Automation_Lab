@@ -140,6 +140,7 @@ CANONICAL_TASK_NAMES: Tuple[str, ...] = (
     "phase2c-05-next-slice-safety-delta-review",
     "phase2c-06-next-slice-final-selection-gate",
     "phase2c-07-next-slice-implementation-kickoff-gate",
+    "phase2c-08-next-slice-implementation",
     "wireguard-runner",
 )
 
@@ -147,6 +148,7 @@ CANONICAL_TASK_NAMES: Tuple[str, ...] = (
 TASK_ALIASES: Dict[str, str] = {
     "broker-review-queue-decision-state": "broker-review-queue",
     "deferred-evidence-collection-log": "reviewer-evidence-intake-outcome-ledger",
+    "phase2c-08-artifact-validation-job": "phase2c-08-next-slice-implementation",
 }
 
 
