@@ -344,6 +344,9 @@ from phase_2b_11_project_consolidation_and_implementation_entry_map import (
 from phase_2b_12_future_implementation_authorization_review import (
     run_phase_2b_12_future_implementation_authorization_review,
 )
+from phase_2b_13_first_slice_final_selection_gate import (
+    run_phase_2b_13_first_slice_final_selection_gate,
+)
 from project_folder_organization_decision_gate import (
     run_project_folder_organization_decision_gate,
 )
@@ -1789,6 +1792,18 @@ PHASE_2B_12_FUTURE_IMPLEMENTATION_AUTHORIZATION_REVIEW_JSON = (
 )
 PHASE_2B_12_FUTURE_IMPLEMENTATION_AUTHORIZATION_REVIEW_HTML = (
     Path("reports") / "lab-summary" / "phase_2b_12_future_implementation_authorization_review.html"
+)
+PHASE_2B_13_FIRST_SLICE_FINAL_SELECTION_GATE_TASK_ID = (
+    "phase2b-13-first-slice-final-selection-gate-planning-only"
+)
+PHASE_2B_13_FIRST_SLICE_FINAL_SELECTION_GATE_DOC = (
+    Path("docs") / "phase_2b" / "phase_2b_13_first_slice_final_selection_gate.md"
+)
+PHASE_2B_13_FIRST_SLICE_FINAL_SELECTION_GATE_JSON = (
+    Path("reports") / "lab-summary" / "phase_2b_13_first_slice_final_selection_gate.json"
+)
+PHASE_2B_13_FIRST_SLICE_FINAL_SELECTION_GATE_HTML = (
+    Path("reports") / "lab-summary" / "phase_2b_13_first_slice_final_selection_gate.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -3737,6 +3752,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{PHASE_2B_12_FUTURE_IMPLEMENTATION_AUTHORIZATION_REVIEW_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Phase 2B",
+        "title": "Phase 2B-13 First-Slice Final Selection Gate - Planning Only",
+        "report_type": "Planning-only first-slice final selection gate",
+        "safety_label": "PHASE_2B_13_FIRST_SLICE_SELECTED_PLANNING_ONLY; AGENTS_MD_FOUND_AND_READ; AGENTS_MD_NOT_MODIFIED; FUTURE_FIRST_SLICE_SELECTED_TRUE; SELECTED_FUTURE_FIRST_SLICE_IMPLEMENTED_FALSE; IMPLEMENTATION_AUTHORIZED_BY_PHASE_2B_13_FALSE; PHASE_2B_14_IMPLEMENTATION_AUTHORIZATION_GATE_RESERVED_TRUE; PHASE_2C_TOUCHED_FALSE; RUNNER_ADAPTER_EXECUTION_PATH_ADDED_FALSE; SSH_NETCONF_RESTCONF_LIVE_DEVICE_TOUCHED_FALSE; PROVIDER_API_MODEL_SECRETS_TOUCHED_FALSE",
+        "description": "Phase 2B-13 selects the future first-slice candidate while remaining planning-only. It selects local_static_job_definition_and_evidence_contract_slice for a later Phase 2B-14 authorization review and does not implement it, authorize implementation, touch Phase 2C, or enable runners, adapters, execution paths, SSH, NETCONF, RESTCONF, live devices, providers/APIs/models, secrets, backups, validation, command execution, config changes, a second safety matrix, or Day1-Day160 replacement.",
+        "json_globs": [PHASE_2B_13_FIRST_SLICE_FINAL_SELECTION_GATE_JSON.as_posix()],
+        "html_globs": [PHASE_2B_13_FIRST_SLICE_FINAL_SELECTION_GATE_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{PHASE_2B_13_FIRST_SLICE_FINAL_SELECTION_GATE_TASK_ID}"
         ),
     },
 ]
@@ -8309,6 +8337,32 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "phase_2b_12_future_implementation_authorization_review.py",
             "notes": "PHASE_2B_12_FUTURE_IMPLEMENTATION_AUTHORIZATION_REVIEW_PLANNING_ONLY PHASE_2B_12_PLANNING_ONLY_COMMITTED AGENTS_MD_FOUND_AND_READ AGENTS_MD_NOT_MODIFIED SCOPE_CONFIRMATION_PASS PHASE_GOAL_CONFIRMED EXAMPLE_JOB_TYPES_TREATED_AS_EXAMPLES_ONLY FORBIDDEN_SCOPE_PRESERVED EXISTING_ARTIFACTS_REFERENCED IMPLEMENTATION_BOUNDARY_PRESERVED FUTURE_IMPLEMENTATION_AUTHORIZED_FALSE PHASE_2B_REMAINS_PLANNING_ONLY MISSING_CONDITIONS_LISTED SCOPE_DRIFT_RISK_REVIEWED NEEDS_SCOPE_CONFIRMATION_BEHAVIOR_INCLUDED DAY1_DAY160_REWRITTEN_OR_REPLACED_FALSE SECOND_SAFETY_MATRIX_CREATED_FALSE FIRST_SLICE_IMPLEMENTED_FALSE RUNNER_ADAPTER_EXECUTION_PATH_ADDED_FALSE SSH_NETCONF_RESTCONF_LIVE_DEVICE_TOUCHED_FALSE PROVIDER_API_MODEL_SECRETS_TOUCHED_FALSE. Planning-only future implementation authorization review; no Phase 2B implementation slice, single-job narrowing, Day1-Day160 rewrite or replacement, second safety matrix, runner, adapter, broker, scheduler, queue worker, SSH, NETCONF, RESTCONF, live device, provider/API/model calls, secrets handling, frontend integration, real execution, real backup, real validation, command execution, config change, approval bypass, or safety gate weakening.",
+        },
+        {
+            "id": PHASE_2B_13_FIRST_SLICE_FINAL_SELECTION_GATE_TASK_ID,
+            "task_id": "phase_2b_13_first_slice_final_selection_gate",
+            "display_name": "Phase 2B-13 First-Slice Final Selection Gate - Planning Only",
+            "user_display_name": "Phase 2B-13 First-Slice Final Selection Gate - Planning Only",
+            "day": "Phase 2B",
+            "category": "planning",
+            "description": "Phase 2B-13 selects local_static_job_definition_and_evidence_contract_slice as the future first-slice candidate while remaining planning-only and preserving Phase 2B-14 as the required implementation authorization gate.",
+            "enabled": True,
+            "safety_level": "planning-only",
+            "execution_mode": "planning-only",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                PHASE_2B_13_FIRST_SLICE_FINAL_SELECTION_GATE_JSON.as_posix(),
+                PHASE_2B_13_FIRST_SLICE_FINAL_SELECTION_GATE_HTML.as_posix(),
+                PHASE_2B_13_FIRST_SLICE_FINAL_SELECTION_GATE_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Phase 2B-13 JSON/HTML planning-only first-slice final selection gate",
+                "Phase 2B-13 first-slice final selection gate documentation",
+            ],
+            "related_script": "phase_2b_13_first_slice_final_selection_gate.py",
+            "notes": "PHASE_2B_13_FIRST_SLICE_FINAL_SELECTION_GATE_PLANNING_ONLY PHASE_2B_13_FIRST_SLICE_SELECTED_PLANNING_ONLY AGENTS_MD_FOUND_AND_READ AGENTS_MD_NOT_MODIFIED FUTURE_FIRST_SLICE_SELECTED_TRUE SELECTED_FUTURE_FIRST_SLICE_IMPLEMENTED_FALSE IMPLEMENTATION_AUTHORIZED_BY_PHASE_2B_13_FALSE PHASE_2B_14_IMPLEMENTATION_AUTHORIZATION_GATE_RESERVED_TRUE PHASE_2C_TOUCHED_FALSE RUNNER_ADAPTER_EXECUTION_PATH_ADDED_FALSE SSH_NETCONF_RESTCONF_LIVE_DEVICE_TOUCHED_FALSE PROVIDER_API_MODEL_SECRETS_TOUCHED_FALSE. Planning-only first-slice final selection gate; selected future first slice is local_static_job_definition_and_evidence_contract_slice; no implementation, Phase 2C, runner, adapter, broker, scheduler, queue worker, execution path, SSH, NETCONF, RESTCONF, live device, provider/API/model calls, secrets handling, frontend integration, real execution, real backup, real validation, command execution, config change, Day1-Day160 rewrite or replacement, second safety matrix, approval bypass, or safety gate weakening.",
         },
     ]
 
@@ -13315,6 +13369,15 @@ def _run_phase_2b_11_project_consolidation_entry_map(project_root: Path) -> int:
 
 def _run_phase_2b_12_future_implementation_authorization_review(project_root: Path) -> int:
     return run_phase_2b_12_future_implementation_authorization_review(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_phase_2b_13_first_slice_final_selection_gate(project_root: Path) -> int:
+    return run_phase_2b_13_first_slice_final_selection_gate(
         project_root,
         format_heading_func=format_heading,
         format_status_func=format_status,
