@@ -97,6 +97,7 @@ def _build_parser(lab: ModuleType) -> argparse.ArgumentParser:
   python network_lab.py --task phase2b-11-project-consolidation-and-implementation-entry-map-planning-only
   python network_lab.py --task phase2b-12-future-implementation-authorization-review-planning-only
   python network_lab.py --task phase2b-13-first-slice-final-selection-gate-planning-only
+  python network_lab.py --task phase2b-14-first-slice-implementation-kickoff-gate
   python network_lab.py --task intent-workflow-demo
   python network_lab.py --task offline-mock-runtime
   python network_lab.py --task offline-mock-runtime-contract
@@ -203,6 +204,7 @@ phase2b-10-day1-day160-reference-mapping-for-future-first-slice-planning-only wr
 phase2b-11-project-consolidation-and-implementation-entry-map-planning-only writes the Phase 2B-11 planning-only project consolidation and implementation entry map; it adds a review-only future plan and drift check without creating future phases, authorizing implementation, selecting a first slice, replacing Phase 2B-10, rewriting Day1-Day160, creating a second safety matrix, or enabling execution, runner, adapter, broker, scheduler, queue worker, SSH, NETCONF, RESTCONF, live device, provider/API/model, token, credential, secret, backup, validation, command execution, config change, approval bypass, or safety-gate relaxation.
 phase2b-12-future-implementation-authorization-review-planning-only writes the Phase 2B-12 planning-only future implementation authorization review; it keeps Phase 2B planning-only, states future implementation is not authorized, treats listed job types as examples only, lists missing authorization conditions and scope drift risks, and does not create a first slice, runner, adapter, broker, scheduler, queue worker, execution path, SSH, NETCONF, RESTCONF, live device, provider/API/model, secret, backup, validation, command execution, config change, second safety matrix, Day1-Day160 replacement, approval bypass, or safety-gate relaxation.
 phase2b-13-first-slice-final-selection-gate-planning-only writes the Phase 2B-13 planning-only first-slice final selection gate; it selects local_static_job_definition_and_evidence_contract_slice as the future first slice, keeps implementation forbidden until a separate Phase 2B-14 authorization gate, and does not touch Phase 2C, runner, adapter, broker, scheduler, queue worker, execution path, SSH, NETCONF, RESTCONF, live device, provider/API/model, secret, backup, validation, command execution, config change, second safety matrix, Day1-Day160 replacement, approval bypass, or safety-gate relaxation.
+phase2b-14-first-slice-implementation-kickoff-gate writes the Phase 2B-14 authorization kickoff gate; it confirms scope in writing, treats job types as examples only, keeps the selected first slice as only the first future target, and does not implement local_static_job or add runner, adapter, broker, scheduler, queue, execution path, SSH, NETCONF, RESTCONF, live device, provider/API/model, secret, backup, config change, custom command/script execution, second safety matrix, Day1-Day160 replacement, approval bypass, or safety-gate relaxation.
 wireguard-runner is dry-run by default and delegates to the existing WireGuard script only after explicit --allow-live-wireguard."""
     parser = argparse.ArgumentParser(
         description=f"Day14 {lab.DAY14_NAME}.",
@@ -419,6 +421,7 @@ def _build_task_handlers(args: argparse.Namespace, root: Path, lab: ModuleType) 
         lab.PHASE_2B_11_PROJECT_CONSOLIDATION_ENTRY_MAP_TASK_ID: lambda: lab._run_phase_2b_11_project_consolidation_entry_map(root),
         lab.PHASE_2B_12_FUTURE_IMPLEMENTATION_AUTHORIZATION_REVIEW_TASK_ID: lambda: lab._run_phase_2b_12_future_implementation_authorization_review(root),
         lab.PHASE_2B_13_FIRST_SLICE_FINAL_SELECTION_GATE_TASK_ID: lambda: lab._run_phase_2b_13_first_slice_final_selection_gate(root),
+        lab.PHASE_2B_14_FIRST_SLICE_IMPLEMENTATION_KICKOFF_GATE_TASK_ID: lambda: lab._run_phase_2b_14_first_slice_implementation_kickoff_gate(root),
         lab.WIREGUARD_RUNNER_TASK_ALIAS: lambda: lab._run_wireguard_runner(
             root,
             dry_run=args.dry_run,

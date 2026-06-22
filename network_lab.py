@@ -347,6 +347,9 @@ from phase_2b_12_future_implementation_authorization_review import (
 from phase_2b_13_first_slice_final_selection_gate import (
     run_phase_2b_13_first_slice_final_selection_gate,
 )
+from phase_2b_14_first_slice_implementation_kickoff_gate import (
+    run_phase_2b_14_first_slice_implementation_kickoff_gate,
+)
 from project_folder_organization_decision_gate import (
     run_project_folder_organization_decision_gate,
 )
@@ -1804,6 +1807,18 @@ PHASE_2B_13_FIRST_SLICE_FINAL_SELECTION_GATE_JSON = (
 )
 PHASE_2B_13_FIRST_SLICE_FINAL_SELECTION_GATE_HTML = (
     Path("reports") / "lab-summary" / "phase_2b_13_first_slice_final_selection_gate.html"
+)
+PHASE_2B_14_FIRST_SLICE_IMPLEMENTATION_KICKOFF_GATE_TASK_ID = (
+    "phase2b-14-first-slice-implementation-kickoff-gate"
+)
+PHASE_2B_14_FIRST_SLICE_IMPLEMENTATION_KICKOFF_GATE_DOC = (
+    Path("docs") / "phase_2b" / "phase_2b_14_first_slice_implementation_kickoff_gate.md"
+)
+PHASE_2B_14_FIRST_SLICE_IMPLEMENTATION_KICKOFF_GATE_JSON = (
+    Path("reports") / "lab-summary" / "phase_2b_14_first_slice_implementation_kickoff_gate.json"
+)
+PHASE_2B_14_FIRST_SLICE_IMPLEMENTATION_KICKOFF_GATE_HTML = (
+    Path("reports") / "lab-summary" / "phase_2b_14_first_slice_implementation_kickoff_gate.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -3765,6 +3780,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{PHASE_2B_13_FIRST_SLICE_FINAL_SELECTION_GATE_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Phase 2B",
+        "title": "Phase 2B-14 First-Slice Implementation Kickoff Gate",
+        "report_type": "Authorization kickoff gate - not implementation",
+        "safety_label": "PHASE_2B_14_KICKOFF_GATE_READY_NOT_IMPLEMENTED; AGENTS_MD_FOUND_YES; AGENTS_MD_READ_BEFORE_ACTION_YES; AGENTS_MD_MODIFIED_NO; SCOPE_CONFIRMATION_WRITTEN_YES; PHASE_GOAL_SEPARATED_YES; EXAMPLE_JOB_TYPES_SEPARATED_YES; FORBIDDEN_SCOPE_SEPARATED_YES; EXISTING_ARTIFACTS_REFERENCED_YES; IMPLEMENTATION_BOUNDARY_SEPARATED_YES; SCOPE_NARROWED_TO_SINGLE_EXAMPLE_NO; NEEDS_SCOPE_CONFIRMATION_NO; FIRST_SLICE_IMPLEMENTED_NO; LOCAL_STATIC_JOB_IMPLEMENTED_NO; RUNNER_ADAPTER_EXECUTION_PATH_ADDED_NO; SSH_NETCONF_RESTCONF_LIVE_DEVICE_TOUCHED_NO; PROVIDER_API_MODEL_SECRETS_TOUCHED_NO; DAY1_DAY160_REWRITTEN_OR_REPLACED_NO; SECOND_SAFETY_MATRIX_CREATED_NO",
+        "description": "Phase 2B-14 writes the authorization kickoff gate before any future first-slice implementation. It confirms scope in writing, keeps local_static_job and other job types as examples only, preserves a later explicit implementation authorization requirement, and does not add runners, adapters, execution paths, SSH, NETCONF, RESTCONF, live devices, providers/APIs/models, secrets, backups, config changes, custom commands/scripts, a second safety matrix, or Day1-Day160 replacement.",
+        "json_globs": [PHASE_2B_14_FIRST_SLICE_IMPLEMENTATION_KICKOFF_GATE_JSON.as_posix()],
+        "html_globs": [PHASE_2B_14_FIRST_SLICE_IMPLEMENTATION_KICKOFF_GATE_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{PHASE_2B_14_FIRST_SLICE_IMPLEMENTATION_KICKOFF_GATE_TASK_ID}"
         ),
     },
 ]
@@ -8363,6 +8391,32 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "phase_2b_13_first_slice_final_selection_gate.py",
             "notes": "PHASE_2B_13_FIRST_SLICE_FINAL_SELECTION_GATE_PLANNING_ONLY PHASE_2B_13_FIRST_SLICE_SELECTED_PLANNING_ONLY AGENTS_MD_FOUND_AND_READ AGENTS_MD_NOT_MODIFIED FUTURE_FIRST_SLICE_SELECTED_TRUE SELECTED_FUTURE_FIRST_SLICE_IMPLEMENTED_FALSE IMPLEMENTATION_AUTHORIZED_BY_PHASE_2B_13_FALSE PHASE_2B_14_IMPLEMENTATION_AUTHORIZATION_GATE_RESERVED_TRUE PHASE_2C_TOUCHED_FALSE RUNNER_ADAPTER_EXECUTION_PATH_ADDED_FALSE SSH_NETCONF_RESTCONF_LIVE_DEVICE_TOUCHED_FALSE PROVIDER_API_MODEL_SECRETS_TOUCHED_FALSE. Planning-only first-slice final selection gate; selected future first slice is local_static_job_definition_and_evidence_contract_slice; no implementation, Phase 2C, runner, adapter, broker, scheduler, queue worker, execution path, SSH, NETCONF, RESTCONF, live device, provider/API/model calls, secrets handling, frontend integration, real execution, real backup, real validation, command execution, config change, Day1-Day160 rewrite or replacement, second safety matrix, approval bypass, or safety gate weakening.",
+        },
+        {
+            "id": PHASE_2B_14_FIRST_SLICE_IMPLEMENTATION_KICKOFF_GATE_TASK_ID,
+            "task_id": "phase_2b_14_first_slice_implementation_kickoff_gate",
+            "display_name": "Phase 2B-14 First-Slice Implementation Kickoff Gate",
+            "user_display_name": "Phase 2B-14 First-Slice Implementation Kickoff Gate",
+            "day": "Phase 2B",
+            "category": "authorization_scope_gate",
+            "description": "Phase 2B-14 confirms the broad kickoff-gate scope in writing before any future first-slice implementation and keeps implementation forbidden until a later explicit user authorization task.",
+            "enabled": True,
+            "safety_level": "planning-only",
+            "execution_mode": "planning-only",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                PHASE_2B_14_FIRST_SLICE_IMPLEMENTATION_KICKOFF_GATE_JSON.as_posix(),
+                PHASE_2B_14_FIRST_SLICE_IMPLEMENTATION_KICKOFF_GATE_HTML.as_posix(),
+                PHASE_2B_14_FIRST_SLICE_IMPLEMENTATION_KICKOFF_GATE_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Phase 2B-14 JSON/HTML authorization kickoff gate",
+                "Phase 2B-14 first-slice implementation kickoff gate documentation",
+            ],
+            "related_script": "phase_2b_14_first_slice_implementation_kickoff_gate.py",
+            "notes": "PHASE_2B_14_FIRST_SLICE_IMPLEMENTATION_KICKOFF_GATE PHASE_2B_14_KICKOFF_GATE_READY_NOT_IMPLEMENTED AGENTS_MD_FOUND_YES AGENTS_MD_READ_BEFORE_ACTION_YES AGENTS_MD_MODIFIED_NO SCOPE_CONFIRMATION_WRITTEN_YES PHASE_GOAL_SEPARATED_YES EXAMPLE_JOB_TYPES_SEPARATED_YES FORBIDDEN_SCOPE_SEPARATED_YES EXISTING_ARTIFACTS_REFERENCED_YES IMPLEMENTATION_BOUNDARY_SEPARATED_YES SCOPE_NARROWED_TO_SINGLE_EXAMPLE_NO NEEDS_SCOPE_CONFIRMATION_NO FIRST_SLICE_IMPLEMENTED_NO LOCAL_STATIC_JOB_IMPLEMENTED_NO RUNNER_ADAPTER_EXECUTION_PATH_ADDED_NO SSH_NETCONF_RESTCONF_LIVE_DEVICE_TOUCHED_NO PROVIDER_API_MODEL_SECRETS_TOUCHED_NO DAY1_DAY160_REWRITTEN_OR_REPLACED_NO SECOND_SAFETY_MATRIX_CREATED_NO. Authorization kickoff gate only; no first-slice implementation, local_static_job implementation, runner, adapter, broker, scheduler, queue, execution path, SSH, NETCONF, RESTCONF, live device, provider/API/model calls, secrets handling, backup execution, config change execution, custom command/script execution, real device operation, Day1-Day160 rewrite or replacement, second safety matrix, approval bypass, or safety gate weakening.",
         },
     ]
 
@@ -13378,6 +13432,15 @@ def _run_phase_2b_12_future_implementation_authorization_review(project_root: Pa
 
 def _run_phase_2b_13_first_slice_final_selection_gate(project_root: Path) -> int:
     return run_phase_2b_13_first_slice_final_selection_gate(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_phase_2b_14_first_slice_implementation_kickoff_gate(project_root: Path) -> int:
+    return run_phase_2b_14_first_slice_implementation_kickoff_gate(
         project_root,
         format_heading_func=format_heading,
         format_status_func=format_status,
