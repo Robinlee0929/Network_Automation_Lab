@@ -359,6 +359,9 @@ from phase_2c_02_post_first_slice_acceptance_review import (
 from phase_2c_03_next_slice_decision_gate_authorization_review import (
     run_phase_2c_03_next_slice_decision_gate_authorization_review,
 )
+from phase_2c_04_next_slice_candidate_inventory import (
+    run_phase_2c_04_next_slice_candidate_inventory,
+)
 from project_folder_organization_decision_gate import (
     run_project_folder_organization_decision_gate,
 )
@@ -1860,6 +1863,16 @@ PHASE_2C_03_NEXT_SLICE_DECISION_GATE_AUTHORIZATION_REVIEW_JSON = (
 )
 PHASE_2C_03_NEXT_SLICE_DECISION_GATE_AUTHORIZATION_REVIEW_HTML = (
     Path("reports") / "lab-summary" / "phase_2c_03_next_slice_decision_gate_authorization_review.html"
+)
+PHASE_2C_04_NEXT_SLICE_CANDIDATE_INVENTORY_TASK_ID = "phase2c-04-next-slice-candidate-inventory"
+PHASE_2C_04_NEXT_SLICE_CANDIDATE_INVENTORY_DOC = (
+    Path("docs") / "phase_2c" / "phase_2c_04_next_slice_candidate_inventory.md"
+)
+PHASE_2C_04_NEXT_SLICE_CANDIDATE_INVENTORY_JSON = (
+    Path("reports") / "lab-summary" / "phase_2c_04_next_slice_candidate_inventory.json"
+)
+PHASE_2C_04_NEXT_SLICE_CANDIDATE_INVENTORY_HTML = (
+    Path("reports") / "lab-summary" / "phase_2c_04_next_slice_candidate_inventory.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -3873,6 +3886,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{PHASE_2C_03_NEXT_SLICE_DECISION_GATE_AUTHORIZATION_REVIEW_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Phase 2C",
+        "title": "Phase 2C-04 Next-Slice Candidate Inventory - Planning Only",
+        "report_type": "Planning-only next-slice candidate inventory",
+        "safety_label": "PHASE_2C_04_CANDIDATE_INVENTORY_DONE_NEXT_SLICE_LOCKED; CANDIDATE_INVENTORY_ONLY_YES; CANDIDATE_SELECTED_NO; NEXT_SLICE_AUTHORIZED_NO; PHASE_2C_05_AUTHORIZED_NO; IMPLEMENTATION_ADDED_NO; RUNNER_ADAPTER_EXECUTION_PATH_ADDED_NO; SSH_NETCONF_RESTCONF_LIVE_DEVICE_TOUCHED_NO; PROVIDER_API_MODEL_SECRETS_TOUCHED_NO; DAY1_DAY160_REWRITTEN_OR_REPLACED_NO; SECOND_SAFETY_MATRIX_CREATED_NO",
+        "description": "Phase 2C-04 lists possible next-slice candidates as planning-only inventory. It does not select a next slice, authorize Phase 2C-05, implement or scaffold a candidate, or open execution, provider/API/model, secret, SSH, NETCONF, RESTCONF, live-device, backup, config-change, Day1-Day160 replacement, AGENTS.md modification, or second safety-matrix scope.",
+        "json_globs": [PHASE_2C_04_NEXT_SLICE_CANDIDATE_INVENTORY_JSON.as_posix()],
+        "html_globs": [PHASE_2C_04_NEXT_SLICE_CANDIDATE_INVENTORY_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{PHASE_2C_04_NEXT_SLICE_CANDIDATE_INVENTORY_TASK_ID}"
         ),
     },
 ]
@@ -8575,6 +8601,32 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "phase_2c_03_next_slice_decision_gate_authorization_review.py",
             "notes": "PHASE_2C_03_NEXT_SLICE_DECISION_GATE_AUTHORIZATION_REVIEW_PLANNING_ONLY PHASE_2C_03_NEXT_SLICE_PLANNING_ALLOWED_IMPLEMENTATION_LOCKED LOCAL_STATIC_JOB_REVIEWED PHASE_2C_02_REFERENCED NEXT_SLICE_PLANNING_ALLOWED NEXT_SLICE_IMPLEMENTATION_ALLOWED_FALSE EXECUTION_PROVIDER_API_OPENED_FALSE LIVE_DEVICE_ACCESS_OPENED_FALSE REQUIRES_SEPARATE_USER_AUTHORIZATION_TRUE SCOPE_NARROWED_TO_ONE_EXAMPLE_JOB_TYPE_NO NEEDS_SCOPE_CONFIRMATION_NO NEXT_SLICE_SELECTED_NO NEXT_SLICE_SCAFFOLDED_NO NEXT_SLICE_IMPLEMENTED_NO RUNNER_ADAPTER_EXECUTION_PATH_ADDED_NO SSH_NETCONF_RESTCONF_LIVE_DEVICE_TOUCHED_NO PROVIDER_API_MODEL_SECRETS_TOUCHED_NO DAY1_DAY160_REWRITTEN_OR_REPLACED_NO SECOND_SAFETY_MATRIX_CREATED_NO. Report-only authorization review; allows planning only, not next-slice selection, scaffolding, implementation, execution runner, adapter, broker, scheduler, queue, provider/API/model call, secret handling, SSH, NETCONF, RESTCONF, live device access, backup execution, config change execution, Day1-Day160 rewrite or replacement, second safety matrix, approval bypass, or safety gate weakening.",
+        },
+        {
+            "id": PHASE_2C_04_NEXT_SLICE_CANDIDATE_INVENTORY_TASK_ID,
+            "task_id": "phase_2c_04_next_slice_candidate_inventory",
+            "display_name": "Phase 2C-04 Next-Slice Candidate Inventory - Planning Only",
+            "user_display_name": "Phase 2C-04 Next-Slice Candidate Inventory - Planning Only",
+            "day": "Phase 2C",
+            "category": "planning_inventory",
+            "description": "Phase 2C-04 lists possible next-slice candidates only; no next slice is selected, Phase 2C-05 is not authorized, and no candidate implementation is added.",
+            "enabled": True,
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                PHASE_2C_04_NEXT_SLICE_CANDIDATE_INVENTORY_JSON.as_posix(),
+                PHASE_2C_04_NEXT_SLICE_CANDIDATE_INVENTORY_HTML.as_posix(),
+                PHASE_2C_04_NEXT_SLICE_CANDIDATE_INVENTORY_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Phase 2C-04 JSON/HTML next-slice candidate inventory evidence",
+                "Phase 2C-04 planning-only candidate inventory documentation",
+            ],
+            "related_script": "phase_2c_04_next_slice_candidate_inventory.py",
+            "notes": "PHASE_2C_04_NEXT_SLICE_CANDIDATE_INVENTORY_PLANNING_ONLY PHASE_2C_04_CANDIDATE_INVENTORY_DONE_NEXT_SLICE_LOCKED CANDIDATE_INVENTORY_ONLY_YES CANDIDATE_SELECTED_NO NEXT_SLICE_AUTHORIZED_NO PHASE_2C_05_AUTHORIZED_NO IMPLEMENTATION_ADDED_NO RUNNER_ADAPTER_EXECUTION_PATH_ADDED_NO SSH_NETCONF_RESTCONF_LIVE_DEVICE_TOUCHED_NO PROVIDER_API_MODEL_SECRETS_TOUCHED_NO DAY1_DAY160_REWRITTEN_OR_REPLACED_NO SECOND_SAFETY_MATRIX_CREATED_NO SCOPE_NARROWED_TO_ONE_EXAMPLE_NO NEEDS_SCOPE_CONFIRMATION_NO. Report-only candidate inventory; lists candidates only, not next-slice selection, ranking as final, authorization, scaffolding, implementation, runner, adapter, broker, scheduler, queue, worker, agent loop, execution path, provider/API/model call, secret handling, SSH, NETCONF, RESTCONF, live device access, backup behavior, config change behavior, AGENTS.md modification, Day1-Day160 rewrite or replacement, second safety matrix, approval bypass, or safety gate weakening.",
         },
     ]
 
@@ -13626,6 +13678,15 @@ def _run_phase_2c_02_post_first_slice_acceptance_review(project_root: Path) -> i
 
 def _run_phase_2c_03_next_slice_decision_gate_authorization_review(project_root: Path) -> int:
     return run_phase_2c_03_next_slice_decision_gate_authorization_review(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_phase_2c_04_next_slice_candidate_inventory(project_root: Path) -> int:
+    return run_phase_2c_04_next_slice_candidate_inventory(
         project_root,
         format_heading_func=format_heading,
         format_status_func=format_status,
