@@ -102,6 +102,7 @@ def _build_parser(lab: ModuleType) -> argparse.ArgumentParser:
   python network_lab.py --task phase2c-02-post-first-slice-acceptance-review
   python network_lab.py --task phase2c-03-next-slice-decision-gate-authorization-review
   python network_lab.py --task phase2c-04-next-slice-candidate-inventory
+  python network_lab.py --task phase2c-05-next-slice-safety-delta-review
   python network_lab.py --task intent-workflow-demo
   python network_lab.py --task offline-mock-runtime
   python network_lab.py --task offline-mock-runtime-contract
@@ -213,6 +214,7 @@ phase2c-01-local-static-job-first-slice writes the Phase 2C-01 local_static_job 
 phase2c-02-post-first-slice-acceptance-review writes the Phase 2C-02 post-first-slice acceptance review; it accepts Phase 2C-01 reviewer evidence without rerunning the source task, regenerating the source report, modifying the first-slice implementation, authorizing the next slice, or adding runner, adapter, broker, scheduler, queue, execution path, SSH, NETCONF, RESTCONF, live device, provider/API/model, secret, shell command, custom script, backup execution, config change execution, Day1-Day160 replacement, or a second safety matrix.
 phase2c-03-next-slice-decision-gate-authorization-review writes the Phase 2C-03 planning-only next-slice decision gate; it allows future next-slice planning after reviewing local_static_job and Phase 2C-02 acceptance evidence, while next-slice implementation remains unauthorized and no runner, adapter, broker, scheduler, queue, execution path, SSH, NETCONF, RESTCONF, live device, provider/API/model, secret, backup, config change, Day1-Day160 replacement, or second safety matrix is opened.
 phase2c-04-next-slice-candidate-inventory writes the Phase 2C-04 planning-only next-slice candidate inventory; it lists candidates only and does not select a next slice, authorize Phase 2C-05, implement or scaffold a candidate, or add runner, adapter, broker, scheduler, queue, worker, agent loop, execution path, SSH, NETCONF, RESTCONF, live device, provider/API/model, secret, backup, config change, Day1-Day160 replacement, AGENTS.md modification, or second safety matrix.
+phase2c-05-next-slice-safety-delta-review writes the Phase 2C-05 planning-only next-slice safety delta review; it compares Phase 2C-04 candidates against existing safety boundaries only and does not select a next slice, authorize Phase 2C-06/2C-07/2C-08, implement a candidate, or add runner, adapter, broker, scheduler, queue, worker, agent loop, execution path, SSH, NETCONF, RESTCONF, live device, provider/API/model, secret, backup, config change, Day1-Day160 replacement, AGENTS.md modification, or second safety matrix.
 wireguard-runner is dry-run by default and delegates to the existing WireGuard script only after explicit --allow-live-wireguard."""
     parser = argparse.ArgumentParser(
         description=f"Day14 {lab.DAY14_NAME}.",
@@ -434,6 +436,7 @@ def _build_task_handlers(args: argparse.Namespace, root: Path, lab: ModuleType) 
         lab.PHASE_2C_02_POST_FIRST_SLICE_ACCEPTANCE_REVIEW_TASK_ID: lambda: lab._run_phase_2c_02_post_first_slice_acceptance_review(root),
         lab.PHASE_2C_03_NEXT_SLICE_DECISION_GATE_AUTHORIZATION_REVIEW_TASK_ID: lambda: lab._run_phase_2c_03_next_slice_decision_gate_authorization_review(root),
         lab.PHASE_2C_04_NEXT_SLICE_CANDIDATE_INVENTORY_TASK_ID: lambda: lab._run_phase_2c_04_next_slice_candidate_inventory(root),
+        lab.PHASE_2C_05_NEXT_SLICE_SAFETY_DELTA_REVIEW_TASK_ID: lambda: lab._run_phase_2c_05_next_slice_safety_delta_review(root),
         lab.WIREGUARD_RUNNER_TASK_ALIAS: lambda: lab._run_wireguard_runner(
             root,
             dry_run=args.dry_run,

@@ -362,6 +362,9 @@ from phase_2c_03_next_slice_decision_gate_authorization_review import (
 from phase_2c_04_next_slice_candidate_inventory import (
     run_phase_2c_04_next_slice_candidate_inventory,
 )
+from phase_2c_05_next_slice_safety_delta_review import (
+    run_phase_2c_05_next_slice_safety_delta_review,
+)
 from project_folder_organization_decision_gate import (
     run_project_folder_organization_decision_gate,
 )
@@ -1873,6 +1876,16 @@ PHASE_2C_04_NEXT_SLICE_CANDIDATE_INVENTORY_JSON = (
 )
 PHASE_2C_04_NEXT_SLICE_CANDIDATE_INVENTORY_HTML = (
     Path("reports") / "lab-summary" / "phase_2c_04_next_slice_candidate_inventory.html"
+)
+PHASE_2C_05_NEXT_SLICE_SAFETY_DELTA_REVIEW_TASK_ID = "phase2c-05-next-slice-safety-delta-review"
+PHASE_2C_05_NEXT_SLICE_SAFETY_DELTA_REVIEW_DOC = (
+    Path("docs") / "phase_2c" / "phase_2c_05_next_slice_safety_delta_review.md"
+)
+PHASE_2C_05_NEXT_SLICE_SAFETY_DELTA_REVIEW_JSON = (
+    Path("reports") / "lab-summary" / "phase_2c_05_next_slice_safety_delta_review.json"
+)
+PHASE_2C_05_NEXT_SLICE_SAFETY_DELTA_REVIEW_HTML = (
+    Path("reports") / "lab-summary" / "phase_2c_05_next_slice_safety_delta_review.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -3899,6 +3912,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{PHASE_2C_04_NEXT_SLICE_CANDIDATE_INVENTORY_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Phase 2C",
+        "title": "Phase 2C-05 Next-Slice Safety Delta Review - Planning Only",
+        "report_type": "Planning-only next-slice safety delta review",
+        "safety_label": "PHASE_2C_05_SAFETY_DELTA_REVIEW_DONE_NEXT_SLICE_LOCKED; SAFETY_DELTA_REVIEW_ONLY_YES; PHASE_2C_04_READ_YES; CANDIDATE_SELECTED_NO; NEXT_SLICE_AUTHORIZED_NO; PHASE_2C_06_STARTED_NO; PHASE_2C_07_STARTED_NO; PHASE_2C_08_STARTED_NO; IMPLEMENTATION_ADDED_NO; RUNNER_ADAPTER_EXECUTION_PATH_ADDED_NO; SSH_NETCONF_RESTCONF_LIVE_DEVICE_TOUCHED_NO; PROVIDER_API_MODEL_SECRETS_TOUCHED_NO; DAY1_DAY160_REWRITTEN_OR_REPLACED_NO; SECOND_SAFETY_MATRIX_CREATED_NO",
+        "description": "Phase 2C-05 compares Phase 2C-04 candidates against existing planning/report-only safety boundaries. It does not select a next slice, authorize Phase 2C-06/2C-07/2C-08, implement a candidate, or open execution, provider/API/model, secret, SSH, NETCONF, RESTCONF, live-device, backup, config-change, Day1-Day160 replacement, AGENTS.md modification, or second safety-matrix scope.",
+        "json_globs": [PHASE_2C_05_NEXT_SLICE_SAFETY_DELTA_REVIEW_JSON.as_posix()],
+        "html_globs": [PHASE_2C_05_NEXT_SLICE_SAFETY_DELTA_REVIEW_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{PHASE_2C_05_NEXT_SLICE_SAFETY_DELTA_REVIEW_TASK_ID}"
         ),
     },
 ]
@@ -8627,6 +8653,32 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "phase_2c_04_next_slice_candidate_inventory.py",
             "notes": "PHASE_2C_04_NEXT_SLICE_CANDIDATE_INVENTORY_PLANNING_ONLY PHASE_2C_04_CANDIDATE_INVENTORY_DONE_NEXT_SLICE_LOCKED CANDIDATE_INVENTORY_ONLY_YES CANDIDATE_SELECTED_NO NEXT_SLICE_AUTHORIZED_NO PHASE_2C_05_AUTHORIZED_NO IMPLEMENTATION_ADDED_NO RUNNER_ADAPTER_EXECUTION_PATH_ADDED_NO SSH_NETCONF_RESTCONF_LIVE_DEVICE_TOUCHED_NO PROVIDER_API_MODEL_SECRETS_TOUCHED_NO DAY1_DAY160_REWRITTEN_OR_REPLACED_NO SECOND_SAFETY_MATRIX_CREATED_NO SCOPE_NARROWED_TO_ONE_EXAMPLE_NO NEEDS_SCOPE_CONFIRMATION_NO. Report-only candidate inventory; lists candidates only, not next-slice selection, ranking as final, authorization, scaffolding, implementation, runner, adapter, broker, scheduler, queue, worker, agent loop, execution path, provider/API/model call, secret handling, SSH, NETCONF, RESTCONF, live device access, backup behavior, config change behavior, AGENTS.md modification, Day1-Day160 rewrite or replacement, second safety matrix, approval bypass, or safety gate weakening.",
+        },
+        {
+            "id": PHASE_2C_05_NEXT_SLICE_SAFETY_DELTA_REVIEW_TASK_ID,
+            "task_id": "phase_2c_05_next_slice_safety_delta_review",
+            "display_name": "Phase 2C-05 Next-Slice Safety Delta Review - Planning Only",
+            "user_display_name": "Phase 2C-05 Next-Slice Safety Delta Review - Planning Only",
+            "day": "Phase 2C",
+            "category": "planning_review",
+            "description": "Phase 2C-05 compares Phase 2C-04 candidate safety deltas against existing planning/report-only boundaries without selecting, authorizing, or implementing the next slice.",
+            "safety_level": "report-only",
+            "enabled": True,
+            "execution_mode": "report-only",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                PHASE_2C_05_NEXT_SLICE_SAFETY_DELTA_REVIEW_JSON.as_posix(),
+                PHASE_2C_05_NEXT_SLICE_SAFETY_DELTA_REVIEW_HTML.as_posix(),
+                PHASE_2C_05_NEXT_SLICE_SAFETY_DELTA_REVIEW_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Phase 2C-05 JSON/HTML next-slice safety delta review evidence",
+                "Phase 2C-05 planning-only safety delta review documentation",
+            ],
+            "related_script": "phase_2c_05_next_slice_safety_delta_review.py",
+            "notes": "PHASE_2C_05_NEXT_SLICE_SAFETY_DELTA_REVIEW_PLANNING_ONLY PHASE_2C_05_SAFETY_DELTA_REVIEW_DONE_NEXT_SLICE_LOCKED PHASE_2C_04_READ_YES SAFETY_DELTA_REVIEW_ONLY_YES CANDIDATE_SELECTED_NO NEXT_SLICE_AUTHORIZED_NO PHASE_2C_06_STARTED_NO PHASE_2C_07_STARTED_NO PHASE_2C_08_STARTED_NO IMPLEMENTATION_ADDED_NO RUNNER_ADAPTER_EXECUTION_PATH_ADDED_NO SSH_NETCONF_RESTCONF_LIVE_DEVICE_TOUCHED_NO PROVIDER_API_MODEL_SECRETS_TOUCHED_NO DAY1_DAY160_REWRITTEN_OR_REPLACED_NO SECOND_SAFETY_MATRIX_CREATED_NO SCOPE_NARROWED_TO_ONE_EXAMPLE_NO NEEDS_SCOPE_CONFIRMATION_NO. Report-only safety delta review; compares Phase 2C-04 candidates against existing safety boundaries only, not next-slice selection, ranking as final, Phase 2C-06/2C-07/2C-08 authorization, implementation, runner, adapter, broker, scheduler, queue, worker, agent loop, execution path, provider/API/model call, secret handling, SSH, NETCONF, RESTCONF, live device access, backup behavior, config change behavior, AGENTS.md modification, Day1-Day160 rewrite or replacement, second safety matrix, approval bypass, or safety gate weakening.",
         },
     ]
 
@@ -13687,6 +13739,15 @@ def _run_phase_2c_03_next_slice_decision_gate_authorization_review(project_root:
 
 def _run_phase_2c_04_next_slice_candidate_inventory(project_root: Path) -> int:
     return run_phase_2c_04_next_slice_candidate_inventory(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_phase_2c_05_next_slice_safety_delta_review(project_root: Path) -> int:
+    return run_phase_2c_05_next_slice_safety_delta_review(
         project_root,
         format_heading_func=format_heading,
         format_status_func=format_status,
