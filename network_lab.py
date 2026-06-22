@@ -356,6 +356,9 @@ from phase_2c_01_local_static_job_first_slice import (
 from phase_2c_02_post_first_slice_acceptance_review import (
     run_phase_2c_02_post_first_slice_acceptance_review,
 )
+from phase_2c_03_next_slice_decision_gate_authorization_review import (
+    run_phase_2c_03_next_slice_decision_gate_authorization_review,
+)
 from project_folder_organization_decision_gate import (
     run_project_folder_organization_decision_gate,
 )
@@ -1845,6 +1848,18 @@ PHASE_2C_02_POST_FIRST_SLICE_ACCEPTANCE_REVIEW_JSON = (
 )
 PHASE_2C_02_POST_FIRST_SLICE_ACCEPTANCE_REVIEW_HTML = (
     Path("reports") / "lab-summary" / "phase_2c_02_post_first_slice_acceptance_review.html"
+)
+PHASE_2C_03_NEXT_SLICE_DECISION_GATE_AUTHORIZATION_REVIEW_TASK_ID = (
+    "phase2c-03-next-slice-decision-gate-authorization-review"
+)
+PHASE_2C_03_NEXT_SLICE_DECISION_GATE_AUTHORIZATION_REVIEW_DOC = (
+    Path("docs") / "phase_2c" / "phase_2c_03_next_slice_decision_gate_authorization_review.md"
+)
+PHASE_2C_03_NEXT_SLICE_DECISION_GATE_AUTHORIZATION_REVIEW_JSON = (
+    Path("reports") / "lab-summary" / "phase_2c_03_next_slice_decision_gate_authorization_review.json"
+)
+PHASE_2C_03_NEXT_SLICE_DECISION_GATE_AUTHORIZATION_REVIEW_HTML = (
+    Path("reports") / "lab-summary" / "phase_2c_03_next_slice_decision_gate_authorization_review.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -3845,6 +3860,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{PHASE_2C_02_POST_FIRST_SLICE_ACCEPTANCE_REVIEW_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Phase 2C",
+        "title": "Phase 2C-03 Next-Slice Decision Gate / Authorization Review - Planning Only",
+        "report_type": "Planning-only next-slice decision gate",
+        "safety_label": "PHASE_2C_03_NEXT_SLICE_PLANNING_ALLOWED_IMPLEMENTATION_LOCKED; LOCAL_STATIC_JOB_REVIEWED; PHASE_2C_02_REFERENCED; NEXT_SLICE_PLANNING_ALLOWED; NEXT_SLICE_IMPLEMENTATION_ALLOWED_FALSE; EXECUTION_PROVIDER_API_OPENED_FALSE; LIVE_DEVICE_ACCESS_OPENED_FALSE; REQUIRES_SEPARATE_USER_AUTHORIZATION_TRUE; NEXT_SLICE_SELECTED_NO; NEXT_SLICE_SCAFFOLDED_NO; NEXT_SLICE_IMPLEMENTED_NO; RUNNER_ADAPTER_EXECUTION_PATH_ADDED_NO; DAY1_DAY160_REWRITTEN_OR_REPLACED_NO; SECOND_SAFETY_MATRIX_CREATED_NO",
+        "description": "Phase 2C-03 reviews whether the completed local_static_job first slice and Phase 2C-02 acceptance evidence are stable enough to allow future next-slice planning only. It does not select, scaffold, implement, or enable the next slice and opens no execution, provider/API/model, secret, SSH, NETCONF, RESTCONF, or live-device scope.",
+        "json_globs": [PHASE_2C_03_NEXT_SLICE_DECISION_GATE_AUTHORIZATION_REVIEW_JSON.as_posix()],
+        "html_globs": [PHASE_2C_03_NEXT_SLICE_DECISION_GATE_AUTHORIZATION_REVIEW_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{PHASE_2C_03_NEXT_SLICE_DECISION_GATE_AUTHORIZATION_REVIEW_TASK_ID}"
         ),
     },
 ]
@@ -8521,6 +8549,32 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "phase_2c_02_post_first_slice_acceptance_review.py",
             "notes": "PHASE_2C_02_POST_FIRST_SLICE_ACCEPTANCE_REVIEW PHASE_2C_02_POST_FIRST_SLICE_ACCEPTED PHASE_2C_01_ACCEPTED_YES PHASE_2C_01_VERDICT_REFERENCED_YES PHASE_2C_01_VALIDATION_PASSED_YES SOURCE_TASK_RERUN_NO SOURCE_REPORT_REGENERATED_NO FIRST_SLICE_IMPLEMENTATION_MODIFIED_NO NEXT_SLICE_AUTHORIZED_NO NEXT_DAY_FEATURE_ADDED_NO EXECUTION_OPENED_NO PROVIDER_API_OPENED_NO MODEL_OPENED_NO SECRETS_TOUCHED_NO LIVE_DEVICE_TOUCHED_NO SSH_NETCONF_RESTCONF_TOUCHED_NO RUNNER_ADAPTER_EXECUTION_PATH_ADDED_NO DAY1_DAY160_REWRITTEN_OR_REPLACED_NO SECOND_SAFETY_MATRIX_CREATED_NO. Report-only acceptance review; no source task rerun, source report regeneration, first-slice implementation modification, next-slice authorization, runner, adapter, broker, scheduler, queue, execution path, shell command, custom script, SSH, NETCONF, RESTCONF, live device, provider/API/model call, secret handling, backup execution, config change execution, Day1-Day160 rewrite or replacement, second safety matrix, approval bypass, or safety gate weakening.",
+        },
+        {
+            "id": PHASE_2C_03_NEXT_SLICE_DECISION_GATE_AUTHORIZATION_REVIEW_TASK_ID,
+            "task_id": "phase_2c_03_next_slice_decision_gate_authorization_review",
+            "display_name": "Phase 2C-03 Next-Slice Decision Gate / Authorization Review - Planning Only",
+            "user_display_name": "Phase 2C-03 Next-Slice Decision Gate / Authorization Review - Planning Only",
+            "day": "Phase 2C",
+            "category": "authorization_review",
+            "description": "Phase 2C-03 allows only planning for a future next slice after reviewing the completed local_static_job first slice and Phase 2C-02 acceptance evidence; implementation remains unauthorized.",
+            "enabled": True,
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                PHASE_2C_03_NEXT_SLICE_DECISION_GATE_AUTHORIZATION_REVIEW_JSON.as_posix(),
+                PHASE_2C_03_NEXT_SLICE_DECISION_GATE_AUTHORIZATION_REVIEW_HTML.as_posix(),
+                PHASE_2C_03_NEXT_SLICE_DECISION_GATE_AUTHORIZATION_REVIEW_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Phase 2C-03 JSON/HTML next-slice planning authorization evidence",
+                "Phase 2C-03 next-slice decision gate documentation",
+            ],
+            "related_script": "phase_2c_03_next_slice_decision_gate_authorization_review.py",
+            "notes": "PHASE_2C_03_NEXT_SLICE_DECISION_GATE_AUTHORIZATION_REVIEW_PLANNING_ONLY PHASE_2C_03_NEXT_SLICE_PLANNING_ALLOWED_IMPLEMENTATION_LOCKED LOCAL_STATIC_JOB_REVIEWED PHASE_2C_02_REFERENCED NEXT_SLICE_PLANNING_ALLOWED NEXT_SLICE_IMPLEMENTATION_ALLOWED_FALSE EXECUTION_PROVIDER_API_OPENED_FALSE LIVE_DEVICE_ACCESS_OPENED_FALSE REQUIRES_SEPARATE_USER_AUTHORIZATION_TRUE SCOPE_NARROWED_TO_ONE_EXAMPLE_JOB_TYPE_NO NEEDS_SCOPE_CONFIRMATION_NO NEXT_SLICE_SELECTED_NO NEXT_SLICE_SCAFFOLDED_NO NEXT_SLICE_IMPLEMENTED_NO RUNNER_ADAPTER_EXECUTION_PATH_ADDED_NO SSH_NETCONF_RESTCONF_LIVE_DEVICE_TOUCHED_NO PROVIDER_API_MODEL_SECRETS_TOUCHED_NO DAY1_DAY160_REWRITTEN_OR_REPLACED_NO SECOND_SAFETY_MATRIX_CREATED_NO. Report-only authorization review; allows planning only, not next-slice selection, scaffolding, implementation, execution runner, adapter, broker, scheduler, queue, provider/API/model call, secret handling, SSH, NETCONF, RESTCONF, live device access, backup execution, config change execution, Day1-Day160 rewrite or replacement, second safety matrix, approval bypass, or safety gate weakening.",
         },
     ]
 
@@ -13563,6 +13617,15 @@ def _run_phase_2c_01_local_static_job_first_slice(project_root: Path) -> int:
 
 def _run_phase_2c_02_post_first_slice_acceptance_review(project_root: Path) -> int:
     return run_phase_2c_02_post_first_slice_acceptance_review(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_phase_2c_03_next_slice_decision_gate_authorization_review(project_root: Path) -> int:
+    return run_phase_2c_03_next_slice_decision_gate_authorization_review(
         project_root,
         format_heading_func=format_heading,
         format_status_func=format_status,
