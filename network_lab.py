@@ -368,6 +368,9 @@ from phase_2c_05_next_slice_safety_delta_review import (
 from phase_2c_06_next_slice_final_selection_gate import (
     run_phase_2c_06_next_slice_final_selection_gate,
 )
+from phase_2c_07_next_slice_implementation_kickoff_gate import (
+    run_phase_2c_07_next_slice_implementation_kickoff_gate,
+)
 from project_folder_organization_decision_gate import (
     run_project_folder_organization_decision_gate,
 )
@@ -1899,6 +1902,16 @@ PHASE_2C_06_NEXT_SLICE_FINAL_SELECTION_GATE_JSON = (
 )
 PHASE_2C_06_NEXT_SLICE_FINAL_SELECTION_GATE_HTML = (
     Path("reports") / "lab-summary" / "phase_2c_06_next_slice_final_selection_gate.html"
+)
+PHASE_2C_07_NEXT_SLICE_IMPLEMENTATION_KICKOFF_GATE_TASK_ID = "phase2c-07-next-slice-implementation-kickoff-gate"
+PHASE_2C_07_NEXT_SLICE_IMPLEMENTATION_KICKOFF_GATE_DOC = (
+    Path("docs") / "phase_2c" / "phase_2c_07_next_slice_implementation_kickoff_gate.md"
+)
+PHASE_2C_07_NEXT_SLICE_IMPLEMENTATION_KICKOFF_GATE_JSON = (
+    Path("reports") / "lab-summary" / "phase_2c_07_next_slice_implementation_kickoff_gate.json"
+)
+PHASE_2C_07_NEXT_SLICE_IMPLEMENTATION_KICKOFF_GATE_HTML = (
+    Path("reports") / "lab-summary" / "phase_2c_07_next_slice_implementation_kickoff_gate.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -3951,6 +3964,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{PHASE_2C_06_NEXT_SLICE_FINAL_SELECTION_GATE_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Phase 2C",
+        "title": "Phase 2C-07 Next-Slice Implementation Kickoff Gate - Authorization Only",
+        "report_type": "Authorization-only next-slice implementation kickoff gate",
+        "safety_label": "PHASE_2C_07_AUTHORIZATION_GATE_DONE_PHASE_2C_08_AUTHORIZED_NOT_STARTED; AUTHORIZATION_GATE_ONLY_YES; SELECTED_NEXT_SLICE_ARTIFACT_VALIDATION_JOB; NEXT_SLICE_AUTHORIZED_FOR_PHASE_2C_08_YES; PHASE_2C_08_STARTED_NO; IMPLEMENTATION_ADDED_NO; ARTIFACT_VALIDATION_JOB_IMPLEMENTED_NO; RUNNER_ADAPTER_EXECUTION_PATH_ADDED_NO; SCHEDULER_QUEUE_BROKER_WORKER_AGENT_LOOP_ADDED_NO; SSH_NETCONF_RESTCONF_LIVE_DEVICE_TOUCHED_NO; PROVIDER_API_MODEL_SECRETS_TOUCHED_NO; REAL_COMMAND_EXECUTION_ADDED_NO; CONFIG_BACKUP_OR_CHANGE_BEHAVIOR_ADDED_NO; DAY1_DAY160_REWRITTEN_OR_REPLACED_NO; SECOND_SAFETY_MATRIX_CREATED_NO",
+        "description": "Phase 2C-07 authorizes artifact_validation_job for a later separate Phase 2C-08 using Phase 2C-04, Phase 2C-05, and Phase 2C-06 evidence. It does not start Phase 2C-08, implement the selected slice, or open execution, provider/API/model, secret, SSH, NETCONF, RESTCONF, live-device, backup, config-change, Day1-Day160 replacement, AGENTS.md modification, or second safety-matrix scope.",
+        "json_globs": [PHASE_2C_07_NEXT_SLICE_IMPLEMENTATION_KICKOFF_GATE_JSON.as_posix()],
+        "html_globs": [PHASE_2C_07_NEXT_SLICE_IMPLEMENTATION_KICKOFF_GATE_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{PHASE_2C_07_NEXT_SLICE_IMPLEMENTATION_KICKOFF_GATE_TASK_ID}"
         ),
     },
 ]
@@ -8731,6 +8757,32 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "phase_2c_06_next_slice_final_selection_gate.py",
             "notes": "PHASE_2C_06_NEXT_SLICE_FINAL_SELECTION_GATE_PLANNING_ONLY PHASE_2C_06_FINAL_SELECTION_GATE_DONE_IMPLEMENTATION_LOCKED FINAL_SELECTION_GATE_ONLY_YES PHASE_2C_04_READ_YES PHASE_2C_05_READ_YES CANDIDATE_SELECTED_YES SELECTED_NEXT_SLICE_ARTIFACT_VALIDATION_JOB NEXT_SLICE_AUTHORIZED_NO PHASE_2C_07_STARTED_NO PHASE_2C_08_STARTED_NO IMPLEMENTATION_ADDED_NO RUNNER_ADAPTER_EXECUTION_PATH_ADDED_NO SSH_NETCONF_RESTCONF_LIVE_DEVICE_TOUCHED_NO PROVIDER_API_MODEL_SECRETS_TOUCHED_NO DAY1_DAY160_REWRITTEN_OR_REPLACED_NO SECOND_SAFETY_MATRIX_CREATED_NO NEEDS_SCOPE_CONFIRMATION_NO. Report-only final selection gate; selects candidate-02 artifact_validation_job from Phase 2C-04 using Phase 2C-05 safety delta input, not Phase 2C-07/2C-08 authorization, implementation, runner, adapter, broker, scheduler, queue, worker, agent loop, execution path, provider/API/model call, secret handling, SSH, NETCONF, RESTCONF, live device access, backup behavior, config change behavior, AGENTS.md modification, Day1-Day160 rewrite or replacement, second safety matrix, approval bypass, or safety gate weakening.",
+        },
+        {
+            "id": PHASE_2C_07_NEXT_SLICE_IMPLEMENTATION_KICKOFF_GATE_TASK_ID,
+            "task_id": "phase_2c_07_next_slice_implementation_kickoff_gate",
+            "display_name": "Phase 2C-07 Next-Slice Implementation Kickoff Gate - Authorization Only",
+            "user_display_name": "Phase 2C-07 Next-Slice Implementation Kickoff Gate - Authorization Only",
+            "day": "Phase 2C",
+            "category": "planning_review",
+            "description": "Phase 2C-07 authorizes artifact_validation_job for a later separate Phase 2C-08 using Phase 2C-04, Phase 2C-05, and Phase 2C-06 evidence without implementing it or starting Phase 2C-08.",
+            "safety_level": "report-only",
+            "enabled": True,
+            "execution_mode": "report-only",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                PHASE_2C_07_NEXT_SLICE_IMPLEMENTATION_KICKOFF_GATE_JSON.as_posix(),
+                PHASE_2C_07_NEXT_SLICE_IMPLEMENTATION_KICKOFF_GATE_HTML.as_posix(),
+                PHASE_2C_07_NEXT_SLICE_IMPLEMENTATION_KICKOFF_GATE_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Phase 2C-07 JSON/HTML next-slice authorization evidence",
+                "Phase 2C-07 authorization-only kickoff documentation",
+            ],
+            "related_script": "phase_2c_07_next_slice_implementation_kickoff_gate.py",
+            "notes": "PHASE_2C_07_NEXT_SLICE_IMPLEMENTATION_KICKOFF_GATE_AUTHORIZATION_ONLY PHASE_2C_07_AUTHORIZATION_GATE_DONE_PHASE_2C_08_AUTHORIZED_NOT_STARTED AGENTS_MD_FOUND_YES AGENTS_MD_READ_BEFORE_ACTION_YES AGENTS_MD_MODIFIED_NO SCOPE_CONFIRMATION_WRITTEN_YES PHASE_2C_04_READ_YES PHASE_2C_05_READ_YES PHASE_2C_06_READ_YES AUTHORIZATION_GATE_ONLY_YES SELECTED_NEXT_SLICE_ARTIFACT_VALIDATION_JOB NEXT_SLICE_AUTHORIZED_FOR_PHASE_2C_08_YES PHASE_2C_08_STARTED_NO IMPLEMENTATION_ADDED_NO ARTIFACT_VALIDATION_JOB_IMPLEMENTED_NO RUNNER_ADAPTER_EXECUTION_PATH_ADDED_NO SCHEDULER_QUEUE_BROKER_WORKER_AGENT_LOOP_ADDED_NO SSH_NETCONF_RESTCONF_LIVE_DEVICE_TOUCHED_NO PROVIDER_API_MODEL_SECRETS_TOUCHED_NO REAL_COMMAND_EXECUTION_ADDED_NO CONFIG_BACKUP_OR_CHANGE_BEHAVIOR_ADDED_NO DAY1_DAY160_REWRITTEN_OR_REPLACED_NO SECOND_SAFETY_MATRIX_CREATED_NO NEEDS_SCOPE_CONFIRMATION_NO. Report-only authorization gate; authorizes candidate-02 artifact_validation_job for later separate Phase 2C-08 using Phase 2C-04 inventory, Phase 2C-05 safety delta, and Phase 2C-06 final selection evidence, not Phase 2C-08 start, implementation, runner, adapter, broker, scheduler, queue, worker, agent loop, execution path, provider/API/model call, secret handling, SSH, NETCONF, RESTCONF, live device access, real command execution, backup behavior, config change behavior, AGENTS.md modification, Day1-Day160 rewrite or replacement, second safety matrix, approval bypass, or safety gate weakening.",
         },
     ]
 
@@ -13809,6 +13861,15 @@ def _run_phase_2c_05_next_slice_safety_delta_review(project_root: Path) -> int:
 
 def _run_phase_2c_06_next_slice_final_selection_gate(project_root: Path) -> int:
     return run_phase_2c_06_next_slice_final_selection_gate(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_phase_2c_07_next_slice_implementation_kickoff_gate(project_root: Path) -> int:
+    return run_phase_2c_07_next_slice_implementation_kickoff_gate(
         project_root,
         format_heading_func=format_heading,
         format_status_func=format_status,
