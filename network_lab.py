@@ -338,6 +338,9 @@ from phase_2b_09_first_slice_implementation_plan_pack import (
 from phase_2b_10_day1_day160_reference_mapping_for_future_first_slice import (
     run_phase_2b_10_day1_day160_reference_mapping,
 )
+from phase_2b_11_project_consolidation_and_implementation_entry_map import (
+    run_phase_2b_11_project_consolidation_entry_map,
+)
 from project_folder_organization_decision_gate import (
     run_project_folder_organization_decision_gate,
 )
@@ -1759,6 +1762,18 @@ PHASE_2B_10_DAY1_DAY160_REFERENCE_MAPPING_JSON = (
 )
 PHASE_2B_10_DAY1_DAY160_REFERENCE_MAPPING_HTML = (
     Path("reports") / "lab-summary" / "phase_2b_10_day1_day160_reference_mapping_for_future_first_slice.html"
+)
+PHASE_2B_11_PROJECT_CONSOLIDATION_ENTRY_MAP_TASK_ID = (
+    "phase2b-11-project-consolidation-and-implementation-entry-map-planning-only"
+)
+PHASE_2B_11_PROJECT_CONSOLIDATION_ENTRY_MAP_DOC = (
+    Path("docs") / "phase_2b" / "phase_2b_11_project_consolidation_and_implementation_entry_map.md"
+)
+PHASE_2B_11_PROJECT_CONSOLIDATION_ENTRY_MAP_JSON = (
+    Path("reports") / "lab-summary" / "phase_2b_11_project_consolidation_and_implementation_entry_map.json"
+)
+PHASE_2B_11_PROJECT_CONSOLIDATION_ENTRY_MAP_HTML = (
+    Path("reports") / "lab-summary" / "phase_2b_11_project_consolidation_and_implementation_entry_map.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -3681,6 +3696,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{PHASE_2B_10_DAY1_DAY160_REFERENCE_MAPPING_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Phase 2B",
+        "title": "Phase 2B-11 Project Consolidation and Implementation Entry Map - Planning Only",
+        "report_type": "Planning-only project consolidation and implementation entry map",
+        "safety_label": "PHASE_2B_11_PROJECT_CONSOLIDATION_ENTRY_MAP_PLANNING_ONLY_DONE; FUTURE_PLAN_CREATED; FUTURE_PLAN_IS_REVIEW_ONLY; FUTURE_IMPLEMENTATION_AUTHORIZED_FALSE; FIRST_SLICE_SELECTED_FALSE; FIRST_SLICE_IMPLEMENTED_FALSE; CURRENT_SCOPE_DRIFT_DETECTED_FALSE; FUTURE_SCOPE_DRIFT_ITEMS_LISTED; RUNNER_ADAPTER_EXECUTION_PATH_ADDED_FALSE; SSH_NETCONF_RESTCONF_LIVE_DEVICE_TOUCHED_FALSE; PROVIDER_API_MODEL_SECRETS_TOUCHED_FALSE",
+        "description": "Phase 2B-11 produces a planning-only project consolidation and implementation entry map. It adds a review-only future plan and drift check without creating future phases, authorizing implementation, selecting a first slice, replacing Phase 2B-10, rewriting Day1-Day160, creating a second safety matrix, or enabling runners, adapters, execution, SSH, NETCONF, RESTCONF, live devices, providers/APIs/models, tokens, credentials, secrets, backups, validation, command execution, config changes, or safety-gate relaxation.",
+        "json_globs": [PHASE_2B_11_PROJECT_CONSOLIDATION_ENTRY_MAP_JSON.as_posix()],
+        "html_globs": [PHASE_2B_11_PROJECT_CONSOLIDATION_ENTRY_MAP_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{PHASE_2B_11_PROJECT_CONSOLIDATION_ENTRY_MAP_TASK_ID}"
         ),
     },
 ]
@@ -8201,6 +8229,32 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "phase_2b_10_day1_day160_reference_mapping_for_future_first_slice.py",
             "notes": "PHASE_2B_10_DAY1_DAY160_REFERENCE_MAPPING_PLANNING_ONLY PHASE_2B_10_DAY1_DAY160_REFERENCE_MAPPING_PLANNING_ONLY_DONE AGENTS_MD_FOUND_AND_READ AGENTS_MD_NOT_MODIFIED SCOPE_CONFIRMATION_PASS PHASE_GOAL_CONFIRMED EXAMPLE_JOB_TYPES_TREATED_AS_EXAMPLES_ONLY FORBIDDEN_SCOPE_PRESERVED EXISTING_ARTIFACTS_REFERENCED IMPLEMENTATION_BOUNDARY_PRESERVED DAY1_DAY160_REFERENCED DAY1_DAY160_REWRITTEN_OR_REPLACED_FALSE SECOND_SAFETY_MATRIX_CREATED_FALSE PHASE_2B_05_DUPLICATED_FALSE PHASE_2B_06_DUPLICATED_FALSE PHASE_2B_08_DUPLICATED_FALSE PHASE_2B_09_DUPLICATED_FALSE FIRST_SLICE_IMPLEMENTED_FALSE RUNNER_ADAPTER_EXECUTION_PATH_ADDED_FALSE SSH_NETCONF_RESTCONF_LIVE_DEVICE_TOUCHED_FALSE PROVIDER_API_MODEL_SECRETS_TOUCHED_FALSE. Planning-only Day1-Day160 reference mapping for a future first slice; no Phase 2B implementation slice, Day1-Day160 rewrite or replacement, copied safety matrix, Phase 2B-05 duplication, Phase 2B-06 readiness re-run, Phase 2B-08 authorization re-run, Phase 2B-09 plan rewrite, second safety matrix, runner, adapter, broker, scheduler, queue worker, background worker, SSH, NETCONF, RESTCONF, live device, provider/API/model calls, secrets handling, frontend integration, real execution, real backup, real validation, command execution, approval bypass, or safety gate weakening.",
+        },
+        {
+            "id": PHASE_2B_11_PROJECT_CONSOLIDATION_ENTRY_MAP_TASK_ID,
+            "task_id": "phase_2b_11_project_consolidation_and_implementation_entry_map",
+            "display_name": "Phase 2B-11 Project Consolidation and Implementation Entry Map - Planning Only",
+            "user_display_name": "Phase 2B-11 Project Consolidation and Implementation Entry Map - Planning Only",
+            "day": "Phase 2B",
+            "category": "authorization_scope_gate",
+            "description": "Phase 2B-11 consolidates Phase 2B planning into a reviewer-visible future implementation entry map and adds a review-only future plan and drift check.",
+            "safety_level": "planning-only",
+            "execution_mode": "planning-only",
+            "enabled": True,
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                PHASE_2B_11_PROJECT_CONSOLIDATION_ENTRY_MAP_JSON.as_posix(),
+                PHASE_2B_11_PROJECT_CONSOLIDATION_ENTRY_MAP_HTML.as_posix(),
+                PHASE_2B_11_PROJECT_CONSOLIDATION_ENTRY_MAP_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Phase 2B-11 JSON/HTML planning-only project consolidation and implementation entry map",
+                "Phase 2B-11 project consolidation and future plan drift-check documentation",
+            ],
+            "related_script": "phase_2b_11_project_consolidation_and_implementation_entry_map.py",
+            "notes": "PHASE_2B_11_PROJECT_CONSOLIDATION_ENTRY_MAP_PLANNING_ONLY PHASE_2B_11_PROJECT_CONSOLIDATION_ENTRY_MAP_PLANNING_ONLY_DONE FUTURE_PLAN_CREATED FUTURE_PLAN_IS_REVIEW_ONLY FUTURE_IMPLEMENTATION_AUTHORIZED_FALSE FIRST_SLICE_SELECTED_FALSE FIRST_SLICE_IMPLEMENTED_FALSE CURRENT_SCOPE_DRIFT_DETECTED_FALSE FUTURE_SCOPE_DRIFT_ITEMS_LISTED RUNNER_ADAPTER_EXECUTION_PATH_ADDED_FALSE SSH_NETCONF_RESTCONF_LIVE_DEVICE_TOUCHED_FALSE PROVIDER_API_MODEL_SECRETS_TOUCHED_FALSE. Planning-only project consolidation and implementation entry map; no future phase creation, Phase 2B implementation slice, final first-slice selection, Day1-Day160 rewrite or replacement, Phase 2B-10 replacement, second safety matrix, runner, adapter, broker, scheduler, queue worker, background worker, SSH, NETCONF, RESTCONF, live device, provider/API/model calls, token handling, credential handling, secrets handling, frontend integration, real execution, real backup, real validation, command execution, config change, approval bypass, or safety gate weakening.",
         },
     ]
 
@@ -13189,6 +13243,15 @@ def _run_phase_2b_09_first_slice_implementation_plan_pack(project_root: Path) ->
 
 def _run_phase_2b_10_day1_day160_reference_mapping(project_root: Path) -> int:
     return run_phase_2b_10_day1_day160_reference_mapping(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_phase_2b_11_project_consolidation_entry_map(project_root: Path) -> int:
+    return run_phase_2b_11_project_consolidation_entry_map(
         project_root,
         format_heading_func=format_heading,
         format_status_func=format_status,
