@@ -374,6 +374,9 @@ from phase_2c_07_next_slice_implementation_kickoff_gate import (
 from phase_2c_08_next_slice_implementation import (
     run_phase_2c_08_next_slice_implementation,
 )
+from phase_2c_09_post_next_slice_acceptance_review import (
+    run_phase_2c_09_post_next_slice_acceptance_review,
+)
 from project_folder_organization_decision_gate import (
     run_project_folder_organization_decision_gate,
 )
@@ -1925,6 +1928,16 @@ PHASE_2C_08_NEXT_SLICE_IMPLEMENTATION_JSON = (
 )
 PHASE_2C_08_NEXT_SLICE_IMPLEMENTATION_HTML = (
     Path("reports") / "lab-summary" / "phase_2c_08_next_slice_implementation.html"
+)
+PHASE_2C_09_POST_NEXT_SLICE_ACCEPTANCE_REVIEW_TASK_ID = "phase2c-09-post-next-slice-acceptance-review"
+PHASE_2C_09_POST_NEXT_SLICE_ACCEPTANCE_REVIEW_DOC = (
+    Path("docs") / "phase_2c" / "phase_2c_09_post_next_slice_acceptance_review.md"
+)
+PHASE_2C_09_POST_NEXT_SLICE_ACCEPTANCE_REVIEW_JSON = (
+    Path("reports") / "lab-summary" / "phase_2c_09_post_next_slice_acceptance_review.json"
+)
+PHASE_2C_09_POST_NEXT_SLICE_ACCEPTANCE_REVIEW_HTML = (
+    Path("reports") / "lab-summary" / "phase_2c_09_post_next_slice_acceptance_review.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -4003,6 +4016,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{PHASE_2C_08_NEXT_SLICE_IMPLEMENTATION_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Phase 2C",
+        "title": "Phase 2C-09 Post-Next-Slice Acceptance Review - Report Only",
+        "report_type": "Report-only post-next-slice acceptance review",
+        "safety_label": "PHASE_2C_09_POST_NEXT_SLICE_ACCEPTANCE_REVIEW_REPORT_ONLY; PHASE_2C_09_POST_NEXT_SLICE_ACCEPTED; ACCEPTANCE_DECISION_ACCEPT; PHASE_2C_06_SELECTION_CONFIRMED_YES; PHASE_2C_07_AUTHORIZATION_CONFIRMED_YES; PHASE_2C_08_EVIDENCE_FOUND_YES; ARTIFACT_VALIDATION_JOB_ACCEPTED_YES; NEXT_SLICE_SELECTED_NO; NEXT_IMPLEMENTATION_STARTED_NO; RUNNER_ADAPTER_EXECUTION_PATH_ADDED_NO; SCHEDULER_QUEUE_BROKER_WORKER_AGENT_LOOP_ADDED_NO; SSH_NETCONF_RESTCONF_LIVE_DEVICE_TOUCHED_NO; PROVIDER_API_MODEL_SECRETS_TOUCHED_NO; CONFIG_BACKUP_CHANGE_BEHAVIOR_ADDED_NO; DAY1_DAY160_REWRITTEN_OR_REPLACED_NO; SECOND_SAFETY_MATRIX_CREATED_NO",
+        "description": "Phase 2C-09 reviews existing Phase 2C-08 artifact_validation_job evidence against Phase 2C-06 selection, Phase 2C-07 authorization, and existing report-only / dry-run / mock-only safety boundaries. It does not select another slice, start Phase 2C-10, modify artifact_validation_job, or open execution, live-device, provider/API/model, secret, backup, config-change, Day1-Day160 replacement, or second-safety-matrix scope.",
+        "json_globs": [PHASE_2C_09_POST_NEXT_SLICE_ACCEPTANCE_REVIEW_JSON.as_posix()],
+        "html_globs": [PHASE_2C_09_POST_NEXT_SLICE_ACCEPTANCE_REVIEW_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{PHASE_2C_09_POST_NEXT_SLICE_ACCEPTANCE_REVIEW_TASK_ID}"
         ),
     },
 ]
@@ -8835,6 +8861,32 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "phase_2c_08_next_slice_implementation.py",
             "notes": "PHASE_2C_08_NEXT_SLICE_IMPLEMENTATION PHASE_2C_08_NEXT_SLICE_IMPLEMENTED_LOCAL_REPORT_ONLY SELECTED_NEXT_SLICE_ARTIFACT_VALIDATION_JOB PHASE_GOAL_CONFIRMED_YES PHASE_2C_06_SELECTION_CONFIRMED_YES PHASE_2C_07_AUTHORIZATION_CONFIRMED_YES SCOPE_NARROWED_TO_ONE_EXAMPLE_NO NEEDS_SCOPE_CONFIRMATION_NO ARTIFACT_VALIDATION_JOB_IMPLEMENTED_YES LOCAL_ONLY_YES DETERMINISTIC_YES REPORT_ONLY_DRY_RUN_MOCK_ONLY_YES VALIDATES_EXISTING_LOCAL_ARTIFACTS_ONLY_YES RUNNER_ADAPTER_EXECUTION_PATH_ADDED_NO SCHEDULER_QUEUE_BROKER_WORKER_AGENT_LOOP_ADDED_NO SSH_NETCONF_RESTCONF_LIVE_DEVICE_TOUCHED_NO PROVIDER_API_MODEL_SECRETS_TOUCHED_NO CONFIG_BACKUP_OR_CHANGE_ADDED_NO DAY1_DAY160_REWRITTEN_OR_REPLACED_NO SECOND_SAFETY_MATRIX_CREATED_NO. Report-only implementation; validates fixed local repository artifacts and prior Phase 2C-06/Phase 2C-07 evidence only, not runner, adapter, broker, scheduler, queue, worker, agent loop, execution path, provider/API/model call, secret handling, SSH, NETCONF, RESTCONF, live device access, real command execution, backup behavior, config change behavior, AGENTS.md modification, Day1-Day160 rewrite or replacement, second safety matrix, approval bypass, or safety gate weakening.",
+        },
+        {
+            "id": PHASE_2C_09_POST_NEXT_SLICE_ACCEPTANCE_REVIEW_TASK_ID,
+            "task_id": "phase_2c_09_post_next_slice_acceptance_review",
+            "display_name": "Phase 2C-09 Post-Next-Slice Acceptance Review - Report Only",
+            "user_display_name": "Phase 2C-09 Post-Next-Slice Acceptance Review - Report Only",
+            "day": "Phase 2C",
+            "category": "acceptance_review",
+            "description": "Phase 2C-09 reviews existing Phase 2C-08 artifact_validation_job evidence against Phase 2C-06 selection, Phase 2C-07 authorization, and existing report-only / dry-run / mock-only safety boundaries.",
+            "safety_level": "report-only",
+            "enabled": True,
+            "execution_mode": "report-only",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                PHASE_2C_09_POST_NEXT_SLICE_ACCEPTANCE_REVIEW_JSON.as_posix(),
+                PHASE_2C_09_POST_NEXT_SLICE_ACCEPTANCE_REVIEW_HTML.as_posix(),
+                PHASE_2C_09_POST_NEXT_SLICE_ACCEPTANCE_REVIEW_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Phase 2C-09 JSON/HTML post-next-slice acceptance evidence",
+                "Phase 2C-09 report-only acceptance review documentation",
+            ],
+            "related_script": "phase_2c_09_post_next_slice_acceptance_review.py",
+            "notes": "PHASE_2C_09_POST_NEXT_SLICE_ACCEPTANCE_REVIEW_REPORT_ONLY PHASE_2C_09_POST_NEXT_SLICE_ACCEPTED ACCEPTANCE_DECISION_ACCEPT AGENTS_MD_FOUND_YES AGENTS_MD_READ_BEFORE_ACTION_YES AGENTS_MD_MODIFIED_NO SCOPE_CONFIRMED_IN_WRITING_YES NEEDS_SCOPE_CONFIRMATION_NO PHASE_2C_06_SELECTION_CONFIRMED_YES PHASE_2C_07_AUTHORIZATION_CONFIRMED_YES PHASE_2C_08_EVIDENCE_FOUND_YES ARTIFACT_VALIDATION_JOB_ACCEPTED_YES REPORT_ONLY_ARTIFACT_CREATED_YES NEXT_SLICE_SELECTED_NO NEXT_IMPLEMENTATION_STARTED_NO RUNNER_ADAPTER_EXECUTION_PATH_ADDED_NO SCHEDULER_QUEUE_BROKER_WORKER_AGENT_LOOP_ADDED_NO SSH_NETCONF_RESTCONF_LIVE_DEVICE_TOUCHED_NO PROVIDER_API_MODEL_SECRETS_TOUCHED_NO CONFIG_BACKUP_CHANGE_BEHAVIOR_ADDED_NO DAY1_DAY160_REWRITTEN_OR_REPLACED_NO SECOND_SAFETY_MATRIX_CREATED_NO. Report-only acceptance review; reviews existing Phase 2C-08 artifact_validation_job evidence against Phase 2C-06 selection and Phase 2C-07 authorization, not a new implementation slice, next-slice selection, Phase 2C-10 start, runner, adapter, broker, scheduler, queue, worker, agent loop, execution path, provider/API/model call, secret handling, SSH, NETCONF, RESTCONF, live device access, real command execution, backup behavior, config change behavior, AGENTS.md modification, Day1-Day160 rewrite or replacement, second safety matrix, approval bypass, or safety gate weakening.",
         },
     ]
 
@@ -13931,6 +13983,15 @@ def _run_phase_2c_07_next_slice_implementation_kickoff_gate(project_root: Path) 
 
 def _run_phase_2c_08_next_slice_implementation(project_root: Path) -> int:
     return run_phase_2c_08_next_slice_implementation(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_phase_2c_09_post_next_slice_acceptance_review(project_root: Path) -> int:
+    return run_phase_2c_09_post_next_slice_acceptance_review(
         project_root,
         format_heading_func=format_heading,
         format_status_func=format_status,
