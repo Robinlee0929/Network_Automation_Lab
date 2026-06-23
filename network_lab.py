@@ -398,6 +398,9 @@ from phase_2c_15_interview_mvp_implementation_slice_kickoff_authorization_gate i
 from phase_2c_16_interview_mvp_local_result_envelope_contract import (
     run_phase_2c_16_interview_mvp_local_result_envelope_contract,
 )
+from phase_2c_17_post_implementation_slice_acceptance_review_local_result_envelope_contract import (
+    run_phase_2c_17_post_implementation_slice_acceptance_review,
+)
 from project_folder_organization_decision_gate import (
     run_project_folder_organization_decision_gate,
 )
@@ -2049,6 +2052,24 @@ PHASE_2C_16_INTERVIEW_MVP_LOCAL_RESULT_ENVELOPE_CONTRACT_JSON = (
 )
 PHASE_2C_16_INTERVIEW_MVP_LOCAL_RESULT_ENVELOPE_CONTRACT_HTML = (
     Path("reports") / "lab-summary" / "phase_2c_16_interview_mvp_local_result_envelope_contract.html"
+)
+PHASE_2C_17_POST_IMPLEMENTATION_SLICE_ACCEPTANCE_REVIEW_LOCAL_RESULT_ENVELOPE_CONTRACT_TASK_ID = (
+    "phase2c-17-post-implementation-slice-acceptance-review-local-result-envelope-contract"
+)
+PHASE_2C_17_POST_IMPLEMENTATION_SLICE_ACCEPTANCE_REVIEW_LOCAL_RESULT_ENVELOPE_CONTRACT_DOC = (
+    Path("docs")
+    / "phase_2c"
+    / "phase_2c_17_post_implementation_slice_acceptance_review_local_result_envelope_contract.md"
+)
+PHASE_2C_17_POST_IMPLEMENTATION_SLICE_ACCEPTANCE_REVIEW_LOCAL_RESULT_ENVELOPE_CONTRACT_JSON = (
+    Path("reports")
+    / "lab-summary"
+    / "phase_2c_17_post_implementation_slice_acceptance_review_local_result_envelope_contract.json"
+)
+PHASE_2C_17_POST_IMPLEMENTATION_SLICE_ACCEPTANCE_REVIEW_LOCAL_RESULT_ENVELOPE_CONTRACT_HTML = (
+    Path("reports")
+    / "lab-summary"
+    / "phase_2c_17_post_implementation_slice_acceptance_review_local_result_envelope_contract.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -4231,6 +4252,23 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{PHASE_2C_16_INTERVIEW_MVP_LOCAL_RESULT_ENVELOPE_CONTRACT_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Phase 2C",
+        "title": "Phase 2C-17 Post-Implementation Slice Acceptance Review - Local Result Envelope Contract",
+        "report_type": "Report-only post-implementation slice acceptance review",
+        "safety_label": "PHASE_2C_17_POST_IMPLEMENTATION_SLICE_ACCEPTANCE_REVIEW_REPORT_ONLY; PHASE_2C_17_LOCAL_RESULT_ENVELOPE_CONTRACT_ACCEPTED; ACCEPTANCE_DECISION_ACCEPT; PHASE_2C_15_AUTHORIZATION_CONFIRMED_YES; PHASE_2C_16_VALIDATION_PASSED_YES; PHASE_2C_16_EVIDENCE_FOUND_YES; LOCAL_RESULT_ENVELOPE_CONTRACT_ACCEPTED_YES; PHASE_2C_16_CONTINUED_NO; NEXT_SLICE_SELECTED_NO; NEXT_IMPLEMENTATION_STARTED_NO; RUNNER_ADAPTER_EXECUTION_PATH_ADDED_NO; QUEUE_SCHEDULER_WORKER_AI_LOOP_ADDED_NO; SSH_NETCONF_RESTCONF_LIVE_DEVICE_TOUCHED_NO; PROVIDER_API_MODEL_SECRETS_TOUCHED_NO; CONFIG_BACKUP_CHANGE_BEHAVIOR_ADDED_NO; PRODUCTION_EXECUTION_PATH_ADDED_NO; DAY1_DAY160_REWRITTEN_OR_REPLACED_NO; SECOND_SAFETY_MATRIX_CREATED_NO",
+        "description": "Phase 2C-17 reviews existing Phase 2C-16 local_result_envelope_contract evidence against Phase 2C-15 authorization, Interview MVP scope, and report-only / dry-run / mock-only safety boundaries. It does not continue Phase 2C-16, select another slice, start Phase 2C-18, modify the contract, or open execution, live-device, provider/API/model, secret, backup, config-change, production, Day1-Day160 replacement, or second-safety-matrix scope.",
+        "json_globs": [
+            PHASE_2C_17_POST_IMPLEMENTATION_SLICE_ACCEPTANCE_REVIEW_LOCAL_RESULT_ENVELOPE_CONTRACT_JSON.as_posix()
+        ],
+        "html_globs": [
+            PHASE_2C_17_POST_IMPLEMENTATION_SLICE_ACCEPTANCE_REVIEW_LOCAL_RESULT_ENVELOPE_CONTRACT_HTML.as_posix()
+        ],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{PHASE_2C_17_POST_IMPLEMENTATION_SLICE_ACCEPTANCE_REVIEW_LOCAL_RESULT_ENVELOPE_CONTRACT_TASK_ID}"
         ),
     },
 ]
@@ -9279,6 +9317,37 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "phase_2c_16_interview_mvp_local_result_envelope_contract.py",
             "notes": "PHASE_2C_16_LOCAL_RESULT_ENVELOPE_CONTRACT PHASE_2C_16_LOCAL_RESULT_ENVELOPE_CONTRACT_IMPLEMENTED_REPORT_ONLY SELECTED_NEXT_SLICE_LOCAL_RESULT_ENVELOPE_CONTRACT PHASE_GOAL_CONFIRMED_YES PHASE_2C_15_AUTHORIZATION_CONFIRMED_YES SCOPE_NARROWED_TO_ONE_EXAMPLE_NO NEEDS_SCOPE_CONFIRMATION_NO CONTRACT_SHAPE_DEFINED_YES VALIDATOR_ADDED_YES SAMPLE_ENVELOPE_STATIC_FIXTURE_ONLY_YES LOCAL_ONLY_YES DETERMINISTIC_YES REPORT_ONLY_DRY_RUN_MOCK_ONLY_YES RUNNER_ADAPTER_EXECUTION_PATH_ADDED_NO QUEUE_SCHEDULER_WORKER_AI_LOOP_ADDED_NO SSH_NETCONF_RESTCONF_LIVE_DEVICE_TOUCHED_NO PROVIDER_API_MODEL_SECRETS_TOUCHED_NO CONFIG_BACKUP_CHANGE_ADDED_NO PRODUCTION_EXECUTION_PATH_ADDED_NO DAY1_DAY160_REWRITTEN_OR_REPLACED_NO SECOND_SAFETY_MATRIX_CREATED_NO NEXT_PHASE_STARTED_NO EXTRA_SLICE_SELECTED_OR_IMPLEMENTED_NO. Report-only contract implementation; defines local envelope shape, static sample, validator, warnings, evidence metadata, and forbidden-scope proof only, not runner, adapter, broker, scheduler, queue, worker, AI loop, execution path, provider/API/model call, secret handling, SSH, NETCONF, RESTCONF, live device access, real command execution, backup behavior, config change behavior, production execution, AGENTS.md modification, Day1-Day160 rewrite or replacement, second safety matrix, approval bypass, next phase, or extra slice.",
+        },
+        {
+            "id": PHASE_2C_17_POST_IMPLEMENTATION_SLICE_ACCEPTANCE_REVIEW_LOCAL_RESULT_ENVELOPE_CONTRACT_TASK_ID,
+            "task_id": "phase_2c_17_post_implementation_slice_acceptance_review_local_result_envelope_contract",
+            "display_name": "Phase 2C-17 Post-Implementation Slice Acceptance Review - Local Result Envelope Contract",
+            "user_display_name": "Phase 2C-17 Post-Implementation Slice Acceptance Review - Local Result Envelope Contract",
+            "day": "Phase 2C",
+            "category": "acceptance_review",
+            "summary": "Reviews whether Phase 2C-16 local_result_envelope_contract is acceptable.",
+            "description": "Report-only acceptance review of existing Phase 2C-16 local_result_envelope_contract evidence using Phase 2C-15 authorization; accepts the contract only if it remains local, bounded, deterministic, report-only, dry-run-only, mock-only, and free of forbidden execution, live-device, provider/API/model, secret, backup, config-change, production, Day1-Day160 replacement, second-safety-matrix, next-phase, or extra-slice behavior.",
+            "command": f"python network_lab.py --task {PHASE_2C_17_POST_IMPLEMENTATION_SLICE_ACCEPTANCE_REVIEW_LOCAL_RESULT_ENVELOPE_CONTRACT_TASK_ID}",
+            "enabled": True,
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                PHASE_2C_17_POST_IMPLEMENTATION_SLICE_ACCEPTANCE_REVIEW_LOCAL_RESULT_ENVELOPE_CONTRACT_JSON.as_posix(),
+                PHASE_2C_17_POST_IMPLEMENTATION_SLICE_ACCEPTANCE_REVIEW_LOCAL_RESULT_ENVELOPE_CONTRACT_HTML.as_posix(),
+                PHASE_2C_17_POST_IMPLEMENTATION_SLICE_ACCEPTANCE_REVIEW_LOCAL_RESULT_ENVELOPE_CONTRACT_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Phase 2C-17 JSON/HTML local result envelope acceptance evidence",
+                "Phase 2C-17 report-only acceptance review documentation",
+            ],
+            "related_script": (
+                "phase_2c_17_post_implementation_slice_acceptance_review_"
+                "local_result_envelope_contract.py"
+            ),
+            "notes": "PHASE_2C_17_POST_IMPLEMENTATION_SLICE_ACCEPTANCE_REVIEW_REPORT_ONLY PHASE_2C_17_LOCAL_RESULT_ENVELOPE_CONTRACT_ACCEPTED ACCEPTANCE_DECISION_ACCEPT AGENTS_MD_FOUND_YES AGENTS_MD_READ_BEFORE_ACTION_YES AGENTS_MD_MODIFIED_NO REQUIRED_REFERENCE_DOCUMENTS_READ_YES SCOPE_CONFIRMED_IN_WRITING_YES NEEDS_SCOPE_CONFIRMATION_NO PHASE_2C_15_AUTHORIZATION_CONFIRMED_YES PHASE_2C_16_VALIDATION_PASSED_YES PHASE_2C_16_EVIDENCE_FOUND_YES LOCAL_RESULT_ENVELOPE_CONTRACT_ACCEPTED_YES REPORT_ONLY_ARTIFACT_CREATED_YES PHASE_2C_16_CONTINUED_NO NEXT_SLICE_SELECTED_NO NEXT_IMPLEMENTATION_STARTED_NO RUNNER_ADAPTER_EXECUTION_PATH_ADDED_NO QUEUE_SCHEDULER_WORKER_AI_LOOP_ADDED_NO SSH_NETCONF_RESTCONF_LIVE_DEVICE_TOUCHED_NO PROVIDER_API_MODEL_SECRETS_TOUCHED_NO CONFIG_BACKUP_CHANGE_BEHAVIOR_ADDED_NO PRODUCTION_EXECUTION_PATH_ADDED_NO DAY1_DAY160_REWRITTEN_OR_REPLACED_NO SECOND_SAFETY_MATRIX_CREATED_NO. Report-only acceptance review; reviews existing Phase 2C-16 local_result_envelope_contract evidence against Phase 2C-15 authorization, not a continuation of Phase 2C-16, not a new implementation slice, not next-slice selection, not Phase 2C-18 start, runner, adapter, broker, scheduler, queue, worker, AI loop, execution path, provider/API/model call, secret handling, SSH, NETCONF, RESTCONF, live device access, real command execution, backup behavior, config change behavior, production execution, AGENTS.md modification, Day1-Day160 rewrite or replacement, second safety matrix, approval bypass, or safety gate weakening.",
         },
     ]
 
@@ -14447,6 +14516,17 @@ def _run_phase_2c_15_interview_mvp_implementation_slice_kickoff_authorization_ga
 
 def _run_phase_2c_16_interview_mvp_local_result_envelope_contract(project_root: Path) -> int:
     return run_phase_2c_16_interview_mvp_local_result_envelope_contract(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_phase_2c_17_post_implementation_slice_acceptance_review_local_result_envelope_contract(
+    project_root: Path,
+) -> int:
+    return run_phase_2c_17_post_implementation_slice_acceptance_review(
         project_root,
         format_heading_func=format_heading,
         format_status_func=format_status,

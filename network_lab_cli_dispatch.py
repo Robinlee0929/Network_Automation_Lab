@@ -114,6 +114,7 @@ def _build_parser(lab: ModuleType) -> argparse.ArgumentParser:
   python network_lab.py --task phase2c-13-interview-mvp-implementation-slice-safety-delta-review
   python network_lab.py --task phase2c-14-interview-mvp-implementation-slice-final-selection-gate
   python network_lab.py --task phase2c-15-interview-mvp-implementation-slice-kickoff-authorization-gate
+  python network_lab.py --task phase2c-17-post-implementation-slice-acceptance-review-local-result-envelope-contract
   python network_lab.py --task intent-workflow-demo
   python network_lab.py --task offline-mock-runtime
   python network_lab.py --task offline-mock-runtime-contract
@@ -237,6 +238,7 @@ phase2c-12-interview-mvp-implementation-slice-candidate-inventory writes the Pha
 phase2c-13-interview-mvp-implementation-slice-safety-delta-review writes the Phase 2C-13 planning-only Interview MVP implementation slice safety delta review; it derives candidates only from Phase 2C-12 and does not select a unique slice, authorize implementation, start implementation, start Phase 2C-14, or add runner, adapter, execution path, queue, scheduler, worker, AI loop, SSH, NETCONF, RESTCONF, live device, provider/API/model, secrets, backup, config change, Day1-Day160 replacement, or second safety matrix.
 phase2c-14-interview-mvp-implementation-slice-final-selection-gate writes the Phase 2C-14 planning-only Interview MVP implementation slice final selection gate; it selects candidate-03 local_result_envelope_contract as planning output only and does not authorize implementation, start implementation, start Phase 2C-15, or add runner, adapter, execution path, queue, scheduler, worker, AI loop, SSH, NETCONF, RESTCONF, live device, provider/API/model, secrets, backup, config change, Day1-Day160 replacement, or second safety matrix.
 phase2c-15-interview-mvp-implementation-slice-kickoff-authorization-gate writes the Phase 2C-15 planning-only kickoff authorization gate; it authorizes candidate-03 local_result_envelope_contract for implementation in a later phase only and does not implement the slice, add result envelope runtime behavior, start the next phase, or add runner, adapter, execution path, queue, scheduler, worker, AI loop, SSH, NETCONF, RESTCONF, live device, provider/API/model, secrets, backup, config change, Day1-Day160 replacement, or second safety matrix.
+phase2c-17-post-implementation-slice-acceptance-review-local-result-envelope-contract writes the Phase 2C-17 report-only acceptance review for existing Phase 2C-16 local_result_envelope_contract evidence; it does not continue Phase 2C-16, select another slice, start Phase 2C-18, modify the contract, or add runner, adapter, broker, scheduler, queue, worker, AI loop, execution path, SSH, NETCONF, RESTCONF, live device, provider/API/model, secret, real command execution, backup, config change, production, Day1-Day160 replacement, AGENTS.md modification, or second safety matrix.
 wireguard-runner is dry-run by default and delegates to the existing WireGuard script only after explicit --allow-live-wireguard."""
     parser = argparse.ArgumentParser(
         description=f"Day14 {lab.DAY14_NAME}.",
@@ -470,6 +472,7 @@ def _build_task_handlers(args: argparse.Namespace, root: Path, lab: ModuleType) 
         lab.PHASE_2C_14_INTERVIEW_MVP_IMPLEMENTATION_SLICE_FINAL_SELECTION_GATE_TASK_ID: lambda: lab._run_phase_2c_14_interview_mvp_implementation_slice_final_selection_gate(root),
         lab.PHASE_2C_15_INTERVIEW_MVP_IMPLEMENTATION_SLICE_KICKOFF_AUTHORIZATION_GATE_TASK_ID: lambda: lab._run_phase_2c_15_interview_mvp_implementation_slice_kickoff_authorization_gate(root),
         lab.PHASE_2C_16_INTERVIEW_MVP_LOCAL_RESULT_ENVELOPE_CONTRACT_TASK_ID: lambda: lab._run_phase_2c_16_interview_mvp_local_result_envelope_contract(root),
+        lab.PHASE_2C_17_POST_IMPLEMENTATION_SLICE_ACCEPTANCE_REVIEW_LOCAL_RESULT_ENVELOPE_CONTRACT_TASK_ID: lambda: lab._run_phase_2c_17_post_implementation_slice_acceptance_review_local_result_envelope_contract(root),
         lab.WIREGUARD_RUNNER_TASK_ALIAS: lambda: lab._run_wireguard_runner(
             root,
             dry_run=args.dry_run,
