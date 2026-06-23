@@ -463,6 +463,7 @@ def _build_task_handlers(args: argparse.Namespace, root: Path, lab: ModuleType) 
         lab.PHASE_2C_11_INTERVIEW_MVP_SCOPE_ARCHITECTURE_GATE_TASK_ID: lambda: lab._run_phase_2c_11_interview_mvp_scope_architecture_gate(root),
         lab.PHASE_2C_12_INTERVIEW_MVP_IMPLEMENTATION_SLICE_CANDIDATE_INVENTORY_TASK_ID: lambda: lab._run_phase_2c_12_interview_mvp_implementation_slice_candidate_inventory(root),
         lab.PHASE_2C_13_INTERVIEW_MVP_IMPLEMENTATION_SLICE_SAFETY_DELTA_REVIEW_TASK_ID: lambda: lab._run_phase_2c_13_interview_mvp_implementation_slice_safety_delta_review(root),
+        lab.PHASE_2C_14_INTERVIEW_MVP_IMPLEMENTATION_SLICE_FINAL_SELECTION_GATE_TASK_ID: lambda: lab._run_phase_2c_14_interview_mvp_implementation_slice_final_selection_gate(root),
         lab.WIREGUARD_RUNNER_TASK_ALIAS: lambda: lab._run_wireguard_runner(
             root,
             dry_run=args.dry_run,
