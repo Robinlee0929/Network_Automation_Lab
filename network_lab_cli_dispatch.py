@@ -112,6 +112,8 @@ def _build_parser(lab: ModuleType) -> argparse.ArgumentParser:
   python network_lab.py --task phase2c-11-interview-mvp-scope-architecture-gate
   python network_lab.py --task phase2c-12-interview-mvp-implementation-slice-candidate-inventory
   python network_lab.py --task phase2c-13-interview-mvp-implementation-slice-safety-delta-review
+  python network_lab.py --task phase2c-14-interview-mvp-implementation-slice-final-selection-gate
+  python network_lab.py --task phase2c-15-interview-mvp-implementation-slice-kickoff-authorization-gate
   python network_lab.py --task intent-workflow-demo
   python network_lab.py --task offline-mock-runtime
   python network_lab.py --task offline-mock-runtime-contract
@@ -233,6 +235,8 @@ phase2c-10-next-slice-decision-gate-authorization-review writes the Phase 2C-10 
 phase2c-11-interview-mvp-scope-architecture-gate writes the Phase 2C-11 planning-only Interview MVP scope and architecture authorization gate; it authorizes later implementation planning only and does not implement or start runner, adapter, result envelope, report renderer, demo jobs, Phase 2C-12, scheduler, queue, worker, AI agent loop, SSH, NETCONF, RESTCONF, live device, provider/API/model, secrets, backup, config change, production execution, AGENTS.md modification, Phase 2C-10 modification, Day1-Day160 replacement, or second safety matrix.
 phase2c-12-interview-mvp-implementation-slice-candidate-inventory writes the Phase 2C-12 planning-only Interview MVP implementation slice candidate inventory; it lists candidates only and does not select a slice, authorize implementation, start implementation, start Phase 2C-13, or add runner, adapter, result envelope, report renderer, demo jobs, scheduler, queue, worker, AI loop, execution path, SSH, NETCONF, RESTCONF, live device, provider/API/model, secrets, backup, config change, production execution, AGENTS.md modification, Day1-Day160 replacement, or second safety matrix.
 phase2c-13-interview-mvp-implementation-slice-safety-delta-review writes the Phase 2C-13 planning-only Interview MVP implementation slice safety delta review; it derives candidates only from Phase 2C-12 and does not select a unique slice, authorize implementation, start implementation, start Phase 2C-14, or add runner, adapter, execution path, queue, scheduler, worker, AI loop, SSH, NETCONF, RESTCONF, live device, provider/API/model, secrets, backup, config change, Day1-Day160 replacement, or second safety matrix.
+phase2c-14-interview-mvp-implementation-slice-final-selection-gate writes the Phase 2C-14 planning-only Interview MVP implementation slice final selection gate; it selects candidate-03 local_result_envelope_contract as planning output only and does not authorize implementation, start implementation, start Phase 2C-15, or add runner, adapter, execution path, queue, scheduler, worker, AI loop, SSH, NETCONF, RESTCONF, live device, provider/API/model, secrets, backup, config change, Day1-Day160 replacement, or second safety matrix.
+phase2c-15-interview-mvp-implementation-slice-kickoff-authorization-gate writes the Phase 2C-15 planning-only kickoff authorization gate; it authorizes candidate-03 local_result_envelope_contract for implementation in a later phase only and does not implement the slice, add result envelope runtime behavior, start the next phase, or add runner, adapter, execution path, queue, scheduler, worker, AI loop, SSH, NETCONF, RESTCONF, live device, provider/API/model, secrets, backup, config change, Day1-Day160 replacement, or second safety matrix.
 wireguard-runner is dry-run by default and delegates to the existing WireGuard script only after explicit --allow-live-wireguard."""
     parser = argparse.ArgumentParser(
         description=f"Day14 {lab.DAY14_NAME}.",
@@ -464,6 +468,7 @@ def _build_task_handlers(args: argparse.Namespace, root: Path, lab: ModuleType) 
         lab.PHASE_2C_12_INTERVIEW_MVP_IMPLEMENTATION_SLICE_CANDIDATE_INVENTORY_TASK_ID: lambda: lab._run_phase_2c_12_interview_mvp_implementation_slice_candidate_inventory(root),
         lab.PHASE_2C_13_INTERVIEW_MVP_IMPLEMENTATION_SLICE_SAFETY_DELTA_REVIEW_TASK_ID: lambda: lab._run_phase_2c_13_interview_mvp_implementation_slice_safety_delta_review(root),
         lab.PHASE_2C_14_INTERVIEW_MVP_IMPLEMENTATION_SLICE_FINAL_SELECTION_GATE_TASK_ID: lambda: lab._run_phase_2c_14_interview_mvp_implementation_slice_final_selection_gate(root),
+        lab.PHASE_2C_15_INTERVIEW_MVP_IMPLEMENTATION_SLICE_KICKOFF_AUTHORIZATION_GATE_TASK_ID: lambda: lab._run_phase_2c_15_interview_mvp_implementation_slice_kickoff_authorization_gate(root),
         lab.WIREGUARD_RUNNER_TASK_ALIAS: lambda: lab._run_wireguard_runner(
             root,
             dry_run=args.dry_run,
