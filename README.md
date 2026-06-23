@@ -115,6 +115,45 @@ The v0.1 portfolio package covers Day 1 through Day 30 post-tag verification. Th
 
 The project is designed as a practical QA Automation / SDET portfolio project for network infrastructure. It focuses on repeatable validation, structured test evidence, and readable JSON / HTML reports rather than one-off manual checks.
 
+## Current Repo Structure Map
+
+This is the current documentation map, not a new architecture or a file-move plan. Phase 2C-19 only clarifies how to read the existing repository layout.
+
+Active documentation / mock / report-only path:
+
+- `docs/phase_2c/` is the current Phase 2C navigation lane. Phase 2C-01 through Phase 2C-10 cover the local static job and artifact validation cycles. Phase 2C-11 through Phase 2C-17 cover the Interview MVP scope, candidate inventory, selected `local_result_envelope_contract`, implementation evidence, and acceptance review. Phase 2C-18 is the planning-only structure review that recommended this clarification. Phase 2C-19 is documentation / polish only.
+- `phase_2c_*.py` files at the repository root preserve the matching Phase 2C evidence-generation tasks where they already exist. Phase 2C-19 does not add or change task execution behavior.
+- `tests/test_phase_2c_*.py` files preserve targeted regression coverage for existing Phase 2C behavior. This map does not add a new runtime behavior surface.
+- `fixtures/` and `fixtures/phase_2a/` hold committed sample data used by safe, deterministic reviewer evidence paths.
+
+Root-level entry and visibility files:
+
+- `network_lab.py` is the unified local CLI entry point for existing lab tasks and report-index generation.
+- `network_lab_task_registry.py` and `network_lab_cli_dispatch.py` expose existing task metadata and dispatch wiring. They are visibility and routing surfaces, not authorization to open new live execution scope.
+- `dashboard_app.py`, `dashboard_command_runner.py`, `templates/`, `app/`, `components/`, and `lib/` contain existing local dashboard / Next.js reviewer and MVP surfaces. Phase 2C-19 does not change these surfaces.
+- Historical Day and intent modules at the repository root remain in place for traceability. Their presence does not mean a current Phase 2C task rewrites, replaces, or reactivates Day1-Day160 work.
+
+Documentation areas:
+
+- `docs/phase_2a/`, `docs/phase_2b/`, and `docs/phase_2c/` hold staged planning, authorization, implementation, and acceptance evidence.
+- `docs/ai/` and `docs/ai-intent/` hold AI Assistance and AI Intent reviewer evidence. The v0.4/v0.5 AI Assistance chain remains reviewer-only / report-only unless a future safety gate separately changes that boundary.
+- `docs/automation_readiness/` holds future actual-automation readiness planning. It does not authorize live automation by itself.
+- `docs/portfolio/`, `docs/reviewer/`, `docs/demo/`, `docs/roadmap/`, and `docs/portfolio_evidence/` are reviewer-facing navigation, demo, roadmap, and portfolio evidence areas.
+- `docs/assets/` contains committed visual assets used by documentation and demo material.
+
+Test, configuration, and evidence areas:
+
+- `tests/` contains the Python regression suite for existing safety, report, parser, runner, dashboard, and phase evidence behavior.
+- `config/`, `config.example.json`, `.env.example`, `runner_profiles/`, and `topology_profiles/` provide committed examples and profiles. Real secrets, private credentials, and local runtime environment files must stay out of Git.
+- `summary/` contains committed summary snapshots that are intentionally safe to share.
+- Generated local reports are expected under `reports/` when tasks are run locally. The report index is a reviewer evidence index, not a complete repository map and not an authorization surface.
+
+Parked, historical, or future-only tracks:
+
+- Day1-Day160 artifacts remain historical project evidence and are not rewritten or replaced by Phase 2C-19.
+- Older live-lab workflows remain guarded and outside the active Phase 2C documentation / mock / report-only path.
+- Actual automation integration, live device access, SSH, NETCONF, RESTCONF, new network-automation provider/API/model execution, queues, schedulers, workers, AI agent loops, backup execution, configuration changes, and production execution remain inactive unless a future task explicitly authorizes a separate safety gate.
+
 ## Network Automation AI Node
 
 The current AI workbench is now connected to the Day1-Day160 Router/Switch automation platform as a Network Automation AI Node. It is not a general chatbot. It reads existing reviewer-facing evidence such as `reports/`, `summary/`, inventory-shaped JSON pasted by the user, topology context, and raw report text, then returns structured JSON for downstream platform steps.
