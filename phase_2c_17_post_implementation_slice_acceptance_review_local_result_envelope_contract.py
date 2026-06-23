@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import html
 import json
+import os
 from copy import deepcopy
 from pathlib import Path
 from typing import Any, Callable, Dict, Mapping, Optional, Sequence, Tuple
@@ -46,12 +47,10 @@ FINAL_VERDICT = "PHASE_2C_17_LOCAL_RESULT_ENVELOPE_CONTRACT_ACCEPTED"
 NOT_ACCEPT_VERDICT = "PHASE_2C_17_LOCAL_RESULT_ENVELOPE_CONTRACT_NOT_ACCEPTED"
 NEEDS_EVIDENCE_VERDICT = "PHASE_2C_17_NEEDS_EVIDENCE"
 REPORT_JSON = Path("reports") / "lab-summary" / (
-    "phase_2c_17_post_implementation_slice_acceptance_review_"
-    "local_result_envelope_contract.json"
+    "phase_2c_17_acceptance_review.json"
 )
 REPORT_HTML = Path("reports") / "lab-summary" / (
-    "phase_2c_17_post_implementation_slice_acceptance_review_"
-    "local_result_envelope_contract.html"
+    "phase_2c_17_acceptance_review.html"
 )
 DOC_PATH = Path("docs") / "phase_2c" / (
     "phase_2c_17_post_implementation_slice_acceptance_review_"
@@ -725,8 +724,29 @@ def _check_rows(values: Sequence[Mapping[str, Any]]) -> str:
     )
 
 
+def _write_text_with_windows_long_path_fallback(output_path: Path, content: str) -> None:
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        output_path.write_text(content, encoding="utf-8")
+        return
+    except FileNotFoundError:
+        if os.name != "nt":
+            raise
+
+    resolved = output_path.resolve()
+    path_text = str(resolved)
+    if path_text.startswith("\\\\?\\"):
+        extended_path = Path(path_text)
+    elif path_text.startswith("\\\\"):
+        extended_path = Path("\\\\?\\UNC\\" + path_text[2:])
+    else:
+        extended_path = Path("\\\\?\\" + path_text)
+    extended_path.write_text(content, encoding="utf-8")
+
+
 def _write_html_report(report: Mapping[str, Any], output_path: Path) -> None:
-    output_path.write_text(
+    _write_text_with_windows_long_path_fallback(
+        output_path,
         f"""<!doctype html>
 <html lang="en">
 <head>
@@ -761,7 +781,6 @@ def _write_html_report(report: Mapping[str, Any], output_path: Path) -> None:
 </body>
 </html>
 """,
-        encoding="utf-8",
     )
 
 
@@ -774,9 +793,10 @@ def write_phase_2c_17_post_implementation_slice_acceptance_review_reports(
     )
     json_path = project_root / REPORT_JSON
     html_path = project_root / REPORT_HTML
-    json_path.parent.mkdir(parents=True, exist_ok=True)
-    html_path.parent.mkdir(parents=True, exist_ok=True)
-    json_path.write_text(json.dumps(report_data, indent=2, sort_keys=True), encoding="utf-8")
+    _write_text_with_windows_long_path_fallback(
+        json_path,
+        json.dumps(report_data, indent=2, sort_keys=True),
+    )
     _write_html_report(report_data, html_path)
     return json_path, html_path
 

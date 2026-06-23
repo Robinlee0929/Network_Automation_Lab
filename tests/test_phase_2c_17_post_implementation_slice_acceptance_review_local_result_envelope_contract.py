@@ -241,7 +241,4 @@ def test_task_catalog_and_report_index_visibility_for_phase_2c_17(tmp_path):
     assert network_lab.main(["--report-index"], project_root=tmp_path) == 0
     html = (tmp_path / "reports/report_index.html").read_text(encoding="utf-8")
     assert "Phase 2C-17 Post-Implementation Slice Acceptance Review" in html
-    assert (
-        "phase_2c_17_post_implementation_slice_acceptance_review_"
-        "local_result_envelope_contract.json"
-    ) in html
+    assert "phase_2c_17_acceptance_review.json" in html

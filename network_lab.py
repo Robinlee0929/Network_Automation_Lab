@@ -2064,12 +2064,12 @@ PHASE_2C_17_POST_IMPLEMENTATION_SLICE_ACCEPTANCE_REVIEW_LOCAL_RESULT_ENVELOPE_CO
 PHASE_2C_17_POST_IMPLEMENTATION_SLICE_ACCEPTANCE_REVIEW_LOCAL_RESULT_ENVELOPE_CONTRACT_JSON = (
     Path("reports")
     / "lab-summary"
-    / "phase_2c_17_post_implementation_slice_acceptance_review_local_result_envelope_contract.json"
+    / "phase_2c_17_acceptance_review.json"
 )
 PHASE_2C_17_POST_IMPLEMENTATION_SLICE_ACCEPTANCE_REVIEW_LOCAL_RESULT_ENVELOPE_CONTRACT_HTML = (
     Path("reports")
     / "lab-summary"
-    / "phase_2c_17_post_implementation_slice_acceptance_review_local_result_envelope_contract.html"
+    / "phase_2c_17_acceptance_review.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
