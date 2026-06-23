@@ -395,6 +395,9 @@ from phase_2c_14_interview_mvp_implementation_slice_final_selection_gate import 
 from phase_2c_15_interview_mvp_implementation_slice_kickoff_authorization_gate import (
     run_phase_2c_15_interview_mvp_implementation_slice_kickoff_authorization_gate,
 )
+from phase_2c_16_interview_mvp_local_result_envelope_contract import (
+    run_phase_2c_16_interview_mvp_local_result_envelope_contract,
+)
 from project_folder_organization_decision_gate import (
     run_project_folder_organization_decision_gate,
 )
@@ -2034,6 +2037,18 @@ PHASE_2C_15_INTERVIEW_MVP_IMPLEMENTATION_SLICE_KICKOFF_AUTHORIZATION_GATE_HTML =
     Path("reports")
     / "lab-summary"
     / "phase_2c_15_interview_mvp_implementation_slice_kickoff_authorization_gate.html"
+)
+PHASE_2C_16_INTERVIEW_MVP_LOCAL_RESULT_ENVELOPE_CONTRACT_TASK_ID = (
+    "phase2c-16-interview-mvp-local-result-envelope-contract"
+)
+PHASE_2C_16_INTERVIEW_MVP_LOCAL_RESULT_ENVELOPE_CONTRACT_DOC = (
+    Path("docs") / "phase_2c" / "phase_2c_16_interview_mvp_local_result_envelope_contract.md"
+)
+PHASE_2C_16_INTERVIEW_MVP_LOCAL_RESULT_ENVELOPE_CONTRACT_JSON = (
+    Path("reports") / "lab-summary" / "phase_2c_16_interview_mvp_local_result_envelope_contract.json"
+)
+PHASE_2C_16_INTERVIEW_MVP_LOCAL_RESULT_ENVELOPE_CONTRACT_HTML = (
+    Path("reports") / "lab-summary" / "phase_2c_16_interview_mvp_local_result_envelope_contract.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -4203,6 +4218,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{PHASE_2C_15_INTERVIEW_MVP_IMPLEMENTATION_SLICE_KICKOFF_AUTHORIZATION_GATE_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Phase 2C",
+        "title": "Phase 2C-16 Interview MVP Local Result Envelope Contract",
+        "report_type": "Local report-only Interview MVP result envelope contract",
+        "safety_label": "PHASE_2C_16_LOCAL_RESULT_ENVELOPE_CONTRACT; SELECTED_NEXT_SLICE_LOCAL_RESULT_ENVELOPE_CONTRACT; PHASE_GOAL_CONFIRMED_YES; PHASE_2C_15_AUTHORIZATION_CONFIRMED_YES; CONTRACT_SHAPE_DEFINED_YES; VALIDATOR_ADDED_YES; SAMPLE_ENVELOPE_STATIC_FIXTURE_ONLY_YES; LOCAL_ONLY_YES; DETERMINISTIC_YES; REPORT_ONLY_DRY_RUN_MOCK_ONLY_YES; RUNNER_ADAPTER_EXECUTION_PATH_ADDED_NO; QUEUE_SCHEDULER_WORKER_AI_LOOP_ADDED_NO; SSH_NETCONF_RESTCONF_LIVE_DEVICE_TOUCHED_NO; PROVIDER_API_MODEL_SECRETS_TOUCHED_NO; CONFIG_BACKUP_CHANGE_ADDED_NO; PRODUCTION_EXECUTION_PATH_ADDED_NO; DAY1_DAY160_REWRITTEN_OR_REPLACED_NO; SECOND_SAFETY_MATRIX_CREATED_NO; NEXT_PHASE_STARTED_NO; EXTRA_SLICE_SELECTED_OR_IMPLEMENTED_NO",
+        "description": "Phase 2C-16 implements candidate-03 local_result_envelope_contract as a deterministic local contract and static sample for reviewer-visible Interview MVP result envelopes. It validates shape, report-only evidence, warnings, and forbidden-scope metadata without adding runner, adapter, execution path, queue, scheduler, worker, AI-loop, live-device access, provider/API/model, secrets, config backup/change behavior, production execution, Day1-Day160 replacement, second safety matrix, next phase, or extra slices.",
+        "json_globs": [PHASE_2C_16_INTERVIEW_MVP_LOCAL_RESULT_ENVELOPE_CONTRACT_JSON.as_posix()],
+        "html_globs": [PHASE_2C_16_INTERVIEW_MVP_LOCAL_RESULT_ENVELOPE_CONTRACT_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{PHASE_2C_16_INTERVIEW_MVP_LOCAL_RESULT_ENVELOPE_CONTRACT_TASK_ID}"
         ),
     },
 ]
@@ -9223,6 +9251,34 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "phase_2c_15_interview_mvp_implementation_slice_kickoff_authorization_gate.py",
             "notes": "PHASE_2C_15_INTERVIEW_MVP_IMPLEMENTATION_SLICE_KICKOFF_AUTHORIZATION_GATE PHASE_2C_15_INTERVIEW_MVP_KICKOFF_AUTHORIZATION_GATE_DONE_AUTHORIZED_FOR_LATER_PHASE AUTHORIZATION_GATE_ONLY_YES DECISION_TARGET_CANDIDATE_03_LOCAL_RESULT_ENVELOPE_CONTRACT AUTHORIZATION_RESULT_AUTHORIZED FUTURE_PHASE_IMPLEMENTATION_AUTHORIZED_YES PHASE_2C_15_IMPLEMENTS_SLICE_NO LOCAL_RESULT_ENVELOPE_CONTRACT_IMPLEMENTED_NO RESULT_ENVELOPE_RUNTIME_ADDED_NO IMPLEMENTATION_STARTED_NO NEXT_PHASE_STARTED_NO RUNNER_ADAPTER_EXECUTION_PATH_ADDED_NO QUEUE_SCHEDULER_WORKER_AI_LOOP_ADDED_NO SSH_NETCONF_RESTCONF_LIVE_DEVICE_TOUCHED_NO PROVIDER_API_MODEL_SECRETS_TOUCHED_NO CONFIG_BACKUP_CHANGE_ADDED_NO DAY1_DAY160_REWRITTEN_OR_REPLACED_NO SECOND_SAFETY_MATRIX_CREATED_NO EXTRA_SLICE_SELECTED_OR_IMPLEMENTED_NO. Report-only authorization gate; authorizes candidate-03 local_result_envelope_contract to begin implementation in a later phase only and does not implement the slice, add result envelope runtime behavior, start the next phase, add runner, adapter, execution path, scheduler, queue, worker, AI loop, provider/API/model call, secret handling, SSH, NETCONF, RESTCONF, live device access, backup behavior, config change behavior, production execution, AGENTS.md modification, Day1-Day160 rewrite or replacement, second safety matrix, approval bypass, or safety gate weakening.",
+        },
+        {
+            "id": PHASE_2C_16_INTERVIEW_MVP_LOCAL_RESULT_ENVELOPE_CONTRACT_TASK_ID,
+            "task_id": "phase_2c_16_interview_mvp_local_result_envelope_contract",
+            "display_name": "Phase 2C-16 Interview MVP Local Result Envelope Contract",
+            "user_display_name": "Phase 2C-16 Interview MVP Local Result Envelope Contract",
+            "day": "Phase 2C",
+            "category": "planning",
+            "summary": "Defines and validates the local_result_envelope_contract as report-only Interview MVP evidence.",
+            "description": "Report-only implementation of candidate-03 local_result_envelope_contract using Phase 2C-15 authorization; defines a local deterministic envelope shape, static sample, validator, warnings, evidence metadata, and forbidden-scope proof without adding runner, adapter, execution path, queue, scheduler, worker, AI loop, live-device access, provider/API/model, secrets, config backup/change behavior, production execution, Day1-Day160 replacement, second safety matrix, next phase, or extra slices.",
+            "command": f"python network_lab.py --task {PHASE_2C_16_INTERVIEW_MVP_LOCAL_RESULT_ENVELOPE_CONTRACT_TASK_ID}",
+            "enabled": True,
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                PHASE_2C_16_INTERVIEW_MVP_LOCAL_RESULT_ENVELOPE_CONTRACT_JSON.as_posix(),
+                PHASE_2C_16_INTERVIEW_MVP_LOCAL_RESULT_ENVELOPE_CONTRACT_HTML.as_posix(),
+                PHASE_2C_16_INTERVIEW_MVP_LOCAL_RESULT_ENVELOPE_CONTRACT_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Phase 2C-16 JSON/HTML local result envelope contract evidence",
+                "Phase 2C-16 local result envelope contract documentation",
+            ],
+            "related_script": "phase_2c_16_interview_mvp_local_result_envelope_contract.py",
+            "notes": "PHASE_2C_16_LOCAL_RESULT_ENVELOPE_CONTRACT PHASE_2C_16_LOCAL_RESULT_ENVELOPE_CONTRACT_IMPLEMENTED_REPORT_ONLY SELECTED_NEXT_SLICE_LOCAL_RESULT_ENVELOPE_CONTRACT PHASE_GOAL_CONFIRMED_YES PHASE_2C_15_AUTHORIZATION_CONFIRMED_YES SCOPE_NARROWED_TO_ONE_EXAMPLE_NO NEEDS_SCOPE_CONFIRMATION_NO CONTRACT_SHAPE_DEFINED_YES VALIDATOR_ADDED_YES SAMPLE_ENVELOPE_STATIC_FIXTURE_ONLY_YES LOCAL_ONLY_YES DETERMINISTIC_YES REPORT_ONLY_DRY_RUN_MOCK_ONLY_YES RUNNER_ADAPTER_EXECUTION_PATH_ADDED_NO QUEUE_SCHEDULER_WORKER_AI_LOOP_ADDED_NO SSH_NETCONF_RESTCONF_LIVE_DEVICE_TOUCHED_NO PROVIDER_API_MODEL_SECRETS_TOUCHED_NO CONFIG_BACKUP_CHANGE_ADDED_NO PRODUCTION_EXECUTION_PATH_ADDED_NO DAY1_DAY160_REWRITTEN_OR_REPLACED_NO SECOND_SAFETY_MATRIX_CREATED_NO NEXT_PHASE_STARTED_NO EXTRA_SLICE_SELECTED_OR_IMPLEMENTED_NO. Report-only contract implementation; defines local envelope shape, static sample, validator, warnings, evidence metadata, and forbidden-scope proof only, not runner, adapter, broker, scheduler, queue, worker, AI loop, execution path, provider/API/model call, secret handling, SSH, NETCONF, RESTCONF, live device access, real command execution, backup behavior, config change behavior, production execution, AGENTS.md modification, Day1-Day160 rewrite or replacement, second safety matrix, approval bypass, next phase, or extra slice.",
         },
     ]
 
@@ -14382,6 +14438,15 @@ def _run_phase_2c_14_interview_mvp_implementation_slice_final_selection_gate(pro
 
 def _run_phase_2c_15_interview_mvp_implementation_slice_kickoff_authorization_gate(project_root: Path) -> int:
     return run_phase_2c_15_interview_mvp_implementation_slice_kickoff_authorization_gate(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_phase_2c_16_interview_mvp_local_result_envelope_contract(project_root: Path) -> int:
+    return run_phase_2c_16_interview_mvp_local_result_envelope_contract(
         project_root,
         format_heading_func=format_heading,
         format_status_func=format_status,
