@@ -108,3 +108,18 @@ Not allowed:
 ## Final Verdict
 
 PHASE_2C_01_LOCAL_STATIC_JOB_FIRST_SLICE_SCOPE_CONFIRMED
+
+## Phase 2C-25 Readability Polish
+
+PHASE_2C_25_READABILITY_POLISH_APPLIED: YES
+AUTHORIZED_SLICE: `candidate-01 / mock_demo_job_readability_polish`
+SAFETY_BOUNDARY: report-only / dry-run / mock-only
+
+Phase 2C-25 improves how reviewers read the existing `local_static_job`
+mock demo evidence. The JSON and HTML reports now include a reviewer quick-read
+section near the top of the artifact, followed by explicit lists of behavior
+changed and behavior intentionally not changed.
+
+This polish does not change task identity, CLI dispatch, registry behavior,
+report paths, validation behavior, runner behavior, adapter behavior, or the
+project safety posture.

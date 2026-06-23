@@ -32,6 +32,11 @@ REPORT_JSON = Path("reports") / "lab-summary" / "phase_2c_01_local_static_job_fi
 REPORT_HTML = Path("reports") / "lab-summary" / "phase_2c_01_local_static_job_first_slice.html"
 DOC_PATH = Path("docs") / "phase_2c" / "phase_2c_01_local_static_job_first_slice.md"
 
+READABILITY_POLISH_PHASE = "2C-25"
+READABILITY_AUTHORIZED_SLICE = "candidate-01 / mock_demo_job_readability_polish"
+READABILITY_POLISH_STATUS = "APPLIED_REPORT_ONLY"
+READABILITY_SAFETY_BOUNDARY = "report-only / dry-run / mock-only"
+
 PHASE_GOAL = (
     "Implement the minimum safe Phase 2C-01 first slice for local_static_job "
     "as a local-only, static-only, deterministic, offline, testable, "
@@ -97,6 +102,28 @@ IMPLEMENTATION_BOUNDARY = (
     "script execution, live device, SSH, NETCONF, RESTCONF, provider/API/model, "
     "secrets, backup execution, configuration change execution, next-day feature, "
     "Day1-Day160 rewrite, or second safety matrix."
+)
+
+READABILITY_PRESENTATION_ORDER = (
+    "status_and_verdict",
+    "authorized_slice",
+    "mock_demo_job_role",
+    "behavior_changed",
+    "behavior_intentionally_not_changed",
+    "safety_boundary",
+    "validation_summary",
+)
+
+READABILITY_CHANGES = (
+    "Adds a reviewer quick-read section to the existing local_static_job JSON and HTML reports.",
+    "Labels the existing static job as mock demo evidence so reviewers do not confuse it with live execution.",
+    "Surfaces the Phase 2C-25 authorized slice and unchanged safety boundary near the top of the report.",
+)
+
+READABILITY_INTENTIONALLY_NOT_CHANGED = (
+    "No runner, adapter, broker, scheduler, queue, worker, AI loop, or execution path was added.",
+    "No SSH, NETCONF, RESTCONF, live-device, provider/API/model, secret, backup, or config-change behavior was added.",
+    "No task identity, CLI dispatch, registry behavior, report paths, Day1-Day160 artifact, or safety matrix was replaced.",
 )
 
 NON_EXECUTABLE_FIELDS = (
@@ -265,6 +292,45 @@ def build_local_static_job_definition() -> Dict[str, Any]:
     return deepcopy(LOCAL_STATIC_JOB_DEFINITION)
 
 
+def build_reviewer_readability_polish() -> Dict[str, Any]:
+    """Return static Phase 2C-25 readability metadata for reviewer reports."""
+
+    return {
+        "phase": READABILITY_POLISH_PHASE,
+        "authorized_slice": READABILITY_AUTHORIZED_SLICE,
+        "status": READABILITY_POLISH_STATUS,
+        "safety_boundary": READABILITY_SAFETY_BOUNDARY,
+        "mock_demo_job_role": (
+            "The local_static_job evidence is a deterministic mock demo artifact "
+            "for reviewer understanding only; it is not a live or executable job."
+        ),
+        "presentation_order": list(READABILITY_PRESENTATION_ORDER),
+        "behavior_changed": list(READABILITY_CHANGES),
+        "behavior_intentionally_not_changed": list(READABILITY_INTENTIONALLY_NOT_CHANGED),
+        "quick_read": {
+            "phase_goal": "Make the existing mock demo job evidence easier to read.",
+            "authorized_slice": READABILITY_AUTHORIZED_SLICE,
+            "behavior_changed": "Reviewer labels, section order, and report presentation only.",
+            "behavior_intentionally_not_changed": (
+                "No execution capability, live access, dispatch expansion, task identity change, "
+                "or safety posture change."
+            ),
+            "safety_boundary": READABILITY_SAFETY_BOUNDARY,
+        },
+        "forbidden_scope_touched": False,
+        "ssh_netconf_restconf_live_device_touched": False,
+        "queue_scheduler_worker_ai_loop_added": False,
+        "provider_api_model_secrets_touched": False,
+        "config_backup_or_change_behavior_added": False,
+        "production_execution_path_added": False,
+        "day1_day160_rewritten_or_replaced": False,
+        "second_safety_matrix_created": False,
+        "phase_2c_26_started": False,
+        "next_phase_started": False,
+        "extra_slice_selected_or_implemented": False,
+    }
+
+
 def validate_local_static_job_definition(job_definition: Mapping[str, Any]) -> Dict[str, Any]:
     errors = []
     if job_definition.get("job_kind") != AUTHORIZED_FIRST_SLICE:
@@ -389,6 +455,47 @@ def validate_phase_2c_01_report(report: Mapping[str, Any]) -> Dict[str, Any]:
     if report.get("example_job_type_role") != "examples_only_not_phase_scope":
         errors.append("EXAMPLE_JOB_TYPE_ROLE_MISMATCH")
 
+    readability = report.get("reviewer_readability_polish", {})
+    if not isinstance(readability, Mapping):
+        errors.append("REVIEWER_READABILITY_POLISH_NOT_OBJECT")
+        readability = {}
+    else:
+        if readability.get("phase") != READABILITY_POLISH_PHASE:
+            errors.append("READABILITY_POLISH_PHASE_MISMATCH")
+        if readability.get("authorized_slice") != READABILITY_AUTHORIZED_SLICE:
+            errors.append("READABILITY_AUTHORIZED_SLICE_MISMATCH")
+        if readability.get("status") != READABILITY_POLISH_STATUS:
+            errors.append("READABILITY_POLISH_STATUS_MISMATCH")
+        if readability.get("safety_boundary") != READABILITY_SAFETY_BOUNDARY:
+            errors.append("READABILITY_SAFETY_BOUNDARY_MISMATCH")
+        if readability.get("presentation_order") != list(READABILITY_PRESENTATION_ORDER):
+            errors.append("READABILITY_PRESENTATION_ORDER_MISMATCH")
+        if readability.get("behavior_changed") != list(READABILITY_CHANGES):
+            errors.append("READABILITY_BEHAVIOR_CHANGED_MISMATCH")
+        if readability.get("behavior_intentionally_not_changed") != list(READABILITY_INTENTIONALLY_NOT_CHANGED):
+            errors.append("READABILITY_BEHAVIOR_NOT_CHANGED_MISMATCH")
+        if not isinstance(readability.get("quick_read"), Mapping):
+            errors.append("READABILITY_QUICK_READ_MISSING")
+        for flag_name in (
+            "forbidden_scope_touched",
+            "ssh_netconf_restconf_live_device_touched",
+            "queue_scheduler_worker_ai_loop_added",
+            "provider_api_model_secrets_touched",
+            "config_backup_or_change_behavior_added",
+            "production_execution_path_added",
+            "day1_day160_rewritten_or_replaced",
+            "second_safety_matrix_created",
+            "phase_2c_26_started",
+            "next_phase_started",
+            "extra_slice_selected_or_implemented",
+        ):
+            if readability.get(flag_name) is not False:
+                errors.append(f"READABILITY_FORBIDDEN_FLAG_NOT_FALSE:{flag_name}")
+    if report.get("readability_polish_applied") is not True:
+        errors.append("READABILITY_POLISH_APPLIED_NOT_TRUE")
+    if report.get("authorized_readability_slice") != READABILITY_AUTHORIZED_SLICE:
+        errors.append("AUTHORIZED_READABILITY_SLICE_MISMATCH")
+
     job_validation = validate_local_static_job_definition(report.get("local_static_job_definition", {}))
     if job_validation["valid"] is not True:
         errors.extend(f"LOCAL_STATIC_JOB:{error}" for error in job_validation["errors"])
@@ -467,6 +574,7 @@ def validate_phase_2c_01_report(report: Mapping[str, Any]) -> Dict[str, Any]:
 
 
 def build_phase_2c_01_local_static_job_first_slice_report() -> Dict[str, Any]:
+    reviewer_readability_polish = build_reviewer_readability_polish()
     report = {
         "phase": PHASE,
         "task": TASK_NAME,
@@ -494,6 +602,11 @@ def build_phase_2c_01_local_static_job_first_slice_report() -> Dict[str, Any]:
         "phase_2b_13_verdict_referenced": PHASE_2B_13_VERDICT,
         "phase_2b_14_verdict_referenced": PHASE_2B_14_VERDICT,
         "local_static_job_definition": build_local_static_job_definition(),
+        "reviewer_readability_polish": reviewer_readability_polish,
+        "readability_polish_applied": True,
+        "authorized_readability_slice": READABILITY_AUTHORIZED_SLICE,
+        "behavior_changed": list(READABILITY_CHANGES),
+        "behavior_intentionally_not_changed": list(READABILITY_INTENTIONALLY_NOT_CHANGED),
         "forbidden_capability_review": list(_forbidden_capability_review()),
         "non_execution_statement": (
             "Phase 2C-01 implements only a static local_static_job data contract. "
@@ -547,6 +660,8 @@ def build_phase_2c_01_local_static_job_first_slice_report() -> Dict[str, Any]:
         "day1_day160_rewritten_or_replaced": False,
         "second_safety_matrix_created": False,
         "local_static_job_implemented": True,
+        "readability_polish_applied": True,
+        "authorized_readability_slice": READABILITY_AUTHORIZED_SLICE,
         "runner_adapter_execution_path_added": False,
         "final_verdict": FINAL_VERDICT,
     }
@@ -574,6 +689,13 @@ def _dict_rows(values: Mapping[str, Any]) -> str:
     )
 
 
+def _readability_rows(values: Mapping[str, Any]) -> str:
+    quick_read = values.get("quick_read", {})
+    if not isinstance(quick_read, Mapping):
+        quick_read = {}
+    return _dict_rows(quick_read)
+
+
 def _write_html_report(report: Mapping[str, Any], output_path: Path) -> None:
     output_path.write_text(
         f"""<!doctype html>
@@ -595,6 +717,12 @@ def _write_html_report(report: Mapping[str, Any], output_path: Path) -> None:
   <p>Final verdict: <strong>{html.escape(str(report["final_verdict"]))}</strong></p>
   <p>Authorized first slice: <code>{html.escape(str(report["authorized_first_slice"]))}</code></p>
   <p>{html.escape(str(report["non_execution_statement"]))}</p>
+  <h2>Reviewer Quick Read</h2>
+  <table><tbody>{_readability_rows(report["reviewer_readability_polish"])}</tbody></table>
+  <h2>Behavior Changed</h2>
+  <ul>{_list_items(report["behavior_changed"])}</ul>
+  <h2>Behavior Intentionally Not Changed</h2>
+  <ul>{_list_items(report["behavior_intentionally_not_changed"])}</ul>
   <h2>Machine-Readable Verdict</h2>
   <table><tbody>{_dict_rows(report["machine_readable_verdict"])}</tbody></table>
   <h2>Scope Confirmation</h2>
@@ -676,6 +804,8 @@ def run_phase_2c_01_local_static_job_first_slice(
     )
     print(f"second_safety_matrix_created: {str(report['summary']['second_safety_matrix_created']).lower()}")
     print(f"local_static_job_implemented: {str(report['summary']['local_static_job_implemented']).lower()}")
+    print(f"readability_polish_applied: {str(report['summary']['readability_polish_applied']).lower()}")
+    print(f"authorized_readability_slice: {report['summary']['authorized_readability_slice']}")
     print(
         "runner_adapter_execution_path_added: "
         f"{str(report['summary']['runner_adapter_execution_path_added']).lower()}"

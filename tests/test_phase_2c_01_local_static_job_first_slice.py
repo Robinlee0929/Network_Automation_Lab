@@ -6,6 +6,7 @@ import phase_2c_01_local_static_job_first_slice as phase_2c_01
 
 
 DOC_PATH = Path("docs/phase_2c/phase_2c_01_local_static_job_first_slice.md")
+PHASE_2C_25_DOC_PATH = Path("docs/phase_2c/phase_2c_25_mock_demo_job_readability_polish.md")
 
 
 def _doc_text() -> str:
@@ -34,6 +35,28 @@ def test_scope_confirmation_artifact_exists_with_required_sections():
     assert "SCOPE_CONFIRMATION_WRITTEN: YES" in text
     assert "SCOPE_NARROWED_TO_ONE_EXAMPLE_JOB_TYPE: NO" in text
     assert "PHASE_2C_01_LOCAL_STATIC_JOB_FIRST_SLICE_SCOPE_CONFIRMED" in text
+    assert "PHASE_2C_25_READABILITY_POLISH_APPLIED: YES" in text
+    assert "candidate-01 / mock_demo_job_readability_polish" in text
+
+
+def test_phase_2c_25_artifact_records_readability_polish_boundary():
+    text = PHASE_2C_25_DOC_PATH.read_text(encoding="utf-8")
+
+    assert "# Phase 2C-25 Mock Demo Job Readability Polish" in text
+    for section in (
+        "## Phase Goal",
+        "## Authorized Slice",
+        "## Files Changed",
+        "## Behavior Changed",
+        "## Behavior Intentionally Not Changed",
+        "## Safety Boundary",
+        "## Validation Results",
+        "## Final Status",
+    ):
+        assert section in text
+    assert "AUTHORIZED_SLICE: `candidate-01 / mock_demo_job_readability_polish`" in text
+    assert "FORBIDDEN_SCOPE_TOUCHED: NO" in text
+    assert "PHASE_2C_26_STARTED: NO" in text
 
 
 def test_local_static_job_exists_and_is_local_static_deterministic():
@@ -97,6 +120,49 @@ def test_phase_2c_01_report_preserves_forbidden_scope_and_implements_only_local_
         assert report[flag_name] is False
 
 
+def test_phase_2c_25_readability_polish_is_report_only_and_deterministic():
+    first = phase_2c_01.build_reviewer_readability_polish()
+    second = phase_2c_01.build_reviewer_readability_polish()
+
+    assert first == second
+    assert first["phase"] == "2C-25"
+    assert first["authorized_slice"] == "candidate-01 / mock_demo_job_readability_polish"
+    assert first["status"] == "APPLIED_REPORT_ONLY"
+    assert first["safety_boundary"] == "report-only / dry-run / mock-only"
+    assert first["quick_read"]["phase_goal"] == "Make the existing mock demo job evidence easier to read."
+    assert first["presentation_order"] == list(phase_2c_01.READABILITY_PRESENTATION_ORDER)
+    assert first["behavior_changed"] == list(phase_2c_01.READABILITY_CHANGES)
+    assert first["behavior_intentionally_not_changed"] == list(
+        phase_2c_01.READABILITY_INTENTIONALLY_NOT_CHANGED
+    )
+    for flag_name in (
+        "forbidden_scope_touched",
+        "ssh_netconf_restconf_live_device_touched",
+        "queue_scheduler_worker_ai_loop_added",
+        "provider_api_model_secrets_touched",
+        "config_backup_or_change_behavior_added",
+        "production_execution_path_added",
+        "day1_day160_rewritten_or_replaced",
+        "second_safety_matrix_created",
+        "phase_2c_26_started",
+        "next_phase_started",
+        "extra_slice_selected_or_implemented",
+    ):
+        assert first[flag_name] is False
+
+
+def test_phase_2c_01_report_contains_readable_phase_2c_25_presentation_fields():
+    report = phase_2c_01.build_phase_2c_01_local_static_job_first_slice_report()
+
+    assert report["validation"]["valid"] is True
+    assert report["readability_polish_applied"] is True
+    assert report["authorized_readability_slice"] == "candidate-01 / mock_demo_job_readability_polish"
+    assert report["summary"]["readability_polish_applied"] is True
+    assert report["summary"]["authorized_readability_slice"] == "candidate-01 / mock_demo_job_readability_polish"
+    assert report["reviewer_readability_polish"]["quick_read"]["behavior_intentionally_not_changed"]
+    assert "No runner, adapter" in report["behavior_intentionally_not_changed"][0]
+
+
 def test_example_job_types_remain_examples_and_phase_is_not_narrowed():
     report = phase_2c_01.build_phase_2c_01_local_static_job_first_slice_report()
 
@@ -151,6 +217,8 @@ def test_cli_writes_phase_2c_01_without_execution_paths(tmp_path, capsys, monkey
     assert "Phase 2C-01 Local Static Job First Slice" in output
     assert "Authorized first slice: local_static_job" in output
     assert "local_static_job_implemented: true" in output
+    assert "readability_polish_applied: true" in output
+    assert "authorized_readability_slice: candidate-01 / mock_demo_job_readability_polish" in output
     assert "execution_opened: false" in output
     assert "provider_api_opened: false" in output
     assert "model_opened: false" in output
@@ -161,6 +229,9 @@ def test_cli_writes_phase_2c_01_without_execution_paths(tmp_path, capsys, monkey
     assert f"[PASS] {phase_2c_01.FINAL_VERDICT}" in output
     assert (tmp_path / phase_2c_01.REPORT_JSON).exists()
     assert (tmp_path / phase_2c_01.REPORT_HTML).exists()
+    html = (tmp_path / phase_2c_01.REPORT_HTML).read_text(encoding="utf-8")
+    assert "Reviewer Quick Read" in html
+    assert "Behavior Intentionally Not Changed" in html
 
 
 def test_task_catalog_and_report_index_visibility_for_phase_2c_01(tmp_path):
