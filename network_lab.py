@@ -380,6 +380,9 @@ from phase_2c_09_post_next_slice_acceptance_review import (
 from phase_2c_10_next_slice_decision_gate_authorization_review import (
     run_phase_2c_10_next_slice_decision_gate_authorization_review,
 )
+from phase_2c_11_interview_mvp_scope_architecture_gate import (
+    run_phase_2c_11_interview_mvp_scope_architecture_gate,
+)
 from project_folder_organization_decision_gate import (
     run_project_folder_organization_decision_gate,
 )
@@ -1953,6 +1956,18 @@ PHASE_2C_10_NEXT_SLICE_DECISION_GATE_AUTHORIZATION_REVIEW_JSON = (
 )
 PHASE_2C_10_NEXT_SLICE_DECISION_GATE_AUTHORIZATION_REVIEW_HTML = (
     Path("reports") / "lab-summary" / "phase_2c_10_next_slice_decision_gate_authorization_review.html"
+)
+PHASE_2C_11_INTERVIEW_MVP_SCOPE_ARCHITECTURE_GATE_TASK_ID = (
+    "phase2c-11-interview-mvp-scope-architecture-gate"
+)
+PHASE_2C_11_INTERVIEW_MVP_SCOPE_ARCHITECTURE_GATE_DOC = (
+    Path("docs") / "phase_2c" / "phase_2c_11_interview_mvp_scope_architecture_gate.md"
+)
+PHASE_2C_11_INTERVIEW_MVP_SCOPE_ARCHITECTURE_GATE_JSON = (
+    Path("reports") / "lab-summary" / "phase_2c_11_interview_mvp_scope_architecture_gate.json"
+)
+PHASE_2C_11_INTERVIEW_MVP_SCOPE_ARCHITECTURE_GATE_HTML = (
+    Path("reports") / "lab-summary" / "phase_2c_11_interview_mvp_scope_architecture_gate.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -4057,6 +4072,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{PHASE_2C_10_NEXT_SLICE_DECISION_GATE_AUTHORIZATION_REVIEW_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Phase 2C",
+        "title": "Phase 2C-11 Interview MVP Scope + Architecture Authorization Gate - Planning Only",
+        "report_type": "Planning-only Interview MVP scope and architecture authorization gate",
+        "safety_label": "PHASE_2C_11_INTERVIEW_MVP_SCOPE_ARCHITECTURE_GATE_PLANNING_ONLY; PHASE_2C_11_INTERVIEW_MVP_SCOPE_ARCHITECTURE_GATE_IMPLEMENTATION_LOCKED; REQUIRED_REFERENCE_DOCUMENT_FOUND_YES; REQUIRED_REFERENCE_DOCUMENT_READ_BEFORE_SCOPE_CONFIRMATION_YES; INTERVIEW_MVP_DEFINITION_PRESENT_YES; SAFE_DRY_RUN_PLATFORM_SCOPE_DEFINED_YES; RUNNER_ARCHITECTURE_BOUNDARY_DEFINED_YES; MOCK_ADAPTER_BOUNDARY_DEFINED_YES; RESULT_ENVELOPE_BOUNDARY_DEFINED_YES; DEMO_JOB_CANDIDATES_EXAMPLES_ONLY_YES; LATER_IMPLEMENTATION_PLANNING_AUTHORIZED_YES; IMPLEMENTATION_AUTHORIZED_NO; IMPLEMENTATION_STARTED_NO; PHASE_2C_12_STARTED_NO; RUNNER_ADAPTER_RESULT_ENVELOPE_REPORT_RENDERER_DEMO_JOBS_ADDED_NO; SCHEDULER_QUEUE_BROKER_WORKER_AGENT_LOOP_ADDED_NO; LIVE_DEVICE_SSH_NETCONF_RESTCONF_TOUCHED_NO; PROVIDER_API_MODEL_SECRETS_TOUCHED_NO; CONFIG_BACKUP_OR_CHANGE_BEHAVIOR_ADDED_NO; PRODUCTION_EXECUTION_PATH_ADDED_NO; DAY1_DAY160_REWRITTEN_OR_REPLACED_NO; SECOND_SAFETY_MATRIX_CREATED_NO; PHASE_2C_10_MODIFIED_NO",
+        "description": "Phase 2C-11 defines the Interview MVP scope and safe architecture boundaries for later planning only. It authorizes only separate future implementation planning and does not implement or start runner, adapter, result envelope, report renderer, demo job, scheduler, queue, worker, AI agent loop, live automation, provider/API/model, secrets, backup, config-change, production, Phase 2C-12, Day1-Day160 replacement, Phase 2C-10 modification, or second-safety-matrix scope.",
+        "json_globs": [PHASE_2C_11_INTERVIEW_MVP_SCOPE_ARCHITECTURE_GATE_JSON.as_posix()],
+        "html_globs": [PHASE_2C_11_INTERVIEW_MVP_SCOPE_ARCHITECTURE_GATE_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{PHASE_2C_11_INTERVIEW_MVP_SCOPE_ARCHITECTURE_GATE_TASK_ID}"
         ),
     },
 ]
@@ -8941,6 +8969,32 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "phase_2c_10_next_slice_decision_gate_authorization_review.py",
             "notes": "PHASE_2C_10_NEXT_SLICE_DECISION_GATE_AUTHORIZATION_REVIEW_PLANNING_ONLY PHASE_2C_10_NEXT_PLANNING_ALLOWED_IMPLEMENTATION_LOCKED PHASE_2C_09_ACCEPTANCE_CONFIRMED_YES PHASE_2C_09_DECISION_ACCEPT ALLOW_NEXT_PLANNING_YES NEXT_ALLOWED_PHASE_PHASE_2C_11_NEXT_SLICE_CANDIDATE_INVENTORY_PLANNING_ONLY DUPLICATES_PHASE_2C_03_PATTERN_REUSE_ONLY DUPLICATES_DAY1_DAY160_REFERENCE_ONLY NEXT_SLICE_CANDIDATES_LISTED_NO NEXT_SLICE_SELECTED_NO NEXT_IMPLEMENTATION_AUTHORIZED_NO NEXT_IMPLEMENTATION_STARTED_NO RUNNER_ADAPTER_EXECUTION_PATH_ADDED_NO SCHEDULER_QUEUE_BROKER_WORKER_AGENT_LOOP_ADDED_NO LIVE_DEVICE_SSH_NETCONF_RESTCONF_TOUCHED_NO PROVIDER_API_MODEL_SECRETS_TOUCHED_NO CONFIG_BACKUP_OR_CHANGE_BEHAVIOR_ADDED_NO DAY1_DAY160_REWRITTEN_OR_REPLACED_NO SECOND_SAFETY_MATRIX_CREATED_NO. Planning-only decision gate; allows only Phase 2C-11 candidate inventory planning after Phase 2C-09 acceptance, not candidate listing, next-slice selection, implementation authorization, Phase 2C-11 start, runner, adapter, broker, scheduler, queue, worker, agent loop, execution path, provider/API/model call, secret handling, SSH, NETCONF, RESTCONF, live device access, real command execution, backup behavior, config change behavior, AGENTS.md modification, Day1-Day160 rewrite or replacement, second safety matrix, approval bypass, or safety gate weakening.",
+        },
+        {
+            "id": PHASE_2C_11_INTERVIEW_MVP_SCOPE_ARCHITECTURE_GATE_TASK_ID,
+            "task_id": "phase_2c_11_interview_mvp_scope_architecture_gate",
+            "display_name": "Phase 2C-11 Interview MVP Scope + Architecture Authorization Gate - Planning Only",
+            "user_display_name": "Phase 2C-11 Interview MVP Scope + Architecture Authorization Gate - Planning Only",
+            "day": "Phase 2C",
+            "category": "authorization_gate",
+            "description": "Phase 2C-11 defines Interview MVP scope and architecture boundaries for later planning only.",
+            "safety_level": "report-only",
+            "enabled": True,
+            "execution_mode": "report-only",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                PHASE_2C_11_INTERVIEW_MVP_SCOPE_ARCHITECTURE_GATE_JSON.as_posix(),
+                PHASE_2C_11_INTERVIEW_MVP_SCOPE_ARCHITECTURE_GATE_HTML.as_posix(),
+                PHASE_2C_11_INTERVIEW_MVP_SCOPE_ARCHITECTURE_GATE_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Phase 2C-11 JSON/HTML Interview MVP architecture authorization evidence",
+                "Phase 2C-11 planning-only Interview MVP scope documentation",
+            ],
+            "related_script": "phase_2c_11_interview_mvp_scope_architecture_gate.py",
+            "notes": "PHASE_2C_11_INTERVIEW_MVP_SCOPE_ARCHITECTURE_GATE_PLANNING_ONLY PHASE_2C_11_INTERVIEW_MVP_SCOPE_ARCHITECTURE_GATE_IMPLEMENTATION_LOCKED REQUIRED_REFERENCE_DOCUMENT_FOUND_YES REQUIRED_REFERENCE_DOCUMENT_READ_BEFORE_SCOPE_CONFIRMATION_YES INTERVIEW_MVP_DEFINITION_PRESENT_YES SAFE_DRY_RUN_PLATFORM_SCOPE_DEFINED_YES RUNNER_ARCHITECTURE_BOUNDARY_DEFINED_YES MOCK_ADAPTER_BOUNDARY_DEFINED_YES RESULT_ENVELOPE_BOUNDARY_DEFINED_YES DEMO_JOB_CANDIDATES_EXAMPLES_ONLY_YES LATER_IMPLEMENTATION_PLANNING_AUTHORIZED_YES IMPLEMENTATION_AUTHORIZED_NO IMPLEMENTATION_STARTED_NO PHASE_2C_12_STARTED_NO RUNNER_ADAPTER_RESULT_ENVELOPE_REPORT_RENDERER_DEMO_JOBS_ADDED_NO SCHEDULER_QUEUE_BROKER_WORKER_AGENT_LOOP_ADDED_NO LIVE_DEVICE_SSH_NETCONF_RESTCONF_TOUCHED_NO PROVIDER_API_MODEL_SECRETS_TOUCHED_NO CONFIG_BACKUP_OR_CHANGE_BEHAVIOR_ADDED_NO PRODUCTION_EXECUTION_PATH_ADDED_NO DAY1_DAY160_REWRITTEN_OR_REPLACED_NO SECOND_SAFETY_MATRIX_CREATED_NO PHASE_2C_10_MODIFIED_NO. Planning-only authorization gate; defines Interview MVP scope, safe dry-run platform scope, runner architecture boundary, mock adapter boundary, result envelope boundary, demo job candidates as examples only, and later implementation planning authorization only. It does not implement or start runner, adapter, result envelope, report renderer, demo jobs, Phase 2C-12, scheduler, queue, broker, worker, agent loop, execution path, provider/API/model call, secret handling, SSH, NETCONF, RESTCONF, live device access, real command execution, backup behavior, config change behavior, production execution, AGENTS.md modification, Phase 2C-10 modification, Day1-Day160 rewrite or replacement, second safety matrix, approval bypass, or safety gate weakening.",
         },
     ]
 
@@ -14055,6 +14109,15 @@ def _run_phase_2c_09_post_next_slice_acceptance_review(project_root: Path) -> in
 
 def _run_phase_2c_10_next_slice_decision_gate_authorization_review(project_root: Path) -> int:
     return run_phase_2c_10_next_slice_decision_gate_authorization_review(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_phase_2c_11_interview_mvp_scope_architecture_gate(project_root: Path) -> int:
+    return run_phase_2c_11_interview_mvp_scope_architecture_gate(
         project_root,
         format_heading_func=format_heading,
         format_status_func=format_status,
