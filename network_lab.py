@@ -386,6 +386,9 @@ from phase_2c_11_interview_mvp_scope_architecture_gate import (
 from phase_2c_12_interview_mvp_implementation_slice_candidate_inventory import (
     run_phase_2c_12_interview_mvp_implementation_slice_candidate_inventory,
 )
+from phase_2c_13_interview_mvp_implementation_slice_safety_delta_review import (
+    run_phase_2c_13_interview_mvp_implementation_slice_safety_delta_review,
+)
 from project_folder_organization_decision_gate import (
     run_project_folder_organization_decision_gate,
 )
@@ -1983,6 +1986,18 @@ PHASE_2C_12_INTERVIEW_MVP_IMPLEMENTATION_SLICE_CANDIDATE_INVENTORY_JSON = (
 )
 PHASE_2C_12_INTERVIEW_MVP_IMPLEMENTATION_SLICE_CANDIDATE_INVENTORY_HTML = (
     Path("reports") / "lab-summary" / "phase_2c_12_interview_mvp_implementation_slice_candidate_inventory.html"
+)
+PHASE_2C_13_INTERVIEW_MVP_IMPLEMENTATION_SLICE_SAFETY_DELTA_REVIEW_TASK_ID = (
+    "phase2c-13-interview-mvp-implementation-slice-safety-delta-review"
+)
+PHASE_2C_13_INTERVIEW_MVP_IMPLEMENTATION_SLICE_SAFETY_DELTA_REVIEW_DOC = (
+    Path("docs") / "phase_2c" / "phase_2c_13_interview_mvp_implementation_slice_safety_delta_review.md"
+)
+PHASE_2C_13_INTERVIEW_MVP_IMPLEMENTATION_SLICE_SAFETY_DELTA_REVIEW_JSON = (
+    Path("reports") / "lab-summary" / "phase_2c_13_interview_mvp_implementation_slice_safety_delta_review.json"
+)
+PHASE_2C_13_INTERVIEW_MVP_IMPLEMENTATION_SLICE_SAFETY_DELTA_REVIEW_HTML = (
+    Path("reports") / "lab-summary" / "phase_2c_13_interview_mvp_implementation_slice_safety_delta_review.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -4113,6 +4128,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{PHASE_2C_12_INTERVIEW_MVP_IMPLEMENTATION_SLICE_CANDIDATE_INVENTORY_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Phase 2C",
+        "title": "Phase 2C-13 Interview MVP Implementation Slice Safety Delta Review - Planning Only",
+        "report_type": "Planning-only Interview MVP implementation slice safety delta review",
+        "safety_label": "PHASE_2C_13_INTERVIEW_MVP_IMPLEMENTATION_SLICE_SAFETY_DELTA_REVIEW; CANDIDATE_SOURCE_PHASE_2C_12_ONLY_YES; NO_NEW_CANDIDATES_INVENTED_YES; SAFETY_DELTA_REVIEW_ONLY_YES; UNIQUE_SLICE_SELECTED_NO; IMPLEMENTATION_AUTHORIZED_NO; IMPLEMENTATION_STARTED_NO; SECOND_SAFETY_MATRIX_CREATED_NO; NEXT_PHASE_STARTED_NO; RUNNER_ADAPTER_EXECUTION_PATH_ADDED_NO; QUEUE_SCHEDULER_WORKER_AI_LOOP_ADDED_NO; SSH_NETCONF_RESTCONF_LIVE_DEVICE_TOUCHED_NO; PROVIDER_API_MODEL_SECRETS_TOUCHED_NO; CONFIG_BACKUP_CHANGE_ADDED_NO; DAY1_DAY160_REWRITTEN_OR_REPLACED_NO",
+        "description": "Phase 2C-13 reviews Phase 2C-12 Interview MVP implementation slice candidates for safety deltas only. It derives candidates only from Phase 2C-12 and does not select a unique slice, authorize implementation, start implementation, start Phase 2C-14, or open runner, adapter, execution, queue, scheduler, worker, AI-loop, live-device, provider/API/model, secret, backup, config-change, Day1-Day160 replacement, or second-safety-matrix scope.",
+        "json_globs": [PHASE_2C_13_INTERVIEW_MVP_IMPLEMENTATION_SLICE_SAFETY_DELTA_REVIEW_JSON.as_posix()],
+        "html_globs": [PHASE_2C_13_INTERVIEW_MVP_IMPLEMENTATION_SLICE_SAFETY_DELTA_REVIEW_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{PHASE_2C_13_INTERVIEW_MVP_IMPLEMENTATION_SLICE_SAFETY_DELTA_REVIEW_TASK_ID}"
         ),
     },
 ]
@@ -9049,6 +9077,34 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "phase_2c_12_interview_mvp_implementation_slice_candidate_inventory.py",
             "notes": "PHASE_2C_12_INTERVIEW_MVP_IMPLEMENTATION_SLICE_CANDIDATE_INVENTORY PHASE_2C_12_INTERVIEW_MVP_CANDIDATE_INVENTORY_DONE_IMPLEMENTATION_LOCKED CANDIDATE_INVENTORY_ONLY_YES NO_SINGLE_SLICE_SELECTED NO_IMPLEMENTATION_AUTHORIZED NO_IMPLEMENTATION_STARTED PHASE_2C_13_STARTED_NO RUNNER_CODE_ADDED_NO ADAPTER_CODE_ADDED_NO RESULT_ENVELOPE_CODE_ADDED_NO REPORT_RENDERER_CODE_ADDED_NO DEMO_JOBS_ADDED_NO SSH_NETCONF_RESTCONF_LIVE_DEVICE_TOUCHED_NO PROVIDER_API_MODEL_SECRETS_TOUCHED_NO CONFIG_BACKUP_CHANGE_ADDED_NO DAY1_DAY160_REWRITTEN_OR_REPLACED_NO SECOND_SAFETY_MATRIX_CREATED_NO. Report-only candidate inventory; lists possible Interview MVP implementation slices only, not single-slice selection, implementation authorization, implementation start, Phase 2C-13 start, runner, adapter, result envelope, report renderer, demo jobs, scheduler, queue, worker, AI loop, execution path, provider/API/model call, secret handling, SSH, NETCONF, RESTCONF, live device access, backup behavior, config change behavior, production execution, AGENTS.md modification, Day1-Day160 rewrite or replacement, second safety matrix, approval bypass, or safety gate weakening.",
+        },
+        {
+            "id": PHASE_2C_13_INTERVIEW_MVP_IMPLEMENTATION_SLICE_SAFETY_DELTA_REVIEW_TASK_ID,
+            "task_id": "phase_2c_13_interview_mvp_implementation_slice_safety_delta_review",
+            "display_name": "Phase 2C-13 Interview MVP Implementation Slice Safety Delta Review - Planning Only",
+            "user_display_name": "Phase 2C-13 Interview MVP Implementation Slice Safety Delta Review - Planning Only",
+            "day": "Phase 2C",
+            "category": "planning",
+            "summary": "Reviews Phase 2C-12 Interview MVP implementation slice candidates for safety deltas without selecting or authorizing a slice.",
+            "description": "Planning-only safety delta review over Phase 2C-12 Interview MVP implementation slice candidates; no unique slice selection, implementation authorization, implementation start, runner, adapter, execution path, queue, scheduler, worker, AI loop, live-device access, provider/API/model, secrets, config backup/change behavior, Day1-Day160 replacement, or second safety matrix is added.",
+            "command": f"python network_lab.py --task {PHASE_2C_13_INTERVIEW_MVP_IMPLEMENTATION_SLICE_SAFETY_DELTA_REVIEW_TASK_ID}",
+            "enabled": True,
+            "safety_level": "report-only",
+            "execution_mode": "report-only",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                PHASE_2C_13_INTERVIEW_MVP_IMPLEMENTATION_SLICE_SAFETY_DELTA_REVIEW_JSON.as_posix(),
+                PHASE_2C_13_INTERVIEW_MVP_IMPLEMENTATION_SLICE_SAFETY_DELTA_REVIEW_HTML.as_posix(),
+                PHASE_2C_13_INTERVIEW_MVP_IMPLEMENTATION_SLICE_SAFETY_DELTA_REVIEW_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Phase 2C-13 JSON/HTML Interview MVP safety delta review evidence",
+                "Phase 2C-13 planning-only safety delta review documentation",
+            ],
+            "related_script": "phase_2c_13_interview_mvp_implementation_slice_safety_delta_review.py",
+            "notes": "PHASE_2C_13_INTERVIEW_MVP_IMPLEMENTATION_SLICE_SAFETY_DELTA_REVIEW PHASE_2C_13_INTERVIEW_MVP_SAFETY_DELTA_REVIEW_DONE_IMPLEMENTATION_LOCKED CANDIDATE_SOURCE_PHASE_2C_12_ONLY_YES NO_NEW_CANDIDATES_INVENTED_YES SAFETY_DELTA_REVIEW_ONLY_YES UNIQUE_SLICE_SELECTED_NO IMPLEMENTATION_AUTHORIZED_NO IMPLEMENTATION_STARTED_NO SECOND_SAFETY_MATRIX_CREATED_NO NEXT_PHASE_STARTED_NO RUNNER_ADAPTER_EXECUTION_PATH_ADDED_NO QUEUE_SCHEDULER_WORKER_AI_LOOP_ADDED_NO SSH_NETCONF_RESTCONF_LIVE_DEVICE_TOUCHED_NO PROVIDER_API_MODEL_SECRETS_TOUCHED_NO CONFIG_BACKUP_CHANGE_ADDED_NO DAY1_DAY160_REWRITTEN_OR_REPLACED_NO. Report-only safety delta review; derives candidates only from Phase 2C-12, does not invent candidates, select a unique slice, authorize implementation, start implementation, start Phase 2C-14, add runner, adapter, execution path, scheduler, queue, worker, AI loop, provider/API/model call, secret handling, SSH, NETCONF, RESTCONF, live device access, backup behavior, config change behavior, production execution, AGENTS.md modification, Day1-Day160 rewrite or replacement, second safety matrix, approval bypass, or safety gate weakening.",
         },
     ]
 
@@ -14181,6 +14237,15 @@ def _run_phase_2c_11_interview_mvp_scope_architecture_gate(project_root: Path) -
 
 def _run_phase_2c_12_interview_mvp_implementation_slice_candidate_inventory(project_root: Path) -> int:
     return run_phase_2c_12_interview_mvp_implementation_slice_candidate_inventory(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_phase_2c_13_interview_mvp_implementation_slice_safety_delta_review(project_root: Path) -> int:
+    return run_phase_2c_13_interview_mvp_implementation_slice_safety_delta_review(
         project_root,
         format_heading_func=format_heading,
         format_status_func=format_status,
