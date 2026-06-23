@@ -110,6 +110,7 @@ def _build_parser(lab: ModuleType) -> argparse.ArgumentParser:
   python network_lab.py --task phase2c-09-post-next-slice-acceptance-review
   python network_lab.py --task phase2c-10-next-slice-decision-gate-authorization-review
   python network_lab.py --task phase2c-11-interview-mvp-scope-architecture-gate
+  python network_lab.py --task phase2c-12-interview-mvp-implementation-slice-candidate-inventory
   python network_lab.py --task intent-workflow-demo
   python network_lab.py --task offline-mock-runtime
   python network_lab.py --task offline-mock-runtime-contract
@@ -229,6 +230,7 @@ phase2c-08-artifact-validation-job is an alias for phase2c-08-next-slice-impleme
 phase2c-09-post-next-slice-acceptance-review writes the Phase 2C-09 report-only acceptance review for existing Phase 2C-08 artifact_validation_job evidence; it does not select another slice, start Phase 2C-10, modify the implementation, or add runner, adapter, broker, scheduler, queue, worker, agent loop, execution path, SSH, NETCONF, RESTCONF, live device, provider/API/model, secret, real command execution, backup, config change, Day1-Day160 replacement, AGENTS.md modification, or second safety matrix.
 phase2c-10-next-slice-decision-gate-authorization-review writes the Phase 2C-10 planning-only next-slice decision gate after Phase 2C-09 acceptance; it allows only entry into Phase 2C-11 planning and does not list candidates, select a slice, authorize implementation, start Phase 2C-11, or add runner, adapter, broker, scheduler, queue, worker, agent loop, execution path, SSH, NETCONF, RESTCONF, live device, provider/API/model, secret, real command execution, backup, config change, Day1-Day160 replacement, AGENTS.md modification, or second safety matrix.
 phase2c-11-interview-mvp-scope-architecture-gate writes the Phase 2C-11 planning-only Interview MVP scope and architecture authorization gate; it authorizes later implementation planning only and does not implement or start runner, adapter, result envelope, report renderer, demo jobs, Phase 2C-12, scheduler, queue, worker, AI agent loop, SSH, NETCONF, RESTCONF, live device, provider/API/model, secrets, backup, config change, production execution, AGENTS.md modification, Phase 2C-10 modification, Day1-Day160 replacement, or second safety matrix.
+phase2c-12-interview-mvp-implementation-slice-candidate-inventory writes the Phase 2C-12 planning-only Interview MVP implementation slice candidate inventory; it lists candidates only and does not select a slice, authorize implementation, start implementation, start Phase 2C-13, or add runner, adapter, result envelope, report renderer, demo jobs, scheduler, queue, worker, AI loop, execution path, SSH, NETCONF, RESTCONF, live device, provider/API/model, secrets, backup, config change, production execution, AGENTS.md modification, Day1-Day160 replacement, or second safety matrix.
 wireguard-runner is dry-run by default and delegates to the existing WireGuard script only after explicit --allow-live-wireguard."""
     parser = argparse.ArgumentParser(
         description=f"Day14 {lab.DAY14_NAME}.",
@@ -457,6 +459,7 @@ def _build_task_handlers(args: argparse.Namespace, root: Path, lab: ModuleType) 
         lab.PHASE_2C_09_POST_NEXT_SLICE_ACCEPTANCE_REVIEW_TASK_ID: lambda: lab._run_phase_2c_09_post_next_slice_acceptance_review(root),
         lab.PHASE_2C_10_NEXT_SLICE_DECISION_GATE_AUTHORIZATION_REVIEW_TASK_ID: lambda: lab._run_phase_2c_10_next_slice_decision_gate_authorization_review(root),
         lab.PHASE_2C_11_INTERVIEW_MVP_SCOPE_ARCHITECTURE_GATE_TASK_ID: lambda: lab._run_phase_2c_11_interview_mvp_scope_architecture_gate(root),
+        lab.PHASE_2C_12_INTERVIEW_MVP_IMPLEMENTATION_SLICE_CANDIDATE_INVENTORY_TASK_ID: lambda: lab._run_phase_2c_12_interview_mvp_implementation_slice_candidate_inventory(root),
         lab.WIREGUARD_RUNNER_TASK_ALIAS: lambda: lab._run_wireguard_runner(
             root,
             dry_run=args.dry_run,

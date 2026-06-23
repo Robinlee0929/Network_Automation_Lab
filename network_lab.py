@@ -383,6 +383,9 @@ from phase_2c_10_next_slice_decision_gate_authorization_review import (
 from phase_2c_11_interview_mvp_scope_architecture_gate import (
     run_phase_2c_11_interview_mvp_scope_architecture_gate,
 )
+from phase_2c_12_interview_mvp_implementation_slice_candidate_inventory import (
+    run_phase_2c_12_interview_mvp_implementation_slice_candidate_inventory,
+)
 from project_folder_organization_decision_gate import (
     run_project_folder_organization_decision_gate,
 )
@@ -1968,6 +1971,18 @@ PHASE_2C_11_INTERVIEW_MVP_SCOPE_ARCHITECTURE_GATE_JSON = (
 )
 PHASE_2C_11_INTERVIEW_MVP_SCOPE_ARCHITECTURE_GATE_HTML = (
     Path("reports") / "lab-summary" / "phase_2c_11_interview_mvp_scope_architecture_gate.html"
+)
+PHASE_2C_12_INTERVIEW_MVP_IMPLEMENTATION_SLICE_CANDIDATE_INVENTORY_TASK_ID = (
+    "phase2c-12-interview-mvp-implementation-slice-candidate-inventory"
+)
+PHASE_2C_12_INTERVIEW_MVP_IMPLEMENTATION_SLICE_CANDIDATE_INVENTORY_DOC = (
+    Path("docs") / "phase_2c" / "phase_2c_12_interview_mvp_implementation_slice_candidate_inventory.md"
+)
+PHASE_2C_12_INTERVIEW_MVP_IMPLEMENTATION_SLICE_CANDIDATE_INVENTORY_JSON = (
+    Path("reports") / "lab-summary" / "phase_2c_12_interview_mvp_implementation_slice_candidate_inventory.json"
+)
+PHASE_2C_12_INTERVIEW_MVP_IMPLEMENTATION_SLICE_CANDIDATE_INVENTORY_HTML = (
+    Path("reports") / "lab-summary" / "phase_2c_12_interview_mvp_implementation_slice_candidate_inventory.html"
 )
 WIREGUARD_RUNNER_TASK_ALIAS = "wireguard-runner"
 WIREGUARD_RUNNER_TASK_ID = "wireguard_runner_safety_layer"
@@ -4085,6 +4100,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{PHASE_2C_11_INTERVIEW_MVP_SCOPE_ARCHITECTURE_GATE_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Phase 2C",
+        "title": "Phase 2C-12 Interview MVP Implementation Slice Candidate Inventory",
+        "report_type": "Planning-only Interview MVP implementation slice candidate inventory",
+        "safety_label": "PHASE_2C_12_INTERVIEW_MVP_IMPLEMENTATION_SLICE_CANDIDATE_INVENTORY; CANDIDATE_INVENTORY_ONLY_YES; NO_SINGLE_SLICE_SELECTED; NO_IMPLEMENTATION_AUTHORIZED; NO_IMPLEMENTATION_STARTED; PHASE_2C_13_STARTED_NO; RUNNER_CODE_ADDED_NO; ADAPTER_CODE_ADDED_NO; RESULT_ENVELOPE_CODE_ADDED_NO; REPORT_RENDERER_CODE_ADDED_NO; DEMO_JOBS_ADDED_NO; SSH_NETCONF_RESTCONF_LIVE_DEVICE_TOUCHED_NO; PROVIDER_API_MODEL_SECRETS_TOUCHED_NO; CONFIG_BACKUP_CHANGE_ADDED_NO; DAY1_DAY160_REWRITTEN_OR_REPLACED_NO; SECOND_SAFETY_MATRIX_CREATED_NO",
+        "description": "Phase 2C-12 lists possible Interview MVP implementation slice candidates only. It does not select a slice, authorize implementation, start implementation, start Phase 2C-13, or open runner, adapter, execution, live-device, provider/API/model, secret, backup, config-change, production, Day1-Day160 replacement, or second-safety-matrix scope.",
+        "json_globs": [PHASE_2C_12_INTERVIEW_MVP_IMPLEMENTATION_SLICE_CANDIDATE_INVENTORY_JSON.as_posix()],
+        "html_globs": [PHASE_2C_12_INTERVIEW_MVP_IMPLEMENTATION_SLICE_CANDIDATE_INVENTORY_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{PHASE_2C_12_INTERVIEW_MVP_IMPLEMENTATION_SLICE_CANDIDATE_INVENTORY_TASK_ID}"
         ),
     },
 ]
@@ -8995,6 +9023,32 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "phase_2c_11_interview_mvp_scope_architecture_gate.py",
             "notes": "PHASE_2C_11_INTERVIEW_MVP_SCOPE_ARCHITECTURE_GATE_PLANNING_ONLY PHASE_2C_11_INTERVIEW_MVP_SCOPE_ARCHITECTURE_GATE_IMPLEMENTATION_LOCKED REQUIRED_REFERENCE_DOCUMENT_FOUND_YES REQUIRED_REFERENCE_DOCUMENT_READ_BEFORE_SCOPE_CONFIRMATION_YES INTERVIEW_MVP_DEFINITION_PRESENT_YES SAFE_DRY_RUN_PLATFORM_SCOPE_DEFINED_YES RUNNER_ARCHITECTURE_BOUNDARY_DEFINED_YES MOCK_ADAPTER_BOUNDARY_DEFINED_YES RESULT_ENVELOPE_BOUNDARY_DEFINED_YES DEMO_JOB_CANDIDATES_EXAMPLES_ONLY_YES LATER_IMPLEMENTATION_PLANNING_AUTHORIZED_YES IMPLEMENTATION_AUTHORIZED_NO IMPLEMENTATION_STARTED_NO PHASE_2C_12_STARTED_NO RUNNER_ADAPTER_RESULT_ENVELOPE_REPORT_RENDERER_DEMO_JOBS_ADDED_NO SCHEDULER_QUEUE_BROKER_WORKER_AGENT_LOOP_ADDED_NO LIVE_DEVICE_SSH_NETCONF_RESTCONF_TOUCHED_NO PROVIDER_API_MODEL_SECRETS_TOUCHED_NO CONFIG_BACKUP_OR_CHANGE_BEHAVIOR_ADDED_NO PRODUCTION_EXECUTION_PATH_ADDED_NO DAY1_DAY160_REWRITTEN_OR_REPLACED_NO SECOND_SAFETY_MATRIX_CREATED_NO PHASE_2C_10_MODIFIED_NO. Planning-only authorization gate; defines Interview MVP scope, safe dry-run platform scope, runner architecture boundary, mock adapter boundary, result envelope boundary, demo job candidates as examples only, and later implementation planning authorization only. It does not implement or start runner, adapter, result envelope, report renderer, demo jobs, Phase 2C-12, scheduler, queue, broker, worker, agent loop, execution path, provider/API/model call, secret handling, SSH, NETCONF, RESTCONF, live device access, real command execution, backup behavior, config change behavior, production execution, AGENTS.md modification, Phase 2C-10 modification, Day1-Day160 rewrite or replacement, second safety matrix, approval bypass, or safety gate weakening.",
+        },
+        {
+            "id": PHASE_2C_12_INTERVIEW_MVP_IMPLEMENTATION_SLICE_CANDIDATE_INVENTORY_TASK_ID,
+            "task_id": "phase_2c_12_interview_mvp_implementation_slice_candidate_inventory",
+            "display_name": "Phase 2C-12 Interview MVP Implementation Slice Candidate Inventory",
+            "user_display_name": "Phase 2C-12 Interview MVP Implementation Slice Candidate Inventory",
+            "day": "Phase 2C",
+            "category": "candidate_inventory",
+            "description": "Phase 2C-12 inventories possible Interview MVP implementation slices only; no slice is selected, authorized, or started.",
+            "safety_level": "report-only",
+            "enabled": True,
+            "execution_mode": "report-only",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                PHASE_2C_12_INTERVIEW_MVP_IMPLEMENTATION_SLICE_CANDIDATE_INVENTORY_JSON.as_posix(),
+                PHASE_2C_12_INTERVIEW_MVP_IMPLEMENTATION_SLICE_CANDIDATE_INVENTORY_HTML.as_posix(),
+                PHASE_2C_12_INTERVIEW_MVP_IMPLEMENTATION_SLICE_CANDIDATE_INVENTORY_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Phase 2C-12 JSON/HTML Interview MVP candidate inventory evidence",
+                "Phase 2C-12 planning-only candidate inventory documentation",
+            ],
+            "related_script": "phase_2c_12_interview_mvp_implementation_slice_candidate_inventory.py",
+            "notes": "PHASE_2C_12_INTERVIEW_MVP_IMPLEMENTATION_SLICE_CANDIDATE_INVENTORY PHASE_2C_12_INTERVIEW_MVP_CANDIDATE_INVENTORY_DONE_IMPLEMENTATION_LOCKED CANDIDATE_INVENTORY_ONLY_YES NO_SINGLE_SLICE_SELECTED NO_IMPLEMENTATION_AUTHORIZED NO_IMPLEMENTATION_STARTED PHASE_2C_13_STARTED_NO RUNNER_CODE_ADDED_NO ADAPTER_CODE_ADDED_NO RESULT_ENVELOPE_CODE_ADDED_NO REPORT_RENDERER_CODE_ADDED_NO DEMO_JOBS_ADDED_NO SSH_NETCONF_RESTCONF_LIVE_DEVICE_TOUCHED_NO PROVIDER_API_MODEL_SECRETS_TOUCHED_NO CONFIG_BACKUP_CHANGE_ADDED_NO DAY1_DAY160_REWRITTEN_OR_REPLACED_NO SECOND_SAFETY_MATRIX_CREATED_NO. Report-only candidate inventory; lists possible Interview MVP implementation slices only, not single-slice selection, implementation authorization, implementation start, Phase 2C-13 start, runner, adapter, result envelope, report renderer, demo jobs, scheduler, queue, worker, AI loop, execution path, provider/API/model call, secret handling, SSH, NETCONF, RESTCONF, live device access, backup behavior, config change behavior, production execution, AGENTS.md modification, Day1-Day160 rewrite or replacement, second safety matrix, approval bypass, or safety gate weakening.",
         },
     ]
 
@@ -14118,6 +14172,15 @@ def _run_phase_2c_10_next_slice_decision_gate_authorization_review(project_root:
 
 def _run_phase_2c_11_interview_mvp_scope_architecture_gate(project_root: Path) -> int:
     return run_phase_2c_11_interview_mvp_scope_architecture_gate(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_phase_2c_12_interview_mvp_implementation_slice_candidate_inventory(project_root: Path) -> int:
+    return run_phase_2c_12_interview_mvp_implementation_slice_candidate_inventory(
         project_root,
         format_heading_func=format_heading,
         format_status_func=format_status,
