@@ -142,6 +142,9 @@ Phase lanes and close status:
   - Phase 2D-05 is that documentation-only implementation slice at `docs/phase_2d/phase_2d_05_readme_demo_flow_convergence.md`; it clarifies the current reviewer demo path and Phase 2D active path without modifying code, runners, adapters, execution paths, live device access, SSH, NETCONF, RESTCONF, APIs, providers, models, secrets, config backup/change behavior, production execution paths, Day1-Day160 history, or the safety baseline.
   - Phase 2D-06 is the post-implementation acceptance review at `docs/phase_2d/phase_2d_06_post_implementation_acceptance_review_report_only.md`; it accepts Phase 2D-05 and does not select another slice or authorize new implementation.
   - Phase 2D-07 is the planning-only close-or-continue gate at `docs/phase_2d/phase_2d_07_close_or_continue_decision_gate_planning_only.md`; it records `CLOSE_PHASE_2D` using existing Phase 2D evidence only and does not create a candidate inventory, select a slice, authorize implementation, start a next phase, or add execution-capable behavior.
+- `docs/phase_2e/` holds the Phase 2E controlled automation planning lane after Phase 2D closure.
+  - Phase 2E-00 records `ALLOW_CONTROLLED_AUTOMATION_PLANNING_ONLY` at `docs/phase_2e/phase_2e_00_controlled_automation_entry_gate_planning_only.md`; it does not select a slice, authorize implementation, or add execution-capable behavior.
+  - Phase 2E-01 reconciles read-only lab integration scope at `docs/phase_2e/phase_2e_01_read_only_lab_integration_scope_reconciliation_planning_only.md`; it is planning-only / documentation-only / report-only and does not select or authorize an implementation slice.
 
 Existing report-only evidence surfaces:
 
