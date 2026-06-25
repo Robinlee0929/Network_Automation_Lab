@@ -147,6 +147,7 @@ Phase lanes and close status:
   - Phase 2E-01 reconciles read-only lab integration scope at `docs/phase_2e/phase_2e_01_read_only_lab_integration_scope_reconciliation_planning_only.md`; it is planning-only / documentation-only / report-only and does not select or authorize an implementation slice.
   - Phase 2E-02 inventories read-only lab integration candidate directions at `docs/phase_2e/phase_2e_02_read_only_lab_integration_candidate_inventory_planning_only.md`; it is planning-only / documentation-only / report-only, selects no unique slice, and does not authorize implementation.
   - Phase 2E-03 reviews Phase 2E-02 read-only lab integration candidate directions for safety deltas at `docs/phase_2e/phase_2e_03_readonly_lab_integration_safety_delta_review_planning_only.md`; it records `NO_NEW_SAFETY_DELTA_IDENTIFIED`, selects no unique slice, does not authorize implementation, and does not create a second safety matrix.
+  - Phase 2E-04 records the read-only lab integration final selection gate at `docs/phase_2e/phase_2e_04_readonly_lab_final_selection_gate_planning_only.md`; it selects `Static lab artifact validation` for future authorization-gate review only, does not authorize implementation, and does not create a second safety matrix.
 
 Existing report-only evidence surfaces:
 
