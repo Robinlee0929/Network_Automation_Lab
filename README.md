@@ -145,6 +145,7 @@ Phase lanes and close status:
 - `docs/phase_2e/` holds the Phase 2E controlled automation planning lane after Phase 2D closure.
   - Phase 2E-00 records `ALLOW_CONTROLLED_AUTOMATION_PLANNING_ONLY` at `docs/phase_2e/phase_2e_00_controlled_automation_entry_gate_planning_only.md`; it does not select a slice, authorize implementation, or add execution-capable behavior.
   - Phase 2E-01 reconciles read-only lab integration scope at `docs/phase_2e/phase_2e_01_read_only_lab_integration_scope_reconciliation_planning_only.md`; it is planning-only / documentation-only / report-only and does not select or authorize an implementation slice.
+  - Phase 2E-02 inventories read-only lab integration candidate directions at `docs/phase_2e/phase_2e_02_read_only_lab_integration_candidate_inventory_planning_only.md`; it is planning-only / documentation-only / report-only, selects no unique slice, and does not authorize implementation.
 
 Existing report-only evidence surfaces:
 
