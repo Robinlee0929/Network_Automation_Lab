@@ -152,6 +152,8 @@ Phase lanes and close status:
   - Phase 2E-06 implements the static lab artifact validation slice at `docs/phase_2e/phase_2e_06_static_lab_artifact_validation_implementation.md`; it validates local static artifact envelopes only and keeps runner, adapter, execution, live access, provider/API/model, secrets, queue/scheduler/worker, config backup/change, production, Day1-Day160 rewrite, and second-safety-matrix scope closed.
   - Phase 2E-07 records the post-implementation acceptance review for Phase 2E-06 at `docs/phase_2e/phase_2e_07_static_lab_artifact_validation_acceptance_review_report_only.md`; it accepts the static lab artifact validation slice and does not authorize further implementation or start the next phase.
   - Phase 2E-08 records the close-or-continue decision gate at `docs/phase_2e/phase_2e_08_close_or_continue_decision_gate_planning_only.md`; it records `CLOSE` for Phase 2E and does not authorize further implementation or Phase 2F.
+- `docs/phase_2f/` holds the Phase 2F read-only lab adapter re-entry planning lane after Phase 2E closure.
+  - Phase 2F-00 records `ALLOW_PLANNING_DISCUSSION_ONLY` at `docs/phase_2f/phase_2f_00_readonly_lab_adapter_reentry_gate_planning_only.md`; it allows only future planning discussion and does not select a slice, authorize implementation, add adapter code, change runners or execution paths, use live access, or create a second safety matrix.
 
 Existing report-only evidence surfaces:
 
