@@ -157,6 +157,7 @@ Phase lanes and close status:
   - Phase 2F-01 reconciles adapter planning scope at `docs/phase_2f/phase_2f_01_adapter_scope_reconciliation_planning_only.md`; it records `SCOPE_RECONCILED` for planning discussion only and does not create candidate inventory, select a slice, authorize implementation, design adapter boundaries, add adapter code, change runners or execution paths, use live access, or create a second safety matrix.
   - Phase 2F-02 inventories adapter boundary discussion candidates at `docs/phase_2f/phase_2f_02_adapter_boundary_candidate_inventory_planning_only.md`; it selects no candidate, ranks no candidate, performs no safety delta review, creates no adapter boundary design, authorizes no implementation, and changes no code or execution behavior.
   - Phase 2F-03 reviews Phase 2F-02 adapter boundary candidates for safety deltas at `docs/phase_2f/phase_2f_03_adapter_safety_delta_review_planning_only.md`; it selects no candidate, ranks no candidate, creates no adapter boundary design, authorizes no implementation, and records that some candidates require narrowing, exclusion, or deferral before Phase 2F-04.
+  - Phase 2F-04 creates the planning-only adapter boundary design at `docs/phase_2f/phase_2f_04_adapter_boundary_design_planning_only.md`; it defines conceptual reviewer boundaries, defers live-source details, selects no implementation slice, authorizes no implementation, adds no adapter code, changes no runners or execution paths, uses no live access, and creates no second safety matrix.
 
 Existing report-only evidence surfaces:
 
