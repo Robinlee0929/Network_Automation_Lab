@@ -155,6 +155,7 @@ Phase lanes and close status:
 - `docs/phase_2f/` holds the Phase 2F read-only lab adapter re-entry planning lane after Phase 2E closure.
   - Phase 2F-00 records `ALLOW_PLANNING_DISCUSSION_ONLY` at `docs/phase_2f/phase_2f_00_readonly_lab_adapter_reentry_gate_planning_only.md`; it allows only future planning discussion and does not select a slice, authorize implementation, add adapter code, change runners or execution paths, use live access, or create a second safety matrix.
   - Phase 2F-01 reconciles adapter planning scope at `docs/phase_2f/phase_2f_01_adapter_scope_reconciliation_planning_only.md`; it records `SCOPE_RECONCILED` for planning discussion only and does not create candidate inventory, select a slice, authorize implementation, design adapter boundaries, add adapter code, change runners or execution paths, use live access, or create a second safety matrix.
+  - Phase 2F-02 inventories adapter boundary discussion candidates at `docs/phase_2f/phase_2f_02_adapter_boundary_candidate_inventory_planning_only.md`; it selects no candidate, ranks no candidate, performs no safety delta review, creates no adapter boundary design, authorizes no implementation, and changes no code or execution behavior.
 
 Existing report-only evidence surfaces:
 
