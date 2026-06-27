@@ -172,6 +172,7 @@ Phase lanes and close status:
 - `docs/phase_2g/` holds the Phase 2G project acceleration and demo-value planning lane after Phase 2F closure.
   - Phase 2G-00 records the project acceleration and demo-value entry review at `docs/phase_2g/phase_2g_00_project_acceleration_demo_value_entry_review.md`; it carries forward `Demo Flow`, `Project Health Dashboard`, `Evidence / Report Dashboard`, `Codex Workflow Accelerator`, and `Phase Scaffold` as planning candidates only, authorizes no implementation, selects no slice, changes no source behavior, and preserves the existing safety boundary.
   - Phase 2G-00A adds the future-plan addendum at `docs/phase_2g/phase_2g_00a_future_plan_addendum.md`; it defines the Phase 2G-01 through Phase 2G-08 planning path, keeps all five candidate tracks behind future gates, authorizes no implementation, changes no source behavior, and preserves the existing safety boundary.
+  - Phase 2G-01 records the track prioritization planning result at `docs/phase_2g/phase_2g_01_track_prioritization.md`; it compares the five existing candidate tracks, recommends `Demo Flow` as the next planning focus, authorizes no implementation, defines no implementation slice, changes no source behavior, and preserves the existing safety boundary.
 
 Existing report-only evidence surfaces:
 
