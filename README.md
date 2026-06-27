@@ -175,6 +175,7 @@ Phase lanes and close status:
   - Phase 2G-01 records the track prioritization planning result at `docs/phase_2g/phase_2g_01_track_prioritization.md`; it compares the five existing candidate tracks, recommends `Demo Flow` as the next planning focus, authorizes no implementation, defines no implementation slice, changes no source behavior, and preserves the existing safety boundary.
   - Phase 2G-02 records the Demo Flow authorization gate at `docs/phase_2g/phase_2g_02_demo_flow_authorization_gate.md`; it defines the demo-facing boundary using existing static evidence and report artifacts only, authorizes no implementation, recommends Phase 2G-03 as a planning-only slice-definition kickoff gate, changes no source behavior, and preserves the existing safety boundary.
   - Phase 2G-03 records the Demo Flow slice definition and implementation kickoff gate at `docs/phase_2g/phase_2g_03_demo_flow_slice_definition.md`; it selects one smallest static-documentation demo entry point for possible later Phase 2G-04 implementation, authorizes no implementation in this phase, changes no source behavior, and preserves the existing safety boundary.
+  - Phase 2G-04 records the static Markdown walkthrough at `docs/phase_2g/phase_2g_04_demo_flow_walkthrough.md`; it documents the future demo path only, adds no runtime execution, no new report generation, no new dashboard behavior, and no runner or adapter changes.
 
 Existing report-only evidence surfaces:
 
