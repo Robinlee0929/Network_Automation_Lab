@@ -71,9 +71,57 @@ def test_dashboard_shell_contains_expected_static_sections_and_boundary_notice()
     assert "Evidence summary placeholder" in html
     assert "Report summary placeholder" in html
     assert "Artifact status placeholder" in html
+    assert "Static artifact references" in html
     assert "No live data source is attached" in html
     assert phase_2h_06.BOUNDARY_NOTICE in html
     assert "<script" not in html.lower()
+
+
+def test_static_artifact_references_are_hard_coded_and_local_only():
+    model = phase_2h_06.build_dashboard_shell_model()
+    references = model["artifact_references"]
+
+    assert references == phase_2h_06.STATIC_ARTIFACT_REFERENCES
+    assert tuple(reference["kind"] for reference in references) == (
+        "static artifact reference",
+        "report reference",
+        "report reference",
+        "optional or missing local artifact reference",
+    )
+    assert tuple(reference["path"] for reference in references) == (
+        "docs/phase_2h/phase_2h_06_evidence_report_dashboard_static_shell.html",
+        "docs/phase_2h/phase_2h_06_evidence_report_dashboard_static_shell.md",
+        "docs/phase_2h/phase_2h_07_evidence_report_dashboard_static_shell_acceptance_review_planning_only.md",
+        "reports/report_index.html",
+    )
+    for reference in references:
+        path = reference["path"]
+        assert not path.startswith(("/", "\\"))
+        assert "://" not in path
+        assert "*" not in path
+        assert "?" not in path
+
+
+def test_static_artifact_reference_section_uses_no_runtime_discovery_terms():
+    source = Path("phase_2h_06_evidence_report_dashboard_static_shell.py").read_text(
+        encoding="utf-8"
+    )
+
+    forbidden_terms = (
+        "glob(",
+        ".glob",
+        "os.walk",
+        "scandir",
+        "Path.exists",
+        ".exists(",
+        "requests",
+        "urlopen",
+        "fetch(",
+        "importlib",
+        "subprocess",
+    )
+    for term in forbidden_terms:
+        assert term not in source
 
 
 def test_committed_static_html_shell_can_be_read_locally():
@@ -84,6 +132,11 @@ def test_committed_static_html_shell_can_be_read_locally():
     assert "Evidence summary placeholder" in html
     assert "Report summary placeholder" in html
     assert "Artifact status placeholder" in html
+    assert "Static artifact references" in html
+    assert "static artifact reference" in html
+    assert "report reference" in html
+    assert "optional or missing local artifact reference" in html
+    assert "reports/report_index.html" in html
     assert "<script" not in html.lower()
 
 
@@ -108,11 +161,13 @@ def test_dashboard_shell_validation_rejects_tampered_forbidden_scope_flags():
     tampered["forbidden_scope_status"]["adapter_connected"] = True
     tampered["forbidden_scope_status"]["execution_path_added"] = True
     tampered["requires_external_dependencies"] = True
+    tampered["artifact_references"] = ()
 
     validation = phase_2h_06.validate_dashboard_shell_model(tampered)
 
     assert validation["valid"] is False
     assert "EXTERNAL_DEPENDENCIES_REQUIRED" in validation["errors"]
+    assert "STATIC_ARTIFACT_REFERENCES_MISMATCH" in validation["errors"]
     assert "FORBIDDEN_SCOPE_STATUS_MISMATCH:live_data_connected" in validation["errors"]
     assert "FORBIDDEN_SCOPE_STATUS_MISMATCH:runner_connected" in validation["errors"]
     assert "FORBIDDEN_SCOPE_STATUS_MISMATCH:adapter_connected" in validation["errors"]

@@ -13,6 +13,7 @@ from typing import Any, Dict, Mapping, Sequence, Tuple
 
 
 PHASE = "2H-06"
+PHASE_2H_08 = "2H-08"
 TASK_NAME = "phase2h-06-evidence-report-dashboard-static-shell"
 TITLE = "Phase 2H-06 Evidence / Report Dashboard Static Shell"
 MODE = "implementation_static_local_deterministic_read_only_dashboard_shell"
@@ -22,6 +23,9 @@ STATUS_FAIL = "FAIL"
 FINAL_VERDICT = "PHASE_2H_06_STATIC_DASHBOARD_SHELL_READY"
 DOC_PATH = "docs/phase_2h/phase_2h_06_evidence_report_dashboard_static_shell.md"
 HTML_PATH = "docs/phase_2h/phase_2h_06_evidence_report_dashboard_static_shell.html"
+PHASE_2H_08_DOC_PATH = (
+    "docs/phase_2h/phase_2h_08_evidence_report_dashboard_static_artifact_reference.md"
+)
 
 BOUNDARY_NOTICE = (
     "Static/read-only/no execution boundary: this dashboard shell is local, "
@@ -34,8 +38,46 @@ EXPECTED_SECTION_TITLES = (
     "Evidence summary placeholder",
     "Report summary placeholder",
     "Artifact status placeholder",
+    "Static artifact references",
     "Empty state",
     "Boundary notice",
+)
+
+STATIC_ARTIFACT_REFERENCES = (
+    {
+        "kind": "static artifact reference",
+        "label": "Committed dashboard static shell HTML",
+        "path": HTML_PATH,
+        "status": "STATIC_COMMITTED",
+        "note": "Hard-coded repository-local dashboard artifact reference.",
+    },
+    {
+        "kind": "report reference",
+        "label": "Phase 2H-06 implementation report",
+        "path": DOC_PATH,
+        "status": "REPORT_REFERENCE",
+        "note": "Hard-coded repository-local implementation report reference.",
+    },
+    {
+        "kind": "report reference",
+        "label": "Phase 2H-07 acceptance review",
+        "path": (
+            "docs/phase_2h/"
+            "phase_2h_07_evidence_report_dashboard_static_shell_acceptance_review_planning_only.md"
+        ),
+        "status": "REPORT_REFERENCE",
+        "note": "Hard-coded repository-local acceptance review reference.",
+    },
+    {
+        "kind": "optional or missing local artifact reference",
+        "label": "Optional local report-index output",
+        "path": "reports/report_index.html",
+        "status": "OPTIONAL_LOCAL_ARTIFACT_STATIC_REFERENCE_ONLY",
+        "note": (
+            "Static path label only; the dashboard performs no runtime existence "
+            "check and does not generate or refresh this artifact."
+        ),
+    },
 )
 
 FORBIDDEN_SCOPE_STATUS = {
@@ -78,6 +120,17 @@ def build_dashboard_shell_model() -> Dict[str, Any]:
             "body": "Artifact status is reserved for local deterministic committed evidence references, not runtime collection.",
         },
         {
+            "id": "static-artifact-references",
+            "title": "Static artifact references",
+            "status": "REVIEW_ONLY",
+            "body": (
+                "Hard-coded repository-local references only. These entries are static "
+                "dashboard content and perform no scan, fetch, discovery, or runtime "
+                "existence check."
+            ),
+            "references": STATIC_ARTIFACT_REFERENCES,
+        },
+        {
             "id": "empty-state",
             "title": "Empty state",
             "status": "NO_LIVE_DATA",
@@ -105,6 +158,7 @@ def build_dashboard_shell_model() -> Dict[str, Any]:
         "non_executing": True,
         "requires_external_dependencies": False,
         "external_dependency_names": (),
+        "artifact_references": STATIC_ARTIFACT_REFERENCES,
         "sections": sections,
         "boundary_notice": BOUNDARY_NOTICE,
         "forbidden_scope_status": dict(FORBIDDEN_SCOPE_STATUS),
@@ -134,6 +188,10 @@ def validate_dashboard_shell_model(model: Mapping[str, Any]) -> Dict[str, Any]:
         errors.append("EXTERNAL_DEPENDENCIES_REQUIRED")
     if tuple(model.get("external_dependency_names", ())) != ():
         errors.append("EXTERNAL_DEPENDENCY_NAMES_PRESENT")
+
+    artifact_references = model.get("artifact_references", ())
+    if tuple(artifact_references) != STATIC_ARTIFACT_REFERENCES:
+        errors.append("STATIC_ARTIFACT_REFERENCES_MISMATCH")
 
     sections = model.get("sections", ())
     if not isinstance(sections, Sequence) or isinstance(sections, (str, bytes, bytearray)):
@@ -196,6 +254,9 @@ def render_dashboard_shell_html(model: Mapping[str, Any] | None = None) -> str:
         "    h2 { font-size: 18px; margin: 0 0 8px; }\n"
         "    .status { font-size: 12px; font-weight: bold; letter-spacing: .04em; color: #375a7f; }\n"
         "    p { line-height: 1.45; }\n"
+        "    ul { padding-left: 20px; margin: 12px 0 0; }\n"
+        "    li { margin: 0 0 10px; line-height: 1.4; }\n"
+        "    code { background: #eef3f8; padding: 1px 4px; }\n"
         "  </style>\n"
         "</head>\n"
         "<body>\n"
@@ -229,6 +290,8 @@ def build_phase_2h_06_dashboard_shell_summary() -> Dict[str, Any]:
         "final_verdict": FINAL_VERDICT,
         "doc_path": DOC_PATH,
         "html_path": HTML_PATH,
+        "phase_2h_08_doc_path": PHASE_2H_08_DOC_PATH,
+        "artifact_references": STATIC_ARTIFACT_REFERENCES,
         "section_titles": tuple(section["title"] for section in model["sections"]),
         "boundary_notice": BOUNDARY_NOTICE,
         "html_length": len(html),
@@ -244,10 +307,28 @@ def build_phase_2h_06_dashboard_shell_summary() -> Dict[str, Any]:
 
 
 def _render_section(section: Mapping[str, Any]) -> str:
+    references = section.get("references", ())
+    reference_html = ""
+    if references:
+        items = "\n".join(_render_reference(reference) for reference in references)
+        reference_html = f"\n        <ul>\n{items}\n        </ul>"
     return (
         "      <section>\n"
         f"        <div class=\"status\">{escape(str(section['status']))}</div>\n"
         f"        <h2>{escape(str(section['title']))}</h2>\n"
         f"        <p>{escape(str(section['body']))}</p>\n"
+        f"{reference_html}\n"
         "      </section>"
+    )
+
+
+def _render_reference(reference: Mapping[str, Any]) -> str:
+    return (
+        "          <li>"
+        f"<strong>{escape(str(reference['kind']))}</strong>: "
+        f"{escape(str(reference['label']))} - "
+        f"<code>{escape(str(reference['path']))}</code> "
+        f"({escape(str(reference['status']))}). "
+        f"{escape(str(reference['note']))}"
+        "</li>"
     )
