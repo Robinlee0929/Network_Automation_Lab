@@ -180,6 +180,7 @@ Phase lanes and close status:
   - Phase 2G-06 records the next-step decision gate for the accepted demo-flow walkthrough at `docs/phase_2g/phase_2g_06_demo_flow_next_step_decision_gate.md`; it closes or pauses the demo-flow track as sufficiently documented and does not authorize implementation, execution, adapter work, runner work, live network access, or demo-flow expansion.
 - `docs/phase_2h/` holds project-state consolidation after Phase 2G demo-flow closure or pause.
   - Phase 2H-00 records the project-state consolidation at `docs/phase_2h/phase_2h_00_project_state_consolidation.md`; it summarizes current track status only, recommends Phase 2H-01 as planning-only candidate inventory, and does not select a track, authorize implementation, reopen Demo Flow, or add execution-capable behavior.
+  - Phase 2H-01 records the next-track candidate inventory at `docs/phase_2h/phase_2h_01_next_track_candidate_inventory.md`; it inventories the remaining non-demo-flow candidate tracks, keeps Demo Flow closed or paused, selects and ranks no track, authorizes no implementation, and adds no runner, adapter, execution, live-device, provider/API/model, secret, queue, scheduler, worker, agent-loop, config-backup, or config-change behavior.
 
 Existing report-only evidence surfaces:
 
