@@ -177,6 +177,7 @@ Phase lanes and close status:
   - Phase 2G-03 records the Demo Flow slice definition and implementation kickoff gate at `docs/phase_2g/phase_2g_03_demo_flow_slice_definition.md`; it selects one smallest static-documentation demo entry point for possible later Phase 2G-04 implementation, authorizes no implementation in this phase, changes no source behavior, and preserves the existing safety boundary.
   - Phase 2G-04 records the static Markdown walkthrough at `docs/phase_2g/phase_2g_04_demo_flow_walkthrough.md`; it documents the future demo path only, adds no runtime execution, no new report generation, no new dashboard behavior, and no runner or adapter changes.
   - Phase 2G-05 records the acceptance review for the Phase 2G-04 static Markdown walkthrough at `docs/phase_2g/phase_2g_05_demo_flow_walkthrough_acceptance_review.md`; it accepts the walkthrough as planning-only / documentation-only / report-only and does not authorize implementation, execution, adapter work, runner work, live network access, or demo-flow expansion.
+  - Phase 2G-06 records the next-step decision gate for the accepted demo-flow walkthrough at `docs/phase_2g/phase_2g_06_demo_flow_next_step_decision_gate.md`; it closes or pauses the demo-flow track as sufficiently documented and does not authorize implementation, execution, adapter work, runner work, live network access, or demo-flow expansion.
 
 Existing report-only evidence surfaces:
 
