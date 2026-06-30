@@ -14,6 +14,7 @@ from typing import Any, Dict, Mapping, Sequence, Tuple
 
 PHASE = "2H-06"
 PHASE_2H_08 = "2H-08"
+PHASE_2H_12 = "2H-12"
 TASK_NAME = "phase2h-06-evidence-report-dashboard-static-shell"
 TITLE = "Phase 2H-06 Evidence / Report Dashboard Static Shell"
 MODE = "implementation_static_local_deterministic_read_only_dashboard_shell"
@@ -25,6 +26,10 @@ DOC_PATH = "docs/phase_2h/phase_2h_06_evidence_report_dashboard_static_shell.md"
 HTML_PATH = "docs/phase_2h/phase_2h_06_evidence_report_dashboard_static_shell.html"
 PHASE_2H_08_DOC_PATH = (
     "docs/phase_2h/phase_2h_08_evidence_report_dashboard_static_artifact_reference.md"
+)
+PHASE_2H_12_DOC_PATH = (
+    "docs/phase_2h/"
+    "phase_2h_12_dashboard_empty_state_missing_artifact_messaging.md"
 )
 
 BOUNDARY_NOTICE = (
@@ -39,6 +44,8 @@ EXPECTED_SECTION_TITLES = (
     "Report summary placeholder",
     "Artifact status placeholder",
     "Static artifact references",
+    "Static empty-state messaging",
+    "Static missing-artifact messaging",
     "Empty state",
     "Boundary notice",
 )
@@ -49,6 +56,7 @@ STATIC_ARTIFACT_REFERENCES = (
         "label": "Committed dashboard static shell HTML",
         "path": HTML_PATH,
         "status": "STATIC_COMMITTED",
+        "availability": "STATIC_REFERENCE_AVAILABLE",
         "note": "Hard-coded repository-local dashboard artifact reference.",
     },
     {
@@ -56,6 +64,7 @@ STATIC_ARTIFACT_REFERENCES = (
         "label": "Phase 2H-06 implementation report",
         "path": DOC_PATH,
         "status": "REPORT_REFERENCE",
+        "availability": "STATIC_REFERENCE_AVAILABLE",
         "note": "Hard-coded repository-local implementation report reference.",
     },
     {
@@ -66,6 +75,7 @@ STATIC_ARTIFACT_REFERENCES = (
             "phase_2h_07_evidence_report_dashboard_static_shell_acceptance_review_planning_only.md"
         ),
         "status": "REPORT_REFERENCE",
+        "availability": "STATIC_REFERENCE_AVAILABLE",
         "note": "Hard-coded repository-local acceptance review reference.",
     },
     {
@@ -73,9 +83,49 @@ STATIC_ARTIFACT_REFERENCES = (
         "label": "Optional local report-index output",
         "path": "reports/report_index.html",
         "status": "OPTIONAL_LOCAL_ARTIFACT_STATIC_REFERENCE_ONLY",
+        "availability": "STATIC_OPTIONAL_OR_MISSING_MESSAGE_ONLY",
         "note": (
             "Static path label only; the dashboard performs no runtime existence "
             "check and does not generate or refresh this artifact."
+        ),
+    },
+)
+
+STATIC_EMPTY_STATE_MESSAGES = (
+    {
+        "id": "no-usable-artifact-reference",
+        "status": "STATIC_EMPTY_STATE_MESSAGE_ONLY",
+        "title": "No usable artifact reference in static context",
+        "body": (
+            "If static dashboard content has no usable artifact reference, the "
+            "dashboard reports that state as committed copy only. No live scan, "
+            "runtime artifact discovery, fetch, generation, recovery, or execution "
+            "is attempted."
+        ),
+    },
+    {
+        "id": "static-report-only-dashboard-state",
+        "status": "STATIC_REPORT_ONLY",
+        "title": "Static report-only dashboard state",
+        "body": (
+            "The empty state remains local, deterministic, read-only, report-only, "
+            "and non-executing; it does not inspect local files or infer runtime "
+            "artifact availability."
+        ),
+    },
+)
+
+STATIC_MISSING_ARTIFACT_MESSAGES = (
+    {
+        "id": "optional-report-index-static-missing",
+        "reference_label": "Optional local report-index output",
+        "reference_path": "reports/report_index.html",
+        "status": "STATIC_MISSING_ARTIFACT_MESSAGE_ONLY",
+        "title": "Optional local artifact may be absent",
+        "body": (
+            "The optional report-index reference is marked by static dashboard "
+            "context only. The dashboard does not check the filesystem, discover "
+            "artifacts, recover, fetch, generate, refresh, or execute anything."
         ),
     },
 )
@@ -131,6 +181,27 @@ def build_dashboard_shell_model() -> Dict[str, Any]:
             "references": STATIC_ARTIFACT_REFERENCES,
         },
         {
+            "id": "static-empty-state-messaging",
+            "title": "Static empty-state messaging",
+            "status": "STATIC_EMPTY_STATE",
+            "body": (
+                "Empty-state messages are deterministic dashboard copy derived "
+                "only from the static dashboard model."
+            ),
+            "messages": STATIC_EMPTY_STATE_MESSAGES,
+        },
+        {
+            "id": "static-missing-artifact-messaging",
+            "title": "Static missing-artifact messaging",
+            "status": "STATIC_MISSING_ARTIFACT",
+            "body": (
+                "Missing-artifact messages are static report-only notices. They "
+                "do not perform live scans, runtime discovery, fetching, recovery, "
+                "generation, or execution."
+            ),
+            "messages": STATIC_MISSING_ARTIFACT_MESSAGES,
+        },
+        {
             "id": "empty-state",
             "title": "Empty state",
             "status": "NO_LIVE_DATA",
@@ -159,6 +230,8 @@ def build_dashboard_shell_model() -> Dict[str, Any]:
         "requires_external_dependencies": False,
         "external_dependency_names": (),
         "artifact_references": STATIC_ARTIFACT_REFERENCES,
+        "static_empty_state_messages": STATIC_EMPTY_STATE_MESSAGES,
+        "static_missing_artifact_messages": STATIC_MISSING_ARTIFACT_MESSAGES,
         "sections": sections,
         "boundary_notice": BOUNDARY_NOTICE,
         "forbidden_scope_status": dict(FORBIDDEN_SCOPE_STATUS),
@@ -192,6 +265,14 @@ def validate_dashboard_shell_model(model: Mapping[str, Any]) -> Dict[str, Any]:
     artifact_references = model.get("artifact_references", ())
     if tuple(artifact_references) != STATIC_ARTIFACT_REFERENCES:
         errors.append("STATIC_ARTIFACT_REFERENCES_MISMATCH")
+
+    if tuple(model.get("static_empty_state_messages", ())) != STATIC_EMPTY_STATE_MESSAGES:
+        errors.append("STATIC_EMPTY_STATE_MESSAGES_MISMATCH")
+    if (
+        tuple(model.get("static_missing_artifact_messages", ()))
+        != STATIC_MISSING_ARTIFACT_MESSAGES
+    ):
+        errors.append("STATIC_MISSING_ARTIFACT_MESSAGES_MISMATCH")
 
     sections = model.get("sections", ())
     if not isinstance(sections, Sequence) or isinstance(sections, (str, bytes, bytearray)):
@@ -291,7 +372,10 @@ def build_phase_2h_06_dashboard_shell_summary() -> Dict[str, Any]:
         "doc_path": DOC_PATH,
         "html_path": HTML_PATH,
         "phase_2h_08_doc_path": PHASE_2H_08_DOC_PATH,
+        "phase_2h_12_doc_path": PHASE_2H_12_DOC_PATH,
         "artifact_references": STATIC_ARTIFACT_REFERENCES,
+        "static_empty_state_messages": STATIC_EMPTY_STATE_MESSAGES,
+        "static_missing_artifact_messages": STATIC_MISSING_ARTIFACT_MESSAGES,
         "section_titles": tuple(section["title"] for section in model["sections"]),
         "boundary_notice": BOUNDARY_NOTICE,
         "html_length": len(html),
@@ -308,16 +392,22 @@ def build_phase_2h_06_dashboard_shell_summary() -> Dict[str, Any]:
 
 def _render_section(section: Mapping[str, Any]) -> str:
     references = section.get("references", ())
+    messages = section.get("messages", ())
     reference_html = ""
     if references:
         items = "\n".join(_render_reference(reference) for reference in references)
         reference_html = f"\n        <ul>\n{items}\n        </ul>"
+    message_html = ""
+    if messages:
+        items = "\n".join(_render_message(message) for message in messages)
+        message_html = f"\n        <ul>\n{items}\n        </ul>"
     return (
         "      <section>\n"
         f"        <div class=\"status\">{escape(str(section['status']))}</div>\n"
         f"        <h2>{escape(str(section['title']))}</h2>\n"
         f"        <p>{escape(str(section['body']))}</p>\n"
         f"{reference_html}\n"
+        f"{message_html}\n"
         "      </section>"
     )
 
@@ -330,5 +420,21 @@ def _render_reference(reference: Mapping[str, Any]) -> str:
         f"<code>{escape(str(reference['path']))}</code> "
         f"({escape(str(reference['status']))}). "
         f"{escape(str(reference['note']))}"
+        "</li>"
+    )
+
+
+def _render_message(message: Mapping[str, Any]) -> str:
+    reference = ""
+    if "reference_path" in message:
+        reference = (
+            f" <code>{escape(str(message['reference_path']))}</code>"
+            f" ({escape(str(message.get('reference_label', 'static reference')))})."
+        )
+    return (
+        "          <li>"
+        f"<strong>{escape(str(message['status']))}</strong>: "
+        f"{escape(str(message['title']))}.{reference} "
+        f"{escape(str(message['body']))}"
         "</li>"
     )

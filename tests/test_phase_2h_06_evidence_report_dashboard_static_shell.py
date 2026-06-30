@@ -72,6 +72,8 @@ def test_dashboard_shell_contains_expected_static_sections_and_boundary_notice()
     assert "Report summary placeholder" in html
     assert "Artifact status placeholder" in html
     assert "Static artifact references" in html
+    assert "Static empty-state messaging" in html
+    assert "Static missing-artifact messaging" in html
     assert "No live data source is attached" in html
     assert phase_2h_06.BOUNDARY_NOTICE in html
     assert "<script" not in html.lower()
@@ -100,6 +102,34 @@ def test_static_artifact_references_are_hard_coded_and_local_only():
         assert "://" not in path
         assert "*" not in path
         assert "?" not in path
+    assert references[-1]["availability"] == "STATIC_OPTIONAL_OR_MISSING_MESSAGE_ONLY"
+
+
+def test_static_empty_state_and_missing_artifact_messages_are_deterministic_copy_only():
+    model = phase_2h_06.build_dashboard_shell_model()
+
+    assert model["static_empty_state_messages"] == phase_2h_06.STATIC_EMPTY_STATE_MESSAGES
+    assert (
+        model["static_missing_artifact_messages"]
+        == phase_2h_06.STATIC_MISSING_ARTIFACT_MESSAGES
+    )
+    assert tuple(message["id"] for message in model["static_empty_state_messages"]) == (
+        "no-usable-artifact-reference",
+        "static-report-only-dashboard-state",
+    )
+    assert tuple(message["id"] for message in model["static_missing_artifact_messages"]) == (
+        "optional-report-index-static-missing",
+    )
+
+    rendered = phase_2h_06.render_dashboard_shell_html(model)
+    for expected in (
+        "No usable artifact reference in static context",
+        "No live scan, runtime artifact discovery, fetch, generation, recovery, or execution is attempted.",
+        "Optional local artifact may be absent",
+        "The dashboard does not check the filesystem, discover artifacts, recover, fetch, generate, refresh, or execute anything.",
+        "local, deterministic, read-only, report-only, and non-executing",
+    ):
+        assert expected in rendered
 
 
 def test_static_artifact_reference_section_uses_no_runtime_discovery_terms():
@@ -110,10 +140,13 @@ def test_static_artifact_reference_section_uses_no_runtime_discovery_terms():
     forbidden_terms = (
         "glob(",
         ".glob",
+        "rglob",
         "os.walk",
+        "os.path.exists",
         "scandir",
         "Path.exists",
         ".exists(",
+        "iterdir",
         "requests",
         "urlopen",
         "fetch(",
@@ -133,10 +166,14 @@ def test_committed_static_html_shell_can_be_read_locally():
     assert "Report summary placeholder" in html
     assert "Artifact status placeholder" in html
     assert "Static artifact references" in html
+    assert "Static empty-state messaging" in html
+    assert "Static missing-artifact messaging" in html
     assert "static artifact reference" in html
     assert "report reference" in html
     assert "optional or missing local artifact reference" in html
     assert "reports/report_index.html" in html
+    assert "No usable artifact reference in static context" in html
+    assert "Optional local artifact may be absent" in html
     assert "<script" not in html.lower()
 
 

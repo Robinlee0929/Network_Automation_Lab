@@ -54,6 +54,23 @@
         </ul>
       </section>
       <section>
+        <div class="status">STATIC_EMPTY_STATE</div>
+        <h2>Static empty-state messaging</h2>
+        <p>Empty-state messages are deterministic dashboard copy derived only from the static dashboard model.</p>
+        <ul>
+          <li><strong>STATIC_EMPTY_STATE_MESSAGE_ONLY</strong>: No usable artifact reference in static context. If static dashboard content has no usable artifact reference, the dashboard reports that state as committed copy only. No live scan, runtime artifact discovery, fetch, generation, recovery, or execution is attempted.</li>
+          <li><strong>STATIC_REPORT_ONLY</strong>: Static report-only dashboard state. The empty state remains local, deterministic, read-only, report-only, and non-executing; it does not inspect local files or infer runtime artifact availability.</li>
+        </ul>
+      </section>
+      <section>
+        <div class="status">STATIC_MISSING_ARTIFACT</div>
+        <h2>Static missing-artifact messaging</h2>
+        <p>Missing-artifact messages are static report-only notices. They do not perform live scans, runtime discovery, fetching, recovery, generation, or execution.</p>
+        <ul>
+          <li><strong>STATIC_MISSING_ARTIFACT_MESSAGE_ONLY</strong>: Optional local artifact may be absent. <code>reports/report_index.html</code> (Optional local report-index output). The optional report-index reference is marked by static dashboard context only. The dashboard does not check the filesystem, discover artifacts, recover, fetch, generate, refresh, or execute anything.</li>
+        </ul>
+      </section>
+      <section>
         <div class="status">NO_LIVE_DATA</div>
         <h2>Empty state</h2>
         <p>No live data source is attached. The dashboard shell is ready for static review only.</p>
