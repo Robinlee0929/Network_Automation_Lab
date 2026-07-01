@@ -88,7 +88,7 @@ def test_static_artifact_references_are_hard_coded_and_local_only():
         "static artifact reference",
         "report reference",
         "report reference",
-        "optional or missing local artifact reference",
+        "optional local artifact reference",
     )
     assert tuple(reference["path"] for reference in references) == (
         "docs/phase_2h/phase_2h_06_evidence_report_dashboard_static_shell.html",
@@ -170,7 +170,7 @@ def test_committed_static_html_shell_can_be_read_locally():
     assert "Static missing-artifact messaging" in html
     assert "static artifact reference" in html
     assert "report reference" in html
-    assert "optional or missing local artifact reference" in html
+    assert "optional local artifact reference" in html
     assert "reports/report_index.html" in html
     assert "No usable artifact reference in static context" in html
     assert "Optional local artifact may be absent" in html

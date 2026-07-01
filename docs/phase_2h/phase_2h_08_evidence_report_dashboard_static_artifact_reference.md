@@ -28,7 +28,7 @@ Hard-coded references:
 | static artifact reference | Committed dashboard static shell HTML | `docs/phase_2h/phase_2h_06_evidence_report_dashboard_static_shell.html` | STATIC_COMMITTED |
 | report reference | Phase 2H-06 implementation report | `docs/phase_2h/phase_2h_06_evidence_report_dashboard_static_shell.md` | REPORT_REFERENCE |
 | report reference | Phase 2H-07 acceptance review | `docs/phase_2h/phase_2h_07_evidence_report_dashboard_static_shell_acceptance_review_planning_only.md` | REPORT_REFERENCE |
-| optional or missing local artifact reference | Optional local report-index output | `reports/report_index.html` | OPTIONAL_LOCAL_ARTIFACT_STATIC_REFERENCE_ONLY |
+| optional local artifact reference | Optional local report-index output | `reports/report_index.html` | OPTIONAL_LOCAL_ARTIFACT_STATIC_REFERENCE_ONLY |
 
 The optional local report-index path is static dashboard content only. The dashboard does not check whether it exists, generate it, refresh it, scan for it, or inspect the filesystem at runtime.
 

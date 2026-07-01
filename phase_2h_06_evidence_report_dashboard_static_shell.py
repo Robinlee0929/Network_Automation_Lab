@@ -79,7 +79,7 @@ STATIC_ARTIFACT_REFERENCES = (
         "note": "Hard-coded repository-local acceptance review reference.",
     },
     {
-        "kind": "optional or missing local artifact reference",
+        "kind": "optional local artifact reference",
         "label": "Optional local report-index output",
         "path": "reports/report_index.html",
         "status": "OPTIONAL_LOCAL_ARTIFACT_STATIC_REFERENCE_ONLY",
