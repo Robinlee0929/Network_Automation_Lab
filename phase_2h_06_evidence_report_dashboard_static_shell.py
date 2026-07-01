@@ -40,14 +40,52 @@ BOUNDARY_NOTICE = (
 )
 
 EXPECTED_SECTION_TITLES = (
+    "Boundary notice",
+    "Empty state",
     "Evidence summary placeholder",
     "Report summary placeholder",
     "Artifact status placeholder",
     "Static artifact references",
     "Static empty-state messaging",
     "Static missing-artifact messaging",
-    "Empty state",
-    "Boundary notice",
+)
+
+EXPECTED_SECTION_GROUPS = (
+    {
+        "id": "reviewer-orientation",
+        "title": "Reviewer orientation",
+        "description": (
+            "Start with the locked safety boundary and no-live-data state so "
+            "reviewers know the dashboard is passive before reading evidence."
+        ),
+        "section_ids": ("boundary-notice", "empty-state"),
+    },
+    {
+        "id": "static-evidence-and-reports",
+        "title": "Static evidence and report references",
+        "description": (
+            "Then show the passive evidence and report placeholders before the "
+            "hard-coded repository-local artifact references."
+        ),
+        "section_ids": (
+            "evidence-summary",
+            "report-summary",
+            "artifact-status",
+            "static-artifact-references",
+        ),
+    },
+    {
+        "id": "static-state-messaging",
+        "title": "Static state messaging",
+        "description": (
+            "Close with committed empty-state and missing-artifact copy that "
+            "explains optional local artifacts without probing the filesystem."
+        ),
+        "section_ids": (
+            "static-empty-state-messaging",
+            "static-missing-artifact-messaging",
+        ),
+    },
 )
 
 STATIC_ARTIFACT_REFERENCES = (
@@ -152,6 +190,18 @@ def build_dashboard_shell_model() -> Dict[str, Any]:
 
     sections = (
         {
+            "id": "boundary-notice",
+            "title": "Boundary notice",
+            "status": "LOCKED",
+            "body": BOUNDARY_NOTICE,
+        },
+        {
+            "id": "empty-state",
+            "title": "Empty state",
+            "status": "NO_LIVE_DATA",
+            "body": "No live data source is attached. The dashboard shell is ready for static review only.",
+        },
+        {
             "id": "evidence-summary",
             "title": "Evidence summary placeholder",
             "status": "EMPTY_STATE",
@@ -201,18 +251,6 @@ def build_dashboard_shell_model() -> Dict[str, Any]:
             ),
             "messages": STATIC_MISSING_ARTIFACT_MESSAGES,
         },
-        {
-            "id": "empty-state",
-            "title": "Empty state",
-            "status": "NO_LIVE_DATA",
-            "body": "No live data source is attached. The dashboard shell is ready for static review only.",
-        },
-        {
-            "id": "boundary-notice",
-            "title": "Boundary notice",
-            "status": "LOCKED",
-            "body": BOUNDARY_NOTICE,
-        },
     )
     model: Dict[str, Any] = {
         "phase": PHASE,
@@ -233,6 +271,7 @@ def build_dashboard_shell_model() -> Dict[str, Any]:
         "static_empty_state_messages": STATIC_EMPTY_STATE_MESSAGES,
         "static_missing_artifact_messages": STATIC_MISSING_ARTIFACT_MESSAGES,
         "sections": sections,
+        "section_groups": EXPECTED_SECTION_GROUPS,
         "boundary_notice": BOUNDARY_NOTICE,
         "forbidden_scope_status": dict(FORBIDDEN_SCOPE_STATUS),
     }
@@ -279,9 +318,25 @@ def validate_dashboard_shell_model(model: Mapping[str, Any]) -> Dict[str, Any]:
         errors.append("SECTIONS_NOT_SEQUENCE")
         sections = ()
     section_titles = tuple(section.get("title") for section in sections if isinstance(section, Mapping))
+    if section_titles != EXPECTED_SECTION_TITLES:
+        errors.append("SECTION_ORDER_MISMATCH")
     for expected in EXPECTED_SECTION_TITLES:
         if expected not in section_titles:
             errors.append(f"EXPECTED_SECTION_MISSING:{expected}")
+
+    section_groups = model.get("section_groups", ())
+    if tuple(section_groups) != EXPECTED_SECTION_GROUPS:
+        errors.append("SECTION_GROUPS_MISMATCH")
+        section_groups = ()
+    section_ids = tuple(section.get("id") for section in sections if isinstance(section, Mapping))
+    grouped_section_ids = tuple(
+        section_id
+        for group in section_groups
+        if isinstance(group, Mapping)
+        for section_id in group.get("section_ids", ())
+    )
+    if grouped_section_ids != section_ids:
+        errors.append("SECTION_GROUP_ORDER_MISMATCH")
 
     if model.get("boundary_notice") != BOUNDARY_NOTICE:
         errors.append("BOUNDARY_NOTICE_MISMATCH")
@@ -317,7 +372,10 @@ def render_dashboard_shell_html(model: Mapping[str, Any] | None = None) -> str:
     if not validation["valid"]:
         raise ValueError(";".join(validation["errors"]))
 
-    sections = "\n".join(_render_section(section) for section in shell_model["sections"])
+    groups = "\n".join(
+        _render_section_group(group, shell_model["sections"])
+        for group in shell_model["section_groups"]
+    )
     return (
         "<!doctype html>\n"
         "<html lang=\"en\">\n"
@@ -330,9 +388,12 @@ def render_dashboard_shell_html(model: Mapping[str, Any] | None = None) -> str:
         "    header { border-bottom: 2px solid #d6dee8; margin-bottom: 24px; padding-bottom: 18px; }\n"
         "    h1 { font-size: 30px; margin: 0 0 10px; }\n"
         "    .notice { background: #fff7d6; border: 1px solid #d9ba45; padding: 14px; margin: 18px 0; }\n"
-        "    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }\n"
+        "    .section-group { margin: 0 0 18px; }\n"
+        "    .section-group > h2 { font-size: 20px; margin: 0 0 6px; }\n"
+        "    .section-group-intro { margin: 0 0 12px; color: #52616f; }\n"
+        "    .group-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }\n"
         "    section { background: #ffffff; border: 1px solid #d6dee8; padding: 16px; }\n"
-        "    h2 { font-size: 18px; margin: 0 0 8px; }\n"
+        "    h3 { font-size: 18px; margin: 0 0 8px; }\n"
         "    .status { font-size: 12px; font-weight: bold; letter-spacing: .04em; color: #375a7f; }\n"
         "    p { line-height: 1.45; }\n"
         "    ul { padding-left: 20px; margin: 12px 0 0; }\n"
@@ -347,9 +408,7 @@ def render_dashboard_shell_html(model: Mapping[str, Any] | None = None) -> str:
         "      <p>Static local dashboard shell for reviewer-visible evidence and report orientation.</p>\n"
         f"      <div class=\"notice\">{escape(str(shell_model['boundary_notice']))}</div>\n"
         "    </header>\n"
-        "    <div class=\"grid\">\n"
-        f"{sections}\n"
-        "    </div>\n"
+        f"{groups}\n"
         "  </main>\n"
         "</body>\n"
         "</html>\n"
@@ -377,6 +436,7 @@ def build_phase_2h_06_dashboard_shell_summary() -> Dict[str, Any]:
         "static_empty_state_messages": STATIC_EMPTY_STATE_MESSAGES,
         "static_missing_artifact_messages": STATIC_MISSING_ARTIFACT_MESSAGES,
         "section_titles": tuple(section["title"] for section in model["sections"]),
+        "section_groups": EXPECTED_SECTION_GROUPS,
         "boundary_notice": BOUNDARY_NOTICE,
         "html_length": len(html),
         "validation": validate_dashboard_shell_model(model),
@@ -404,11 +464,27 @@ def _render_section(section: Mapping[str, Any]) -> str:
     return (
         "      <section>\n"
         f"        <div class=\"status\">{escape(str(section['status']))}</div>\n"
-        f"        <h2>{escape(str(section['title']))}</h2>\n"
+        f"        <h3>{escape(str(section['title']))}</h3>\n"
         f"        <p>{escape(str(section['body']))}</p>\n"
         f"{reference_html}\n"
         f"{message_html}\n"
         "      </section>"
+    )
+
+
+def _render_section_group(group: Mapping[str, Any], sections: Sequence[Mapping[str, Any]]) -> str:
+    section_by_id = {section["id"]: section for section in sections}
+    grouped_sections = "\n".join(
+        _render_section(section_by_id[section_id]) for section_id in group["section_ids"]
+    )
+    return (
+        "    <div class=\"section-group\">\n"
+        f"      <h2>{escape(str(group['title']))}</h2>\n"
+        f"      <p class=\"section-group-intro\">{escape(str(group['description']))}</p>\n"
+        "      <div class=\"group-grid\">\n"
+        f"{grouped_sections}\n"
+        "      </div>\n"
+        "    </div>"
     )
 
 

@@ -9,9 +9,12 @@
     header { border-bottom: 2px solid #d6dee8; margin-bottom: 24px; padding-bottom: 18px; }
     h1 { font-size: 30px; margin: 0 0 10px; }
     .notice { background: #fff7d6; border: 1px solid #d9ba45; padding: 14px; margin: 18px 0; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+    .section-group { margin: 0 0 18px; }
+    .section-group > h2 { font-size: 20px; margin: 0 0 6px; }
+    .section-group-intro { margin: 0 0 12px; color: #52616f; }
+    .group-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
     section { background: #ffffff; border: 1px solid #d6dee8; padding: 16px; }
-    h2 { font-size: 18px; margin: 0 0 8px; }
+    h3 { font-size: 18px; margin: 0 0 8px; }
     .status { font-size: 12px; font-weight: bold; letter-spacing: .04em; color: #375a7f; }
     p { line-height: 1.45; }
     ul { padding-left: 20px; margin: 12px 0 0; }
@@ -26,25 +29,44 @@
       <p>Static local dashboard shell for reviewer-visible evidence and report orientation.</p>
       <div class="notice">Static/read-only/no execution boundary: this dashboard shell is local, deterministic, and non-executing. It connects to no live data source, runner, adapter, execution system, provider, API, model, secret store, SSH, NETCONF, or RESTCONF.</div>
     </header>
-    <div class="grid">
+    <div class="section-group">
+      <h2>Reviewer orientation</h2>
+      <p class="section-group-intro">Start with the locked safety boundary and no-live-data state so reviewers know the dashboard is passive before reading evidence.</p>
+      <div class="group-grid">
+      <section>
+        <div class="status">LOCKED</div>
+        <h3>Boundary notice</h3>
+        <p>Static/read-only/no execution boundary: this dashboard shell is local, deterministic, and non-executing. It connects to no live data source, runner, adapter, execution system, provider, API, model, secret store, SSH, NETCONF, or RESTCONF.</p>
+      </section>
+      <section>
+        <div class="status">NO_LIVE_DATA</div>
+        <h3>Empty state</h3>
+        <p>No live data source is attached. The dashboard shell is ready for static review only.</p>
+      </section>
+      </div>
+    </div>
+    <div class="section-group">
+      <h2>Static evidence and report references</h2>
+      <p class="section-group-intro">Then show the passive evidence and report placeholders before the hard-coded repository-local artifact references.</p>
+      <div class="group-grid">
       <section>
         <div class="status">EMPTY_STATE</div>
-        <h2>Evidence summary placeholder</h2>
+        <h3>Evidence summary placeholder</h3>
         <p>No live evidence is connected. Static evidence links may be added only as committed local references in a later authorized slice.</p>
       </section>
       <section>
         <div class="status">EMPTY_STATE</div>
-        <h2>Report summary placeholder</h2>
+        <h3>Report summary placeholder</h3>
         <p>No report refresh is performed. This shell is a passive reviewer navigation surface only.</p>
       </section>
       <section>
         <div class="status">REVIEW_ONLY</div>
-        <h2>Artifact status placeholder</h2>
+        <h3>Artifact status placeholder</h3>
         <p>Artifact status is reserved for local deterministic committed evidence references, not runtime collection.</p>
       </section>
       <section>
         <div class="status">REVIEW_ONLY</div>
-        <h2>Static artifact references</h2>
+        <h3>Static artifact references</h3>
         <p>Hard-coded repository-local references only. These entries are static dashboard content and perform no scan, fetch, discovery, or runtime existence check.</p>
         <ul>
           <li><strong>static artifact reference</strong>: Committed dashboard static shell HTML - <code>docs/phase_2h/phase_2h_06_evidence_report_dashboard_static_shell.html</code> (STATIC_COMMITTED). Hard-coded repository-local dashboard artifact reference.</li>
@@ -53,9 +75,15 @@
           <li><strong>optional local artifact reference</strong>: Optional local report-index output - <code>reports/report_index.html</code> (OPTIONAL_LOCAL_ARTIFACT_STATIC_REFERENCE_ONLY). Static path label only; the dashboard performs no runtime existence check and does not generate or refresh this artifact.</li>
         </ul>
       </section>
+      </div>
+    </div>
+    <div class="section-group">
+      <h2>Static state messaging</h2>
+      <p class="section-group-intro">Close with committed empty-state and missing-artifact copy that explains optional local artifacts without probing the filesystem.</p>
+      <div class="group-grid">
       <section>
         <div class="status">STATIC_EMPTY_STATE</div>
-        <h2>Static empty-state messaging</h2>
+        <h3>Static empty-state messaging</h3>
         <p>Empty-state messages are deterministic dashboard copy derived only from the static dashboard model.</p>
         <ul>
           <li><strong>STATIC_EMPTY_STATE_MESSAGE_ONLY</strong>: No usable artifact reference in static context. If static dashboard content has no usable artifact reference, the dashboard reports that state as committed copy only. No live scan, runtime artifact discovery, fetch, generation, recovery, or execution is attempted.</li>
@@ -64,22 +92,13 @@
       </section>
       <section>
         <div class="status">STATIC_MISSING_ARTIFACT</div>
-        <h2>Static missing-artifact messaging</h2>
+        <h3>Static missing-artifact messaging</h3>
         <p>Missing-artifact messages are static report-only notices. They do not perform live scans, runtime discovery, fetching, recovery, generation, or execution.</p>
         <ul>
           <li><strong>STATIC_MISSING_ARTIFACT_MESSAGE_ONLY</strong>: Optional local artifact may be absent. <code>reports/report_index.html</code> (Optional local report-index output). The optional report-index reference is marked by static dashboard context only. The dashboard does not check the filesystem, discover artifacts, recover, fetch, generate, refresh, or execute anything.</li>
         </ul>
       </section>
-      <section>
-        <div class="status">NO_LIVE_DATA</div>
-        <h2>Empty state</h2>
-        <p>No live data source is attached. The dashboard shell is ready for static review only.</p>
-      </section>
-      <section>
-        <div class="status">LOCKED</div>
-        <h2>Boundary notice</h2>
-        <p>Static/read-only/no execution boundary: this dashboard shell is local, deterministic, and non-executing. It connects to no live data source, runner, adapter, execution system, provider, API, model, secret store, SSH, NETCONF, or RESTCONF.</p>
-      </section>
+      </div>
     </div>
   </main>
 </body>

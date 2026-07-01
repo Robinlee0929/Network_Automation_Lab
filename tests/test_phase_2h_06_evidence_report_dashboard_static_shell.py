@@ -55,19 +55,32 @@ def test_dashboard_shell_model_is_static_local_and_deterministic():
     assert first["non_executing"] is True
     assert first["requires_external_dependencies"] is False
     assert first["external_dependency_names"] == ()
+    assert first["section_groups"] == phase_2h_06.EXPECTED_SECTION_GROUPS
     assert first["validation"]["valid"] is True
 
 
-def test_dashboard_shell_contains_expected_static_sections_and_boundary_notice():
+def test_dashboard_shell_contains_expected_static_section_order_groups_and_boundary_notice():
     model = phase_2h_06.build_dashboard_shell_model()
     section_titles = tuple(section["title"] for section in model["sections"])
 
-    for expected in phase_2h_06.EXPECTED_SECTION_TITLES:
-        assert expected in section_titles
+    assert section_titles == phase_2h_06.EXPECTED_SECTION_TITLES
+    assert tuple(group["title"] for group in model["section_groups"]) == (
+        "Reviewer orientation",
+        "Static evidence and report references",
+        "Static state messaging",
+    )
+    assert tuple(
+        section_id
+        for group in model["section_groups"]
+        for section_id in group["section_ids"]
+    ) == tuple(section["id"] for section in model["sections"])
     assert phase_2h_06.BOUNDARY_NOTICE in model["boundary_notice"]
 
     html = phase_2h_06.render_dashboard_shell_html(model)
     assert "<h1>Phase 2H-06 Evidence / Report Dashboard Static Shell</h1>" in html
+    assert html.index("Reviewer orientation") < html.index("Static evidence and report references")
+    assert html.index("Static evidence and report references") < html.index("Static state messaging")
+    assert html.index("Boundary notice") < html.index("Evidence summary placeholder")
     assert "Evidence summary placeholder" in html
     assert "Report summary placeholder" in html
     assert "Artifact status placeholder" in html
@@ -181,6 +194,8 @@ def test_no_live_connector_runner_adapter_or_execution_integration_is_required()
     summary = phase_2h_06.build_phase_2h_06_dashboard_shell_summary()
     validation = summary["validation"]
 
+    assert summary["section_titles"] == phase_2h_06.EXPECTED_SECTION_TITLES
+    assert summary["section_groups"] == phase_2h_06.EXPECTED_SECTION_GROUPS
     assert validation["valid"] is True
     assert validation["live_connector_required"] is False
     assert validation["runner_required"] is False
@@ -218,3 +233,25 @@ def test_render_rejects_invalid_model_without_reaching_execution_path():
 
     with pytest.raises(ValueError):
         phase_2h_06.render_dashboard_shell_html(model)
+
+
+def test_dashboard_shell_validation_rejects_tampered_section_grouping():
+    model = phase_2h_06.build_dashboard_shell_model()
+    tampered = deepcopy(model)
+    tampered["section_groups"] = (
+        {
+            "id": "static-state-messaging",
+            "title": "Static state messaging",
+            "description": "Tampered group order.",
+            "section_ids": (
+                "static-empty-state-messaging",
+                "static-missing-artifact-messaging",
+            ),
+        },
+    )
+
+    validation = phase_2h_06.validate_dashboard_shell_model(tampered)
+
+    assert validation["valid"] is False
+    assert "SECTION_GROUPS_MISMATCH" in validation["errors"]
+    assert "SECTION_GROUP_ORDER_MISMATCH" in validation["errors"]
