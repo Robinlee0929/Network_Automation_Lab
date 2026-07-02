@@ -116,6 +116,9 @@ def test_static_artifact_references_are_hard_coded_and_local_only():
         assert "*" not in path
         assert "?" not in path
     assert references[-1]["availability"] == "STATIC_OPTIONAL_OR_MISSING_MESSAGE_ONLY"
+    for reference in references:
+        assert reference["status_explanation"]
+        assert reference["availability_explanation"]
 
 
 def test_static_empty_state_and_missing_artifact_messages_are_deterministic_copy_only():
@@ -143,6 +146,49 @@ def test_static_empty_state_and_missing_artifact_messages_are_deterministic_copy
         "local, deterministic, read-only, report-only, and non-executing",
     ):
         assert expected in rendered
+
+
+def test_static_status_and_availability_labels_have_reviewer_explanations():
+    model = phase_2h_06.build_dashboard_shell_model()
+    rendered = phase_2h_06.render_dashboard_shell_html(model)
+
+    assert model["static_label_explanation_groups"] == (
+        phase_2h_06.STATIC_LABEL_EXPLANATION_GROUPS
+    )
+    for section in model["sections"]:
+        assert section["status"] in phase_2h_06.STATIC_SECTION_STATUS_EXPLANATIONS
+        assert (
+            section["status_explanation"]
+            == phase_2h_06.STATIC_SECTION_STATUS_EXPLANATIONS[section["status"]]
+        )
+    for reference in model["artifact_references"]:
+        assert (
+            reference["status_explanation"]
+            == phase_2h_06.STATIC_ARTIFACT_REFERENCE_STATUS_EXPLANATIONS[
+                reference["status"]
+            ]
+        )
+        assert (
+            reference["availability_explanation"]
+            == phase_2h_06.STATIC_ARTIFACT_AVAILABILITY_EXPLANATIONS[
+                reference["availability"]
+            ]
+        )
+    for message in (
+        *model["static_empty_state_messages"],
+        *model["static_missing_artifact_messages"],
+    ):
+        assert (
+            message["status_explanation"]
+            == phase_2h_06.STATIC_MESSAGE_STATUS_EXPLANATIONS[message["status"]]
+        )
+
+    assert "Status label:" in rendered
+    assert "Availability label:" in rendered
+    assert "STATIC_REFERENCE_AVAILABLE" in rendered
+    assert "STATIC_OPTIONAL_OR_MISSING_MESSAGE_ONLY" in rendered
+    assert "availability is a committed static declaration" in rendered
+    assert "message-only static copy" in rendered
 
 
 def test_static_artifact_reference_section_uses_no_runtime_discovery_terms():

@@ -16,6 +16,9 @@
     section { background: #ffffff; border: 1px solid #d6dee8; padding: 16px; }
     h3 { font-size: 18px; margin: 0 0 8px; }
     .status { font-size: 12px; font-weight: bold; letter-spacing: .04em; color: #375a7f; }
+    .label-explanation { font-size: 13px; margin: 6px 0 10px; color: #465562; }
+    .label-explanation strong { color: #17202a; }
+    .reference-labels { display: block; margin-top: 4px; color: #465562; }
     p { line-height: 1.45; }
     ul { padding-left: 20px; margin: 12px 0 0; }
     li { margin: 0 0 10px; line-height: 1.4; }
@@ -35,13 +38,19 @@
       <div class="group-grid">
       <section>
         <div class="status">LOCKED</div>
+        <p class="label-explanation"><strong>Status label:</strong> the committed safety boundary is closed to live execution and remains static reviewer copy only.</p>
         <h3>Boundary notice</h3>
         <p>Static/read-only/no execution boundary: this dashboard shell is local, deterministic, and non-executing. It connects to no live data source, runner, adapter, execution system, provider, API, model, secret store, SSH, NETCONF, or RESTCONF.</p>
+
+
       </section>
       <section>
         <div class="status">NO_LIVE_DATA</div>
+        <p class="label-explanation"><strong>Status label:</strong> no live data source is attached and no runtime collection is attempted.</p>
         <h3>Empty state</h3>
         <p>No live data source is attached. The dashboard shell is ready for static review only.</p>
+
+
       </section>
       </div>
     </div>
@@ -51,29 +60,41 @@
       <div class="group-grid">
       <section>
         <div class="status">EMPTY_STATE</div>
+        <p class="label-explanation"><strong>Status label:</strong> the section is an intentional static placeholder, not a failed lookup.</p>
         <h3>Evidence summary placeholder</h3>
         <p>No live evidence is connected. Static evidence links may be added only as committed local references in a later authorized slice.</p>
+
+
       </section>
       <section>
         <div class="status">EMPTY_STATE</div>
+        <p class="label-explanation"><strong>Status label:</strong> the section is an intentional static placeholder, not a failed lookup.</p>
         <h3>Report summary placeholder</h3>
         <p>No report refresh is performed. This shell is a passive reviewer navigation surface only.</p>
+
+
       </section>
       <section>
         <div class="status">REVIEW_ONLY</div>
+        <p class="label-explanation"><strong>Status label:</strong> the section is for reviewer orientation and does not trigger execution.</p>
         <h3>Artifact status placeholder</h3>
         <p>Artifact status is reserved for local deterministic committed evidence references, not runtime collection.</p>
+
+
       </section>
       <section>
         <div class="status">REVIEW_ONLY</div>
+        <p class="label-explanation"><strong>Status label:</strong> the section is for reviewer orientation and does not trigger execution.</p>
         <h3>Static artifact references</h3>
         <p>Hard-coded repository-local references only. These entries are static dashboard content and perform no scan, fetch, discovery, or runtime existence check.</p>
+
         <ul>
-          <li><strong>static artifact reference</strong>: Committed dashboard static shell HTML - <code>docs/phase_2h/phase_2h_06_evidence_report_dashboard_static_shell.html</code> (STATIC_COMMITTED). Hard-coded repository-local dashboard artifact reference.</li>
-          <li><strong>report reference</strong>: Phase 2H-06 implementation report - <code>docs/phase_2h/phase_2h_06_evidence_report_dashboard_static_shell.md</code> (REPORT_REFERENCE). Hard-coded repository-local implementation report reference.</li>
-          <li><strong>report reference</strong>: Phase 2H-07 acceptance review - <code>docs/phase_2h/phase_2h_07_evidence_report_dashboard_static_shell_acceptance_review_planning_only.md</code> (REPORT_REFERENCE). Hard-coded repository-local acceptance review reference.</li>
-          <li><strong>optional local artifact reference</strong>: Optional local report-index output - <code>reports/report_index.html</code> (OPTIONAL_LOCAL_ARTIFACT_STATIC_REFERENCE_ONLY). Static path label only; the dashboard performs no runtime existence check and does not generate or refresh this artifact.</li>
+          <li><strong>static artifact reference</strong>: Committed dashboard static shell HTML - <code>docs/phase_2h/phase_2h_06_evidence_report_dashboard_static_shell.html</code> (STATIC_COMMITTED). <span class="reference-labels"><strong>Status label:</strong> the referenced artifact is committed static reviewer evidence. <strong>Availability label:</strong> STATIC_REFERENCE_AVAILABLE: availability is a committed static declaration, not a live filesystem check.</span> Hard-coded repository-local dashboard artifact reference.</li>
+          <li><strong>report reference</strong>: Phase 2H-06 implementation report - <code>docs/phase_2h/phase_2h_06_evidence_report_dashboard_static_shell.md</code> (REPORT_REFERENCE). <span class="reference-labels"><strong>Status label:</strong> the referenced path points to a committed static report or review artifact. <strong>Availability label:</strong> STATIC_REFERENCE_AVAILABLE: availability is a committed static declaration, not a live filesystem check.</span> Hard-coded repository-local implementation report reference.</li>
+          <li><strong>report reference</strong>: Phase 2H-07 acceptance review - <code>docs/phase_2h/phase_2h_07_evidence_report_dashboard_static_shell_acceptance_review_planning_only.md</code> (REPORT_REFERENCE). <span class="reference-labels"><strong>Status label:</strong> the referenced path points to a committed static report or review artifact. <strong>Availability label:</strong> STATIC_REFERENCE_AVAILABLE: availability is a committed static declaration, not a live filesystem check.</span> Hard-coded repository-local acceptance review reference.</li>
+          <li><strong>optional local artifact reference</strong>: Optional local report-index output - <code>reports/report_index.html</code> (OPTIONAL_LOCAL_ARTIFACT_STATIC_REFERENCE_ONLY). <span class="reference-labels"><strong>Status label:</strong> the path is a static label for an optional local artifact and is not checked at runtime. <strong>Availability label:</strong> STATIC_OPTIONAL_OR_MISSING_MESSAGE_ONLY: availability is message-only static copy; the optional artifact may be absent without probing, recovery, refresh, or execution.</span> Static path label only; the dashboard performs no runtime existence check and does not generate or refresh this artifact.</li>
         </ul>
+
       </section>
       </div>
     </div>
@@ -83,19 +104,25 @@
       <div class="group-grid">
       <section>
         <div class="status">STATIC_EMPTY_STATE</div>
+        <p class="label-explanation"><strong>Status label:</strong> the empty-state content is committed dashboard copy from the static model.</p>
         <h3>Static empty-state messaging</h3>
         <p>Empty-state messages are deterministic dashboard copy derived only from the static dashboard model.</p>
+
+
         <ul>
-          <li><strong>STATIC_EMPTY_STATE_MESSAGE_ONLY</strong>: No usable artifact reference in static context. If static dashboard content has no usable artifact reference, the dashboard reports that state as committed copy only. No live scan, runtime artifact discovery, fetch, generation, recovery, or execution is attempted.</li>
-          <li><strong>STATIC_REPORT_ONLY</strong>: Static report-only dashboard state. The empty state remains local, deterministic, read-only, report-only, and non-executing; it does not inspect local files or infer runtime artifact availability.</li>
+          <li><strong>STATIC_EMPTY_STATE_MESSAGE_ONLY</strong>: <span class="reference-labels"><strong>Status label:</strong> the message explains a static empty state only and does not inspect files.</span> No usable artifact reference in static context. If static dashboard content has no usable artifact reference, the dashboard reports that state as committed copy only. No live scan, runtime artifact discovery, fetch, generation, recovery, or execution is attempted.</li>
+          <li><strong>STATIC_REPORT_ONLY</strong>: <span class="reference-labels"><strong>Status label:</strong> the message keeps the dashboard local, deterministic, read-only, and report-only.</span> Static report-only dashboard state. The empty state remains local, deterministic, read-only, report-only, and non-executing; it does not inspect local files or infer runtime artifact availability.</li>
         </ul>
       </section>
       <section>
         <div class="status">STATIC_MISSING_ARTIFACT</div>
+        <p class="label-explanation"><strong>Status label:</strong> the missing-artifact content is a static notice and performs no filesystem probe.</p>
         <h3>Static missing-artifact messaging</h3>
         <p>Missing-artifact messages are static report-only notices. They do not perform live scans, runtime discovery, fetching, recovery, generation, or execution.</p>
+
+
         <ul>
-          <li><strong>STATIC_MISSING_ARTIFACT_MESSAGE_ONLY</strong>: Optional local artifact may be absent. <code>reports/report_index.html</code> (Optional local report-index output). The optional report-index reference is marked by static dashboard context only. The dashboard does not check the filesystem, discover artifacts, recover, fetch, generate, refresh, or execute anything.</li>
+          <li><strong>STATIC_MISSING_ARTIFACT_MESSAGE_ONLY</strong>: <span class="reference-labels"><strong>Status label:</strong> the message describes an optional missing artifact without checking for it.</span> Optional local artifact may be absent. <code>reports/report_index.html</code> (Optional local report-index output). The optional report-index reference is marked by static dashboard context only. The dashboard does not check the filesystem, discover artifacts, recover, fetch, generate, refresh, or execute anything.</li>
         </ul>
       </section>
       </div>

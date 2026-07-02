@@ -88,13 +88,85 @@ EXPECTED_SECTION_GROUPS = (
     },
 )
 
+STATIC_SECTION_STATUS_EXPLANATIONS = {
+    "LOCKED": (
+        "the committed safety boundary is closed to live execution and remains "
+        "static reviewer copy only."
+    ),
+    "NO_LIVE_DATA": (
+        "no live data source is attached and no runtime collection is attempted."
+    ),
+    "EMPTY_STATE": (
+        "the section is an intentional static placeholder, not a failed lookup."
+    ),
+    "REVIEW_ONLY": (
+        "the section is for reviewer orientation and does not trigger execution."
+    ),
+    "STATIC_EMPTY_STATE": (
+        "the empty-state content is committed dashboard copy from the static model."
+    ),
+    "STATIC_MISSING_ARTIFACT": (
+        "the missing-artifact content is a static notice and performs no filesystem "
+        "probe."
+    ),
+}
+
+STATIC_ARTIFACT_REFERENCE_STATUS_EXPLANATIONS = {
+    "STATIC_COMMITTED": (
+        "the referenced artifact is committed static reviewer evidence."
+    ),
+    "REPORT_REFERENCE": (
+        "the referenced path points to a committed static report or review artifact."
+    ),
+    "OPTIONAL_LOCAL_ARTIFACT_STATIC_REFERENCE_ONLY": (
+        "the path is a static label for an optional local artifact and is not checked "
+        "at runtime."
+    ),
+}
+
+STATIC_ARTIFACT_AVAILABILITY_EXPLANATIONS = {
+    "STATIC_REFERENCE_AVAILABLE": (
+        "availability is a committed static declaration, not a live filesystem check."
+    ),
+    "STATIC_OPTIONAL_OR_MISSING_MESSAGE_ONLY": (
+        "availability is message-only static copy; the optional artifact may be "
+        "absent without probing, recovery, refresh, or execution."
+    ),
+}
+
+STATIC_MESSAGE_STATUS_EXPLANATIONS = {
+    "STATIC_EMPTY_STATE_MESSAGE_ONLY": (
+        "the message explains a static empty state only and does not inspect files."
+    ),
+    "STATIC_REPORT_ONLY": (
+        "the message keeps the dashboard local, deterministic, read-only, and "
+        "report-only."
+    ),
+    "STATIC_MISSING_ARTIFACT_MESSAGE_ONLY": (
+        "the message describes an optional missing artifact without checking for it."
+    ),
+}
+
+STATIC_LABEL_EXPLANATION_GROUPS = {
+    "section_status_labels": STATIC_SECTION_STATUS_EXPLANATIONS,
+    "artifact_reference_status_labels": STATIC_ARTIFACT_REFERENCE_STATUS_EXPLANATIONS,
+    "artifact_availability_labels": STATIC_ARTIFACT_AVAILABILITY_EXPLANATIONS,
+    "message_status_labels": STATIC_MESSAGE_STATUS_EXPLANATIONS,
+}
+
 STATIC_ARTIFACT_REFERENCES = (
     {
         "kind": "static artifact reference",
         "label": "Committed dashboard static shell HTML",
         "path": HTML_PATH,
         "status": "STATIC_COMMITTED",
+        "status_explanation": STATIC_ARTIFACT_REFERENCE_STATUS_EXPLANATIONS[
+            "STATIC_COMMITTED"
+        ],
         "availability": "STATIC_REFERENCE_AVAILABLE",
+        "availability_explanation": STATIC_ARTIFACT_AVAILABILITY_EXPLANATIONS[
+            "STATIC_REFERENCE_AVAILABLE"
+        ],
         "note": "Hard-coded repository-local dashboard artifact reference.",
     },
     {
@@ -102,7 +174,13 @@ STATIC_ARTIFACT_REFERENCES = (
         "label": "Phase 2H-06 implementation report",
         "path": DOC_PATH,
         "status": "REPORT_REFERENCE",
+        "status_explanation": STATIC_ARTIFACT_REFERENCE_STATUS_EXPLANATIONS[
+            "REPORT_REFERENCE"
+        ],
         "availability": "STATIC_REFERENCE_AVAILABLE",
+        "availability_explanation": STATIC_ARTIFACT_AVAILABILITY_EXPLANATIONS[
+            "STATIC_REFERENCE_AVAILABLE"
+        ],
         "note": "Hard-coded repository-local implementation report reference.",
     },
     {
@@ -113,7 +191,13 @@ STATIC_ARTIFACT_REFERENCES = (
             "phase_2h_07_evidence_report_dashboard_static_shell_acceptance_review_planning_only.md"
         ),
         "status": "REPORT_REFERENCE",
+        "status_explanation": STATIC_ARTIFACT_REFERENCE_STATUS_EXPLANATIONS[
+            "REPORT_REFERENCE"
+        ],
         "availability": "STATIC_REFERENCE_AVAILABLE",
+        "availability_explanation": STATIC_ARTIFACT_AVAILABILITY_EXPLANATIONS[
+            "STATIC_REFERENCE_AVAILABLE"
+        ],
         "note": "Hard-coded repository-local acceptance review reference.",
     },
     {
@@ -121,7 +205,13 @@ STATIC_ARTIFACT_REFERENCES = (
         "label": "Optional local report-index output",
         "path": "reports/report_index.html",
         "status": "OPTIONAL_LOCAL_ARTIFACT_STATIC_REFERENCE_ONLY",
+        "status_explanation": STATIC_ARTIFACT_REFERENCE_STATUS_EXPLANATIONS[
+            "OPTIONAL_LOCAL_ARTIFACT_STATIC_REFERENCE_ONLY"
+        ],
         "availability": "STATIC_OPTIONAL_OR_MISSING_MESSAGE_ONLY",
+        "availability_explanation": STATIC_ARTIFACT_AVAILABILITY_EXPLANATIONS[
+            "STATIC_OPTIONAL_OR_MISSING_MESSAGE_ONLY"
+        ],
         "note": (
             "Static path label only; the dashboard performs no runtime existence "
             "check and does not generate or refresh this artifact."
@@ -133,6 +223,9 @@ STATIC_EMPTY_STATE_MESSAGES = (
     {
         "id": "no-usable-artifact-reference",
         "status": "STATIC_EMPTY_STATE_MESSAGE_ONLY",
+        "status_explanation": STATIC_MESSAGE_STATUS_EXPLANATIONS[
+            "STATIC_EMPTY_STATE_MESSAGE_ONLY"
+        ],
         "title": "No usable artifact reference in static context",
         "body": (
             "If static dashboard content has no usable artifact reference, the "
@@ -144,6 +237,7 @@ STATIC_EMPTY_STATE_MESSAGES = (
     {
         "id": "static-report-only-dashboard-state",
         "status": "STATIC_REPORT_ONLY",
+        "status_explanation": STATIC_MESSAGE_STATUS_EXPLANATIONS["STATIC_REPORT_ONLY"],
         "title": "Static report-only dashboard state",
         "body": (
             "The empty state remains local, deterministic, read-only, report-only, "
@@ -159,6 +253,9 @@ STATIC_MISSING_ARTIFACT_MESSAGES = (
         "reference_label": "Optional local report-index output",
         "reference_path": "reports/report_index.html",
         "status": "STATIC_MISSING_ARTIFACT_MESSAGE_ONLY",
+        "status_explanation": STATIC_MESSAGE_STATUS_EXPLANATIONS[
+            "STATIC_MISSING_ARTIFACT_MESSAGE_ONLY"
+        ],
         "title": "Optional local artifact may be absent",
         "body": (
             "The optional report-index reference is marked by static dashboard "
@@ -193,36 +290,42 @@ def build_dashboard_shell_model() -> Dict[str, Any]:
             "id": "boundary-notice",
             "title": "Boundary notice",
             "status": "LOCKED",
+            "status_explanation": STATIC_SECTION_STATUS_EXPLANATIONS["LOCKED"],
             "body": BOUNDARY_NOTICE,
         },
         {
             "id": "empty-state",
             "title": "Empty state",
             "status": "NO_LIVE_DATA",
+            "status_explanation": STATIC_SECTION_STATUS_EXPLANATIONS["NO_LIVE_DATA"],
             "body": "No live data source is attached. The dashboard shell is ready for static review only.",
         },
         {
             "id": "evidence-summary",
             "title": "Evidence summary placeholder",
             "status": "EMPTY_STATE",
+            "status_explanation": STATIC_SECTION_STATUS_EXPLANATIONS["EMPTY_STATE"],
             "body": "No live evidence is connected. Static evidence links may be added only as committed local references in a later authorized slice.",
         },
         {
             "id": "report-summary",
             "title": "Report summary placeholder",
             "status": "EMPTY_STATE",
+            "status_explanation": STATIC_SECTION_STATUS_EXPLANATIONS["EMPTY_STATE"],
             "body": "No report refresh is performed. This shell is a passive reviewer navigation surface only.",
         },
         {
             "id": "artifact-status",
             "title": "Artifact status placeholder",
             "status": "REVIEW_ONLY",
+            "status_explanation": STATIC_SECTION_STATUS_EXPLANATIONS["REVIEW_ONLY"],
             "body": "Artifact status is reserved for local deterministic committed evidence references, not runtime collection.",
         },
         {
             "id": "static-artifact-references",
             "title": "Static artifact references",
             "status": "REVIEW_ONLY",
+            "status_explanation": STATIC_SECTION_STATUS_EXPLANATIONS["REVIEW_ONLY"],
             "body": (
                 "Hard-coded repository-local references only. These entries are static "
                 "dashboard content and perform no scan, fetch, discovery, or runtime "
@@ -234,6 +337,9 @@ def build_dashboard_shell_model() -> Dict[str, Any]:
             "id": "static-empty-state-messaging",
             "title": "Static empty-state messaging",
             "status": "STATIC_EMPTY_STATE",
+            "status_explanation": STATIC_SECTION_STATUS_EXPLANATIONS[
+                "STATIC_EMPTY_STATE"
+            ],
             "body": (
                 "Empty-state messages are deterministic dashboard copy derived "
                 "only from the static dashboard model."
@@ -244,6 +350,9 @@ def build_dashboard_shell_model() -> Dict[str, Any]:
             "id": "static-missing-artifact-messaging",
             "title": "Static missing-artifact messaging",
             "status": "STATIC_MISSING_ARTIFACT",
+            "status_explanation": STATIC_SECTION_STATUS_EXPLANATIONS[
+                "STATIC_MISSING_ARTIFACT"
+            ],
             "body": (
                 "Missing-artifact messages are static report-only notices. They "
                 "do not perform live scans, runtime discovery, fetching, recovery, "
@@ -270,6 +379,7 @@ def build_dashboard_shell_model() -> Dict[str, Any]:
         "artifact_references": STATIC_ARTIFACT_REFERENCES,
         "static_empty_state_messages": STATIC_EMPTY_STATE_MESSAGES,
         "static_missing_artifact_messages": STATIC_MISSING_ARTIFACT_MESSAGES,
+        "static_label_explanation_groups": STATIC_LABEL_EXPLANATION_GROUPS,
         "sections": sections,
         "section_groups": EXPECTED_SECTION_GROUPS,
         "boundary_notice": BOUNDARY_NOTICE,
@@ -312,6 +422,8 @@ def validate_dashboard_shell_model(model: Mapping[str, Any]) -> Dict[str, Any]:
         != STATIC_MISSING_ARTIFACT_MESSAGES
     ):
         errors.append("STATIC_MISSING_ARTIFACT_MESSAGES_MISMATCH")
+    if model.get("static_label_explanation_groups") != STATIC_LABEL_EXPLANATION_GROUPS:
+        errors.append("STATIC_LABEL_EXPLANATION_GROUPS_MISMATCH")
 
     sections = model.get("sections", ())
     if not isinstance(sections, Sequence) or isinstance(sections, (str, bytes, bytearray)):
@@ -323,6 +435,39 @@ def validate_dashboard_shell_model(model: Mapping[str, Any]) -> Dict[str, Any]:
     for expected in EXPECTED_SECTION_TITLES:
         if expected not in section_titles:
             errors.append(f"EXPECTED_SECTION_MISSING:{expected}")
+    for section in sections:
+        if not isinstance(section, Mapping):
+            continue
+        label = section.get("status")
+        expected_explanation = STATIC_SECTION_STATUS_EXPLANATIONS.get(str(label))
+        if section.get("status_explanation") != expected_explanation:
+            errors.append(f"SECTION_STATUS_EXPLANATION_MISMATCH:{label}")
+
+    for reference in artifact_references:
+        if not isinstance(reference, Mapping):
+            continue
+        label = reference.get("status")
+        expected_explanation = STATIC_ARTIFACT_REFERENCE_STATUS_EXPLANATIONS.get(str(label))
+        if reference.get("status_explanation") != expected_explanation:
+            errors.append(f"ARTIFACT_STATUS_EXPLANATION_MISMATCH:{label}")
+        availability_label = reference.get("availability")
+        expected_availability = STATIC_ARTIFACT_AVAILABILITY_EXPLANATIONS.get(
+            str(availability_label)
+        )
+        if reference.get("availability_explanation") != expected_availability:
+            errors.append(f"ARTIFACT_AVAILABILITY_EXPLANATION_MISMATCH:{availability_label}")
+
+    for message_group_name in (
+        "static_empty_state_messages",
+        "static_missing_artifact_messages",
+    ):
+        for message in model.get(message_group_name, ()):
+            if not isinstance(message, Mapping):
+                continue
+            label = message.get("status")
+            expected_explanation = STATIC_MESSAGE_STATUS_EXPLANATIONS.get(str(label))
+            if message.get("status_explanation") != expected_explanation:
+                errors.append(f"MESSAGE_STATUS_EXPLANATION_MISMATCH:{label}")
 
     section_groups = model.get("section_groups", ())
     if tuple(section_groups) != EXPECTED_SECTION_GROUPS:
@@ -395,6 +540,9 @@ def render_dashboard_shell_html(model: Mapping[str, Any] | None = None) -> str:
         "    section { background: #ffffff; border: 1px solid #d6dee8; padding: 16px; }\n"
         "    h3 { font-size: 18px; margin: 0 0 8px; }\n"
         "    .status { font-size: 12px; font-weight: bold; letter-spacing: .04em; color: #375a7f; }\n"
+        "    .label-explanation { font-size: 13px; margin: 6px 0 10px; color: #465562; }\n"
+        "    .label-explanation strong { color: #17202a; }\n"
+        "    .reference-labels { display: block; margin-top: 4px; color: #465562; }\n"
         "    p { line-height: 1.45; }\n"
         "    ul { padding-left: 20px; margin: 12px 0 0; }\n"
         "    li { margin: 0 0 10px; line-height: 1.4; }\n"
@@ -435,6 +583,7 @@ def build_phase_2h_06_dashboard_shell_summary() -> Dict[str, Any]:
         "artifact_references": STATIC_ARTIFACT_REFERENCES,
         "static_empty_state_messages": STATIC_EMPTY_STATE_MESSAGES,
         "static_missing_artifact_messages": STATIC_MISSING_ARTIFACT_MESSAGES,
+        "static_label_explanation_groups": STATIC_LABEL_EXPLANATION_GROUPS,
         "section_titles": tuple(section["title"] for section in model["sections"]),
         "section_groups": EXPECTED_SECTION_GROUPS,
         "boundary_notice": BOUNDARY_NOTICE,
@@ -453,6 +602,10 @@ def build_phase_2h_06_dashboard_shell_summary() -> Dict[str, Any]:
 def _render_section(section: Mapping[str, Any]) -> str:
     references = section.get("references", ())
     messages = section.get("messages", ())
+    status_explanation = _render_label_explanation(
+        "Status label",
+        section.get("status_explanation"),
+    )
     reference_html = ""
     if references:
         items = "\n".join(_render_reference(reference) for reference in references)
@@ -464,6 +617,7 @@ def _render_section(section: Mapping[str, Any]) -> str:
     return (
         "      <section>\n"
         f"        <div class=\"status\">{escape(str(section['status']))}</div>\n"
+        f"{status_explanation}"
         f"        <h3>{escape(str(section['title']))}</h3>\n"
         f"        <p>{escape(str(section['body']))}</p>\n"
         f"{reference_html}\n"
@@ -495,6 +649,13 @@ def _render_reference(reference: Mapping[str, Any]) -> str:
         f"{escape(str(reference['label']))} - "
         f"<code>{escape(str(reference['path']))}</code> "
         f"({escape(str(reference['status']))}). "
+        "<span class=\"reference-labels\">"
+        "<strong>Status label:</strong> "
+        f"{escape(str(reference['status_explanation']))} "
+        "<strong>Availability label:</strong> "
+        f"{escape(str(reference['availability']))}: "
+        f"{escape(str(reference['availability_explanation']))}"
+        "</span> "
         f"{escape(str(reference['note']))}"
         "</li>"
     )
@@ -510,7 +671,19 @@ def _render_message(message: Mapping[str, Any]) -> str:
     return (
         "          <li>"
         f"<strong>{escape(str(message['status']))}</strong>: "
+        "<span class=\"reference-labels\"><strong>Status label:</strong> "
+        f"{escape(str(message['status_explanation']))}</span> "
         f"{escape(str(message['title']))}.{reference} "
         f"{escape(str(message['body']))}"
         "</li>"
+    )
+
+
+def _render_label_explanation(label_type: str, explanation: Any) -> str:
+    if not explanation:
+        return ""
+    return (
+        "        <p class=\"label-explanation\">"
+        f"<strong>{escape(label_type)}:</strong> {escape(str(explanation))}"
+        "</p>\n"
     )
