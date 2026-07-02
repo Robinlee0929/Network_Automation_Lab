@@ -25,7 +25,7 @@ Phase 2H-25 adds static reviewer-facing explanations for existing dashboard stat
 
 The implementation keeps the existing dashboard section order, grouping, artifact references, empty-state messages, and missing-artifact messages. It clarifies label meaning in committed static model fields and renders the explanations in the committed dashboard HTML.
 
-Availability label wording remains a committed static declaration, not a live filesystem check. Optional local artifact availability remains message-only static copy and may describe a missing optional artifact without probing, recovery, refresh, generation, or execution.
+Availability label wording remains a committed static declaration, not a live filesystem check: availability is a committed static declaration. Optional local artifact availability remains message-only static copy and may describe a missing optional artifact without probing, recovery, refresh, generation, or execution.
 
 ## Files Changed
 
