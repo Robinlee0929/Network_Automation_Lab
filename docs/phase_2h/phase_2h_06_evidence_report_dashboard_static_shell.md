@@ -19,9 +19,9 @@ Implemented artifacts:
 The shell includes:
 
 - dashboard title
-- evidence summary placeholder
-- report summary placeholder
-- artifact status placeholder
+- static evidence summary
+- static report summary
+- static artifact summary
 - empty-state / no-live-data message
 - boundary notice stating static/read-only/no execution
 

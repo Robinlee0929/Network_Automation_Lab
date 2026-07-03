@@ -66,7 +66,7 @@ def test_dashboard_shell_contains_expected_static_section_order_groups_and_bound
     assert section_titles == phase_2h_06.EXPECTED_SECTION_TITLES
     assert tuple(group["title"] for group in model["section_groups"]) == (
         "Reviewer orientation",
-        "Static evidence and report references",
+        "Static evidence, report, and artifact summaries",
         "Static state messaging",
     )
     assert tuple(
@@ -78,18 +78,42 @@ def test_dashboard_shell_contains_expected_static_section_order_groups_and_bound
 
     html = phase_2h_06.render_dashboard_shell_html(model)
     assert "<h1>Phase 2H-06 Evidence / Report Dashboard Static Shell</h1>" in html
-    assert html.index("Reviewer orientation") < html.index("Static evidence and report references")
-    assert html.index("Static evidence and report references") < html.index("Static state messaging")
-    assert html.index("Boundary notice") < html.index("Evidence summary placeholder")
-    assert "Evidence summary placeholder" in html
-    assert "Report summary placeholder" in html
-    assert "Artifact status placeholder" in html
+    assert html.index("Reviewer orientation") < html.index(
+        "Static evidence, report, and artifact summaries"
+    )
+    assert html.index("Static evidence, report, and artifact summaries") < html.index(
+        "Static state messaging"
+    )
+    assert html.index("Boundary notice") < html.index("Static evidence summary")
+    assert "Static evidence summary" in html
+    assert "Static report summary" in html
+    assert "Static artifact summary" in html
     assert "Static artifact references" in html
     assert "Static empty-state messaging" in html
     assert "Static missing-artifact messaging" in html
     assert "No live data source is attached" in html
     assert phase_2h_06.BOUNDARY_NOTICE in html
     assert "<script" not in html.lower()
+
+
+def test_phase_2h_29_static_summary_wording_refinement_is_visible():
+    model = phase_2h_06.build_dashboard_shell_model()
+    sections = {section["id"]: section for section in model["sections"]}
+    rendered = phase_2h_06.render_dashboard_shell_html(model)
+
+    assert sections["evidence-summary"]["title"] == "Static evidence summary"
+    assert "committed local evidence references only" in sections["evidence-summary"]["body"]
+    assert "No live evidence source is connected, collected, refreshed, or inferred." in rendered
+
+    assert sections["report-summary"]["title"] == "Static report summary"
+    assert "committed report references only" in sections["report-summary"]["body"]
+    assert "No report refresh, regeneration, fetch, or runtime lookup is performed." in rendered
+
+    assert sections["artifact-status"]["title"] == "Static artifact summary"
+    assert "optional static labels, not runtime collection" in sections["artifact-status"]["body"]
+    assert "Evidence summary placeholder" not in rendered
+    assert "Report summary placeholder" not in rendered
+    assert "Artifact status placeholder" not in rendered
 
 
 def test_static_artifact_references_are_hard_coded_and_local_only():
@@ -221,9 +245,9 @@ def test_committed_static_html_shell_can_be_read_locally():
 
     assert "Phase 2H-06 Evidence / Report Dashboard Static Shell" in html
     assert phase_2h_06.BOUNDARY_NOTICE in html
-    assert "Evidence summary placeholder" in html
-    assert "Report summary placeholder" in html
-    assert "Artifact status placeholder" in html
+    assert "Static evidence summary" in html
+    assert "Static report summary" in html
+    assert "Static artifact summary" in html
     assert "Static artifact references" in html
     assert "Static empty-state messaging" in html
     assert "Static missing-artifact messaging" in html

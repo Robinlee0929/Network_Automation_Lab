@@ -29,7 +29,7 @@
   <main>
     <header>
       <h1>Phase 2H-06 Evidence / Report Dashboard Static Shell</h1>
-      <p>Static local dashboard shell for reviewer-visible evidence and report orientation.</p>
+      <p>Static local dashboard shell for reviewer-visible evidence summaries and report summaries.</p>
       <div class="notice">Static/read-only/no execution boundary: this dashboard shell is local, deterministic, and non-executing. It connects to no live data source, runner, adapter, execution system, provider, API, model, secret store, SSH, NETCONF, or RESTCONF.</div>
     </header>
     <div class="section-group">
@@ -55,30 +55,30 @@
       </div>
     </div>
     <div class="section-group">
-      <h2>Static evidence and report references</h2>
-      <p class="section-group-intro">Then show the passive evidence and report placeholders before the hard-coded repository-local artifact references.</p>
+      <h2>Static evidence, report, and artifact summaries</h2>
+      <p class="section-group-intro">Then show the committed static evidence, report, and artifact summaries before the hard-coded repository-local artifact references.</p>
       <div class="group-grid">
       <section>
         <div class="status">EMPTY_STATE</div>
-        <p class="label-explanation"><strong>Status label:</strong> the section is an intentional static placeholder, not a failed lookup.</p>
-        <h3>Evidence summary placeholder</h3>
-        <p>No live evidence is connected. Static evidence links may be added only as committed local references in a later authorized slice.</p>
+        <p class="label-explanation"><strong>Status label:</strong> the section is an intentional static summary state, not a failed lookup.</p>
+        <h3>Static evidence summary</h3>
+        <p>The evidence summary describes committed local evidence references only. No live evidence source is connected, collected, refreshed, or inferred.</p>
 
 
       </section>
       <section>
         <div class="status">EMPTY_STATE</div>
-        <p class="label-explanation"><strong>Status label:</strong> the section is an intentional static placeholder, not a failed lookup.</p>
-        <h3>Report summary placeholder</h3>
-        <p>No report refresh is performed. This shell is a passive reviewer navigation surface only.</p>
+        <p class="label-explanation"><strong>Status label:</strong> the section is an intentional static summary state, not a failed lookup.</p>
+        <h3>Static report summary</h3>
+        <p>The report summary describes committed report references only. No report refresh, regeneration, fetch, or runtime lookup is performed.</p>
 
 
       </section>
       <section>
         <div class="status">REVIEW_ONLY</div>
         <p class="label-explanation"><strong>Status label:</strong> the section is for reviewer orientation and does not trigger execution.</p>
-        <h3>Artifact status placeholder</h3>
-        <p>Artifact status is reserved for local deterministic committed evidence references, not runtime collection.</p>
+        <h3>Static artifact summary</h3>
+        <p>Artifact summary status is limited to local deterministic committed references and optional static labels, not runtime collection.</p>
 
 
       </section>

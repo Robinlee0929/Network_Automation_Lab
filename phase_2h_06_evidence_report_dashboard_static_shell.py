@@ -42,9 +42,9 @@ BOUNDARY_NOTICE = (
 EXPECTED_SECTION_TITLES = (
     "Boundary notice",
     "Empty state",
-    "Evidence summary placeholder",
-    "Report summary placeholder",
-    "Artifact status placeholder",
+    "Static evidence summary",
+    "Static report summary",
+    "Static artifact summary",
     "Static artifact references",
     "Static empty-state messaging",
     "Static missing-artifact messaging",
@@ -62,10 +62,10 @@ EXPECTED_SECTION_GROUPS = (
     },
     {
         "id": "static-evidence-and-reports",
-        "title": "Static evidence and report references",
+        "title": "Static evidence, report, and artifact summaries",
         "description": (
-            "Then show the passive evidence and report placeholders before the "
-            "hard-coded repository-local artifact references."
+            "Then show the committed static evidence, report, and artifact "
+            "summaries before the hard-coded repository-local artifact references."
         ),
         "section_ids": (
             "evidence-summary",
@@ -97,7 +97,7 @@ STATIC_SECTION_STATUS_EXPLANATIONS = {
         "no live data source is attached and no runtime collection is attempted."
     ),
     "EMPTY_STATE": (
-        "the section is an intentional static placeholder, not a failed lookup."
+        "the section is an intentional static summary state, not a failed lookup."
     ),
     "REVIEW_ONLY": (
         "the section is for reviewer orientation and does not trigger execution."
@@ -302,24 +302,34 @@ def build_dashboard_shell_model() -> Dict[str, Any]:
         },
         {
             "id": "evidence-summary",
-            "title": "Evidence summary placeholder",
+            "title": "Static evidence summary",
             "status": "EMPTY_STATE",
             "status_explanation": STATIC_SECTION_STATUS_EXPLANATIONS["EMPTY_STATE"],
-            "body": "No live evidence is connected. Static evidence links may be added only as committed local references in a later authorized slice.",
+            "body": (
+                "The evidence summary describes committed local evidence references "
+                "only. No live evidence source is connected, collected, refreshed, "
+                "or inferred."
+            ),
         },
         {
             "id": "report-summary",
-            "title": "Report summary placeholder",
+            "title": "Static report summary",
             "status": "EMPTY_STATE",
             "status_explanation": STATIC_SECTION_STATUS_EXPLANATIONS["EMPTY_STATE"],
-            "body": "No report refresh is performed. This shell is a passive reviewer navigation surface only.",
+            "body": (
+                "The report summary describes committed report references only. No "
+                "report refresh, regeneration, fetch, or runtime lookup is performed."
+            ),
         },
         {
             "id": "artifact-status",
-            "title": "Artifact status placeholder",
+            "title": "Static artifact summary",
             "status": "REVIEW_ONLY",
             "status_explanation": STATIC_SECTION_STATUS_EXPLANATIONS["REVIEW_ONLY"],
-            "body": "Artifact status is reserved for local deterministic committed evidence references, not runtime collection.",
+            "body": (
+                "Artifact summary status is limited to local deterministic committed "
+                "references and optional static labels, not runtime collection."
+            ),
         },
         {
             "id": "static-artifact-references",
@@ -553,7 +563,7 @@ def render_dashboard_shell_html(model: Mapping[str, Any] | None = None) -> str:
         "  <main>\n"
         "    <header>\n"
         f"      <h1>{escape(str(shell_model['title']))}</h1>\n"
-        "      <p>Static local dashboard shell for reviewer-visible evidence and report orientation.</p>\n"
+        "      <p>Static local dashboard shell for reviewer-visible evidence summaries and report summaries.</p>\n"
         f"      <div class=\"notice\">{escape(str(shell_model['boundary_notice']))}</div>\n"
         "    </header>\n"
         f"{groups}\n"
