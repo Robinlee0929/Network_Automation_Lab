@@ -84,7 +84,10 @@ def test_dashboard_shell_contains_expected_static_section_order_groups_and_bound
     assert html.index("Static evidence, report, and artifact summaries") < html.index(
         "Static state messaging"
     )
-    assert html.index("Boundary notice") < html.index("Static evidence summary")
+    assert html.index("Boundary notice") < html.index("AI introduction")
+    assert html.index("AI introduction") < html.index("Static evidence summary")
+    assert "Static local dashboard shell for reviewer-visible evidence summaries, report summaries, and AI boundary explanation." in html
+    assert "AI may explain committed evidence and static review context only" in html
     assert "Static evidence summary" in html
     assert "Static report summary" in html
     assert "Static artifact summary" in html
@@ -94,6 +97,28 @@ def test_dashboard_shell_contains_expected_static_section_order_groups_and_bound
     assert "No live data source is attached" in html
     assert phase_2h_06.BOUNDARY_NOTICE in html
     assert "<script" not in html.lower()
+
+
+def test_phase_2i_02_ai_introduction_static_refresh_is_visible():
+    model = phase_2h_06.build_dashboard_shell_model()
+    sections = {section["id"]: section for section in model["sections"]}
+    rendered = phase_2h_06.render_dashboard_shell_html(model)
+
+    ai_section = sections["ai-introduction"]
+
+    assert ai_section["title"] == "AI introduction"
+    assert ai_section["status"] == "REVIEW_ONLY"
+    assert "static explanation, review, and documentation aid" in ai_section["body"]
+    assert "AI must not act as a controller" in ai_section["body"]
+    assert "must not execute tools, jobs, commands, model calls, provider calls" in ai_section["body"]
+    assert "SSH, NETCONF, RESTCONF" in ai_section["body"]
+    assert "MCP bridge" in ai_section["body"]
+    assert "The safe control object is evidence, report, and dashboard copy" in ai_section["body"]
+    assert phase_2h_06.AI_INTRODUCTION_SAFE_WORKFLOW in ai_section["body"]
+    assert "Phase 2J non-device automation control remains future work" in ai_section["body"]
+    assert "AI introduction" in rendered
+    assert phase_2h_06.AI_INTRODUCTION_SAFE_WORKFLOW.replace(">", "&gt;") in rendered
+    assert "<script" not in rendered.lower()
 
 
 def test_phase_2h_29_static_summary_wording_refinement_is_visible():
@@ -245,6 +270,8 @@ def test_committed_static_html_shell_can_be_read_locally():
 
     assert "Phase 2H-06 Evidence / Report Dashboard Static Shell" in html
     assert phase_2h_06.BOUNDARY_NOTICE in html
+    assert "AI introduction" in html
+    assert phase_2h_06.AI_INTRODUCTION_SAFE_WORKFLOW.replace(">", "&gt;") in html
     assert "Static evidence summary" in html
     assert "Static report summary" in html
     assert "Static artifact summary" in html

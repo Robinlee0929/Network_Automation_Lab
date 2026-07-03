@@ -31,16 +31,22 @@ PHASE_2H_12_DOC_PATH = (
     "docs/phase_2h/"
     "phase_2h_12_dashboard_empty_state_missing_artifact_messaging.md"
 )
+AI_INTRODUCTION_SAFE_WORKFLOW = (
+    "User Request -> Static Review Context -> Policy Boundary Explanation -> "
+    "Manual Reviewer Interpretation -> Committed Evidence -> Static Dashboard / Report"
+)
 
 BOUNDARY_NOTICE = (
     "Static/read-only/no execution boundary: this dashboard shell is local, "
     "deterministic, and non-executing. It connects to no live data source, "
     "runner, adapter, execution system, provider, API, model, secret store, "
-    "SSH, NETCONF, or RESTCONF."
+    "SSH, NETCONF, or RESTCONF. AI may explain committed evidence and static "
+    "review context only; AI must not act as a controller."
 )
 
 EXPECTED_SECTION_TITLES = (
     "Boundary notice",
+    "AI introduction",
     "Empty state",
     "Static evidence summary",
     "Static report summary",
@@ -55,10 +61,11 @@ EXPECTED_SECTION_GROUPS = (
         "id": "reviewer-orientation",
         "title": "Reviewer orientation",
         "description": (
-            "Start with the locked safety boundary and no-live-data state so "
-            "reviewers know the dashboard is passive before reading evidence."
+            "Start with the locked safety boundary, AI review-only role, and "
+            "no-live-data state so reviewers know the dashboard is passive "
+            "before reading evidence."
         ),
-        "section_ids": ("boundary-notice", "empty-state"),
+        "section_ids": ("boundary-notice", "ai-introduction", "empty-state"),
     },
     {
         "id": "static-evidence-and-reports",
@@ -292,6 +299,27 @@ def build_dashboard_shell_model() -> Dict[str, Any]:
             "status": "LOCKED",
             "status_explanation": STATIC_SECTION_STATUS_EXPLANATIONS["LOCKED"],
             "body": BOUNDARY_NOTICE,
+        },
+        {
+            "id": "ai-introduction",
+            "title": "AI introduction",
+            "status": "REVIEW_ONLY",
+            "status_explanation": STATIC_SECTION_STATUS_EXPLANATIONS["REVIEW_ONLY"],
+            "body": (
+                "AI is allowed only as a static explanation, review, and "
+                "documentation aid for committed evidence, report summaries, "
+                "safe boundaries, and mock-only demo narrative. AI must not act "
+                "as a controller and must not execute tools, jobs, commands, "
+                "model calls, provider calls, device operations, SSH, NETCONF, "
+                "RESTCONF, config backup, config change, scheduler, queue, "
+                "worker, agent loop, MCP bridge, live discovery, secrets, or "
+                "external automation. The safe control object is evidence, "
+                "report, and dashboard copy, not a router, switch, session, or "
+                "device command. Safe workflow: "
+                f"{AI_INTRODUCTION_SAFE_WORKFLOW}. Phase 2J non-device "
+                "automation control remains future work and is not implemented "
+                "by this dashboard refresh."
+            ),
         },
         {
             "id": "empty-state",
@@ -563,7 +591,7 @@ def render_dashboard_shell_html(model: Mapping[str, Any] | None = None) -> str:
         "  <main>\n"
         "    <header>\n"
         f"      <h1>{escape(str(shell_model['title']))}</h1>\n"
-        "      <p>Static local dashboard shell for reviewer-visible evidence summaries and report summaries.</p>\n"
+        "      <p>Static local dashboard shell for reviewer-visible evidence summaries, report summaries, and AI boundary explanation.</p>\n"
         f"      <div class=\"notice\">{escape(str(shell_model['boundary_notice']))}</div>\n"
         "    </header>\n"
         f"{groups}\n"
@@ -596,6 +624,7 @@ def build_phase_2h_06_dashboard_shell_summary() -> Dict[str, Any]:
         "static_label_explanation_groups": STATIC_LABEL_EXPLANATION_GROUPS,
         "section_titles": tuple(section["title"] for section in model["sections"]),
         "section_groups": EXPECTED_SECTION_GROUPS,
+        "ai_introduction_safe_workflow": AI_INTRODUCTION_SAFE_WORKFLOW,
         "boundary_notice": BOUNDARY_NOTICE,
         "html_length": len(html),
         "validation": validate_dashboard_shell_model(model),

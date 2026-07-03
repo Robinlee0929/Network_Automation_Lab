@@ -29,18 +29,26 @@
   <main>
     <header>
       <h1>Phase 2H-06 Evidence / Report Dashboard Static Shell</h1>
-      <p>Static local dashboard shell for reviewer-visible evidence summaries and report summaries.</p>
-      <div class="notice">Static/read-only/no execution boundary: this dashboard shell is local, deterministic, and non-executing. It connects to no live data source, runner, adapter, execution system, provider, API, model, secret store, SSH, NETCONF, or RESTCONF.</div>
+      <p>Static local dashboard shell for reviewer-visible evidence summaries, report summaries, and AI boundary explanation.</p>
+      <div class="notice">Static/read-only/no execution boundary: this dashboard shell is local, deterministic, and non-executing. It connects to no live data source, runner, adapter, execution system, provider, API, model, secret store, SSH, NETCONF, or RESTCONF. AI may explain committed evidence and static review context only; AI must not act as a controller.</div>
     </header>
     <div class="section-group">
       <h2>Reviewer orientation</h2>
-      <p class="section-group-intro">Start with the locked safety boundary and no-live-data state so reviewers know the dashboard is passive before reading evidence.</p>
+      <p class="section-group-intro">Start with the locked safety boundary, AI review-only role, and no-live-data state so reviewers know the dashboard is passive before reading evidence.</p>
       <div class="group-grid">
       <section>
         <div class="status">LOCKED</div>
         <p class="label-explanation"><strong>Status label:</strong> the committed safety boundary is closed to live execution and remains static reviewer copy only.</p>
         <h3>Boundary notice</h3>
-        <p>Static/read-only/no execution boundary: this dashboard shell is local, deterministic, and non-executing. It connects to no live data source, runner, adapter, execution system, provider, API, model, secret store, SSH, NETCONF, or RESTCONF.</p>
+        <p>Static/read-only/no execution boundary: this dashboard shell is local, deterministic, and non-executing. It connects to no live data source, runner, adapter, execution system, provider, API, model, secret store, SSH, NETCONF, or RESTCONF. AI may explain committed evidence and static review context only; AI must not act as a controller.</p>
+
+
+      </section>
+      <section>
+        <div class="status">REVIEW_ONLY</div>
+        <p class="label-explanation"><strong>Status label:</strong> the section is for reviewer orientation and does not trigger execution.</p>
+        <h3>AI introduction</h3>
+        <p>AI is allowed only as a static explanation, review, and documentation aid for committed evidence, report summaries, safe boundaries, and mock-only demo narrative. AI must not act as a controller and must not execute tools, jobs, commands, model calls, provider calls, device operations, SSH, NETCONF, RESTCONF, config backup, config change, scheduler, queue, worker, agent loop, MCP bridge, live discovery, secrets, or external automation. The safe control object is evidence, report, and dashboard copy, not a router, switch, session, or device command. Safe workflow: User Request -&gt; Static Review Context -&gt; Policy Boundary Explanation -&gt; Manual Reviewer Interpretation -&gt; Committed Evidence -&gt; Static Dashboard / Report. Phase 2J non-device automation control remains future work and is not implemented by this dashboard refresh.</p>
 
 
       </section>
