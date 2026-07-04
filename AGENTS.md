@@ -58,6 +58,23 @@ git status --short --branch
 - Explain safety boundaries in reviewer-facing language.
 - Keep public documentation safe for GitHub publication.
 
+## Documentation Readability Review
+
+Before closing any phase, acceptance review, or closure document, contributors must perform a documentation readability review.
+
+The review must verify:
+
+- The document starts with a clear conclusion or decision summary.
+- The phase purpose is understandable without relying on hidden context.
+- Allowed scope and forbidden scope are clearly separated.
+- Safety boundaries are explicit and not weakened.
+- Status labels are consistent across README and phase documents.
+- Acceptance criteria are concrete and verifiable.
+- Long paragraphs are split into readable sections.
+- Terminology is consistent with the current project glossary and previous phase documents.
+
+This review is documentation-only. It must not introduce implementation behavior, runtime behavior, runner behavior, adapter behavior, execution behavior, scheduler / queue / broker / worker / agent loop behavior, AI execution, MCP, live access, SSH, NETCONF, RESTCONF, external API / provider / model calls, secrets handling, config backup/change, Day1-Day160 rewrites, or a second safety matrix.
+
 ## Testing Expectations
 
 - Add or update tests for new behavior.
