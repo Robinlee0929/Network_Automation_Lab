@@ -220,6 +220,47 @@ Phase lanes and close status:
   - Phase 2I-06 records the static demo interview script at `docs/phase_2i/phase_2i_06_demo_interview_script.md`; it explains the project as a safe local deterministic network automation lab, confirms AI remains static explanation/review/documentation support only and not a controller, clarifies that project runtime/demo AI executes no tools, jobs, commands, model/provider/API calls, or device operations, keeps the dashboard static/read-only, and adds no implementation behavior, runtime behavior, runner, job, adapter, demo alias, demo flow, queue, scheduler, worker, agent-loop, live/API/provider/model, secret, config backup/change, Phase 2I-09, Phase 2J, Day1-Day160 rewrite, or second safety matrix behavior.
   - Phase 2I-09 records the demo AI safe workflow at `docs/phase_2i/phase_2i_09_demo_ai_safe_workflow.md`; it documents how to demonstrate AI-assisted explanation safely using committed local evidence, keeps AI limited to static reviewer/documentation support, confirms the demo remains report-only, dry-run, mock-only, local-only, deterministic, and non-executing, and adds no runtime behavior, runner, job, adapter, demo alias, demo flow, queue, scheduler, worker, broker, agent-loop, live/API/provider/model, secret, config backup/change, production execution path, Phase 2I-13, Phase 2J, Day1-Day160 rewrite, or second safety matrix behavior.
   - Phase 2I-13 assembles the demo package at `docs/phase_2i/phase_2i_13_demo_package_assembly.md`; it connects the Phase 2I-06 demo interview script and Phase 2I-09 demo AI safe workflow into a reviewer-facing reading order and walkthrough while keeping the package documentation-only, local-only, deterministic, report-only, dry-run, mock-only, and non-executing, and adds no runtime behavior, runner, job, adapter, demo alias, demo flow, queue, scheduler, worker, broker, agent-loop, live/API/provider/model, secret, config backup/change, production execution path, Phase 2I-18 work, Phase 2J work, Day1-Day160 rewrite, or second safety matrix behavior.
+  - Current progress status after the Phase 2I-13 merge: Phase 2I-13 is `DONE / MERGED_TO_MAIN`; Phase 2I-18 is `READY / PENDING` as the next separately requested final demo readiness review; Phase 2J remains pending; Phase 2K remains future/deferred. This status update is documentation-only and adds no runtime behavior, runner, adapter, live access, provider/API/model call, secret handling, config backup/change behavior, production execution path, Day1-Day160 rewrite, or second safety matrix.
+
+Current Phase 2H / 2I / 2J / 2K progress snapshot:
+
+| Order | Phase | Name | Status | Recommended handling |
+| ----: | ----- | ---- | ------ | -------------------- |
+| 1 | 2H-27 | Static Dashboard Next Static Slice Decision Gate / Planning Only | DONE / MERGED_TO_MAIN | Keep |
+| 2 | 2H-28 | Static Evidence / Report Summary Wording Authorization Gate | DONE / MERGED_TO_MAIN | Keep |
+| 3 | 2H-29 | Static Evidence / Report Summary Wording Implementation | DONE / MERGED_TO_MAIN | Keep |
+| 4 | 2H-30 | Static Evidence / Report Summary Wording Closure | DONE / MERGED_TO_MAIN | Keep |
+| 5 | 2I-00 | AI Introduction Dashboard Refresh Scope Review | DONE / MERGED_TO_MAIN | Keep |
+| 6 | 2I-01 | AI Introduction Dashboard Refresh Authorization Gate | DONE / MERGED_TO_MAIN | Keep |
+| 7 | 2I-02 | AI Introduction Dashboard Refresh Implementation | DONE / MERGED_TO_MAIN | Keep |
+| 8 | 2I-03 | AI Introduction Dashboard Refresh Acceptance Review | DONE / BLOCKED | Not considered full closure |
+| 9 | 2I-06 | Demo Interview Script | DONE / MERGED_TO_MAIN | Keep |
+| 10 | 2I-09 | Demo AI Safe Workflow | DONE / MERGED_TO_MAIN | Keep |
+| 11 | 2I-13 | Demo Package Assembly | DONE / MERGED_TO_MAIN | Keep |
+| 12 | 2I-18 | Final Demo Readiness Review | READY / PENDING | Next executable review phase |
+| 13 | 2J-00 | Non-Device Automation Control Boundary / Planning Only | PENDING | Preserve priority |
+| 14 | 2J-01 | Local Job Contract Skeleton / Non-executing | PENDING | Preserve priority |
+| 15 | 2J-02 | Policy Gate Contract / Non-executing | PENDING | Preserve priority |
+| 16 | 2J-03 | Approval Envelope Contract / Non-executing | PENDING | Preserve priority |
+| 17 | 2J-04 | First Local-only Validation Job / Implementation | PENDING | Preserve priority |
+| 18 | 2K-00 | Platform Guidance Provider Concept Decision Gate / Planning Only | NEW / FUTURE | Defer |
+| 19 | 2K-01 | Vendor Profile Provider Architecture Flow / Planning Only | NEW / FUTURE | Defer |
+| 20 | 2K-02 | Vendor Profile Schema Contract / Planning Only | NEW / FUTURE | Defer |
+| 21 | 2K-03 | Instruction Template Contract / Planning Only | NEW / FUTURE | Defer |
+| 22 | 2K-04 | AI-visible / AI-hidden Boundary Review / Planning Only | NEW / FUTURE | Defer |
+| 23 | 2K-05 | Guidance Mode Instruction Card Design / Static Only | NEW / FUTURE | Defer |
+| 24 | 2K-06 | Reference Mode Policy Gate / Planning Only | NEW / FUTURE | Defer |
+| 25 | 2K-07 | Static Vendor Profile Catalog Authorization Gate | NEW / FUTURE | Defer |
+
+In this table, "Next executable review phase" means the next separately requested review task in the documentation workflow. It does not mean runtime execution, device execution, AI execution, provider/API/model calls, runner execution, adapter execution, or automation execution.
+
+Documentation Readability Review status for Phase 2I demo documents:
+
+| Phase | Document | Readability status | Evidence |
+| ----- | -------- | ------------------ | -------- |
+| 2I-06 | `docs/phase_2i/phase_2i_06_demo_interview_script.md` | PASS | Explicit `FINAL_READABILITY_RESULT: PASS` is recorded in the document. |
+| 2I-09 | `docs/phase_2i/phase_2i_09_demo_ai_safe_workflow.md` | PASS | Explicit `FINAL_READABILITY_RESULT: PASS` is recorded in the document. |
+| 2I-13 | `docs/phase_2i/phase_2i_13_demo_package_assembly.md` | PASS | Explicit `FINAL_READABILITY_RESULT: PASS` is recorded in the document. |
 
 Existing report-only evidence surfaces:
 
