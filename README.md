@@ -225,6 +225,14 @@ Phase lanes and close status:
   - Phase 2J-00 records the completed and merged non-device automation control boundary at `docs/phase_2j/phase_2j_00_non_device_automation_control_boundary_planning.md`; it is planning-only and documentation-only, uses the Phase 2I-18 `PASS_WITH_NOTES` transition context without rewriting Phase 2I artifacts, defines allowed future discussion areas, restates forbidden execution scope, preserves Phase 2I-03 as `DONE / BLOCKED` rather than full closure, lists Phase 2J-01 through Phase 2J-04 only as future unauthorized planning targets, starts no Phase 2J-01 work, and adds no runner, adapter, scheduler, queue, broker, worker, agent-loop, live access, provider/API/model call, secret handling, config backup/change behavior, production execution path, Day1-Day160 rewrite, or second safety matrix.
   - Phase 2J-01 is the current planning-only local job contract skeleton authorization gate at `docs/phase_2j/phase_2j_01_local_job_contract_skeleton_non_executing_authorization_gate_planning_only.md`; it defines only a future non-executing local job contract planning shape, implements no code, keeps implementation unauthorized now, requires separate authorization before future skeleton creation, starts no Phase 2J-02 work, and adds no source, tests, task registry entry, CLI dispatch, report-index behavior change, runner, adapter, scheduler, queue, broker, worker, agent-loop, live access, provider/API/model call, secret handling, config backup/change behavior, production execution path, Day1-Day160 rewrite, or second safety matrix.
 
+### AI-assisted Human-guided Network Testing Architecture
+
+The architecture diagram is a conceptual / roadmap view of the project's AI-assisted, human-guided, non-executing network testing workflow.
+
+It does not mean all modules are implemented. The project remains report-only, dry-run/mock-only, and does not include live device access, SSH, NETCONF, RESTCONF, provider/API/model integration, secrets handling, config backup/change, runners, adapters, schedulers, queues, workers, or autonomous agent loops. Implementation still requires separate phase authorization.
+
+See: [AI-assisted Human-guided Network Testing Architecture](docs/concepts/ai_assisted_human_guided_network_testing_architecture.md)
+
 Current Phase 2H / 2I / 2J / 2K progress snapshot:
 
 | Order | Phase | Name | Status | Recommended handling |
