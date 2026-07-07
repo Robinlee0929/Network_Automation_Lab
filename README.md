@@ -228,6 +228,7 @@ Phase lanes and close status:
   - Phase 2J-02A defines the policy gate contract as documentation only at `docs/phase_2j/phase_2j_02a_policy_gate_contract_definition_documentation_only.md`; it defines static contract fields, allowed documentation-level input categories, required output fields, decision statuses, denial reasons, evidence linkage expectations, and non-execution guarantees while adding no source, tests, validators, engines, runners, adapters, policy executors, schedulers, queues, brokers, workers, agent-loop behavior, live access, provider/API/model calls, secrets, config backup/change behavior, production execution path, Day1-Day160 rewrite, second safety matrix, Phase 2J-03 start, or Phase 2J-04 start.
   - Phase 2J-03 defines the approval envelope contract as documentation only at `docs/phase_2j/phase_2j_03_approval_envelope_contract_documentation_only.md`; it defines static authorization envelope fields, documentation-only status labels, safety interpretation rules, evidence linkage expectations, and the explicit Phase 2J-04 boundary while adding no source, tests, validators, runners, jobs, adapters, policy executors, schedulers, queues, brokers, workers, agent-loop behavior, live access, provider/API/model calls, secrets, config backup/change behavior, production execution path, Day1-Day160 rewrite, second safety matrix, or Phase 2J-04 start.
   - Phase 2J-04 authorizes only a future separate Phase 2J-05 implementation of `local_approval_envelope_validation_job` at `docs/phase_2j/phase_2j_04_first_local_validation_job_authorization_gate_planning_only.md`; it fixes the first validation job scope as local-only, deterministic, report-only, dry-run/mock-only, static approval envelope validation while adding no source, tests, validators, runners, jobs, adapters, policy executors, schedulers, queues, brokers, workers, agent-loop behavior, live access, provider/API/model calls, secrets, config backup/change behavior, production execution path, Day1-Day160 rewrite, second safety matrix, or Phase 2J-05 implementation.
+  - Phase 2J-05 implements `local_approval_envelope_validation_job` at `docs/phase_2j/phase_2j_05_first_local_validation_job_implementation.md`; it validates local static approval-envelope documentation markers from the Phase 2J-04 artifact and writes deterministic JSON/HTML report evidence while adding no approval execution, runtime permission, runner, scheduler, worker, queue, broker, agent-loop behavior, adapter invocation, live access, SSH, NETCONF, RESTCONF, provider/API/model calls, secrets, config backup/change behavior, production execution path, Day1-Day160 rewrite, second safety matrix, next phase, or extra slice.
 
 ### AI-assisted Human-guided Network Testing Architecture
 
@@ -258,15 +259,16 @@ Current Phase 2H / 2I / 2J / 2K progress snapshot:
 | 15 | 2J-02 | Policy Gate Contract / Non-executing | PLANNING_ONLY / DONE | Future docs-only contract definition may be separately authorized |
 | 15A | 2J-02A | Policy Gate Contract Definition / Documentation Only | DOCUMENTATION_ONLY / DONE | Contract defined as static documentation only |
 | 16 | 2J-03 | Approval Envelope Contract / Non-executing | DOCUMENTATION_ONLY / DONE | Contract defined as static documentation only |
-| 17 | 2J-04 | First Local-only Validation Job / Implementation | PENDING | Preserve priority |
-| 18 | 2K-00 | Platform Guidance Provider Concept Decision Gate / Planning Only | NEW / FUTURE | Defer |
-| 19 | 2K-01 | Vendor Profile Provider Architecture Flow / Planning Only | NEW / FUTURE | Defer |
-| 20 | 2K-02 | Vendor Profile Schema Contract / Planning Only | NEW / FUTURE | Defer |
-| 21 | 2K-03 | Instruction Template Contract / Planning Only | NEW / FUTURE | Defer |
-| 22 | 2K-04 | AI-visible / AI-hidden Boundary Review / Planning Only | NEW / FUTURE | Defer |
-| 23 | 2K-05 | Guidance Mode Instruction Card Design / Static Only | NEW / FUTURE | Defer |
-| 24 | 2K-06 | Reference Mode Policy Gate / Planning Only | NEW / FUTURE | Defer |
-| 25 | 2K-07 | Static Vendor Profile Catalog Authorization Gate | NEW / FUTURE | Defer |
+| 17 | 2J-04 | First Local-only Validation Job Authorization Gate | PLANNING_ONLY / DONE | Authorized 2J-05 only |
+| 18 | 2J-05 | First Local-only Validation Job / Implementation | IMPLEMENTATION / DONE | Local approval-envelope validation only |
+| 19 | 2K-00 | Platform Guidance Provider Concept Decision Gate / Planning Only | NEW / FUTURE | Defer |
+| 20 | 2K-01 | Vendor Profile Provider Architecture Flow / Planning Only | NEW / FUTURE | Defer |
+| 21 | 2K-02 | Vendor Profile Schema Contract / Planning Only | NEW / FUTURE | Defer |
+| 22 | 2K-03 | Instruction Template Contract / Planning Only | NEW / FUTURE | Defer |
+| 23 | 2K-04 | AI-visible / AI-hidden Boundary Review / Planning Only | NEW / FUTURE | Defer |
+| 24 | 2K-05 | Guidance Mode Instruction Card Design / Static Only | NEW / FUTURE | Defer |
+| 25 | 2K-06 | Reference Mode Policy Gate / Planning Only | NEW / FUTURE | Defer |
+| 26 | 2K-07 | Static Vendor Profile Catalog Authorization Gate | NEW / FUTURE | Defer |
 
 In this table, "Next executable review phase" means the next separately requested review task in the documentation workflow. It does not mean runtime execution, device execution, AI execution, provider/API/model calls, runner execution, adapter execution, or automation execution.
 

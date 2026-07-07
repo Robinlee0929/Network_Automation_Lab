@@ -374,6 +374,9 @@ from phase_2c_07_next_slice_implementation_kickoff_gate import (
 from phase_2c_08_next_slice_implementation import (
     run_phase_2c_08_next_slice_implementation,
 )
+from phase_2j_05_local_approval_envelope_validation_job import (
+    run_phase_2j_05_local_approval_envelope_validation_job,
+)
 from phase_2c_09_post_next_slice_acceptance_review import (
     run_phase_2c_09_post_next_slice_acceptance_review,
 )
@@ -1952,6 +1955,16 @@ PHASE_2C_08_NEXT_SLICE_IMPLEMENTATION_JSON = (
 )
 PHASE_2C_08_NEXT_SLICE_IMPLEMENTATION_HTML = (
     Path("reports") / "lab-summary" / "phase_2c_08_next_slice_implementation.html"
+)
+PHASE_2J_05_LOCAL_APPROVAL_ENVELOPE_VALIDATION_JOB_TASK_ID = "local-approval-envelope-validation-job"
+PHASE_2J_05_LOCAL_APPROVAL_ENVELOPE_VALIDATION_JOB_DOC = (
+    Path("docs") / "phase_2j" / "phase_2j_05_first_local_validation_job_implementation.md"
+)
+PHASE_2J_05_LOCAL_APPROVAL_ENVELOPE_VALIDATION_JOB_JSON = (
+    Path("reports") / "lab-summary" / "phase_2j_05_local_approval_envelope_validation_job.json"
+)
+PHASE_2J_05_LOCAL_APPROVAL_ENVELOPE_VALIDATION_JOB_HTML = (
+    Path("reports") / "lab-summary" / "phase_2j_05_local_approval_envelope_validation_job.html"
 )
 PHASE_2C_09_POST_NEXT_SLICE_ACCEPTANCE_REVIEW_TASK_ID = "phase2c-09-post-next-slice-acceptance-review"
 PHASE_2C_09_POST_NEXT_SLICE_ACCEPTANCE_REVIEW_DOC = (
@@ -4148,6 +4161,19 @@ REPORT_CATALOG = [
         "missing_note": (
             "Generate with: python network_lab.py --task "
             f"{PHASE_2C_08_NEXT_SLICE_IMPLEMENTATION_TASK_ID}"
+        ),
+    },
+    {
+        "day": "Phase 2J",
+        "title": "Phase 2J-05 First Local-only Validation Job",
+        "report_type": "Local report-only approval envelope validation job",
+        "safety_label": "PHASE_2J_05_LOCAL_APPROVAL_ENVELOPE_VALIDATION_JOB_IMPLEMENTED; AUTHORIZED_BY_2J_04_YES; LOCAL_APPROVAL_ENVELOPE_VALIDATION_JOB_IMPLEMENTED_YES; LOCAL_ONLY_YES; DETERMINISTIC_YES; REPORT_ONLY_YES; DRY_RUN_MOCK_ONLY_YES; RUNTIME_PERMISSION_ADDED_NO; APPROVAL_EXECUTION_ADDED_NO; RUNNER_SCHEDULER_WORKER_QUEUE_BROKER_AGENT_LOOP_ADDED_NO; DEVICE_SSH_NETCONF_RESTCONF_PROVIDER_API_MODEL_SECRETS_TOUCHED_NO; CONFIG_BACKUP_OR_CHANGE_TOUCHED_NO",
+        "description": "Phase 2J-05 implements local_approval_envelope_validation_job as a deterministic local static documentation validation report over the Phase 2J-04 approval envelope artifact. It does not execute approval, grant runtime permission, add runners, schedulers, workers, queues, brokers, agent loops, adapters, SSH, NETCONF, RESTCONF, live-device access, provider/API/model/secret access, config backup/change behavior, production execution, Day1-Day160 replacement, or a second safety matrix.",
+        "json_globs": [PHASE_2J_05_LOCAL_APPROVAL_ENVELOPE_VALIDATION_JOB_JSON.as_posix()],
+        "html_globs": [PHASE_2J_05_LOCAL_APPROVAL_ENVELOPE_VALIDATION_JOB_HTML.as_posix()],
+        "missing_note": (
+            "Generate with: python network_lab.py --task "
+            f"{PHASE_2J_05_LOCAL_APPROVAL_ENVELOPE_VALIDATION_JOB_TASK_ID}"
         ),
     },
     {
@@ -9101,6 +9127,32 @@ def list_tasks() -> List[Dict[str, Any]]:
             ],
             "related_script": "phase_2c_08_next_slice_implementation.py",
             "notes": "PHASE_2C_08_NEXT_SLICE_IMPLEMENTATION PHASE_2C_08_NEXT_SLICE_IMPLEMENTED_LOCAL_REPORT_ONLY SELECTED_NEXT_SLICE_ARTIFACT_VALIDATION_JOB PHASE_GOAL_CONFIRMED_YES PHASE_2C_06_SELECTION_CONFIRMED_YES PHASE_2C_07_AUTHORIZATION_CONFIRMED_YES SCOPE_NARROWED_TO_ONE_EXAMPLE_NO NEEDS_SCOPE_CONFIRMATION_NO ARTIFACT_VALIDATION_JOB_IMPLEMENTED_YES LOCAL_ONLY_YES DETERMINISTIC_YES REPORT_ONLY_DRY_RUN_MOCK_ONLY_YES VALIDATES_EXISTING_LOCAL_ARTIFACTS_ONLY_YES RUNNER_ADAPTER_EXECUTION_PATH_ADDED_NO SCHEDULER_QUEUE_BROKER_WORKER_AGENT_LOOP_ADDED_NO SSH_NETCONF_RESTCONF_LIVE_DEVICE_TOUCHED_NO PROVIDER_API_MODEL_SECRETS_TOUCHED_NO CONFIG_BACKUP_OR_CHANGE_ADDED_NO DAY1_DAY160_REWRITTEN_OR_REPLACED_NO SECOND_SAFETY_MATRIX_CREATED_NO. Report-only implementation; validates fixed local repository artifacts and prior Phase 2C-06/Phase 2C-07 evidence only, not runner, adapter, broker, scheduler, queue, worker, agent loop, execution path, provider/API/model call, secret handling, SSH, NETCONF, RESTCONF, live device access, real command execution, backup behavior, config change behavior, AGENTS.md modification, Day1-Day160 rewrite or replacement, second safety matrix, approval bypass, or safety gate weakening.",
+        },
+        {
+            "id": PHASE_2J_05_LOCAL_APPROVAL_ENVELOPE_VALIDATION_JOB_TASK_ID,
+            "task_id": "phase_2j_05_local_approval_envelope_validation_job",
+            "display_name": "Phase 2J-05 First Local-only Validation Job",
+            "user_display_name": "Phase 2J-05 First Local-only Validation Job",
+            "day": "Phase 2J",
+            "category": "implementation",
+            "description": "Phase 2J-05 implements local_approval_envelope_validation_job as a local deterministic static approval-envelope documentation validation report.",
+            "safety_level": "report-only",
+            "enabled": True,
+            "execution_mode": "report-only",
+            "requires_live_device": False,
+            "requires_password": False,
+            "produces_report": True,
+            "report_paths": [
+                PHASE_2J_05_LOCAL_APPROVAL_ENVELOPE_VALIDATION_JOB_JSON.as_posix(),
+                PHASE_2J_05_LOCAL_APPROVAL_ENVELOPE_VALIDATION_JOB_HTML.as_posix(),
+                PHASE_2J_05_LOCAL_APPROVAL_ENVELOPE_VALIDATION_JOB_DOC.as_posix(),
+            ],
+            "report_outputs": [
+                "Phase 2J-05 JSON/HTML local approval envelope validation evidence",
+                "Phase 2J-05 implementation documentation",
+            ],
+            "related_script": "phase_2j_05_local_approval_envelope_validation_job.py",
+            "notes": "PHASE_2J_05_LOCAL_APPROVAL_ENVELOPE_VALIDATION_JOB PHASE_2J_05_LOCAL_APPROVAL_ENVELOPE_VALIDATION_JOB_IMPLEMENTED AUTHORIZED_BY_2J_04_YES LOCAL_APPROVAL_ENVELOPE_VALIDATION_JOB_IMPLEMENTED_YES LOCAL_ONLY_YES DETERMINISTIC_YES REPORT_ONLY_YES DRY_RUN_MOCK_ONLY_YES RUNTIME_PERMISSION_ADDED_NO APPROVAL_EXECUTION_ADDED_NO RUNNER_SCHEDULER_WORKER_QUEUE_BROKER_AGENT_LOOP_ADDED_NO DEVICE_SSH_NETCONF_RESTCONF_PROVIDER_API_MODEL_SECRETS_TOUCHED_NO CONFIG_BACKUP_OR_CHANGE_TOUCHED_NO. Report-only implementation; validates local static approval-envelope documentation markers only, not approval execution, runtime permission, runner, adapter, scheduler, queue, broker, worker, agent loop, SSH, NETCONF, RESTCONF, live device access, provider/API/model call, secret handling, backup behavior, config change behavior, production execution, Day1-Day160 replacement, second safety matrix, approval bypass, or safety gate weakening.",
         },
         {
             "id": PHASE_2C_09_POST_NEXT_SLICE_ACCEPTANCE_REVIEW_TASK_ID,
@@ -14444,6 +14496,15 @@ def _run_phase_2c_07_next_slice_implementation_kickoff_gate(project_root: Path) 
 
 def _run_phase_2c_08_next_slice_implementation(project_root: Path) -> int:
     return run_phase_2c_08_next_slice_implementation(
+        project_root,
+        format_heading_func=format_heading,
+        format_status_func=format_status,
+        relative_to_project_func=_relative_to_project,
+    )
+
+
+def _run_phase_2j_05_local_approval_envelope_validation_job(project_root: Path) -> int:
+    return run_phase_2j_05_local_approval_envelope_validation_job(
         project_root,
         format_heading_func=format_heading,
         format_status_func=format_status,
