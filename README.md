@@ -1,5 +1,89 @@
 # Network Automation Lab
 
+## Project Summary
+
+Network Automation Lab is a reviewer-visible network automation portfolio project. It uses local, deterministic artifacts to show how network validation work can be planned, reviewed, and evidenced without granting live automation authority by default.
+
+The current repository emphasis is safe documentation, report-only validation, dry-run planning, mock-only examples, and traceable reviewer evidence. It is intended to help a first-time reviewer understand what has been completed, what remains explicitly forbidden, and what future work would require a separate authorization gate.
+
+## Current Safety Boundary
+
+Allowed by default:
+
+- Documentation-only review and refinement.
+- Report-only validation evidence.
+- Dry-run and mock-only examples.
+- Local deterministic checks that do not contact devices or external providers.
+- Reviewer navigation, status summaries, and evidence indexing.
+
+Forbidden unless a later task explicitly authorizes a separate safety gate:
+
+- SSH.
+- Live device access.
+- NETCONF.
+- RESTCONF.
+- Provider, API, or model calls.
+- Secrets handling.
+- Config backup.
+- Config change.
+- Runner implementation unless separately authorized.
+- Adapter implementation unless separately authorized.
+- Scheduler.
+- Queue.
+- Broker.
+- Worker.
+- Agent loop.
+- Hidden execution path.
+- Autonomous execution path.
+
+## Current Project Status
+
+Phase 2J is closed. The latest known merged `main` / `origin/main` commit for the Pre-2K baseline is:
+
+```text
+2d53e75c1118e857db5ae59dae4ca99bfaf1f127
+```
+
+The recommended next candidate is `2K-00 - Platform Guidance Provider Concept Decision Gate / Planning Only`. This is future-only and not authorization. Phase 2K has not started, and this README does not create or imply provider execution, implementation work, or a new runtime capability.
+
+## Completed Milestone Summary
+
+- Day 1-Day 30: v0.1 portfolio package, post-reset validation, report visibility, dashboard evidence, and release readiness work.
+- Day 31-Day 55: v0.2 HA / VRRP planning, guarded evidence, demo packaging, public repository readiness, and offline reviewer walkthrough work.
+- Day 56-Day 82: AI intent and mock runtime evidence chain, kept static, dry-run, mock-only, and non-executing.
+- Day 145-Day 160: AI Assistance review-only evidence, closure, reopen rationale, boundary contracts, fixture rendering, safety regression review, and phase-gate review without execution approval.
+- Phase 2C-Phase 2J: later local-only documentation, reviewer evidence, static validation, contract, authorization, implementation, acceptance, and closure steps. Phase 2J closes the local-only validation sequence and leaves Phase 2K future-only.
+
+This is a compact reader summary, not a replacement for the detailed phase documents or historical evidence files.
+
+## How to Read This Repository
+
+- Start with `AGENTS.md` for repository rules, safety boundaries, validation expectations, and task protocol.
+- Use this README for a high-level orientation and current Pre-2K status.
+- Use `docs/phase_2j/phase_2j_07_closure_finalization_gate.md` to understand why Phase 2J is closed and why Phase 2K remains future-only.
+- Use phase folders under `docs/phase_*` for the detailed planning, authorization, implementation, acceptance, and closure records.
+- Use `docs/reviewer/` and demo documentation under `docs/demo/` for reviewer-facing walkthrough material when present.
+- Treat newer phase documents and this README together with `AGENTS.md`; the README is an orientation layer, not an authority to weaken safety gates.
+
+## Validation / Testing Notes
+
+`AGENTS.md` defines the standard validation expectation for repository work:
+
+```bash
+python -m pytest
+python network_lab.py --task report-index
+```
+
+This README does not claim a fresh validation result by itself. Task-specific final reports should state the exact commands run and their results.
+
+## Next Recommended Step
+
+```text
+2K-00 - Platform Guidance Provider Concept Decision Gate / Planning Only
+```
+
+This is only a recommended next planning candidate. It does not start Phase 2K, authorize implementation, or permit live, provider-backed, autonomous, or hidden execution behavior.
+
 ## Project Overview
 
 Network Automation Lab is a Python-based lab automation project for validating network device configuration, connectivity, topology, and report output across a small multi-vendor lab.
