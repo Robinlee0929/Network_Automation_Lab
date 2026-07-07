@@ -42,7 +42,7 @@ Forbidden unless a later task explicitly authorizes a separate safety gate:
 
 ## Current Project Status
 
-Phase 2J is closed. Phase 2K-00 is now recorded as a planning-only concept decision gate and is ready for review.
+Phase 2J is closed. Phase 2K-01 is now recorded as a planning-only Vendor Profile Provider architecture flow and is ready for review.
 
 The latest known merged `main` / `origin/main` commit for the Pre-2K baseline is:
 
@@ -50,7 +50,7 @@ The latest known merged `main` / `origin/main` commit for the Pre-2K baseline is
 2d53e75c1118e857db5ae59dae4ca99bfaf1f127
 ```
 
-The recommended next candidate is `2K-01 - Vendor Profile Provider Architecture Flow / Planning Only`. This is future-only and not authorization. Phase 2K-00 does not create or imply provider execution, implementation work, API or model calls, or a new runtime capability.
+The recommended next candidate is `2K-02 - Vendor Profile Schema Contract / Planning Only`. This is future-only and not authorization. Phase 2K-01 does not create or imply provider execution, implementation work, API or model calls, catalog loading, or a new runtime capability.
 
 ## Completed Milestone Summary
 
@@ -85,10 +85,10 @@ This README does not claim a fresh validation result by itself. Task-specific fi
 ## Next Recommended Step
 
 ```text
-2K-01 - Vendor Profile Provider Architecture Flow / Planning Only
+2K-02 - Vendor Profile Schema Contract / Planning Only
 ```
 
-This is only a recommended next planning candidate. It does not authorize implementation or permit live, provider-backed, autonomous, or hidden execution behavior.
+This is only a recommended next planning candidate. It does not authorize implementation or permit live, provider-backed, autonomous, catalog-loading, or hidden execution behavior.
 
 ## Project Overview
 
@@ -322,6 +322,7 @@ Phase lanes and close status:
   - Phase 2J-06 records the first local-only validation job acceptance review at `docs/phase_2j/phase_2j_06_first_local_validation_job_acceptance_review.md`; it accepts Phase 2J-05 as conforming to the Phase 2J-04 authorization boundary, explains why repeated safety checks are expected in an acceptance review, implements no new job, changes no job behavior, and adds no runner, adapter, scheduler, queue, broker, worker, agent-loop, live access, SSH, NETCONF, RESTCONF, REST/provider/model/external API access, secrets handling, config backup/change behavior, production execution path, Day1-Day160 rewrite, second safety matrix, Phase 2K start, or extra slice.
 - `docs/phase_2k/` holds the Platform Guidance Provider concept planning lane after Phase 2J closure.
   - Phase 2K-00 records the Platform Guidance Provider concept decision gate at `docs/phase_2k/phase_2k_00_platform_guidance_provider_concept_decision_gate.md`; it allows the concept track to continue to future planning-only phases, keeps implementation unauthorized, keeps provider runtime/API/model calls unauthorized, and adds no source, tests, runner, adapter, scheduler, queue, broker, worker, agent-loop, live access, SSH, NETCONF, RESTCONF, secrets, config backup/change behavior, production execution path, Day1-Day160 rewrite, second safety matrix, Phase 2K-01 start, or extra slice.
+  - Phase 2K-01 records the Vendor Profile Provider architecture flow at `docs/phase_2k/phase_2k_01_vendor_profile_provider_architecture_flow_planning_only.md`; it defines a static conceptual flow for future planning only, separates AI-visible guidance concepts from AI-hidden/reviewer-only boundary concepts, keeps implementation and runtime provider integration unauthorized, and adds no source, tests, runner, adapter, catalog loader, scheduler, queue, broker, worker, agent-loop, live access, SSH, NETCONF, RESTCONF, secrets, provider/API/model calls, config backup/change behavior, production execution path, Day1-Day160 rewrite, second safety matrix, Phase 2K-02 start, or extra slice.
 
 ### AI-assisted Human-guided Network Testing Architecture
 
@@ -356,7 +357,7 @@ Current Phase 2H / 2I / 2J / 2K progress snapshot:
 | 18 | 2J-05 | First Local-only Validation Job / Implementation | IMPLEMENTATION / DONE | Local approval-envelope validation only |
 | 19 | 2J-06 | First Local-only Validation Job Acceptance Review / Review Only | DONE / PENDING_MERGE | Acceptance review closure only |
 | 20 | 2K-00 | Platform Guidance Provider Concept Decision Gate / Planning Only | DONE / READY_FOR_REVIEW | Concept track may continue to future planning only |
-| 21 | 2K-01 | Vendor Profile Provider Architecture Flow / Planning Only | NEW / FUTURE | Defer |
+| 21 | 2K-01 | Vendor Profile Provider Architecture Flow / Planning Only | DONE / READY_FOR_REVIEW | Static architecture flow only |
 | 22 | 2K-02 | Vendor Profile Schema Contract / Planning Only | NEW / FUTURE | Defer |
 | 23 | 2K-03 | Instruction Template Contract / Planning Only | NEW / FUTURE | Defer |
 | 24 | 2K-04 | AI-visible / AI-hidden Boundary Review / Planning Only | NEW / FUTURE | Defer |
