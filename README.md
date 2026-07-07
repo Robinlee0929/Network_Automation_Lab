@@ -6,6 +6,10 @@ Network Automation Lab is a reviewer-visible network automation portfolio projec
 
 The current repository emphasis is safe documentation, report-only validation, dry-run planning, mock-only examples, and traceable reviewer evidence. It is intended to help a first-time reviewer understand what has been completed, what remains explicitly forbidden, and what future work would require a separate authorization gate.
 
+![AI-assisted workflow overview](docs/assets/readme-ai-assisted-workflow.png)
+
+This diagram summarizes the reviewer-visible, safety-gated workflow at a high level.
+
 ## Current Safety Boundary
 
 Allowed by default:
