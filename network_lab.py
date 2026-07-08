@@ -2047,12 +2047,12 @@ PHASE_2C_15_INTERVIEW_MVP_IMPLEMENTATION_SLICE_KICKOFF_AUTHORIZATION_GATE_DOC = 
 PHASE_2C_15_INTERVIEW_MVP_IMPLEMENTATION_SLICE_KICKOFF_AUTHORIZATION_GATE_JSON = (
     Path("reports")
     / "lab-summary"
-    / "phase_2c_15_interview_mvp_implementation_slice_kickoff_authorization_gate.json"
+    / "phase_2c_15_kickoff_authorization_gate.json"
 )
 PHASE_2C_15_INTERVIEW_MVP_IMPLEMENTATION_SLICE_KICKOFF_AUTHORIZATION_GATE_HTML = (
     Path("reports")
     / "lab-summary"
-    / "phase_2c_15_interview_mvp_implementation_slice_kickoff_authorization_gate.html"
+    / "phase_2c_15_kickoff_authorization_gate.html"
 )
 PHASE_2C_16_INTERVIEW_MVP_LOCAL_RESULT_ENVELOPE_CONTRACT_TASK_ID = (
     "phase2c-16-interview-mvp-local-result-envelope-contract"

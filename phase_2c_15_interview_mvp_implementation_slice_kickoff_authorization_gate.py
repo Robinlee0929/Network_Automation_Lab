@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import html
 import json
+import os
 from pathlib import Path
 from typing import Any, Callable, Dict, Mapping, Optional, Sequence, Tuple
 
@@ -36,8 +37,8 @@ DECISION_TARGET_SLICE = "local_result_envelope_contract"
 DECISION_TARGET_DISPLAY_NAME = "Local Result Envelope Contract"
 FINAL_VERDICT = "PHASE_2C_15_INTERVIEW_MVP_KICKOFF_AUTHORIZATION_GATE_DONE_AUTHORIZED_FOR_LATER_PHASE"
 BLOCKED_VERDICT = "NEEDS_SCOPE_CONFIRMATION"
-REPORT_JSON = Path("reports") / "lab-summary" / "phase_2c_15_interview_mvp_implementation_slice_kickoff_authorization_gate.json"
-REPORT_HTML = Path("reports") / "lab-summary" / "phase_2c_15_interview_mvp_implementation_slice_kickoff_authorization_gate.html"
+REPORT_JSON = Path("reports") / "lab-summary" / "phase_2c_15_kickoff_authorization_gate.json"
+REPORT_HTML = Path("reports") / "lab-summary" / "phase_2c_15_kickoff_authorization_gate.html"
 DOC_PATH = Path("docs") / "phase_2c" / "phase_2c_15_interview_mvp_implementation_slice_kickoff_authorization_gate.md"
 
 PHASE_GOAL = (
@@ -452,8 +453,28 @@ def _dict_rows(values: Mapping[str, Any]) -> str:
     )
 
 
+def _windows_extended_path(path: Path) -> Path:
+    if os.name != "nt":
+        return path
+
+    resolved = path.resolve()
+    text = str(resolved)
+    if text.startswith("\\\\?\\"):
+        return resolved
+    if text.startswith("\\\\"):
+        return Path("\\\\?\\UNC\\" + text.lstrip("\\"))
+    return Path("\\\\?\\" + text)
+
+
+def _write_text(path: Path, text: str) -> None:
+    io_path = _windows_extended_path(path)
+    io_path.parent.mkdir(parents=True, exist_ok=True)
+    io_path.write_text(text, encoding="utf-8")
+
+
 def _write_html_report(report: Mapping[str, Any], output_path: Path) -> None:
-    output_path.write_text(
+    _write_text(
+        output_path,
         f"""<!doctype html>
 <html lang="en">
 <head>
@@ -490,7 +511,6 @@ def _write_html_report(report: Mapping[str, Any], output_path: Path) -> None:
 </body>
 </html>
 """,
-        encoding="utf-8",
     )
 
 
@@ -503,9 +523,7 @@ def write_phase_2c_15_interview_mvp_implementation_slice_kickoff_authorization_g
     )
     json_path = project_root / REPORT_JSON
     html_path = project_root / REPORT_HTML
-    json_path.parent.mkdir(parents=True, exist_ok=True)
-    html_path.parent.mkdir(parents=True, exist_ok=True)
-    json_path.write_text(json.dumps(report_data, indent=2, sort_keys=True), encoding="utf-8")
+    _write_text(json_path, json.dumps(report_data, indent=2, sort_keys=True))
     _write_html_report(report_data, html_path)
     return json_path, html_path
 
