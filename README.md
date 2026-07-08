@@ -42,7 +42,7 @@ Forbidden unless a later task explicitly authorizes a separate safety gate:
 
 ## Current Project Status
 
-Phase 2J is closed. Phase 2K-01, the 2C-15 Windows Long Path Report Directory Hardening Fix, Phase 2K-02, Phase 2K-03, and Phase 2K-04 are already merged to `main`. Phase 2K-05 is documented as `DONE / READY_FOR_REVIEW`.
+Phase 2J is closed. Phase 2K-01, the 2C-15 Windows Long Path Report Directory Hardening Fix, Phase 2K-02, Phase 2K-03, Phase 2K-04, and Phase 2K-05 are already merged to `main`. Phase 2K-06 is documented as `DONE / READY_FOR_REVIEW`.
 
 The latest known merged `main` / `origin/main` commit for the Pre-2K baseline is:
 
@@ -50,7 +50,7 @@ The latest known merged `main` / `origin/main` commit for the Pre-2K baseline is
 2d53e75c1118e857db5ae59dae4ca99bfaf1f127
 ```
 
-The recommended next candidate is `2K-06 - Reference Mode Policy Gate / Planning Only`. This is future-only and not authorization. Phase 2K-05 does not create or imply AI execution, provider execution, runtime prompts, instruction rendering, placeholder expansion, implementation work, API or model calls, catalog loading, schema enforcement, secrets handling, live access, command generation, or a new runtime capability.
+The recommended next candidate is `2K-07 - Static Vendor Profile Catalog Authorization Gate`. This is future-only and not authorization. Phase 2K-06 does not create or imply AI execution, provider execution, runtime prompts, instruction rendering, placeholder expansion, implementation work, API or model calls, reference loading, catalog loading, schema enforcement, secrets handling, live access, command generation, or a new runtime capability.
 
 ## Completed Milestone Summary
 
@@ -85,10 +85,10 @@ This README does not claim a fresh validation result by itself. Task-specific fi
 ## Next Recommended Step
 
 ```text
-2K-06 - Reference Mode Policy Gate / Planning Only
+2K-07 - Static Vendor Profile Catalog Authorization Gate
 ```
 
-This is only a recommended next planning candidate. It does not authorize implementation or permit live, provider-backed, autonomous, catalog-loading, schema-enforcement, instruction-rendering, runtime prompt, hidden execution, AI execution, command-generation, or secrets-handling behavior.
+This is only a recommended next planning candidate. It does not authorize implementation or permit live, provider-backed, autonomous, reference-loading, catalog-loading, schema-enforcement, instruction-rendering, runtime prompt, hidden execution, AI execution, command-generation, or secrets-handling behavior.
 
 ## Project Overview
 
@@ -327,6 +327,7 @@ Phase lanes and close status:
   - Phase 2K-03 records the Instruction Template Contract at `docs/phase_2k/phase_2k_03_instruction_template_contract_planning_only.md`; it defines static template-level field expectations, required template sections, allowed and forbidden output types, placeholder categories, and future-phase boundaries for planning only, while adding no source, tests, runner, adapter, instruction renderer, prompt executor, placeholder resolver, scheduler, queue, broker, worker, agent-loop, live access, SSH, NETCONF, RESTCONF, secrets, provider/API/model calls, schema enforcement, config backup/change behavior, production execution path, Day1-Day160 rewrite, second safety matrix, Phase 2K-04 start, or extra slice.
   - Phase 2K-04 records the AI-visible / AI-hidden Boundary Review at `docs/phase_2k/phase_2k_04_ai_visible_ai_hidden_boundary_review_planning_only.md`; it defines static planning rules for what may be AI-visible and what must remain hidden, excluded, redacted, or unavailable, while adding no source, tests, runner, adapter, prompt constructor, instruction renderer, provider runtime, scheduler, queue, broker, worker, agent-loop, live access, SSH, NETCONF, RESTCONF, secrets handling, provider/API/model calls, schema enforcement, config backup/change behavior, production execution path, Day1-Day160 rewrite, second safety matrix, Phase 2K-05 start, or extra slice.
   - Phase 2K-05 records the Guidance Mode Instruction Card Design at `docs/phase_2k/phase_2k_05_guidance_mode_instruction_card_design_static_only.md`; it defines static reviewer-facing card fields, AI-visible and AI-hidden summaries, non-execution notices, and reviewer checklist expectations for future Guidance Mode only, while adding no source, tests, runner, adapter, command generator, prompt constructor, instruction renderer, provider runtime, scheduler, queue, broker, worker, agent-loop, live access, SSH, NETCONF, RESTCONF, secrets handling, provider/API/model calls, schema enforcement, config backup/change behavior, production execution path, Day1-Day160 rewrite, second safety matrix, Phase 2K-06 start, or extra slice.
+  - Phase 2K-06 records the Reference Mode Policy Gate at `docs/phase_2k/phase_2k_06_reference_mode_policy_gate_planning_only.md`; it defines planning-only reviewer gate questions, gate outcomes, and blocked-by-default expectations for future Reference Mode static display eligibility, while adding no source, tests, runner, adapter, reference loader, catalog loader, command generator, prompt constructor, instruction renderer, provider runtime, scheduler, queue, broker, worker, agent-loop, live access, SSH, NETCONF, RESTCONF, secrets handling, provider/API/model calls, schema enforcement, config backup/change behavior, production execution path, Day1-Day160 rewrite, second safety matrix, Phase 2K-07 start, or extra slice.
 
 ### AI-assisted Human-guided Network Testing Architecture
 
@@ -367,9 +368,9 @@ Current Phase 2H / 2I / 2J / 2K progress snapshot:
 | 26 | 2K-02 | Vendor Profile Schema Contract / Planning Only | DONE / MERGED_TO_MAIN | Static schema contract only |
 | 27 | 2K-03 | Instruction Template Contract / Planning Only | DONE / MERGED_TO_MAIN | Static instruction template contract only |
 | 28 | 2K-04 | AI-visible / AI-hidden Boundary Review / Planning Only | DONE / MERGED_TO_MAIN | Static boundary review only |
-| 29 | 2K-05 | Guidance Mode Instruction Card Design / Static Only | DONE / READY_FOR_REVIEW | Static instruction card design only |
-| 30 | 2K-06 | Reference Mode Policy Gate / Planning Only | NEW / FUTURE | Next candidate |
-| 31 | 2K-07 | Static Vendor Profile Catalog Authorization Gate | NEW / FUTURE | Defer |
+| 29 | 2K-05 | Guidance Mode Instruction Card Design / Static Only | DONE / MERGED_TO_MAIN | Keep |
+| 30 | 2K-06 | Reference Mode Policy Gate / Planning Only | DONE / READY_FOR_REVIEW | Planning-only policy gate complete |
+| 31 | 2K-07 | Static Vendor Profile Catalog Authorization Gate | NEW / FUTURE | Next candidate / 下一候選 |
 | 32 | 2K-08 | README Fastest Hands-on Path / Reviewer Onboarding Clarity | NEW / FUTURE | Defer; remember Traditional Chinese support |
 | 33 | 2K-09 | README License Clarification / MIT License Usage Note | NEW / FUTURE | Defer |
 
