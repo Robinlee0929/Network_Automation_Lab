@@ -4,6 +4,7 @@ from pathlib import Path
 
 import intent_parser_consumer_reviewer_triage_evidence_traceability as day114
 import network_lab
+from report_file_utils import path_exists, read_text_with_long_path
 
 
 FORBIDDEN_IMPORTS = {
@@ -169,8 +170,8 @@ def test_day114_writer_outputs_json_and_html_traceability_audit(tmp_path):
 
     assert json_path == tmp_path / "reports/lab-summary/day114_parser_consumer_reviewer_triage_evidence_traceability.json"
     assert html_path == tmp_path / "reports/lab-summary/day114_parser_consumer_reviewer_triage_evidence_traceability.html"
-    assert json.loads(json_path.read_text(encoding="utf-8")) == report
-    html = html_path.read_text(encoding="utf-8")
+    assert json.loads(read_text_with_long_path(json_path, encoding="utf-8")) == report
+    html = read_text_with_long_path(html_path, encoding="utf-8")
     assert "Day114 Parser Consumer Reviewer Triage Evidence Traceability / Blocked Record Preservation Audit" in html
     assert "Traceability Records" in html
     assert "NO_EXECUTION_READINESS_INFERRED" in html
@@ -248,8 +249,8 @@ def test_day114_runner_writes_reports_without_live_runner_paths(tmp_path, capsys
     assert "NO_EXECUTION_READINESS_INFERRED" in output
     assert "NO_NEXT_PHASE_UNLOCK" in output
     assert "BLOCKED_RECORDS_PRESERVED" in output
-    assert (tmp_path / "reports/lab-summary/day114_parser_consumer_reviewer_triage_evidence_traceability.json").exists()
-    assert (tmp_path / "reports/lab-summary/day114_parser_consumer_reviewer_triage_evidence_traceability.html").exists()
+    assert path_exists(tmp_path / "reports/lab-summary/day114_parser_consumer_reviewer_triage_evidence_traceability.json")
+    assert path_exists(tmp_path / "reports/lab-summary/day114_parser_consumer_reviewer_triage_evidence_traceability.html")
 
 
 def test_day114_report_index_visibility_includes_traceability_audit(tmp_path):
@@ -259,7 +260,7 @@ def test_day114_report_index_visibility_includes_traceability_audit(tmp_path):
     exit_code = network_lab.main(["--report-index"], project_root=tmp_path)
 
     assert exit_code == 0
-    html = (tmp_path / "reports/report_index.html").read_text(encoding="utf-8")
+    html = read_text_with_long_path(tmp_path / "reports/report_index.html", encoding="utf-8")
     assert "Parser Consumer Reviewer Triage Evidence Traceability / Blocked Record Preservation Audit" in html
     assert "traceability" in html
     assert "reports/lab-summary/day114_parser_consumer_reviewer_triage_evidence_traceability.json" in html

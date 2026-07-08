@@ -8,6 +8,7 @@ import network_lab
 import network_lab_cli_dispatch
 import intent_project_folder_organization_dry_run_inventory_gate as day138
 from network_lab_task_registry import resolve_task_handler, resolve_task_name
+from report_file_utils import path_exists, read_text_with_long_path
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -157,12 +158,12 @@ def test_day138_write_reports_and_report_index_visibility(day138_report, tmp_pat
     )
 
     exit_code = network_lab.main(["--report-index"], project_root=tmp_path)
-    index_html = (tmp_path / "reports" / "report_index.html").read_text(encoding="utf-8")
-    written = json.loads(json_path.read_text(encoding="utf-8"))
+    index_html = read_text_with_long_path(tmp_path / "reports" / "report_index.html", encoding="utf-8")
+    written = json.loads(read_text_with_long_path(json_path, encoding="utf-8"))
 
     assert exit_code == 0
-    assert json_path.exists()
-    assert html_path.exists()
+    assert path_exists(json_path)
+    assert path_exists(html_path)
     assert written["overall_status"] == "PASS"
     assert written["final_recommendation"] == "KEEP_DRY_RUN_INVENTORY_ONLY"
     assert written["next_phase_allowed"] is False

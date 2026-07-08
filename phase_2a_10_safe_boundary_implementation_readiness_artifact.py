@@ -17,6 +17,8 @@ from copy import deepcopy
 from pathlib import Path
 from typing import Any, Callable, Dict, Iterable, Mapping, Optional, Sequence, Tuple
 
+from report_file_utils import write_text_with_parents
+
 from phase_2a_08_jobs_catalog_ui_readiness_planning_pack import (
     REQUIRED_JOB_TYPES,
 )
@@ -408,7 +410,7 @@ def write_phase_2a_10_safe_boundary_implementation_readiness_artifact_reports(
     html_path = project_root / REPORT_HTML
     json_path.parent.mkdir(parents=True, exist_ok=True)
     html_path.parent.mkdir(parents=True, exist_ok=True)
-    json_path.write_text(json.dumps(report_data, indent=2, sort_keys=True), encoding="utf-8")
+    write_text_with_parents(json_path, json.dumps(report_data, indent=2, sort_keys=True), encoding="utf-8")
     _write_html_report(report_data, html_path)
     return json_path, html_path
 
@@ -438,7 +440,8 @@ def _readiness_rows(report: Mapping[str, Any]) -> str:
 
 
 def _write_html_report(report: Mapping[str, Any], output_path: Path) -> None:
-    output_path.write_text(
+    write_text_with_parents(
+        output_path,
         f"""<!doctype html>
 <html lang="en">
 <head>

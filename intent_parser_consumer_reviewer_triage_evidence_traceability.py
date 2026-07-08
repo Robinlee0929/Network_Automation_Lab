@@ -14,6 +14,8 @@ import json
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
+from report_file_utils import write_text_with_parents
+
 from intent_parser_consumer_release_review_intake import (
     REPORT_HTML as DAY112_REPORT_HTML,
     REPORT_JSON as DAY112_REPORT_JSON,
@@ -544,7 +546,8 @@ def write_parser_consumer_reviewer_triage_evidence_traceability_html(
         (key, json.dumps(value)) for key, value in report["safety_invariants"].items()
     )
     agents = report["agents_md_pre_read_evidence"]
-    output_path.write_text(
+    write_text_with_parents(
+        output_path,
         f"""<!doctype html>
 <html lang="en">
 <head>
@@ -624,7 +627,7 @@ def write_parser_consumer_reviewer_triage_evidence_traceability_reports(
     json_path = Path(project_root) / REPORT_JSON
     html_path = Path(project_root) / REPORT_HTML
     json_path.parent.mkdir(parents=True, exist_ok=True)
-    json_path.write_text(json.dumps(safe_report, indent=2), encoding="utf-8")
+    write_text_with_parents(json_path, json.dumps(safe_report, indent=2), encoding="utf-8")
     write_parser_consumer_reviewer_triage_evidence_traceability_html(safe_report, html_path)
     return json_path, html_path
 

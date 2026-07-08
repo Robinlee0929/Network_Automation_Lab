@@ -13,6 +13,8 @@ import json
 from pathlib import Path
 from typing import Any, Callable, Dict, Iterable, Mapping, Optional, Tuple
 
+from report_file_utils import write_text_with_parents
+
 
 DAY = 135
 DAY_LABEL = "Day135"
@@ -367,7 +369,7 @@ def write_ai_provider_disabled_by_default_safety_regression_reports(
     json_path = Path(project_root) / REPORT_JSON
     html_path = Path(project_root) / REPORT_HTML
     json_path.parent.mkdir(parents=True, exist_ok=True)
-    json_path.write_text(json.dumps(safe_report, indent=2), encoding="utf-8")
+    write_text_with_parents(json_path, json.dumps(safe_report, indent=2), encoding="utf-8")
     write_ai_provider_disabled_by_default_safety_regression_html(safe_report, html_path)
     return json_path, html_path
 
@@ -386,7 +388,8 @@ def write_ai_provider_disabled_by_default_safety_regression_html(report: Mapping
         )
         for case in report.get("regression_cases", [])
     )
-    output_path.write_text(
+    write_text_with_parents(
+        output_path,
         f"""<!doctype html>
 <html lang="en">
 <head>

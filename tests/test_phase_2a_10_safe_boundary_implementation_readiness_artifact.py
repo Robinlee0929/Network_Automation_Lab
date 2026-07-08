@@ -3,6 +3,7 @@ from pathlib import Path
 
 import network_lab
 import phase_2a_10_safe_boundary_implementation_readiness_artifact as pack
+from report_file_utils import path_exists, read_text_with_long_path
 
 
 def test_agents_md_status_is_recorded_and_file_was_not_modified_by_pack():
@@ -132,8 +133,8 @@ def test_cli_writes_phase_2a_10_readiness_artifact_without_execution_paths(tmp_p
     assert "safety_gates_weakened: false" in output
     assert "Readiness decision: PHASE_2A_10_SAFE_BOUNDARY_IMPLEMENTATION_READY" in output
     assert "[PASS] PHASE_2A_10_SAFE_BOUNDARY_IMPLEMENTATION_READY" in output
-    assert (tmp_path / pack.REPORT_JSON).exists()
-    assert (tmp_path / pack.REPORT_HTML).exists()
+    assert path_exists(tmp_path / pack.REPORT_JSON)
+    assert path_exists(tmp_path / pack.REPORT_HTML)
 
 
 def test_task_catalog_and_report_index_visibility(tmp_path):
@@ -157,6 +158,6 @@ def test_task_catalog_and_report_index_visibility(tmp_path):
 
     assert network_lab.main(["--task", pack.TASK_NAME], project_root=tmp_path) == 0
     assert network_lab.main(["--report-index"], project_root=tmp_path) == 0
-    html = (tmp_path / "reports/report_index.html").read_text(encoding="utf-8")
+    html = read_text_with_long_path(tmp_path / "reports/report_index.html", encoding="utf-8")
     assert "Phase 2A-10 Safe-Boundary Implementation Readiness Artifact" in html
     assert "phase_2a_10_safe_boundary_implementation_readiness_artifact.json" in html

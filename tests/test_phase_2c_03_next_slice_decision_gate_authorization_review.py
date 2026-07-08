@@ -3,6 +3,7 @@ from pathlib import Path
 
 import network_lab
 import phase_2c_03_next_slice_decision_gate_authorization_review as phase_2c_03
+from report_file_utils import path_exists, read_text_with_long_path
 
 
 DOC_PATH = Path("docs/phase_2c/phase_2c_03_next_slice_decision_gate_authorization_review.md")
@@ -175,8 +176,8 @@ def test_cli_writes_phase_2c_03_without_execution_paths(tmp_path, capsys, monkey
     assert "next_slice_implemented: false" in output
     assert "runner_adapter_execution_path_added: false" in output
     assert f"[PASS] {phase_2c_03.FINAL_VERDICT}" in output
-    assert (tmp_path / phase_2c_03.REPORT_JSON).exists()
-    assert (tmp_path / phase_2c_03.REPORT_HTML).exists()
+    assert path_exists(tmp_path / phase_2c_03.REPORT_JSON)
+    assert path_exists(tmp_path / phase_2c_03.REPORT_HTML)
 
 
 def test_task_catalog_and_report_index_visibility_for_phase_2c_03(tmp_path):
@@ -200,6 +201,6 @@ def test_task_catalog_and_report_index_visibility_for_phase_2c_03(tmp_path):
 
     assert network_lab.main(["--task", phase_2c_03.TASK_NAME], project_root=tmp_path) == 0
     assert network_lab.main(["--report-index"], project_root=tmp_path) == 0
-    html = (tmp_path / "reports/report_index.html").read_text(encoding="utf-8")
+    html = read_text_with_long_path(tmp_path / "reports/report_index.html", encoding="utf-8")
     assert "Phase 2C-03 Next-Slice Decision Gate / Authorization Review - Planning Only" in html
     assert "phase_2c_03_next_slice_decision_gate_authorization_review.json" in html

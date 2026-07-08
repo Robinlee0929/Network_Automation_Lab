@@ -17,6 +17,8 @@ from copy import deepcopy
 from pathlib import Path
 from typing import Any, Callable, Dict, Mapping, Optional, Sequence, Tuple
 
+from report_file_utils import write_text_with_parents
+
 from phase_2b_00a_planning_only_owner_authorization_statement import FORBIDDEN_CAPABILITIES
 from phase_2c_03_next_slice_decision_gate_authorization_review import (
     FINAL_VERDICT as PHASE_2C_03_VERDICT,
@@ -628,7 +630,8 @@ def _check_rows(values: Sequence[Mapping[str, Any]]) -> str:
 
 
 def _write_html_report(report: Mapping[str, Any], output_path: Path) -> None:
-    output_path.write_text(
+    write_text_with_parents(
+        output_path,
         f"""<!doctype html>
 <html lang="en">
 <head>
@@ -682,7 +685,7 @@ def write_phase_2c_10_next_slice_decision_gate_authorization_review_reports(
     html_path = project_root / REPORT_HTML
     json_path.parent.mkdir(parents=True, exist_ok=True)
     html_path.parent.mkdir(parents=True, exist_ok=True)
-    json_path.write_text(json.dumps(report_data, indent=2, sort_keys=True), encoding="utf-8")
+    write_text_with_parents(json_path, json.dumps(report_data, indent=2, sort_keys=True), encoding="utf-8")
     _write_html_report(report_data, html_path)
     return json_path, html_path
 

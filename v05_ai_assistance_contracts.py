@@ -8,6 +8,8 @@ import json
 from pathlib import Path
 from typing import Any, Callable, Dict, Iterable, Mapping, Optional, Tuple
 
+from report_file_utils import write_text_with_parents
+
 
 OVERALL_STATUS = "PASS"
 STATUS = "REVIEW_READY"
@@ -256,7 +258,7 @@ def write_v05_ai_assistance_reports(
     json_path = Path(project_root) / spec["report_json"]
     html_path = Path(project_root) / spec["report_html"]
     json_path.parent.mkdir(parents=True, exist_ok=True)
-    json_path.write_text(json.dumps(safe_report, indent=2), encoding="utf-8")
+    write_text_with_parents(json_path, json.dumps(safe_report, indent=2), encoding="utf-8")
     write_v05_ai_assistance_html(safe_report, html_path)
     return json_path, html_path
 
@@ -308,7 +310,8 @@ def write_v05_ai_assistance_html(report: Mapping[str, Any], output_path: Path) -
         )
         for item in report.get("reference_records", [])
     )
-    output_path.write_text(
+    write_text_with_parents(
+        output_path,
         f"""<!doctype html>
 <html lang="en">
 <head>

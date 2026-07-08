@@ -4,6 +4,7 @@ from pathlib import Path
 
 import intent_parser_consumer_reviewer_triage_closure_summary as day115
 import network_lab
+from report_file_utils import path_exists, read_text_with_long_path
 
 
 FORBIDDEN_IMPORTS = {
@@ -234,8 +235,8 @@ def test_day115_writer_outputs_json_and_html_closure_summary(tmp_path):
 
     assert json_path == tmp_path / "reports/lab-summary/day115_parser_consumer_reviewer_triage_closure_summary.json"
     assert html_path == tmp_path / "reports/lab-summary/day115_parser_consumer_reviewer_triage_closure_summary.html"
-    assert json.loads(json_path.read_text(encoding="utf-8")) == report
-    html = html_path.read_text(encoding="utf-8")
+    assert json.loads(read_text_with_long_path(json_path, encoding="utf-8")) == report
+    html = read_text_with_long_path(html_path, encoding="utf-8")
     assert "Day115 Parser Consumer Reviewer Triage Closure Summary / Non-Advancement Decision Audit" in html
     assert "TRIAGE_CHAIN_CLOSED_NON_ADVANCING" in html
     assert "NO_EXECUTION_READINESS_INFERRED" in html
@@ -313,8 +314,8 @@ def test_day115_runner_writes_reports_without_live_runner_paths(tmp_path, capsys
     assert "approval_unlock_allowed: false" in output
     assert "TRIAGE_CHAIN_CLOSED_NON_ADVANCING" in output
     assert "BLOCKED_RECORDS_NOT_DOWNGRADED" in output
-    assert (tmp_path / "reports/lab-summary/day115_parser_consumer_reviewer_triage_closure_summary.json").exists()
-    assert (tmp_path / "reports/lab-summary/day115_parser_consumer_reviewer_triage_closure_summary.html").exists()
+    assert path_exists(tmp_path / "reports/lab-summary/day115_parser_consumer_reviewer_triage_closure_summary.json")
+    assert path_exists(tmp_path / "reports/lab-summary/day115_parser_consumer_reviewer_triage_closure_summary.html")
 
 
 def test_day115_report_index_visibility_includes_closure_summary(tmp_path):
@@ -324,7 +325,7 @@ def test_day115_report_index_visibility_includes_closure_summary(tmp_path):
     exit_code = network_lab.main(["--report-index"], project_root=tmp_path)
 
     assert exit_code == 0
-    html = (tmp_path / "reports/report_index.html").read_text(encoding="utf-8")
+    html = read_text_with_long_path(tmp_path / "reports/report_index.html", encoding="utf-8")
     assert "Parser Consumer Reviewer Triage Closure Summary / Non-Advancement Decision Audit" in html
     assert "TRIAGE_CLOSURE_AUDITED_NON_ADVANCING" in html
     assert "reports/lab-summary/day115_parser_consumer_reviewer_triage_closure_summary.json" in html

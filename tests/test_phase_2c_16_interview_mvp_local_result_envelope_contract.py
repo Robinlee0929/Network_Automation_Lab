@@ -4,6 +4,7 @@ from pathlib import Path
 import network_lab
 import phase_2c_12_interview_mvp_implementation_slice_candidate_inventory as phase_2c_12
 import phase_2c_16_interview_mvp_local_result_envelope_contract as phase_2c_16
+from report_file_utils import path_exists, read_text_with_long_path, write_text_with_parents
 
 
 DOC_PATH = Path("docs/phase_2c/phase_2c_16_interview_mvp_local_result_envelope_contract.md")
@@ -23,8 +24,7 @@ def _doc_text() -> str:
 
 def _materialize_reference(project_root: Path) -> None:
     path = project_root / phase_2c_12.REFERENCE_DOC
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(REFERENCE_TEXT, encoding="utf-8")
+    write_text_with_parents(path, REFERENCE_TEXT, encoding="utf-8")
 
 
 def test_agents_md_is_not_modified_for_phase_2c_16():
@@ -222,8 +222,8 @@ def test_cli_writes_phase_2c_16_without_execution_paths(tmp_path, capsys, monkey
     assert "next_phase_started: false" in output
     assert "extra_slice_selected_or_implemented: false" in output
     assert f"[PASS] {phase_2c_16.FINAL_VERDICT}" in output
-    assert (tmp_path / phase_2c_16.REPORT_JSON).exists()
-    assert (tmp_path / phase_2c_16.REPORT_HTML).exists()
+    assert path_exists(tmp_path / phase_2c_16.REPORT_JSON)
+    assert path_exists(tmp_path / phase_2c_16.REPORT_HTML)
 
 
 def test_task_catalog_and_report_index_visibility_for_phase_2c_16(tmp_path):
@@ -248,6 +248,6 @@ def test_task_catalog_and_report_index_visibility_for_phase_2c_16(tmp_path):
 
     assert network_lab.main(["--task", phase_2c_16.TASK_NAME], project_root=tmp_path) == 0
     assert network_lab.main(["--report-index"], project_root=tmp_path) == 0
-    html = (tmp_path / "reports/report_index.html").read_text(encoding="utf-8")
+    html = read_text_with_long_path(tmp_path / "reports/report_index.html", encoding="utf-8")
     assert "Phase 2C-16 Interview MVP Local Result Envelope Contract" in html
     assert "phase_2c_16_interview_mvp_local_result_envelope_contract.json" in html
