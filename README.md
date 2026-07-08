@@ -42,7 +42,7 @@ Forbidden unless a later task explicitly authorizes a separate safety gate:
 
 ## Current Project Status
 
-Phase 2J is closed. Phase 2K-01 and the 2C-15 Windows Long Path Report Directory Hardening Fix are already merged to `main`. Phase 2K-02 is now recorded as a planning-only Vendor Profile Schema Contract and is ready for review.
+Phase 2J is closed. Phase 2K-01, the 2C-15 Windows Long Path Report Directory Hardening Fix, and Phase 2K-02 are already merged to `main`. Phase 2K-03 is now recorded as a planning-only Instruction Template Contract and is ready for review.
 
 The latest known merged `main` / `origin/main` commit for the Pre-2K baseline is:
 
@@ -50,7 +50,7 @@ The latest known merged `main` / `origin/main` commit for the Pre-2K baseline is
 2d53e75c1118e857db5ae59dae4ca99bfaf1f127
 ```
 
-The recommended next candidate is `2K-03 - Instruction Template Contract / Planning Only`. This is future-only and not authorization. Phase 2K-02 does not create or imply schema enforcement, provider execution, implementation work, API or model calls, catalog loading, or a new runtime capability.
+The recommended next candidate is `2K-04 - AI-visible / AI-hidden Boundary Review / Planning Only`. This is future-only and not authorization. Phase 2K-03 does not create or imply runtime prompts, instruction rendering, placeholder expansion, provider execution, implementation work, API or model calls, catalog loading, schema enforcement, or a new runtime capability.
 
 ## Completed Milestone Summary
 
@@ -85,10 +85,10 @@ This README does not claim a fresh validation result by itself. Task-specific fi
 ## Next Recommended Step
 
 ```text
-2K-03 - Instruction Template Contract / Planning Only
+2K-04 - AI-visible / AI-hidden Boundary Review / Planning Only
 ```
 
-This is only a recommended next planning candidate. It does not authorize implementation or permit live, provider-backed, autonomous, catalog-loading, schema-enforcement, or hidden execution behavior.
+This is only a recommended next planning candidate. It does not authorize implementation or permit live, provider-backed, autonomous, catalog-loading, schema-enforcement, instruction-rendering, runtime prompt, or hidden execution behavior.
 
 ## Project Overview
 
@@ -324,6 +324,7 @@ Phase lanes and close status:
   - Phase 2K-00 records the Platform Guidance Provider concept decision gate at `docs/phase_2k/phase_2k_00_platform_guidance_provider_concept_decision_gate.md`; it allows the concept track to continue to future planning-only phases, keeps implementation unauthorized, keeps provider runtime/API/model calls unauthorized, and adds no source, tests, runner, adapter, scheduler, queue, broker, worker, agent-loop, live access, SSH, NETCONF, RESTCONF, secrets, config backup/change behavior, production execution path, Day1-Day160 rewrite, second safety matrix, Phase 2K-01 start, or extra slice.
   - Phase 2K-01 records the Vendor Profile Provider architecture flow at `docs/phase_2k/phase_2k_01_vendor_profile_provider_architecture_flow_planning_only.md`; it defines a static conceptual flow for future planning only, separates AI-visible guidance concepts from AI-hidden/reviewer-only boundary concepts, keeps implementation and runtime provider integration unauthorized, and adds no source, tests, runner, adapter, catalog loader, scheduler, queue, broker, worker, agent-loop, live access, SSH, NETCONF, RESTCONF, secrets, provider/API/model calls, config backup/change behavior, production execution path, Day1-Day160 rewrite, second safety matrix, Phase 2K-02 start, or extra slice.
   - Phase 2K-02 records the Vendor Profile Schema Contract at `docs/phase_2k/phase_2k_02_vendor_profile_schema_contract_planning_only.md`; it defines static schema field-group expectations for future planning only, keeps schema enforcement and runtime provider behavior unauthorized, and adds no source, tests, runner, adapter, catalog loader, provider registry, scheduler, queue, broker, worker, agent-loop, live access, SSH, NETCONF, RESTCONF, secrets, provider/API/model calls, config backup/change behavior, production execution path, Day1-Day160 rewrite, second safety matrix, Phase 2K-03 start, or extra slice.
+  - Phase 2K-03 records the Instruction Template Contract at `docs/phase_2k/phase_2k_03_instruction_template_contract_planning_only.md`; it defines static template-level field expectations, required template sections, allowed and forbidden output types, placeholder categories, and future-phase boundaries for planning only, while adding no source, tests, runner, adapter, instruction renderer, prompt executor, placeholder resolver, scheduler, queue, broker, worker, agent-loop, live access, SSH, NETCONF, RESTCONF, secrets, provider/API/model calls, schema enforcement, config backup/change behavior, production execution path, Day1-Day160 rewrite, second safety matrix, Phase 2K-04 start, or extra slice.
 
 ### AI-assisted Human-guided Network Testing Architecture
 
@@ -360,9 +361,9 @@ Current Phase 2H / 2I / 2J / 2K progress snapshot:
 | 20 | 2K-00 | Platform Guidance Provider Concept Decision Gate / Planning Only | DONE / MERGED_TO_MAIN | Keep |
 | 25 | 2K-01 | Vendor Profile Provider Architecture Flow / Planning Only | DONE / MERGED_TO_MAIN | Keep |
 | 25A | 2C-15 Fix | Windows Long Path Report Directory Hardening Fix | DONE / MERGED_TO_MAIN | Keep |
-| 26 | 2K-02 | Vendor Profile Schema Contract / Planning Only | DONE / READY_FOR_REVIEW | Static schema contract only |
-| 27 | 2K-03 | Instruction Template Contract / Planning Only | NEW / FUTURE | Next candidate |
-| 28 | 2K-04 | AI-visible / AI-hidden Boundary Review / Planning Only | NEW / FUTURE | Defer |
+| 26 | 2K-02 | Vendor Profile Schema Contract / Planning Only | DONE / MERGED_TO_MAIN | Static schema contract only |
+| 27 | 2K-03 | Instruction Template Contract / Planning Only | DONE / READY_FOR_REVIEW | Static instruction template contract only |
+| 28 | 2K-04 | AI-visible / AI-hidden Boundary Review / Planning Only | NEW / FUTURE | Next candidate |
 | 29 | 2K-05 | Guidance Mode Instruction Card Design / Static Only | NEW / FUTURE | Defer |
 | 30 | 2K-06 | Reference Mode Policy Gate / Planning Only | NEW / FUTURE | Defer |
 | 31 | 2K-07 | Static Vendor Profile Catalog Authorization Gate | NEW / FUTURE | Defer |
