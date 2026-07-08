@@ -15,6 +15,8 @@ from copy import deepcopy
 from pathlib import Path
 from typing import Any, Callable, Dict, Mapping, Optional, Sequence, Tuple
 
+from report_file_utils import path_exists, read_text_with_long_path, write_text_with_parents
+
 
 PHASE = "2J-05"
 JOB_NAME = "local_approval_envelope_validation_job"
@@ -280,7 +282,7 @@ def validate_approval_envelope_text(text: str) -> Dict[str, Any]:
 
 def _read_local_artifact(project_root: Path, artifact_path: Path) -> Dict[str, Any]:
     path = project_root / artifact_path
-    if not path.exists():
+    if not path_exists(path):
         return {
             "path": artifact_path.as_posix(),
             "exists": False,
@@ -292,7 +294,7 @@ def _read_local_artifact(project_root: Path, artifact_path: Path) -> Dict[str, A
         "path": artifact_path.as_posix(),
         "exists": True,
         "loaded": True,
-        "text": path.read_text(encoding="utf-8"),
+        "text": read_text_with_long_path(path, encoding="utf-8"),
         "error": None,
     }
 
@@ -301,7 +303,7 @@ def _static_reference_checks(project_root: Path, artifact_record: Mapping[str, A
     return (
         {
             "check": "Phase 2J-03 approval envelope contract source exists",
-            "status": "PASS" if (project_root / PHASE_2J_03_APPROVAL_ENVELOPE_CONTRACT_PATH).exists() else "FAIL",
+            "status": "PASS" if path_exists(project_root / PHASE_2J_03_APPROVAL_ENVELOPE_CONTRACT_PATH) else "FAIL",
         },
         {
             "check": "validated artifact is local repository documentation",
@@ -496,7 +498,8 @@ def _field_rows(values: Sequence[Mapping[str, Any]]) -> str:
 
 def _write_html_report(report: Mapping[str, Any], output_path: Path) -> None:
     envelope_validation = report["approval_envelope_validation"]
-    output_path.write_text(
+    write_text_with_parents(
+        output_path,
         f"""<!doctype html>
 <html lang="en">
 <head>
@@ -542,7 +545,7 @@ def write_phase_2j_05_local_approval_envelope_validation_reports(
     html_path = project_root / REPORT_HTML
     json_path.parent.mkdir(parents=True, exist_ok=True)
     html_path.parent.mkdir(parents=True, exist_ok=True)
-    json_path.write_text(json.dumps(report_data, indent=2, sort_keys=True), encoding="utf-8")
+    write_text_with_parents(json_path, json.dumps(report_data, indent=2, sort_keys=True), encoding="utf-8")
     _write_html_report(report_data, html_path)
     return json_path, html_path
 

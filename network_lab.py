@@ -10,6 +10,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, Iterator, List, Optional, Tuple
 
+from report_file_utils import path_exists, read_text_with_long_path
 from intent_dry_run_plan_builder import build_dry_run_plan_builder_report
 from intent_manual_review_approval_envelope import (
     build_manual_review_approval_envelope_report,
@@ -4761,8 +4762,8 @@ def check_report_file(report_item: Dict[str, Any], project_root: Path) -> Dict[s
         "html": str(report_item.get("html", "")),
         "required": bool(report_item.get("required", False)),
         "status": "MISSING",
-        "exists": json_path.exists(),
-        "html_exists": html_path.exists(),
+        "exists": path_exists(json_path),
+        "html_exists": path_exists(html_path),
         "message": "",
     }
 
@@ -4771,7 +4772,7 @@ def check_report_file(report_item: Dict[str, Any], project_root: Path) -> Dict[s
         return record
 
     try:
-        data = json.loads(json_path.read_text(encoding="utf-8"))
+        data = json.loads(read_text_with_long_path(json_path, encoding="utf-8"))
     except json.JSONDecodeError as exc:
         record["status"] = "UNKNOWN"
         record["message"] = f"Invalid JSON: {exc.msg}"
@@ -14686,6 +14687,61 @@ def _normalize_report_visibility_rows(
     return rows
 
 
+def _materialized_task_report_visibility_rows(
+    project_root: Path,
+    existing_rows: List[Dict[str, Any]],
+) -> List[Dict[str, Any]]:
+    seen = {
+        (str(row.get("json", "")), str(row.get("html", "")))
+        for row in existing_rows
+        if str(row.get("status", "")).upper() == "FOUND"
+    }
+    rows: List[Dict[str, Any]] = []
+    for task in list_tasks():
+        report_paths = [Path(str(path)) for path in task.get("report_paths", [])]
+        json_paths = [
+            path
+            for path in report_paths
+            if path.suffix.lower() == ".json" and path.as_posix().startswith("reports/lab-summary/")
+        ]
+        for json_relative in json_paths:
+            html_relative = next(
+                (
+                    path
+                    for path in report_paths
+                    if path.suffix.lower() == ".html"
+                    and path.as_posix().startswith("reports/lab-summary/")
+                    and path.with_suffix("").as_posix() == json_relative.with_suffix("").as_posix()
+                ),
+                json_relative.with_suffix(".html"),
+            )
+            json_found = path_exists(Path(project_root) / json_relative)
+            html_found = path_exists(Path(project_root) / html_relative)
+            if not json_found and not html_found:
+                continue
+            json_label = json_relative.as_posix() if json_found else "MISSING"
+            html_label = html_relative.as_posix() if html_found else "MISSING"
+            key = (json_label, html_label)
+            if key in seen:
+                continue
+            seen.add(key)
+            rows.append(
+                {
+                    "day": task.get("day", ""),
+                    "title": task.get("user_display_name") or task.get("display_name") or task.get("id", ""),
+                    "report_type": "Task catalog report",
+                    "device": "Task catalog",
+                    "status": "FOUND",
+                    "safety": task.get("safety_level", "report-only"),
+                    "description": task.get("description", ""),
+                    "json": json_label,
+                    "html": html_label,
+                    "notes": "Materialized task-catalog report discovered directly.",
+                }
+            )
+    return rows
+
+
 def _attach_day18_runner_evidence(rows: List[Dict[str, Any]], project_root: Path) -> None:
     day18_evidence = build_day18_runner_evidence(project_root)
     for row in rows:
@@ -14715,6 +14771,7 @@ def discover_report_visibility(project_root: Path) -> List[Dict[str, Any]]:
         scanned_paths = _scan_report_catalog_item(project_root, report_type)
         rows.extend(_normalize_report_visibility_rows(project_root, report_type, scanned_paths))
 
+    rows.extend(_materialized_task_report_visibility_rows(project_root, rows))
     _attach_day18_runner_evidence(rows, project_root)
     rows.append(_disabled_day13_live_execution_row())
     return rows

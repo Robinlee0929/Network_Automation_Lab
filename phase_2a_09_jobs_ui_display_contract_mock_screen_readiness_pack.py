@@ -17,6 +17,7 @@ from copy import deepcopy
 from pathlib import Path
 from typing import Any, Callable, Dict, Iterable, Mapping, Optional, Sequence, Tuple
 
+from report_file_utils import write_text_with_parents
 from phase_2a_08_jobs_catalog_ui_readiness_planning_pack import (
     DOC_PATH as PHASE_2A_08_DOC_PATH,
     REPORT_HTML as PHASE_2A_08_REPORT_HTML,
@@ -729,7 +730,7 @@ def write_phase_2a_09_jobs_ui_display_contract_mock_screen_readiness_pack_report
     html_path = project_root / REPORT_HTML
     json_path.parent.mkdir(parents=True, exist_ok=True)
     html_path.parent.mkdir(parents=True, exist_ok=True)
-    json_path.write_text(json.dumps(report_data, indent=2, sort_keys=True), encoding="utf-8")
+    write_text_with_parents(json_path, json.dumps(report_data, indent=2, sort_keys=True), encoding="utf-8")
     _write_html_report(report_data, html_path)
     return json_path, html_path
 
@@ -775,7 +776,8 @@ def _badge_rows(report: Mapping[str, Any]) -> str:
 def _write_html_report(report: Mapping[str, Any], output_path: Path) -> None:
     markers = "".join(f"<li>{html.escape(marker)}</li>" for marker in report["completion_markers"])
     safety = "; ".join(report["safety_display_contract"]["required_banner_lines"])
-    output_path.write_text(
+    write_text_with_parents(
+        output_path,
         f"""<!doctype html>
 <html lang="en">
 <head>

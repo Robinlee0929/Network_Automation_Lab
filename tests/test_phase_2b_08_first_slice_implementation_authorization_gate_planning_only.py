@@ -3,6 +3,7 @@ from pathlib import Path
 
 import network_lab
 import phase_2b_08_first_slice_implementation_authorization_gate_planning_only as gate
+from report_file_utils import path_exists, read_text_with_long_path
 
 
 DOC_PATH = Path("docs/phase_2b/phase_2b_08_first_slice_implementation_authorization_gate_planning_only.md")
@@ -200,8 +201,8 @@ def test_cli_writes_phase_2b_08_gate_without_execution_paths(tmp_path, capsys, m
     assert "live_device_access_added: false" in output
     assert "provider_api_model_calls_added: false" in output
     assert f"[PASS] {gate.FINAL_VERDICT}" in output
-    assert (tmp_path / gate.REPORT_JSON).exists()
-    assert (tmp_path / gate.REPORT_HTML).exists()
+    assert path_exists(tmp_path / gate.REPORT_JSON)
+    assert path_exists(tmp_path / gate.REPORT_HTML)
 
 
 def test_task_catalog_and_report_index_visibility(tmp_path):
@@ -224,6 +225,6 @@ def test_task_catalog_and_report_index_visibility(tmp_path):
 
     assert network_lab.main(["--task", gate.TASK_NAME], project_root=tmp_path) == 0
     assert network_lab.main(["--report-index"], project_root=tmp_path) == 0
-    html = (tmp_path / "reports/report_index.html").read_text(encoding="utf-8")
+    html = read_text_with_long_path(tmp_path / "reports/report_index.html", encoding="utf-8")
     assert "Phase 2B-08 First-Slice Implementation Authorization Gate - Planning Only" in html
     assert "phase_2b_08_first_slice_implementation_authorization_gate_planning_only.json" in html

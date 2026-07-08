@@ -15,6 +15,8 @@ import json
 from pathlib import Path
 from typing import Any, Callable, Dict, Iterable, Mapping, Optional, Tuple
 
+from report_file_utils import write_text_with_parents
+
 
 DAY = 149
 DAY_LABEL = "Day149"
@@ -445,7 +447,7 @@ def write_day149_ai_assistance_docs_registry_report_index_consistency_audit_repo
     json_path = Path(project_root) / REPORT_JSON
     html_path = Path(project_root) / REPORT_HTML
     json_path.parent.mkdir(parents=True, exist_ok=True)
-    json_path.write_text(json.dumps(safe_report, indent=2), encoding="utf-8")
+    write_text_with_parents(json_path, json.dumps(safe_report, indent=2), encoding="utf-8")
     write_day149_ai_assistance_docs_registry_report_index_consistency_audit_html(safe_report, html_path)
     return json_path, html_path
 
@@ -477,7 +479,8 @@ def write_day149_ai_assistance_docs_registry_report_index_consistency_audit_html
     )
     flag_rows = _table_rows((field, report[field]) for field in REQUIRED_TRUE_FIELDS + REQUIRED_FALSE_FIELDS)
     concept_items = "".join(f"<li><code>{html.escape(concept)}</code></li>" for concept in REQUIRED_CONCEPTS)
-    output_path.write_text(
+    write_text_with_parents(
+        output_path,
         f"""<!doctype html>
 <html lang="en">
 <head>

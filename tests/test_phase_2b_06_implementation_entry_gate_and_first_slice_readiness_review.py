@@ -3,6 +3,7 @@ from pathlib import Path
 
 import network_lab
 import phase_2b_06_implementation_entry_gate_and_first_slice_readiness_review as readiness
+from report_file_utils import path_exists, read_text_with_long_path
 
 
 DOC_PATH = Path("docs/phase_2b/phase_2b_06_implementation_entry_gate_and_first_slice_readiness_review.md")
@@ -203,8 +204,8 @@ def test_cli_writes_phase_2b_06_review_without_execution_paths(tmp_path, capsys,
     assert "provider_api_model_calls_enabled: false" in output
     assert "live_device_access_enabled: false" in output
     assert f"[PASS] {readiness.FINAL_VERDICT}" in output
-    assert (tmp_path / readiness.REPORT_JSON).exists()
-    assert (tmp_path / readiness.REPORT_HTML).exists()
+    assert path_exists(tmp_path / readiness.REPORT_JSON)
+    assert path_exists(tmp_path / readiness.REPORT_HTML)
 
 
 def test_task_catalog_and_report_index_visibility(tmp_path):
@@ -227,6 +228,6 @@ def test_task_catalog_and_report_index_visibility(tmp_path):
 
     assert network_lab.main(["--task", readiness.TASK_NAME], project_root=tmp_path) == 0
     assert network_lab.main(["--report-index"], project_root=tmp_path) == 0
-    html = (tmp_path / "reports/report_index.html").read_text(encoding="utf-8")
+    html = read_text_with_long_path(tmp_path / "reports/report_index.html", encoding="utf-8")
     assert "Phase 2B-06 Implementation Entry Gate and First-Slice Readiness Review" in html
     assert "phase_2b_06_implementation_entry_gate_and_first_slice_readiness_review.json" in html

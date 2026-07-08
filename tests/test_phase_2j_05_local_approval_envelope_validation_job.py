@@ -3,6 +3,7 @@ from pathlib import Path
 
 import network_lab
 import phase_2j_05_local_approval_envelope_validation_job as phase_2j_05
+from report_file_utils import path_exists, read_text_with_long_path, write_text_with_parents
 
 
 DOC_PATH = Path("docs/phase_2j/phase_2j_05_first_local_validation_job_implementation.md")
@@ -44,10 +45,8 @@ RECOMMENDED_NEXT_TASK_MODE: IMPLEMENTATION
 def _materialize_required_artifacts(project_root: Path) -> None:
     contract_path = project_root / phase_2j_05.PHASE_2J_03_APPROVAL_ENVELOPE_CONTRACT_PATH
     envelope_path = project_root / phase_2j_05.DEFAULT_APPROVAL_ENVELOPE_PATH
-    contract_path.parent.mkdir(parents=True, exist_ok=True)
-    envelope_path.parent.mkdir(parents=True, exist_ok=True)
-    contract_path.write_text("Phase 2J-03 approval envelope contract fixture\n", encoding="utf-8")
-    envelope_path.write_text(APPROVAL_ENVELOPE_TEXT, encoding="utf-8")
+    write_text_with_parents(contract_path, "Phase 2J-03 approval envelope contract fixture\n", encoding="utf-8")
+    write_text_with_parents(envelope_path, APPROVAL_ENVELOPE_TEXT, encoding="utf-8")
 
 
 def test_agents_md_is_not_modified_for_phase_2j_05():
@@ -246,8 +245,8 @@ def test_cli_writes_phase_2j_05_without_execution_paths(tmp_path, capsys, monkey
     assert "device_ssh_netconf_restconf_provider_api_model_secrets_touched: false" in output
     assert "config_backup_or_change_touched: false" in output
     assert f"[PASS] {phase_2j_05.FINAL_VERDICT}" in output
-    assert (tmp_path / phase_2j_05.REPORT_JSON).exists()
-    assert (tmp_path / phase_2j_05.REPORT_HTML).exists()
+    assert path_exists(tmp_path / phase_2j_05.REPORT_JSON)
+    assert path_exists(tmp_path / phase_2j_05.REPORT_HTML)
 
 
 def test_task_catalog_and_report_index_visibility_for_phase_2j_05(tmp_path):
@@ -269,6 +268,6 @@ def test_task_catalog_and_report_index_visibility_for_phase_2j_05(tmp_path):
 
     assert network_lab.main(["--task", phase_2j_05.TASK_NAME], project_root=tmp_path) == 0
     assert network_lab.main(["--report-index"], project_root=tmp_path) == 0
-    html = (tmp_path / "reports/report_index.html").read_text(encoding="utf-8")
+    html = read_text_with_long_path(tmp_path / "reports/report_index.html", encoding="utf-8")
     assert "Phase 2J-05 First Local-only Validation Job" in html
     assert "phase_2j_05_local_approval_envelope_validation_job.json" in html

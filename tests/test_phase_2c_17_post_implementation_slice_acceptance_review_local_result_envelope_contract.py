@@ -5,6 +5,7 @@ import network_lab
 import phase_2c_12_interview_mvp_implementation_slice_candidate_inventory as phase_2c_12
 import phase_2c_16_interview_mvp_local_result_envelope_contract as phase_2c_16
 import phase_2c_17_post_implementation_slice_acceptance_review_local_result_envelope_contract as phase_2c_17
+from report_file_utils import path_exists, read_text_with_long_path, write_text_with_parents
 
 
 DOC_PATH = Path(
@@ -27,14 +28,12 @@ def _doc_text() -> str:
 
 
 def _write_placeholder(path: Path) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(f"fixture for {path.as_posix()}\n", encoding="utf-8")
+    write_text_with_parents(path, f"fixture for {path.as_posix()}\n", encoding="utf-8")
 
 
 def _materialize_reference(project_root: Path) -> None:
     path = project_root / phase_2c_12.REFERENCE_DOC
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(REFERENCE_TEXT, encoding="utf-8")
+    write_text_with_parents(path, REFERENCE_TEXT, encoding="utf-8")
 
 
 def _materialize_phase_2c_16_evidence(project_root: Path) -> None:
@@ -43,7 +42,7 @@ def _materialize_phase_2c_16_evidence(project_root: Path) -> None:
 
     for artifact in phase_2c_17.EXISTING_ARTIFACTS_REVIEWED:
         path = project_root / artifact
-        if not path.exists():
+        if not path_exists(path):
             _write_placeholder(path)
 
 
@@ -213,8 +212,8 @@ def test_cli_writes_phase_2c_17_without_execution_paths(tmp_path, capsys, monkey
     assert "config_backup_change_behavior_added: false" in output
     assert "production_execution_path_added: false" in output
     assert f"[PASS] {phase_2c_17.FINAL_VERDICT}" in output
-    assert (tmp_path / phase_2c_17.REPORT_JSON).exists()
-    assert (tmp_path / phase_2c_17.REPORT_HTML).exists()
+    assert path_exists(tmp_path / phase_2c_17.REPORT_JSON)
+    assert path_exists(tmp_path / phase_2c_17.REPORT_HTML)
 
 
 def test_task_catalog_and_report_index_visibility_for_phase_2c_17(tmp_path):
@@ -239,6 +238,6 @@ def test_task_catalog_and_report_index_visibility_for_phase_2c_17(tmp_path):
 
     assert network_lab.main(["--task", phase_2c_17.TASK_NAME], project_root=tmp_path) == 0
     assert network_lab.main(["--report-index"], project_root=tmp_path) == 0
-    html = (tmp_path / "reports/report_index.html").read_text(encoding="utf-8")
+    html = read_text_with_long_path(tmp_path / "reports/report_index.html", encoding="utf-8")
     assert "Phase 2C-17 Post-Implementation Slice Acceptance Review" in html
     assert "phase_2c_17_acceptance_review.json" in html

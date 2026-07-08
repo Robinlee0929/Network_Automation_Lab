@@ -3,6 +3,7 @@ from pathlib import Path
 
 import network_lab
 import phase_2a_09_jobs_ui_display_contract_mock_screen_readiness_pack as pack
+from report_file_utils import path_exists, read_text_with_long_path
 
 
 def _rows_by_type(report):
@@ -219,8 +220,8 @@ def test_cli_writes_jobs_ui_display_contract_without_execution_paths(tmp_path, c
     assert "real_vrrp_execution_introduced: false" in output
     assert "real_frontend_api_integration_introduced: false" in output
     assert "[PASS] PHASE_2A_09_JOBS_UI_DISPLAY_CONTRACT_MOCK_SCREEN_READINESS_PACK_READY" in output
-    assert (tmp_path / pack.REPORT_JSON).exists()
-    assert (tmp_path / pack.REPORT_HTML).exists()
+    assert path_exists(tmp_path / pack.REPORT_JSON)
+    assert path_exists(tmp_path / pack.REPORT_HTML)
 
 
 def test_task_catalog_and_report_index_visibility(tmp_path):
@@ -243,6 +244,6 @@ def test_task_catalog_and_report_index_visibility(tmp_path):
 
     assert network_lab.main(["--task", pack.TASK_NAME], project_root=tmp_path) == 0
     assert network_lab.main(["--report-index"], project_root=tmp_path) == 0
-    html = (tmp_path / "reports/report_index.html").read_text(encoding="utf-8")
+    html = read_text_with_long_path(tmp_path / "reports/report_index.html", encoding="utf-8")
     assert "Phase 2A-09 Jobs UI Display Contract / Mock Screen Readiness Pack" in html
     assert "phase_2a_09_jobs_ui_display_contract_mock_screen_readiness_pack.json" in html

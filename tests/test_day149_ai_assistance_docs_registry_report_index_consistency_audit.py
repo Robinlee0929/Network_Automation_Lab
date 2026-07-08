@@ -6,6 +6,7 @@ import day149_ai_assistance_docs_registry_report_index_consistency_audit as day1
 import network_lab
 import network_lab_cli_dispatch
 from network_lab_task_registry import resolve_task_handler, resolve_task_name
+from report_file_utils import path_exists, read_text_with_long_path
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -182,12 +183,12 @@ def test_day149_task_catalog_dispatch_and_report_index_visibility(tmp_path):
         report,
     )
     exit_code = network_lab.main(["--report-index"], project_root=tmp_path)
-    index_html = (tmp_path / "reports" / "report_index.html").read_text(encoding="utf-8")
-    written = json.loads(json_path.read_text(encoding="utf-8"))
+    index_html = read_text_with_long_path(tmp_path / "reports" / "report_index.html", encoding="utf-8")
+    written = json.loads(read_text_with_long_path(json_path, encoding="utf-8"))
 
     assert exit_code == 0
-    assert json_path.exists()
-    assert html_path.exists()
+    assert path_exists(json_path)
+    assert path_exists(html_path)
     assert written["status"] == "CONSISTENCY_AUDITED_REVIEW_ONLY"
     assert written["is_next_day_functionality"] is False
     assert written["execution_enabled"] is False

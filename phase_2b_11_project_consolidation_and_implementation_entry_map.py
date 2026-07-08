@@ -16,6 +16,7 @@ from copy import deepcopy
 from pathlib import Path
 from typing import Any, Callable, Dict, Mapping, Optional, Sequence, Tuple
 
+from report_file_utils import write_text_with_parents
 from phase_2a_08_jobs_catalog_ui_readiness_planning_pack import REQUIRED_JOB_TYPES
 from phase_2b_00a_planning_only_owner_authorization_statement import FORBIDDEN_CAPABILITIES
 from phase_2b_10_day1_day160_reference_mapping_for_future_first_slice import (
@@ -525,7 +526,8 @@ def _table_rows(values: Sequence[Mapping[str, Any]], fields: Sequence[str]) -> s
 
 def _write_html_report(report: Mapping[str, Any], output_path: Path) -> None:
     future_plan = report["future_plan"]
-    output_path.write_text(
+    write_text_with_parents(
+        output_path,
         f"""<!doctype html>
 <html lang="en">
 <head>
@@ -581,7 +583,7 @@ def write_phase_2b_11_project_consolidation_entry_map_reports(
     html_path = project_root / REPORT_HTML
     json_path.parent.mkdir(parents=True, exist_ok=True)
     html_path.parent.mkdir(parents=True, exist_ok=True)
-    json_path.write_text(json.dumps(report_data, indent=2, sort_keys=True), encoding="utf-8")
+    write_text_with_parents(json_path, json.dumps(report_data, indent=2, sort_keys=True), encoding="utf-8")
     _write_html_report(report_data, html_path)
     return json_path, html_path
 
