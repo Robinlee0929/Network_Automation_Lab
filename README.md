@@ -42,7 +42,7 @@ Forbidden unless a later task explicitly authorizes a separate safety gate:
 
 ## Current Project Status
 
-Phase 2J is closed. Phase 2K-01, the 2C-15 Windows Long Path Report Directory Hardening Fix, and Phase 2K-02 are already merged to `main`. Phase 2K-03 is now recorded as a planning-only Instruction Template Contract and is ready for review.
+Phase 2J is closed. Phase 2K-01, the 2C-15 Windows Long Path Report Directory Hardening Fix, Phase 2K-02, and Phase 2K-03 are already merged to `main`.
 
 The latest known merged `main` / `origin/main` commit for the Pre-2K baseline is:
 
@@ -361,12 +361,19 @@ Current Phase 2H / 2I / 2J / 2K progress snapshot:
 | 20 | 2K-00 | Platform Guidance Provider Concept Decision Gate / Planning Only | DONE / MERGED_TO_MAIN | Keep |
 | 25 | 2K-01 | Vendor Profile Provider Architecture Flow / Planning Only | DONE / MERGED_TO_MAIN | Keep |
 | 25A | 2C-15 Fix | Windows Long Path Report Directory Hardening Fix | DONE / MERGED_TO_MAIN | Keep |
+| 25B | pytest fix | Pytest Report Directory Materialization Fix | DONE / MERGED_TO_MAIN | Keep |
 | 26 | 2K-02 | Vendor Profile Schema Contract / Planning Only | DONE / MERGED_TO_MAIN | Static schema contract only |
-| 27 | 2K-03 | Instruction Template Contract / Planning Only | DONE / READY_FOR_REVIEW | Static instruction template contract only |
+| 27 | 2K-03 | Instruction Template Contract / Planning Only | DONE / MERGED_TO_MAIN | Static instruction template contract only |
 | 28 | 2K-04 | AI-visible / AI-hidden Boundary Review / Planning Only | NEW / FUTURE | Next candidate |
 | 29 | 2K-05 | Guidance Mode Instruction Card Design / Static Only | NEW / FUTURE | Defer |
 | 30 | 2K-06 | Reference Mode Policy Gate / Planning Only | NEW / FUTURE | Defer |
 | 31 | 2K-07 | Static Vendor Profile Catalog Authorization Gate | NEW / FUTURE | Defer |
+| 32 | 2K-08 | README Fastest Hands-on Path / Reviewer Onboarding Clarity | NEW / FUTURE | Defer |
+| 33 | 2K-09 | README License Clarification / MIT License Usage Note | NEW / FUTURE | Defer |
+
+Future 2K-08 planning context: the README may later add a `Fastest Hands-on Path` for first-time reviewers that shows clone, enter-directory, dependency install, local dashboard startup, local URL, available GUI pages, validation commands, expected PASS / WARN interpretation, and how the dashboard demonstrates both Report / Evidence and AI Safety / Guidance paths. This is future documentation planning only and does not implement the README section here.
+
+Future 2K-09 planning context: the README may later clarify that the MIT License is a code usage license for public portfolio reuse, review, clone, local execution, learning, and fork usage. That license note must not weaken the project safety boundary: no SSH, live device access, NETCONF, RESTCONF, provider/API/model calls, secrets handling, config backup, config change, or autonomous execution is authorized by the license clarification.
 
 In this table, "Next executable review phase" means the next separately requested review task in the documentation workflow. It does not mean runtime execution, device execution, AI execution, provider/API/model calls, runner execution, adapter execution, or automation execution.
 
