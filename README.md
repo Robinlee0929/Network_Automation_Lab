@@ -101,15 +101,15 @@ Safe demo / review reminders:
 
 Explicitly not authorized:
 
-- 2K-09 is not started here.
 - `LICENSE` is not modified here.
-- Live device access, SSH, NETCONF, RESTCONF, provider/API/model calls, secrets handling, runtime catalog loading, schema enforcement, runner/adapter/scheduler/queue/worker/agent-loop behavior, config backup, and config change remain forbidden.
+- MIT License usage rights do not grant operational authorization.
+- Live device access, SSH, NETCONF, RESTCONF, provider/API/model calls, secrets handling, runtime catalog loading, schema enforcement, runner/adapter/scheduler/queue/worker/agent-loop behavior, config backup, config change, and autonomous execution remain forbidden.
 
 Next task after this:
 
-- `2K-09 - README License Clarification / MIT License Usage Note` remains `NEW / FUTURE`.
-- It is not started now because 2K-08 is limited to reviewer onboarding clarity and fastest safe hands-on review only.
-- 繁中：2K-09 仍是未來任務，本次不修改授權條款、不修改 `LICENSE`，也不加入授權說明。
+- `2K-10 - Future Documentation Clarity Gate / Planning Only` remains `NEW / FUTURE`.
+- It is not started now because 2K-09 is limited to README license clarification only.
+- 繁中：2K-09 只更新 README 的授權邊界說明，不修改 `LICENSE`，也不授權 live device、SSH、API、model 或 provider 行為。
 
 ## Current Safety Boundary
 
@@ -141,9 +141,17 @@ Forbidden unless a later task explicitly authorizes a separate safety gate:
 - Hidden execution path.
 - Autonomous execution path.
 
+## MIT License Usage Note
+
+The MIT License is a code usage license. Under the license terms, reviewers and users may clone the repository, review the code, run local deterministic checks, learn from the project, and fork the project.
+
+The MIT License does not grant operational authorization. It does not authorize SSH, live device access, NETCONF, RESTCONF, API calls, model calls, provider calls, secrets access, config backup, config change, or autonomous execution.
+
+Project execution boundaries remain controlled by `AGENTS.md`, phase gates, and explicit task authorization. This note adds no new license terms and does not alter the actual MIT License text in `LICENSE`.
+
 ## Current Project Status
 
-Phase 2J is closed. Phase 2K-01, the 2C-15 Windows Long Path Report Directory Hardening Fix, Phase 2K-02, Phase 2K-03, Phase 2K-04, Phase 2K-05, Phase 2K-06, Phase 2K-07, Phase 2K-08, Phase 2K-08A, and Phase 2K-08B are already merged to `main`. Phase 2K-08B is documented as `DONE / MERGED_TO_MAIN`.
+Phase 2J is closed. Phase 2K-01, the 2C-15 Windows Long Path Report Directory Hardening Fix, Phase 2K-02, Phase 2K-03, Phase 2K-04, Phase 2K-05, Phase 2K-06, Phase 2K-07, Phase 2K-08, Phase 2K-08A, Phase 2K-08B, and Phase 2K-08C are already merged to `main`. Phase 2K-09 is documented as `DONE / READY_FOR_REVIEW`.
 
 The latest known merged `main` / `origin/main` commit for the Pre-2K baseline is:
 
@@ -153,7 +161,7 @@ The latest known merged `main` / `origin/main` commit for the Pre-2K baseline is
 
 Phase 2K-08B expands the fastest hands-on path for first-time reviewers from clone, local dependency install, dashboard startup, GUI review, and validation. It is documentation-only and does not create or imply AI execution, provider execution, runtime prompts, instruction rendering, placeholder expansion, implementation work, API or model calls, reference loading, catalog loading, schema enforcement, secrets handling, live access, command generation, static catalog creation, runtime catalog loading, or a new runtime capability.
 
-The next candidate after this README onboarding task is `2K-09 - README License Clarification / MIT License Usage Note`. It remains `NEW / FUTURE`, is not started here, and is not authorization to modify `LICENSE` or add license clarification text in 2K-08B.
+Phase 2K-09 clarifies the MIT License usage boundary in this README only. It does not modify `LICENSE`, add new license terms, or authorize SSH, live device access, NETCONF, RESTCONF, API/model/provider calls, secrets access, config backup/change, or autonomous execution.
 
 ## Completed Milestone Summary
 
@@ -188,10 +196,10 @@ This README does not claim a fresh validation result by itself. Task-specific fi
 ## Next Recommended Step
 
 ```text
-2K-09 - README License Clarification / MIT License Usage Note
+2K-10 - Future Documentation Clarity Gate / Planning Only
 ```
 
-This is only a future planning candidate. It is not started by 2K-08, does not modify `LICENSE`, and does not authorize implementation or permit live, provider-backed, autonomous, reference-loading, catalog-loading, schema-enforcement, instruction-rendering, runtime prompt, hidden execution, AI execution, command-generation, static catalog creation, runtime catalog loading, or secrets-handling behavior.
+This is only a future planning candidate. It is not started by 2K-09, does not modify `LICENSE`, and does not authorize implementation or permit live, provider-backed, autonomous, reference-loading, catalog-loading, schema-enforcement, instruction-rendering, runtime prompt, hidden execution, AI execution, command-generation, static catalog creation, runtime catalog loading, or secrets-handling behavior.
 
 ## Project Overview
 
@@ -434,6 +442,7 @@ Phase lanes and close status:
   - Phase 2K-07 records the Static Vendor Profile Catalog Authorization Gate at `docs/phase_2k/phase_2k_07_static_vendor_profile_catalog_authorization_gate_planning_only.md`; it defines a conservative planning-only authorization gate for whether a future static vendor profile catalog may be considered as documentation-only or static local reference material, while adding no source, tests, catalog files, catalog loader, provider execution, schema enforcement code, instruction generation, runner, adapter, scheduler, queue, broker, worker, agent-loop, live access, SSH, NETCONF, RESTCONF, SNMP, secrets handling, provider/API/model calls, config backup/change behavior, production execution path, Day1-Day160 rewrite, second safety matrix, Phase 2K-08 start, or extra slice.
   - Phase 2K-08 records the README Fastest Hands-on Path / Reviewer Onboarding Clarity update at `docs/phase_2k/phase_2k_08_readme_fastest_hands_on_path_reviewer_onboarding_clarity.md`; it clarifies the fastest safe reviewer path, adds Traditional Chinese reviewer notes where useful, and keeps 2K-09 future-only, while adding no source, tests, runtime behavior, provider logic, schema enforcement, catalog loading, runner, adapter, scheduler, queue, broker, worker, agent-loop, live access, SSH, NETCONF, RESTCONF, secrets handling, provider/API/model calls, config backup/change behavior, production execution path, Day1-Day160 rewrite, second safety matrix, 2K-09 start, or extra slice.
   - Phase 2K-08B records the README Fastest Hands-on Path Clone / Dashboard Onboarding Expansion at `docs/phase_2k/phase_2k_08b_fastest_hands_on_path_clone_dashboard_onboarding.md`; it expands first-time reviewer onboarding with clone, dependency install, local dashboard startup, GUI route review, and local validation instructions while adding no source, tests, runtime behavior, dashboard behavior, provider logic, schema enforcement, catalog loading, runner, adapter, scheduler, queue, broker, worker, agent-loop, live access, SSH, NETCONF, RESTCONF, secrets handling, provider/API/model calls, config backup/change behavior, production execution path, Day1-Day160 rewrite, second safety matrix, 2K-09 start, or extra slice.
+  - Phase 2K-09 records this README License Clarification / MIT License Usage Note; it updates README wording only, modifies no `LICENSE` text, adds no new license terms, and adds no source, tests, runtime behavior, provider logic, schema enforcement, catalog loading, runner, adapter, scheduler, queue, broker, worker, agent-loop, live access, SSH, NETCONF, RESTCONF, secrets handling, provider/API/model calls, config backup/change behavior, production execution path, Day1-Day160 rewrite, second safety matrix, next phase, or extra slice.
 
 ### AI-assisted Human-guided Network Testing Architecture
 
@@ -480,11 +489,13 @@ Current Phase 2H / 2I / 2J / 2K progress snapshot:
 | 32 | 2K-08 | README Fastest Hands-on Path / Reviewer Onboarding Clarity | DONE / MERGED_TO_MAIN | README reviewer onboarding clarity with Traditional Chinese notes |
 | 32A | 2K-08A | README Progress Table Post-merge Status Correction | DONE / MERGED_TO_MAIN | Keep |
 | 32B | 2K-08B | README Fastest Hands-on Path Clone / Dashboard Onboarding Expansion | DONE / MERGED_TO_MAIN | Clone / install / dashboard / GUI entry onboarding expansion |
-| 33 | 2K-09 | README License Clarification / MIT License Usage Note | NEW / FUTURE | Future-only; not started or authorized by 2K-08B |
+| 32C | 2K-08C | README Progress Table Post-merge Status Correction for 2K-08B | DONE / MERGED_TO_MAIN | Keep |
+| 33 | 2K-09 | README License Clarification / MIT License Usage Note | DONE / READY_FOR_REVIEW | README-only MIT usage-boundary clarification |
+| 34 | 2K-10 | Future Documentation Clarity Gate / Planning Only | NEW / FUTURE | Future-only; not started or authorized by 2K-09 |
 
-2K-08B result: the README now includes a `Fastest Hands-on Path` for first-time reviewers, clone and `cd` commands, local dependency install, dashboard startup, local GUI entry at `http://127.0.0.1:5000`, reviewer route guidance, local validation commands, Traditional Chinese reviewer notes, and an explicit reminder that 2K-09 remains future-only.
+2K-09 result: the README now clarifies that the MIT License covers code usage rights such as cloning, reviewing, learning from, running local deterministic checks, and forking under the license terms. It also states that the license does not grant operational authorization for SSH, live device access, NETCONF, RESTCONF, API/model/provider calls, secrets access, config backup/change, or autonomous execution.
 
-Future 2K-09 planning context: the README may later clarify that the MIT License is a code usage license for public portfolio reuse, review, clone, local execution, learning, and fork usage. That license note must not weaken the project safety boundary: no SSH, live device access, NETCONF, RESTCONF, provider/API/model calls, secrets handling, config backup, config change, or autonomous execution is authorized by the license clarification.
+Future 2K-10 planning context: any later documentation clarity gate remains future-only and must preserve `AGENTS.md`, phase gates, explicit task authorization, and the existing report-only / dry-run / mock-only safety baseline.
 
 In this table, "Next executable review phase" means the next separately requested review task in the documentation workflow. It does not mean runtime execution, device execution, AI execution, provider/API/model calls, runner execution, adapter execution, or automation execution.
 
