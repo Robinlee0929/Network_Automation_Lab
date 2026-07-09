@@ -143,7 +143,7 @@ Forbidden unless a later task explicitly authorizes a separate safety gate:
 
 ## Current Project Status
 
-Phase 2J is closed. Phase 2K-01, the 2C-15 Windows Long Path Report Directory Hardening Fix, Phase 2K-02, Phase 2K-03, Phase 2K-04, Phase 2K-05, Phase 2K-06, Phase 2K-07, Phase 2K-08, and Phase 2K-08A are already merged to `main`. Phase 2K-08B is documented as `DONE / READY_FOR_REVIEW`.
+Phase 2J is closed. Phase 2K-01, the 2C-15 Windows Long Path Report Directory Hardening Fix, Phase 2K-02, Phase 2K-03, Phase 2K-04, Phase 2K-05, Phase 2K-06, Phase 2K-07, Phase 2K-08, Phase 2K-08A, and Phase 2K-08B are already merged to `main`. Phase 2K-08B is documented as `DONE / MERGED_TO_MAIN`.
 
 The latest known merged `main` / `origin/main` commit for the Pre-2K baseline is:
 
@@ -479,7 +479,7 @@ Current Phase 2H / 2I / 2J / 2K progress snapshot:
 | 31 | 2K-07 | Static Vendor Profile Catalog Authorization Gate | DONE / MERGED_TO_MAIN | Planning-only authorization gate complete |
 | 32 | 2K-08 | README Fastest Hands-on Path / Reviewer Onboarding Clarity | DONE / MERGED_TO_MAIN | README reviewer onboarding clarity with Traditional Chinese notes |
 | 32A | 2K-08A | README Progress Table Post-merge Status Correction | DONE / MERGED_TO_MAIN | Keep |
-| 32B | 2K-08B | README Fastest Hands-on Path Clone / Dashboard Onboarding Expansion | DONE / READY_FOR_REVIEW | Clone / install / dashboard / GUI entry onboarding expansion |
+| 32B | 2K-08B | README Fastest Hands-on Path Clone / Dashboard Onboarding Expansion | DONE / MERGED_TO_MAIN | Clone / install / dashboard / GUI entry onboarding expansion |
 | 33 | 2K-09 | README License Clarification / MIT License Usage Note | NEW / FUTURE | Future-only; not started or authorized by 2K-08B |
 
 2K-08B result: the README now includes a `Fastest Hands-on Path` for first-time reviewers, clone and `cd` commands, local dependency install, dashboard startup, local GUI entry at `http://127.0.0.1:5000`, reviewer route guidance, local validation commands, Traditional Chinese reviewer notes, and an explicit reminder that 2K-09 remains future-only.
