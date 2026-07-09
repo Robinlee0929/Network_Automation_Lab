@@ -1,8 +1,8 @@
 # Phase 2K-12 - Phase 2K Closure / Finalization Gate / Planning Only
 
-Status: DONE / READY_FOR_REVIEW
+Status: DONE / MERGED_TO_MAIN
 
-Decision summary: Phase 2K is `READY_TO_CLOSE` pending owner review and merge of Phase 2K-12. This is planning-only documentation. It does not state that Phase 2K is fully closed, finalized, or merged to `main` before this branch is reviewed and merged.
+Decision summary: Phase 2K-12 has been merged to `main`, and Phase 2K is now formally closed. This remains planning-only documentation. It does not authorize implementation, runtime behavior, provider/model/API execution, live access, secrets handling, configuration backup, configuration change, or next-phase work.
 
 ## Status
 
@@ -10,9 +10,9 @@ Decision summary: Phase 2K is `READY_TO_CLOSE` pending owner review and merge of
 PHASE: 2K-12
 TASK_NAME: Phase 2K Closure / Finalization Gate / Planning Only
 TASK_MODE: PLANNING_ONLY_DOCUMENTATION
-STATUS: DONE / READY_FOR_REVIEW
-PHASE_2K_READY_TO_CLOSE_PENDING_OWNER_REVIEW_AND_MERGE: YES
-PHASE_2K_FULLY_CLOSED_NOW: NO
+STATUS: DONE / MERGED_TO_MAIN
+PHASE_2K_12_MERGED_TO_MAIN: YES
+PHASE_2K_FULLY_CLOSED_NOW: YES
 PLANNING_ONLY_DOCUMENTATION: YES
 README_UPDATED: YES
 ROOT_LICENSE_EXISTS: YES
@@ -36,7 +36,7 @@ Allowed scope:
 - Confirm Phase 2K-01 through Phase 2K-11 are completed and merged when verified from README status rows.
 - Confirm Phase 2K-11A was a local cleanup item with no required committed repository change.
 - Confirm root `LICENSE` exists.
-- Mark Phase 2K as `READY_TO_CLOSE` pending owner review and merge of Phase 2K-12.
+- Mark Phase 2K as fully closed after Phase 2K-12 was merged to `main`.
 - Identify any next phase only as future planning without starting it.
 
 This scope is a closure gate only. It is not a runtime gate, implementation gate, provider gate, schema gate, catalog gate, runner gate, adapter gate, scheduler gate, queue gate, worker gate, or agent-loop gate.
@@ -95,19 +95,19 @@ Phase 2K-12 does not authorize:
 
 All Phase 2K closure language remains reviewer-facing and non-executing.
 
-## Closure Readiness Decision
+## Closure Decision
 
 Recommended decision:
 
 ```text
-PHASE_2K_READY_TO_CLOSE: YES
-CONDITION: OWNER_REVIEW_AND_MERGE_OF_2K_12_REQUIRED
-PHASE_2K_FULLY_CLOSED_BEFORE_MERGE: NO
+PHASE_2K_12_MERGED_TO_MAIN: YES
+PHASE_2K_FULLY_CLOSED_NOW: YES
+CONDITION: POST_MERGE_STATUS_RECORDED
 ```
 
-Reason: Phase 2K has completed the documented planning lane for vendor profile guidance provider concepts, schema and instruction-template planning, AI-visible/AI-hidden boundaries, reference-mode and static-catalog authorization gates, reviewer onboarding clarity, license clarification, future documentation clarity, and the root MIT License file task.
+Reason: Phase 2K has completed the documented planning lane for vendor profile guidance provider concepts, schema and instruction-template planning, AI-visible/AI-hidden boundaries, reference-mode and static-catalog authorization gates, reviewer onboarding clarity, license clarification, future documentation clarity, and the root MIT License file task. Phase 2K-12 was then merged to `main`, so the closure result can now be recorded as fully closed.
 
-This closure readiness decision records that Phase 2K appears complete enough for owner review. It does not merge the branch, close the phase on `main`, or authorize implementation.
+This closure decision records the post-merge status only. It does not authorize implementation.
 
 ## Next Phase Boundary
 
@@ -131,9 +131,9 @@ Phase 2K-12 is acceptable only if:
 - The trusted remote is `https://github.com/Robinlee0929/Network_Automation_Lab.git`.
 - Work started from synced `main`.
 - Only README.md and this Phase 2K-12 document changed.
-- README marks 2K-12 as `DONE / READY_FOR_REVIEW`, not `DONE / MERGED_TO_MAIN`.
+- README marks 2K-12 as `DONE / MERGED_TO_MAIN`.
 - Root `LICENSE` exists.
-- Phase 2K is marked only as `READY_TO_CLOSE` pending owner review and merge of 2K-12.
+- Phase 2K is marked fully closed after Phase 2K-12 was merged to `main`.
 - No implementation files are modified.
 - No runtime/provider/model/API/schema/catalog/runner/adapter/scheduler/queue/worker/agent-loop work is added.
 - No live device access, SSH, NETCONF, RESTCONF, secrets handling, configuration backup, or configuration change behavior is added.
@@ -153,7 +153,7 @@ STATUS_LABELS_CONSISTENT_WITH_README: PASS
 ACCEPTANCE_CRITERIA_CONCRETE_AND_VERIFIABLE: PASS
 LONG_PARAGRAPHS_SPLIT_FOR_READABILITY: PASS
 TERMINOLOGY_CONSISTENT_WITH_PHASE_2K_DOCUMENTS: PASS
-PHASE_2K_READY_TO_CLOSE_NOT_FULLY_CLOSED: PASS
+PHASE_2K_FULLY_CLOSED_AFTER_2K_12_MERGE: PASS
 NO_IMPLEMENTATION_AUTHORIZATION_LANGUAGE: PASS
 NO_RUNTIME_PROVIDER_AUTHORIZATION_LANGUAGE: PASS
 NO_SCHEMA_OR_CATALOG_ENFORCEMENT_AUTHORIZATION_LANGUAGE: PASS
@@ -162,16 +162,16 @@ NO_DUPLICATED_SAFETY_MATRIX: PASS
 FINAL_READABILITY_RESULT: PASS
 ```
 
-This document starts with the decision summary, explains the closure purpose without hidden context, separates allowed closure-review scope from forbidden implementation scope, keeps status labels aligned with README, and avoids language that could imply runtime behavior, provider execution, model/API calls, schema or catalog enforcement, live access, secrets handling, or next-phase authorization.
+This document starts with the decision summary, explains the closure purpose without hidden context, separates allowed closure-status scope from forbidden implementation scope, keeps status labels aligned with README, and avoids language that could imply runtime behavior, provider execution, model/API calls, schema or catalog enforcement, live access, secrets handling, or next-phase authorization.
 
 ## Final Decision
 
 ```text
 FINAL_PHASE_DECISION: PASS
 PHASE: 2K-12
-STATUS: DONE / READY_FOR_REVIEW
-PHASE_2K_READY_TO_CLOSE_PENDING_OWNER_REVIEW_AND_MERGE: YES
-PHASE_2K_FULLY_CLOSED_NOW: NO
+STATUS: DONE / MERGED_TO_MAIN
+PHASE_2K_12_MERGED_TO_MAIN: YES
+PHASE_2K_FULLY_CLOSED_NOW: YES
 ROOT_LICENSE_EXISTS: YES
 README_PROGRESS_UPDATED: YES
 IMPLEMENTATION_AUTHORIZED: NO
@@ -187,4 +187,4 @@ NEXT_PHASE_STARTED: NO
 EXTRA_SLICE_SELECTED_OR_IMPLEMENTED: NO
 ```
 
-The phase decision is PASS because Phase 2K is ready for owner closure review while implementation, runtime behavior, provider/model/API calls, schema or catalog enforcement, live access, secrets handling, configuration backup or change, Day1-Day160 rewrites, second safety matrix creation, and next-phase work remain unauthorized.
+The phase decision is PASS because Phase 2K-12 has been merged to `main` and Phase 2K is formally closed while implementation, runtime behavior, provider/model/API calls, schema or catalog enforcement, live access, secrets handling, configuration backup or change, Day1-Day160 rewrites, second safety matrix creation, and next-phase work remain unauthorized.
