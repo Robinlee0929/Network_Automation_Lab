@@ -492,7 +492,7 @@ Current Phase 2H / 2I / 2J / 2K progress snapshot:
 | 32C | 2K-08C | README Progress Table Post-merge Status Correction for 2K-08B | DONE / MERGED_TO_MAIN | Keep |
 | 33 | 2K-09 | README License Clarification / MIT License Usage Note | DONE / MERGED_TO_MAIN | README-only MIT usage-boundary clarification |
 | 34 | 2K-10 | Future Documentation Clarity Gate / Planning Only | DONE / MERGED_TO_MAIN | Planning-only documentation clarity gate |
-| 35 | 2K-11 | Add MIT License File / Documentation Only | DONE / READY_FOR_REVIEW | Root MIT License file added |
+| 35 | 2K-11 | Add MIT License File / Documentation Only | DONE / MERGED_TO_MAIN | Root MIT License file added |
 
 2K-09 result: the README now clarifies that the MIT License covers code usage rights such as cloning, reviewing, learning from, running local deterministic checks, and forking under the license terms. It also states that the license does not grant operational authorization for SSH, live device access, NETCONF, RESTCONF, API/model/provider calls, secrets access, config backup/change, or autonomous execution.
 
