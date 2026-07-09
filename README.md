@@ -498,8 +498,9 @@ Current Phase 2H / 2I / 2J / 2K / 2L progress snapshot:
 | 36A | 2K-12A | Phase 2K Post-closure Main Status Confirmation | DONE / MERGED_TO_MAIN | Keep |
 | 36B | 2K-12B | Local Pytest Temporary Artifact Cleanup Attempt | BLOCKED / PARTIAL_LOCAL_CLEANUP | Keep partial local cleanup status |
 | 36C | 2K-12C | Local Pytest Temporary Artifact Cleanup Verification | DONE / LOCAL_CLEANUP_VERIFIED | Keep local cleanup verification status |
-| 37 | 2L-00 | Phase 2L Entry / Next Phase Planning Gate | DONE / READY_FOR_REVIEW | Review then merge; no implementation authorized |
-| 38 | 2L-01 | Phase 2L Candidate Inventory / Planning Only | NEW / FUTURE | Next candidate after 2L-00 review |
+| 37 | 2L-00 | Phase 2L Entry / Next Phase Planning Gate | DONE / MERGED_TO_MAIN | Phase 2L entry gate merged; no implementation authorized |
+| 38 | 2L-01 | Phase 2L Candidate Inventory / Planning Only | DONE / READY_FOR_REVIEW | Review then merge; no implementation authorized |
+| 39 | 2L-02 | Phase 2L Candidate Prioritization Gate / Planning Only | NEW / FUTURE | Next planning candidate after 2L-01 review |
 
 2K-09 result: the README now clarifies that the MIT License covers code usage rights such as cloning, reviewing, learning from, running local deterministic checks, and forking under the license terms. It also states that the license does not grant operational authorization for SSH, live device access, NETCONF, RESTCONF, API/model/provider calls, secrets access, config backup/change, or autonomous execution.
 
