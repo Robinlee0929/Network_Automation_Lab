@@ -10,42 +10,94 @@ The current repository emphasis is safe documentation, report-only validation, d
 
 This diagram summarizes the reviewer-visible, safety-gated workflow at a high level.
 
-## Fastest Reviewer Path
+## Fastest Hands-on Path
 
-For a first pass, read and validate in this order:
+For a first-time reviewer who has just received the repository, use this local-only path:
 
-1. Read `AGENTS.md` first. It is the repository rulebook for safety boundaries, task modes, validation expectations, and forbidden scope.
-   - 繁中：請先讀 `AGENTS.md`。它定義安全邊界、任務模式、驗證方式，以及目前明確禁止的範圍。
-2. Read this README through `Current Safety Boundary`, `Current Project Status`, and this `Fastest Reviewer Path` section.
-   - 繁中：接著閱讀本 README 的安全邊界、目前狀態與最快審閱路徑，就能快速理解專案現況。
-3. Run the safest first validation command:
+### 1. Clone and enter the repository
 
 ```bash
-python network_lab.py --task report-index
+git clone https://github.com/Robinlee0929/Network_Automation_Lab.git
+cd Network_Automation_Lab
 ```
 
-This is the fastest hands-on reviewer path because it stays local and report-only. It indexes reviewer-facing evidence without contacting live devices, providers, APIs, models, SSH, NETCONF, RESTCONF, or external services.
+繁中：第一次審閱時，先 clone repo 並進入專案資料夾。
 
-繁中：這是最快且安全的實作體驗路徑，因為它只做本機報告索引，不會連線到真實設備、外部服務、API、模型、SSH、NETCONF 或 RESTCONF。
+### 2. Read the repository rules
 
-For a broader local check, use the standard validation command from `AGENTS.md` when appropriate:
+Read `AGENTS.md` first. It is the repository rulebook for safety boundaries, task modes, validation expectations, and forbidden scope.
+
+```text
+AGENTS.md
+```
+
+繁中：執行任何指令前，先閱讀 `AGENTS.md`。它定義安全邊界、驗證方式與禁止範圍。
+
+### 3. Install local dependencies
+
+```bash
+python -m pip install -r requirements.txt
+```
+
+繁中：安裝本機檢視與驗證需要的套件。這一步不代表授權 live device、SSH、API、model 或 provider 行為。
+
+### 4. Start the local dashboard
+
+```bash
+python dashboard_app.py
+```
+
+Open:
+
+```text
+http://127.0.0.1:5000
+```
+
+繁中：啟動本機 Flask dashboard，並用瀏覽器開啟本機網址。
+
+### 5. What to review in the GUI
+
+Dashboard viewing is usually the fastest way to understand the project value, current evidence, and safety boundary. It is a local reviewer orientation surface, not a live device console, provider/API/model entry point, arbitrary shell surface, or autonomous execution interface.
+
+Review these local routes:
+
+- `/` - project summary cards.
+- `/reports` - report evidence and JSON / HTML report previews.
+- `/commands` - registered local commands and existing execution logs; do not treat this as authorization to run arbitrary commands.
+- `/ai-checklist` - AI safety review checklist.
+- `/ai-intent-reviewer` - AI intent, mock runtime evidence, readiness gates, and safety boundaries.
+
+繁中：dashboard 主要用來快速理解專案價值、報告證據與 AI safety 邊界。它不是 live device 控制台，也不是 provider/API/model 執行入口。`/commands` 頁面用於審閱已登錄的本機命令與既有紀錄，不代表預設應執行命令。
+
+### 6. Run local validation
 
 ```bash
 python -m pytest
+python network_lab.py --task report-index
 ```
 
-Safe demo / review path:
+Expected result:
+
+```text
+pytest:
+- The test suite should pass.
+
+report-index:
+- Shows current report evidence.
+- PASS means report evidence exists.
+- WARN may appear when optional local reports are missing.
+```
+
+繁中：pytest 是測試驗證；report-index 是報告證據索引。若 WARN 只來自已知 optional local report missing，需在 final report 中說明。
+
+Safe demo / review reminders:
 
 - Use `AGENTS.md` for rules and safety gates.
 - Use this README for orientation and current phase status.
-- Use `python network_lab.py --task report-index` as the first hands-on validation path.
+- Use the dashboard for local reviewer orientation and evidence browsing.
+- Use pytest and `report-index` as local validation checks.
 - Use `docs/phase_2k/` for the current Phase 2K planning records.
 - Treat Phase 2K as documentation-only / planning-only unless a later task separately authorizes a different boundary.
-
-Currently documentation-only:
-
-- `2K-08 - README Fastest Hands-on Path / Reviewer Onboarding Clarity` is a README and planning-document clarity task only.
-- It does not implement runtime behavior, provider logic, schema enforcement, catalog loading, runner behavior, adapter behavior, live access, or external calls.
 
 Explicitly not authorized:
 
@@ -91,7 +143,7 @@ Forbidden unless a later task explicitly authorizes a separate safety gate:
 
 ## Current Project Status
 
-Phase 2J is closed. Phase 2K-01, the 2C-15 Windows Long Path Report Directory Hardening Fix, Phase 2K-02, Phase 2K-03, Phase 2K-04, Phase 2K-05, Phase 2K-06, Phase 2K-07, and Phase 2K-08 are already merged to `main`. Phase 2K-08 is documented as `DONE / MERGED_TO_MAIN`.
+Phase 2J is closed. Phase 2K-01, the 2C-15 Windows Long Path Report Directory Hardening Fix, Phase 2K-02, Phase 2K-03, Phase 2K-04, Phase 2K-05, Phase 2K-06, Phase 2K-07, Phase 2K-08, and Phase 2K-08A are already merged to `main`. Phase 2K-08B is documented as `DONE / READY_FOR_REVIEW`.
 
 The latest known merged `main` / `origin/main` commit for the Pre-2K baseline is:
 
@@ -99,9 +151,9 @@ The latest known merged `main` / `origin/main` commit for the Pre-2K baseline is
 2d53e75c1118e857db5ae59dae4ca99bfaf1f127
 ```
 
-Phase 2K-08 clarifies reviewer onboarding and the fastest safe hands-on path. It is documentation-only and does not create or imply AI execution, provider execution, runtime prompts, instruction rendering, placeholder expansion, implementation work, API or model calls, reference loading, catalog loading, schema enforcement, secrets handling, live access, command generation, static catalog creation, runtime catalog loading, or a new runtime capability.
+Phase 2K-08B expands the fastest hands-on path for first-time reviewers from clone, local dependency install, dashboard startup, GUI review, and validation. It is documentation-only and does not create or imply AI execution, provider execution, runtime prompts, instruction rendering, placeholder expansion, implementation work, API or model calls, reference loading, catalog loading, schema enforcement, secrets handling, live access, command generation, static catalog creation, runtime catalog loading, or a new runtime capability.
 
-The next candidate after this README clarity task is `2K-09 - README License Clarification / MIT License Usage Note`. It remains `NEW / FUTURE`, is not started here, and is not authorization to modify `LICENSE` or add license clarification text in 2K-08.
+The next candidate after this README onboarding task is `2K-09 - README License Clarification / MIT License Usage Note`. It remains `NEW / FUTURE`, is not started here, and is not authorization to modify `LICENSE` or add license clarification text in 2K-08B.
 
 ## Completed Milestone Summary
 
@@ -381,6 +433,7 @@ Phase lanes and close status:
   - Phase 2K-06 records the Reference Mode Policy Gate at `docs/phase_2k/phase_2k_06_reference_mode_policy_gate_planning_only.md`; it defines planning-only reviewer gate questions, gate outcomes, and blocked-by-default expectations for future Reference Mode static display eligibility, while adding no source, tests, runner, adapter, reference loader, catalog loader, command generator, prompt constructor, instruction renderer, provider runtime, scheduler, queue, broker, worker, agent-loop, live access, SSH, NETCONF, RESTCONF, secrets handling, provider/API/model calls, schema enforcement, config backup/change behavior, production execution path, Day1-Day160 rewrite, second safety matrix, Phase 2K-07 start, or extra slice.
   - Phase 2K-07 records the Static Vendor Profile Catalog Authorization Gate at `docs/phase_2k/phase_2k_07_static_vendor_profile_catalog_authorization_gate_planning_only.md`; it defines a conservative planning-only authorization gate for whether a future static vendor profile catalog may be considered as documentation-only or static local reference material, while adding no source, tests, catalog files, catalog loader, provider execution, schema enforcement code, instruction generation, runner, adapter, scheduler, queue, broker, worker, agent-loop, live access, SSH, NETCONF, RESTCONF, SNMP, secrets handling, provider/API/model calls, config backup/change behavior, production execution path, Day1-Day160 rewrite, second safety matrix, Phase 2K-08 start, or extra slice.
   - Phase 2K-08 records the README Fastest Hands-on Path / Reviewer Onboarding Clarity update at `docs/phase_2k/phase_2k_08_readme_fastest_hands_on_path_reviewer_onboarding_clarity.md`; it clarifies the fastest safe reviewer path, adds Traditional Chinese reviewer notes where useful, and keeps 2K-09 future-only, while adding no source, tests, runtime behavior, provider logic, schema enforcement, catalog loading, runner, adapter, scheduler, queue, broker, worker, agent-loop, live access, SSH, NETCONF, RESTCONF, secrets handling, provider/API/model calls, config backup/change behavior, production execution path, Day1-Day160 rewrite, second safety matrix, 2K-09 start, or extra slice.
+  - Phase 2K-08B records the README Fastest Hands-on Path Clone / Dashboard Onboarding Expansion at `docs/phase_2k/phase_2k_08b_fastest_hands_on_path_clone_dashboard_onboarding.md`; it expands first-time reviewer onboarding with clone, dependency install, local dashboard startup, GUI route review, and local validation instructions while adding no source, tests, runtime behavior, dashboard behavior, provider logic, schema enforcement, catalog loading, runner, adapter, scheduler, queue, broker, worker, agent-loop, live access, SSH, NETCONF, RESTCONF, secrets handling, provider/API/model calls, config backup/change behavior, production execution path, Day1-Day160 rewrite, second safety matrix, 2K-09 start, or extra slice.
 
 ### AI-assisted Human-guided Network Testing Architecture
 
@@ -425,9 +478,11 @@ Current Phase 2H / 2I / 2J / 2K progress snapshot:
 | 30 | 2K-06 | Reference Mode Policy Gate / Planning Only | DONE / MERGED_TO_MAIN | Keep |
 | 31 | 2K-07 | Static Vendor Profile Catalog Authorization Gate | DONE / MERGED_TO_MAIN | Planning-only authorization gate complete |
 | 32 | 2K-08 | README Fastest Hands-on Path / Reviewer Onboarding Clarity | DONE / MERGED_TO_MAIN | README reviewer onboarding clarity with Traditional Chinese notes |
-| 33 | 2K-09 | README License Clarification / MIT License Usage Note | NEW / FUTURE | Future-only; not started or authorized by 2K-08 |
+| 32A | 2K-08A | README Progress Table Post-merge Status Correction | DONE / MERGED_TO_MAIN | Keep |
+| 32B | 2K-08B | README Fastest Hands-on Path Clone / Dashboard Onboarding Expansion | DONE / READY_FOR_REVIEW | Clone / install / dashboard / GUI entry onboarding expansion |
+| 33 | 2K-09 | README License Clarification / MIT License Usage Note | NEW / FUTURE | Future-only; not started or authorized by 2K-08B |
 
-2K-08 result: the README now includes a `Fastest Reviewer Path` for first-time reviewers, the safest first validation command, Traditional Chinese reviewer notes, and an explicit reminder that 2K-09 remains future-only.
+2K-08B result: the README now includes a `Fastest Hands-on Path` for first-time reviewers, clone and `cd` commands, local dependency install, dashboard startup, local GUI entry at `http://127.0.0.1:5000`, reviewer route guidance, local validation commands, Traditional Chinese reviewer notes, and an explicit reminder that 2K-09 remains future-only.
 
 Future 2K-09 planning context: the README may later clarify that the MIT License is a code usage license for public portfolio reuse, review, clone, local execution, learning, and fork usage. That license note must not weaken the project safety boundary: no SSH, live device access, NETCONF, RESTCONF, provider/API/model calls, secrets handling, config backup, config change, or autonomous execution is authorized by the license clarification.
 
