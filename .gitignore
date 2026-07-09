@@ -2,6 +2,8 @@ config.json
 config.cisco.json
 Set_WireguardVPN*_config.json
 reports/
+!app/api/network/reports/
+!app/api/network/reports/**
 exports/
 data/network-ai/analyses.json
 data/network-ai/jobs.json
@@ -12,6 +14,7 @@ __pycache__/
 .pytest_tmp*/
 .pytest-tmp/
 .pytest-tmp*/
+.pytest-basetemp/
 .venv/
 node_modules/
 .next/

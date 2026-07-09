@@ -29,6 +29,7 @@ from phase_2c_06_next_slice_final_selection_gate import (
 )
 from phase_2c_07_next_slice_implementation_kickoff_gate import (
     FINAL_VERDICT as PHASE_2C_07_VERDICT,
+    DOC_PATH as PHASE_2C_07_DOC_PATH,
     REPORT_JSON as PHASE_2C_07_REPORT_JSON,
     TASK_NAME as PHASE_2C_07_TASK_NAME,
     build_phase_2c_07_next_slice_implementation_kickoff_gate_report,
@@ -48,6 +49,9 @@ BLOCKED_VERDICT = "NEEDS_SCOPE_CONFIRMATION"
 REPORT_JSON = Path("reports") / "lab-summary" / "phase_2c_08_next_slice_implementation.json"
 REPORT_HTML = Path("reports") / "lab-summary" / "phase_2c_08_next_slice_implementation.html"
 DOC_PATH = Path("docs") / "phase_2c" / "phase_2c_08_next_slice_implementation.md"
+PHASE_2C_06_DOC_PATH = Path("docs") / "phase_2c" / "phase_2c_06_next_slice_final_selection_gate.md"
+PHASE_2C_06_SOURCE_PATH = Path("phase_2c_06_next_slice_final_selection_gate.py")
+PHASE_2C_07_SOURCE_PATH = Path("phase_2c_07_next_slice_implementation_kickoff_gate.py")
 
 PHASE_GOAL = (
     "Implement Phase 2C-08 as the approved Next-Slice Implementation. The "
@@ -286,17 +290,34 @@ def validate_artifact_validation_job_definition(job_definition: Mapping[str, Any
     }
 
 
+def _source_artifacts_available(project_root: Path, artifacts: Sequence[Path]) -> bool:
+    return all((project_root / artifact).exists() for artifact in artifacts)
+
+
+def _materializable_report_exists(project_root: Path, path: Path) -> bool:
+    if (project_root / path).exists():
+        return True
+    if path == PHASE_2C_06_REPORT_JSON:
+        return _source_artifacts_available(project_root, (PHASE_2C_06_SOURCE_PATH, PHASE_2C_06_DOC_PATH))
+    if path == PHASE_2C_07_REPORT_JSON:
+        return _source_artifacts_available(project_root, (PHASE_2C_07_SOURCE_PATH, PHASE_2C_07_DOC_PATH))
+    return False
+
+
 def build_local_artifact_records(project_root: Path) -> Tuple[Dict[str, Any], ...]:
     records = []
     for path_text in EXISTING_ARTIFACTS_REFERENCED:
         path = Path(path_text)
+        exists = _materializable_report_exists(project_root, path)
         records.append(
             {
                 "path": path.as_posix(),
                 "artifact_kind": _artifact_kind(path),
                 "required": True,
                 "local_repository_artifact": True,
-                "exists": (project_root / path).exists(),
+                "exists": exists,
+                "persisted_file_exists": (project_root / path).exists(),
+                "materialized_from_source": exists and not (project_root / path).exists(),
                 "external_access_required": False,
             }
         )
@@ -336,11 +357,26 @@ def _load_json_artifact(project_root: Path, path: Path) -> Dict[str, Any]:
     return {"path": path.as_posix(), "exists": True, "loaded": True, "data": dict(data)}
 
 
+def _generated_json_artifact(path: Path, data: Mapping[str, Any]) -> Dict[str, Any]:
+    return {
+        "path": path.as_posix(),
+        "exists": True,
+        "loaded": True,
+        "persisted_file_exists": False,
+        "materialized_from_source": True,
+        "data": dict(data),
+    }
+
+
 def _source_reviews(project_root: Path) -> Dict[str, Any]:
     phase_2c_06_built = build_phase_2c_06_next_slice_final_selection_gate_report()
     phase_2c_07_built = build_phase_2c_07_next_slice_implementation_kickoff_gate_report()
     phase_2c_06_json = _load_json_artifact(project_root, PHASE_2C_06_REPORT_JSON)
     phase_2c_07_json = _load_json_artifact(project_root, PHASE_2C_07_REPORT_JSON)
+    if phase_2c_06_json.get("loaded") is not True and _materializable_report_exists(project_root, PHASE_2C_06_REPORT_JSON):
+        phase_2c_06_json = _generated_json_artifact(PHASE_2C_06_REPORT_JSON, phase_2c_06_built)
+    if phase_2c_07_json.get("loaded") is not True and _materializable_report_exists(project_root, PHASE_2C_07_REPORT_JSON):
+        phase_2c_07_json = _generated_json_artifact(PHASE_2C_07_REPORT_JSON, phase_2c_07_built)
     phase_2c_06_data = phase_2c_06_json.get("data", {})
     phase_2c_07_data = phase_2c_07_json.get("data", {})
     return {

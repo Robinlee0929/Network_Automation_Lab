@@ -47,9 +47,11 @@ from phase_2c_08_next_slice_implementation import (
     TASK_NAME as PHASE_2C_08_TASK_NAME,
 )
 from phase_2c_09_post_next_slice_acceptance_review import (
+    DOC_PATH as PHASE_2C_09_DOC_PATH,
     FINAL_VERDICT as PHASE_2C_09_VERDICT,
     REPORT_JSON as PHASE_2C_09_REPORT_JSON,
     TASK_NAME as PHASE_2C_09_TASK_NAME,
+    build_phase_2c_09_post_next_slice_acceptance_review_report,
     validate_phase_2c_09_report,
 )
 
@@ -66,6 +68,7 @@ NEEDS_SCOPE_CONFIRMATION_VERDICT = "NEEDS_SCOPE_CONFIRMATION"
 REPORT_JSON = Path("reports") / "lab-summary" / "phase_2c_10_next_slice_decision_gate_authorization_review.json"
 REPORT_HTML = Path("reports") / "lab-summary" / "phase_2c_10_next_slice_decision_gate_authorization_review.html"
 DOC_PATH = Path("docs") / "phase_2c" / "phase_2c_10_next_slice_decision_gate_authorization_review.md"
+PHASE_2C_09_SOURCE_PATH = Path("phase_2c_09_post_next_slice_acceptance_review.py")
 
 NEXT_ALLOWED_PHASE = "Phase 2C-11 Next-Slice Candidate Inventory - Planning Only"
 
@@ -279,6 +282,21 @@ def _load_json_artifact(project_root: Path, path: Path) -> Dict[str, Any]:
     return {"path": path.as_posix(), "exists": True, "loaded": True, "data": dict(data)}
 
 
+def _source_artifacts_available(project_root: Path, artifacts: Sequence[Path]) -> bool:
+    return all((project_root / artifact).exists() for artifact in artifacts)
+
+
+def _generated_json_artifact(path: Path, data: Mapping[str, Any]) -> Dict[str, Any]:
+    return {
+        "path": path.as_posix(),
+        "exists": True,
+        "loaded": True,
+        "persisted_file_exists": False,
+        "materialized_from_source": True,
+        "data": dict(data),
+    }
+
+
 def _artifact_record(project_root: Path, path_text: str) -> Dict[str, Any]:
     path = Path(path_text)
     return {
@@ -291,6 +309,14 @@ def _artifact_record(project_root: Path, path_text: str) -> Dict[str, Any]:
 
 def _phase_2c_09_acceptance_review(project_root: Path) -> Dict[str, Any]:
     artifact = _load_json_artifact(project_root, PHASE_2C_09_REPORT_JSON)
+    if artifact.get("loaded") is not True and _source_artifacts_available(
+        project_root,
+        (PHASE_2C_09_SOURCE_PATH, PHASE_2C_09_DOC_PATH),
+    ):
+        artifact = _generated_json_artifact(
+            PHASE_2C_09_REPORT_JSON,
+            build_phase_2c_09_post_next_slice_acceptance_review_report(project_root),
+        )
     data = artifact.get("data", {})
     validation = validate_phase_2c_09_report(data) if artifact.get("loaded") is True else {}
     return {

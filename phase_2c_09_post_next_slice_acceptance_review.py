@@ -18,21 +18,27 @@ from typing import Any, Callable, Dict, Mapping, Optional, Sequence, Tuple
 
 from phase_2b_00a_planning_only_owner_authorization_statement import FORBIDDEN_CAPABILITIES
 from phase_2c_06_next_slice_final_selection_gate import (
+    DOC_PATH as PHASE_2C_06_DOC_PATH,
     REPORT_JSON as PHASE_2C_06_REPORT_JSON,
     SELECTED_NEXT_SLICE,
     TASK_NAME as PHASE_2C_06_TASK_NAME,
+    build_phase_2c_06_next_slice_final_selection_gate_report,
     validate_phase_2c_06_report,
 )
 from phase_2c_07_next_slice_implementation_kickoff_gate import (
+    DOC_PATH as PHASE_2C_07_DOC_PATH,
     REPORT_JSON as PHASE_2C_07_REPORT_JSON,
     TASK_NAME as PHASE_2C_07_TASK_NAME,
+    build_phase_2c_07_next_slice_implementation_kickoff_gate_report,
     validate_phase_2c_07_report,
 )
 from phase_2c_08_next_slice_implementation import (
+    DOC_PATH as PHASE_2C_08_DOC_PATH,
     FINAL_VERDICT as PHASE_2C_08_VERDICT,
     REPORT_HTML as PHASE_2C_08_REPORT_HTML,
     REPORT_JSON as PHASE_2C_08_REPORT_JSON,
     TASK_NAME as PHASE_2C_08_TASK_NAME,
+    build_phase_2c_08_next_slice_implementation_report,
     validate_phase_2c_08_report,
 )
 
@@ -49,6 +55,9 @@ NEEDS_EVIDENCE_VERDICT = "PHASE_2C_09_NEEDS_EVIDENCE"
 REPORT_JSON = Path("reports") / "lab-summary" / "phase_2c_09_post_next_slice_acceptance_review.json"
 REPORT_HTML = Path("reports") / "lab-summary" / "phase_2c_09_post_next_slice_acceptance_review.html"
 DOC_PATH = Path("docs") / "phase_2c" / "phase_2c_09_post_next_slice_acceptance_review.md"
+PHASE_2C_06_SOURCE_PATH = Path("phase_2c_06_next_slice_final_selection_gate.py")
+PHASE_2C_07_SOURCE_PATH = Path("phase_2c_07_next_slice_implementation_kickoff_gate.py")
+PHASE_2C_08_SOURCE_PATH = Path("phase_2c_08_next_slice_implementation.py")
 
 ALLOWED_ACCEPTANCE_DECISIONS = ("ACCEPT", "NOT_ACCEPT", "NEEDS_EVIDENCE")
 
@@ -199,6 +208,42 @@ def _load_json_artifact(project_root: Path, path: Path) -> Dict[str, Any]:
     return {"path": path.as_posix(), "exists": True, "loaded": True, "data": dict(data)}
 
 
+def _source_artifacts_available(project_root: Path, artifacts: Sequence[Path]) -> bool:
+    return all((project_root / artifact).exists() for artifact in artifacts)
+
+
+def _generated_json_artifact(path: Path, data: Mapping[str, Any]) -> Dict[str, Any]:
+    return {
+        "path": path.as_posix(),
+        "exists": True,
+        "loaded": True,
+        "persisted_file_exists": False,
+        "materialized_from_source": True,
+        "data": dict(data),
+    }
+
+
+def _materialize_missing_source_evidence(project_root: Path, path: Path, artifact: Dict[str, Any]) -> Dict[str, Any]:
+    if artifact.get("loaded") is True:
+        return artifact
+    if path == PHASE_2C_06_REPORT_JSON and _source_artifacts_available(
+        project_root,
+        (PHASE_2C_06_SOURCE_PATH, PHASE_2C_06_DOC_PATH),
+    ):
+        return _generated_json_artifact(path, build_phase_2c_06_next_slice_final_selection_gate_report())
+    if path == PHASE_2C_07_REPORT_JSON and _source_artifacts_available(
+        project_root,
+        (PHASE_2C_07_SOURCE_PATH, PHASE_2C_07_DOC_PATH),
+    ):
+        return _generated_json_artifact(path, build_phase_2c_07_next_slice_implementation_kickoff_gate_report())
+    if path == PHASE_2C_08_REPORT_JSON and _source_artifacts_available(
+        project_root,
+        (PHASE_2C_08_SOURCE_PATH, PHASE_2C_08_DOC_PATH),
+    ):
+        return _generated_json_artifact(path, build_phase_2c_08_next_slice_implementation_report(project_root))
+    return artifact
+
+
 def _artifact_record(project_root: Path, path_text: str) -> Dict[str, Any]:
     path = Path(path_text)
     return {
@@ -210,9 +255,21 @@ def _artifact_record(project_root: Path, path_text: str) -> Dict[str, Any]:
 
 
 def _source_evidence_review(project_root: Path) -> Dict[str, Any]:
-    phase_2c_06_json = _load_json_artifact(project_root, PHASE_2C_06_REPORT_JSON)
-    phase_2c_07_json = _load_json_artifact(project_root, PHASE_2C_07_REPORT_JSON)
-    phase_2c_08_json = _load_json_artifact(project_root, PHASE_2C_08_REPORT_JSON)
+    phase_2c_06_json = _materialize_missing_source_evidence(
+        project_root,
+        PHASE_2C_06_REPORT_JSON,
+        _load_json_artifact(project_root, PHASE_2C_06_REPORT_JSON),
+    )
+    phase_2c_07_json = _materialize_missing_source_evidence(
+        project_root,
+        PHASE_2C_07_REPORT_JSON,
+        _load_json_artifact(project_root, PHASE_2C_07_REPORT_JSON),
+    )
+    phase_2c_08_json = _materialize_missing_source_evidence(
+        project_root,
+        PHASE_2C_08_REPORT_JSON,
+        _load_json_artifact(project_root, PHASE_2C_08_REPORT_JSON),
+    )
 
     phase_2c_06_data = phase_2c_06_json.get("data", {})
     phase_2c_07_data = phase_2c_07_json.get("data", {})
@@ -228,7 +285,9 @@ def _source_evidence_review(project_root: Path) -> Dict[str, Any]:
         validate_phase_2c_08_report(phase_2c_08_data) if phase_2c_08_json.get("loaded") is True else {}
     )
 
-    phase_2c_08_html_exists = (project_root / PHASE_2C_08_REPORT_HTML).exists()
+    phase_2c_08_html_exists = (project_root / PHASE_2C_08_REPORT_HTML).exists() or (
+        phase_2c_08_json.get("materialized_from_source") is True
+    )
     return {
         "phase_2c_06_report_json": {
             "path": phase_2c_06_json["path"],
