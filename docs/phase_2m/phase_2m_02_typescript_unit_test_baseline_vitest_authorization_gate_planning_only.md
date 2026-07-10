@@ -1,14 +1,14 @@
 # Phase 2M-02 - TypeScript Unit Test Baseline / Vitest Authorization Gate / Planning Only
 
-Status: DONE / READY_FOR_REVIEW (PLANNING GATE); IMPLEMENTATION FUTURE / NOT_AUTHORIZED
+Status: DONE / MERGED_TO_MAIN (PLANNING GATE); IMPLEMENTATION NOT_AUTHORIZED / NEEDS_DEPENDENCY_AUTHORIZATION
 
-Decision summary: A TypeScript unit-test baseline is required because the repository has TypeScript application code but no JavaScript or TypeScript unit-test files, test script, installed test runner, or locked test-runner dependency. Vitest is the recommended runner for a future local-only first slice, and `lib/ai/validators.ts` is the narrowest identified source boundary. Implementation is `NEEDS_DEPENDENCY_AUTHORIZATION` because neither `package-lock.json` nor the existing installed tree provides a repository-controlled Vitest version. This gate creates planning evidence only; it does not install a dependency, change package metadata, create tests, change source or configuration, start Phase 2M-02 implementation, or start Phase 2M-03.
+Decision summary: The Phase 2M-02 planning gate is `DONE / MERGED_TO_MAIN`. A TypeScript unit-test baseline is required because the repository has TypeScript application code but no JavaScript or TypeScript unit-test files, test script, installed test runner, or locked test-runner dependency. Vitest is the recommended runner for a future local-only first slice, and `lib/ai/validators.ts` is the narrowest identified source boundary. Implementation remains `NOT_AUTHORIZED / NEEDS_DEPENDENCY_AUTHORIZATION` because neither `package-lock.json` nor the existing installed tree provides a repository-controlled Vitest version. The merged gate is planning evidence only; it does not install a dependency, change package metadata, create tests, change source or configuration, start Phase 2M-02 implementation, or start Phase 2M-03.
 
 ```text
 PHASE: 2M-02
 TASK_MODE: TYPESCRIPT_UNIT_TEST_BASELINE_AUTHORIZATION_GATE_PLANNING_ONLY
-PLANNING_GATE_STATUS: DONE / READY_FOR_REVIEW
-PHASE_2M_02_IMPLEMENTATION_STATUS: FUTURE / NOT_AUTHORIZED
+PLANNING_GATE_STATUS: DONE / MERGED_TO_MAIN
+PHASE_2M_02_IMPLEMENTATION_STATUS: NOT_AUTHORIZED / NEEDS_DEPENDENCY_AUTHORIZATION
 PHASE_2M_03_STATUS: FUTURE / NOT_AUTHORIZED
 LOCAL_ONLY: YES
 DETERMINISTIC_ONLY: YES
@@ -249,7 +249,7 @@ EXTRA_SLICE_SELECTED_OR_IMPLEMENTED: NO
 
 ```text
 FINAL_PHASE_DECISION: NEEDS_DEPENDENCY_AUTHORIZATION
-PLANNING_GATE_COMPLETE_LOCALLY: YES
+PLANNING_GATE_MERGED_TO_MAIN: YES
 PHASE_2M_02_IMPLEMENTATION_AUTHORIZED: NO
 PHASE_2M_02_IMPLEMENTATION_STARTED: NO
 PHASE_2M_03_STARTED_OR_AUTHORIZED: NO
