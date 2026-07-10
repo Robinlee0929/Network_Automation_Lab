@@ -1,6 +1,6 @@
 # Phase 2L-03 — Phase 2L Narrowed Continuation Scope Gate / Planning Only
 
-Status: DONE / READY_FOR_REVIEW
+Status: DONE / MERGED_TO_MAIN
 
 Decision summary: `NOT_AUTHORIZED`. None of the six candidate directions recorded by Phase 2L-01 satisfies every narrowed-continuation criterion after the Phase 2L-02 duplication review and the completed Phase 2L-02A through Phase 2L-02E registry-evidence detour. Phase 2L-03 authorizes no further Phase 2L continuation, adds no Phase 2L-04 candidate, authorizes no implementation, and does not start or authorize Phase 2M.
 
@@ -10,7 +10,7 @@ Decision summary: `NOT_AUTHORIZED`. None of the six candidate directions recorde
 PHASE: 2L-03
 TASK_NAME: Phase 2L Narrowed Continuation Scope Gate / Planning Only
 TASK_MODE: AUTHORIZATION_GATE_PLANNING_ONLY
-STATUS: DONE / READY_FOR_REVIEW
+STATUS: DONE / MERGED_TO_MAIN
 PLANNING_ONLY: YES
 DOCUMENTATION_ONLY: YES
 LOCAL_ONLY: YES
@@ -242,7 +242,7 @@ EXTRA_SLICE_SELECTED_OR_IMPLEMENTED: NO
 ```text
 FINAL_PHASE_DECISION: PASS
 PHASE: 2L-03
-STATUS: DONE / READY_FOR_REVIEW
+STATUS: DONE / MERGED_TO_MAIN
 TASK_MODE: AUTHORIZATION_GATE_PLANNING_ONLY
 AUTHORIZATION_DECISION: NOT_AUTHORIZED
 GATE_COMPLETED: YES
