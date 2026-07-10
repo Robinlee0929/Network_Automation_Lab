@@ -208,9 +208,15 @@ Typecheck, zero-warning lint, and the telemetry-disabled Next.js build passed. T
 
 ### Phase 2M-02 TypeScript Unit Test Baseline Authorization Gate
 
-The Phase 2M-02 planning gate is `DONE / MERGED_TO_MAIN`; Phase 2M-02 implementation remains `NOT_AUTHORIZED / NEEDS_DEPENDENCY_AUTHORIZATION` and has not started. Repository inventory found no JavaScript or TypeScript unit-test files, no unit-test script, and no installed or locked Vitest, Jest, React Testing Library, or jsdom dependency. The gate recommends Vitest for a later deterministic, Node-environment-only first slice around `lib/ai/validators.ts`, with React component rendering and DOM configuration excluded.
+The Phase 2M-02 planning gate is `DONE / MERGED_TO_MAIN`; it originally left implementation `NOT_AUTHORIZED / NEEDS_DEPENDENCY_AUTHORIZATION`. Repository inventory found no JavaScript or TypeScript unit-test files, no unit-test script, and no installed or locked Vitest, Jest, React Testing Library, or jsdom dependency. The gate recommends Vitest for a later deterministic, Node-environment-only first slice around `lib/ai/validators.ts`, with React component rendering and DOM configuration excluded.
 
-The implementation decision is `NEEDS_DEPENDENCY_AUTHORIZATION` because no repository-controlled Vitest version evidence exists. This planning gate does not authorize an install, package or lockfile change, test creation, source or configuration change, or a Vitest execution command. Phase 2M-03 remains `FUTURE / NOT_AUTHORIZED` and has not started.
+Phase 2M-02A separately closes the version-evidence gap for a future task; it does not alter the historical Phase 2M-02 planning-gate result. Phase 2M-02 implementation has not started, and Vitest is not installed or executed. Phase 2M-03 remains `FUTURE / NOT_AUTHORIZED` and has not started.
+
+### Phase 2M-02A Vitest Dependency Authorization Gate
+
+Phase 2M-02A is `DONE / READY_FOR_REVIEW` with dependency decision `AUTHORIZED` for exact `vitest@4.1.10`. Read-only official npm registry metadata confirms the candidate supports the tested Node `v22.20.0`; DOM/browser peers are optional; the future validators-only Node slice needs no React Testing Library, jsdom, additional direct dependency, or separate Vitest configuration.
+
+This is dependency authorization evidence only. Vitest is not installed, `package.json` and `package-lock.json` are unchanged, no test exists, and Phase 2M-02 implementation has not started. Any implementation requires a future separately requested task limited to exact package metadata plus `lib/ai/validators.test.ts`. Phase 2M-03 remains `FUTURE / NOT_AUTHORIZED` and has not started.
 
 ## Next Recommended Step
 
@@ -529,6 +535,7 @@ Current Phase 2H / 2I / 2J / 2K / 2L progress snapshot:
 | 43 | 2M-00 | Platform Quality & TypeScript Automation Entry Gate / Planning Only | DONE / MERGED_TO_MAIN | `AUTHORIZED`: the gate found a real local TypeScript validation gap and bounded a separate 2M-01 task; no package, source, test, CI, runtime, dependency, or 2M-01 implementation change occurred |
 | 44 | 2M-01 | TypeScript Tooling Baseline / Local-only | DONE / MERGED_TO_MAIN | Reviewed source commit `79fe866d1f788816a6aa152d0938d4f601378c63` and tooling commit `cf7f42259c583f6b76658e74ff525a4113599f6f` were integrated by fast-forward only; post-merge validation passed within the documented pytest/report-index boundary, no lint rule was suppressed or weakened, and Phase 2M-02 has not started or been authorized |
 | 45 | 2M-02 | TypeScript Unit Test Baseline / Vitest Authorization Gate / Planning Only | DONE / MERGED_TO_MAIN (PLANNING GATE); IMPLEMENTATION NOT_AUTHORIZED / NEEDS_DEPENDENCY_AUTHORIZATION | No JS/TS unit-test baseline or repository-controlled Vitest version evidence exists; the recommended first slice is `lib/ai/validators.ts`, but no dependency, package, test, source, or configuration change is authorized |
+| 45A | 2M-02A | Vitest Dependency Authorization Gate / Planning Only | DONE / READY_FOR_REVIEW — DEPENDENCY AUTHORIZED | Official npm registry metadata authorizes exact `vitest@4.1.10` only for a future separately requested validators-only implementation; Vitest is not installed, Phase 2M-02 implementation has not started, and Phase 2M-03 remains future/not authorized |
 | 46 | 2M-03 | Future Phase 2M continuation | FUTURE / NOT_AUTHORIZED | Not started; no scope selected or implemented by the Phase 2M-02 planning gate |
 
 2K-09 result: the README now clarifies that the MIT License covers code usage rights such as cloning, reviewing, learning from, running local deterministic checks, and forking under the license terms. It also states that the license does not grant operational authorization for SSH, live device access, NETCONF, RESTCONF, API/model/provider calls, secrets access, config backup/change, or autonomous execution.
