@@ -1,6 +1,6 @@
 # Phase 2L-02C — Report-index Registry Expectation Review / Planning Only
 
-Status: DONE / READY_FOR_REVIEW
+Status: DONE / MERGED_TO_MAIN
 
 Decision summary: the current registry does not fully match the repository's report lifecycle. Seven missing paths are valid optional runtime-output expectations. The two Day8 paths do not match the filenames written and tested by the current Day8 implementation. The two Day4 paths match the writer, but they are ignored, untracked outputs of a live-validation workflow while the registry marks them required, making a clean pre-execution checkout `INCOMPLETE`. No separate baseline fixture gap is supported by repository evidence. The overall outcome is `REGISTRY_EXPECTATION_MISMATCH_CONFIRMED`; no registry correction, report creation, fixture creation, or implementation is authorized.
 
@@ -10,7 +10,7 @@ Decision summary: the current registry does not fully match the repository's rep
 PHASE: 2L-02C
 TASK_NAME: Report-index Registry Expectation Review / Planning Only
 TASK_MODE: PLANNING_ONLY_DOCUMENTATION_AND_REGISTRY_EXPECTATION_REVIEW_ONLY
-STATUS: DONE / READY_FOR_REVIEW
+STATUS: DONE / MERGED_TO_MAIN
 PLANNING_ONLY: YES
 DOCUMENTATION_ONLY: YES
 REGISTRY_EXPECTATION_REVIEW_ONLY: YES
@@ -184,7 +184,7 @@ FINAL_READABILITY_RESULT: PASS
 ```text
 FINAL_PHASE_DECISION: PASS
 PHASE: 2L-02C
-STATUS: DONE / READY_FOR_REVIEW
+STATUS: DONE / MERGED_TO_MAIN
 INVENTORY_ITEMS_REVIEWED: 11
 INVENTORY_ITEMS_CLASSIFIED: 11
 DAY4_REGISTRY_EXPECTATION_REVIEW_INCLUDED: YES
