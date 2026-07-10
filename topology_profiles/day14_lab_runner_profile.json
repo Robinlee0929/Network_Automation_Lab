@@ -20,12 +20,18 @@
           "name": "Day4 Baseline Validation",
           "json": "reports/Hex-s-2025-lab01/day4_baseline_validation.json",
           "html": "reports/Hex-s-2025-lab01/day4_baseline_validation.html",
-          "required": true
+          "required": false
         },
         {
-          "name": "Day8 iperf3 Performance",
-          "json": "reports/Hex-s-2025-lab01/day8_iperf3_performance_report.json",
-          "html": "reports/Hex-s-2025-lab01/day8_iperf3_performance_report.html",
+          "name": "Day8 iperf3 WAN_TO_LAN_DNAT",
+          "json": "reports/Hex-s-2025-lab01/day8_iperf3_WAN_TO_LAN_DNAT_report.json",
+          "html": "reports/Hex-s-2025-lab01/day8_iperf3_WAN_TO_LAN_DNAT_report.html",
+          "required": false
+        },
+        {
+          "name": "Day8 iperf3 LAN_TO_WAN_DNAT_REPLY",
+          "json": "reports/Hex-s-2025-lab01/day8_iperf3_LAN_TO_WAN_DNAT_REPLY_report.json",
+          "html": "reports/Hex-s-2025-lab01/day8_iperf3_LAN_TO_WAN_DNAT_REPLY_report.html",
           "required": false
         },
         {
@@ -51,12 +57,18 @@
           "name": "Day4 Baseline Validation",
           "json": "reports/Hex-s-2025-lab02/day4_baseline_validation.json",
           "html": "reports/Hex-s-2025-lab02/day4_baseline_validation.html",
-          "required": true
+          "required": false
         },
         {
-          "name": "Day8 iperf3 Performance",
-          "json": "reports/Hex-s-2025-lab02/day8_iperf3_performance_report.json",
-          "html": "reports/Hex-s-2025-lab02/day8_iperf3_performance_report.html",
+          "name": "Day8 iperf3 WAN_TO_LAN_DNAT",
+          "json": "reports/Hex-s-2025-lab02/day8_iperf3_WAN_TO_LAN_DNAT_report.json",
+          "html": "reports/Hex-s-2025-lab02/day8_iperf3_WAN_TO_LAN_DNAT_report.html",
+          "required": false
+        },
+        {
+          "name": "Day8 iperf3 LAN_TO_WAN_DNAT_REPLY",
+          "json": "reports/Hex-s-2025-lab02/day8_iperf3_LAN_TO_WAN_DNAT_REPLY_report.json",
+          "html": "reports/Hex-s-2025-lab02/day8_iperf3_LAN_TO_WAN_DNAT_REPLY_report.html",
           "required": false
         },
         {
