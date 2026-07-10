@@ -1,6 +1,6 @@
 # Phase 2L-02B — Report-index Missing Runtime Report Decision Gate / Planning Only
 
-Status: DONE / READY_FOR_REVIEW
+Status: DONE / MERGED_TO_MAIN
 
 Decision summary: the current `INCOMPLETE` result cannot be accepted as a set of documented optional gaps because two missing Day4 runtime outputs are marked required by the current report-index profile. Repository evidence also shows that the configured Day8 paths do not match the filenames written by the current Day8 implementation. The gate outcome is `REGISTRY_EXPECTATION_REVIEW_REQUIRED`. This task authorizes no report creation, regeneration, backfill, registry change, report-index change, or runtime implementation.
 
@@ -10,7 +10,7 @@ Decision summary: the current `INCOMPLETE` result cannot be accepted as a set of
 PHASE: 2L-02B
 TASK_NAME: Report-index Missing Runtime Report Decision Gate / Planning Only
 TASK_MODE: PLANNING_ONLY_DOCUMENTATION_AND_DECISION_GATE_ONLY
-STATUS: DONE / READY_FOR_REVIEW
+STATUS: DONE / MERGED_TO_MAIN
 PLANNING_ONLY: YES
 DOCUMENTATION_ONLY: YES
 DECISION_GATE_ONLY: YES
@@ -127,7 +127,7 @@ FINAL_READABILITY_RESULT: PASS
 ```text
 FINAL_PHASE_DECISION: PASS
 PHASE: 2L-02B
-STATUS: DONE / READY_FOR_REVIEW
+STATUS: DONE / MERGED_TO_MAIN
 INVENTORY_ITEMS_REVIEWED: 11
 DAY4_BASELINE_JSON_DECISION_INCLUDED: YES
 OVERALL_GATE_OUTCOME: REGISTRY_EXPECTATION_REVIEW_REQUIRED
