@@ -1,18 +1,22 @@
 # Phase 2M-01 - TypeScript Tooling Baseline / Local-only
 
-Status: DONE / READY_FOR_RE_REVIEW
+Status: DONE / MERGED_TO_MAIN
 
-Decision summary: Phase 2M-01 is complete on the local feature branch and ready for re-review after aligning `eslint.config.mjs` with the exact Phase 2M-00 authorization. The repository has a reviewer-visible TypeScript typecheck script, an ESLint 9 FlatCompat configuration with a zero-warning lint policy, an exact direct `@eslint/eslintrc@3.3.5` metadata declaration, and a validated telemetry-disabled Next.js build. Two verified unused symbols remain isolated in the unchanged source-correction commit. No lint rule was suppressed or weakened, no runtime or status behavior changed, and Phase 2M-02 was not started.
+Decision summary: Phase 2M-01 is `DONE / MERGED_TO_MAIN`. Re-review returned `APPROVE_FOR_MERGE`, and the reviewed source and tooling commits were integrated into local `main` by fast-forward only before post-merge validation and status reconciliation. Direct dependency metadata, typecheck, zero-warning lint, the telemetry-disabled Next.js build, and report-index passed within the approved validation boundary. No lint rule was suppressed or weakened, no runtime or status behavior changed, and Phase 2M-02 was not started or authorized.
 
 ```text
 PHASE: 2M-01
 TASK_NAME: TypeScript Tooling Baseline / Local-only
 TASK_MODE: EXACT_UNUSED_SYMBOL_SOURCE_CORRECTION_AND_TYPESCRIPT_TOOLING_RESUME
-STATUS: DONE / READY_FOR_RE_REVIEW
+STATUS: DONE / MERGED_TO_MAIN
 BASE_COMMIT: 26d04401f5f11247c138fc8e3afb52fc8f4cb346
 SOURCE_CORRECTION_COMMIT: 79fe866d1f788816a6aa152d0938d4f601378c63
+TOOLING_COMMIT: cf7f42259c583f6b76658e74ff525a4113599f6f
+RE_REVIEW_DECISION: APPROVE_FOR_MERGE
+MERGE_METHOD: FAST_FORWARD_ONLY
+MERGED_SOURCE_HEAD: cf7f42259c583f6b76658e74ff525a4113599f6f
 LOCAL_ONLY: YES
-BRANCH_MERGED: NO
+BRANCH_MERGED: YES
 PHASE_2M_02_STARTED: NO
 ```
 
@@ -76,6 +80,33 @@ LATEST_TOOLING_COMMIT_AMENDED_LOCALLY_BEFORE_PUSH: YES
 README_MODIFIED_BY_ALIGNMENT: NO
 PHASE_2M_02_STARTED: NO
 POST_REVIEW_STATUS: DONE / READY_FOR_RE_REVIEW
+```
+
+## Merge and Post-merge Validation
+
+Re-review confirmed the exact ESLint authorization alignment and returned `APPROVE_FOR_MERGE`. Source commit `79fe866d1f788816a6aa152d0938d4f601378c63` and tooling commit `cf7f42259c583f6b76658e74ff525a4113599f6f` were integrated into local `main` with `git merge --ff-only`; no merge commit, squash, rebase, or conflict occurred. The merged source HEAD was `cf7f42259c583f6b76658e74ff525a4113599f6f`.
+
+Post-merge validation reused only the existing local dependency tree. The full pytest limitation remained non-blocking because no existing Python runtime contained pytest. Report-index exited 0 with only the accepted optional-report warning and did not repair or modify a tracked report or registry. The status-reconciliation commit intentionally does not record its own final hash inside that same commit.
+
+```text
+SOURCE_CORRECTION_COMMIT: 79fe866d1f788816a6aa152d0938d4f601378c63
+TOOLING_COMMIT: cf7f42259c583f6b76658e74ff525a4113599f6f
+RE_REVIEW_DECISION: APPROVE_FOR_MERGE
+MERGE_METHOD: FAST_FORWARD_ONLY
+MERGE_COMMIT_CREATED: NO
+MERGE_CONFLICTS: NO
+MERGED_SOURCE_HEAD: cf7f42259c583f6b76658e74ff525a4113599f6f
+NPM_LS_POST_MERGE: PASS; direct @eslint/eslintrc@3.3.5
+TYPECHECK_POST_MERGE: PASS
+ESLINT_POST_MERGE: PASS; 0 errors; 0 warnings
+NEXT_BUILD_POST_MERGE: PASS; telemetry disabled; only ignored .next output
+FULL_PYTEST_POST_MERGE: VALIDATION_NOT_RUN; no existing Python runtime contains pytest
+REPORT_INDEX_POST_MERGE: WARN accepted; exit 0; pass 1; optional missing 13; fail 0
+GIT_DIFF_CHECK_POST_MERGE: PASS
+FORBIDDEN_SCOPE_CHANGED: NO
+PHASE_2M_02_STARTED: NO
+PHASE_2M_02_AUTHORIZED: NO
+POST_MERGE_STATUS: DONE / MERGED_TO_MAIN
 ```
 
 ## Bounded Source Correction
@@ -155,8 +186,8 @@ PRODUCTION_EXECUTION_PATH_ADDED: NO
 DAY1_DAY160_REWRITTEN_OR_REPLACED: NO
 SECOND_SAFETY_MATRIX_CREATED: NO
 PHASE_2M_02_STARTED: NO
-BRANCH_PUSHED: NO
-MERGED_TO_MAIN: NO
+SOURCE_BRANCH_PUSHED: YES
+MERGED_TO_MAIN: YES
 PULL_REQUEST_CREATED: NO
-FINAL_PHASE_STATUS: DONE / READY_FOR_RE_REVIEW
+FINAL_PHASE_STATUS: DONE / MERGED_TO_MAIN
 ```

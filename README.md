@@ -195,7 +195,7 @@ This README does not claim a fresh validation result by itself. Task-specific fi
 
 ### Local TypeScript / Next.js Quality Baseline
 
-Phase 2M-01 is complete on its local feature branch and is `DONE / READY_FOR_REVIEW`; it is not merged. The tested local baseline is Node `v22.20.0` with npm `11.17.0`, using the repository's already-installed dependencies. This records the environment validated by Phase 2M-01 rather than a universal compatibility guarantee.
+Phase 2M-01 is complete and `DONE / MERGED_TO_MAIN`. The reviewed source and tooling commits were integrated by fast-forward only, and the post-merge typecheck, zero-warning lint, telemetry-disabled build, and report-index validation completed within the documented boundary. The tested local baseline is Node `v22.20.0` with npm `11.17.0`, using the repository's already-installed dependencies. This records the environment validated by Phase 2M-01 rather than a universal compatibility guarantee.
 
 ```powershell
 npm.cmd run typecheck
@@ -521,7 +521,7 @@ Current Phase 2H / 2I / 2J / 2K / 2L progress snapshot:
 | 41C | 2L-02E | Bounded Report-index Registry Correction / Registry Only | DONE / MERGED_TO_MAIN | Bounded registry-only correction is complete and merged into main at implementation commit `5c14d095f49f0d6c55e2f371388345f4afa7dbe2`, which changed exactly `topology_profiles/day14_lab_runner_profile.json` and contained no README or documentation changes; the merge/push/sync/cleanup task also made no README or documentation edit, and this post-merge README status is now reconciled |
 | 42 | 2L-03 | Narrowed Continuation Scope Gate / Planning Only | DONE / MERGED_TO_MAIN | `NOT_AUTHORIZED`: no recorded candidate met every narrowed-continuation criterion; no 2L-04 or implementation was authorized, and Phase 2M remains not started and unauthorized |
 | 43 | 2M-00 | Platform Quality & TypeScript Automation Entry Gate / Planning Only | DONE / MERGED_TO_MAIN | `AUTHORIZED`: the gate found a real local TypeScript validation gap and bounded a separate 2M-01 task; no package, source, test, CI, runtime, dependency, or 2M-01 implementation change occurred |
-| 44 | 2M-01 | TypeScript Tooling Baseline / Local-only | DONE / READY_FOR_REVIEW | Local-only ESLint 9 FlatCompat baseline, exact direct `@eslint/eslintrc@3.3.5` metadata promotion, bounded two-symbol source correction, and deterministic typecheck/lint/build validation are complete on the unmerged feature branch; no lint rule was suppressed or weakened, and Phase 2M-02 has not started |
+| 44 | 2M-01 | TypeScript Tooling Baseline / Local-only | DONE / MERGED_TO_MAIN | Reviewed source commit `79fe866d1f788816a6aa152d0938d4f601378c63` and tooling commit `cf7f42259c583f6b76658e74ff525a4113599f6f` were integrated by fast-forward only; post-merge validation passed within the documented pytest/report-index boundary, no lint rule was suppressed or weakened, and Phase 2M-02 has not started or been authorized |
 
 2K-09 result: the README now clarifies that the MIT License covers code usage rights such as cloning, reviewing, learning from, running local deterministic checks, and forking under the license terms. It also states that the license does not grant operational authorization for SSH, live device access, NETCONF, RESTCONF, API/model/provider calls, secrets access, config backup/change, or autonomous execution.
 
