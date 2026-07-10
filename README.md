@@ -504,7 +504,7 @@ Current Phase 2H / 2I / 2J / 2K / 2L progress snapshot:
 | 40 | 2L-02A | Report-index Missing Runtime Report Inventory / Planning Only | DONE / MERGED_TO_MAIN | Inventory-only planning record for current report-index INCOMPLETE caused by missing runtime reports; no report repair authorized |
 | 41 | 2L-02B | Report-index Missing Runtime Report Decision Gate / Planning Only | DONE / MERGED_TO_MAIN | Registry expectation review is required before any later remediation decision; no report creation, backfill, registry change, or implementation authorized |
 | 41A | 2L-02C | Report-index Registry Expectation Review / Planning Only | DONE / MERGED_TO_MAIN | Registry expectation mismatches confirmed for required Day4 runtime outputs and configured Day8 filenames; no correction or implementation authorized |
-| 41B | 2L-02D | Report-index Registry Correction Authorization Gate / Planning Only | DONE / READY_FOR_REVIEW | A later bounded correction of the four confirmed registry mismatches is authorized; no registry or implementation change occurred in 2L-02D |
+| 41B | 2L-02D | Report-index Registry Correction Authorization Gate / Planning Only | DONE / MERGED_TO_MAIN | A later bounded correction of the four confirmed registry mismatches is authorized; no registry or implementation change occurred in 2L-02D |
 | 41C | 2L-02E | Bounded Report-index Registry Correction / Registry Only | NEW / FUTURE | Selected next candidate; limited to the two Day4 requiredness corrections and deterministic two-direction Day8 registry representation; not started |
 | 42 | 2L-03 | Narrowed Continuation Scope Gate / Planning Only | NEW / FUTURE | Future planning-only candidate; not selected as the next candidate |
 
