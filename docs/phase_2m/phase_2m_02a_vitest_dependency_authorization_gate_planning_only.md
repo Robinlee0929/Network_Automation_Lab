@@ -1,14 +1,14 @@
 # Phase 2M-02A — Vitest Dependency Authorization Gate / Planning Only
 
-Status: DONE / READY_FOR_REVIEW
+Status: DONE / MERGED_TO_MAIN
 
-Decision summary: Official npm registry metadata supports authorizing exactly `vitest@4.1.10` as a future exact development dependency for the separately requested Phase 2M-02 validators-only implementation. The candidate is stable, its Node engine range includes the current Node `v22.20.0`, its only non-optional peer (`vite`) is also declared by Vitest as a dependency over the same compatible range, and its DOM, browser, UI, coverage, and runtime peers are optional. The proposed `lib/ai/validators.ts` slice needs no React rendering, DOM environment, jsdom, React Testing Library, browser, server, provider, device, or separate Vitest configuration. This task only records the gate: it did not install or execute Vitest, change package metadata, create a test, start Phase 2M-02 implementation, or start Phase 2M-03.
+Decision summary: Phase 2M-02A is `DONE / MERGED_TO_MAIN`. Official npm registry metadata supports authorizing exactly `vitest@4.1.10` as a future exact development dependency for the separately requested Phase 2M-02 validators-only implementation. The candidate is stable, its Node engine range includes the current Node `v22.20.0`, its only non-optional peer (`vite`) is also declared by Vitest as a dependency over the same compatible range, and its DOM, browser, UI, coverage, and runtime peers are optional. The proposed `lib/ai/validators.ts` slice needs no React rendering, DOM environment, jsdom, React Testing Library, browser, server, provider, device, or separate Vitest configuration. This task only records the gate: it did not install or execute Vitest, change package metadata, create a test, start Phase 2M-02 implementation, or start Phase 2M-03.
 
 ```text
 PHASE: 2M-02A
 TASK_NAME: Vitest Dependency Authorization Gate / Planning Only
 TASK_MODE: VITEST_DEPENDENCY_AUTHORIZATION_GATE_PLANNING_ONLY
-STATUS: DONE / READY_FOR_REVIEW
+STATUS: DONE / MERGED_TO_MAIN
 DEPENDENCY_AUTHORIZATION_DECISION: AUTHORIZED
 EXACT_VERSION_AUTHORIZED: YES
 AUTHORIZED_VITEST_VERSION: 4.1.10
@@ -317,7 +317,7 @@ FINAL_READABILITY_RESULT: PASS
 
 ```text
 FINAL_PHASE_DECISION: AUTHORIZED
-PHASE_2M_02A_STATUS: DONE / READY_FOR_REVIEW
+PHASE_2M_02A_STATUS: DONE / MERGED_TO_MAIN
 AUTHORIZED_VITEST_VERSION: 4.1.10
 AUTHORIZATION_APPLIES_TO_FUTURE_SEPARATELY_REQUESTED_TASK_ONLY: YES
 VITEST_INSTALLED: NO
