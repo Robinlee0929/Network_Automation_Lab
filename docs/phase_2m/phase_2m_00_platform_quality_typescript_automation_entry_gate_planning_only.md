@@ -1,6 +1,6 @@
 # Phase 2M-00 — Platform Quality & TypeScript Automation Entry Gate / Planning Only
 
-Status: DONE / READY_FOR_REVIEW
+Status: DONE / MERGED_TO_MAIN
 
 Decision summary: Phase 2M is required because the repository contains a substantial tracked Next.js and TypeScript surface that the Python validation baseline does not typecheck, lint, or build. The current baseline is only partially sufficient because there is no typecheck script, no ESLint flat configuration, no project Node/npm declaration, and no recorded local Next.js build gate. Pre-merge inspection also found that `eslint-config-next@15.5.19` exposes legacy configuration only and its required `FlatCompat` bridge, `@eslint/eslintrc@3.3.5`, is present only transitively through ESLint. Phase 2M-01 remains `AUTHORIZED` as a separate local-only task with an exact direct dependency promotion, lockfile scope, flat-config file, direct ESLint command, warning policy, and validation boundary. Phase 2M-01 was not started by this task.
 
@@ -8,7 +8,7 @@ Decision summary: Phase 2M is required because the repository contains a substan
 PHASE: 2M-00
 TASK_NAME: Platform Quality & TypeScript Automation Entry Gate / Planning Only
 TASK_MODE: PLATFORM_QUALITY_TYPESCRIPT_AUTOMATION_ENTRY_GATE_PLANNING_ONLY
-STATUS: DONE / READY_FOR_REVIEW
+STATUS: DONE / MERGED_TO_MAIN
 PLANNING_ONLY: YES
 LOCAL_ONLY: YES
 NON_EXECUTING: YES
@@ -515,7 +515,7 @@ EXTRA_SLICE_SELECTED_OR_IMPLEMENTED: NO
 ```text
 FINAL_PHASE_DECISION: PASS
 PHASE: 2M-00
-STATUS: DONE / READY_FOR_REVIEW
+STATUS: DONE / MERGED_TO_MAIN
 PHASE_2M_NECESSITY_DECISION: REQUIRED
 NODE_NPM_NEXT_BASELINE: PARTIALLY_SUFFICIENT
 PHASE_2M_01_AUTHORIZATION_DECISION: AUTHORIZED
