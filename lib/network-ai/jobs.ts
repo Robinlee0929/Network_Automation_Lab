@@ -5,7 +5,6 @@ import { findAvailableAction } from "./actions";
 import { evaluateJobCreateReadiness } from "./readiness";
 import type { NetworkJob, Vendor } from "./schemas";
 
-const PHASE1_JOB_STATUSES = ["ready", "pending_approval", "blocked"] as const;
 const STORE_PATH =
   process.env.NETWORK_AI_JOB_STORE_PATH ??
   path.join(process.cwd(), "data", "network-ai", "jobs.json");
