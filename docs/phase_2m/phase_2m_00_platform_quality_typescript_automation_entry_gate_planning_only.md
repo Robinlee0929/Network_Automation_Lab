@@ -2,7 +2,7 @@
 
 Status: DONE / READY_FOR_REVIEW
 
-Decision summary: Phase 2M is required because the repository contains a substantial tracked Next.js and TypeScript surface that the Python validation baseline does not typecheck, lint, or build. The installed local dependencies are sufficient for a bounded follow-up, but the current baseline is only partially sufficient because there is no typecheck script, no ESLint configuration, no project Node/npm declaration, and no recorded local Next.js build gate. Phase 2M-01 is therefore `AUTHORIZED` as a separate local-only task using existing dependencies. Phase 2M-01 was not started by this task.
+Decision summary: Phase 2M is required because the repository contains a substantial tracked Next.js and TypeScript surface that the Python validation baseline does not typecheck, lint, or build. The current baseline is only partially sufficient because there is no typecheck script, no ESLint flat configuration, no project Node/npm declaration, and no recorded local Next.js build gate. Pre-merge inspection also found that `eslint-config-next@15.5.19` exposes legacy configuration only and its required `FlatCompat` bridge, `@eslint/eslintrc@3.3.5`, is present only transitively through ESLint. Phase 2M-01 remains `AUTHORIZED` as a separate local-only task with an exact direct dependency promotion, lockfile scope, flat-config file, direct ESLint command, warning policy, and validation boundary. Phase 2M-01 was not started by this task.
 
 ```text
 PHASE: 2M-00
@@ -59,7 +59,7 @@ Repository evidence inspected:
 - the tracked TypeScript/TSX and JavaScript/JSX inventories;
 - the App Router, component, and library path inventory;
 - local test-configuration and GitHub Actions workflow inventories;
-- installed local metadata for `next` and `eslint-config-next`;
+- installed local metadata for `next`, `eslint`, `eslint-config-next`, and `@eslint/eslintrc`;
 - static source references to client-side fetches, environment variables, and the OpenAI client boundary.
 
 No `docs/phase_2m/` directory or Phase 2M document existed before this task. No tracked ESLint configuration, JS test-runner configuration, or `.github/workflows/` directory was found.
@@ -99,6 +99,7 @@ The actual-automation integration reference is not applicable because this task 
 | TypeScript | `5.9.3` |
 | ESLint | `9.39.4` |
 | `eslint-config-next` | `15.5.19` |
+| `@eslint/eslintrc` | `3.3.5`; installed only as a transitive dependency of `eslint@9.39.4` |
 | `packageManager` field | Absent |
 | Project `engines` field | Absent |
 | `.nvmrc`, `.node-version`, or `.tool-versions` | Absent |
@@ -144,6 +145,27 @@ Static inspection found client components that call repository-relative `/api/..
 
 The ESLint diagnostic failed before linting source because ESLint 9 could not find `eslint.config.js`, `eslint.config.mjs`, or `eslint.config.cjs`. This is baseline evidence, not a source-code failure. No file was changed by either diagnostic.
 
+## Pre-merge ESLint Authorization Correction
+
+The original future plan named `.eslintrc.json`, retained `next lint`, and declared no dependency change. Pre-merge local metadata inspection shows that boundary is not stable for the installed toolchain:
+
+- ESLint `9.39.4` uses flat configuration by default.
+- `package.json` has no `type` field, so an ESM flat configuration must use the explicit `.mjs` extension.
+- `eslint-config-next@15.5.19` contains only `index.js`, `core-web-vitals.js`, `typescript.js`, and parser metadata. Its configs use legacy `module.exports` plus `extends`; it exposes no directly usable native flat-config entry point.
+- `@eslint/eslintrc@3.3.5` exports `FlatCompat`, which can translate the installed legacy Next.js configs for ESLint 9.
+- `@eslint/eslintrc` is not a direct dependency in `package.json`; `npm ls @eslint/eslintrc` shows it only below `eslint@9.39.4`.
+- A project-owned `eslint.config.mjs` must not import an undeclared transitive dependency as though it were stable project API.
+
+```text
+ESLINT_CONFIG_SYSTEM_REQUIRED: ESLINT_9_FLAT_CONFIG
+ESLINT_FLAT_CONFIG_FILENAME: eslint.config.mjs
+ESLINT_FLAT_CONFIG_METHOD: @eslint/eslintrc FlatCompat translating next/core-web-vitals and next/typescript
+ESLINT_CONFIG_NEXT_FLAT_ENTRY_AVAILABLE: NO
+ESLINT_ESLINTRC_DIRECT_DEPENDENCY: NO
+ESLINT_ESLINTRC_TRANSITIVE_ONLY: YES
+ESLINT_RC_REMOVED_FROM_AUTHORIZATION: YES
+```
+
 ## Identified Quality Gap
 
 The current Python baseline is necessary but does not validate the tracked Next.js/TypeScript surface. Repository evidence shows four concrete gaps:
@@ -176,18 +198,20 @@ What is sufficient:
 - required packages are already installed and `npm ls --depth=0` passes;
 - local TypeScript passes without emit;
 - Next.js exposes a local `build` command and the installed Node version satisfies the installed Next.js engine range;
-- Next.js 15.5.19 exposes the current local `next lint` command;
-- `eslint-config-next` includes the legacy `next/core-web-vitals` and `next/typescript` configurations.
+- ESLint 9.39.4 exposes the direct local `eslint` CLI;
+- `eslint-config-next` includes the legacy `next/core-web-vitals` and `next/typescript` configurations;
+- transitive `@eslint/eslintrc@3.3.5` locally proves that `FlatCompat` can bridge those legacy configs, subject to direct dependency promotion.
 
 What is missing:
 
 - project-level Node/npm pinning or documentation;
 - a typecheck package script;
-- a tracked ESLint configuration;
+- a tracked ESLint 9 flat configuration;
+- a stable direct `@eslint/eslintrc@3.3.5` project dependency and matching lockfile root declaration;
 - a deterministic no-cache, zero-warning lint script;
 - recorded local build validation and artifact containment.
 
-New dependencies are not required. Existing scripts and configuration must be bounded and documented.
+One exact dependency-scope correction is required: promote the already installed and already locked `@eslint/eslintrc@3.3.5` from ESLint's transitive tree to an exact direct development dependency. No package download, version resolution, or new transitive package is authorized.
 
 ### Phase 2M-01 authorization
 
@@ -212,11 +236,12 @@ The future task may start only after Phase 2M-00 is reviewed and merged to synch
 ### Exact authorized tracked files
 
 1. `package.json`
-2. `.eslintrc.json`
-3. `README.md`
-4. `docs/phase_2m/phase_2m_01_typescript_tooling_baseline_local_only.md`
+2. `package-lock.json`
+3. `eslint.config.mjs`
+4. `README.md`
+5. `docs/phase_2m/phase_2m_01_typescript_tooling_baseline_local_only.md`
 
-No TypeScript source path is authorized. `package-lock.json` is not authorized because no dependency or version change is required.
+No TypeScript source path is authorized. `.eslintrc.json` is removed from authorization.
 
 ### Exact dependency plan
 
@@ -227,37 +252,69 @@ Existing dependencies reused:
 - `eslint@9.39.4`
 - `eslint-config-next@15.5.19`
 
+Exact direct dependency promotion:
+
+- add `"@eslint/eslintrc": "3.3.5"` to `devDependencies` in `package.json`;
+- add the same exact root `devDependencies` declaration in `package-lock.json`;
+- retain the existing locked `node_modules/@eslint/eslintrc` entry at version `3.3.5` unchanged.
+
 ```text
-REQUIRED_DEPENDENCY_CHANGES: NONE
+PHASE_2M_01_REQUIRED_DEPENDENCY_CHANGES: ADD @eslint/eslintrc@3.3.5 AS AN EXACT DIRECT DEVDEPENDENCY
+PACKAGE_LOCK_AUTHORIZATION_REQUIRED: YES
 PHASE_2M_01_DEPENDENCY_INSTALL_ALLOWED: NO
 PHASE_2M_01_NPM_CI_ALLOWED: NO
 ```
 
-No addition, removal, upgrade, downgrade, lockfile refresh, audit, or registry access is authorized. If the existing local dependency tree is absent or invalid, Phase 2M-01 must stop rather than install or repair it.
+This is a manifest-and-lockfile root-declaration correction for an already installed, already locked package. Phase 2M-01 must use `apply_patch`; it must not run `npm install`, `npm ci`, `npm update`, `npm audit`, `npx`, or registry resolution. If `@eslint/eslintrc@3.3.5` is absent from the existing local tree or lock entry, Phase 2M-01 must stop rather than install or repair it.
 
 ### Exact authorized content changes
 
 `package.json`:
 
 - retain `dev`, `build`, and `start` unchanged;
+- add the exact direct development dependency `"@eslint/eslintrc": "3.3.5"`;
 - replace `lint: next lint` with:
 
 ```json
-"lint": "next lint --no-cache --max-warnings 0"
+"lint": "eslint app components lib --no-cache --max-warnings=0"
 ```
 
 - add:
 
 ```json
-"typecheck": "tsc --noEmit --incremental false --pretty false"
+"typecheck": "tsc --noEmit --incremental false"
 ```
 
-Create `.eslintrc.json` with exactly:
+`package-lock.json`:
 
-```json
-{
-  "extends": ["next/core-web-vitals", "next/typescript"]
-}
+- add `"@eslint/eslintrc": "3.3.5"` only to the root package's `devDependencies`;
+- leave the existing `node_modules/@eslint/eslintrc` version, resolution, integrity, dependency, and engine metadata unchanged.
+
+Create `eslint.config.mjs` with exactly:
+
+```javascript
+import { FlatCompat } from "@eslint/eslintrc";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const compat = new FlatCompat({
+  baseDirectory: __dirname,
+});
+
+export default [
+  ...compat.extends("next/core-web-vitals", "next/typescript"),
+];
+```
+
+```text
+CORRECTED_LINT_SCRIPT: "lint": "eslint app components lib --no-cache --max-warnings=0"
+CORRECTED_LINT_COMMAND: eslint app components lib --no-cache --max-warnings=0
+LINT_WARNING_POLICY: ZERO WARNINGS; --max-warnings=0
+CORRECTED_TYPECHECK_COMMAND: tsc --noEmit --incremental false
+CORRECTED_BUILD_COMMAND: $env:NEXT_TELEMETRY_DISABLED = '1'; npm run build
 ```
 
 `README.md`:
@@ -268,7 +325,7 @@ Create `.eslintrc.json` with exactly:
 - explain that these commands are local-only, require existing installed dependencies, and authorize no server, browser, provider, API, model, secrets, or live-device access;
 - after every required validation passes, change only the existing 2M-01 progress row from `NEW / AUTHORIZED` to `DONE / READY_FOR_REVIEW` and state that the branch is not merged.
 
-Create `docs/phase_2m/phase_2m_01_typescript_tooling_baseline_local_only.md` as the conclusion-first validation record. It must record the base commit, exact four-file scope, environment, dependency inventory, command results, build-artifact boundary, documentation readability review, and unchanged safety boundary.
+Create `docs/phase_2m/phase_2m_01_typescript_tooling_baseline_local_only.md` as the conclusion-first validation record. It must record the base commit, exact five-file scope, environment, dependency inventory, command results, build-artifact boundary, documentation readability review, and unchanged safety boundary.
 
 ### Exact implementation commands and actions
 
@@ -285,6 +342,7 @@ git diff --cached --name-only
 node --version
 npm --version
 npm ls --depth=0
+npm ls eslint eslint-config-next @eslint/eslintrc --depth=0
 Test-Path -LiteralPath '.next'
 ```
 
@@ -294,28 +352,38 @@ After verifying synchronized clean `main` and the merged Phase 2M-00 decision, c
 git switch -c codex/phase-2m-01-typescript-tooling-baseline-local-only
 ```
 
-Then use `apply_patch` to make exactly the authorized content changes above. No npm write command is an implementation step.
+Then use `apply_patch` to make exactly the authorized content changes above. No npm write or install command is an implementation step. After patching and before diagnostics, `npm ls eslint eslint-config-next @eslint/eslintrc --depth=0` must exit 0 and list `@eslint/eslintrc@3.3.5` at the project root.
 
 ### Exact validation commands and pass conditions
 
 1. `npm run typecheck`
    - PASS: exit code 0, no emitted JavaScript, no `*.tsbuildinfo`, and no tracked file change.
 2. `npm run lint`
-   - PASS: exit code 0, zero warnings because `--max-warnings 0` is enforced, no fix, and no cache file.
+   - Executes exactly `eslint app components lib --no-cache --max-warnings=0`.
+   - PASS: exit code 0, zero warnings because `--max-warnings=0` is enforced, no fix, and no cache file.
 3. In PowerShell, set `$env:NEXT_TELEMETRY_DISABLED = '1'`, then run `npm run build`.
    - PASS: exit code 0; no external request, provider call, secret requirement, server, or browser; only ignored `.next/` output may be created or updated.
-4. `python -m pytest`
-   - PASS: exit code 0 and no regression or safety failure.
+4. Probe an already installed Python environment with `python -c "import pytest"`.
+   - If the probe exits 0, run `python -m pytest`; PASS requires exit code 0.
+   - If Python or pytest is unavailable, do not install either one. Record `VALIDATION_NOT_RUN` with the exact reason and do not claim PASS.
+   - Pytest unavailability is non-blocking only because 2M-01 changes TypeScript tooling metadata and documentation exclusively, provided every TypeScript, Git-scope, safety, and report-index requirement otherwise passes and no Python file changed.
 5. `python network_lab.py --task report-index`
    - PASS: exit code 0 with `PASS`, or documented `WARN` caused only by missing optional local runtime reports; do not create or repair reports.
+   - Record whether the command refreshes ignored latest-overview outputs and classify that refresh as a validation side effect, not a tracked project change.
 6. `git diff --check`
    - PASS: exit code 0.
 7. `git status --short`, `git diff --name-only`, and `git diff --stat`
-   - PASS: tracked changes are exactly the four authorized paths.
+   - PASS: tracked changes are exactly the five authorized paths.
 8. Inspect the focused diff.
    - PASS: no dependency version, source, test, CI, runtime, safety, or later-phase change; README and the Phase 2M-01 document agree.
 
 No command may use `npx`, `npm exec`, `npm install`, `npm ci`, `npm update`, `npm audit`, or `npm audit fix`.
+
+```text
+PYTEST_VALIDATION_POLICY: RUN ONLY WHEN AN ALREADY-INSTALLED PYTHON ENVIRONMENT CONTAINS PYTEST; OTHERWISE VALIDATION_NOT_RUN WITH EXACT REASON
+PYTEST_UNAVAILABLE_NON_BLOCKING: YES — ONLY UNDER THE TYPESCRIPT-TOOLING-ONLY CONDITIONS ABOVE
+LINT_WARNING_POLICY: ZERO WARNINGS; --max-warnings=0
+```
 
 ```text
 PHASE_2M_01_NEXT_BUILD_ALLOWED: YES
@@ -346,15 +414,15 @@ Phase 2M-01 must stop without broadening scope if:
 
 - Phase 2M-00 is not merged to synchronized `main`;
 - the branch, remote, base refs, worktree, or staged state fails preflight;
-- `node_modules/` is absent or `npm ls --depth=0` is nonzero or reports missing/invalid dependencies;
+- `node_modules/` is absent, the existing lock lacks `node_modules/@eslint/eslintrc@3.3.5`, or either required `npm ls` command is nonzero or reports missing/invalid dependencies;
 - Node or npm differs from the documented tested baseline and compatibility cannot be established from local evidence;
-- the lint configuration requires an undeclared dependency or package installation;
-- typecheck, lint, or build requires any TypeScript, TSX, JavaScript, JSX, Next config, TypeScript config, or lockfile correction;
+- the exact direct dependency promotion cannot be completed by the two authorized manifest/lockfile root edits without installation or registry access;
+- typecheck, lint, or build requires any TypeScript, TSX, JavaScript, JSX, Next config, TypeScript config, or additional lockfile correction;
 - build attempts external access, requires a provider or secret, starts a server, or modifies a tracked unauthorized file such as `next-env.d.ts`;
 - any command creates `.eslintcache`, `*.tsbuildinfo`, or an ignored artifact outside `.next/`;
-- Python pytest reports a failure;
+- an available Python pytest run reports a failure;
 - report-index reports a safety/regression failure rather than an allowed optional-report warning;
-- the changed-file set exceeds the four exact authorized paths.
+- the changed-file set exceeds the five exact authorized paths.
 
 A diagnostic failure is evidence for a later separately scoped correction gate. It is not authority to edit source or add dependencies during Phase 2M-01.
 
@@ -362,7 +430,7 @@ A diagnostic failure is evidence for a later separately scoped correction gate. 
 
 Excluded tracked files include:
 
-- `package-lock.json`;
+- `.eslintrc.json` and every ESLint configuration except the exact new `eslint.config.mjs`;
 - `tsconfig.json`;
 - `next-env.d.ts`;
 - `next.config.mjs` and any other Next.js configuration;
@@ -370,11 +438,11 @@ Excluded tracked files include:
 - Python source, tests, fixtures, profiles, registries, reports, and CI/workflow files;
 - `AGENTS.md`.
 
-Excluded activities include Vitest, Playwright, Jest, Cypress, GitHub Actions, CI, dependency changes, source cleanup, route execution, server startup, browser automation, deployment, report repair, runtime changes, runner/adapter/scheduler/queue/broker/worker/agent-loop work, SSH, NETCONF, RESTCONF, live devices, provider/API/model calls, secrets, configuration backup/change, production execution, Day1-Day160 rewrites, a second safety matrix, and Phase 2M-02 or later work.
+Excluded activities include any dependency change beyond the exact direct `@eslint/eslintrc@3.3.5` manifest/lockfile promotion, Vitest, Playwright, Jest, Cypress, GitHub Actions, CI, source cleanup, route execution, server startup, browser automation, deployment, report repair, runtime changes, runner/adapter/scheduler/queue/broker/worker/agent-loop work, SSH, NETCONF, RESTCONF, live devices, provider/API/model calls, secrets, configuration backup/change, production execution, Day1-Day160 rewrites, a second safety matrix, and Phase 2M-02 or later work.
 
 ## Phase 2M-00 Risks and Stop Conditions
 
-- The current `next lint` command is specific to the inspected Next.js 15.5.19 baseline. This gate does not authorize a Next.js or ESLint migration.
+- `eslint-config-next@15.5.19` is legacy-config-only. The corrected plan uses ESLint 9 flat config plus `FlatCompat`; it does not authorize a Next.js or ESLint version migration.
 - A future lint or build failure may reveal source issues. No source correction is pre-authorized.
 - The project lacks declared Node/npm requirements. Phase 2M-01 may document only the tested local baseline; broader compatibility claims require separate evidence.
 - Existing runtime/provider-oriented route code remains outside this quality gate and must not be executed.
@@ -395,6 +463,9 @@ REPORT_INDEX_SEMANTIC_RESULT: WARN
 REPORT_INDEX_COUNTS: total=14 pass=1 fail=0 warn=0 missing=13 unknown=0
 REPORT_INDEX_WARN_ACCEPTED: YES — every missing row is optional and no safety or regression failure was reported
 REPORT_INDEX_NORMAL_IGNORED_OUTPUTS_REFRESHED: reports/lab-summary/latest_lab_overview.json and reports/lab-summary/latest_lab_overview.html
+REPORT_INDEX_TRACKED_REPORTS_CHANGED: NO
+REPORT_INDEX_IGNORED_OVERVIEW_OUTPUTS_REFRESHED: YES
+REPORT_INDEX_VALIDATION_SIDE_EFFECT_OBSERVED: YES
 MISSING_RUNTIME_REPORT_CREATED_REPAIRED_OR_BACKFILLED: NO
 ```
 
@@ -448,9 +519,12 @@ STATUS: DONE / READY_FOR_REVIEW
 PHASE_2M_NECESSITY_DECISION: REQUIRED
 NODE_NPM_NEXT_BASELINE: PARTIALLY_SUFFICIENT
 PHASE_2M_01_AUTHORIZATION_DECISION: AUTHORIZED
+PHASE_2M_01_DECISION_BEFORE_CORRECTION: AUTHORIZED
+PHASE_2M_01_DECISION_AFTER_CORRECTION: AUTHORIZED
 PHASE_2M_01_CAN_START_AS_SEPARATE_TASK: YES
 PHASE_2M_01_STARTED_IN_THIS_TASK: NO
-REQUIRED_DEPENDENCY_CHANGES: NONE
+PHASE_2M_01_REQUIRED_DEPENDENCY_CHANGES: ADD @eslint/eslintrc@3.3.5 AS AN EXACT DIRECT DEVDEPENDENCY
+PACKAGE_LOCK_AUTHORIZATION_REQUIRED: YES
 PHASE_2M_01_DEPENDENCY_INSTALL_ALLOWED: NO
 PHASE_2M_01_NEXT_BUILD_ALLOWED: YES
 PHASE_2M_01_EXTERNAL_NETWORK_ALLOWED: NO
