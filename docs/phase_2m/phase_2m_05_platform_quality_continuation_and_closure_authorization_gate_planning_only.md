@@ -1,15 +1,24 @@
 # Phase 2M-05 — Platform Quality Continuation and Closure Authorization Gate / Planning Only
 
-Status: DONE / READY_FOR_REVIEW
+Status: DONE / MERGED_TO_MAIN
 
-Decision summary: the merged Phase 2M evidence meets the current minimum local quality baseline, but Phase 2M should not close while the repository has no reviewer-visible CI baseline for its Python and Node validation stacks. The Gate therefore sets `PHASE_2M_DISPOSITION: CONTINUE_TO_SAFE_CI` and authorizes exactly one separate future task, `Phase 2M-06 — GitHub Actions Dual-Stack Safe CI Baseline`, as `AUTHORIZED / NOT_STARTED`. React/DOM component testing is deferred because no current defect or requirement evidence justifies its additional dependency and configuration surface. Playwright E2E is deferred to Phase 2N, where user-facing acceptance and demo readiness can define the browser, server, artifact, and cleanup boundary. This planning task does not create a workflow, run CI, add tests or dependencies, start 2M-06, start 2M-07, or start Phase 2N.
+Decision summary: Phase 2M-05 implementation commit `f8d9c311cf42e36154b3b2ed7e2b03eca283f7a1` is integrated into `main` by fast-forward only, with no merge commit or conflict, and its post-merge scope validation passed. The merged Phase 2M evidence meets the current minimum local quality baseline, but Phase 2M should not close while the repository has no reviewer-visible CI baseline for its Python and Node validation stacks. The Gate therefore sets `PHASE_2M_DISPOSITION: CONTINUE_TO_SAFE_CI` and authorizes exactly one separate future task, `Phase 2M-06 — GitHub Actions Dual-Stack Safe CI Baseline`, as `AUTHORIZED / NOT_STARTED`. React/DOM component testing is deferred because no current defect or requirement evidence justifies its additional dependency and configuration surface. Playwright E2E is deferred to Phase 2N, where user-facing acceptance and demo readiness can define the browser, server, artifact, and cleanup boundary. No workflow, CI run, test, dependency, Phase 2M-06, Phase 2M-07, or Phase 2N work starts in this reconciliation.
 
 ```text
 PHASE: 2M-05
 TASK_MODE: PLATFORM_QUALITY_CONTINUATION_AND_CLOSURE_AUTHORIZATION_GATE_PLANNING_ONLY
 TASK_MODE_CLASS: planning-only / authorization-gate
 SAFETY_MODE: PLANNING_ONLY / DOCUMENTATION_ONLY / LOCAL_ONLY / NON_EXECUTING
-STATUS: DONE / READY_FOR_REVIEW
+STATUS: DONE / MERGED_TO_MAIN
+SOURCE_BRANCH: codex/phase-2m-05-platform-quality-continuation-closure-gate-planning-only
+IMPLEMENTATION_COMMIT: f8d9c311cf42e36154b3b2ed7e2b03eca283f7a1
+SOURCE_BRANCH_PUSHED_OUTSIDE_CODEX: YES
+SOURCE_MERGE_TYPE: FAST_FORWARD
+SOURCE_MERGE_COMMIT_CREATED: NO
+SOURCE_MERGE_CONFLICTS: NO
+POST_MERGE_SCOPE_VALIDATION: PASS
+SOURCE_TASK_FIRST_GIT_COMMAND_DEVIATION_FOUND: YES
+SOURCE_TASK_PROCEDURAL_DEVIATION_CLASSIFICATION: NON_BLOCKING_READ_ONLY_COMMAND_ORDER_DEVIATION
 PHASE_2M_MINIMUM_QUALITY_BASELINE: MET
 SAFE_CI_NECESSITY: REQUIRED
 REACT_DOM_TESTING_DECISION: DEFER
@@ -139,6 +148,16 @@ Review / Closure Only
 ```
 
 Phase 2M-07 is contingent future work, not authorized or started by this Gate. It must review actual Phase 2M-06 results and cannot rely on this planning decision as proof that CI exists or passes.
+
+## Post-merge integration and procedural reconciliation
+
+Implementation commit `f8d9c311cf42e36154b3b2ed7e2b03eca283f7a1` was pushed to the trusted remote source branch from an externally authorized environment. Local source, remote source, local `main`, `origin/main`, and trusted remote `main` were verified against the exact expected commits before integration.
+
+The source branch was integrated into `main` by fast-forward only from `1ce03036140b8766c87d7046780e34e90c8911da` to `f8d9c311cf42e36154b3b2ed7e2b03eca283f7a1`. No merge commit was created, no conflict occurred, and no conflict resolution, squash, rebase, cherry-pick, reset, or force update was used. Post-merge `git diff --check` passed, and the merged source scope contained exactly `README.md` and this Phase 2M-05 planning record.
+
+The original planning task ran `git branch --show-current` before its required `git status --short --branch`. Both commands were read-only and were executed only after the requested skill, its references, and the applicable `AGENTS.md` were read. Neither README nor this planning record claimed that the original first Git command was `git status --short --branch`. The deviation is therefore retained as `NON_BLOCKING_READ_ONLY_COMMAND_ORDER_DEVIATION`; it affected no commit, worktree state, scope decision, Gate decision, or safety boundary.
+
+Phase 2M-06 remains `AUTHORIZED / NOT_STARTED`. Phase 2M-07 and Phase 2N remain unstarted. This reconciliation adds no workflow or Safe CI implementation.
 
 ## Exact authorized Phase 2M-06 boundary
 
@@ -271,5 +290,5 @@ NEXT_CANDIDATE_SELECTED: YES
 NEXT_TASK_STARTED: NO
 PUSH_PERFORMED: NO
 MERGE_PERFORMED: NO
-FINAL_PHASE_STATUS: DONE / READY_FOR_REVIEW
+FINAL_PHASE_STATUS: DONE / MERGED_TO_MAIN
 ```
