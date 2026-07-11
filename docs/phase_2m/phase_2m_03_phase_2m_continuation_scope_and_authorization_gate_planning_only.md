@@ -1,18 +1,53 @@
 # Phase 2M-03 — Phase 2M Continuation Scope and Authorization Gate / Planning Only
 
-Status: DONE / READY_FOR_REVIEW
+Status: DONE / MERGED_TO_MAIN
 
-Conclusion: Phase 2M should continue with exactly one bounded Node-only Vitest slice. The selected result is `EXPAND_NODE_ONLY_VITEST`, limited to behavioral tests for `evaluateJobCreateReadiness` in `lib/network-ai/readiness.ts`. The future test must use synthetic in-memory inputs and the existing Vitest 4.1.10 default Node environment. It requires no dependency, configuration, server, browser, external network, provider, device, filesystem, timer, or production source change. React/DOM component testing and Playwright remain unapproved because both introduce prerequisites and process ownership that are unnecessary for the available pure-function safety candidate. Phase 2M-04 is authorized as a separate future test-only task and has not started.
+Conclusion: Phase 2M-03 is `DONE / MERGED_TO_MAIN`. Source planning commit `56eee84ce14ebf264c35bf296d3e1e6a0bba19b4` was pushed and integrated by fast-forward only, and every required post-merge validation passed. The original Gate decision remains `EXPAND_NODE_ONLY_VITEST`, limited to behavioral tests for `evaluateJobCreateReadiness` in `lib/network-ai/readiness.ts`. The future test must use synthetic in-memory inputs and the existing Vitest 4.1.10 default Node environment. It requires no dependency, configuration, server, browser, external network, provider, device, filesystem, timer, or production source change. React/DOM component testing and Playwright remain unapproved. Phase 2M-04 remains `FUTURE / AUTHORIZED_NOT_STARTED`; its implementation has not started.
 
 ```text
 PHASE: 2M-03
 TASK_NAME: Phase 2M Continuation Scope and Authorization Gate / Planning Only
 TASK_MODE: PHASE_2M_CONTINUATION_SCOPE_AND_AUTHORIZATION_GATE_PLANNING_ONLY
 SAFETY_MODE: LOCAL_ONLY / DETERMINISTIC / DOCUMENTATION_ONLY / NON_EXECUTING
-STATUS: DONE / READY_FOR_REVIEW
+STATUS: DONE / MERGED_TO_MAIN
 IMPLEMENTATION_PERFORMED: NO
 NEXT_TASK_STARTED: NO
 ```
+
+## Post-merge integration and reconciliation
+
+The reviewed planning commit was pushed to the trusted remote and then integrated into local `main` by `git merge --ff-only`. The merge created no commit and encountered no conflict. Validation ran on the fast-forwarded `main` before this documentation-only reconciliation.
+
+```text
+SOURCE_PLANNING_COMMIT: 56eee84ce14ebf264c35bf296d3e1e6a0bba19b4
+SOURCE_BRANCH_PUSHED: YES
+SOURCE_COMMIT_FAST_FORWARD_MERGED: YES
+SOURCE_MERGE_COMMIT_CREATED: NO
+SOURCE_MERGE_CONFLICTS: NO
+POST_MERGE_TYPECHECK: PASS — exit 0; no diagnostics
+POST_MERGE_LINT: PASS — exit 0; zero errors and zero warnings
+POST_MERGE_BUILD: PASS — exit 0; compiled successfully; 24/24 static pages generated
+POST_MERGE_VITEST: PASS — exit 0; 1 file, 47 tests
+POST_MERGE_FULL_PYTEST: PASS — exit 0; 1,866 passed, 0 failed, 1 existing warning
+POST_MERGE_REPORT_INDEX: WARN accepted — exit 0; total 14, pass 1, fail 0, optional missing 13
+PRODUCTION_SOURCE_MODIFIED: NO
+TEST_FILES_MODIFIED: NO
+DEPENDENCIES_MODIFIED: NO
+CONFIGURATION_MODIFIED: NO
+PHASE_2M_04_STARTED: NO
+FINAL_RECONCILIATION_COMMIT: SELF
+```
+
+| Post-merge gate | Exact command | Result | Exit code |
+| --- | --- | --- | ---: |
+| TypeScript | `npm.cmd run typecheck` | PASS; no diagnostics | 0 |
+| ESLint | `npm.cmd run lint` | PASS; zero errors and zero warnings | 0 |
+| Next.js build | `$env:NEXT_TELEMETRY_DISABLED = '1'` then `npm.cmd run build` | PASS; compiled successfully; 24/24 static pages generated | 0 |
+| Vitest | `npm.cmd run test:unit` | PASS; 1 file, 47 tests | 0 |
+| Full pytest | `python -m pytest` | PASS; 1,866 passed, 0 failed, 1 existing `GetPassWarning` | 0 |
+| Report index | `python network_lab.py --task report-index` | WARN accepted; total 14, pass 1, fail 0, optional missing 13 | 0 |
+
+No production source, test, dependency, configuration, workflow, runner, adapter, execution path, or Phase 2M-04 implementation changed during merge or reconciliation. Phase 2M-04 remains authorized but unstarted.
 
 ## Purpose and authorization boundary
 
@@ -179,7 +214,7 @@ TERMINOLOGY_CONSISTENT_WITH_PHASE_2M_AND_AGENTS_MD: PASS
 FINAL_READABILITY_RESULT: PASS
 ```
 
-## Final structured decision
+## Source-commit structured Gate decision
 
 ```text
 PHASE_2M_03_STATUS: DONE / READY_FOR_REVIEW
