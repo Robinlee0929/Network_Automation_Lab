@@ -204,31 +204,43 @@ $env:NEXT_TELEMETRY_DISABLED = '1'
 npm.cmd run build
 ```
 
-Typecheck, zero-warning lint, and the telemetry-disabled Next.js build passed. The bounded source correction removed the unused `ParseRequestOutput` type import and the unused `PHASE1_JOB_STATUSES` const declaration; it changed no status value or runtime behavior, and no lint rule was suppressed or weakened. These commands are local-only, require the existing installed dependency tree, and authorize no server, browser, deployment, provider, API, model, secrets, SSH, NETCONF, RESTCONF, or live-device access. Phase 2M-02 has not started.
+Typecheck, zero-warning lint, and the telemetry-disabled Next.js build passed. The bounded source correction removed the unused `ParseRequestOutput` type import and the unused `PHASE1_JOB_STATUSES` const declaration; it changed no status value or runtime behavior, and no lint rule was suppressed or weakened. These commands are local-only, require the existing installed dependency tree, and authorize no server, browser, deployment, provider, API, model, secrets, SSH, NETCONF, RESTCONF, or live-device access. At Phase 2M-01 completion, Phase 2M-02 had not started.
 
 ### Phase 2M-02 TypeScript Unit Test Baseline Authorization Gate
 
 The Phase 2M-02 planning gate is `DONE / MERGED_TO_MAIN`; it originally left implementation `NOT_AUTHORIZED / NEEDS_DEPENDENCY_AUTHORIZATION`. Repository inventory found no JavaScript or TypeScript unit-test files, no unit-test script, and no installed or locked Vitest, Jest, React Testing Library, or jsdom dependency. The gate recommends Vitest for a later deterministic, Node-environment-only first slice around `lib/ai/validators.ts`, with React component rendering and DOM configuration excluded.
 
-Phase 2M-02A separately closed the version-evidence gap without altering the historical Phase 2M-02 planning-gate result. Phase 2M-02B has now completed and merged the authorized validators-only implementation into `main`. Phase 2M-03 remains `FUTURE / NOT_AUTHORIZED` and has not started.
+Phase 2M-02A separately closed the version-evidence gap without altering the historical Phase 2M-02 planning-gate result. Phase 2M-02B later completed and merged the authorized validators-only implementation into `main`. At Phase 2M-02 completion, Phase 2M-03 remained `FUTURE / NOT_AUTHORIZED` and had not started.
 
 ### Phase 2M-02A Vitest Dependency Authorization Gate
 
 Phase 2M-02A is `DONE / MERGED_TO_MAIN` with dependency decision `AUTHORIZED` for exact `vitest@4.1.10`. Read-only official npm registry metadata confirms the candidate supports the tested Node `v22.20.0`; DOM/browser peers are optional; the future validators-only Node slice needs no React Testing Library, jsdom, additional direct dependency, or separate Vitest configuration.
 
-Phase 2M-02A itself was dependency-authorization evidence only and did not install or execute Vitest. The separately authorized Phase 2M-02B implementation installed exact `vitest@4.1.10` and merged only the validators test baseline into `main`. Phase 2M-03 remains `FUTURE / NOT_AUTHORIZED` and has not started.
+Phase 2M-02A itself was dependency-authorization evidence only and did not install or execute Vitest. The separately authorized Phase 2M-02B implementation installed exact `vitest@4.1.10` and merged only the validators test baseline into `main`. At Phase 2M-02A completion, Phase 2M-03 remained `FUTURE / NOT_AUTHORIZED` and had not started.
 
 ### Phase 2M-02B Validators-only Unit Test Baseline
 
 Phase 2M-02B is `DONE / MERGED_TO_MAIN`. The implementation installs exact `vitest@4.1.10` as a development dependency, adds the `test:unit` script, and creates exactly `lib/ai/validators.test.ts` for the unchanged `lib/ai/validators.ts` module. Post-merge targeted and complete Vitest runs pass 47 tests in one file.
 
-The test baseline uses the default Node environment and requires no Vitest configuration, React, DOM, browser, jsdom, React Testing Library, provider, device, network, filesystem, or source modification. Phase 2M-03 remains `FUTURE / NOT_AUTHORIZED` and has not started.
+The test baseline uses the default Node environment and requires no Vitest configuration, React, DOM, browser, jsdom, React Testing Library, provider, device, network, filesystem, or source modification. At Phase 2M-02B completion, Phase 2M-03 remained `FUTURE / NOT_AUTHORIZED` and had not started.
 
 ### Phase 2M-02C Validators Baseline Post-implementation Acceptance Review
 
 Phase 2M-02C is `DONE / MERGED_TO_MAIN` with acceptance result `ACCEPT`. The review confirms that Phase 2M-02B stayed within its exact validators-only, Node-only boundary and changed no production source. Its original non-blocking documentation finding remains recorded in the Phase 2M-02C evidence, and the stale Phase 2M-02B readability field was corrected during the separately authorized post-merge reconciliation. The newly permitted full pytest run recorded 1 pre-existing, out-of-scope Network AI contract failure with 1,865 tests passing; that failure remains unresolved, and no pytest repair was performed.
 
-This review-only decision adds no test, dependency, source, configuration, runtime, CI, Playwright, React, DOM, browser, jsdom, or component-testing work. It does not authorize another unit-test slice or Phase 2M-03, which remains `FUTURE / NOT_AUTHORIZED` and not started.
+This review-only decision added no test, dependency, source, configuration, runtime, CI, Playwright, React, DOM, browser, jsdom, or component-testing work. At Phase 2M-02C completion it did not authorize another unit-test slice or Phase 2M-03, which remained `FUTURE / NOT_AUTHORIZED` and not started.
+
+### Phase 2M-02D Pytest Contract Baseline Repair
+
+Phase 2M-02D is `DONE / MERGED_TO_MAIN`. It repaired the stale Python source-text assertion exposed by Phase 2M-02C and restored the full pytest baseline to 1,866 passing tests without changing production source or runtime status behavior. Its implementation commit is `00a8e7c732ad2609e6d63169b830e0b3ce521eb8`; the current merged reconciliation baseline is `b4da945efa8d74bd0b7b3f2886dc2de6a2e37f60`.
+
+At Phase 2M-02D completion, Phase 2M-03 remained unauthorized and unstarted. That historical boundary is preserved; the separately authorized Phase 2M-03 gate below is a later decision.
+
+### Phase 2M-03 Continuation Scope and Authorization Gate
+
+Phase 2M-03 is `DONE / READY_FOR_REVIEW` on its local feature branch. The planning-only gate selected `EXPAND_NODE_ONLY_VITEST` and authorized exactly one future Node-only test slice for `evaluateJobCreateReadiness` in `lib/network-ai/readiness.ts`, using synthetic in-memory inputs and the existing Vitest 4.1.10 Node environment.
+
+The exact future task is `Phase 2M-04 — Network AI Job-readiness Pure-function Vitest Baseline / Node-only Test Implementation`. It is `FUTURE / AUTHORIZED_NOT_STARTED`: no test, source, dependency, configuration, server, browser, workflow, provider, device, runner, adapter, queue, scheduler, worker, AI loop, backup, configuration change, or production execution work started in Phase 2M-03. The detailed evidence and authorization boundary are in `docs/phase_2m/phase_2m_03_phase_2m_continuation_scope_and_authorization_gate_planning_only.md`.
 
 ## Next Recommended Step
 
@@ -551,7 +563,8 @@ Current Phase 2H / 2I / 2J / 2K / 2L progress snapshot:
 | 45B | 2M-02B | Vitest Validators-only Unit Test Baseline / Local-only Implementation | DONE / MERGED_TO_MAIN | Exact `vitest@4.1.10`, `test:unit`, and `lib/ai/validators.test.ts` add 47 passing Node-only validator tests with no configuration or source change; post-merge validation passed, and Phase 2M-03 has not started |
 | 45C | 2M-02C | Vitest Validators Baseline Post-implementation Acceptance Review / Review-only | DONE / MERGED_TO_MAIN | `ACCEPT`; the original non-blocking Phase 2M-02B readability finding is preserved and its follow-up is resolved by post-merge reconciliation; the known out-of-scope pytest failure remains unfixed, with no new test, dependency, source, configuration, runtime, or Phase 2M-03 work |
 | 45D | 2M-02D | Network AI Pytest Job-status Contract Baseline Repair / Test-only | DONE / MERGED_TO_MAIN | Repaired the stale source-text assertion exposed by 2M-02C; production source and runtime behavior unchanged; full pytest baseline restored to 1866 passed; Phase 2M-03 remains FUTURE / NOT_AUTHORIZED |
-| 46 | 2M-03 | Future Phase 2M continuation | FUTURE / NOT_AUTHORIZED | Not started; no scope selected or implemented by the Phase 2M-02 planning gate |
+| 46 | 2M-03 | Phase 2M Continuation Scope and Authorization Gate / Planning Only | DONE / READY_FOR_REVIEW | `EXPAND_NODE_ONLY_VITEST`; authorized exactly one future Node-only `evaluateJobCreateReadiness` Vitest slice; no implementation, dependency, configuration, server, browser, workflow, provider, device, or execution work started |
+| 47 | 2M-04 | Network AI Job-readiness Pure-function Vitest Baseline / Node-only Test Implementation | FUTURE / AUTHORIZED_NOT_STARTED | Authorized boundary is one future `lib/network-ai/readiness.test.ts` slice for `evaluateJobCreateReadiness`, using synthetic in-memory inputs and existing Vitest/Node only; implementation has not started |
 
 2K-09 result: the README now clarifies that the MIT License covers code usage rights such as cloning, reviewing, learning from, running local deterministic checks, and forking under the license terms. It also states that the license does not grant operational authorization for SSH, live device access, NETCONF, RESTCONF, API/model/provider calls, secrets access, config backup/change, or autonomous execution.
 
