@@ -48,12 +48,17 @@ def test_network_ai_routes_are_server_side_and_do_not_return_api_keys_to_fronten
 
 def test_network_ai_job_adapter_creates_jobs_without_execution_paths():
     jobs = read("lib/network-ai/jobs.ts")
+    readiness = read("lib/network-ai/readiness.ts")
+    schemas = read("lib/network-ai/schemas.ts")
     create_route = read("app/api/network/jobs/create/route.ts")
     combined = f"{jobs}\n{create_route}".lower()
 
-    assert "pending_approval" in jobs
-    assert "ready" in jobs
     assert "createnetworkjob" in create_route.lower()
+    assert "evaluateJobCreateReadiness" in jobs
+    assert "status: readiness.status" in jobs
+    for status in ["blocked", "pending_approval", "ready"]:
+        assert f'status: "{status}" as const' in readiness
+    assert 'status: "ready" | "pending_approval" | "blocked";' in schemas
     forbidden_terms = ["ssh", "paramiko", "netmiko", "subprocess", "exec(", "spawn("]
     for term in forbidden_terms:
         assert term not in combined
