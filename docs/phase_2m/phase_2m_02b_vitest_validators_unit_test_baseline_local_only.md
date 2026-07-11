@@ -1,13 +1,13 @@
 # Phase 2M-02B — Vitest Validators-only Unit Test Baseline / Local-only Implementation
 
-Status: DONE / READY_FOR_REVIEW
+Status: DONE / MERGED_TO_MAIN
 
-Decision summary: Phase 2M-02B is complete locally and ready for review on its unpushed feature branch. Exact `vitest@4.1.10` is installed as the only new direct development dependency, `test:unit` runs `vitest run`, and the single new `lib/ai/validators.test.ts` file passes all 47 behavioral tests against the unchanged `lib/ai/validators.ts` module. Typecheck, zero-warning lint, the telemetry-disabled production build, diff checks, and report-index also pass within the documented boundary. No Vitest configuration, production-source change, React/DOM/browser test, provider/device behavior, Phase 2M-02C work, or Phase 2M-03 work was introduced.
+Decision summary: Phase 2M-02B is `DONE / MERGED_TO_MAIN`. Exact `vitest@4.1.10` is installed as the only new direct development dependency, `test:unit` runs `vitest run`, and the single new `lib/ai/validators.test.ts` file passes all 47 behavioral tests against the unchanged `lib/ai/validators.ts` module. Post-merge typecheck, zero-warning lint, the telemetry-disabled production build, targeted and full unit tests, and report-index all pass within the documented boundary. No Vitest configuration, production-source change, React/DOM/browser test, provider/device behavior, Phase 2M-02C work, or Phase 2M-03 work was introduced.
 
 ```text
 PHASE: 2M-02B
 TASK_MODE: BOUNDED_VITEST_VALIDATORS_UNIT_TEST_BASELINE_LOCAL_ONLY_IMPLEMENTATION
-STATUS: DONE / READY_FOR_REVIEW
+STATUS: DONE / MERGED_TO_MAIN
 BASE_COMMIT: 273933e588046c98082223597eec6824eadfc875
 BRANCH: codex/phase-2m-02b-vitest-validators-unit-test-baseline-local-only
 VITEST_VERSION: 4.1.10
@@ -187,13 +187,13 @@ FINAL_READABILITY_RESULT: PASS
 
 ```text
 FINAL_PHASE_DECISION: PASS
-PHASE_2M_02B_STATUS: DONE / READY_FOR_REVIEW
+PHASE_2M_02B_STATUS: DONE / MERGED_TO_MAIN
 VITEST_INSTALLED: YES — exact devDependency 4.1.10
 VITEST_EXECUTED: YES — validators-only unit tests
 PHASE_2M_02_IMPLEMENTATION_COMPLETED_LOCALLY: YES
-BRANCH_PUSHED: NO
-MERGED_TO_MAIN: NO
+BRANCH_PUSHED: YES
+MERGED_TO_MAIN: YES
 PHASE_2M_02C_STARTED: NO
 PHASE_2M_03_STARTED: NO
-NEXT_ACTION: stop for review
+NEXT_ACTION: any further implementation requires a separate explicit task
 ```
