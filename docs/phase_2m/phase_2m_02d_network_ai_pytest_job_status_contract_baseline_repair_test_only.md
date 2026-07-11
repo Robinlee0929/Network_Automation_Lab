@@ -1,8 +1,8 @@
 # Phase 2M-02D - Network AI Pytest Job-status Contract Baseline Repair / Test-only
 
-Status: DONE / READY_FOR_REVIEW
+Status: DONE / MERGED_TO_MAIN
 
-Conclusion: Phase 2M-02D repaired one stale Python source-text contract and restored the full pytest baseline. Production source and runtime status behavior were unchanged. The repaired test now follows the authoritative delegation chain from the job creation route through `jobs.ts` to `readiness.ts`, while also checking the `NetworkJob.status` union in `schemas.ts` and preserving the no-execution assertions. Phase 2M-03 remains unstarted and unauthorized.
+Conclusion: Phase 2M-02D is `DONE / MERGED_TO_MAIN`. It repaired one stale Python source-text contract and restored the full pytest baseline to 1,866 passing tests. Production source and runtime status behavior were unchanged. The repaired test follows the authoritative delegation chain from the job creation route through `jobs.ts` to `readiness.ts`, while also checking the `NetworkJob.status` union in `schemas.ts` and preserving the no-execution assertions. Phase 2M-03 remains unstarted and unauthorized.
 
 ## Task and starting point
 
@@ -14,6 +14,26 @@ START_BRANCH: main
 START_COMMIT: 7029c5986fa0859f70fea30f4ab9082179a4720e
 FEATURE_BRANCH: codex/phase-2m-02d-network-ai-pytest-job-status-contract-repair
 ```
+
+## Post-merge integration and reconciliation
+
+```text
+IMPLEMENTATION_COMMIT: 00a8e7c732ad2609e6d63169b830e0b3ce521eb8
+SOURCE_BRANCH_PUSHED: YES
+SOURCE_COMMIT_FAST_FORWARD_MERGED: YES
+SOURCE_MERGE_COMMIT_CREATED: NO
+SOURCE_MERGE_CONFLICTS: NO
+POST_MERGE_TARGETED_TEST: PASS - 1 passed
+POST_MERGE_NETWORK_AI_CONTRACT_FILE: PASS - 4 passed
+POST_MERGE_FULL_PYTEST: PASS - 1866 passed, 0 failed, 1 warning
+POST_MERGE_REPORT_INDEX: WARN accepted - exit 0; total 14; pass 1; fail 0; missing optional 13
+PRODUCTION_SOURCE_MODIFIED: NO
+RUNTIME_BEHAVIOR_MODIFIED: NO
+PHASE_2M_03_STARTED_OR_AUTHORIZED: NO
+FINAL_RECONCILIATION_COMMIT: SELF - use this document's containing Git commit; exact SHA is recorded in the merge task final report
+```
+
+The source commit was pushed and integrated into local `main` by fast-forward only after its pre-merge validation passed. The same targeted, contract-file, full-pytest, and report-index gates passed again on `main` before this documentation-only reconciliation. No production repair, runtime change, test change, or additional Phase 2M slice was introduced during merge or reconciliation.
 
 The original failing test was:
 
