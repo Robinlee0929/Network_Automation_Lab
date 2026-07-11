@@ -248,6 +248,14 @@ Phase 2M-04 is `DONE / MERGED_TO_MAIN`. Implementation commit `e57f06c178f3456e8
 
 The merged `main` was pushed and independently revalidated. Production source, dependency tree, lockfile, TypeScript/ESLint/Vitest configuration, server/browser surfaces, workflows, and all execution paths remain unchanged. Post-merge targeted Vitest passes 9 tests in one file; complete Vitest passes 56 tests in two files; typecheck, zero-warning lint, the 24/24-page telemetry-disabled build, full pytest with 1,866 passing tests and one existing warning, and report-index with only 13 optional local reports missing all complete within the documented boundary. React/DOM, Playwright, GitHub Actions, a second TypeScript test module, real-device integration, and Phase 2M-05 remain unauthorized and unstarted. Detailed evidence is in `docs/phase_2m/phase_2m_04_network_ai_job_readiness_pure_function_vitest_baseline_node_only_test_implementation.md`.
 
+### Phase 2M-05 Platform Quality Continuation and Closure Authorization Gate
+
+Phase 2M-05 is `DONE / READY_FOR_REVIEW`. The planning Gate classifies the current minimum quality baseline as `MET` from merged Phase 2M-04 evidence: 1,866 passing pytest tests, 56 passing Node-only Vitest tests, passing typecheck and zero-warning lint, a passing 24/24-page telemetry-disabled Next.js build, and report-index with only documented optional-local-report warnings. Phase 2M-05 did not rerun those commands and does not claim fresh validation.
+
+The Gate sets `SAFE_CI_NECESSITY: REQUIRED` because the repository has established Python and Node validation stacks but no `.github/workflows/` baseline. It authorizes exactly one separate future task, `Phase 2M-06 — GitHub Actions Dual-Stack Safe CI Baseline`, as `AUTHORIZED / NOT_STARTED`. Phase 2M-06 must remain one read-only-permissions, no-secrets workflow plus bounded README and evidence documentation; no workflow or CI implementation starts in Phase 2M-05.
+
+React/DOM component testing is `DEFER` because no current defect or requirement evidence justifies a new DOM dependency/configuration surface. Playwright E2E is `DEFER_TO_PHASE_2N`, where user-facing acceptance and demo readiness can define browser/server lifecycle, artifacts, and cleanup. Phase 2M therefore has disposition `CONTINUE_TO_SAFE_CI`; Phase 2M-07 closure review and Phase 2N remain unstarted and unauthorized. Detailed evidence and the exact 2M-06 boundary are in `docs/phase_2m/phase_2m_05_platform_quality_continuation_and_closure_authorization_gate_planning_only.md`.
+
 ## Next Recommended Step
 
 ```text
@@ -571,6 +579,8 @@ Current Phase 2H / 2I / 2J / 2K / 2L progress snapshot:
 | 45D | 2M-02D | Network AI Pytest Job-status Contract Baseline Repair / Test-only | DONE / MERGED_TO_MAIN | Repaired the stale source-text assertion exposed by 2M-02C; production source and runtime behavior unchanged; full pytest baseline restored to 1866 passed; Phase 2M-03 remains FUTURE / NOT_AUTHORIZED |
 | 46 | 2M-03 | Phase 2M Continuation Scope and Authorization Gate / Planning Only | DONE / MERGED_TO_MAIN | Source planning commit `56eee84ce14ebf264c35bf296d3e1e6a0bba19b4` was fast-forward merged; post-merge validation passed; Gate decision remains `EXPAND_NODE_ONLY_VITEST` for `evaluateJobCreateReadiness`; Phase 2M-04 remains authorized but not started |
 | 47 | 2M-04 | Network AI Job-readiness Pure-function Vitest Baseline / Node-only Test Implementation | DONE / MERGED_TO_MAIN | Implementation commit `e57f06c178f3456e83db73649ea6770388589441` was fast-forward merged and pushed; post-merge validation passed; production source, dependencies, configuration, browser/server, workflows, and execution paths remain unchanged |
+| 48 | 2M-05 | Platform Quality Continuation and Closure Authorization Gate / Planning Only | DONE / READY_FOR_REVIEW | Minimum quality baseline `MET`; Safe CI `REQUIRED`; React/DOM `DEFER`; Playwright `DEFER_TO_PHASE_2N`; disposition `CONTINUE_TO_SAFE_CI`; planning only, with no workflow, test, dependency, browser, server, or next-task implementation |
+| 49 | 2M-06 | GitHub Actions Dual-Stack Safe CI Baseline | AUTHORIZED / NOT_STARTED | Exact future boundary: one read-only-permissions, no-secrets GitHub Actions workflow for the existing Node and Python quality commands plus bounded README/evidence documentation; no implementation has started |
 
 2K-09 result: the README now clarifies that the MIT License covers code usage rights such as cloning, reviewing, learning from, running local deterministic checks, and forking under the license terms. It also states that the license does not grant operational authorization for SSH, live device access, NETCONF, RESTCONF, API/model/provider calls, secrets access, config backup/change, or autonomous execution.
 
