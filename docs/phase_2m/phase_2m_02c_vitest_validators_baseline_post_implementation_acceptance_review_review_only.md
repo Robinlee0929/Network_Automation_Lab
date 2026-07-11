@@ -1,18 +1,38 @@
 # Phase 2M-02C — Vitest Validators Baseline Post-implementation Acceptance Review / Review-only
 
-Status: DONE / READY_FOR_REVIEW
+Status: DONE / MERGED_TO_MAIN
 
-Decision summary: Phase 2M-02C records `ACCEPT` for the existing Phase 2M-02B validators-only unit-test baseline. Local Git, package, lockfile, source, and test evidence confirms the expected commits and exact file boundaries, exact `vitest@4.1.10`, exact `"test:unit": "vitest run"`, one Node-only validators test file, and unchanged production source. The merged Phase 2M-02B document still contains the stale readability field `STATUS_DONE_READY_FOR_REVIEW_NOT_MERGED: PASS`; this conflicts with its merged status but is classified as a non-blocking documentation inconsistency requiring a separately authorized correction. Phase 2M-02C does not modify or rerun the implementation, does not edit Phase 2M-02B, and authorizes no further test slice or Phase 2M-03 work.
+Decision summary: Phase 2M-02C is `DONE / MERGED_TO_MAIN` and preserves `ACCEPT` for the existing Phase 2M-02B validators-only unit-test baseline. Local Git, package, lockfile, source, and test evidence confirms the expected commits and exact file boundaries, exact `vitest@4.1.10`, exact `"test:unit": "vitest run"`, one Node-only validators test file, and unchanged production source. The original review correctly found the stale readability field `STATUS_DONE_READY_FOR_REVIEW_NOT_MERGED: PASS` and classified it as a non-blocking documentation inconsistency; the separately authorized post-merge reconciliation corrected that field to `STATUS_DONE_MERGED_TO_MAIN: PASS`. The known out-of-scope pytest failure remains unresolved, and no pytest repair, implementation change, further test slice, or Phase 2M-03 work was authorized.
 
 ```text
 PHASE: 2M-02C
 TASK_MODE: REVIEW_ONLY
 SAFETY_MODE: REPORT_ONLY / DOCUMENTATION_ONLY / LOCAL_ONLY / DETERMINISTIC / NON_EXECUTING
-STATUS: DONE / READY_FOR_REVIEW
+STATUS: DONE / MERGED_TO_MAIN
 REVIEW_TARGET: Phase 2M-02B
 ACCEPTANCE_RESULT: ACCEPT
 DOCUMENTATION_FOLLOW_UP_REQUIRED: YES
+DOCUMENTATION_FOLLOW_UP_RESOLVED_POST_MERGE: YES
 PHASE_2M_03_STATUS: FUTURE / NOT_AUTHORIZED
+```
+
+## Post-merge integration and reconciliation
+
+```text
+SOURCE_REVIEW_COMMIT: 4740d86287245324dfb075f99e0ee50b989e15f9
+SOURCE_BRANCH: codex/phase-2m-02c-vitest-validators-post-implementation-acceptance-review
+SOURCE_BRANCH_PUSHED: YES
+SOURCE_COMMIT_FAST_FORWARD_MERGED: YES
+SOURCE_MERGE_COMMIT_CREATED: NO
+FINAL_RECONCILIATION_COMMIT: SELF — use this document's containing Git commit; exact SHA is recorded in the merge task final report
+ACCEPTANCE_RESULT: ACCEPT
+DOCUMENTATION_FOLLOW_UP_REQUIRED: YES — historical acceptance-time finding preserved
+DOCUMENTATION_FOLLOW_UP_RESOLVED_POST_MERGE: YES
+DOCUMENTATION_FOLLOW_UP_RESOLUTION: Corrected the stale Phase 2M-02B readability status field during the separately authorized post-merge reconciliation.
+KNOWN_PYTEST_FAILURE_RESOLVED: NO
+KNOWN_PYTEST_FAILURE_SCOPE: OUTSIDE PHASE 2M-02B
+PYTEST_FIX_ATTEMPTED: NO
+PHASE_2M_03_STARTED_OR_AUTHORIZED: NO
 ```
 
 ## Purpose and review boundary
@@ -146,6 +166,13 @@ DOCUMENTATION_FOLLOW_UP_REQUIRED: YES
 PHASE_2M_02B_DOCUMENT_MODIFIED: NO
 ```
 
+The finding above is the historical acceptance-time record and remains intentionally unchanged. During the separately authorized post-merge reconciliation, the Phase 2M-02B field was corrected to `STATUS_DONE_MERGED_TO_MAIN: PASS`.
+
+```text
+DOCUMENTATION_FOLLOW_UP_RESOLVED_POST_MERGE: YES
+DOCUMENTATION_FOLLOW_UP_RESOLUTION: Corrected the stale Phase 2M-02B readability status field during the separately authorized post-merge reconciliation.
+```
+
 ## Safety-boundary review
 
 The reviewed implementation adds no React or component testing, DOM/browser environment, jsdom, happy-dom, Playwright, E2E, snapshot, mock, fake timer, server, runtime behavior, runner or adapter path, workflow or CI, queue, scheduler, broker, worker, AI agent loop, provider/API/model integration, secrets, SSH, NETCONF, RESTCONF, live-device access, configuration backup/change, production execution, Day1-Day160 rewrite, or second safety matrix.
@@ -176,14 +203,17 @@ FINAL_READABILITY_RESULT: PASS
 
 ```text
 FINAL_PHASE_DECISION: ACCEPT
-PHASE_2M_02C_STATUS: DONE / READY_FOR_REVIEW
+PHASE_2M_02C_STATUS: DONE / MERGED_TO_MAIN
 ACCEPTANCE_RESULT: ACCEPT
 DOCUMENTATION_FOLLOW_UP_REQUIRED: YES
+DOCUMENTATION_FOLLOW_UP_RESOLVED_POST_MERGE: YES
 PHASE_2M_02B_IMPLEMENTATION_MODIFIED_OR_RERUN: NO
-PHASE_2M_02B_DOCUMENT_MODIFIED: NO
+PHASE_2M_02B_DOCUMENT_MODIFIED: YES — stale readability status field only, during separately authorized post-merge reconciliation
+KNOWN_PYTEST_FAILURE_RESOLVED: NO
+PYTEST_FIX_ATTEMPTED: NO
 ANOTHER_UNIT_TEST_SLICE_AUTHORIZED: NO
 REACT_DOM_BROWSER_OR_COMPONENT_TESTING_AUTHORIZED: NO
 PLAYWRIGHT_AUTHORIZED: NO
 PHASE_2M_03_STARTED_OR_AUTHORIZED: NO
-NEXT_ACTION: stop for review; the stale Phase 2M-02B readability field requires a separate explicit documentation-only task
+NEXT_ACTION: stop after verified main synchronization and source-branch cleanup; any pytest repair or future work requires a separate explicit task
 ```
