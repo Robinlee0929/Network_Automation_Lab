@@ -5,6 +5,7 @@ from pathlib import Path
 import day149_ai_assistance_docs_registry_report_index_consistency_audit as day149
 import network_lab
 import network_lab_cli_dispatch
+from ai_assistance_evidence_test_fixtures import build_deterministic_ai_assistance_evidence_root
 from network_lab_task_registry import resolve_task_handler, resolve_task_name
 from report_file_utils import path_exists, read_text_with_long_path
 
@@ -12,8 +13,9 @@ from report_file_utils import path_exists, read_text_with_long_path
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 
-def test_day149_report_contains_required_scope_concepts_and_safety_flags():
-    report = day149.build_day149_ai_assistance_docs_registry_report_index_consistency_audit(PROJECT_ROOT)
+def test_day149_report_contains_required_scope_concepts_and_safety_flags(tmp_path):
+    evidence_root = build_deterministic_ai_assistance_evidence_root(tmp_path, PROJECT_ROOT)
+    report = day149.build_day149_ai_assistance_docs_registry_report_index_consistency_audit(evidence_root)
 
     assert report["overall_status"] == "PASS"
     assert report["status"] == "CONSISTENCY_AUDITED_REVIEW_ONLY"
@@ -52,8 +54,9 @@ def test_day149_report_contains_required_scope_concepts_and_safety_flags():
         assert report[field] is False
 
 
-def test_day149_day_records_cover_day145_day149_without_mismatches():
-    report = day149.build_day149_ai_assistance_docs_registry_report_index_consistency_audit(PROJECT_ROOT)
+def test_day149_day_records_cover_day145_day149_without_mismatches(tmp_path):
+    evidence_root = build_deterministic_ai_assistance_evidence_root(tmp_path, PROJECT_ROOT)
+    report = day149.build_day149_ai_assistance_docs_registry_report_index_consistency_audit(evidence_root)
 
     assert [record["day_label"] for record in report["day_records"]] == [
         "Day145",
@@ -73,7 +76,10 @@ def test_day149_day_records_cover_day145_day149_without_mismatches():
         assert record["mismatch_count"] == 0
 
 
-def test_day149_cli_does_not_execute_provider_network_runner_or_prior_day_tasks(monkeypatch, capsys):
+def test_day149_cli_does_not_execute_provider_network_runner_or_prior_day_tasks(
+    tmp_path, monkeypatch, capsys
+):
+    evidence_root = build_deterministic_ai_assistance_evidence_root(tmp_path, PROJECT_ROOT)
     def fail_subprocess(*args, **kwargs):
         raise AssertionError("Day149 must not execute subprocess")
 
@@ -89,7 +95,7 @@ def test_day149_cli_does_not_execute_provider_network_runner_or_prior_day_tasks(
 
     exit_code = network_lab.main(
         ["--task", "ai-assistance-docs-registry-report-index-consistency-audit"],
-        project_root=PROJECT_ROOT,
+        project_root=evidence_root,
     )
     output = capsys.readouterr().out
 
@@ -114,8 +120,9 @@ def test_day149_cli_does_not_execute_provider_network_runner_or_prior_day_tasks(
     assert "[PASS] CONSISTENCY_AUDITED_REVIEW_ONLY" in output
 
 
-def test_day149_negative_validation_blocks_unsafe_flags_and_mismatches():
-    report = day149.build_day149_ai_assistance_docs_registry_report_index_consistency_audit(PROJECT_ROOT)
+def test_day149_negative_validation_blocks_unsafe_flags_and_mismatches(tmp_path):
+    evidence_root = build_deterministic_ai_assistance_evidence_root(tmp_path, PROJECT_ROOT)
+    report = day149.build_day149_ai_assistance_docs_registry_report_index_consistency_audit(evidence_root)
     unsafe = copy.deepcopy(report)
     unsafe["agents_md_pre_read_result"] = "FAIL"
     unsafe["agents_md_read_before_day149_work"] = False
@@ -150,6 +157,7 @@ def test_day149_negative_validation_blocks_unsafe_flags_and_mismatches():
 
 
 def test_day149_task_catalog_dispatch_and_report_index_visibility(tmp_path):
+    evidence_root = build_deterministic_ai_assistance_evidence_root(tmp_path, PROJECT_ROOT)
     task = next(
         task
         for task in network_lab.list_tasks()
@@ -177,13 +185,13 @@ def test_day149_task_catalog_dispatch_and_report_index_visibility(tmp_path):
     assert "EXECUTION_PROVIDER_API_DISABLED" in task["notes"]
     assert "AGENTS_MD_FOUND_AND_READ" in task["notes"]
 
-    report = day149.build_day149_ai_assistance_docs_registry_report_index_consistency_audit(PROJECT_ROOT)
+    report = day149.build_day149_ai_assistance_docs_registry_report_index_consistency_audit(evidence_root)
     json_path, html_path = day149.write_day149_ai_assistance_docs_registry_report_index_consistency_audit_reports(
-        tmp_path,
+        evidence_root,
         report,
     )
-    exit_code = network_lab.main(["--report-index"], project_root=tmp_path)
-    index_html = read_text_with_long_path(tmp_path / "reports" / "report_index.html", encoding="utf-8")
+    exit_code = network_lab.main(["--report-index"], project_root=evidence_root)
+    index_html = read_text_with_long_path(evidence_root / "reports" / "report_index.html", encoding="utf-8")
     written = json.loads(read_text_with_long_path(json_path, encoding="utf-8"))
 
     assert exit_code == 0

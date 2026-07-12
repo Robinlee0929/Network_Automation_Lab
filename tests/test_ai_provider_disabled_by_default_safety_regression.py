@@ -5,6 +5,10 @@ from pathlib import Path
 import ai_provider_disabled_by_default_safety_regression as day135
 import network_lab
 import network_lab_cli_dispatch
+from ai_assistance_evidence_test_fixtures import (
+    build_deterministic_ai_assistance_evidence_root,
+    day134_disabled_provider_contract,
+)
 from network_lab_task_registry import resolve_task_handler, resolve_task_name
 from report_file_utils import path_exists, read_text_with_long_path
 
@@ -48,7 +52,7 @@ def _write_agents_md(root: Path) -> None:
 
 
 def _day134_evidence() -> dict:
-    return json.loads((PROJECT_ROOT / day135.SOURCE_CONTRACT_JSON).read_text(encoding="utf-8"))
+    return day134_disabled_provider_contract()
 
 
 def _write_day134_evidence(root: Path, evidence: dict) -> Path:
@@ -58,8 +62,9 @@ def _write_day134_evidence(root: Path, evidence: dict) -> Path:
     return path
 
 
-def test_day135_accepts_day134_disabled_contract_as_read_only_evidence():
-    report = day135.build_ai_provider_disabled_by_default_safety_regression_report(PROJECT_ROOT)
+def test_day135_accepts_day134_disabled_contract_as_read_only_evidence(tmp_path):
+    evidence_root = build_deterministic_ai_assistance_evidence_root(tmp_path, PROJECT_ROOT)
+    report = day135.build_ai_provider_disabled_by_default_safety_regression_report(evidence_root)
 
     assert report["overall_status"] == "PASS"
     assert report["regression_verdict"] == "DISABLED_BY_DEFAULT_PRESERVED"
@@ -83,8 +88,9 @@ def test_day135_accepts_day134_disabled_contract_as_read_only_evidence():
         assert report[field] is False
 
 
-def test_day135_regression_cases_cover_required_accept_and_reject_paths():
-    report = day135.build_ai_provider_disabled_by_default_safety_regression_report(PROJECT_ROOT)
+def test_day135_regression_cases_cover_required_accept_and_reject_paths(tmp_path):
+    evidence_root = build_deterministic_ai_assistance_evidence_root(tmp_path, PROJECT_ROOT)
+    report = day135.build_ai_provider_disabled_by_default_safety_regression_report(evidence_root)
     cases = {case["case"]: case for case in report["regression_cases"]}
 
     assert cases["baseline_day134_disabled_provider_contract"]["accepted"] is True
@@ -134,7 +140,10 @@ def test_day135_missing_or_unreadable_day134_evidence_does_not_advance(tmp_path)
     assert report["regression_verdict"] == "DISABLED_BY_DEFAULT_REGRESSION_BLOCKED"
 
 
-def test_day135_cli_report_and_registry_paths_do_not_activate_provider_api_or_execution(monkeypatch, capsys):
+def test_day135_cli_report_and_registry_paths_do_not_activate_provider_api_or_execution(
+    tmp_path, monkeypatch, capsys
+):
+    evidence_root = build_deterministic_ai_assistance_evidence_root(tmp_path, PROJECT_ROOT)
     def fail_subprocess(*args, **kwargs):
         raise AssertionError("Day135 regression must not execute subprocess")
 
@@ -146,7 +155,7 @@ def test_day135_cli_report_and_registry_paths_do_not_activate_provider_api_or_ex
 
     exit_code = network_lab.main(
         ["--task", "ai-provider-disabled-by-default-safety-regression"],
-        project_root=PROJECT_ROOT,
+        project_root=evidence_root,
     )
     output = capsys.readouterr().out
 
@@ -199,16 +208,15 @@ def test_day135_task_catalog_and_dispatch_are_registered_without_activation():
 
 
 def test_day135_write_reports_and_report_index_visibility(tmp_path):
-    _write_agents_md(tmp_path)
-    _write_day134_evidence(tmp_path, _day134_evidence())
-    report = day135.build_ai_provider_disabled_by_default_safety_regression_report(tmp_path)
+    evidence_root = build_deterministic_ai_assistance_evidence_root(tmp_path, PROJECT_ROOT)
+    report = day135.build_ai_provider_disabled_by_default_safety_regression_report(evidence_root)
     json_path, html_path = day135.write_ai_provider_disabled_by_default_safety_regression_reports(
-        tmp_path,
+        evidence_root,
         report,
     )
 
-    exit_code = network_lab.main(["--report-index"], project_root=tmp_path)
-    index_html = read_text_with_long_path(tmp_path / "reports" / "report_index.html", encoding="utf-8")
+    exit_code = network_lab.main(["--report-index"], project_root=evidence_root)
+    index_html = read_text_with_long_path(evidence_root / "reports" / "report_index.html", encoding="utf-8")
     written = json.loads(read_text_with_long_path(json_path, encoding="utf-8"))
 
     assert exit_code == 0

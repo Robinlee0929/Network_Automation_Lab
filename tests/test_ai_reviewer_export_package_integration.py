@@ -4,6 +4,7 @@ from pathlib import Path
 import ai_reviewer_export_package_integration as day136
 import network_lab
 import network_lab_cli_dispatch
+from ai_assistance_evidence_test_fixtures import build_deterministic_ai_assistance_evidence_root
 from network_lab_task_registry import resolve_task_handler, resolve_task_name
 
 
@@ -25,8 +26,9 @@ DISABLED_FIELDS = (
 )
 
 
-def test_day136_export_package_contains_required_review_only_fields():
-    report = day136.build_ai_reviewer_export_package_integration_report(PROJECT_ROOT)
+def test_day136_export_package_contains_required_review_only_fields(tmp_path):
+    evidence_root = build_deterministic_ai_assistance_evidence_root(tmp_path, PROJECT_ROOT)
+    report = day136.build_ai_reviewer_export_package_integration_report(evidence_root)
 
     assert report["overall_status"] == "PASS"
     assert report["status"] == "AI_REVIEWER_EXPORT_PACKAGE_READY"
@@ -54,8 +56,9 @@ def test_day136_export_package_contains_required_review_only_fields():
         assert report[field] is False
 
 
-def test_day136_source_sections_cover_day127_through_day135():
-    report = day136.build_ai_reviewer_export_package_integration_report(PROJECT_ROOT)
+def test_day136_source_sections_cover_day127_through_day135(tmp_path):
+    evidence_root = build_deterministic_ai_assistance_evidence_root(tmp_path, PROJECT_ROOT)
+    report = day136.build_ai_reviewer_export_package_integration_report(evidence_root)
     days = [section["day"] for section in report["source_sections"]]
 
     assert days == list(range(127, 136))
@@ -81,9 +84,11 @@ def test_day136_missing_agents_md_fails_closed(tmp_path):
 
 
 def test_day136_cli_report_and_registry_paths_do_not_activate_execution_provider_api_or_runners(
+    tmp_path,
     monkeypatch,
     capsys,
 ):
+    evidence_root = build_deterministic_ai_assistance_evidence_root(tmp_path, PROJECT_ROOT)
     def fail_subprocess(*args, **kwargs):
         raise AssertionError("Day136 export package must not execute subprocess")
 
@@ -95,7 +100,7 @@ def test_day136_cli_report_and_registry_paths_do_not_activate_execution_provider
 
     exit_code = network_lab.main(
         ["--task", "ai-reviewer-export-package-integration"],
-        project_root=PROJECT_ROOT,
+        project_root=evidence_root,
     )
     output = capsys.readouterr().out
 
@@ -142,11 +147,12 @@ def test_day136_task_catalog_and_dispatch_are_registered_without_activation():
 
 
 def test_day136_write_reports_and_report_index_visibility(tmp_path):
-    report = day136.build_ai_reviewer_export_package_integration_report(PROJECT_ROOT)
-    json_path, html_path = day136.write_ai_reviewer_export_package_integration_reports(tmp_path, report)
+    evidence_root = build_deterministic_ai_assistance_evidence_root(tmp_path, PROJECT_ROOT)
+    report = day136.build_ai_reviewer_export_package_integration_report(evidence_root)
+    json_path, html_path = day136.write_ai_reviewer_export_package_integration_reports(evidence_root, report)
 
-    exit_code = network_lab.main(["--report-index"], project_root=tmp_path)
-    index_html = (tmp_path / "reports" / "report_index.html").read_text(encoding="utf-8")
+    exit_code = network_lab.main(["--report-index"], project_root=evidence_root)
+    index_html = (evidence_root / "reports" / "report_index.html").read_text(encoding="utf-8")
     written = json.loads(json_path.read_text(encoding="utf-8"))
 
     assert exit_code == 0

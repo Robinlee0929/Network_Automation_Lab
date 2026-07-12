@@ -5,23 +5,25 @@ from pathlib import Path
 import day146_v04_ai_assistance_non_advancement_gate as day146
 import network_lab
 import network_lab_cli_dispatch
+from ai_assistance_evidence_test_fixtures import build_deterministic_ai_assistance_evidence_root
 from network_lab_task_registry import resolve_task_handler, resolve_task_name
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 
-def _day145_paths():
+def _day145_paths(project_root):
     day145_record = next(item for item in day146.SOURCE_ARTIFACTS if item["day"] == "Day145")
-    return [PROJECT_ROOT / path for path in day145_record["paths"]]
+    return [project_root / path for path in day145_record["paths"]]
 
 
 def _sha256(path):
     return day146._sha256_file(path)
 
 
-def test_day146_report_contains_non_advancement_scope_and_review_only_boundaries():
-    report = day146.build_day146_v04_ai_assistance_non_advancement_gate(PROJECT_ROOT)
+def test_day146_report_contains_non_advancement_scope_and_review_only_boundaries(tmp_path):
+    evidence_root = build_deterministic_ai_assistance_evidence_root(tmp_path, PROJECT_ROOT)
+    report = day146.build_day146_v04_ai_assistance_non_advancement_gate(evidence_root)
 
     assert report["overall_status"] == "PASS"
     assert report["status"] == "V0_4_AI_ASSISTANCE_NON_ADVANCEMENT_GATE_READY"
@@ -49,8 +51,9 @@ def test_day146_report_contains_non_advancement_scope_and_review_only_boundaries
         assert report[field] is False
 
 
-def test_day146_source_artifacts_are_static_ordered_day127_to_day145_and_not_write_targets():
-    report = day146.build_day146_v04_ai_assistance_non_advancement_gate(PROJECT_ROOT)
+def test_day146_source_artifacts_are_static_ordered_day127_to_day145_and_not_write_targets(tmp_path):
+    evidence_root = build_deterministic_ai_assistance_evidence_root(tmp_path, PROJECT_ROOT)
+    report = day146.build_day146_v04_ai_assistance_non_advancement_gate(evidence_root)
 
     assert [item["source_day"] for item in report["source_artifacts"]] == [
         f"Day{day}" for day in range(127, 146)
@@ -69,8 +72,11 @@ def test_day146_source_artifacts_are_static_ordered_day127_to_day145_and_not_wri
         assert artifact["next_phase_allowed"] is False
 
 
-def test_day146_day145_artifacts_are_frozen_input_only_and_not_modified_by_cli(monkeypatch, capsys):
-    before_hashes = {path.as_posix(): _sha256(path) for path in _day145_paths()}
+def test_day146_day145_artifacts_are_frozen_input_only_and_not_modified_by_cli(
+    tmp_path, monkeypatch, capsys
+):
+    evidence_root = build_deterministic_ai_assistance_evidence_root(tmp_path, PROJECT_ROOT)
+    before_hashes = {path.as_posix(): _sha256(path) for path in _day145_paths(evidence_root)}
 
     def fail_subprocess(*args, **kwargs):
         raise AssertionError("Day146 must not execute subprocess")
@@ -87,10 +93,10 @@ def test_day146_day145_artifacts_are_frozen_input_only_and_not_modified_by_cli(m
 
     exit_code = network_lab.main(
         ["--task", "v0.4-ai-assistance-non-advancement-gate"],
-        project_root=PROJECT_ROOT,
+        project_root=evidence_root,
     )
     output = capsys.readouterr().out
-    after_hashes = {path.as_posix(): _sha256(path) for path in _day145_paths()}
+    after_hashes = {path.as_posix(): _sha256(path) for path in _day145_paths(evidence_root)}
 
     assert exit_code == 0
     assert before_hashes == after_hashes
@@ -109,8 +115,9 @@ def test_day146_day145_artifacts_are_frozen_input_only_and_not_modified_by_cli(m
     assert "[PASS] V0_4_AI_ASSISTANCE_NON_ADVANCEMENT_GATE_READY" in output
 
 
-def test_day146_negative_validation_blocks_unsafe_flags_day145_mutation_and_next_phase():
-    report = day146.build_day146_v04_ai_assistance_non_advancement_gate(PROJECT_ROOT)
+def test_day146_negative_validation_blocks_unsafe_flags_day145_mutation_and_next_phase(tmp_path):
+    evidence_root = build_deterministic_ai_assistance_evidence_root(tmp_path, PROJECT_ROOT)
+    report = day146.build_day146_v04_ai_assistance_non_advancement_gate(evidence_root)
     unsafe = copy.deepcopy(report)
     unsafe["agents_md_read_before_day146_work"] = False
     unsafe["agents_md_pre_read_result"] = "FAIL"
@@ -137,6 +144,7 @@ def test_day146_negative_validation_blocks_unsafe_flags_day145_mutation_and_next
 
 
 def test_day146_task_catalog_dispatch_and_report_index_visibility(tmp_path):
+    evidence_root = build_deterministic_ai_assistance_evidence_root(tmp_path, PROJECT_ROOT)
     task = next(
         task for task in network_lab.list_tasks() if task["id"] == "v0.4-ai-assistance-non-advancement-gate"
     )
@@ -163,13 +171,13 @@ def test_day146_task_catalog_dispatch_and_report_index_visibility(tmp_path):
     assert "day147_implemented=false" in task["notes"]
     assert "next_phase_allowed=false" in task["notes"]
 
-    report = day146.build_day146_v04_ai_assistance_non_advancement_gate(PROJECT_ROOT)
+    report = day146.build_day146_v04_ai_assistance_non_advancement_gate(evidence_root)
     json_path, html_path = day146.write_day146_v04_ai_assistance_non_advancement_gate_reports(
-        tmp_path,
+        evidence_root,
         report,
     )
-    exit_code = network_lab.main(["--report-index"], project_root=tmp_path)
-    index_html = (tmp_path / "reports" / "report_index.html").read_text(encoding="utf-8")
+    exit_code = network_lab.main(["--report-index"], project_root=evidence_root)
+    index_html = (evidence_root / "reports" / "report_index.html").read_text(encoding="utf-8")
     written = json.loads(json_path.read_text(encoding="utf-8"))
 
     assert exit_code == 0

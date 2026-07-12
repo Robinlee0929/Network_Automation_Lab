@@ -4,6 +4,7 @@ from pathlib import Path
 import network_lab
 import network_lab_cli_dispatch
 import project_folder_organization_decision_gate as day137
+from ai_assistance_evidence_test_fixtures import build_deterministic_ai_assistance_evidence_root
 from network_lab_task_registry import resolve_task_handler, resolve_task_name
 
 
@@ -25,8 +26,9 @@ SAFETY_FALSE_FIELDS = (
 )
 
 
-def test_day137_decision_gate_contains_required_safety_fields():
-    report = day137.build_project_folder_organization_decision_gate_report(PROJECT_ROOT)
+def test_day137_decision_gate_contains_required_safety_fields(tmp_path):
+    evidence_root = build_deterministic_ai_assistance_evidence_root(tmp_path, PROJECT_ROOT)
+    report = day137.build_project_folder_organization_decision_gate_report(evidence_root)
 
     assert report["overall_status"] == "PASS"
     assert report["status"] == "PROJECT_FOLDER_ORGANIZATION_DECISION_RECORDED"
@@ -45,8 +47,9 @@ def test_day137_decision_gate_contains_required_safety_fields():
         assert report[field] is False
 
 
-def test_day137_lists_blocked_groups_and_coupled_paths():
-    report = day137.build_project_folder_organization_decision_gate_report(PROJECT_ROOT)
+def test_day137_lists_blocked_groups_and_coupled_paths(tmp_path):
+    evidence_root = build_deterministic_ai_assistance_evidence_root(tmp_path, PROJECT_ROOT)
+    report = day137.build_project_folder_organization_decision_gate_report(evidence_root)
     high_risk_groups = {
         item["group"]: item
         for item in report["folder_groups_high_risk_do_not_move_first"]
@@ -67,8 +70,9 @@ def test_day137_lists_blocked_groups_and_coupled_paths():
     assert "Day136 stability" in coupled["ai_reviewer_export_package_integration.py"]
 
 
-def test_day137_preserves_day134_day136_ai_reviewer_export_package_stability():
-    report = day137.build_project_folder_organization_decision_gate_report(PROJECT_ROOT)
+def test_day137_preserves_day134_day136_ai_reviewer_export_package_stability(tmp_path):
+    evidence_root = build_deterministic_ai_assistance_evidence_root(tmp_path, PROJECT_ROOT)
+    report = day137.build_project_folder_organization_decision_gate_report(evidence_root)
     stability = report["day134_day136_stability_evidence"]
 
     assert stability["source_day_range"] == "Day134-Day136"
@@ -88,9 +92,11 @@ def test_day137_preserves_day134_day136_ai_reviewer_export_package_stability():
 
 
 def test_day137_cli_report_and_registry_paths_do_not_activate_execution_provider_api_or_runners(
+    tmp_path,
     monkeypatch,
     capsys,
 ):
+    evidence_root = build_deterministic_ai_assistance_evidence_root(tmp_path, PROJECT_ROOT)
     def fail_subprocess(*args, **kwargs):
         raise AssertionError("Day137 decision gate must not execute subprocess")
 
@@ -102,7 +108,7 @@ def test_day137_cli_report_and_registry_paths_do_not_activate_execution_provider
 
     exit_code = network_lab.main(
         ["--task", "project-folder-organization-decision-gate"],
-        project_root=PROJECT_ROOT,
+        project_root=evidence_root,
     )
     output = capsys.readouterr().out
 
@@ -151,11 +157,12 @@ def test_day137_task_catalog_and_dispatch_are_registered_without_activation():
 
 
 def test_day137_write_reports_and_report_index_visibility(tmp_path):
-    report = day137.build_project_folder_organization_decision_gate_report(PROJECT_ROOT)
-    json_path, html_path = day137.write_project_folder_organization_decision_gate_reports(tmp_path, report)
+    evidence_root = build_deterministic_ai_assistance_evidence_root(tmp_path, PROJECT_ROOT)
+    report = day137.build_project_folder_organization_decision_gate_report(evidence_root)
+    json_path, html_path = day137.write_project_folder_organization_decision_gate_reports(evidence_root, report)
 
-    exit_code = network_lab.main(["--report-index"], project_root=tmp_path)
-    index_html = (tmp_path / "reports" / "report_index.html").read_text(encoding="utf-8")
+    exit_code = network_lab.main(["--report-index"], project_root=evidence_root)
+    index_html = (evidence_root / "reports" / "report_index.html").read_text(encoding="utf-8")
     written = json.loads(json_path.read_text(encoding="utf-8"))
 
     assert exit_code == 0

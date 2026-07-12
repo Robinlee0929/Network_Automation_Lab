@@ -1,17 +1,20 @@
 # Phase 2M-06 — GitHub Actions Dual-Stack Safe CI Baseline
 
-Status: DONE / READY_FOR_REVIEW
+Status: DONE / READY_FOR_CI_REVALIDATION
 
-Decision summary: Phase 2M-06 is `DONE / READY_FOR_REVIEW` on its local feature branch. The exact Safe CI boundary authorized by merged Phase 2M-05 is implemented as one GitHub-hosted Ubuntu job with read-only repository contents permission, no secrets, disabled checkout credential persistence, immutable action pins, and the existing Node and Python validation commands. All locally available validation passes; report-index returns only the documented optional-report WARN. No push occurred, so no GitHub-hosted workflow run or CI PASS is claimed. No merge, Phase 2M-07, or Phase 2N work is authorized or performed.
+Decision summary: Phase 2M-06 is `DONE / READY_FOR_CI_REVALIDATION` on Draft PR #47. The exact Safe CI boundary authorized by merged Phase 2M-05 remains one GitHub-hosted Ubuntu job with read-only repository contents permission, no secrets, disabled checkout credential persistence, immutable action pins, and the existing Node and Python validation commands. The first hosted run `29190165478` failed pytest with 36 failed and 1,830 passed because nine positive-path test modules depended on locally generated evidence absent from a clean runner. A bounded `TEST_ONLY_CI_HERMETICITY_REPAIR` now creates deterministic evidence under pytest temporary roots; targeted and full pytest pass in a disposable tracked-files-only checkout. Production source, workflow behavior, dependencies, generated reports, and safety semantics are unchanged. The correction is local only, hosted CI has not been rerun, no CI PASS is claimed, PR #47 remains Draft and unmerged, and Phase 2M-07 and Phase 2N remain unauthorized and unstarted.
 
 ```text
 PHASE: 2M-06
 TASK_MODE: IMPLEMENTATION_ONLY / CI_WORKFLOW_ONLY / DOCUMENTATION_ONLY_SUPPORT / NON_LIVE
 SAFETY_MODE: STAGE_0 / LOCAL_ONLY_IMPLEMENTATION / NO_SECRETS / NO_LIVE_ACCESS
-STATUS: DONE / READY_FOR_REVIEW
+STATUS: DONE / READY_FOR_CI_REVALIDATION
 BASE_COMMIT: 0dd62844c05acfe8936124a9aad11688b09206aa
 FEATURE_BRANCH: codex/phase-2m-06-github-actions-dual-stack-safe-ci-baseline
-AUTHORIZED_TRACKED_FILES: .github/workflows/safe-ci.yml; README.md; docs/phase_2m/phase_2m_06_github_actions_dual_stack_safe_ci_baseline.md
+ORIGINAL_WORKFLOW_COMMIT: 843b4e62a6990cdad6a60a280bb053458817ebe8
+PR_NUMBER: 47
+PR_STATE: OPEN / DRAFT / NOT_MERGED
+CORRECTION_CLASSIFICATION: TEST_ONLY_CI_HERMETICITY_REPAIR
 PUSH_AUTHORIZED: NO
 MERGE_AUTHORIZED: NO
 PHASE_2M_07_STARTED: NO
@@ -46,17 +49,26 @@ Two early PowerShell process-creation attempts for path confirmation were reject
 
 ## Authorization and implementation boundary
 
-Merged Phase 2M-05 records `SAFE_CI_NECESSITY: REQUIRED` and authorizes exactly one future workflow plus bounded README and evidence documentation. The Phase 2M-05 implementation commit `f8d9c311cf42e36154b3b2ed7e2b03eca283f7a1` is an ancestor of the synchronized starting commit.
+Merged Phase 2M-05 records `SAFE_CI_NECESSITY: REQUIRED` and authorized exactly one workflow plus bounded README and evidence documentation. The Phase 2M-05 implementation commit `f8d9c311cf42e36154b3b2ed7e2b03eca283f7a1` is an ancestor of the synchronized starting commit. Original workflow commit `843b4e62a6990cdad6a60a280bb053458817ebe8` contains exactly the workflow, README, and this evidence record.
 
-Allowed tracked files:
+The corrective task additionally authorizes only these test/helper files plus README and this evidence record:
 
-- `.github/workflows/safe-ci.yml`;
-- `README.md`;
-- this Phase 2M-06 evidence record.
+- `tests/ai_assistance_evidence_test_fixtures.py`;
+- `tests/test_ai_provider_disabled_by_default_safety_regression.py`;
+- `tests/test_ai_reviewer_export_package_integration.py`;
+- `tests/test_project_folder_organization_decision_gate.py`;
+- `tests/test_day145_v04_ai_assistance_evidence_freeze_package.py`;
+- `tests/test_day146_v04_ai_assistance_non_advancement_gate.py`;
+- `tests/test_day148_ai_assistance_display_consistency_audit.py`;
+- `tests/test_day149_ai_assistance_docs_registry_report_index_consistency_audit.py`;
+- `tests/test_day150_v04_ai_assistance_phase_gate_closure_review.py`;
+- `tests/test_day151_v04_ai_assistance_closure_evidence_index.py`;
+- `README.md` and this Phase 2M-06 evidence record for accuracy.
 
 Forbidden and untouched:
 
-- production source, tests, fixtures, dependencies, package metadata, lockfiles, requirements, TypeScript, ESLint, or Vitest configuration;
+- production source, workflow content, dependencies, package metadata, lockfiles, requirements, TypeScript, ESLint, or Vitest configuration;
+- generated or historical reports, repository-root fixture outputs, test skips, xfails, reduced assertions, or weakened fail-closed behavior;
 - React/DOM, jsdom, React Testing Library, Playwright, browser binaries, servers, E2E tests, or artifacts;
 - secrets, repository write permission, deployment, release, publishing, branch protection, repository settings, or a second workflow;
 - provider/API/model calls, SSH, NETCONF, RESTCONF, live devices, real inventory, configuration backup/change, runner or adapter execution, queue, scheduler, broker, worker, or AI loop;
@@ -109,7 +121,7 @@ Official GitHub release pages and commit pages were reviewed read-only before im
 
 The selected v4/v5 action releases avoid introducing the newer Node 24 action-runtime and minimum-runner requirement into this conservative first baseline. The project runtimes remain explicitly Node 22 and Python 3.13.
 
-## Validation evidence
+## Original local validation evidence
 
 The implementation reused the existing local Node and Python environments. No dependency was installed, removed, updated, audited, or repaired for local validation.
 
@@ -132,13 +144,42 @@ The full pytest command was run twice because the first command wrapper yielded 
 
 Report-index refreshed only its normal ignored latest-overview JSON and HTML outputs. It created, repaired, backfilled, or modified no tracked report or registry file. The Next.js build created or refreshed only ignored `.next/` output.
 
-A local workflow file is not proof of GitHub-hosted execution:
+The original local pass was not proof of clean-runner hermeticity. It consumed generated reports already present in the developer worktree, which the first hosted run did not have.
+
+## GitHub-hosted failure and test-only hermeticity repair
+
+Run `29190165478` executed on Python 3.13.14 under Linux. The job `Node and Python quality gates` passed checkout, dependency installation, typecheck, zero-warning lint, 56 Node unit tests, the 24/24-page Next.js build, Python setup, and Python dependency installation. Step `Run Python tests` failed with 36 failed and 1,830 passed; report-index and tracked-diff proof were then skipped by normal step ordering.
+
+The earliest direct failure was missing `reports/lab-summary/day134_disabled_ai_provider_adapter_contract.json`. Day135 read that ignored/generated file directly; Day136 and Day137 consumed the resulting failed or absent Day134-Day136 evidence; Day145-Day151 then propagated fail-closed evidence-chain results. Complete log review found no independent failure, Linux/Windows path defect, Python 3.13 incompatibility, or workflow-order defect. The workflow correctly installed dependencies before pytest, and its fail-fast ordering only explains why the later report-index and no-diff steps were skipped.
+
+The repair uses one explicit helper, `tests/ai_assistance_evidence_test_fixtures.py`, to copy tracked static inputs and create the minimum deterministic Day127-Day150 prerequisite evidence inside each pytest-managed temporary root. The nine affected modules now pass that root to positive-path builders and CLI checks. Missing, malformed, enabled-provider, enabled-API, enabled-execution, and other negative cases remain fail-closed; no autouse fixture, repository-root write, persistent report, test ordering, skip, xfail, or assertion reduction was introduced.
+
+| Corrective gate | Exact command or method | Result |
+| --- | --- | --- |
+| GitHub failure inspection | PR #47, run `29190165478`, job `86643307056`, complete decoded job log | CONFIRMED; 36 failed, 1,830 passed; nine failing modules |
+| Clean pre-fix reproduction | detached worktree at original commit; exact nine modules | CONFIRMED; 36 failed, 32 passed; same modules and Day134 root prerequisite |
+| Targeted normal worktree | exact nine modules | PASS; 68 passed |
+| Full pytest normal worktree | `python -m pytest` | PASS; 1,866 passed, one existing warning |
+| Clean targeted validation | disposable tracked-files-only worktree plus intended test patch | PASS; 68 passed |
+| Clean full pytest | existing Node dependency tree reused through `NODE_PATH`; no install/update | PASS; 1,866 passed, one existing warning |
+| Clean report-index | `python network_lab.py --task report-index` | WARN accepted; exit 0; optional missing 13 |
+| TypeScript | `npm.cmd run typecheck` | PASS |
+| ESLint | `npm.cmd run lint` | PASS; zero warnings |
+| Vitest | `npm.cmd run test:unit` | PASS; 2 files, 56 tests |
+| Next.js build | telemetry-disabled `npm.cmd run build` | PASS; 24/24 pages |
+
+The first clean full-suite attempt intentionally had no `node_modules` and produced 28 unrelated Node-bridge test failures because `typescript` could not resolve. The authoritative clean full-suite rerun reused the existing unchanged dependency tree via `NODE_PATH`, matching the workflow's already-completed `npm ci` prerequisite without installing or updating anything.
+
+Current hosted state:
 
 ```text
-GITHUB_HOSTED_CI_RUN: NOT_RUN — push is not authorized
+GITHUB_HOSTED_CI_RUN: FAIL — run 29190165478 at original commit 843b4e62a6990cdad6a60a280bb053458817ebe8
+GITHUB_HOSTED_CI_RERUN_AFTER_CORRECTION: NO
 CI_PASS_CLAIMED: NO
 LOCAL_VALIDATION_RESULT: PASS
+CLEAN_TRACKED_FILES_ONLY_VALIDATION: PASS
 REPORT_INDEX_RESULT: WARN_ACCEPTED_OPTIONAL_LOCAL_REPORTS_ONLY
+PR_47_STATE: OPEN / DRAFT / NOT_MERGED
 ```
 
 ## Documentation readability review
@@ -160,7 +201,7 @@ FINAL_READABILITY_RESULT: PASS
 
 ```text
 FINAL_PHASE_DECISION: PASS
-PHASE_2M_06_STATUS: DONE / READY_FOR_REVIEW
+PHASE_2M_06_STATUS: DONE / READY_FOR_CI_REVALIDATION
 AUTHORIZED_SCOPE_TOUCHED: YES
 FORBIDDEN_SCOPE_TOUCHED: NO
 WORKFLOW_CREATED: YES
@@ -168,8 +209,15 @@ WORKFLOW_COUNT: 1
 WORKFLOW_PERMISSIONS_READ_ONLY: YES
 SECRETS_REFERENCED: NO
 LOCAL_VALIDATION_RESULT: PASS
-GITHUB_HOSTED_CI_RUN: NOT_RUN — push not authorized
+GITHUB_HOSTED_CI_RUN: FAIL — run 29190165478 before correction
+GITHUB_HOSTED_CI_RERUN_AFTER_CORRECTION: NO
 CI_PASS_CLAIMED: NO
+CORRECTION_CLASSIFICATION: TEST_ONLY_CI_HERMETICITY_REPAIR
+PRODUCTION_SOURCE_CHANGED: NO
+WORKFLOW_CHANGED_BY_CORRECTION: NO
+DEPENDENCIES_CHANGED: NO
+GENERATED_REPORTS_COMMITTED: NO
+PR_47_DRAFT_AND_UNMERGED: YES
 PUSH_PERFORMED: NO
 MERGE_PERFORMED: NO
 PHASE_2M_07_STARTED: NO

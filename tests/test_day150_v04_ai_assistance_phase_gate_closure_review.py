@@ -5,14 +5,16 @@ from pathlib import Path
 import day150_v04_ai_assistance_phase_gate_closure_review as day150
 import network_lab
 import network_lab_cli_dispatch
+from ai_assistance_evidence_test_fixtures import build_deterministic_ai_assistance_evidence_root
 from network_lab_task_registry import resolve_task_handler, resolve_task_name
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 
-def test_day150_report_contains_required_closure_conclusions_and_safety_flags():
-    report = day150.build_day150_v04_ai_assistance_phase_gate_closure_review(PROJECT_ROOT)
+def test_day150_report_contains_required_closure_conclusions_and_safety_flags(tmp_path):
+    evidence_root = build_deterministic_ai_assistance_evidence_root(tmp_path, PROJECT_ROOT)
+    report = day150.build_day150_v04_ai_assistance_phase_gate_closure_review(evidence_root)
 
     assert report["overall_status"] == "PASS"
     assert report["status"] == "PHASE_GATE_CLOSED_REVIEW_ONLY"
@@ -42,7 +44,8 @@ def test_day150_report_contains_required_closure_conclusions_and_safety_flags():
         assert report[field] is False
 
 
-def test_day150_real_agents_md_evidence_takes_precedence_over_required_true_defaults(monkeypatch):
+def test_day150_real_agents_md_evidence_takes_precedence_over_required_true_defaults(tmp_path, monkeypatch):
+    evidence_root = build_deterministic_ai_assistance_evidence_root(tmp_path, PROJECT_ROOT)
     failure_like_agents_evidence = {
         "agents_md_pre_read_result": "FAIL",
         "agents_md_read_before_day150_work": False,
@@ -55,7 +58,7 @@ def test_day150_real_agents_md_evidence_takes_precedence_over_required_true_defa
 
     monkeypatch.setattr(day150, "build_agents_md_evidence", lambda project_root: failure_like_agents_evidence)
 
-    report = day150.build_day150_v04_ai_assistance_phase_gate_closure_review(PROJECT_ROOT)
+    report = day150.build_day150_v04_ai_assistance_phase_gate_closure_review(evidence_root)
 
     assert report["agents_md_pre_read_result"] == "FAIL"
     assert report["agents_md_read_before_day150_work"] is False
@@ -72,8 +75,9 @@ def test_day150_real_agents_md_evidence_takes_precedence_over_required_true_defa
     assert report["status"] == "PHASE_GATE_CLOSURE_BLOCKED_REVIEW_ONLY"
 
 
-def test_day150_prior_day_conclusions_are_referenced_and_preserved():
-    report = day150.build_day150_v04_ai_assistance_phase_gate_closure_review(PROJECT_ROOT)
+def test_day150_prior_day_conclusions_are_referenced_and_preserved(tmp_path):
+    evidence_root = build_deterministic_ai_assistance_evidence_root(tmp_path, PROJECT_ROOT)
+    report = day150.build_day150_v04_ai_assistance_phase_gate_closure_review(evidence_root)
 
     expected_conclusions = {
         "Day145": "Day145 evidence freeze is complete.",
@@ -95,7 +99,10 @@ def test_day150_prior_day_conclusions_are_referenced_and_preserved():
     assert "README remains a status summary and formal docs remain present" in check_names
 
 
-def test_day150_cli_does_not_execute_provider_network_runner_or_prior_day_tasks(monkeypatch, capsys):
+def test_day150_cli_does_not_execute_provider_network_runner_or_prior_day_tasks(
+    tmp_path, monkeypatch, capsys
+):
+    evidence_root = build_deterministic_ai_assistance_evidence_root(tmp_path, PROJECT_ROOT)
     def fail_subprocess(*args, **kwargs):
         raise AssertionError("Day150 must not execute subprocess")
 
@@ -115,7 +122,7 @@ def test_day150_cli_does_not_execute_provider_network_runner_or_prior_day_tasks(
 
     exit_code = network_lab.main(
         ["--task", "v04-ai-assistance-phase-gate-closure-review"],
-        project_root=PROJECT_ROOT,
+        project_root=evidence_root,
     )
     output = capsys.readouterr().out
 
@@ -141,8 +148,9 @@ def test_day150_cli_does_not_execute_provider_network_runner_or_prior_day_tasks(
     assert "[PASS] PHASE_GATE_CLOSED_REVIEW_ONLY" in output
 
 
-def test_day150_negative_validation_blocks_unsafe_flags_and_missing_closure_evidence():
-    report = day150.build_day150_v04_ai_assistance_phase_gate_closure_review(PROJECT_ROOT)
+def test_day150_negative_validation_blocks_unsafe_flags_and_missing_closure_evidence(tmp_path):
+    evidence_root = build_deterministic_ai_assistance_evidence_root(tmp_path, PROJECT_ROOT)
+    report = day150.build_day150_v04_ai_assistance_phase_gate_closure_review(evidence_root)
     unsafe = copy.deepcopy(report)
     unsafe["agents_md_pre_read_result"] = "FAIL"
     unsafe["agents_md_read_before_day150_work"] = False
@@ -173,6 +181,7 @@ def test_day150_negative_validation_blocks_unsafe_flags_and_missing_closure_evid
 
 
 def test_day150_task_catalog_dispatch_and_report_index_visibility(tmp_path):
+    evidence_root = build_deterministic_ai_assistance_evidence_root(tmp_path, PROJECT_ROOT)
     task = next(
         task
         for task in network_lab.list_tasks()
@@ -200,13 +209,13 @@ def test_day150_task_catalog_dispatch_and_report_index_visibility(tmp_path):
     assert "NEXT_PHASE_ALLOWED_FALSE" in task["notes"]
     assert "execution_enabled=false" in task["notes"]
 
-    report = day150.build_day150_v04_ai_assistance_phase_gate_closure_review(PROJECT_ROOT)
+    report = day150.build_day150_v04_ai_assistance_phase_gate_closure_review(evidence_root)
     json_path, html_path = day150.write_day150_v04_ai_assistance_phase_gate_closure_review_reports(
-        tmp_path,
+        evidence_root,
         report,
     )
-    exit_code = network_lab.main(["--report-index"], project_root=tmp_path)
-    index_html = (tmp_path / "reports" / "report_index.html").read_text(encoding="utf-8")
+    exit_code = network_lab.main(["--report-index"], project_root=evidence_root)
+    index_html = (evidence_root / "reports" / "report_index.html").read_text(encoding="utf-8")
     written = json.loads(json_path.read_text(encoding="utf-8"))
 
     assert exit_code == 0

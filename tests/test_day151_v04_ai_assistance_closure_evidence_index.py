@@ -5,14 +5,16 @@ from pathlib import Path
 import day151_v04_ai_assistance_closure_evidence_index as day151
 import network_lab
 import network_lab_cli_dispatch
+from ai_assistance_evidence_test_fixtures import build_deterministic_ai_assistance_evidence_root
 from network_lab_task_registry import resolve_task_handler, resolve_task_name
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 
-def test_day151_report_indexes_closure_evidence_and_safety_flags():
-    report = day151.build_day151_v04_ai_assistance_closure_evidence_index(PROJECT_ROOT)
+def test_day151_report_indexes_closure_evidence_and_safety_flags(tmp_path):
+    evidence_root = build_deterministic_ai_assistance_evidence_root(tmp_path, PROJECT_ROOT)
+    report = day151.build_day151_v04_ai_assistance_closure_evidence_index(evidence_root)
 
     assert report["overall_status"] == "PASS"
     assert report["status"] == "V0_4_AI_ASSISTANCE_CLOSURE_EVIDENCE_INDEX_READY"
@@ -45,8 +47,9 @@ def test_day151_report_indexes_closure_evidence_and_safety_flags():
         assert report[field] is False
 
 
-def test_day151_evidence_items_cover_day145_through_day150_without_reruns():
-    report = day151.build_day151_v04_ai_assistance_closure_evidence_index(PROJECT_ROOT)
+def test_day151_evidence_items_cover_day145_through_day150_without_reruns(tmp_path):
+    evidence_root = build_deterministic_ai_assistance_evidence_root(tmp_path, PROJECT_ROOT)
+    report = day151.build_day151_v04_ai_assistance_closure_evidence_index(evidence_root)
 
     expected_roles = {
         "Day145": "Evidence freeze baseline",
@@ -71,7 +74,8 @@ def test_day151_evidence_items_cover_day145_through_day150_without_reruns():
     assert "Day150 phase gate closure remains authoritative" in check_names
 
 
-def test_day151_real_agents_md_evidence_takes_precedence_over_required_true_defaults(monkeypatch):
+def test_day151_real_agents_md_evidence_takes_precedence_over_required_true_defaults(tmp_path, monkeypatch):
+    evidence_root = build_deterministic_ai_assistance_evidence_root(tmp_path, PROJECT_ROOT)
     failure_like_agents_evidence = {
         "agents_md_pre_read_result": "FAIL",
         "agents_md_read_before_day151_work": False,
@@ -84,7 +88,7 @@ def test_day151_real_agents_md_evidence_takes_precedence_over_required_true_defa
 
     monkeypatch.setattr(day151, "build_agents_md_evidence", lambda project_root: failure_like_agents_evidence)
 
-    report = day151.build_day151_v04_ai_assistance_closure_evidence_index(PROJECT_ROOT)
+    report = day151.build_day151_v04_ai_assistance_closure_evidence_index(evidence_root)
 
     assert report["agents_md_pre_read_result"] == "FAIL"
     assert report["agents_md_read_before_day151_work"] is False
@@ -100,7 +104,10 @@ def test_day151_real_agents_md_evidence_takes_precedence_over_required_true_defa
     assert report["status"] == "V0_4_AI_ASSISTANCE_CLOSURE_EVIDENCE_INDEX_BLOCKED"
 
 
-def test_day151_cli_does_not_execute_provider_network_runner_or_source_tasks(monkeypatch, capsys):
+def test_day151_cli_does_not_execute_provider_network_runner_or_source_tasks(
+    tmp_path, monkeypatch, capsys
+):
+    evidence_root = build_deterministic_ai_assistance_evidence_root(tmp_path, PROJECT_ROOT)
     def fail_subprocess(*args, **kwargs):
         raise AssertionError("Day151 must not execute subprocess")
 
@@ -116,7 +123,7 @@ def test_day151_cli_does_not_execute_provider_network_runner_or_source_tasks(mon
 
     exit_code = network_lab.main(
         ["--task", "v04-ai-assistance-closure-evidence-index"],
-        project_root=PROJECT_ROOT,
+        project_root=evidence_root,
     )
     output = capsys.readouterr().out
 
@@ -144,8 +151,9 @@ def test_day151_cli_does_not_execute_provider_network_runner_or_source_tasks(mon
     assert "[PASS] V0_4_AI_ASSISTANCE_CLOSURE_EVIDENCE_INDEX_READY" in output
 
 
-def test_day151_negative_validation_blocks_unsafe_flags_and_missing_index_evidence():
-    report = day151.build_day151_v04_ai_assistance_closure_evidence_index(PROJECT_ROOT)
+def test_day151_negative_validation_blocks_unsafe_flags_and_missing_index_evidence(tmp_path):
+    evidence_root = build_deterministic_ai_assistance_evidence_root(tmp_path, PROJECT_ROOT)
+    report = day151.build_day151_v04_ai_assistance_closure_evidence_index(evidence_root)
     unsafe = copy.deepcopy(report)
     unsafe["agents_md_pre_read_result"] = "FAIL"
     unsafe["agents_md_read_before_day151_work"] = False
@@ -176,6 +184,7 @@ def test_day151_negative_validation_blocks_unsafe_flags_and_missing_index_eviden
 
 
 def test_day151_task_catalog_dispatch_and_report_index_visibility(tmp_path):
+    evidence_root = build_deterministic_ai_assistance_evidence_root(tmp_path, PROJECT_ROOT)
     task = next(
         task
         for task in network_lab.list_tasks()
@@ -203,13 +212,13 @@ def test_day151_task_catalog_dispatch_and_report_index_visibility(tmp_path):
     assert "PHASE_GATE_CLOSED_REVIEW_ONLY" in task["notes"]
     assert "source_task_rerun=false" in task["notes"]
 
-    report = day151.build_day151_v04_ai_assistance_closure_evidence_index(PROJECT_ROOT)
+    report = day151.build_day151_v04_ai_assistance_closure_evidence_index(evidence_root)
     json_path, html_path = day151.write_day151_v04_ai_assistance_closure_evidence_index_reports(
-        tmp_path,
+        evidence_root,
         report,
     )
-    exit_code = network_lab.main(["--report-index"], project_root=tmp_path)
-    index_html = (tmp_path / "reports" / "report_index.html").read_text(encoding="utf-8")
+    exit_code = network_lab.main(["--report-index"], project_root=evidence_root)
+    index_html = (evidence_root / "reports" / "report_index.html").read_text(encoding="utf-8")
     written = json.loads(json_path.read_text(encoding="utf-8"))
 
     assert exit_code == 0
