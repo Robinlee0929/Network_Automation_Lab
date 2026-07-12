@@ -1,13 +1,17 @@
 # Phase 2M-07 — Platform Quality Acceptance Review / Phase Closure
 
-Status: DONE / READY_FOR_REVIEW
+Status: DONE / MERGED_TO_MAIN
 
-Decision summary: Phase 2M is accepted and closed for its authorized platform-quality purpose, and one future Phase 2N planning-only gate is authorized. The final decision is `AUTHORIZE_PHASE_2N_PLANNING_GATE`; it does not authorize Phase 2N implementation. Repository-controlled evidence consistently identifies Safe CI run `29192854074` as the successful clean-runner result, including the final tracked-file no-diff proof. Live GitHub metadata was not re-queried because GitHub CLI is unavailable, so GitHub platform facts are `DOCUMENTATION_CORROBORATED`. The previously supplied run `29193111204` is an unsupported external reference, is not a repository defect, and is not used for acceptance.
+Decision summary: Phase 2M-07 is `DONE / MERGED_TO_MAIN`. Source/review commit `90ec51e19988cf6eaa728eea4233999dc309c53f` was integrated into `main` by fast-forward only, with no merge commit or conflict, and all required post-merge validation passed before this status reconciliation. Phase 2M is accepted and closed for its authorized platform-quality purpose, and one future Phase 2N planning-only gate is authorized. The final decision is `AUTHORIZE_PHASE_2N_PLANNING_GATE`; it does not authorize Phase 2N implementation. Repository-controlled evidence consistently identifies Safe CI run `29192854074` as the successful clean-runner result. Live GitHub metadata was not re-queried because GitHub CLI is unavailable, so GitHub platform facts are `DOCUMENTATION_CORROBORATED`. The previously supplied run `29193111204` remains unsupported, is not a repository defect, and is not used for acceptance.
 
 ```text
 PHASE: 2M-07
 TASK_MODE: PLATFORM_QUALITY_ACCEPTANCE_REVIEW_AND_PHASE_CLOSURE_REVIEW_ONLY
-STATUS: DONE / READY_FOR_REVIEW
+STATUS: DONE / MERGED_TO_MAIN
+SOURCE_REVIEW_COMMIT: 90ec51e19988cf6eaa728eea4233999dc309c53f
+INTEGRATION_METHOD: FAST_FORWARD
+MERGE_COMMIT_CREATED: NO
+MERGE_CONFLICTS: NONE
 REVIEW_ONLY: YES
 PLANNING_ONLY: YES
 DOCUMENTATION_ONLY: YES
@@ -162,7 +166,20 @@ PHASE_2M_BLOCKING_GAPS: NONE
 
 The future Phase 2N gate may plan user-facing acceptance, React/DOM value and prerequisites, Playwright ownership, server/browser lifecycle, ports, artifacts, timeouts, cleanup, and reproducibility. It may not implement any of them without another explicit authorization.
 
-## Local validation
+## Post-merge integration and validation
+
+The verified source branch was pushed to the trusted remote and then fast-forward integrated into local `main` from `fad26f8d02695cba3d5aede784ece8d9b584249d` to `90ec51e19988cf6eaa728eea4233999dc309c53f`. The source range contained exactly one commit and changed exactly `README.md` plus this Phase 2M-07 document. No merge commit, squash, rebase, cherry-pick, conflict, or conflict-resolution change occurred.
+
+```text
+SOURCE_REVIEW_COMMIT: 90ec51e19988cf6eaa728eea4233999dc309c53f
+INTEGRATION_METHOD: FAST_FORWARD
+MERGE_COMMIT_CREATED: NO
+MERGE_CONFLICTS: NONE
+PHASE_2M_07_PRESENT_ON_MAIN: YES
+PHASE_2N_00_STARTED: NO
+PHASE_2N_IMPLEMENTATION_AUTHORIZED: NO
+POST_MERGE_RECONCILIATION_COMMIT: SELF
+```
 
 No dependency was installed and no GitHub workflow was rerun.
 
@@ -170,10 +187,11 @@ No dependency was installed and no GitHub workflow was rerun.
 | --- | --- |
 | `python -m pytest` | Could not start because `python` is not on the restricted PowerShell PATH |
 | Bundled workspace Python pytest probe | `No module named pytest`; no installation attempted |
-| Existing local Python 3.13.7: `-m pytest` | PASS; 1,866 passed, 1 existing warning in 82.94 seconds |
+| Existing local Python 3.13.7: `-m pytest` on fast-forwarded `main` | PASS; 1,866 passed, 1 existing warning in 77.93 seconds |
 | Existing local Python 3.13.7: `network_lab.py --task report-index` | WARN accepted; exit 0; total 14, pass 1, fail 0, optional missing 13 |
-| Changed-file boundary | PASS; exactly `README.md` and this Phase 2M-07 document |
-| `git diff --check` | PASS; exit 0; existing line-ending notice only |
+| Merged source changed-file boundary | PASS; exactly `README.md` and this Phase 2M-07 document |
+| `git diff --check fad26f8d...90ec51e1` | PASS; exit 0 |
+| Tracked status after validation | PASS; clean; `main` ahead of `origin/main` only by the fast-forwarded source commit |
 
 The local interpreter path is intentionally not recorded because repository evidence must not contain private local paths.
 
@@ -222,4 +240,12 @@ PHASE_2N_PLANNING_GATE_DECISION: AUTHORIZED
 BOUNDED_REPAIR_TASK: NONE
 IMPLEMENTATION_PERFORMED: NO
 PHASE_2N_IMPLEMENTATION_STARTED: NO
+PHASE_2M_07_STATUS: DONE / MERGED_TO_MAIN
+SOURCE_REVIEW_COMMIT: 90ec51e19988cf6eaa728eea4233999dc309c53f
+INTEGRATION_METHOD: FAST_FORWARD
+MERGE_COMMIT_CREATED: NO
+MERGE_CONFLICTS: NONE
+POST_MERGE_FULL_PYTEST: PASS / 1866 PASSED / 1 EXISTING WARNING
+POST_MERGE_REPORT_INDEX: WARN_ACCEPTED / EXIT_0 / FAIL_0 / OPTIONAL_MISSING_13
+POST_MERGE_RECONCILIATION_COMMIT: SELF
 ```
