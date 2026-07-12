@@ -33,15 +33,20 @@ AGENTS.md
 
 繁中：執行任何指令前，先閱讀 `AGENTS.md`。它定義安全邊界、驗證方式與禁止範圍。
 
-### 3. Install local dependencies
+### 3. Confirm the existing local prerequisites
+
+The canonical reviewer path requires a usable `python` command and the committed Flask requirement. Verify the existing environment before startup:
 
 ```bash
-python -m pip install -r requirements.txt
+python --version
+python -c "import importlib.metadata as m; print(m.version('flask'))"
 ```
 
-繁中：安裝本機檢視與驗證需要的套件。這一步不代表授權 live device、SSH、API、model 或 provider 行為。
+If either check fails, stop and consult the committed `requirements.txt`; Phase 2N-01 did not install or repair dependencies. It does not define a universal Python version requirement. 繁中：先確認既有 Python 與 Flask 環境；若缺少套件，請停止，本階段不安裝或修復環境。
 
 ### 4. Start the local dashboard
+
+The Flask dashboard is the canonical reviewer entry point:
 
 ```bash
 python dashboard_app.py
@@ -54,6 +59,8 @@ http://127.0.0.1:5000
 ```
 
 繁中：啟動本機 Flask dashboard，並用瀏覽器開啟本機網址。
+
+Phase 2N-01 directly verified this command and its task-relevant local GET routes with an already-available environment, then stopped the server cleanly. Overall canonical verification remains `PARTIAL` because this documentation-only task did not establish a reproducible interactive browser lifecycle or repair the earlier environment gap. See the [Phase 2N-01 canonical Quick Start and Demo runbook](docs/phase_2n/phase_2n_01_canonical_quick_start_and_demo_runbook_documentation_only.md).
 
 ### 5. What to review in the GUI
 
@@ -68,6 +75,8 @@ Review these local routes:
 - `/ai-intent-reviewer` - AI intent, mock runtime evidence, readiness gates, and safety boundaries.
 
 繁中：dashboard 主要用來快速理解專案價值、報告證據與 AI safety 邊界。它不是 live device 控制台，也不是 provider/API/model 執行入口。`/commands` 頁面用於審閱已登錄的本機命令與既有紀錄，不代表預設應執行命令。
+
+The Next.js Network Automation AI Node is secondary, not canonical. Phase 2N-00 verified its local evidence browser at `http://127.0.0.1:3000/network/day-results` using the existing dependency tree. Its visible Reports navigation still targets `/network/reports`, which returns 404. Use the Evidence route only as a local committed-evidence fallback; do not use provider-backed analysis, parsing, or job actions in the safe Demo. This workaround does not resolve the navigation defect.
 
 ### 6. Run local validation
 
@@ -96,8 +105,8 @@ Safe demo / review reminders:
 - Use this README for orientation and current phase status.
 - Use the dashboard for local reviewer orientation and evidence browsing.
 - Use pytest and `report-index` as local validation checks.
-- Use `docs/phase_2k/` for the current Phase 2K planning records.
-- Treat Phase 2K as documentation-only / planning-only unless a later task separately authorizes a different boundary.
+- Use the Phase 2N-01 runbook for canonical startup, evidence classification, negative states, fallback limits, and shutdown.
+- Treat Phase 2N implementation and every follow-on candidate as unauthorized unless a later task separately approves one exact boundary.
 
 Explicitly not authorized:
 
@@ -105,11 +114,10 @@ Explicitly not authorized:
 - MIT License usage rights do not grant operational authorization.
 - Live device access, SSH, NETCONF, RESTCONF, provider/API/model calls, secrets handling, runtime catalog loading, schema enforcement, runner/adapter/scheduler/queue/worker/agent-loop behavior, config backup, config change, and autonomous execution remain forbidden.
 
-Next task after this:
+Next Phase 2N candidate after this documentation task:
 
-- `2K-10 - Future Documentation Clarity Gate / Planning Only` remains `NEW / FUTURE`.
-- It is not started now because 2K-09 is limited to README license clarification only.
-- 繁中：2K-09 只更新 README 的授權邊界說明，不修改 `LICENSE`，也不授權 live device、SSH、API、model 或 provider 行為。
+- `Phase 2N-03 — Next.js Reports Navigation Repair` is `CANDIDATE / NOT_AUTHORIZED / NOT_STARTED`.
+- Phase 2N-01 does not authorize or start it, and Phase 2N-02, 2N-04, and 2N-05 also remain `NOT_AUTHORIZED / NOT_STARTED`.
 
 ## Current Safety Boundary
 
@@ -274,7 +282,13 @@ Phase 2N is `AUTHORIZED / NOT_STARTED` for `PLANNING_GATE_ONLY`. This authorizes
 
 Phase 2N-00 is `DONE / MERGED_TO_MAIN`. Planning commit `7b79e3266764a06555515e607202fb15580fae6c` was integrated into `main` by fast-forward only, with no merge commit and no conflict. `USER_FACING_ACCEPTANCE_READINESS: NOT_READY`, `PRIMARY_DEMO_FLOW_AVAILABLE: PARTIAL`, and `CANONICAL_STARTUP_PATH_VERIFIED: PARTIAL` remain unchanged. The canonical Flask startup is still only partially verified, and the secondary Next.js Reports navigation still returns 404; neither blocker was repaired by documentation reconciliation.
 
-Phase 2N follow-on work is required, but every proposed Phase 2N-01 through Phase 2N-05 task remains `CANDIDATE / NOT_AUTHORIZED / NOT_STARTED`; the next task has not started. `PHASE_2N_IMPLEMENTATION_AUTHORIZED: NO`. Live-device access, SSH, NETCONF, RESTCONF, provider/API/model calls, secrets, configuration backup/change, command execution changes, and production execution remain forbidden. Detailed evidence and the bounded candidate definitions are in `docs/phase_2n/phase_2n_00_user_facing_acceptance_and_demo_readiness_entry_gate_planning_only.md`.
+Phase 2N follow-on work remains required. Phase 2N-01 was later separately authorized as documentation-only; Phase 2N-02 through Phase 2N-05 remain `NOT_AUTHORIZED / NOT_STARTED`. `PHASE_2N_IMPLEMENTATION_AUTHORIZED: NO`. Live-device access, SSH, NETCONF, RESTCONF, provider/API/model calls, secrets, configuration backup/change, command execution changes, and production execution remain forbidden. Detailed Phase 2N-00 evidence and candidate definitions remain in `docs/phase_2n/phase_2n_00_user_facing_acceptance_and_demo_readiness_entry_gate_planning_only.md`.
+
+### Phase 2N-01 Canonical Quick Start and Demo Runbook
+
+Phase 2N-01 is `DONE / READY_FOR_REVIEW` on its feature branch. It adds documentation only: the canonical Flask startup decision, prerequisite matrix, exact startup/shutdown steps, primary Demo sequence, secondary Next.js fallback boundary, observable success/failure criteria, limitations, and evidence classification. A bounded current-environment check started `python dashboard_app.py`, verified the task-relevant Flask GET routes, and proved clean shutdown; this does not establish a cross-environment browser lifecycle or repair the earlier prerequisite gap.
+
+`USER_FACING_ACCEPTANCE_READINESS: NOT_READY`, `CANONICAL_STARTUP_PATH_VERIFIED: PARTIAL`, `PRIMARY_DEMO_FLOW_AVAILABLE: PARTIAL`, `ACCEPTANCE_BLOCKERS_RESOLVED_BY_2N_01: NO`, and `PHASE_2N_IMPLEMENTATION_AUTHORIZED: NO`. The Next.js Reports navigation still returns 404. Phase 2N-03 is recommended only as `CANDIDATE / NOT_AUTHORIZED / NOT_STARTED`; Phase 2N-02, 2N-03, 2N-04, and 2N-05 have not started. See `docs/phase_2n/phase_2n_01_canonical_quick_start_and_demo_runbook_documentation_only.md`.
 
 ## Next Recommended Step
 
@@ -602,7 +616,8 @@ Current Phase 2H / 2I / 2J / 2K / 2L progress snapshot:
 | 48 | 2M-05 | Platform Quality Continuation and Closure Authorization Gate / Planning Only | DONE / MERGED_TO_MAIN | Implementation commit `f8d9c311cf42e36154b3b2ed7e2b03eca283f7a1` was externally pushed and fast-forward merged with no merge commit or conflict; post-merge scope validation passed; the non-blocking read-only command-order deviation is recorded; no workflow, test, dependency, browser, server, or next-task implementation occurred |
 | 49 | 2M-06 | GitHub Actions Dual-Stack Safe CI Baseline | DONE / MERGED_TO_MAIN | Original run `29190165478` failed pytest because nine tests relied on local generated evidence; repair commit `1a1795a51b41ee75bfd54638d67297bdf4b7f548` preserved production/workflow/dependency behavior and passed corrective PR run `29192238344`; the branch was fast-forward integrated with no merge commit or conflict, push-triggered main run `29192854074` passed, and GitHub recognized PR #47 as merged |
 | 50 | 2M-07 | Platform Quality Acceptance Review / Phase Closure | DONE / MERGED_TO_MAIN | Source/review commit `90ec51e19988cf6eaa728eea4233999dc309c53f` was fast-forward integrated with no merge commit or conflict; post-merge validation passed; `AUTHORIZE_PHASE_2N_PLANNING_GATE`; Phase 2M is closed and no implementation occurred |
-| 51 | 2N-00 | User-facing Acceptance and Demo Readiness Entry Gate / Planning Only | DONE / MERGED_TO_MAIN | Planning commit `7b79e3266764a06555515e607202fb15580fae6c` was fast-forward integrated with no merge commit or conflict; acceptance remains `NOT_READY`; canonical startup and the primary Demo remain `PARTIAL`; both blockers remain unresolved; 2N-01 through 2N-05 remain `CANDIDATE / NOT_AUTHORIZED / NOT_STARTED`; `NO_PHASE_2N_IMPLEMENTATION_AUTHORIZED` |
+| 51 | 2N-00 | User-facing Acceptance and Demo Readiness Entry Gate / Planning Only | DONE / MERGED_TO_MAIN | Planning commit `7b79e3266764a06555515e607202fb15580fae6c` was fast-forward integrated with no merge commit or conflict; acceptance remains `NOT_READY`; canonical startup and the primary Demo remain `PARTIAL`; both blockers remain unresolved; at 2N-00 completion, 2N-01 through 2N-05 were `CANDIDATE / NOT_AUTHORIZED / NOT_STARTED`; `NO_PHASE_2N_IMPLEMENTATION_AUTHORIZED` |
+| 52 | 2N-01 | Canonical Quick Start and Demo Runbook / Documentation Only | DONE / READY_FOR_REVIEW | Canonical Flask startup, prerequisites, Demo sequence, secondary Next.js fallback, negative states, shutdown, limitations, and evidence classifications are documented; bounded Flask GET verification passed with clean shutdown, but acceptance remains `NOT_READY`, canonical startup and the primary Demo remain `PARTIAL`, the Next.js Reports 404 remains unresolved, and 2N-02 through 2N-05 remain `NOT_AUTHORIZED / NOT_STARTED` |
 
 2K-09 result: the README now clarifies that the MIT License covers code usage rights such as cloning, reviewing, learning from, running local deterministic checks, and forking under the license terms. It also states that the license does not grant operational authorization for SSH, live device access, NETCONF, RESTCONF, API/model/provider calls, secrets access, config backup/change, or autonomous execution.
 
