@@ -1,8 +1,8 @@
 # Phase 2N-00 — User-facing Acceptance and Demo Readiness Entry Gate
 
-Status: DONE / READY_FOR_REVIEW
+Status: DONE / MERGED_TO_MAIN
 
-Decision summary: The existing repository is not yet ready for final user-facing acceptance. The primary Demo flow is `PARTIAL`: repository and recent Safe CI evidence support the canonical Flask dashboard routes, while a separate Next.js evidence surface was directly demonstrated locally, but the documented canonical command could not start in this environment because no usable Python/Flask installation was available and dependency repair was forbidden. The verified Next.js surface displayed local report evidence, report-only safety labels, an empty job state, and disabled initial job creation, but its visible Reports navigation returned a 404. Phase 2N follow-on work is required, every follow-on remains `CANDIDATE / NOT_AUTHORIZED / NOT_STARTED`, and `PHASE_2N_IMPLEMENTATION_AUTHORIZED: NO`.
+Decision summary: Phase 2N-00 planning commit `7b79e3266764a06555515e607202fb15580fae6c` was integrated into `main` by fast-forward only and pushed to the trusted remote, with no merge commit and no conflict. Phase 2N-00 is `DONE / MERGED_TO_MAIN`, but Phase 2N remains `NOT_READY` for final user-facing acceptance. The canonical Flask startup remains only partially verified, and the secondary Next.js Reports navigation still returns 404. Phase 2N-01 through Phase 2N-05 remain `CANDIDATE / NOT_AUTHORIZED / NOT_STARTED`, the next task has not started, and `PHASE_2N_IMPLEMENTATION_AUTHORIZED: NO`.
 
 ```text
 USER_FACING_ACCEPTANCE_READINESS: NOT_READY
@@ -11,6 +11,13 @@ PRIMARY_DEMO_FLOW_AVAILABLE: PARTIAL
 CANONICAL_STARTUP_PATH_VERIFIED: PARTIAL
 USER_FACING_ACCEPTANCE_BLOCKERS_FOUND: YES
 PHASE_2N_IMPLEMENTATION_AUTHORIZED: NO
+PHASE_2N_00_STATUS: DONE / MERGED_TO_MAIN
+PLANNING_COMMIT: 7b79e3266764a06555515e607202fb15580fae6c
+INTEGRATION_METHOD: FAST_FORWARD
+MERGE_COMMIT_CREATED: NO
+MERGE_CONFLICTS: NONE
+PHASE_2N_01_THROUGH_2N_05_STATUS: CANDIDATE / NOT_AUTHORIZED / NOT_STARTED
+NEXT_TASK_STARTED: NO
 ```
 
 ## A. Gate purpose and authority
