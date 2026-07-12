@@ -1,22 +1,23 @@
 # Phase 2M-06 — GitHub Actions Dual-Stack Safe CI Baseline
 
-Status: DONE / READY_FOR_CI_REVALIDATION
+Status: DONE / MERGED_TO_MAIN
 
-Decision summary: Phase 2M-06 is `DONE / READY_FOR_CI_REVALIDATION` on Draft PR #47. The exact Safe CI boundary authorized by merged Phase 2M-05 remains one GitHub-hosted Ubuntu job with read-only repository contents permission, no secrets, disabled checkout credential persistence, immutable action pins, and the existing Node and Python validation commands. The first hosted run `29190165478` failed pytest with 36 failed and 1,830 passed because nine positive-path test modules depended on locally generated evidence absent from a clean runner. A bounded `TEST_ONLY_CI_HERMETICITY_REPAIR` now creates deterministic evidence under pytest temporary roots; targeted and full pytest pass in a disposable tracked-files-only checkout. Production source, workflow behavior, dependencies, generated reports, and safety semantics are unchanged. The correction is local only, hosted CI has not been rerun, no CI PASS is claimed, PR #47 remains Draft and unmerged, and Phase 2M-07 and Phase 2N remain unauthorized and unstarted.
+Decision summary: Phase 2M-06 is `DONE / MERGED_TO_MAIN`. The exact Safe CI boundary authorized by merged Phase 2M-05 remains one GitHub-hosted Ubuntu job with read-only repository contents permission, no secrets, disabled checkout credential persistence, immutable action pins, and the existing Node and Python validation commands. The first hosted run `29190165478` failed pytest with 36 failed and 1,830 passed because nine positive-path test modules depended on locally generated evidence absent from a clean runner. Bounded `TEST_ONLY_CI_HERMETICITY_REPAIR` commit `1a1795a51b41ee75bfd54638d67297bdf4b7f548` creates deterministic evidence under pytest temporary roots and passed corrective PR run `29192238344`. The source branch was integrated into `main` by fast-forward only with no merge commit or conflict, and push-triggered Safe CI run `29192854074` passed. GitHub recognized PR #47 as merged at the exact repair commit without the PR merge button. Production source, workflow behavior, dependencies, generated reports, and safety semantics remain unchanged by the repair. Phase 2M-07 and Phase 2N remain unauthorized and unstarted.
 
 ```text
 PHASE: 2M-06
 TASK_MODE: IMPLEMENTATION_ONLY / CI_WORKFLOW_ONLY / DOCUMENTATION_ONLY_SUPPORT / NON_LIVE
 SAFETY_MODE: STAGE_0 / LOCAL_ONLY_IMPLEMENTATION / NO_SECRETS / NO_LIVE_ACCESS
-STATUS: DONE / READY_FOR_CI_REVALIDATION
+STATUS: DONE / MERGED_TO_MAIN
 BASE_COMMIT: 0dd62844c05acfe8936124a9aad11688b09206aa
 FEATURE_BRANCH: codex/phase-2m-06-github-actions-dual-stack-safe-ci-baseline
 ORIGINAL_WORKFLOW_COMMIT: 843b4e62a6990cdad6a60a280bb053458817ebe8
+CORRECTIVE_COMMIT: 1a1795a51b41ee75bfd54638d67297bdf4b7f548
 PR_NUMBER: 47
-PR_STATE: OPEN / DRAFT / NOT_MERGED
+PR_STATE: CLOSED / MERGED_BY_FAST_FORWARD_MAIN_PUSH / NO_PR_MERGE_BUTTON
 CORRECTION_CLASSIFICATION: TEST_ONLY_CI_HERMETICITY_REPAIR
-PUSH_AUTHORIZED: NO
-MERGE_AUTHORIZED: NO
+PUSH_AUTHORIZED: YES — SEPARATE BOUNDED INTEGRATION TASK
+MERGE_AUTHORIZED: YES — FAST_FORWARD_ONLY IN SEPARATE BOUNDED INTEGRATION TASK
 PHASE_2M_07_STARTED: NO
 PHASE_2N_STARTED: NO
 ```
@@ -65,7 +66,7 @@ The corrective task additionally authorizes only these test/helper files plus RE
 - `tests/test_day151_v04_ai_assistance_closure_evidence_index.py`;
 - `README.md` and this Phase 2M-06 evidence record for accuracy.
 
-Forbidden and untouched:
+Forbidden and untouched by the implementation and repair tasks:
 
 - production source, workflow content, dependencies, package metadata, lockfiles, requirements, TypeScript, ESLint, or Vitest configuration;
 - generated or historical reports, repository-root fixture outputs, test skips, xfails, reduced assertions, or weakened fail-closed behavior;
@@ -170,16 +171,40 @@ The repair uses one explicit helper, `tests/ai_assistance_evidence_test_fixtures
 
 The first clean full-suite attempt intentionally had no `node_modules` and produced 28 unrelated Node-bridge test failures because `typescript` could not resolve. The authoritative clean full-suite rerun reused the existing unchanged dependency tree via `NODE_PATH`, matching the workflow's already-completed `npm ci` prerequisite without installing or updating anything.
 
+## Post-merge integration and Safe CI reconciliation
+
+The exact two-commit source branch was integrated into local `main` from base `0dd62844c05acfe8936124a9aad11688b09206aa` by `git merge --ff-only`. The resulting `main` head was the repair commit itself, proving that no merge commit, squash, rebase, rewrite, conflict resolution, or PR merge-button action occurred. The main push caused GitHub to recognize PR #47 as merged at `1a1795a51b41ee75bfd54638d67297bdf4b7f548`.
+
+Post-merge local validation passed before the first main push:
+
+| Gate | Result |
+| --- | --- |
+| TypeScript | PASS; `npm.cmd run typecheck` |
+| ESLint | PASS; `npm.cmd run lint`; zero warnings |
+| Vitest | PASS; 2 files, 56 tests |
+| Next.js build | PASS; telemetry disabled; 24/24 static pages |
+| Full pytest | PASS; 1,866 passed; one existing `GetPassWarning` |
+| Report index | PASS for command exit; overall WARN only for 13 optional missing local reports; fail 0 |
+| Whitespace | PASS; `git diff --check` |
+
+Corrective PR run `29192238344` passed all Safe CI steps at repair commit `1a1795a51b41ee75bfd54638d67297bdf4b7f548`. After fast-forward integration and the first main push, run `29192854074` (`Safe CI #3`) completed successfully on `main`. Its single `Node and Python quality gates` job passed checkout, committed dependency installation, typecheck, zero-warning lint, 56 Node tests, the telemetry-disabled 24/24-page build, 1,866 Python tests, report-index with expected optional-report warnings and exit 0, and `git diff --exit-code` tracked-file immutability proof.
+
+The repair changed no production source, workflow, dependency, package metadata, generated report, or runtime safety behavior. No live device, SSH, NETCONF, RESTCONF, provider, API, model, secret, queue, scheduler, worker, broker, agent loop, configuration backup/change, Day1-Day160 rewrite, or second safety matrix work occurred.
+
 Current hosted state:
 
 ```text
-GITHUB_HOSTED_CI_RUN: FAIL — run 29190165478 at original commit 843b4e62a6990cdad6a60a280bb053458817ebe8
-GITHUB_HOSTED_CI_RERUN_AFTER_CORRECTION: NO
-CI_PASS_CLAIMED: NO
+GITHUB_HOSTED_INITIAL_CI_RUN: FAIL — run 29190165478 at original commit 843b4e62a6990cdad6a60a280bb053458817ebe8
+GITHUB_HOSTED_CORRECTIVE_PR_RUN: PASS — run 29192238344 at repair commit 1a1795a51b41ee75bfd54638d67297bdf4b7f548
+GITHUB_HOSTED_PUSH_TO_MAIN_RUN: PASS — run 29192854074 at repair commit 1a1795a51b41ee75bfd54638d67297bdf4b7f548
+CI_PASS_CLAIMED: YES
 LOCAL_VALIDATION_RESULT: PASS
 CLEAN_TRACKED_FILES_ONLY_VALIDATION: PASS
 REPORT_INDEX_RESULT: WARN_ACCEPTED_OPTIONAL_LOCAL_REPORTS_ONLY
-PR_47_STATE: OPEN / DRAFT / NOT_MERGED
+FAST_FORWARD_INTEGRATION: YES
+MERGE_COMMIT_CREATED: NO
+MERGE_CONFLICT_OCCURRED: NO
+PR_47_STATE: CLOSED / MERGED
 ```
 
 ## Documentation readability review
@@ -201,7 +226,7 @@ FINAL_READABILITY_RESULT: PASS
 
 ```text
 FINAL_PHASE_DECISION: PASS
-PHASE_2M_06_STATUS: DONE / READY_FOR_CI_REVALIDATION
+PHASE_2M_06_STATUS: DONE / MERGED_TO_MAIN
 AUTHORIZED_SCOPE_TOUCHED: YES
 FORBIDDEN_SCOPE_TOUCHED: NO
 WORKFLOW_CREATED: YES
@@ -209,17 +234,22 @@ WORKFLOW_COUNT: 1
 WORKFLOW_PERMISSIONS_READ_ONLY: YES
 SECRETS_REFERENCED: NO
 LOCAL_VALIDATION_RESULT: PASS
-GITHUB_HOSTED_CI_RUN: FAIL — run 29190165478 before correction
-GITHUB_HOSTED_CI_RERUN_AFTER_CORRECTION: NO
-CI_PASS_CLAIMED: NO
+GITHUB_HOSTED_INITIAL_CI_RUN: FAIL — run 29190165478 before correction
+GITHUB_HOSTED_CORRECTIVE_PR_RUN: PASS — run 29192238344
+GITHUB_HOSTED_PUSH_TO_MAIN_RUN: PASS — run 29192854074
+CI_PASS_CLAIMED: YES
 CORRECTION_CLASSIFICATION: TEST_ONLY_CI_HERMETICITY_REPAIR
 PRODUCTION_SOURCE_CHANGED: NO
 WORKFLOW_CHANGED_BY_CORRECTION: NO
 DEPENDENCIES_CHANGED: NO
 GENERATED_REPORTS_COMMITTED: NO
-PR_47_DRAFT_AND_UNMERGED: YES
-PUSH_PERFORMED: NO
-MERGE_PERFORMED: NO
+PR_47_DRAFT_AND_UNMERGED: NO
+PR_47_RECOGNIZED_MERGED: YES
+FAST_FORWARD_INTEGRATION: YES
+MERGE_COMMIT_CREATED: NO
+MERGE_CONFLICT_OCCURRED: NO
+PUSH_PERFORMED: YES
+MERGE_PERFORMED: YES — FAST_FORWARD_ONLY
 PHASE_2M_07_STARTED: NO
 PHASE_2N_STARTED: NO
 ```
