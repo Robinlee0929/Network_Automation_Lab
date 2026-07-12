@@ -1,8 +1,25 @@
 # Phase 2N-01 — Canonical Quick Start and Demo Runbook
 
-Status: DONE / READY_FOR_REVIEW
+Status: DONE / MERGED_TO_MAIN
 
-Decision summary: The canonical reviewer entry point remains the Flask dashboard started with `python dashboard_app.py`. A bounded Phase 2N-01 check started that command with the already-available environment, verified the task-relevant local GET routes, and proved clean shutdown. The canonical path nevertheless remains `PARTIAL` for user-facing acceptance because this documentation-only task did not establish a reproducible browser lifecycle or repair the Phase 2N-00 environment gap. The Next.js app remains a secondary committed-evidence browser; its Reports navigation still returns 404. Therefore user-facing acceptance remains `NOT_READY`, Phase 2N implementation remains unauthorized, and no follow-on task has started.
+Decision summary: Phase 2N-01 implementation commit `7be97b1f351dc139b06c7ea77c07930d0dcee6d3` was integrated into `main` by fast-forward only, with no merge commit and no conflict. Fresh post-merge validation passed full pytest with 1,866 tests and one existing warning; report-index exited 0 with only 13 optional reports missing and zero failures. The canonical reviewer entry point remains the Flask dashboard started with `python dashboard_app.py`. A bounded Phase 2N-01 check started that command with the already-available environment, verified the task-relevant local GET routes, and proved clean shutdown. The canonical path nevertheless remains `PARTIAL` for user-facing acceptance because the evidence does not establish a reproducible browser lifecycle or a general clean-environment prerequisite/startup contract. The Next.js app remains a secondary committed-evidence browser; its Reports navigation still returns 404. Therefore user-facing acceptance remains `NOT_READY`, Phase 2N implementation remains unauthorized, Phase 2N-03 remains only `CANDIDATE / NOT_AUTHORIZED / NOT_STARTED`, and no follow-on task has started.
+
+```text
+PHASE_2N_01_STATUS: DONE / MERGED_TO_MAIN
+IMPLEMENTATION_COMMIT: 7be97b1f351dc139b06c7ea77c07930d0dcee6d3
+INTEGRATION_TYPE: FAST_FORWARD_ONLY
+MERGE_COMMIT: NONE
+CONFLICTS: NONE
+POST_MERGE_FULL_PYTEST: PASS / 1866 PASSED / 1 EXISTING WARNING
+POST_MERGE_REPORT_INDEX: WARN_ACCEPTED / EXIT_0 / FAIL_0 / OPTIONAL_MISSING_13
+USER_FACING_ACCEPTANCE_READINESS: NOT_READY
+CANONICAL_STARTUP_PATH_STATUS: PARTIAL
+SECONDARY_STARTUP_PATH_STATUS: PARTIAL
+NEXTJS_REPORTS_404_RESOLVED: NO
+PHASE_2N_IMPLEMENTATION_AUTHORIZED: NO
+PHASE_2N_03_STATUS: CANDIDATE / NOT_AUTHORIZED / NOT_STARTED
+PHASE_2N_02_THROUGH_2N_05_STARTED: NO
+```
 
 ## A. Authority and scope
 
