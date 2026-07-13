@@ -1,8 +1,8 @@
 # Phase 2N-03B — Bounded Reports Collection Route and Empty-state Correction
 
-Status: DONE / READY_FOR_REVIEW
+Status: DONE / MERGED_TO_MAIN
 
-Decision summary: Phase 2N-03B addresses the confirmed `MISSING_PAGE_ROUTE` root cause by adding `/network/reports` and replacing the unsafe Reports presentation with a metadata-only collection. The route returns HTTP 200 with available report metadata and HTTP 200 with an explicit empty state when report storage is absent or empty. Raw payloads, source paths, device identity, provider/API/model actions, and an `All Missing Reports` feature are not exposed or added. User-facing acceptance remains `NOT_READY`, and Phase 2N-03C remains unauthorized.
+Decision summary: Phase 2N-03B implementation commit `18a3685eace92fb96273ea278d78977bdaac6de7` was pushed, integrated into `main` by fast-forward only with no merge commit, and pushed to synchronized trusted remote main. The implementation addresses `MISSING_PAGE_ROUTE` by adding `/network/reports` and replacing the unsafe Reports presentation with a metadata-only collection. The route returns HTTP 200 with available report metadata and HTTP 200 with an explicit empty state when report storage is absent or empty. Raw payloads, source paths, device identity, provider/API/model actions, and an `All Missing Reports` feature are not exposed or added. User-facing acceptance remains `NOT_READY`, and Phase 2N-03C remains unauthorized.
 
 ## A. Scope and authority
 
@@ -66,7 +66,47 @@ Safety boundary:
 
 No dependency was installed or repaired. Playwright was not run because it is not present and adding it is outside scope.
 
-## E. Report-data boundary
+## E. Integration and synchronization
+
+```text
+IMPLEMENTATION_COMMIT:
+18a3685eace92fb96273ea278d78977bdaac6de7
+
+INTEGRATION_METHOD:
+FAST_FORWARD_ONLY
+
+MERGE_COMMIT_CREATED:
+NO
+
+SOURCE_BRANCH_PUSHED:
+YES
+
+MAIN_PUSHED:
+YES
+
+LOCAL_MAIN_REMOTE_MAIN_SYNCHRONIZED:
+YES
+
+REPORTS_COLLECTION_ROUTE_STATUS:
+IMPLEMENTED / MERGED_TO_MAIN
+
+REPORTS_WITH_DATA_BEHAVIOR:
+HTTP_200_COLLECTION
+
+REPORTS_WITHOUT_DATA_BEHAVIOR:
+HTTP_200_EMPTY_STATE
+
+ALL_MISSING_REPORTS_FEATURE_ADDED:
+NO
+
+ROOT_REPORTS_DIRECTORY_TRACKED:
+NO
+
+CLEAN_CLONE_REPORT_DATA_REPRODUCIBILITY:
+NOT_VERIFIED
+```
+
+## F. Report-data boundary
 
 - `reports/` remains ignored historical local evidence.
 - Ignored reports were not read into test fixtures, modified, renamed, moved, deleted, staged, force-added, or committed.
@@ -74,7 +114,7 @@ No dependency was installed or repaired. Playwright was not run because it is no
 - Clean-clone report-data reproducibility remains `NOT_VERIFIED`.
 - The page's zero-data HTTP 200 behavior is verified with synthetic input and does not depend on tracked report fixtures.
 
-## F. Acceptance effect
+## G. Acceptance effect
 
 ```text
 USER_FACING_ACCEPTANCE_READINESS:
@@ -90,7 +130,7 @@ PHASE_2N_03A1_STATUS:
 DONE / MERGED_TO_MAIN
 
 PHASE_2N_03B_STATUS:
-DONE / READY_FOR_REVIEW
+DONE / MERGED_TO_MAIN
 
 PHASE_2N_03B_ROOT_CAUSE_ADDRESSED:
 MISSING_PAGE_ROUTE
@@ -111,17 +151,17 @@ PHASE_2N_03C_AUTHORIZED:
 NO
 ```
 
-## G. Next candidate
+## H. Next candidate
 
 ```text
 RECOMMENDED_NEXT_CANDIDATE:
-Phase 2N-03B Merge, Push, Synchronization, Cleanup, and Post-merge Status Reconciliation
+Phase 2N-03C — Navigation, Empty-state and Error-state Acceptance Review
 
 RECOMMENDED_NEXT_CANDIDATE_STATUS:
 CANDIDATE / NOT_AUTHORIZED / NOT_STARTED
 ```
 
-Phase 2N-03C must not be recommended or started before Phase 2N-03B is merged and reconciled.
+Phase 2N-03C is not authorized or started by this reconciliation. Phase 2N and parent Phase 2N-03 remain incomplete, and user-facing acceptance remains `NOT_READY`.
 
 ## Documentation readability review
 
