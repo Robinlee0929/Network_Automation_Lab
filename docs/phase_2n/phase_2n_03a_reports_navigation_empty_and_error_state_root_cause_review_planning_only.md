@@ -1,8 +1,8 @@
 # Phase 2N-03A — Reports Navigation, Empty-state and Error-state Root-cause Review
 
-Status: DONE / READY_FOR_REVIEW
+Status: DONE / MERGED_TO_MAIN
 
-Decision summary: the current defect is `MISSING_PAGE_ROUTE`. The Next.js navigation visibly links `Reports` to `/network/reports`, but the repository has no `app/network/reports/page.tsx`; bounded localhost verification therefore returned HTTP 404 even though the local evidence importer returned data. Restoring ignored historical reports did not and cannot create the missing page. Phase 2N-03A is planning-only, user-facing acceptance remains `NOT_READY`, and Phase 2N-03B remains `CANDIDATE / NOT_AUTHORIZED / NOT_STARTED`.
+Decision summary: the current defect is `MISSING_PAGE_ROUTE`. The Next.js navigation visibly links `Reports` to `/network/reports`, but the repository has no `app/network/reports/page.tsx`; bounded localhost verification therefore returned HTTP 404 even though the local evidence importer returned data. Restoring ignored historical reports did not and cannot create the missing page. Planning commit `32bf94089b72507043cf1a8788a386f6164895be` was integrated into `main` by fast-forward only, with no merge commit or conflict. Phase 2N-03A is `DONE / MERGED_TO_MAIN`, parent Phase 2N-03 is `IN_PROGRESS`, user-facing acceptance remains `NOT_READY`, and Phase 2N-03B remains `CANDIDATE / NOT_AUTHORIZED / NOT_STARTED`.
 
 ## A. Scope and authority
 
@@ -158,8 +158,12 @@ No validation may require a live device, SSH, NETCONF, RESTCONF, provider, model
 
 ```text
 USER_FACING_ACCEPTANCE_READINESS: NOT_READY
-PARENT_PHASE_2N_03_STATUS: AUTHORIZED_FOR_PLANNING_ONLY
-PHASE_2N_03A_STATUS: DONE / READY_FOR_REVIEW
+PARENT_PHASE_2N_03_STATUS: IN_PROGRESS
+PHASE_2N_03A_STATUS: DONE / MERGED_TO_MAIN
+PHASE_2N_03A_PLANNING_COMMIT: 32bf94089b72507043cf1a8788a386f6164895be
+PHASE_2N_03A_INTEGRATION_METHOD: FAST_FORWARD_ONLY
+PHASE_2N_03A_MERGE_COMMIT_CREATED: NO
+PHASE_2N_03A_MERGE_CONFLICT: NO
 NEXTJS_REPORTS_DEFECT_REPRODUCED: YES
 NEXTJS_REPORTS_ROOT_CAUSE: MISSING_PAGE_ROUTE
 REPORT_DATA_LOCALLY_AVAILABLE: YES
