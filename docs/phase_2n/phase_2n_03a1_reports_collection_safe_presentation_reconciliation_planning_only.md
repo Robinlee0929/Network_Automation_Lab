@@ -1,8 +1,8 @@
 # Phase 2N-03A1 — Reports Collection Safe-presentation Reconciliation
 
-Status: DONE / READY_FOR_REVIEW
+Status: DONE / MERGED_TO_MAIN
 
-Decision summary: Phase 2N-03B should add the missing `/network/reports` page, reuse the existing read-only `importDayResults()` collection, and change `ReportsClient` into a metadata-only reviewer view. The current `ReportsClient` must not be mounted unchanged because it renders `sourcePath` and `rawOutput`, exposes an AI Summary action, and sends report content plus the complete selected result to `/api/network/ai/analyze-report`. The future collection must return HTTP 200 with data or with an explicit empty state, must not expose report payloads or device identity, and must not offer provider/API/model actions. This record is planning only; Phase 2N-03B remains unauthorized and has not started.
+Decision summary: Phase 2N-03A1 source commit `ba339f7d06e05672be8cbe93dfeab46da661960e` was integrated into `main` by fast-forward only, with no merge commit or conflict. The safe-presentation decision remains unchanged: Phase 2N-03B should add the missing `/network/reports` page, reuse the existing read-only `importDayResults()` collection, and change `ReportsClient` into a metadata-only reviewer view. The current component must not be mounted unchanged because it renders `sourcePath` and `rawOutput`, exposes an AI Summary action, and sends report content plus the complete selected result to `/api/network/ai/analyze-report`. Phase 2N-03B is now the one authorized next task, but its implementation has not started; user-facing acceptance remains `NOT_READY`.
 
 ## A. Scope and authority
 
@@ -172,12 +172,30 @@ PHASE_2N_03A_STATUS:
 DONE / MERGED_TO_MAIN
 
 PHASE_2N_03A1_STATUS:
-DONE / READY_FOR_REVIEW
+DONE / MERGED_TO_MAIN
+
+PHASE_2N_03A1_SOURCE_COMMIT:
+ba339f7d06e05672be8cbe93dfeab46da661960e
+
+PHASE_2N_03A1_INTEGRATION_METHOD:
+FAST_FORWARD_ONLY
+
+PHASE_2N_03A1_MERGE_COMMIT_CREATED:
+NO
+
+PHASE_2N_03A1_MERGE_CONFLICT:
+NO
+
+REPORTS_CLIENT_SAFE_TO_MOUNT_UNCHANGED:
+NO
 
 PHASE_2N_03B_STATUS:
-CANDIDATE / NOT_AUTHORIZED / NOT_STARTED
+AUTHORIZED / NEXT / READY_TO_RUN
 
 PHASE_2N_03B_IMPLEMENTATION_AUTHORIZED:
+YES
+
+PHASE_2N_03B_STARTED:
 NO
 
 REPORTS_COLLECTION_SAFE_PRESENTATION_CONTRACT_DEFINED:
@@ -202,17 +220,17 @@ PHASE_2N_03C_AUTHORIZED:
 NO
 ```
 
-## J. Next candidate
+## J. Next authorized task
 
 ```text
-RECOMMENDED_NEXT_CANDIDATE:
-Phase 2N-03A1 Merge, Push, Synchronization, Cleanup, and Post-merge Status Reconciliation
+RECOMMENDED_NEXT_TASK:
+Phase 2N-03B — Bounded Reports Collection Route and Empty-state Correction
 
-RECOMMENDED_NEXT_CANDIDATE_STATUS:
-CANDIDATE / NOT_AUTHORIZED / NOT_STARTED
+RECOMMENDED_NEXT_TASK_STATUS:
+AUTHORIZED / NEXT / READY_TO_RUN
 ```
 
-Do not start Phase 2N-03B until Phase 2N-03A1 is separately reviewed, merged, synchronized, and reconciled.
+Phase 2N-03A1 is integrated. Phase 2N-03B is authorized as the next task but is not started by this reconciliation.
 
 ## Documentation readability review
 
