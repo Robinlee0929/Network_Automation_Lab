@@ -76,7 +76,7 @@ Review these local routes:
 
 繁中：dashboard 主要用來快速理解專案價值、報告證據與 AI safety 邊界。它不是 live device 控制台，也不是 provider/API/model 執行入口。`/commands` 頁面用於審閱已登錄的本機命令與既有紀錄，不代表預設應執行命令。
 
-The Next.js Network Automation AI Node is secondary, not canonical. Phase 2N-03A revalidated its local evidence browser at `http://127.0.0.1:3000/network/day-results` using the existing dependency tree and restored ignored historical reports. The visible `Reports` navigation targets `/network/reports`, but no matching page route exists, so the configured href and an unconfigured `/network/reports?missing=0` probe both return 404. Source and runtime contain no `All Missing Reports` UI entry or filter, and no collection empty state rendered at the missing route. The root-cause classification is `MISSING_PAGE_ROUTE`, not a demonstrated zero-result filter defect. Use the Evidence route only as a local fallback; the restored reports and user-observed report-index `PASS 14/14` state do not prove clean-clone reproducibility.
+The Next.js Network Automation AI Node is secondary, not canonical. Phase 2N-03B implements the visible `Reports` navigation target at `/network/reports`: available local evidence returns HTTP 200 with a metadata-only collection, while absent evidence returns HTTP 200 with an explicit empty state. The page exposes no raw payload, source path, device identity, provider/API/model action, or `All Missing Reports` feature. Its existing read-only importer tolerates absent report storage, but ignored historical reports were not committed and do not prove clean-clone report-data reproducibility.
 
 ### 6. Run local validation
 
@@ -107,7 +107,7 @@ Safe demo / review reminders:
 - Use pytest and `report-index` as local validation checks.
 - Use the Phase 2N-01 runbook for canonical startup, evidence classification, negative states, fallback limits, and shutdown.
 - Use the Phase 2N-03A planning record for the Reports route map and `MISSING_PAGE_ROUTE` root cause, and the Phase 2N-03A1 planning record for the metadata-only safe-presentation contract.
-- Phase 2N-03B is the only currently authorized Phase 2N implementation task, and it remains not started; every other follow-on requires separate authorization.
+- Phase 2N-03B is `DONE / READY_FOR_REVIEW` on its feature branch; integration remains a separate candidate and every other follow-on requires separate authorization.
 
 Explicitly not authorized:
 
@@ -120,8 +120,8 @@ Current Phase 2N-03 planning status:
 - Phase 2N-03 retains the name `User-facing Navigation, Empty-state and Error-state Hardening` and is `IN_PROGRESS`.
 - Phase 2N-03A is `DONE / MERGED_TO_MAIN`; planning commit `32bf94089b72507043cf1a8788a386f6164895be` was integrated by fast-forward only, with no merge commit or conflict, and user-facing acceptance remains `NOT_READY`.
 - Phase 2N-03A1 is `DONE / MERGED_TO_MAIN`; source commit `ba339f7d06e05672be8cbe93dfeab46da661960e` was integrated by fast-forward only, with no merge commit or conflict. Its safe-presentation contract remains binding: the existing `ReportsClient` must not be mounted unchanged, and raw report output, source paths, device identity, and provider/API/model actions are prohibited.
-- `Phase 2N-03B — Bounded Reports Collection Route and Empty-state Correction` is `AUTHORIZED / NEXT / READY_TO_RUN`, but implementation is not started.
-- User-facing acceptance remains `NOT_READY`, Phase 2N-03C remains unauthorized, and the exact next task is Phase 2N-03B. This reconciliation does not implement it or authorize another slice.
+- `Phase 2N-03B — Bounded Reports Collection Route and Empty-state Correction` is `DONE / READY_FOR_REVIEW`; `/network/reports` now provides HTTP 200 metadata-only collection and empty-state behavior without changing `NetworkNav`, the importer, report files, or API routes.
+- User-facing acceptance remains `NOT_READY`, Phase 2N-03C remains unauthorized, and the next candidate is the separate Phase 2N-03B merge, push, synchronization, cleanup, and post-merge status reconciliation task. It is not authorized or started here.
 
 ## Current Safety Boundary
 
@@ -304,7 +304,13 @@ Local report data was available: the importer returned data from both tracked ev
 
 Phase 2N-03A1 is `DONE / MERGED_TO_MAIN`. Source commit `ba339f7d06e05672be8cbe93dfeab46da661960e` was integrated by fast-forward only, with no merge commit or conflict. It preserves the `MISSING_PAGE_ROUTE` root cause and reconciles the proposed use of `ReportsClient`: current source renders `sourcePath` and complete `rawOutput`, exposes an AI Summary control, and POSTs report content plus the selected result context to `/api/network/ai/analyze-report`. The component is therefore not safe to mount unchanged.
 
-The single Phase 2N-03B recommendation is a `/network/reports` page that reuses the existing importer and presents only constrained reviewer metadata, returns HTTP 200 with data or an explicit zero-data empty state, and offers no raw payload, source-path, device-identity, provider, API, model, external-service, or execution action. `NetworkNav`, the importer, current API routes, dependencies, and report files remain unchanged. Phase 2N-03B is now `AUTHORIZED / NEXT / READY_TO_RUN`, but implementation has not started; user-facing acceptance remains `NOT_READY`, and Phase 2N-03C remains unauthorized. The exact next task is `Phase 2N-03B — Bounded Reports Collection Route and Empty-state Correction`. See `docs/phase_2n/phase_2n_03a1_reports_collection_safe_presentation_reconciliation_planning_only.md`.
+The single Phase 2N-03B recommendation was implemented on its feature branch: `/network/reports` reuses the existing importer and presents only constrained reviewer metadata, returns HTTP 200 with data or an explicit zero-data empty state, and offers no raw payload, source-path, device-identity, provider, API, model, external-service, or execution action. `NetworkNav`, the importer, current API routes, dependencies, and report files remain unchanged. Phase 2N-03B is `DONE / READY_FOR_REVIEW`; user-facing acceptance remains `NOT_READY`, and Phase 2N-03C remains unauthorized. See `docs/phase_2n/phase_2n_03a1_reports_collection_safe_presentation_reconciliation_planning_only.md` and `docs/phase_2n/phase_2n_03b_bounded_reports_collection_route_and_empty_state_correction.md`.
+
+### Phase 2N-03B Bounded Reports Collection Route and Empty-state Correction
+
+Phase 2N-03B is `DONE / READY_FOR_REVIEW` on its feature branch. It creates the `/network/reports` page and rewrites `ReportsClient` as a read-only metadata collection that displays only aggregate count, fixed category, normalized status, normalized source-day label, and stable creation date. Available evidence returns HTTP 200 with the collection; absent evidence returns HTTP 200 with a clear empty state and does not call `notFound()`.
+
+The implementation adds no `All Missing Reports` entry or filter and does not change `/network/day-results`, `NetworkNav`, the importer, API routes, Python, dependencies, configuration, workflows, or ignored reports. No real report fixture was added, and clean-clone report-data reproducibility remains `NOT_VERIFIED`; the zero-data behavior is covered by synthetic Node-only tests. User-facing acceptance remains `NOT_READY`, Phase 2N-03C remains unauthorized, and the next candidate is the separate Phase 2N-03B integration and post-merge reconciliation task.
 
 ## Next Recommended Step
 
@@ -636,6 +642,7 @@ Current Phase 2H / 2I / 2J / 2K / 2L progress snapshot:
 | 52 | 2N-01 | Canonical Quick Start and Demo Runbook / Documentation Only | DONE / MERGED_TO_MAIN | Documentation implementation commit `7be97b1f351dc139b06c7ea77c07930d0dcee6d3` was fast-forward integrated with no merge commit or conflict; fresh post-merge validation passed 1,866 pytest tests and report-index exited 0 with only 13 optional reports missing; acceptance remains `NOT_READY`, canonical startup and the primary Demo remain `PARTIAL`, the Next.js Reports 404 remains unresolved, Phase 2N-03 remains `CANDIDATE / NOT_AUTHORIZED / NOT_STARTED`, and 2N-02 through 2N-05 remain unstarted |
 | 53 | 2N-03A | Reports Navigation, Empty-state and Error-state Root-cause Review / Planning Only | DONE / MERGED_TO_MAIN | Planning commit `32bf94089b72507043cf1a8788a386f6164895be` was fast-forward integrated with no merge commit or conflict; Phase 2N-03 is `IN_PROGRESS`; source and bounded localhost evidence classify the reproduced `/network/reports` 404 as `MISSING_PAGE_ROUTE`; local historical reports were available but cannot create the missing page or prove clean-clone reproducibility; acceptance remains `NOT_READY`; Phase 2N-03B is `CANDIDATE / NOT_AUTHORIZED / NOT_STARTED`; no implementation occurred |
 | 54 | 2N-03A1 | Reports Collection Safe-presentation Reconciliation / Planning Only | DONE / MERGED_TO_MAIN | Source commit `ba339f7d06e05672be8cbe93dfeab46da661960e` was integrated by fast-forward only with no merge commit or conflict; the existing `ReportsClient` must not be mounted unchanged; the metadata-only safe-presentation contract remains binding; acceptance remains `NOT_READY`; Phase 2N-03B is `AUTHORIZED / NEXT / READY_TO_RUN` but not started; no implementation occurred |
+| 55 | 2N-03B | Bounded Reports Collection Route and Empty-state Correction / Implementation | DONE / READY_FOR_REVIEW | `/network/reports` returns HTTP 200 with a metadata-only collection or explicit empty state; no raw payload, source path, device identity, AI/API action, real fixture, or `All Missing Reports` feature was added; ignored historical reports remain uncommitted; acceptance remains `NOT_READY`; Phase 2N-03C remains unauthorized; integration and post-merge reconciliation are a separate candidate |
 
 2K-09 result: the README now clarifies that the MIT License covers code usage rights such as cloning, reviewing, learning from, running local deterministic checks, and forking under the license terms. It also states that the license does not grant operational authorization for SSH, live device access, NETCONF, RESTCONF, API/model/provider calls, secrets access, config backup/change, or autonomous execution.
 

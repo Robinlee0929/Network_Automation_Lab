@@ -4,6 +4,8 @@ Set_WireguardVPN*_config.json
 reports/
 !app/api/network/reports/
 !app/api/network/reports/**
+!app/network/reports/
+!app/network/reports/**
 exports/
 data/network-ai/analyses.json
 data/network-ai/jobs.json
