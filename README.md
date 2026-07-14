@@ -115,13 +115,14 @@ Explicitly not authorized:
 - MIT License usage rights do not grant operational authorization.
 - Live device access, SSH, NETCONF, RESTCONF, provider/API/model calls, secrets handling, runtime catalog loading, schema enforcement, runner/adapter/scheduler/queue/worker/agent-loop behavior, config backup, config change, and autonomous execution remain forbidden.
 
-Current Phase 2N-03 planning status:
+Current Phase 2N continuation status:
 
 - Phase 2N-03 retains the name `User-facing Navigation, Empty-state and Error-state Hardening` and is `ACCEPTED / MERGED_TO_MAIN` with bounded acceptance `PASS_WITH_NOTES`.
 - Phase 2N-03A is `DONE / MERGED_TO_MAIN`; planning commit `32bf94089b72507043cf1a8788a386f6164895be` was integrated by fast-forward only, with no merge commit or conflict, and user-facing acceptance remains `NOT_READY`.
 - Phase 2N-03A1 is `DONE / MERGED_TO_MAIN`; source commit `ba339f7d06e05672be8cbe93dfeab46da661960e` was integrated by fast-forward only, with no merge commit or conflict. Its safe-presentation contract remains binding: the pre-2N-03B `ReportsClient` could not be mounted unchanged, and the implemented collection continues to prohibit raw report output, source paths, device identity, and provider/API/model actions.
 - `Phase 2N-03B — Bounded Reports Collection Route and Empty-state Correction` is `DONE / MERGED_TO_MAIN`; implementation commit `18a3685eace92fb96273ea278d78977bdaac6de7` was integrated by fast-forward only, with no merge commit, then pushed and synchronized.
 - Phase 2N-03C is `DONE / MERGED_TO_MAIN` with `PASS_WITH_NOTES`: source commit `d7c5555dfd967075ed0c344876338bdad053d28f` was pushed normally, fast-forward integrated, and pushed on `main`; navigation, available-data, empty-state, collection-level 404 prevention, error-state, safety, and bounded localhost criteria passed; root reports remain ignored, clean-clone report-data reproducibility remains `NOT_VERIFIED`, and empty-state evidence remains synthetic and non-destructive.
+- The Phase 2N-04 authorization review is `DONE / READY_FOR_REVIEW` on its bounded planning branch with disposition `AUTHORIZED`. The future implementation is limited to user-facing canonical/secondary, Stage 0/provider-unavailable, report/demo-only, and `/commands` display-only labels; Phase 2N-04 implementation remains `AUTHORIZED / NOT_STARTED`.
 - User-facing acceptance remains `NOT_READY`, overall Phase 2N remains `IN_PROGRESS`, and final Phase 2N closure is not authorized.
 
 ## Current Safety Boundary
@@ -325,13 +326,19 @@ Phase 2N-03C is `DONE / MERGED_TO_MAIN` with `PHASE_2N_03C_ACCEPTANCE_DECISION: 
 
 Targeted and complete Vitest, typecheck, zero-warning lint, the telemetry-disabled 25/25-page Next.js build, and bounded localhost checks passed with existing dependencies during acceptance review. Post-merge validation passed the committed-range and whitespace checks, full pytest with 1,866 passing tests and one existing warning, and report-index with 14/14 PASS and no missing reports. Root `reports/` remains ignored, no real report fixture was added, clean-clone report-data reproducibility remains `NOT_VERIFIED`, and empty-state evidence is synthetic and non-destructive. Parent Phase 2N-03 is `ACCEPTED / MERGED_TO_MAIN`; user-facing acceptance remains `NOT_READY`, overall Phase 2N remains `IN_PROGRESS`, and final closure is not authorized.
 
+### Phase 2N-04 User-facing Entry-point and Safety-label Clarification Authorization Review
+
+The Phase 2N-04 planning decision is `DONE / READY_FOR_REVIEW` on its bounded local branch with disposition `AUTHORIZED`. Repository evidence shows that `2N-GAP-003`, `2N-GAP-005`, and `2N-GAP-008` remain partially open at the presentation layer: README defines Flask as canonical and Next.js as secondary, but the Next.js entry surfaces do not show that relationship; Phase 2N-03 removed provider actions from Reports, but separate Evidence and AI Actions surfaces still need Stage 0/provider-unavailable labels; and the Flask `/commands` page does not visibly state the Phase 2N display-only Demo boundary.
+
+The future implementation is limited to static entry-point, navigation, safety, availability, report/demo-only, and display-only wording on existing pages plus directly relevant presentation tests and status documentation. It may not change routes, href destinations, handlers, POST paths, provider/API/model behavior, job creation, command submission, runners, adapters, dependencies, report importers, or any execution path. Phase 2N-04 implementation remains `AUTHORIZED / NOT_STARTED`; Phase 2N remains `IN_PROGRESS`, user-facing acceptance remains `NOT_READY`, Phase 2N-05 remains `NOT_STARTED`, and final closure remains `NOT_AUTHORIZED`. See `docs/phase_2n/phase_2n_04_user_facing_entry_point_and_safety_label_clarification_authorization_review_planning_only.md`.
+
 ## Next Recommended Step
 
 ```text
-Separate Phase 2N continuation decision required
+Phase 2N-04 — User-facing Entry-point and Safety-label Clarification / Implementation
 ```
 
-Recommended status: `NOT_SELECTED / NOT_AUTHORIZED / NOT_STARTED`. Phase 2N-02 is merged, but this reconciliation does not select or authorize Phase 2N-04, Phase 2N-05, final Phase 2N acceptance or closure, live access, provider-backed behavior, secrets handling, command execution changes, or production execution. A separate user-authorized continuation decision is required.
+Recommended status: `AUTHORIZED / NOT_STARTED`. The next task requires a separate user request and must follow the bounded Phase 2N-04 authorization record. It does not authorize Phase 2N-05, final Phase 2N acceptance or closure, live access, provider-backed behavior, secrets handling, command execution changes, or production execution.
 
 ## Project Overview
 
@@ -658,6 +665,7 @@ Current Phase 2H / 2I / 2J / 2K / 2L progress snapshot:
 | 55 | 2N-03A1 | Reports Collection Safe-presentation Reconciliation / Planning Only | DONE / MERGED_TO_MAIN | Source commit `ba339f7d06e05672be8cbe93dfeab46da661960e` was integrated by fast-forward only with no merge commit or conflict; the existing `ReportsClient` must not be mounted unchanged; the metadata-only safe-presentation contract remains binding; acceptance remains `NOT_READY`; Phase 2N-03B is `AUTHORIZED / NEXT / READY_TO_RUN` but not started; no implementation occurred |
 | 56 | 2N-03B | Bounded Reports Collection Route and Empty-state Correction / Implementation | DONE / MERGED_TO_MAIN | Implementation commit `18a3685eace92fb96273ea278d78977bdaac6de7` was pushed, fast-forward integrated with no merge commit, and synchronized to trusted remote main; `/network/reports` returns HTTP 200 with a metadata-only collection or explicit empty state; no raw payload, source path, device identity, AI/API action, real fixture, or `All Missing Reports` feature was added; at 2N-03B completion, acceptance remained `NOT_READY` and Phase 2N-03C was still a candidate; the later review result is recorded in row 57 |
 | 57 | 2N-03C | Navigation, Empty-state and Error-state Acceptance Review / Review-only | DONE / MERGED_TO_MAIN | Source commit `d7c5555dfd967075ed0c344876338bdad053d28f` was pushed normally, fast-forward integrated without a merge commit or conflict, and pushed on `main`; post-merge validation passed 1,866 pytest tests and report-index 14/14; `PASS_WITH_NOTES`; navigation, bounded metadata, HTTP-200 empty-state, collection-level 404 prevention, error-boundary, and safety criteria pass; clean-clone report-data reproducibility remains `NOT_VERIFIED`, user-facing acceptance remains `NOT_READY`, and overall Phase 2N remains `IN_PROGRESS` |
+| 58 | 2N-04 | User-facing Entry-point and Safety-label Clarification Authorization Review / Planning Only | DONE / READY_FOR_REVIEW | Disposition `AUTHORIZED` for one future static presentation-only clarification slice covering the remaining parts of `2N-GAP-003`, `2N-GAP-005`, and `2N-GAP-008`; Phase 2N-04 implementation remains `AUTHORIZED / NOT_STARTED`; routes, handlers, provider/API/model behavior, command/job behavior, dependencies, report importers, and all execution paths remain unchanged; Phase 2N-05 and final closure remain unauthorized and unstarted |
 
 2K-09 result: the README now clarifies that the MIT License covers code usage rights such as cloning, reviewing, learning from, running local deterministic checks, and forking under the license terms. It also states that the license does not grant operational authorization for SSH, live device access, NETCONF, RESTCONF, API/model/provider calls, secrets access, config backup/change, or autonomous execution.
 
