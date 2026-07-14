@@ -258,6 +258,13 @@ export function DayResultsClient({ results }: { results: DayResult[] }) {
 
   return (
     <div className="network-grid">
+      <section className="network-panel network-panel-wide">
+        <div className="status-strip" role="note">
+          <strong>Stage 0 safe Demo · report-only · provider-unavailable.</strong>
+          AI Analyze is excluded from this Demo; review evidence only and do not submit
+          analysis.
+        </div>
+      </section>
       <section className="network-panel">
         <div className="network-toolbar">
           <h2>Imported Evidence</h2>

@@ -141,6 +141,13 @@ export function AiActionsClient({ actions }: { actions: AvailableAction[] }) {
 
   return (
     <div className="network-grid">
+      <section className="network-panel network-panel-wide">
+        <div className="status-strip" role="note">
+          <strong>Stage 0 safe Demo · demo-only · provider-unavailable.</strong>
+          Parse and Create Job are excluded from this Demo; do not submit requests or create
+          jobs.
+        </div>
+      </section>
       <section className="network-panel">
         <div className="network-toolbar">
           <h2>Network Request Parser</h2>

@@ -15,6 +15,7 @@ export function NetworkNav() {
 
   return (
     <nav className="network-nav" aria-label="Network automation sections">
+      <span className="eyebrow">Secondary Stage 0 surface · report-only / demo-only</span>
       {links.map((link) => (
         <Link aria-current={pathname === link.href ? "page" : undefined} href={link.href} key={link.href}>
           {link.label}
