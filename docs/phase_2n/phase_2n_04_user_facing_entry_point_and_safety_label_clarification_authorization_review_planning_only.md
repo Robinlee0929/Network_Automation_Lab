@@ -15,9 +15,14 @@ implementation remains `AUTHORIZED / NOT_STARTED`; Phase 2N remains
 `IN_PROGRESS`, user-facing acceptance remains `NOT_READY`, Phase 2N-05 remains
 `NOT_STARTED`, and final Phase 2N closure remains `NOT_AUTHORIZED`.
 
+Authorization-review documentation commit
+`305f717a00b11b8b4231304a68d722b98d91e9f9` is `DONE / MERGED_TO_MAIN`; it was
+integrated by fast-forward only and synchronized to trusted remote main. This
+integration does not start the authorized implementation.
+
 ```text
 AUTHORIZATION_DECISION: AUTHORIZED
-AUTHORIZATION_REVIEW_STATUS: DONE / READY_FOR_REVIEW
+AUTHORIZATION_REVIEW_STATUS: DONE / MERGED_TO_MAIN
 PHASE_2N_04_IMPLEMENTATION_STATUS: AUTHORIZED / NOT_STARTED
 OVERALL_PHASE_2N_STATUS: IN_PROGRESS
 USER_FACING_ACCEPTANCE_READINESS: NOT_READY
@@ -269,10 +274,9 @@ LIVE_DEVICE_BOUNDARY: UNCHANGED
 
 ## Next legal action
 
-The next legal action, after review and integration of this planning decision,
-is one separately requested Phase 2N-04 implementation task constrained by this
-record. This review does not start that implementation and does not authorize
-merge, push, Phase 2N-05, or final closure.
+The next legal action is one separate fresh-task Phase 2N-04 bounded
+implementation constrained by this record. This integration does not start that
+implementation and does not authorize Phase 2N-05 or final closure.
 
 ## Documentation readability review
 
