@@ -2,7 +2,7 @@
 
 ## Conclusion and decision
 
-Phase 2N-02 is `DONE / READY_FOR_REVIEW` with acceptance decision `PASS_WITH_NOTES`.
+Phase 2N-02 is `DONE / MERGED_TO_MAIN` with acceptance decision `PASS_WITH_NOTES`.
 The canonical Flask entry point was started as an actual local process on fixed endpoint
 `127.0.0.1:5000` with the same Python interpreter that ran pytest. The bounded GET-only
 reviewer flow passed, synthetic safe report details and negative states passed, the exact
@@ -18,6 +18,11 @@ interpreter.
 
 User-facing acceptance remains `NOT_READY`, overall Phase 2N remains `IN_PROGRESS`, and
 final Phase 2N acceptance or closure is not authorized.
+
+The source commit `5832a2452ca5541ceb94c642256e4f873b84d795`, with direct parent
+`83ff84d3a972ce8bdc787e044518126f13ca8d65`, was pushed normally on the source
+branch, integrated into `main` by fast-forward only, and pushed normally to the trusted
+remote. No merge commit, squash, rebase, cherry-pick, conflict, or force push occurred.
 
 ## Authority and scope
 
@@ -141,6 +146,28 @@ while the synthetic expectations were aligned to existing report discovery and m
 wording. Every failed iteration still proved server cleanup and port closure. The final
 targeted run above and the subsequent full suite are the acceptance evidence.
 
+## Post-integration evidence
+
+The integration task independently verified the source branch and commit, its exact three-file
+scope, its one-commit direct ancestry from the expected `main`, and trusted remote state. The
+source branch was pushed with a normal non-force push. Local `main`, tracking `origin/main`,
+and trusted remote `main` were all rechecked at the expected parent before integration. The
+source commit was then integrated with `git merge --ff-only` and pushed normally to `main`.
+
+Post-integration validation on local `main` recorded:
+
+| Validation | Result |
+| --- | --- |
+| Phase 2N-02 targeted test | Exit 0; 2 passed in 2.14s; PID 8684; all five GET routes returned 200; exact process, child, and port cleanup passed |
+| Full pytest | Exit 0; 1,868 passed, 1 existing `GetPassWarning`, in 76.93s |
+| Report index | Exit 0; PASS; total 14, pass 14, fail 0, warn 0, missing 0, unknown 0 |
+| Whitespace and tracked state | `git diff --check` passed; no tracked report or other tracked file changed |
+
+The literal `python` alias remains unavailable in the tested environment. The automated
+baseline and integration validation used the explicit existing Python 3.13 interpreter at
+`C:\Users\Robin\AppData\Local\Programs\Python\Python313\python.exe`; no dependency or
+environment repair was attempted.
+
 ## Reproducibility and limitations
 
 `CLEAN_CLONE_REPRODUCIBILITY: TEST_LOGIC_HERMETIC_WITH_EXISTING_DEPENDENCIES`. The test
@@ -165,12 +192,14 @@ execution behavior.
 ## Final status
 
 - `PHASE_2N_02_ACCEPTANCE_DECISION: PASS_WITH_NOTES`
-- `PHASE_2N_02_STATUS: DONE / READY_FOR_REVIEW`
+- `PHASE_2N_02_STATUS: DONE / MERGED_TO_MAIN`
 - `USER_FACING_ACCEPTANCE_READINESS: NOT_READY`
 - `OVERALL_PHASE_2N_STATUS: IN_PROGRESS`
 - `PHASE_2N_FINAL_CLOSURE_AUTHORIZED: NO`
-- Push, merge, pull request, and branch cleanup: not authorized and not performed
+- Source push and fast-forward-only main integration: completed with normal non-force pushes
+- Merge commit, squash, rebase, cherry-pick, conflict, force push, and pull request: none
+- Phase 2N-04 and Phase 2N-05: unstarted and unauthorized
 
-The next recommended candidate is `Phase 2N-02 Merge, Push, Synchronization, Cleanup, and
-Post-merge Status Reconciliation`, with status
-`CANDIDATE / NOT_AUTHORIZED / NOT_STARTED`.
+A separate user-authorized continuation decision is required before any next Phase 2N task.
+No Phase 2N-04, Phase 2N-05, final acceptance, or final closure is selected or authorized by
+this reconciliation.
