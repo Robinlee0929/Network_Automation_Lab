@@ -1,8 +1,8 @@
 # Phase 2N-03C — Navigation, Empty-state and Error-state Acceptance Review
 
-Status: DONE / READY_FOR_REVIEW
+Status: DONE / MERGED_TO_MAIN
 
-Decision summary: Phase 2N-03C accepts the bounded Phase 2N-03 navigation, available-data, empty-state, and error-state objective with `PASS_WITH_NOTES`. The visible `Reports` navigation resolves to `/network/reports`; the Reports collection and `/network/day-results` return HTTP 200; the collection presents only normalized reviewer metadata; zero reports render a clear HTTP-200 empty state; and expected absence remains distinct from unexpected importer or programming failures. Root reports remain ignored, clean-clone report-data reproducibility remains `NOT_VERIFIED`, and empty-state verification remains synthetic and non-destructive. User-facing acceptance remains `NOT_READY`, overall Phase 2N remains `IN_PROGRESS`, and final Phase 2N closure is not authorized.
+Decision summary: Phase 2N-03C accepts the bounded Phase 2N-03 navigation, available-data, empty-state, and error-state objective with `PASS_WITH_NOTES` and is now `DONE / MERGED_TO_MAIN`. Source commit `d7c5555dfd967075ed0c344876338bdad053d28f` was pushed normally, integrated by fast-forward only, and pushed normally on `main`; no merge commit, squash, rebase, cherry-pick, conflict, or force push occurred. The visible `Reports` navigation resolves to `/network/reports`; the Reports collection and `/network/day-results` return HTTP 200; the collection presents only normalized reviewer metadata; zero reports render a clear HTTP-200 empty state without a collection-level 404; and expected absence remains distinct from unexpected importer or programming failures. Root reports remain ignored, clean-clone report-data reproducibility remains `NOT_VERIFIED`, and empty-state verification remains synthetic and non-destructive. Parent Phase 2N-03 is `ACCEPTED / MERGED_TO_MAIN`; user-facing acceptance remains `NOT_READY`, overall Phase 2N remains `IN_PROGRESS`, and final Phase 2N closure is not authorized.
 
 ## A. Authority and prerequisite bootstrap
 
@@ -20,7 +20,7 @@ The first sandboxed checkpoint process could not start because the environment d
 
 Authorized work was limited to repository and trusted-remote preflight, one review branch, read-only evidence inspection, validation with existing dependencies, bounded localhost validation, this acceptance record, directly relevant README status, and one local documentation commit.
 
-No product source, component, navigation implementation, test, Python source, `.gitignore`, dependency, lockfile, configuration, workflow, report data, or prior Phase 2N record was changed. No package was installed or updated. Push, merge, pull-request creation, cleanup, post-merge reconciliation, commit amendment, later Phase work, and final Phase 2N closure remained unauthorized.
+No product source, component, navigation implementation, test, Python source, `.gitignore`, dependency, lockfile, configuration, workflow, report data, or prior Phase 2N record was changed. No package was installed or updated. Push, merge, pull-request creation, cleanup, post-merge reconciliation, commit amendment, later Phase work, and final Phase 2N closure remained unauthorized during the original acceptance-review task. The separately authorized integration and reconciliation are recorded in Section K and do not alter that historical boundary.
 
 ## C. Verified starting state
 
@@ -145,16 +145,16 @@ TEMPORARY_LISTENING_PORT_CLOSED: YES
 
 ```text
 PHASE_2N_03C_ACCEPTANCE_DECISION: PASS_WITH_NOTES
-PHASE_2N_03C_STATUS: DONE / READY_FOR_REVIEW
+PHASE_2N_03C_STATUS: DONE / MERGED_TO_MAIN
 PARENT_PHASE_2N_03_ACCEPTANCE: PASS_WITH_NOTES
-PARENT_PHASE_2N_03_STATUS: ACCEPTED / READY_FOR_REVIEW
+PARENT_PHASE_2N_03_STATUS: ACCEPTED / MERGED_TO_MAIN
 USER_FACING_ACCEPTANCE_READINESS: NOT_READY
 OVERALL_PHASE_2N_STATUS: IN_PROGRESS
 PHASE_2N_FINAL_CLOSURE_AUTHORIZED: NO
 CLEAN_CLONE_REPORT_DATA_REPRODUCIBILITY: NOT_VERIFIED
 ```
 
-Notes are limited to the preserved ignored-report boundary, clean-clone report-data reproducibility remaining unverified, synthetic/non-destructive empty-state evidence, and the unavailable fresh pytest runtime. These notes do not weaken the accepted navigation, empty-state, error-state, or safety contracts.
+Notes are limited to the preserved ignored-report boundary, clean-clone report-data reproducibility remaining unverified, and synthetic/non-destructive empty-state evidence. Post-merge full pytest and report-index validation passed. These notes do not weaken the accepted navigation, empty-state, error-state, or safety contracts.
 
 ## J. Documentation readability review
 
@@ -169,4 +169,41 @@ LONG_PARAGRAPHS_SPLIT: PASS
 TERMINOLOGY_CONSISTENT_WITH_CURRENT_PHASE_RECORDS: PASS
 REAL_REPORT_CONTENT_OR_IDENTIFIER_EXPOSED: NO
 FINAL_READABILITY_RESULT: PASS
+```
+
+## K. Integration and post-merge reconciliation
+
+Conclusion: the accepted Phase 2N-03C source commit is integrated and verified on trusted remote `main`; reconciliation changes only this document and `README.md`. The acceptance decision remains `PASS_WITH_NOTES`, while user-facing acceptance remains `NOT_READY` and overall Phase 2N remains `IN_PROGRESS`.
+
+| Integration evidence | Verified result |
+| --- | --- |
+| Source commit | `d7c5555dfd967075ed0c344876338bdad053d28f` |
+| Source parent | `afad784dc883b1f40b78cb7d55b4fdc7adc49ec6` |
+| Source tree | `96cb75bdbc397ad0bd33aa3b4d39086b3b30f4ab` |
+| Source branch push | Normal non-force push; trusted remote source branch matched the source commit |
+| Integration method | Fast-forward only from the verified parent to the source commit |
+| Merge commit / squash / rebase / cherry-pick / conflict | None |
+| Implementation `main` push | Normal non-force push; trusted remote `main` matched the source commit before reconciliation |
+| Committed-range validation | PASS; only `README.md` and this Phase 2N-03C record entered `main`; `git diff --check` passed |
+| Full pytest | PASS; 1,866 tests passed with one existing terminal warning |
+| Report index | PASS; 14/14 reports passed, with zero failures, warnings, or missing reports |
+| Product source, tests, Python, dependencies, lockfiles, configuration, workflows, reports | Unchanged |
+| Reconciliation scope | Exactly `README.md` and this Phase 2N-03C record |
+
+```text
+PHASE_2N_03C_ACCEPTANCE_DECISION: PASS_WITH_NOTES
+PHASE_2N_03C_STATUS: DONE / MERGED_TO_MAIN
+PARENT_PHASE_2N_03_ACCEPTANCE: PASS_WITH_NOTES
+PARENT_PHASE_2N_03_STATUS: ACCEPTED / MERGED_TO_MAIN
+NETWORK_REPORTS_NAVIGATION_ACCEPTANCE: PASS
+AVAILABLE_DATA_ACCEPTANCE: PASS
+EMPTY_STATE_ACCEPTANCE: PASS
+COLLECTION_LEVEL_404_PREVENTION: PASS
+ERROR_STATE_ACCEPTANCE: PASS
+CLEAN_CLONE_REPORT_DATA_REPRODUCIBILITY: NOT_VERIFIED
+USER_FACING_ACCEPTANCE_READINESS: NOT_READY
+OVERALL_PHASE_2N_STATUS: IN_PROGRESS
+PHASE_2N_FINAL_CLOSURE_AUTHORIZED: NO
+LATER_PHASE_STARTED: NO
+NEXT_RECOMMENDED_CANDIDATE: SEPARATE_CONTINUATION_PLANNING_DECISION_REQUIRED
 ```
