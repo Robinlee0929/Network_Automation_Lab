@@ -1,15 +1,22 @@
 # Phase 2N-04 — User-facing Entry-point and Safety-label Clarification Implementation
 
-Status: DONE / READY_FOR_REVIEW
+Status: DONE / FIX_APPLIED / READY_FOR_REPEAT_REVIEW
 
 ## Conclusion
 
-The bounded Phase 2N-04 implementation is complete on its dedicated local
-source branch and is ready for a separate review or integration decision. The
-Flask dashboard now identifies itself as the canonical reviewer entry point,
-the Next.js app identifies itself as a secondary Stage 0 surface, provider-
-backed controls are visibly excluded from the safe Demo, and the Flask
-`/commands` page states that the Phase 2N Demo is display-only.
+The bounded Phase 2N-04 implementation and its review-authorized presentation
+fix are complete on the dedicated local source branch. The first independent
+implementation review returned `FAIL / FIX_REQUIRED`: `/commands` still looked
+executable despite its display-only notice, and the Evidence / AI Actions
+surfaces still showed active-looking provider and job controls despite their
+provider-unavailable labels.
+
+The bounded fix removes those controls from the rendered Stage 0 Demo surfaces
+without deleting or modifying their backend routes. `/commands` is now a
+static allowlist and historical-record reference with no Run control or POST
+form. Evidence has no AI Analyze control. AI Actions has no Parse, Create Job,
+request-input, or other submission control. The branch is ready only for a
+separate repeat implementation review; the earlier review is not marked PASS.
 
 The change is presentation-only. Existing routes, href destinations, handlers,
 POST paths, provider/API/model behavior, job creation, command submission,
@@ -23,6 +30,8 @@ remains `NOT_AUTHORIZED`.
 - Task mode: `IMPLEMENTATION_ONLY`.
 - Task subtype:
   `PHASE_2N_04_BOUNDED_USER_FACING_ENTRY_POINT_AND_SAFETY_LABEL_CLARIFICATION_ONLY`.
+- Fix task subtype:
+  `PHASE_2N_04_BOUNDED_DISPLAY_ONLY_AND_PROVIDER_UNAVAILABLE_PRESENTATION_FIX_ONLY`.
 - Starting baseline: clean `main` at
   `aba36e3238cc5904e974b609c7b2014d48c785f0`.
 - Source branch:
@@ -49,52 +58,68 @@ production execution behavior was used or added.
 
 ### Provider-unavailable presentation
 
-- `components/network/DayResultsClient.tsx` labels Evidence as report-only and
-  states that provider-backed AI Analyze is unavailable and excluded from the
-  Stage 0 safe Demo.
-- `components/network/AiActionsClient.tsx` labels AI Actions as demo-only and
-  states that Parse and Create Job are provider-unavailable and excluded from
-  the Stage 0 safe Demo.
-- Existing controls and their behavior are not enabled, disabled, removed, or
-  otherwise changed by this slice.
+- `components/network/Phase2N04DemoPresentation.ts` provides server-renderable,
+  non-actionable Stage 0 presentation fragments using the existing React
+  dependency and no JSX test transform or new package.
+- `components/network/DayResultsClient.tsx` preserves evidence selection, raw
+  evidence display, and existing stored-analysis GET presentation while no
+  longer rendering the AI Analyze control or its POST-triggering handler.
+- `components/network/AiActionsClient.tsx` preserves the existing action
+  catalog and recorded parse-result GET presentation while no longer rendering
+  request inputs, Parse, Create Job, or their POST-triggering handlers.
+- Provider, analysis, parse, job, and API backend routes remain unchanged.
 
 ### Commands display-only boundary
 
-- `templates/dashboard_commands.html` prominently states that `/commands` is
-  display-only during the Phase 2N Stage 0 Demo and that reviewers must not use
-  a Run button.
+- `templates/dashboard_commands.html` now presents a static command allowlist,
+  inert syntax examples, and clearly historical records. It renders no Run
+  button, POST form, execution-oriented heading, run invitation, or active
+  execution-log wording.
 - `templates/dashboard_home.html` repeats that boundary in the canonical entry
   point and Commands quick-link copy.
 
 ## Tests
 
-- `components/network/Phase2N04SafetyLabels.test.ts` uses Node-only source
-  inspection. It imports no presentation component and therefore invokes no
-  provider, API, job, or execution path.
-- `tests/test_phase_2n_04_user_facing_safety_labels.py` verifies the templates
-  and Flask GET rendering. The GET-only test replaces command execution with a
-  fail-fast sentinel and records zero calls.
+- `components/network/Phase2N04SafetyLabels.test.ts` server-renders the actual
+  non-actionable Stage 0 presentation fragments, rejects action controls in
+  their markup, and verifies that the parent components contain none of the
+  removed provider/job handlers or POST targets.
+- `tests/test_phase_2n_04_user_facing_safety_labels.py` verifies actual Flask
+  GET output rejects forms, buttons, the execution heading, run invitations,
+  and active execution-log wording. A fail-fast command-execution sentinel
+  records zero calls.
+- `tests/test_network_phase1_ui_presentation.py` preserves the related
+  read-only evidence and recorded-result contracts while rejecting the removed
+  submission handlers.
 
 ## Validation evidence
 
 | Validation | Result |
 | --- | --- |
-| Targeted Phase 2N-04 Vitest | PASS — 1 file, 2 tests |
-| Targeted Phase 2N-04 pytest | PASS — 2 tests |
-| `npm.cmd run test:unit` | PASS — 4 files, 61 tests |
+| Targeted Phase 2N-04 Vitest | PASS — 1 file, 3 tests |
+| Targeted Phase 2N-04 and related presentation pytest | PASS — 9 tests |
+| `npm.cmd run test:unit` | PASS — 4 files, 62 tests |
 | `npm.cmd run typecheck` | PASS |
 | `npm.cmd run lint` | PASS — zero warnings |
 | Telemetry-disabled `npm.cmd run build` | PASS — 25/25 pages |
 | Full pytest with the existing Python 3.13.7 environment | PASS — 1,870 tests, 1 existing `GetPassWarning` |
 | `python network_lab.py --task report-index` equivalent with the existing Python 3.13.7 environment | PASS — 14/14, fail 0, warn 0, missing 0 |
-| Next.js GET-only localhost check | PASS — `/`, `/network/day-results`, `/network/ai-actions`, `/network/reports`, and `/network/jobs` returned HTTP 200 and rendered the expected labels |
-| Flask GET-only localhost check | PASS — `/` and `/commands` returned HTTP 200 and rendered the expected labels |
+| Next.js GET-only localhost check | PASS — affected pages returned HTTP 200; provider-unavailable/read-only text rendered; AI Analyze, Parse, Create Job, textarea, and action-button markers were absent |
+| Flask GET-only localhost check | PASS — `/` and `/commands` returned HTTP 200; display-only/demo-only text rendered; form, button, execution heading, run invitation, and active execution-log heading were absent |
 | Temporary server cleanup | PASS — exact temporary listeners stopped; ports 3000 and 5000 closed |
 
-The literal `python` alias was unavailable in this environment. The existing
-repository-capable Python 3.13.7 interpreter was used without installing,
-updating, or repairing any dependency. No private interpreter path is recorded
-in this repository document.
+The generic `python` command and the explicitly available Python 3.13.7
+interpreter both reported Python 3.13.7. The explicit interpreter ran pytest
+and report-index without installing, updating, or repairing any dependency. No
+private interpreter path is recorded in this repository document.
+
+The first targeted Vitest attempt failed before collecting tests because the
+existing Node-only configuration preserves JSX and cannot directly import the
+affected `.tsx` parents. The zero-dependency presentation fragment resolved
+that constraint; the final targeted and complete Vitest runs passed. The first
+full pytest run found two directly related historical source-text assertions.
+They were updated to the new non-actionable presentation contract, targeted
+pytest passed, and the final full run passed all 1,870 tests.
 
 ## Scope and safety audit
 
@@ -106,6 +131,11 @@ PROVIDER_UNAVAILABLE_PRESENTATION_CLARIFIED: YES
 REPORT_ONLY_LABEL_CLARIFIED: YES
 DEMO_ONLY_LABEL_CLARIFIED: YES
 COMMANDS_DISPLAY_ONLY_CLARIFIED: YES
+RUN_CONTROLS_RENDERED: NO
+COMMAND_POST_FORMS_RENDERED: NO
+AI_ANALYZE_CONTROL_RENDERED: NO
+PARSE_CONTROL_RENDERED: NO
+CREATE_JOB_CONTROL_RENDERED: NO
 ROUTES_OR_HREF_DESTINATIONS_CHANGED: NO
 PROVIDER_OR_API_BEHAVIOR_CHANGED: NO
 POST_OR_MUTATING_PATH_CHANGED: NO
@@ -134,6 +164,6 @@ FINAL_READABILITY_RESULT: PASS
 
 ## Next legal action
 
-The only next legal action is a separate Phase 2N-04 implementation review or
-integration decision task. This record does not authorize Phase 2N-05 or final
-Phase 2N closure.
+The only next legal action is a separate fresh Phase 2N-04 bounded fix
+implementation review-only task. This record does not authorize merge, push,
+Phase 2N-05, or final Phase 2N closure.

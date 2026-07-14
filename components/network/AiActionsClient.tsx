@@ -1,41 +1,20 @@
 "use client";
 
-import { BrainCircuit, ClipboardCheck, Play } from "lucide-react";
-import Link from "next/link";
 import { useEffect, useState } from "react";
-import type { AvailableAction, NetworkJob, ParseResultRecord } from "@/lib/network-ai/schemas";
+import type { AvailableAction, ParseResultRecord } from "@/lib/network-ai/schemas";
+import { AiActionsStage0Presentation } from "./Phase2N04DemoPresentation";
 
 type ParseResponse = {
   parseResult: ParseResultRecord | null;
 };
 
 export function AiActionsClient({ actions }: { actions: AvailableAction[] }) {
-  const [userRequest, setUserRequest] = useState("");
-  const [inventoryText, setInventoryText] = useState("");
   const [parseResult, setParseResult] = useState<ParseResultRecord | null>(null);
-  const [createdJob, setCreatedJob] = useState<NetworkJob | null>(null);
   const [error, setError] = useState("");
-  const [isParsing, setIsParsing] = useState(false);
-  const [isCreating, setIsCreating] = useState(false);
   const [isLoadingLatest, setIsLoadingLatest] = useState(false);
 
   const output = parseResult?.output ?? null;
   const recommendedAction = actions.find((action) => action.id === output?.recommendedActionId) ?? null;
-  const canCreateJob = Boolean(output?.jobCreationAllowed && output.recommendedActionId);
-  const disabledReason =
-    output && !output.jobCreationAllowed
-      ? output.blockedReason ??
-        (output.missingFields.length
-          ? `Missing: ${output.missingFields.join(", ")}`
-          : "Job creation is not allowed for this parsed request.")
-      : "";
-
-  function parseOptionalJson(text: string) {
-    if (!text.trim()) {
-      return undefined;
-    }
-    return JSON.parse(text);
-  }
 
   useEffect(() => {
     let ignore = false;
@@ -51,12 +30,6 @@ export function AiActionsClient({ actions }: { actions: AvailableAction[] }) {
         }
         if (!ignore && payload.parseResult) {
           setParseResult(payload.parseResult);
-          setUserRequest(payload.parseResult.userRequest);
-          setInventoryText(
-            payload.parseResult.deviceInventorySnapshot
-              ? JSON.stringify(payload.parseResult.deviceInventorySnapshot, null, 2)
-              : ""
-          );
         }
       } catch (caught) {
         if (!ignore) {
@@ -76,114 +49,18 @@ export function AiActionsClient({ actions }: { actions: AvailableAction[] }) {
     };
   }, []);
 
-  async function parseRequest() {
-    setIsParsing(true);
-    setError("");
-    setCreatedJob(null);
-    try {
-      const response = await fetch("/api/network/ai/parse-request", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          userRequest,
-          deviceInventory: parseOptionalJson(inventoryText),
-          availableActions: actions
-        })
-      });
-      const payload = await response.json();
-      if (!response.ok) {
-        throw new Error(payload.error ?? "Parse request failed.");
-      }
-      setParseResult(payload.parseResult);
-    } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "Parse request failed.");
-    } finally {
-      setIsParsing(false);
-    }
-  }
-
-  async function createJob() {
-    if (!output?.recommendedActionId || !output.targetDevice) {
-      return;
-    }
-
-    setIsCreating(true);
-    setError("");
-    try {
-      const response = await fetch("/api/network/jobs/create", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          actionId: output.recommendedActionId,
-          targetDevice: output.targetDevice,
-          vendor: output.vendor,
-          deviceInventory: parseOptionalJson(inventoryText),
-          params: {
-            source: "ai-actions",
-            parseResultId: parseResult?.id,
-            intent: output.intent,
-            interfaceName: output.interfaceName,
-            vlanId: output.vlanId
-          }
-        })
-      });
-      const payload = await response.json();
-      if (!response.ok) {
-        throw new Error(payload.error ?? "Create job failed.");
-      }
-      setCreatedJob(payload.job);
-    } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "Create job failed.");
-    } finally {
-      setIsCreating(false);
-    }
-  }
-
   return (
     <div className="network-grid">
-      <section className="network-panel network-panel-wide">
-        <div className="status-strip" role="note">
-          <strong>Stage 0 safe Demo · demo-only · provider-unavailable.</strong>
-          Parse and Create Job are excluded from this Demo; do not submit requests or create
-          jobs.
-        </div>
-      </section>
+      <AiActionsStage0Presentation />
       <section className="network-panel">
-        <div className="network-toolbar">
-          <h2>Network Request Parser</h2>
-          <button className="icon-action-button" disabled={isParsing || !userRequest.trim()} onClick={parseRequest} type="button">
-            <BrainCircuit aria-hidden="true" size={18} />
-            <span>{isParsing ? "Parsing" : "Parse"}</span>
-          </button>
-        </div>
-        <label className="network-field">
-          <span>User request</span>
-          <textarea
-            onChange={(event) => setUserRequest(event.target.value)}
-            placeholder="例如：幫我檢查 core-switch Gi0/1 的介面狀態"
-            value={userRequest}
-          />
-        </label>
-        <label className="network-field">
-          <span>Device inventory JSON</span>
-          <textarea
-            className="compact-textarea"
-            onChange={(event) => setInventoryText(event.target.value)}
-            placeholder='{"devices":[{"name":"core-switch","vendor":"cisco"}]}'
-            value={inventoryText}
-          />
-        </label>
         {error && <div className="error-box">{error}</div>}
         {isLoadingLatest && <div className="status-strip">Loading latest parse result...</div>}
       </section>
 
       <section className="network-panel">
         <div className="network-toolbar">
-          <h2>Recommendation</h2>
-          <button className="icon-action-button" disabled={!canCreateJob || isCreating} onClick={createJob} type="button">
-            <Play aria-hidden="true" size={18} />
-            <span>{isCreating ? "Creating" : "Create Job"}</span>
-          </button>
+          <h2>Recorded Recommendation</h2>
+          <span>Read-only</span>
         </div>
         <dl className="detail-grid">
           <div>
@@ -207,7 +84,7 @@ export function AiActionsClient({ actions }: { actions: AvailableAction[] }) {
             <dd>{output?.vendor ?? "unknown"}</dd>
           </div>
           <div>
-            <dt>Job Allowed</dt>
+            <dt>Recorded Job Eligibility</dt>
             <dd>{output?.jobCreationAllowed ? "yes" : "no"}</dd>
           </div>
           <div>
@@ -227,28 +104,20 @@ export function AiActionsClient({ actions }: { actions: AvailableAction[] }) {
             <dd>{parseResult?.createdAt ?? "none"}</dd>
           </div>
         </dl>
-        {disabledReason && <div className="status-strip">{disabledReason}</div>}
         {output?.missingFields.length ? (
           <div className="status-strip">Missing: {output.missingFields.join(", ")}</div>
         ) : null}
-        {createdJob && (
-          <div className="status-strip">
-            <ClipboardCheck aria-hidden="true" size={18} />
-            Job {createdJob.id} is {createdJob.status}.{" "}
-            <Link href="/network/jobs">View Jobs</Link>
-          </div>
-        )}
         <pre className="network-pre">
           {parseResult
             ? JSON.stringify(parseResult.output, null, 2)
-            : "Parse output JSON will appear here."}
+            : "No recorded parse result is available."}
         </pre>
       </section>
 
       <section className="network-panel network-panel-wide">
         <div className="network-toolbar">
-          <h2>Available Actions</h2>
-          <span>{actions.length} allowlisted</span>
+          <h2>Allowlist Reference</h2>
+          <span>{actions.length} static entries</span>
         </div>
         <div className="action-grid">
           {actions.map((action) => (

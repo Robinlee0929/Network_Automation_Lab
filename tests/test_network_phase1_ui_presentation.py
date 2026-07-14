@@ -72,7 +72,7 @@ def test_selected_evidence_uses_user_facing_fields_and_boundary_labels():
         "Read-only candidate",
         "Approval required",
         "Blocked",
-        "AI Analysis Record",
+        "Historical Analysis Record",
         "Raw Evidence JSON",
     ]:
         assert label in source
@@ -104,19 +104,22 @@ def test_primary_button_contrast_and_icon_current_color_are_locked():
     assert "text-gray-500" not in components
 
 
-def test_ai_actions_reloads_latest_parse_result_and_displays_record_metadata():
+def test_ai_actions_reloads_latest_parse_result_without_submission_controls():
     source = read("components/network/AiActionsClient.tsx")
 
     assert 'fetch("/api/network/ai/parse-request/latest")' in source
-    assert "setUserRequest(payload.parseResult.userRequest)" in source
-    assert "setInventoryText(" in source
+    assert "setParseResult(payload.parseResult)" in source
     assert "<dt>Parse Result</dt>" in source
     assert "<dt>Created</dt>" in source
     assert "parseResult?.id" in source
     assert "parseResult?.createdAt" in source
-    assert 'source: "ai-actions"' in source
-    assert "parseResultId: parseResult?.id" in source
-    assert "vendor: output.vendor" in source
+    assert "<AiActionsStage0Presentation />" in source
+    assert "setUserRequest(" not in source
+    assert "setInventoryText(" not in source
+    assert 'fetch("/api/network/ai/parse-request"' not in source
+    assert "/api/network/jobs/create" not in source
+    assert "parseRequest" not in source
+    assert "createJob" not in source
 
 
 def test_jobs_client_reloads_jobs_and_does_not_offer_phase1_run_behavior():

@@ -1,6 +1,13 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
+
+import {
+  AiActionsStage0Presentation,
+  EvidenceStage0Presentation
+} from "./Phase2N04DemoPresentation";
 
 function source(relativePath: string) {
   return readFileSync(path.join(process.cwd(), relativePath), "utf8");
@@ -26,13 +33,50 @@ describe("Phase 2N-04 user-facing safety labels", () => {
     }
   });
 
-  it("labels provider-backed controls without importing or invoking their components", () => {
+  it("renders provider-unavailable surfaces without provider or job controls", () => {
+    const evidenceMarkup = renderToStaticMarkup(
+      createElement(EvidenceStage0Presentation)
+    );
+    const actionsMarkup = renderToStaticMarkup(
+      createElement(AiActionsStage0Presentation)
+    );
+
+    expect(evidenceMarkup).toContain(
+      "Stage 0 safe Demo · report-only · provider-unavailable"
+    );
+    expect(evidenceMarkup).toContain("Provider analysis controls are not rendered");
+    expect(evidenceMarkup).not.toContain("AI Analyze");
+    expect(evidenceMarkup).not.toContain("icon-action-button");
+
+    expect(actionsMarkup).toContain(
+      "Stage 0 safe Demo · demo-only · provider-unavailable"
+    );
+    expect(actionsMarkup).toContain("Provider parsing and job-creation controls are not rendered");
+    expect(actionsMarkup).toContain("Recorded Request Context");
+    expect(actionsMarkup).toContain("No provider request can be submitted from this page");
+    expect(actionsMarkup).not.toContain("<button");
+    expect(actionsMarkup).not.toContain("<textarea");
+    expect(actionsMarkup).not.toContain(">Parse<");
+    expect(actionsMarkup).not.toContain("Create Job");
+  });
+
+  it("removes the legacy provider and job action paths from the rendered Demo parents", () => {
     const evidence = source("components/network/DayResultsClient.tsx");
     const aiActions = source("components/network/AiActionsClient.tsx");
 
-    expect(evidence).toContain("Stage 0 safe Demo · report-only · provider-unavailable");
-    expect(evidence).toContain("AI Analyze is excluded from this Demo");
-    expect(aiActions).toContain("Stage 0 safe Demo · demo-only · provider-unavailable");
-    expect(aiActions).toContain("Parse and Create Job are excluded from this Demo");
+    expect(evidence).toContain("<EvidenceStage0Presentation />");
+    expect(evidence).toContain("Read-only evidence");
+    expect(evidence).not.toContain("analyzeSelected");
+    expect(evidence).not.toContain("/api/network/ai/analyze-report");
+    expect(evidence).not.toContain("icon-action-button");
+
+    expect(aiActions).toContain("<AiActionsStage0Presentation />");
+    expect(aiActions).toContain("Allowlist Reference");
+    expect(aiActions).not.toContain("parseRequest");
+    expect(aiActions).not.toContain("createJob");
+    expect(aiActions).not.toContain('fetch("/api/network/ai/parse-request"');
+    expect(aiActions).not.toContain("/api/network/jobs/create");
+    expect(aiActions).not.toContain("icon-action-button");
+    expect(aiActions).not.toContain("<textarea");
   });
 });

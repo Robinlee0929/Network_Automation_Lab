@@ -1,8 +1,9 @@
 "use client";
 
-import { BrainCircuit, FileJson } from "lucide-react";
+import { FileJson } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import type { AnalysisRecord, DayResult, DayResultKind } from "@/lib/network-ai/schemas";
+import { EvidenceStage0Presentation } from "./Phase2N04DemoPresentation";
 
 type ExecutionBoundary = "report_only" | "read_only_action_candidate" | "approval_required" | "blocked";
 
@@ -156,7 +157,6 @@ export function DayResultsClient({ results }: { results: DayResult[] }) {
   const [selectedId, setSelectedId] = useState(sortedResults[0]?.id ?? "");
   const [analysis, setAnalysis] = useState<AnalysisRecord | null>(null);
   const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const [isLoadingLatest, setIsLoadingLatest] = useState(false);
 
   const selected = useMemo(
@@ -219,52 +219,9 @@ export function DayResultsClient({ results }: { results: DayResult[] }) {
     };
   }, [selected?.id]);
 
-  async function analyzeSelected() {
-    if (!selected) {
-      return;
-    }
-
-    setIsLoading(true);
-    setError("");
-    try {
-      const response = await fetch("/api/network/ai/analyze-report", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          reportId: selected.id,
-          reportText: selected.rawOutput,
-          deviceContext: {
-            sourceDay: selected.sourceDay,
-            dayLabel: selected.dayLabel,
-            resultKind: selected.resultKind,
-            deviceName: selected.deviceName,
-            vendor: selected.vendor,
-            checkType: selected.checkType,
-            status: selected.status
-          }
-        })
-      });
-      const payload = await response.json();
-      if (!response.ok) {
-        throw new Error(payload.error ?? "Analyze report failed.");
-      }
-      setAnalysis(payload.analysis);
-    } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "Analyze report failed.");
-    } finally {
-      setIsLoading(false);
-    }
-  }
-
   return (
     <div className="network-grid">
-      <section className="network-panel network-panel-wide">
-        <div className="status-strip" role="note">
-          <strong>Stage 0 safe Demo · report-only · provider-unavailable.</strong>
-          AI Analyze is excluded from this Demo; review evidence only and do not submit
-          analysis.
-        </div>
-      </section>
+      <EvidenceStage0Presentation />
       <section className="network-panel">
         <div className="network-toolbar">
           <h2>Imported Evidence</h2>
@@ -311,10 +268,7 @@ export function DayResultsClient({ results }: { results: DayResult[] }) {
       <section className="network-panel">
         <div className="network-toolbar">
           <h2>Selected Evidence</h2>
-          <button className="icon-action-button" disabled={!selected || isLoading} onClick={analyzeSelected} type="button">
-            <BrainCircuit aria-hidden="true" size={18} />
-            <span>{isLoading ? "Analyzing" : analysis ? "Re-analyze" : "AI Analyze"}</span>
-          </button>
+          <span>Read-only evidence</span>
         </div>
         {selected ? (
           <>
@@ -369,7 +323,7 @@ export function DayResultsClient({ results }: { results: DayResult[] }) {
 
       <section className="network-panel network-panel-wide">
         <div className="network-toolbar">
-          <h2>AI Analysis Record</h2>
+          <h2>Historical Analysis Record</h2>
           <span>{analysis?.output.riskLevel ?? (isLoadingLatest ? "loading" : "waiting")}</span>
         </div>
         {analysis ? (

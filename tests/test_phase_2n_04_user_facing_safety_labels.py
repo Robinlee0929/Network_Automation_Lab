@@ -8,17 +8,12 @@ import dashboard_app as dashboard
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def test_phase_2n_04_templates_state_the_static_demo_boundaries():
+def test_phase_2n_04_home_template_states_the_static_demo_boundaries():
     home = (ROOT / "templates" / "dashboard_home.html").read_text(encoding="utf-8")
-    commands = (ROOT / "templates" / "dashboard_commands.html").read_text(
-        encoding="utf-8"
-    )
 
     assert "Canonical reviewer entry point · Stage 0 Demo" in home
     assert "report-only / demo-only" in home
     assert "display-only during the Phase 2N Demo" in home
-    assert "Phase 2N Stage 0 Demo · display-only" in commands
-    assert "Do not submit a command or use a Run button during the Demo" in commands
 
 
 def test_phase_2n_04_flask_labels_render_through_get_without_command_execution(
@@ -51,5 +46,18 @@ def test_phase_2n_04_flask_labels_render_through_get_without_command_execution(
     assert b"display-only during the Phase 2N Demo" in home_response.data
     assert b"Phase 2N Stage 0 Demo" in commands_response.data
     assert b"display-only" in commands_response.data
-    assert b"Do not submit a command" in commands_response.data
+    assert b"demo-only" in commands_response.data
+
+    commands_html = commands_response.get_data(as_text=True)
+    assert "Command Allowlist Reference" in commands_html
+    assert "No command can be submitted or executed from this page" in commands_html
+    assert "Registered Command Examples" in commands_html
+    assert "Historical Demonstration Records" in commands_html
+    assert "Static Command Examples" in commands_html
+    assert "Safe Command Execution" not in commands_html
+    assert "Run a limited allowlist" not in commands_html
+    assert "Recent Execution Logs" not in commands_html
+    assert "before running commands" not in commands_html
+    assert "<form" not in commands_html
+    assert "<button" not in commands_html
     assert command_execution_calls == 0
