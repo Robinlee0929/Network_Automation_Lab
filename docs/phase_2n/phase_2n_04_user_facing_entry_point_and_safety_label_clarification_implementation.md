@@ -1,22 +1,31 @@
 # Phase 2N-04 — User-facing Entry-point and Safety-label Clarification Implementation
 
-Status: DONE / FIX_APPLIED / READY_FOR_REPEAT_REVIEW
+Status: DONE / REVIEWED / MERGED
 
 ## Conclusion
 
-The bounded Phase 2N-04 implementation and its review-authorized presentation
-fix are complete on the dedicated local source branch. The first independent
+The bounded Phase 2N-04 implementation, its review-authorized presentation fix,
+and its README review-state correction are complete. The first independent
 implementation review returned `FAIL / FIX_REQUIRED`: `/commands` still looked
 executable despite its display-only notice, and the Evidence / AI Actions
 surfaces still showed active-looking provider and job controls despite their
-provider-unavailable labels.
+provider-unavailable labels. After the bounded UI fix and README-only
+reconciliation, the final fresh repeat review returned `PASS` and the
+integration decision was `AUTHORIZED`.
 
 The bounded fix removes those controls from the rendered Stage 0 Demo surfaces
 without deleting or modifying their backend routes. `/commands` is now a
 static allowlist and historical-record reference with no Run control or POST
 form. Evidence has no AI Analyze control. AI Actions has no Parse, Create Job,
-request-input, or other submission control. The branch is ready only for a
-separate repeat implementation review; the earlier review is not marked PASS.
+request-input, or other submission control. The exact source history
+`b623d00fc0f1cdf51143d783f344d3f2bfa2fd03` ->
+`a860001b4653d78e9452e6a4e53f227e8fcdb313` ->
+`d6cf3949f4b135effac58ce1b728c81efe0839e5` was preserved, fast-forward
+integrated into `main`, and pushed normally. Local `main`, local tracking
+`origin/main`, and trusted remote `main` were synchronized at
+`d6cf3949f4b135effac58ce1b728c81efe0839e5` before this bounded post-merge
+reconciliation. Integration is complete subject only to the reconciliation
+commit push and final synchronization.
 
 The change is presentation-only. Existing routes, href destinations, handlers,
 POST paths, provider/API/model behavior, job creation, command submission,
@@ -38,8 +47,10 @@ remains `NOT_AUTHORIZED`.
   `codex/phase-2n-04-user-facing-entry-point-safety-label-clarification`.
 - Authorization source:
   `docs/phase_2n/phase_2n_04_user_facing_entry_point_and_safety_label_clarification_authorization_review_planning_only.md`.
-- Merge, push, pull request, cleanup, Phase 2N-05, and final closure are outside
-  this task.
+- The implementation task excluded merge, push, pull request, cleanup, Phase
+  2N-05, and final closure. A later successful repeat review authorized only the
+  bounded fast-forward integration, normal pushes, post-merge status
+  reconciliation, and safe source-branch cleanup recorded here.
 
 No live device, SSH, NETCONF, RESTCONF, provider, external API, model, secret,
 queue, scheduler, worker, broker, agent loop, configuration backup/change, or
@@ -108,6 +119,13 @@ production execution behavior was used or added.
 | Flask GET-only localhost check | PASS — `/` and `/commands` returned HTTP 200; display-only/demo-only text rendered; form, button, execution heading, run invitation, and active execution-log heading were absent |
 | Temporary server cleanup | PASS — exact temporary listeners stopped; ports 3000 and 5000 closed |
 
+Post-merge validation on `main` also passed the exact targeted pytest command
+with 9 tests, full pytest with 1,870 tests and the same existing
+`GetPassWarning`, and `python network_lab.py --task report-index` with 14/14
+PASS. The fast-forward range passed `git diff --check`, preserved the three
+authorized source commits without a merge commit, and introduced no dependency
+or lockfile change.
+
 The generic `python` command and the explicitly available Python 3.13.7
 interpreter both reported Python 3.13.7. The explicit interpreter ran pytest
 and report-index without installing, updating, or repairing any dependency. No
@@ -164,6 +182,6 @@ FINAL_READABILITY_RESULT: PASS
 
 ## Next legal action
 
-The only next legal action is a separate fresh Phase 2N-04 bounded fix
-implementation review-only task. This record does not authorize merge, push,
-Phase 2N-05, or final Phase 2N closure.
+No subsequent implementation is authorized by this record. A separate Phase
+2N continuation authorization decision is required. Phase 2N-05 and final
+Phase 2N closure remain `NOT_AUTHORIZED`.
