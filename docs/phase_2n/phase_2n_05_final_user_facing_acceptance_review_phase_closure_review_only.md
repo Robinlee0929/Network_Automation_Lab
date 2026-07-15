@@ -1,24 +1,26 @@
 # Phase 2N-05 — Final User-facing Acceptance Review / Phase Closure
 
-Status: ACCEPTED / CLOSED ON SOURCE BRANCH / READY_FOR_REVIEW
+Status: ACCEPTED / CLOSED ON MAIN / POST-MERGE RECONCILED
 
 ## Conclusion and decision
 
-Phase 2N is accepted and closed on the dedicated closure-finalization source
-branch. The controlling separate Phase 2N-05 complete fresh repeat review
-passed all 27 user-facing acceptance requirements, and the separate final
-closure-authorization decision authorized this documentation-only closure.
-Stage 0 remains unchanged. This local closure commit is not merged or pushed,
-so `main` continues to record Phase 2N as `IN_PROGRESS / NOT_READY` until a
-separately authorized integration and reconciliation completes.
+Phase 2N is accepted and closed on `main`. The controlling separate Phase
+2N-05 complete fresh repeat review passed all 27 user-facing acceptance
+requirements, and the separate final closure-authorization decision authorized
+this documentation-only closure. Closure commit
+`697d31f07f09fc3c5291d61e328a5d3b6fdc7ffa` was integrated into `main` by
+fast-forward only and first-pushed normally to the trusted remote. Stage 0
+remains unchanged, no application behavior changed, and no safety gate was
+weakened. Phase 2O and Phase 2P remain unauthorized and unstarted.
 
 ```text
 PHASE_2N_ACCEPTANCE_DECISION: PASS
 PHASE_2N_CLOSURE_DECISION: CLOSED
 PHASE_2N_STATUS: ACCEPTED / CLOSED
-SOURCE_BRANCH_STATUS: READY_FOR_REVIEW / LOCAL_COMMIT_UNMERGED
-MAIN_BRANCH_STATUS: IN_PROGRESS / NOT_READY
+SOURCE_COMMIT_STATUS: INTEGRATED INTO MAIN
+MAIN_BRANCH_STATUS: ACCEPTED / CLOSED
 PHASE_2O_STATUS: NOT_AUTHORIZED / NOT_STARTED
+PHASE_2P_STATUS: NOT_AUTHORIZED / NOT_STARTED
 ```
 
 ## Purpose and authority
@@ -121,7 +123,7 @@ Phase 2N closure does not authorize:
 - live devices, SSH, NETCONF, or RESTCONF;
 - configuration backup or change;
 - production execution; or
-- Phase 2O or any subsequent phase.
+- Phase 2O, Phase 2P, or any subsequent phase.
 
 Each capability remains behind its own future explicit authorization gate.
 
@@ -141,7 +143,7 @@ Each capability remains behind its own future explicit authorization gate.
 Historical `NOT_READY`, `NOT_STARTED`, and `NOT_AUTHORIZED` statements remain
 valid for the point at which their earlier records were created. The later
 separate acceptance and closure decisions are the controlling current
-evidence for this source-branch closure.
+evidence for Phase 2N closure on `main`.
 
 ## Closure-finalization validation
 
@@ -169,12 +171,15 @@ documentation-only finalization.
 - No application behavior or safety gate changed.
 - No live-device, provider, model, POST, job, command, runner, or importer
   behavior was exercised.
-- The closure commit remains local and unmerged on the dedicated source branch.
-- `main` remains at the pre-closure baseline and continues to record Phase 2N
-  as `IN_PROGRESS / NOT_READY`.
-- Merge, push, synchronization, reconciliation, and branch cleanup require
-  separate authorization.
-- No next phase is authorized by Phase 2N closure.
+- Closure commit `697d31f07f09fc3c5291d61e328a5d3b6fdc7ffa` was
+  fast-forward integrated into `main` and first-pushed normally.
+- `main` records Phase 2N as `ACCEPTED / CLOSED` after the bounded two-file
+  post-merge reconciliation.
+- This record does not embed the reconciliation commit's own SHA or claim
+  source-branch cleanup; final synchronization and cleanup are verified by the
+  integration task after the reconciliation push.
+- Phase 2O and Phase 2P remain `NOT_AUTHORIZED / NOT_STARTED`; no next phase is
+  authorized by Phase 2N closure.
 
 ## Documentation readability review
 
@@ -207,6 +212,9 @@ APPLICATION_BEHAVIOR_CHANGED: NO
 SAFETY_GATE_WEAKENED: NO
 PHASE_2O_AUTHORIZED: NO
 PHASE_2O_STARTED: NO
-MERGE_AUTHORIZED: NO
-PUSH_AUTHORIZED: NO
+PHASE_2P_AUTHORIZED: NO
+PHASE_2P_STARTED: NO
+CLOSURE_COMMIT_INTEGRATED_TO_MAIN: YES
+CLOSURE_COMMIT_FIRST_PUSH_SUCCEEDED: YES
+INTEGRATION_METHOD: FAST_FORWARD_ONLY
 ```
