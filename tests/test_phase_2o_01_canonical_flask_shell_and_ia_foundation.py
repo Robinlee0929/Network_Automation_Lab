@@ -201,6 +201,83 @@ def test_commands_remains_display_only_and_has_no_action_control(shell_client):
     )
 
 
+def test_ai_intent_reviewer_long_identifier_wrapping_contract(shell_client):
+    _, client = shell_client
+    html, parser = _parse(client.get("/ai-intent-reviewer"))
+    source = Path("templates/dashboard_ai_intent_reviewer.html").read_text(
+        encoding="utf-8"
+    )
+
+    representative_identifiers = (
+        "documentation-only-runbook",
+        "allowed_documentation_only",
+        "manual-review-ambiguous",
+        "needs_manual_review",
+        "adapter_implementation_allowed",
+        "routeros_command_execution_allowed",
+    )
+    for identifier in representative_identifiers:
+        assert identifier in html
+
+    scenario_bindings = (
+        '<code class="breakable-identifier">{{ scenario.scenario_id }}</code>',
+        '<code class="breakable-identifier">{{ scenario.safety_category }}</code>',
+        '<span class="breakable-identifier">Decision: {{ scenario.expected_decision }}</span>',
+        '<span class="breakable-identifier">Contract: {{ scenario.contract_status }}</span>',
+        '<span class="breakable-identifier">Review quality: {{ scenario.review_quality_status }}</span>',
+    )
+    for binding in scenario_bindings:
+        assert binding in source
+    assert (
+        '<li><span class="breakable-identifier">{{ item }}</span></li>' in source
+    )
+
+    expected_identifier_elements = (
+        len(dashboard.day69_scenario_evidence_drilldown()) * len(scenario_bindings)
+        + len(dashboard.ai_intent_safety_boundaries())
+    )
+    rendered_identifier_elements = [
+        (tag, attrs)
+        for tag, attrs in parser.tags
+        if "breakable-identifier" in attrs.get("class", "").split()
+    ]
+    assert len(rendered_identifier_elements) == expected_identifier_elements
+
+    identifier_contract = re.search(
+        r"(?ms)^\s*\.breakable-identifier\s*\{(?P<body>.*?)^\s*\}",
+        source,
+    )
+    assert identifier_contract is not None
+    identifier_css = identifier_contract.group("body")
+    assert "overflow-wrap: anywhere;" in identifier_css
+    assert "word-break: break-word;" in identifier_css
+    assert "max-width: 100%;" in identifier_css
+    for forbidden_rule in (
+        "white-space: nowrap",
+        "overflow: hidden",
+        "text-overflow",
+        "clip-path",
+    ):
+        assert forbidden_rule not in identifier_css
+
+    scenario_card_contract = re.search(
+        r"(?ms)^\s*\.scenario-card\s*\{(?P<body>.*?)^\s*\}",
+        source,
+    )
+    assert scenario_card_contract is not None
+    scenario_card_css = scenario_card_contract.group("body")
+    assert "min-width: 0;" in scenario_card_css
+    assert "overflow: hidden" not in scenario_card_css
+
+    assert len([tag for tag, _ in parser.tags if tag == "main"]) == 1
+    assert len([tag for tag, _ in parser.tags if tag == "h1"]) == 1
+    assert "Stage 0 canonical Flask reviewer surface" in html
+    assert "display-only and report-only" in html
+    assert [(link["text"], link["attrs"].get("href")) for link in parser.nav_links] == list(NAVIGATION)
+    assert len([tag for tag, _ in parser.tags if tag == "form"]) == 0
+    assert len([tag for tag, _ in parser.tags if tag == "button"]) == 0
+
+
 def test_target_views_inherit_the_shared_base_and_base_owns_shell_contract():
     templates_dir = Path("templates")
     for template_name in TARGET_TEMPLATES:

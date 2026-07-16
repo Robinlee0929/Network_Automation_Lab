@@ -25,6 +25,12 @@
       font-family: Consolas, "Courier New", monospace;
       overflow-wrap: anywhere;
     }
+    .breakable-identifier {
+      display: inline-block;
+      max-width: 100%;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
     section, .day-card, .summary-card {
       background: var(--panel);
       border: 1px solid var(--border);
@@ -49,6 +55,7 @@
     }
     .scenario-card {
       background: #ffffff;
+      min-width: 0;
     }
     .status-row {
       display: grid;
@@ -395,11 +402,11 @@
       {% for scenario in day69_scenario_drilldown %}
       <article class="scenario-card">
         <h3>{{ scenario.scenario_name }}</h3>
-        <p><code>{{ scenario.scenario_id }}</code> / <code>{{ scenario.safety_category }}</code></p>
+        <p><code class="breakable-identifier">{{ scenario.scenario_id }}</code> / <code class="breakable-identifier">{{ scenario.safety_category }}</code></p>
         <div class="status-row">
-          <div class="status-pill">Decision: {{ scenario.expected_decision }}</div>
-          <div class="status-pill">Contract: {{ scenario.contract_status }}</div>
-          <div class="status-pill">Review quality: {{ scenario.review_quality_status }}</div>
+          <div class="status-pill"><span class="breakable-identifier">Decision: {{ scenario.expected_decision }}</span></div>
+          <div class="status-pill"><span class="breakable-identifier">Contract: {{ scenario.contract_status }}</span></div>
+          <div class="status-pill"><span class="breakable-identifier">Review quality: {{ scenario.review_quality_status }}</span></div>
         </div>
         <p><strong>Evidence source:</strong> {{ scenario.evidence_source }}</p>
         <p><strong>Safety note:</strong> {{ scenario.safety_note }}</p>
@@ -815,7 +822,7 @@
     <h2>Safety Boundaries</h2>
     <ul>
       {% for item in safety_boundaries %}
-      <li>{{ item }}</li>
+      <li><span class="breakable-identifier">{{ item }}</span></li>
       {% endfor %}
     </ul>
   </section>

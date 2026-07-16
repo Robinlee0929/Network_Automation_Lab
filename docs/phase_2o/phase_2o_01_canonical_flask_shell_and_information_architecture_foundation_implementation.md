@@ -2,22 +2,33 @@
 
 ## 1. Conclusion and authorization boundary
 
-**Status: `DONE / READY_FOR_REVIEW`.** Phase 2O-01 establishes one shared,
-responsive, keyboard-oriented Jinja shell for the canonical Flask reviewer
-surface. The implementation is local-only on
-`codex/phase-2o-01-canonical-flask-shell-ia-foundation`; it has not been
-independently reviewed, merged, or pushed.
+**Status: `DONE / FIX_APPLIED / READY_FOR_REVIEW / LOCAL_ONLY`.** Original
+implementation commit `a2d19722a48eae6f3e8573db0e023bdffdff4ce9`
+established the shared Jinja shell, but its independent implementation review
+returned `FAIL_FIX_REQUIRED`. The review reproduced page-level horizontal
+overflow on `/ai-intent-reviewer` at 320 CSS pixels and found the original
+responsive documentation and regression-test evidence insufficient.
+
+The bounded local fix applies a narrow long-identifier wrapping contract and
+adds source/rendered-contract regression coverage. It is not independently
+reviewed, merged, or pushed. The controlling 320 CSS pixel evidence passes;
+supplementary browser-native 400% evidence at a narrower 267 CSS pixel content
+width fails and is disclosed as non-controlling. A later independent review
+must repeat rendered validation and decide whether the controlling 320 CSS
+pixel result satisfies the Phase 2O acceptance boundary.
 
 Starting `main` was
 `ecaef4a0655cae10d4ed7154f4948fb4d6982e6c`. Stage 0 remains `PRESERVED`.
 Phase 2O remains `IN_PROGRESS / NOT_READY`. Phase 2O-02 through Phase 2O-07 and
 Phase 2P remain `NOT_AUTHORIZED / NOT_STARTED`. The sole next candidate is one
-separately authorized `PHASE_2O_01_IMPLEMENTATION_COMMIT_REVIEW_ONLY` task.
+separately authorized `PHASE_2O_01_IMPLEMENTATION_FIX_COMMIT_REVIEW_ONLY` task.
 
 This implementation grants no merge, push, provider, model, API, POST, command,
 runner, device, configuration, packaging, or production authority.
 
-## 2. Exact changed-file inventory
+## 2. Original implementation and bounded-fix inventories
+
+The original implementation changed-file inventory was:
 
 Created:
 
@@ -39,6 +50,17 @@ Modified:
 - `docs/phase_2o/phase_2o_00_ux_ui_baseline_and_information_architecture_planning_only.md`
 
 No other file is part of this implementation.
+
+The later bounded fix modifies exactly:
+
+- `templates/dashboard_ai_intent_reviewer.html`
+- `tests/test_phase_2o_01_canonical_flask_shell_and_ia_foundation.py`
+- `README.md`
+- `docs/phase_2o/phase_2o_01_canonical_flask_shell_and_information_architecture_foundation_implementation.md`
+
+The original shared base, the other seven migrated templates, runtime code,
+routes, helpers, dependencies, pre-Phase-2O-01 tests, Next.js, workflows, and
+configuration remain unchanged by the fix.
 
 ## 3. Shared base-template design
 
@@ -75,73 +97,92 @@ model access, no command execution, and no live-device access. The Commands page
 still contains no form, Run control, submit control, command input, or action
 button.
 
-## 5. Accessibility, keyboard, responsive, and non-color evidence
+## 5. Original validation and independent review failure
 
-- The first focusable contract is `Skip to main content`; its `#main-content`
-  target exists, has `tabindex="-1"`, and receives focus when activated.
-- The skip link and navigation links use a visible three-pixel solid outline,
-  offset, and white focus halo. The skip link moves into view on focus.
-- Focus order is skip link, canonical identity, the six navigation destinations,
-  then existing main-content links. The native links preserve GET-only route
-  transition behavior and focus returns to the new document on navigation.
-- Each migrated view renders one labeled navigation landmark, one main, and one
-  H1 with the page heading after the shared shell.
-- At 320, 768, and 1440 CSS pixels, all reviewed pages retained every navigation
-  destination, one current-location marker, the Stage 0 notice, and no
-  page-level horizontal overflow. Dense report/checklist tables use bounded
-  horizontal overflow; AI tables reflow on narrow screens; long command and JSON
-  values wrap.
-- A 400% reflow-equivalent check used a 1280-pixel review baseline reduced to
-  320 CSS pixels because the installed in-app browser exposes an explicit CSS
-  viewport control but no separate browser-zoom API. The resulting quarter-width
-  layout passed the same landmark, heading, navigation, notice, focus, table,
-  long-content, and no-overflow checks.
-- Current navigation combines color with an underline and text; safety/status
-  meaning remains in visible text such as `PASS`, `WARN`, `FAIL`, `UNKNOWN`, and
-  the explicit Stage 0 statement rather than color alone.
+The original implementation validation reported 69 targeted pytest tests,
+1,883 full-suite pytest tests with one existing warning, report-index 14/14,
+and responsive rendered review. Those automated results remain historical, but
+the responsive conclusion was inaccurate. Independent review returned
+`FAIL_FIX_REQUIRED` after reproducing the AI Intent Reviewer defect at 320 CSS
+pixels:
 
-## 6. Rendered routes and states reviewed
+- `document.documentElement.scrollWidth=342`
+- `document.documentElement.clientWidth=305`
 
-The task-owned `python dashboard_app.py` process bound only to
-`http://127.0.0.1:5000`. GET-only browser review covered:
+The original dedicated test did not materially enforce wrapping for unbroken
+underscore-separated scenario and safety-boundary identifiers. The original
+record also lacked verified browser-native 400% evidence. These deficiencies
+are not represented as an independent review pass.
 
-- `/`
-- `/reports`
-- `/commands`
-- `/commands/logs`
-- `/ai-checklist`
-- `/ai-intent-reviewer`
-- `/reports/json/lab-summary/latest_lab_overview.json`
+## 6. Bounded fix attempts and carried-forward rendered evidence
 
-Available local report evidence, report metadata and dense tables, the empty
-execution-log state, the display-only command catalog, the long AI reference
-page, and an available safe JSON preview were reviewed. Controlled missing
-states at `/commands/logs/not-found`, `/reports/json/not-found.json`, and
-`/reports/open/not-found.html` retained safe 404 responses. Existing isolated
-tests also replay empty reports, missing evidence, warning/unavailable labels,
-malformed/error handling, traversal rejection, and the command-log detail
-template.
+The first bounded fix attempt was `BLOCKED` before editing because
+browser-native zoom could not initially be verified. It changed no repository
+file.
 
-The keyboard walkthrough verified initial document entry, visible skip-link
-focus, skip target focus, logical navigation order, existing content links, and
-GET route transition/current-location behavior. No new browser console warning
-or error was recorded. No screenshot or browser artifact entered the repository.
+The second bounded retry applied and preserved exactly two changes before its
+validation tooling interrupted the task:
 
-The exact task-owned Flask processes were stopped after each bounded correction;
-the final process exited on task-issued interrupt and a fresh bind check proved
-port 5000 closed. No unrelated process was terminated.
+- `templates/dashboard_ai_intent_reviewer.html` adds the narrow
+  `.breakable-identifier` contract with `max-width: 100%`,
+  `overflow-wrap: anywhere`, and `word-break: break-word`; applies it only to
+  scenario and safety-boundary identifiers; and gives the exact scenario grid
+  child `min-width: 0`. It adds no clipping, ellipsis, hidden overflow, global
+  `word-break: break-all`, data, route, interaction, or execution behavior.
+- `tests/test_phase_2o_01_canonical_flask_shell_and_ia_foundation.py` renders
+  `/ai-intent-reviewer`, preserves representative long identifiers, verifies
+  every affected binding and the dedicated CSS contract, rejects nowrap and
+  content-hiding workarounds, and repeats one-main, one-H1, Stage 0, navigation,
+  and no-execution assertions. It is explicitly a source/rendered-contract
+  regression test, not a browser-layout measurement.
 
-## 7. Validation results
+That retry's exact targeted pytest command passed 70 tests with zero failures,
+skips, or warnings. Its carried-forward, non-independent controlling evidence
+for `/ai-intent-reviewer` at 320 CSS pixels was:
 
-- Exact targeted pytest: `69 passed`, `0 failed`, `0 skipped`, `0 warnings` in
-  `3.61s`.
-- Full pytest: `1883 passed`, `0 failed`, `0 skipped`, `1 warning` in `91.19s`.
-  The warning is the existing terminal `GetPassWarning` from
+- `window.innerWidth=320`
+- `document.documentElement.clientWidth=305`
+- `document.documentElement.scrollWidth=305`
+- `document.body.scrollWidth=305`
+- identifier count: `98`
+- overflowing identifiers: `0`
+- hidden identifiers: `0`
+- page-level horizontal overflow: `NO`
+- result: `PASS`
+
+Additional carried-forward rendered results were `PASS` at 768 and 1440 CSS
+pixels. Keyboard navigation, skip-link activation, visible focus, landmark and
+heading hierarchy, non-color status meaning, absence of execution controls,
+and the isolated application browser console also passed. The task-owned Flask
+process bound only to `127.0.0.1:5000`, was stopped by the task, exited, and
+released port 5000 without terminating an unrelated process or adding a runtime
+artifact.
+
+Supplementary browser-native 400% zoom was later achieved. The browser outer
+width remained 1084, `window.devicePixelRatio` changed from 1.25 to 5.0, and
+`window.innerWidth` changed from 1070 to 267. At 400%, document scroll width was
+301 versus client width 263, so page-level horizontal overflow was present.
+This result is `FAIL / NON_CONTROLLING`: the resulting 267 CSS pixel content
+width was narrower than the controlling 320 CSS pixel Reflow condition. It is
+not hidden, rewritten as PASS, or treated as Phase 2O review acceptance.
+
+The resume task did not start Flask, browser navigation, or computer-use. The
+later independent fix-commit review must repeat rendered validation and decide
+whether the controlling 320 CSS pixel result is sufficient under the Phase 2O
+acceptance boundary.
+
+## 7. Resume validation results
+
+- Exact targeted pytest: `70 passed`, `0 failed`, `0 skipped`, `0 warnings`.
+- Full pytest: `1884 passed`, `0 failed`, `0 skipped`, `1 warning`. The warning
+  is the existing terminal `GetPassWarning` from
   `test_day13_multi_router_wireguard_validation.py`.
 - Report index: overall `PASS`; total `14`, pass `14`, warn `0`, fail `0`,
-  missing `0`, unknown `0`; exit code `0`.
-- Documentation/static checks: whitespace, Markdown structure, relative links,
-  UTF-8, fenced blocks, conflict markers, and allowlisted scope passed.
+  missing `0`; exit code `0`.
+- Documentation/static checks: `git diff --check`, exact four-file scope,
+  Markdown headings and fenced blocks, repository-relative links, UTF-8,
+  conflict markers, forbidden-file immutability, and material-untracked-artifact
+  checks passed.
 
 The required exact validation commands were:
 
@@ -164,7 +205,9 @@ model were not rewritten.
 
 ## 9. Review handoff
 
-Phase 2O-01 is `DONE / READY_FOR_REVIEW / LOCAL_ONLY`. It is not reviewed,
+Phase 2O-01 is `DONE / FIX_APPLIED / READY_FOR_REVIEW / LOCAL_ONLY`. The local
+fix is not independently reviewed,
 merged, pushed, or synchronized. The next candidate is
-`PHASE_2O_01_IMPLEMENTATION_COMMIT_REVIEW_ONLY`; it requires separate explicit
-authorization and does not authorize merge or push by implication.
+`PHASE_2O_01_IMPLEMENTATION_FIX_COMMIT_REVIEW_ONLY`; it requires separate
+explicit authorization, must repeat rendered browser validation, and does not
+authorize merge or push by implication.
