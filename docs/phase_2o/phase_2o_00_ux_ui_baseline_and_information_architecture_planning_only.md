@@ -2,11 +2,13 @@
 
 ## 1. Status and decision
 
-**Decision:** Phase 2O-00 is complete and ready for review. The evidence supports a
-seven-slice Phase 2O sequence that keeps the Flask dashboard as the canonical
-portfolio/reviewer surface and the Next.js application as a secondary Stage 0
-surface. The sequence separates Flask, Next.js, cross-surface verification, and
-final closure responsibilities.
+**Decision:** Phase 2O-00 planning is complete. Planning commit
+`99b1929b6efd0af07ed3bbe634d7e7108867618f` received independent documentation
+review `PASS` and was integrated into `main` by strict fast-forward. The evidence
+supports a seven-slice Phase 2O sequence that keeps the Flask dashboard as the
+canonical portfolio/reviewer surface and the Next.js application as a secondary
+Stage 0 surface. The sequence separates Flask, Next.js, cross-surface
+verification, and final closure responsibilities.
 
 This document is planning evidence only. It authorizes no implementation. Every
 later slice requires a separate explicit authorization decision. Phase 2P remains
@@ -15,10 +17,16 @@ non-executing.
 
 | Field | Status |
 | --- | --- |
-| `PHASE_2O_00_STATUS` | `DONE / READY_FOR_REVIEW` |
+| `PHASE_2O_00_STATUS` | `DONE / REVIEWED / MERGED_TO_MAIN` |
+| `DOCUMENTATION_REVIEW_DECISION` | `PASS` |
+| `PLANNING_COMMIT` | `99b1929b6efd0af07ed3bbe634d7e7108867618f` |
+| `PLANNING_COMMIT_STATUS` | `MERGED_TO_MAIN` |
+| `PHASE_2O_STATUS` | `IN_PROGRESS / NOT_READY` |
+| `PHASE_2O_01_STATUS` | `NOT_AUTHORIZED / NOT_STARTED` |
 | `PHASE_2O_IMPLEMENTATION_STATUS` | `NOT_AUTHORIZED / NOT_STARTED` |
 | `PHASE_2P_STATUS` | `NOT_AUTHORIZED / NOT_STARTED` |
 | `STAGE_0_BOUNDARY` | `PRESERVED` |
+| `NEXT_CANDIDATE` | `PHASE_2O_01_CONTINUATION_AUTHORIZATION_DECISION_ONLY` |
 
 No provider, model, job, command, device, or production authority follows from a
 visual treatment, status label, navigation destination, reviewer view, or
@@ -386,7 +394,8 @@ Phase 2O-07 closure and a new explicit authorization.
 
 ## 13. Phase 2O-00 acceptance criteria
 
-Phase 2O-00 is ready for review because this document provides:
+Phase 2O-00 passed independent documentation review because this document
+provides:
 
 - [x] A source-backed Flask and Next.js current-state inventory.
 - [x] Explicit canonical Flask and secondary Next.js responsibilities.
@@ -405,6 +414,9 @@ Phase 2O-00 is ready for review because this document provides:
   implementation.
 
 Review acceptance of this document does not authorize Phase 2O-01.
+The sole next candidate is one later separate
+`PHASE_2O_01_CONTINUATION_AUTHORIZATION_DECISION_ONLY` task, not Phase 2O-01
+implementation.
 
 ## 14. Explicit exclusions and deferred work
 
@@ -436,8 +448,8 @@ The following remain excluded and unauthorized:
   separated.
 - Current facts cite repository files or Phase 2N records; recommendations and
   assumptions are labeled.
-- `DONE / READY_FOR_REVIEW`, `NOT_AUTHORIZED / NOT_STARTED`, and `PRESERVED` are
-  used consistently.
+- `DONE / REVIEWED / MERGED_TO_MAIN`, `IN_PROGRESS / NOT_READY`,
+  `NOT_AUTHORIZED / NOT_STARTED`, and `PRESERVED` are used consistently.
 - Flask canonical and Next.js secondary terminology matches the Phase 2N closure.
 - Acceptance criteria and later-slice evidence are concrete and verifiable.
 - Long findings are split into sections and tables.
