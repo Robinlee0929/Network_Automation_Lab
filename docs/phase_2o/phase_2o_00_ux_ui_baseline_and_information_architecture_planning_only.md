@@ -22,11 +22,21 @@ non-executing.
 | `PLANNING_COMMIT` | `99b1929b6efd0af07ed3bbe634d7e7108867618f` |
 | `PLANNING_COMMIT_STATUS` | `MERGED_TO_MAIN` |
 | `PHASE_2O_STATUS` | `IN_PROGRESS / NOT_READY` |
-| `PHASE_2O_01_STATUS` | `DONE / READY_FOR_REVIEW / LOCAL_ONLY` |
+| `PHASE_2O_01_CONTINUATION_AUTHORIZATION` | `DONE / AUTHORIZED` |
+| `PHASE_2O_01_IMPLEMENTATION_COMMIT` | `a2d19722a48eae6f3e8573db0e023bdffdff4ce9` |
+| `PHASE_2O_01_IMPLEMENTATION_STATUS` | `DONE / LOCAL_ONLY` |
+| `PHASE_2O_01_IMPLEMENTATION_REVIEW_DECISION` | `FAIL_FIX_REQUIRED` |
+| `PHASE_2O_01_RESPONSIVE_FIX_COMMIT` | `f4a65339cd146b26c0d23810fea992cd6dfea9c6` |
+| `PHASE_2O_01_FIX_COMMIT_STATUS` | `DONE / LOCAL_ONLY` |
+| `PHASE_2O_01_FIX_REVIEW_DECISION` | `FAIL_FIX_REQUIRED` |
+| `PHASE_2O_01_TECHNICAL_AND_SAFETY_DISPOSITION` | `PASS` |
+| `PHASE_2O_01_REMAINING_FINDING` | `STALE_PHASE_2O_00_STATUS_AND_HANDOFF_DOCUMENTATION` |
+| `PHASE_2O_01_STATUS` | `DONE / DOCUMENTATION_FIX_APPLIED / READY_FOR_REVIEW / LOCAL_ONLY` |
 | `PHASE_2O_IMPLEMENTATION_STATUS` | `IN_PROGRESS / NOT_READY` |
+| `PHASE_2O_02_THROUGH_2O_07_STATUS` | `NOT_AUTHORIZED / NOT_STARTED` |
 | `PHASE_2P_STATUS` | `NOT_AUTHORIZED / NOT_STARTED` |
 | `STAGE_0_BOUNDARY` | `PRESERVED` |
-| `NEXT_CANDIDATE` | `PHASE_2O_01_IMPLEMENTATION_COMMIT_REVIEW_ONLY` |
+| `NEXT_CANDIDATE` | `PHASE_2O_01_DOCUMENTATION_STATUS_FIX_COMMIT_REVIEW_ONLY` |
 
 No provider, model, job, command, device, or production authority follows from a
 visual treatment, status label, navigation destination, reviewer view, or
@@ -413,11 +423,47 @@ provides:
 - [x] Planning-only, one-document scope with no UI/source/test/dependency/runtime
   implementation.
 
+### 13.1 Phase 2O-01 implementation chronology and handoff
+
 Review acceptance of this planning document did not itself authorize Phase
-2O-01. A later separate authorization did so, and the local Phase 2O-01
-implementation is now `DONE / READY_FOR_REVIEW / LOCAL_ONLY`. It has not been
-reviewed, merged, or pushed. The sole next candidate is one separately
-authorized `PHASE_2O_01_IMPLEMENTATION_COMMIT_REVIEW_ONLY` task.
+2O-01. The complete current chronology is:
+
+1. Phase 2O-01 continuation authorization is `DONE / AUTHORIZED`.
+2. The original implementation commit is
+   `a2d19722a48eae6f3e8573db0e023bdffdff4ce9`.
+3. The original implementation status is `DONE / LOCAL_ONLY`.
+4. Independent review of the original implementation returned
+   `FAIL_FIX_REQUIRED`.
+5. That review found page-level horizontal overflow on `/ai-intent-reviewer` at
+   320 CSS pixels, missing regression coverage, and inaccurate documentation
+   evidence.
+6. The responsive-fix commit is
+   `f4a65339cd146b26c0d23810fea992cd6dfea9c6`.
+7. The responsive-fix commit status is `DONE / LOCAL_ONLY`.
+8. Independent review of the complete two-commit implementation state returned
+   `FAIL_FIX_REQUIRED`.
+9. That review's technical and safety disposition is `PASS`: source and reflow,
+   regression coverage, targeted pytest (`70 passed`), full pytest (`1,884
+   passed`), report-index (`14/14 PASS`), rendered review at 320, 768, and 1440
+   CSS pixels, keyboard and accessibility review, and server lifecycle all
+   passed; it found no functional or safety error and required no accessibility
+   or responsive fix.
+10. The sole remaining finding was the stale Phase 2O-01 status and handoff
+    chronology in this Phase 2O-00 planning document.
+11. After this one-file correction is committed, the Phase 2O-01 status is
+    `DONE / DOCUMENTATION_FIX_APPLIED / READY_FOR_REVIEW / LOCAL_ONLY`.
+12. No Phase 2O-01 commit is merged or pushed.
+13. Phase 2O remains `IN_PROGRESS / NOT_READY`.
+14. Phase 2O-02 through Phase 2O-07 remain
+    `NOT_AUTHORIZED / NOT_STARTED`.
+15. Phase 2P remains `NOT_AUTHORIZED / NOT_STARTED`.
+16. Stage 0 remains `PRESERVED`.
+17. The sole next candidate is one separately authorized
+    `PHASE_2O_01_DOCUMENTATION_STATUS_FIX_COMMIT_REVIEW_ONLY` task.
+
+This chronology does not claim that the complete Phase 2O-01 state has review
+`PASS`, does not authorize integration, merge, or push, and does not authorize
+Phase 2O-02.
 
 ## 14. Explicit exclusions and deferred work
 
