@@ -2,26 +2,35 @@
 
 ## 1. Conclusion and authorization boundary
 
-**Status: `DONE / FIX_APPLIED / READY_FOR_REVIEW / LOCAL_ONLY`.** Original
+**Status: `DONE / POST_REVIEW_DOCUMENTATION_STATUS_FIX_APPLIED / READY_FOR_REVIEW / LOCAL_ONLY`.** Original
 implementation commit `a2d19722a48eae6f3e8573db0e023bdffdff4ce9`
 established the shared Jinja shell, but its independent implementation review
 returned `FAIL_FIX_REQUIRED`. The review reproduced page-level horizontal
 overflow on `/ai-intent-reviewer` at 320 CSS pixels and found the original
 responsive documentation and regression-test evidence insufficient.
 
-The bounded local fix applies a narrow long-identifier wrapping contract and
-adds source/rendered-contract regression coverage. It is not independently
-reviewed, merged, or pushed. The controlling 320 CSS pixel evidence passes;
-supplementary browser-native 400% evidence at a narrower 267 CSS pixel content
-width fails and is disclosed as non-controlling. A later independent review
-must repeat rendered validation and decide whether the controlling 320 CSS
-pixel result satisfies the Phase 2O acceptance boundary.
+Responsive correction commit
+`f4a65339cd146b26c0d23810fea992cd6dfea9c6` applies the narrow
+long-identifier wrapping contract and source/rendered-contract regression
+coverage. The later controlling technical and safety disposition for the
+corrected implementation state is `PASS`. Documentation correction commit
+`8fdeeb3dc3e605b5f1a80ea78b441fa982c1efb6` subsequently received independent
+documentation-fix review `PASS`.
+
+The post-review integration-authorization decision verified the exact
+three-commit range as clean, three commits ahead, zero commits behind, and
+strict-fast-forward eligible, but returned `BLOCKED` because three applicable
+status records retained stale pre-review handoffs. This bounded documentation
+correction reconciles those records. It is not independently reviewed, so
+Phase 2O-01 integration remains `NOT_AUTHORIZED / NOT_PERFORMED`.
 
 Starting `main` was
 `ecaef4a0655cae10d4ed7154f4948fb4d6982e6c`. Stage 0 remains `PRESERVED`.
 Phase 2O remains `IN_PROGRESS / NOT_READY`. Phase 2O-02 through Phase 2O-07 and
 Phase 2P remain `NOT_AUTHORIZED / NOT_STARTED`. The sole next candidate is one
-separately authorized `PHASE_2O_01_IMPLEMENTATION_FIX_COMMIT_REVIEW_ONLY` task.
+separately authorized
+`PHASE_2O_01_POST_REVIEW_INTEGRATION_AUTHORIZATION_BLOCKER_DOCUMENTATION_STATUS_FIX_COMMIT_REVIEW_ONLY`
+task covering only this new documentation correction.
 
 This implementation grants no merge, push, provider, model, API, POST, command,
 runner, device, configuration, packaging, or production authority.
@@ -158,18 +167,21 @@ process bound only to `127.0.0.1:5000`, was stopped by the task, exited, and
 released port 5000 without terminating an unrelated process or adding a runtime
 artifact.
 
-Supplementary browser-native 400% zoom was later achieved. The browser outer
+Historical browser-native 400% zoom evidence is preserved as a pre-fix-review
+finding from the earlier validation sequence. The browser outer
 width remained 1084, `window.devicePixelRatio` changed from 1.25 to 5.0, and
 `window.innerWidth` changed from 1070 to 267. At 400%, document scroll width was
 301 versus client width 263, so page-level horizontal overflow was present.
-This result is `FAIL / NON_CONTROLLING`: the resulting 267 CSS pixel content
-width was narrower than the controlling 320 CSS pixel Reflow condition. It is
-not hidden, rewritten as PASS, or treated as Phase 2O review acceptance.
+That historical result was `FAIL / NON_CONTROLLING`: the resulting 267 CSS
+pixel content width was narrower than the controlling 320 CSS pixel Reflow
+condition. The responsive correction and later independent complete-state
+review addressed the responsive finding; the controlling technical and safety
+disposition is `PASS`. The earlier measurement remains in the chronology but
+is no longer the current unresolved disposition.
 
 The resume task did not start Flask, browser navigation, or computer-use. The
-later independent fix-commit review must repeat rendered validation and decide
-whether the controlling 320 CSS pixel result is sufficient under the Phase 2O
-acceptance boundary.
+later independent review supplied the controlling technical and safety `PASS`;
+this documentation correction does not repeat or replace that review.
 
 ## 7. Resume validation results
 
@@ -205,9 +217,15 @@ model were not rewritten.
 
 ## 9. Review handoff
 
-Phase 2O-01 is `DONE / FIX_APPLIED / READY_FOR_REVIEW / LOCAL_ONLY`. The local
-fix is not independently reviewed,
-merged, pushed, or synchronized. The next candidate is
-`PHASE_2O_01_IMPLEMENTATION_FIX_COMMIT_REVIEW_ONLY`; it requires separate
-explicit authorization, must repeat rendered browser validation, and does not
-authorize merge or push by implication.
+Phase 2O-01 is
+`DONE / POST_REVIEW_DOCUMENTATION_STATUS_FIX_APPLIED / READY_FOR_REVIEW / LOCAL_ONLY`.
+The implementation and responsive correction have controlling technical and
+safety disposition `PASS`, and documentation correction commit
+`8fdeeb3dc3e605b5f1a80ea78b441fa982c1efb6` has independent documentation-fix
+review `PASS`. The subsequent integration-authorization decision remains
+`BLOCKED` until this new documentation-only correction receives independent
+review. Nothing is merged, pushed, synchronized, or authorized for integration.
+The sole next candidate is
+`PHASE_2O_01_POST_REVIEW_INTEGRATION_AUTHORIZATION_BLOCKER_DOCUMENTATION_STATUS_FIX_COMMIT_REVIEW_ONLY`;
+it may review only this new correction and does not authorize merge or push by
+implication.

@@ -30,13 +30,17 @@ non-executing.
 | `PHASE_2O_01_FIX_COMMIT_STATUS` | `DONE / LOCAL_ONLY` |
 | `PHASE_2O_01_FIX_REVIEW_DECISION` | `FAIL_FIX_REQUIRED` |
 | `PHASE_2O_01_TECHNICAL_AND_SAFETY_DISPOSITION` | `PASS` |
-| `PHASE_2O_01_REMAINING_FINDING` | `STALE_PHASE_2O_00_STATUS_AND_HANDOFF_DOCUMENTATION` |
-| `PHASE_2O_01_STATUS` | `DONE / DOCUMENTATION_FIX_APPLIED / READY_FOR_REVIEW / LOCAL_ONLY` |
+| `PHASE_2O_01_PRIOR_REMAINING_FINDING` | `STALE_PHASE_2O_00_STATUS_AND_HANDOFF_DOCUMENTATION` |
+| `PHASE_2O_01_DOCUMENTATION_FIX_COMMIT` | `8fdeeb3dc3e605b5f1a80ea78b441fa982c1efb6` |
+| `PHASE_2O_01_DOCUMENTATION_FIX_REVIEW_DECISION` | `PASS` |
+| `PHASE_2O_01_INTEGRATION_AUTHORIZATION_DECISION` | `BLOCKED` |
+| `PHASE_2O_01_INTEGRATION_AUTHORIZATION_BLOCKER` | `STALE_APPLICABLE_STATUS_AND_HANDOFF_RECORDS` |
+| `PHASE_2O_01_STATUS` | `DONE / POST_REVIEW_DOCUMENTATION_STATUS_FIX_APPLIED / READY_FOR_REVIEW / LOCAL_ONLY` |
 | `PHASE_2O_IMPLEMENTATION_STATUS` | `IN_PROGRESS / NOT_READY` |
 | `PHASE_2O_02_THROUGH_2O_07_STATUS` | `NOT_AUTHORIZED / NOT_STARTED` |
 | `PHASE_2P_STATUS` | `NOT_AUTHORIZED / NOT_STARTED` |
 | `STAGE_0_BOUNDARY` | `PRESERVED` |
-| `NEXT_CANDIDATE` | `PHASE_2O_01_DOCUMENTATION_STATUS_FIX_COMMIT_REVIEW_ONLY` |
+| `NEXT_CANDIDATE` | `PHASE_2O_01_POST_REVIEW_INTEGRATION_AUTHORIZATION_BLOCKER_DOCUMENTATION_STATUS_FIX_COMMIT_REVIEW_ONLY` |
 
 No provider, model, job, command, device, or production authority follows from a
 visual treatment, status label, navigation destination, reviewer view, or
@@ -448,22 +452,33 @@ Review acceptance of this planning document did not itself authorize Phase
    CSS pixels, keyboard and accessibility review, and server lifecycle all
    passed; it found no functional or safety error and required no accessibility
    or responsive fix.
-10. The sole remaining finding was the stale Phase 2O-01 status and handoff
-    chronology in this Phase 2O-00 planning document.
-11. After this one-file correction is committed, the Phase 2O-01 status is
-    `DONE / DOCUMENTATION_FIX_APPLIED / READY_FOR_REVIEW / LOCAL_ONLY`.
-12. No Phase 2O-01 commit is merged or pushed.
-13. Phase 2O remains `IN_PROGRESS / NOT_READY`.
-14. Phase 2O-02 through Phase 2O-07 remain
+10. At that point, the sole remaining finding was the stale Phase 2O-01 status
+    and handoff chronology in this Phase 2O-00 planning document.
+11. Documentation correction commit
+    `8fdeeb3dc3e605b5f1a80ea78b441fa982c1efb6` addressed that historical finding
+    and subsequently received independent documentation-fix review `PASS`.
+12. The later post-review integration-authorization decision verified the
+    exact three-commit range as clean, three commits ahead, zero commits behind,
+    and strict-fast-forward eligible.
+13. That decision nevertheless remained `BLOCKED` because README, the Phase
+    2O-01 implementation record, and this planning record still contained stale
+    pre-review status or handoff text.
+14. This bounded three-file documentation correction addresses those newly
+    confirmed blockers. It is not independently reviewed, so integration
+    remains `NOT_AUTHORIZED / NOT_PERFORMED`.
+15. Phase 2O remains `IN_PROGRESS / NOT_READY`.
+16. Phase 2O-02 through Phase 2O-07 remain
     `NOT_AUTHORIZED / NOT_STARTED`.
-15. Phase 2P remains `NOT_AUTHORIZED / NOT_STARTED`.
-16. Stage 0 remains `PRESERVED`.
-17. The sole next candidate is one separately authorized
-    `PHASE_2O_01_DOCUMENTATION_STATUS_FIX_COMMIT_REVIEW_ONLY` task.
+17. Phase 2P remains `NOT_AUTHORIZED / NOT_STARTED`.
+18. Stage 0 remains `PRESERVED`.
+19. The sole next candidate is one separately authorized
+    `PHASE_2O_01_POST_REVIEW_INTEGRATION_AUTHORIZATION_BLOCKER_DOCUMENTATION_STATUS_FIX_COMMIT_REVIEW_ONLY`
+    task covering only this new documentation correction.
 
-This chronology does not claim that the complete Phase 2O-01 state has review
-`PASS`, does not authorize integration, merge, or push, and does not authorize
-Phase 2O-02.
+This chronology records the completed technical/safety and prior
+documentation-fix review dispositions as `PASS`, but does not claim that this
+new correction has been reviewed. It does not authorize integration, merge,
+push, Phase 2O-02, any later Phase 2O slice, or Phase 2P.
 
 ## 14. Explicit exclusions and deferred work
 
