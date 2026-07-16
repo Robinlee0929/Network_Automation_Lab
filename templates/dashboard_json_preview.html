@@ -1,9 +1,6 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>JSON Preview - Network Automation Lab Dashboard</title>
+{% extends "dashboard_base.html" %}
+{% block title %}JSON Preview - Network Automation Lab Dashboard{% endblock %}
+{% block page_styles %}
   <style>
     :root {
       --bg: #f4f7fb;
@@ -13,25 +10,6 @@
       --border: #d8e0ec;
       --accent: #0f766e;
     }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--text);
-      font-family: "Segoe UI", Arial, sans-serif;
-      font-size: 14px;
-      line-height: 1.45;
-    }
-    main { max-width: 1080px; margin: 0 auto; padding: 28px 18px 48px; }
-    nav { display: flex; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; }
-    nav a {
-      color: var(--text);
-      text-decoration: none;
-      font-weight: 750;
-      padding: 8px 10px;
-      border-bottom: 2px solid transparent;
-    }
-    nav a.active { border-color: var(--accent); color: var(--accent); }
     h1 { margin: 0 0 8px; font-size: 28px; line-height: 1.15; }
     h2 { margin: 22px 0 10px; font-size: 18px; }
     p { margin: 0 0 18px; color: var(--muted); }
@@ -69,17 +47,13 @@
       text-align: center;
     }
     a { color: #175cd3; }
+    @media (max-width: 620px) {
+      table { table-layout: fixed; }
+      th, td { overflow-wrap: anywhere; word-break: break-word; }
+    }
   </style>
-</head>
-<body>
-<main>
-  <nav>
-    <a href="{{ url_for('home') }}">Home</a>
-    <a class="active" href="{{ url_for('reports') }}">Reports</a>
-    <a href="{{ url_for('commands') }}">Commands</a>
-    <a href="{{ url_for('ai_intent_reviewer') }}">AI Intent Reviewer</a>
-    <a href="{{ url_for('ai_checklist') }}">AI Checklist</a>
-  </nav>
+{% endblock %}
+{% block page_content %}
   <h1>JSON Preview</h1>
   <p><code>{{ report_path }}</code></p>
   <section>
@@ -99,6 +73,4 @@
     <pre>{{ preview.pretty }}</pre>
   </section>
   {% endif %}
-</main>
-</body>
-</html>
+{% endblock %}

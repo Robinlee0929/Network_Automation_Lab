@@ -1,9 +1,6 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AI Intent Reviewer - Network Automation Lab Dashboard</title>
+{% extends "dashboard_base.html" %}
+{% block title %}AI Intent Reviewer - Network Automation Lab Dashboard{% endblock %}
+{% block page_styles %}
   <style>
     :root {
       --bg: #f4f7fb;
@@ -19,25 +16,6 @@
       --safe-bg: #ecfdf3;
       --safe-border: #abefc6;
     }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--text);
-      font-family: "Segoe UI", Arial, sans-serif;
-      font-size: 14px;
-      line-height: 1.45;
-    }
-    main { max-width: 1180px; margin: 0 auto; padding: 28px 18px 48px; }
-    nav { display: flex; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; }
-    nav a {
-      color: var(--text);
-      text-decoration: none;
-      font-weight: 750;
-      padding: 8px 10px;
-      border-bottom: 2px solid transparent;
-    }
-    nav a.active { border-color: var(--accent); color: var(--accent); }
     h1 { margin: 0 0 8px; font-size: 30px; line-height: 1.15; }
     h2 { margin: 0 0 10px; font-size: 18px; }
     h3 { margin: 0 0 8px; font-size: 15px; }
@@ -174,24 +152,14 @@
       color: #7a4d00;
     }
     @media (max-width: 720px) {
-      main { padding: 20px 12px 36px; }
       h1 { font-size: 25px; }
       .summary-grid, .day-grid, .chain-grid, .scenario-grid, .status-row { grid-template-columns: 1fr; }
       th, td { display: block; width: 100%; }
       tr { display: block; margin-bottom: 10px; }
     }
   </style>
-</head>
-<body>
-<main>
-  <nav>
-    <a href="{{ url_for('home') }}">Home</a>
-    <a href="{{ url_for('reports') }}">Reports</a>
-    <a href="{{ url_for('commands') }}">Commands</a>
-    <a class="active" href="{{ url_for('ai_intent_reviewer') }}">AI Intent Reviewer</a>
-    <a href="{{ url_for('ai_checklist') }}">AI Checklist</a>
-  </nav>
-
+{% endblock %}
+{% block page_content %}
   <h1>AI Intent Reviewer Entry Point</h1>
   <p>Reviewer-friendly dashboard view for the Day57-Day94 AI intent workflow. It explains the demo path, links to the committed docs, scenario pack, traceability map, acceptance runbook, sign-off package, offline mock runtime skeleton, contract validation layer, reviewer quality trace, Day69 evidence drilldown, Day70 AI runtime readiness gate, Day71 controlled entry design, Day72 input contract validator, Day73 mock AI decision pipeline, Day74 dry-run plan builder, Day75 manual review approval envelope, Day76 controlled runtime audit trail, Day77 runtime safety gate, Day78 controlled runtime safety case, Day79 read-only task contract, Day80 read-only broker skeleton, Day81 broker review queue, Day82 reviewer decision audit summary, Day93 guarded fake adapter contract, and Day94 adapter boundary regression matrix while keeping the no-execution boundary visible.</p>
   <div class="note">This page is report-only. It does not call an AI model, listen to voice input, execute mapped tasks, open SSH, connect to devices, or change network configuration.</div>
@@ -851,6 +819,4 @@
       {% endfor %}
     </ul>
   </section>
-</main>
-</body>
-</html>
+{% endblock %}

@@ -22,11 +22,11 @@ non-executing.
 | `PLANNING_COMMIT` | `99b1929b6efd0af07ed3bbe634d7e7108867618f` |
 | `PLANNING_COMMIT_STATUS` | `MERGED_TO_MAIN` |
 | `PHASE_2O_STATUS` | `IN_PROGRESS / NOT_READY` |
-| `PHASE_2O_01_STATUS` | `NOT_AUTHORIZED / NOT_STARTED` |
-| `PHASE_2O_IMPLEMENTATION_STATUS` | `NOT_AUTHORIZED / NOT_STARTED` |
+| `PHASE_2O_01_STATUS` | `DONE / READY_FOR_REVIEW / LOCAL_ONLY` |
+| `PHASE_2O_IMPLEMENTATION_STATUS` | `IN_PROGRESS / NOT_READY` |
 | `PHASE_2P_STATUS` | `NOT_AUTHORIZED / NOT_STARTED` |
 | `STAGE_0_BOUNDARY` | `PRESERVED` |
-| `NEXT_CANDIDATE` | `PHASE_2O_01_CONTINUATION_AUTHORIZATION_DECISION_ONLY` |
+| `NEXT_CANDIDATE` | `PHASE_2O_01_IMPLEMENTATION_COMMIT_REVIEW_ONLY` |
 
 No provider, model, job, command, device, or production authority follows from a
 visual treatment, status label, navigation destination, reviewer view, or
@@ -413,10 +413,11 @@ provides:
 - [x] Planning-only, one-document scope with no UI/source/test/dependency/runtime
   implementation.
 
-Review acceptance of this document does not authorize Phase 2O-01.
-The sole next candidate is one later separate
-`PHASE_2O_01_CONTINUATION_AUTHORIZATION_DECISION_ONLY` task, not Phase 2O-01
-implementation.
+Review acceptance of this planning document did not itself authorize Phase
+2O-01. A later separate authorization did so, and the local Phase 2O-01
+implementation is now `DONE / READY_FOR_REVIEW / LOCAL_ONLY`. It has not been
+reviewed, merged, or pushed. The sole next candidate is one separately
+authorized `PHASE_2O_01_IMPLEMENTATION_COMMIT_REVIEW_ONLY` task.
 
 ## 14. Explicit exclusions and deferred work
 
@@ -438,7 +439,7 @@ The following remain excluded and unauthorized:
   authorization both pass.
 - Packaging, distribution, deployment, publication, merge, push, pull request,
   branch cleanup, and all Phase 2P work.
-- Phase 2O-01 through Phase 2O-07 implementation until each applicable slice
+- Phase 2O-02 through Phase 2O-07 implementation until each applicable slice
   receives its own fresh explicit authorization.
 
 ## 15. Documentation readability review

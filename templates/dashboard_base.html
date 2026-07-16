@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Network Automation Lab Dashboard{% endblock %}</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --shell-bg: #f4f7fb;
+      --surface: #ffffff;
+      --text: #172033;
+      --muted: #4a5872;
+      --border: #cbd5e1;
+      --accent: #175cd3;
+      --accent-strong: #0b4db8;
+      --notice-bg: #fff8db;
+      --notice-border: #d5a000;
+      --focus: #111827;
+      --content-max: 1180px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { background: var(--shell-bg); }
+
+    body {
+      margin: 0;
+      min-width: 0;
+      background: var(--shell-bg);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+
+    a { color: var(--accent); }
+    a:hover { color: var(--accent-strong); }
+
+    a:focus-visible,
+    button:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible,
+    [tabindex]:focus-visible {
+      outline: 3px solid var(--focus);
+      outline-offset: 3px;
+      box-shadow: 0 0 0 5px #ffffff;
+    }
+
+    .skip-link {
+      position: fixed;
+      z-index: 1000;
+      top: 8px;
+      left: 8px;
+      padding: 10px 14px;
+      border: 2px solid var(--focus);
+      border-radius: 8px;
+      background: var(--surface);
+      color: var(--focus);
+      font-weight: 800;
+      transform: translateY(-180%);
+    }
+
+    .skip-link:focus { transform: translateY(0); }
+
+    .site-header {
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .site-header__inner {
+      width: min(100% - 32px, var(--content-max));
+      margin: 0 auto;
+      padding: 18px 0 14px;
+    }
+
+    .project-identity {
+      margin: 0 0 12px;
+      font-size: clamp(18px, 2.5vw, 24px);
+      font-weight: 850;
+      letter-spacing: -0.02em;
+    }
+
+    .project-identity a {
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .primary-nav ul {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .primary-nav a {
+      display: inline-block;
+      padding: 8px 11px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      color: var(--text);
+      font-weight: 750;
+      text-decoration: none;
+    }
+
+    .primary-nav a:hover { background: #eef4ff; }
+
+    .primary-nav a[aria-current="page"] {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #ffffff;
+      text-decoration: underline;
+      text-decoration-thickness: 2px;
+      text-underline-offset: 3px;
+    }
+
+    .stage-zero-notice {
+      border-bottom: 1px solid var(--notice-border);
+      background: var(--notice-bg);
+    }
+
+    .stage-zero-notice p {
+      width: min(100% - 32px, var(--content-max));
+      margin: 0 auto;
+      padding: 12px 0;
+      color: #5f4500;
+      font-size: 14px;
+      font-weight: 650;
+    }
+
+    main {
+      width: min(100% - 32px, var(--content-max));
+      margin: 0 auto;
+      padding: 28px 0 48px;
+    }
+
+    h1 { line-height: 1.15; }
+    img, svg { max-width: 100%; }
+    table { max-width: 100%; }
+    pre, code { overflow-wrap: anywhere; }
+    .table-wrap { max-width: 100%; overflow-x: auto; }
+
+    @media (max-width: 760px) {
+      .site-header__inner,
+      .stage-zero-notice p,
+      main { width: min(100% - 24px, var(--content-max)); }
+
+      .primary-nav ul {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .primary-nav a { width: 100%; }
+    }
+
+    @media (max-width: 420px) {
+      .primary-nav ul { grid-template-columns: 1fr; }
+      main { padding-top: 20px; }
+    }
+  </style>
+  {% block page_styles %}{% endblock %}
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <header class="site-header">
+    <div class="site-header__inner">
+      <p class="project-identity"><a href="{{ url_for('home') }}">Network Automation Lab</a></p>
+      <nav class="primary-nav" aria-label="Primary navigation">
+        <ul>
+          <li><a href="{{ url_for('home') }}"{% if request.endpoint == 'home' %} aria-current="page"{% endif %}>Home</a></li>
+          <li><a href="{{ url_for('reports') }}"{% if request.endpoint in ('reports', 'open_report', 'preview_json_report', 'open_evidence_artifact', 'open_wireguard_vpn_report') %} aria-current="page"{% endif %}>Reports</a></li>
+          <li><a href="{{ url_for('commands') }}"{% if request.endpoint == 'commands' %} aria-current="page"{% endif %}>Commands</a></li>
+          <li><a href="{{ url_for('command_logs') }}"{% if request.endpoint in ('command_logs', 'command_log_detail') %} aria-current="page"{% endif %}>Execution Logs</a></li>
+          <li><a href="{{ url_for('ai_intent_reviewer') }}"{% if request.endpoint == 'ai_intent_reviewer' %} aria-current="page"{% endif %}>AI Intent Reviewer</a></li>
+          <li><a href="{{ url_for('ai_checklist') }}"{% if request.endpoint == 'ai_checklist' %} aria-current="page"{% endif %}>AI Checklist</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <aside class="stage-zero-notice" aria-label="Stage 0 safety boundary">
+    <p><strong>Stage 0 canonical Flask reviewer surface:</strong> local evidence is display-only and report-only. No provider or model access, command execution, or live-device access is available from this interface.</p>
+  </aside>
+
+  <main id="main-content" tabindex="-1">
+    {% block page_heading %}{% endblock %}
+    {% block page_content %}{% endblock %}
+  </main>
+  {% block page_scripts %}{% endblock %}
+</body>
+</html>
