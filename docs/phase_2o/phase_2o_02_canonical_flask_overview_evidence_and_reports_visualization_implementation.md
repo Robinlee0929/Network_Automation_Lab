@@ -2,19 +2,21 @@
 
 ## Conclusion and status
 
-**Conclusion: `DONE / LOCAL_ONLY / READY_FOR_INDEPENDENT_FIX_REVIEW`.** The
-bounded Phase 2O-02 review fix is applied locally on branch
-`codex/phase-2o-02-canonical-flask-overview-evidence-reports-visualization` from
-reviewed implementation commit
-`0548c6beab80a087ea02d00d49a213dd4336724a`. Independent review of that
-implementation returned `FAIL_FIX_REQUIRED` for the two findings recorded
-below.
+**Conclusion:** Phase 2O-02 is
+`DONE / MERGED_TO_MAIN / SYNCHRONIZED / POST_MERGE_STATUS_RECONCILIATION_READY_FOR_REVIEW`.
+Original implementation
+commit `0548c6beab80a087ea02d00d49a213dd4336724a` received independent review
+`FAIL_FIX_REQUIRED`. Bounded review-fix commit
+`00862075494bc7a76dd478bee9d1742d53d43167` received independent review `PASS`,
+so the cumulative Phase 2O-02 implementation is `ACCEPTED`. The accepted target
+was integrated into `main` by strict fast-forward, normally pushed, and freshly
+verified on remote `main`; the fully merged local source branch was safely
+deleted.
 
-This record does not claim fix-review acceptance, implementation acceptance,
-integration, merge, push, deployment, publication, or pull-request creation. It
-authorizes no additional phase or slice. The original implementation commit is
-`0548c6beab80a087ea02d00d49a213dd4336724a`; its containing commit used this
-stable identity convention:
+This record does not claim that its post-merge reconciliation has passed
+independent review or that the reconciliation's second push had already
+occurred when this tree was created. It authorizes no additional phase or slice.
+The original implementation commit used this stable identity convention:
 
 ```text
 PHASE_2O_02_IMPLEMENTATION_COMMIT_REFERENCE:
@@ -33,6 +35,20 @@ THIS_COMMIT
 EXACT_REVIEW_FIX_COMMIT_SHA_SOURCE:
 FINAL_TASK_RESULT_AND_INDEPENDENT_FIX_REVIEW_TARGET
 ```
+
+This post-merge reconciliation uses a separate stable identity convention:
+
+```text
+PHASE_2O_02_POST_MERGE_RECONCILIATION_COMMIT_REFERENCE:
+THIS_COMMIT
+
+EXACT_RECONCILIATION_COMMIT_SHA_SOURCE:
+FINAL_TASK_RESULT_AND_INDEPENDENT_POST_MERGE_REVIEW_TARGET
+```
+
+The final task result supplies this reconciliation commit's exact SHA and
+second-push result; the exact SHA becomes the independent post-merge review
+target.
 
 ## Phase goal and implementation boundary
 
@@ -190,7 +206,7 @@ Independent review targeted original implementation commit
   of three for the Home evidence-health cards while the implementation renders
   seven existing category-based cards.
 
-The bounded local fix changes exactly `dashboard_app.py`, the authorized Phase
+The bounded fix changed exactly `dashboard_app.py`, the authorized Phase
 2O-02 regression test, this implementation record, and the Phase 2O-00 planning
 record. It makes every mixed usable collection `READY`, preserves degraded
 counts, corrects both records to seven cards, and behaviorally verifies the
@@ -254,9 +270,24 @@ The rendered review found seven Home category cards, no page-level horizontal
 overflow, table overflow bounded by intended wrappers, unchanged filter and
 native disclosure behavior, explicit non-color labels, rendered focus rules,
 logical headings and landmarks, no raw error, no action control, and no console
-error or warning. The exact fix commit identity is reported by the final task
-result and forms the independent fix-review target. This record does not claim
-fix-review `PASS`.
+error or warning. The exact fix commit was
+`00862075494bc7a76dd478bee9d1742d53d43167`; its independent bounded-fix review
+returned `PASS` and accepted the cumulative implementation.
+
+Pre-first-push integration validation on strict-fast-forwarded local `main`
+also passed:
+
+- `git diff --check` for the exact base-to-target range;
+- the exact targeted suite with `114 passed`;
+- full pytest with `1,928 passed` and one existing terminal `GetPassWarning`;
+- report-index with `14/14 PASS`; and
+- clean worktree plus no task-owned server or listener on ports 5000 through
+  5002.
+
+Accepted target `00862075494bc7a76dd478bee9d1742d53d43167` was normally pushed
+to trusted `origin/main` and freshly verified there. The fully merged local
+source branch was safely deleted. No remote source branch was created or
+deleted, and no force update occurred.
 
 ## Safety and authorization boundaries
 
@@ -279,20 +310,24 @@ Rejected and non-executing paths remain non-executing. Stage 0 remains
 
 ## Documentation readability review
 
-- The document opens with its conclusion and review status.
+- The document opens with its accepted integration and reconciliation-review
+  status.
 - The phase goal, allowed fields, and forbidden behavior are separately stated.
 - Result and availability terminology is explicit and consistent.
 - Collection-state precedence and filter behavior are concrete and verifiable.
 - Validation evidence is separated from implementation claims.
-- The text does not claim independent-review acceptance or integration.
+- The text distinguishes the accepted fix review and verified implementation
+  integration from this reconciliation's still-pending independent review.
 - Long material is divided into short sections, lists, and one results table.
 - No runtime, execution, safety-gate, or later-phase authority is introduced.
 
 ## Handoff
 
 The sole next candidate is
-`PHASE_2O_02_BOUNDED_REVIEW_FIX_COMMIT_REVIEW_ONLY`, an independent review of
-the exact review-fix commit identified in the final task result. Phase 2O-03
-through Phase 2O-07 and Phase 2P remain `NOT_AUTHORIZED / NOT_STARTED`. No
-integration, merge, push, pull request, branch cleanup, or next-slice
-implementation is authorized by this record. Stage 0 remains `PRESERVED`.
+`PHASE_2O_02_POST_MERGE_STATUS_RECONCILIATION_COMMIT_REVIEW_ONLY`, an
+independent review of this exact bounded three-document reconciliation. Its
+commit SHA and second-push result are supplied by the final task result; this
+record does not claim its own future review `PASS`. Phase 2O remains
+`IN_PROGRESS / NOT_READY`; Phase 2O-03 through Phase 2O-07 and Phase 2P remain
+`NOT_AUTHORIZED / NOT_STARTED`. No next-slice implementation is authorized by
+this record. Stage 0 remains `PRESERVED`.

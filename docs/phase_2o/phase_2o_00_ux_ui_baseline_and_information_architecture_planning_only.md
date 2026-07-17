@@ -45,13 +45,19 @@ non-executing.
 | `PHASE_2O_IMPLEMENTATION_STATUS` | `IN_PROGRESS / NOT_READY` |
 | `PHASE_2O_02_IMPLEMENTATION_COMMIT` | `0548c6beab80a087ea02d00d49a213dd4336724a` |
 | `PHASE_2O_02_IMPLEMENTATION_REVIEW_DECISION` | `FAIL_FIX_REQUIRED` |
-| `PHASE_2O_02_REVIEW_FIX_COMMIT` | `THIS_COMMIT` |
-| `PHASE_2O_02_REVIEW_FIX_STATUS` | `DONE / LOCAL_ONLY / READY_FOR_INDEPENDENT_FIX_REVIEW` |
-| `PHASE_2O_02_STATUS` | `DONE / LOCAL_ONLY / READY_FOR_INDEPENDENT_FIX_REVIEW` |
+| `PHASE_2O_02_REVIEW_FIX_COMMIT` | `00862075494bc7a76dd478bee9d1742d53d43167` |
+| `PHASE_2O_02_REVIEW_FIX_STATUS` | `DONE / MERGED_TO_MAIN` |
+| `PHASE_2O_02_REVIEW_FIX_DECISION` | `PASS` |
+| `PHASE_2O_02_CUMULATIVE_IMPLEMENTATION_STATUS` | `ACCEPTED` |
+| `PHASE_2O_02_INTEGRATION_TARGET` | `00862075494bc7a76dd478bee9d1742d53d43167` |
+| `PHASE_2O_02_INTEGRATION_METHOD` | `STRICT_FAST_FORWARD` |
+| `PHASE_2O_02_STATUS` | `DONE / MERGED_TO_MAIN / SYNCHRONIZED / POST_MERGE_STATUS_RECONCILIATION_READY_FOR_REVIEW` |
+| `PHASE_2O_02_POST_MERGE_RECONCILIATION_COMMIT_REFERENCE` | `THIS_COMMIT` |
+| `EXACT_RECONCILIATION_COMMIT_SHA_SOURCE` | `FINAL_TASK_RESULT_AND_INDEPENDENT_POST_MERGE_REVIEW_TARGET` |
 | `PHASE_2O_03_THROUGH_2O_07_STATUS` | `NOT_AUTHORIZED / NOT_STARTED` |
 | `PHASE_2P_STATUS` | `NOT_AUTHORIZED / NOT_STARTED` |
 | `STAGE_0_BOUNDARY` | `PRESERVED` |
-| `NEXT_CANDIDATE` | `PHASE_2O_02_BOUNDED_REVIEW_FIX_COMMIT_REVIEW_ONLY` |
+| `NEXT_CANDIDATE` | `PHASE_2O_02_POST_MERGE_STATUS_RECONCILIATION_COMMIT_REVIEW_ONLY` |
 
 No provider, model, job, command, device, or production authority follows from a
 visual treatment, status label, navigation destination, reviewer view, or
@@ -576,7 +582,7 @@ review of the exact Phase 2O-02 implementation commit.
 
 ### 13.3 Phase 2O-02 bounded review-finding correction
 
-**Conclusion: `DONE / LOCAL_ONLY / READY_FOR_INDEPENDENT_FIX_REVIEW`.**
+**Correction conclusion when created: `DONE / LOCAL_ONLY / READY_FOR_INDEPENDENT_FIX_REVIEW`.**
 Independent review targeted original implementation commit
 `0548c6beab80a087ea02d00d49a213dd4336724a` and returned
 `FAIL_FIX_REQUIRED` for exactly two findings:
@@ -588,7 +594,8 @@ Independent review targeted original implementation commit
    incorrect count of three for the Home evidence-health cards even though the
    existing implementation renders seven category-based cards.
 
-The bounded fix is applied locally in exactly four files:
+The bounded fix was applied locally and committed as
+`00862075494bc7a76dd478bee9d1742d53d43167` in exactly four files:
 
 1. `dashboard_app.py`
 2. `tests/test_phase_2o_02_canonical_flask_overview_evidence_and_reports_visualization.py`
@@ -625,14 +632,44 @@ All three task-owned servers stopped and ports 5000 through 5002 were released.
 The seven existing Home card categories are preserved and behaviorally checked
 by their rendered titles. No dependency, route, route method, POST behavior,
 safe-view boundary, evidence source, importer, action control, or execution path
-was added or expanded. No push, merge, integration, pull request, or branch
-change occurred. Stage 0 remains `PRESERVED`; Phase 2O-03 through Phase 2O-07
-and Phase 2P remain `NOT_AUTHORIZED / NOT_STARTED`.
+was added or expanded. The independent bounded-fix review later returned
+`PASS`; the cumulative Phase 2O-02 implementation was therefore `ACCEPTED`.
 
-The sole next candidate is
-`PHASE_2O_02_BOUNDED_REVIEW_FIX_COMMIT_REVIEW_ONLY`, targeting the exact fix
-commit reported in the final task result. This record does not claim fix-review
-`PASS`, implementation acceptance, or integration authorization.
+### 13.4 Phase 2O-02 integration and post-merge status reconciliation
+
+**Current conclusion:** Phase 2O-02 is
+`DONE / MERGED_TO_MAIN / SYNCHRONIZED / POST_MERGE_STATUS_RECONCILIATION_READY_FOR_REVIEW`.
+Local `main` advanced from
+`1c0fe027e547d4fa89f5ad09ca0f924eb9b6763a` to accepted target
+`00862075494bc7a76dd478bee9d1742d53d43167` using `STRICT_FAST_FORWARD`. No merge
+commit, squash, rebase, cherry-pick, or reset occurred.
+
+Pre-first-push validation passed `git diff --check`, the exact targeted suite
+with `114 passed`, full pytest with `1,928 passed` and one existing terminal
+warning, and report-index with `14/14 PASS`. The accepted target was normally
+pushed to trusted `origin/main` and freshly verified there. The fully merged
+local source branch was safely deleted; no remote source branch was created or
+deleted.
+
+This bounded reconciliation changes only `README.md`, this Phase 2O-00 plan,
+and the Phase 2O-02 implementation record. It changes no application, test,
+template, dependency, runtime, or safety behavior. Its stable identity is:
+
+```text
+PHASE_2O_02_POST_MERGE_RECONCILIATION_COMMIT_REFERENCE:
+THIS_COMMIT
+
+EXACT_RECONCILIATION_COMMIT_SHA_SOURCE:
+FINAL_TASK_RESULT_AND_INDEPENDENT_POST_MERGE_REVIEW_TARGET
+```
+
+The final task result supplies this reconciliation commit's exact SHA and
+second-push result. This record does not claim that its own independent review
+has passed or that its second push had already occurred when its tree was
+created. Phase 2O remains `IN_PROGRESS / NOT_READY`; Phase 2O-03 through Phase
+2O-07 and Phase 2P remain `NOT_AUTHORIZED / NOT_STARTED`; Stage 0 remains
+`PRESERVED`. The sole next candidate is
+`PHASE_2O_02_POST_MERGE_STATUS_RECONCILIATION_COMMIT_REVIEW_ONLY`.
 
 ## 14. Explicit exclusions and deferred work
 
@@ -665,7 +702,8 @@ The following remain excluded and unauthorized:
   separated.
 - Current facts cite repository files or Phase 2N records; recommendations and
   assumptions are labeled.
-- `DONE / REVIEWED / MERGED_TO_MAIN`, `IN_PROGRESS / NOT_READY`,
+- `DONE / MERGED_TO_MAIN / SYNCHRONIZED /
+  POST_MERGE_STATUS_RECONCILIATION_READY_FOR_REVIEW`, `IN_PROGRESS / NOT_READY`,
   `NOT_AUTHORIZED / NOT_STARTED`, and `PRESERVED` are used consistently.
 - Flask canonical and Next.js secondary terminology matches the Phase 2N closure.
 - Acceptance criteria and later-slice evidence are concrete and verifiable.
