@@ -24,23 +24,29 @@ non-executing.
 | `PHASE_2O_STATUS` | `IN_PROGRESS / NOT_READY` |
 | `PHASE_2O_01_CONTINUATION_AUTHORIZATION` | `DONE / AUTHORIZED` |
 | `PHASE_2O_01_IMPLEMENTATION_COMMIT` | `a2d19722a48eae6f3e8573db0e023bdffdff4ce9` |
-| `PHASE_2O_01_IMPLEMENTATION_STATUS` | `DONE / LOCAL_ONLY` |
+| `PHASE_2O_01_IMPLEMENTATION_STATUS` | `DONE / MERGED_TO_MAIN` |
 | `PHASE_2O_01_IMPLEMENTATION_REVIEW_DECISION` | `FAIL_FIX_REQUIRED` |
 | `PHASE_2O_01_RESPONSIVE_FIX_COMMIT` | `f4a65339cd146b26c0d23810fea992cd6dfea9c6` |
-| `PHASE_2O_01_FIX_COMMIT_STATUS` | `DONE / LOCAL_ONLY` |
+| `PHASE_2O_01_FIX_COMMIT_STATUS` | `DONE / MERGED_TO_MAIN` |
 | `PHASE_2O_01_FIX_REVIEW_DECISION` | `FAIL_FIX_REQUIRED` |
 | `PHASE_2O_01_TECHNICAL_AND_SAFETY_DISPOSITION` | `PASS` |
 | `PHASE_2O_01_PRIOR_REMAINING_FINDING` | `STALE_PHASE_2O_00_STATUS_AND_HANDOFF_DOCUMENTATION` |
 | `PHASE_2O_01_DOCUMENTATION_FIX_COMMIT` | `8fdeeb3dc3e605b5f1a80ea78b441fa982c1efb6` |
 | `PHASE_2O_01_DOCUMENTATION_FIX_REVIEW_DECISION` | `PASS` |
-| `PHASE_2O_01_INTEGRATION_AUTHORIZATION_DECISION` | `BLOCKED` |
-| `PHASE_2O_01_INTEGRATION_AUTHORIZATION_BLOCKER` | `STALE_APPLICABLE_STATUS_AND_HANDOFF_RECORDS` |
-| `PHASE_2O_01_STATUS` | `DONE / POST_REVIEW_DOCUMENTATION_STATUS_FIX_APPLIED / READY_FOR_REVIEW / LOCAL_ONLY` |
+| `PHASE_2O_01_HISTORICAL_INTEGRATION_AUTHORIZATION_DECISION` | `BLOCKED` |
+| `PHASE_2O_01_HISTORICAL_INTEGRATION_AUTHORIZATION_BLOCKER` | `STALE_APPLICABLE_STATUS_AND_HANDOFF_RECORDS` |
+| `PHASE_2O_01_INTEGRATION_BLOCKER_DOCUMENTATION_FIX_COMMIT` | `b7d8ec9e63dd72d7a935ed6228deabfaba072a1a` |
+| `PHASE_2O_01_INTEGRATION_BLOCKER_DOCUMENTATION_FIX_REVIEW` | `PASS` |
+| `PHASE_2O_01_LATEST_INTEGRATION_AUTHORIZATION_DECISION` | `AUTHORIZED` |
+| `PHASE_2O_01_INTEGRATION_BASE` | `ecaef4a0655cae10d4ed7154f4948fb4d6982e6c` |
+| `PHASE_2O_01_INTEGRATION_TARGET` | `b7d8ec9e63dd72d7a935ed6228deabfaba072a1a` |
+| `PHASE_2O_01_INTEGRATION_METHOD` | `STRICT_FAST_FORWARD` |
+| `PHASE_2O_01_STATUS` | `DONE / MERGED_TO_MAIN / SYNCHRONIZED / POST_MERGE_STATUS_RECONCILIATION_READY_FOR_REVIEW` |
 | `PHASE_2O_IMPLEMENTATION_STATUS` | `IN_PROGRESS / NOT_READY` |
 | `PHASE_2O_02_THROUGH_2O_07_STATUS` | `NOT_AUTHORIZED / NOT_STARTED` |
 | `PHASE_2P_STATUS` | `NOT_AUTHORIZED / NOT_STARTED` |
 | `STAGE_0_BOUNDARY` | `PRESERVED` |
-| `NEXT_CANDIDATE` | `PHASE_2O_01_POST_REVIEW_INTEGRATION_AUTHORIZATION_BLOCKER_DOCUMENTATION_STATUS_FIX_COMMIT_REVIEW_ONLY` |
+| `NEXT_CANDIDATE` | `PHASE_2O_01_POST_MERGE_STATUS_RECONCILIATION_COMMIT_REVIEW_ONLY` |
 
 No provider, model, job, command, device, or production authority follows from a
 visual treatment, status label, navigation destination, reviewer view, or
@@ -457,28 +463,45 @@ Review acceptance of this planning document did not itself authorize Phase
 11. Documentation correction commit
     `8fdeeb3dc3e605b5f1a80ea78b441fa982c1efb6` addressed that historical finding
     and subsequently received independent documentation-fix review `PASS`.
-12. The later post-review integration-authorization decision verified the
+12. The first post-review integration-authorization decision verified the
     exact three-commit range as clean, three commits ahead, zero commits behind,
     and strict-fast-forward eligible.
 13. That decision nevertheless remained `BLOCKED` because README, the Phase
     2O-01 implementation record, and this planning record still contained stale
     pre-review status or handoff text.
-14. This bounded three-file documentation correction addresses those newly
-    confirmed blockers. It is not independently reviewed, so integration
-    remains `NOT_AUTHORIZED / NOT_PERFORMED`.
-15. Phase 2O remains `IN_PROGRESS / NOT_READY`.
-16. Phase 2O-02 through Phase 2O-07 remain
+14. Integration-blocker documentation correction commit
+    `b7d8ec9e63dd72d7a935ed6228deabfaba072a1a` addressed those blockers and
+    received independent review `PASS`.
+15. A fresh post-review integration-authorization decision returned
+    `AUTHORIZED` for only the exact four-commit range from
+    `ecaef4a0655cae10d4ed7154f4948fb4d6982e6c` through
+    `b7d8ec9e63dd72d7a935ed6228deabfaba072a1a`, which was four commits ahead,
+    zero behind, and strict-fast-forward eligible.
+16. Local `main` advanced to the reviewed target by strict fast-forward only,
+    without a merge commit, squash, rebase, or cherry-pick.
+17. Post-fast-forward validation passed targeted pytest (`14 passed`), full
+    pytest (`1,884 passed`, one existing warning), authorized-range
+    `git diff --check`, and report-index (`14/14 PASS`).
+18. The reviewed target was normally pushed, and remote `main` was proven at
+    `b7d8ec9e63dd72d7a935ed6228deabfaba072a1a` before this reconciliation.
+19. The fully merged local source branch was safely deleted. No remote branch
+    was deleted.
+20. This bounded three-file post-merge status reconciliation changes no
+    implementation behavior and has not passed independent review.
+21. Phase 2O remains `IN_PROGRESS / NOT_READY`.
+22. Phase 2O-02 through Phase 2O-07 remain
     `NOT_AUTHORIZED / NOT_STARTED`.
-17. Phase 2P remains `NOT_AUTHORIZED / NOT_STARTED`.
-18. Stage 0 remains `PRESERVED`.
-19. The sole next candidate is one separately authorized
-    `PHASE_2O_01_POST_REVIEW_INTEGRATION_AUTHORIZATION_BLOCKER_DOCUMENTATION_STATUS_FIX_COMMIT_REVIEW_ONLY`
-    task covering only this new documentation correction.
+23. Phase 2P remains `NOT_AUTHORIZED / NOT_STARTED`.
+24. Stage 0 remains `PRESERVED`.
+25. The sole next candidate is one separately authorized
+    `PHASE_2O_01_POST_MERGE_STATUS_RECONCILIATION_COMMIT_REVIEW_ONLY` task
+    covering only this reconciliation; it does not directly authorize Phase
+    2O-02.
 
-This chronology records the completed technical/safety and prior
-documentation-fix review dispositions as `PASS`, but does not claim that this
-new correction has been reviewed. It does not authorize integration, merge,
-push, Phase 2O-02, any later Phase 2O slice, or Phase 2P.
+This chronology records the completed technical/safety, documentation-fix, and
+integration-blocker correction review dispositions as `PASS`, but does not
+claim that this post-merge reconciliation has been reviewed. It does not
+authorize Phase 2O-02, any later Phase 2O slice, or Phase 2P.
 
 ## 14. Explicit exclusions and deferred work
 
@@ -498,8 +521,9 @@ The following remain excluded and unauthorized:
 - Day 1–160 rewrites or replacement and any second safety matrix.
 - Static topology unless the separate Section 11 gate and a later implementation
   authorization both pass.
-- Packaging, distribution, deployment, publication, merge, push, pull request,
-  branch cleanup, and all Phase 2P work.
+- Any further packaging, distribution, deployment, publication, merge, push,
+  pull request, branch cleanup, or Phase 2P work not explicitly authorized by a
+  separate task.
 - Phase 2O-02 through Phase 2O-07 implementation until each applicable slice
   receives its own fresh explicit authorization.
 

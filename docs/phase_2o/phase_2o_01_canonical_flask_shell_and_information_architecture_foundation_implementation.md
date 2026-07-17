@@ -2,7 +2,7 @@
 
 ## 1. Conclusion and authorization boundary
 
-**Status: `DONE / POST_REVIEW_DOCUMENTATION_STATUS_FIX_APPLIED / READY_FOR_REVIEW / LOCAL_ONLY`.** Original
+**Status: `DONE / MERGED_TO_MAIN / SYNCHRONIZED / POST_MERGE_STATUS_RECONCILIATION_READY_FOR_REVIEW`.** Original
 implementation commit `a2d19722a48eae6f3e8573db0e023bdffdff4ce9`
 established the shared Jinja shell, but its independent implementation review
 returned `FAIL_FIX_REQUIRED`. The review reproduced page-level horizontal
@@ -17,23 +17,38 @@ corrected implementation state is `PASS`. Documentation correction commit
 `8fdeeb3dc3e605b5f1a80ea78b441fa982c1efb6` subsequently received independent
 documentation-fix review `PASS`.
 
-The post-review integration-authorization decision verified the exact
-three-commit range as clean, three commits ahead, zero commits behind, and
-strict-fast-forward eligible, but returned `BLOCKED` because three applicable
-status records retained stale pre-review handoffs. This bounded documentation
-correction reconciles those records. It is not independently reviewed, so
-Phase 2O-01 integration remains `NOT_AUTHORIZED / NOT_PERFORMED`.
+The first post-review integration-authorization decision verified the
+then-current three-commit range as clean, three commits ahead, zero commits
+behind, and strict-fast-forward eligible, but returned `BLOCKED` because three
+applicable status records retained stale pre-review handoffs. Integration-blocker
+documentation correction commit
+`b7d8ec9e63dd72d7a935ed6228deabfaba072a1a` reconciled those records and
+received independent review `PASS`.
+
+A fresh post-review integration-authorization decision returned `AUTHORIZED`
+for only the exact four-commit range from
+`ecaef4a0655cae10d4ed7154f4948fb4d6982e6c` through
+`b7d8ec9e63dd72d7a935ed6228deabfaba072a1a`. Before integration, the range was
+four commits ahead, zero commits behind, and strict-fast-forward eligible.
+Local `main` advanced from the base to the reviewed target by strict
+fast-forward, with no merge commit, squash, rebase, or cherry-pick. Required
+validation passed, the reviewed target was normally pushed, and remote `main`
+was proven at the same commit before this reconciliation. The fully merged
+local source branch was safely deleted; no remote branch was deleted.
 
 Starting `main` was
-`ecaef4a0655cae10d4ed7154f4948fb4d6982e6c`. Stage 0 remains `PRESERVED`.
+`ecaef4a0655cae10d4ed7154f4948fb4d6982e6c`; the reviewed integrated target is
+`b7d8ec9e63dd72d7a935ed6228deabfaba072a1a`. Stage 0 remains `PRESERVED`.
 Phase 2O remains `IN_PROGRESS / NOT_READY`. Phase 2O-02 through Phase 2O-07 and
-Phase 2P remain `NOT_AUTHORIZED / NOT_STARTED`. The sole next candidate is one
-separately authorized
-`PHASE_2O_01_POST_REVIEW_INTEGRATION_AUTHORIZATION_BLOCKER_DOCUMENTATION_STATUS_FIX_COMMIT_REVIEW_ONLY`
-task covering only this new documentation correction.
+Phase 2P remain `NOT_AUTHORIZED / NOT_STARTED`. This bounded post-merge status
+reconciliation changes no implementation behavior and has not passed
+independent review. The sole next candidate is one separately authorized
+`PHASE_2O_01_POST_MERGE_STATUS_RECONCILIATION_COMMIT_REVIEW_ONLY` task covering
+only this reconciliation; it does not directly authorize Phase 2O-02.
 
-This implementation grants no merge, push, provider, model, API, POST, command,
-runner, device, configuration, packaging, or production authority.
+This completed integration and reconciliation grant no provider, model, API,
+POST, command, runner, device, configuration, packaging, production, or later
+Phase authority.
 
 ## 2. Original implementation and bounded-fix inventories
 
@@ -183,7 +198,7 @@ The resume task did not start Flask, browser navigation, or computer-use. The
 later independent review supplied the controlling technical and safety `PASS`;
 this documentation correction does not repeat or replace that review.
 
-## 7. Resume validation results
+## 7. Pre-integration implementation validation results
 
 - Exact targeted pytest: `70 passed`, `0 failed`, `0 skipped`, `0 warnings`.
 - Full pytest: `1884 passed`, `0 failed`, `0 skipped`, `1 warning`. The warning
@@ -204,7 +219,28 @@ python -m pytest
 python network_lab.py --task report-index
 ```
 
-## 8. No-execution and forbidden-scope proof
+## 8. Strict fast-forward integration and synchronization
+
+- Local `main` started at
+  `ecaef4a0655cae10d4ed7154f4948fb4d6982e6c` and advanced by
+  `git merge --ff-only b7d8ec9e63dd72d7a935ed6228deabfaba072a1a`.
+- The resulting history retained the exact four reviewed commits and created no
+  merge commit, squash, rebase, cherry-pick, replacement, or unrelated commit.
+- Authorized-range `git diff --check` passed.
+- Post-fast-forward targeted pytest passed `14` tests. Full pytest passed
+  `1,884` tests with the one existing terminal `GetPassWarning`. Report-index
+  passed `14/14` with zero warnings, failures, or missing reports.
+- The exact reviewed target was pushed normally to `origin/main` without force,
+  and a read-only remote query proved remote `main` at
+  `b7d8ec9e63dd72d7a935ed6228deabfaba072a1a` before this reconciliation.
+- The fully merged local branch
+  `codex/phase-2o-01-canonical-flask-shell-ia-foundation` was deleted safely
+  with no force. No remote branch was deleted.
+- This post-integration reconciliation is limited to `README.md`, this
+  implementation record, and the Phase 2O-00 planning record. It introduces no
+  implementation, test, configuration, runtime, or execution behavior.
+
+## 9. No-execution and forbidden-scope proof
 
 Rendered views contained no form or button and the Commands page retained its
 explicit no-submission statement. Browser traffic was GET-only. No route,
@@ -215,17 +251,22 @@ access, configuration backup/change, or production behavior changed. Phase
 2O-02 content was not implemented. Day1-Day160 history and the single safety
 model were not rewritten.
 
-## 9. Review handoff
+## 10. Review handoff
 
 Phase 2O-01 is
-`DONE / POST_REVIEW_DOCUMENTATION_STATUS_FIX_APPLIED / READY_FOR_REVIEW / LOCAL_ONLY`.
+`DONE / MERGED_TO_MAIN / SYNCHRONIZED / POST_MERGE_STATUS_RECONCILIATION_READY_FOR_REVIEW`.
 The implementation and responsive correction have controlling technical and
 safety disposition `PASS`, and documentation correction commit
 `8fdeeb3dc3e605b5f1a80ea78b441fa982c1efb6` has independent documentation-fix
-review `PASS`. The subsequent integration-authorization decision remains
-`BLOCKED` until this new documentation-only correction receives independent
-review. Nothing is merged, pushed, synchronized, or authorized for integration.
-The sole next candidate is
-`PHASE_2O_01_POST_REVIEW_INTEGRATION_AUTHORIZATION_BLOCKER_DOCUMENTATION_STATUS_FIX_COMMIT_REVIEW_ONLY`;
-it may review only this new correction and does not authorize merge or push by
-implication.
+review `PASS`. Integration-blocker correction commit
+`b7d8ec9e63dd72d7a935ed6228deabfaba072a1a` also has independent review `PASS`.
+The historical first integration-authorization decision remains recorded as
+`BLOCKED`; the later fresh decision was `AUTHORIZED`, and the exact reviewed
+four-commit range is integrated and synchronized on `main` by strict
+fast-forward.
+
+This bounded post-merge status reconciliation commit has not passed independent
+review. The sole next candidate is
+`PHASE_2O_01_POST_MERGE_STATUS_RECONCILIATION_COMMIT_REVIEW_ONLY`; it may review
+only this reconciliation and does not directly authorize Phase 2O-02, another
+Phase 2O slice, or Phase 2P.
