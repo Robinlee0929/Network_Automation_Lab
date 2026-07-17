@@ -6,12 +6,13 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Sequence
 
 try:
-    from flask import Flask, abort, redirect, render_template, send_from_directory, url_for
+    from flask import Flask, abort, redirect, render_template, request, send_from_directory, url_for
 except ImportError:  # pragma: no cover - exercised by environments without Flask.
     Flask = None  # type: ignore[assignment]
     abort = None  # type: ignore[assignment]
     redirect = None  # type: ignore[assignment]
     render_template = None  # type: ignore[assignment]
+    request = None  # type: ignore[assignment]
     send_from_directory = None  # type: ignore[assignment]
     url_for = None  # type: ignore[assignment]
 
@@ -45,6 +46,16 @@ STATUS_FIELDS = (
 PASS_VALUES = {"PASS", "PASSED", "OK", "TRUE"}
 FAIL_VALUES = {"FAIL", "FAILED", "ERROR", "FALSE"}
 WARNING_VALUES = {"WARN", "WARNING"}
+EVIDENCE_RESULT_STATUSES = (
+    "PASS",
+    "WARN",
+    "FAIL",
+    "MISSING",
+    "UNKNOWN",
+    "MALFORMED",
+    "UNAVAILABLE",
+)
+REPORT_STATUS_FILTERS = ("ALL", *EVIDENCE_RESULT_STATUSES)
 
 
 @dataclass
@@ -73,6 +84,33 @@ class DashboardEvidenceEntry:
     notes: str
     json_view_path: Optional[str]
     html_view_path: Optional[str]
+
+    @property
+    def evidence_day_label(self) -> str:
+        return self.day
+
+    @property
+    def evidence_title(self) -> str:
+        return self.title
+
+    @property
+    def evidence_report_type(self) -> str:
+        return self.report_type
+
+    @property
+    def evidence_normalized_result_status(self) -> str:
+        return normalize_evidence_result_status(self.status)
+
+    @property
+    def evidence_availability_state(self) -> str:
+        if self.json_view_path or self.html_view_path:
+            return "FOUND"
+        normalized = str(self.availability).strip().upper()
+        if normalized in {"MISSING", "NOT_GENERATED"}:
+            return "MISSING"
+        if normalized == "UNAVAILABLE":
+            return "UNAVAILABLE"
+        return "FOUND" if normalized == "FOUND" else "UNKNOWN"
 
 
 @dataclass
@@ -486,6 +524,121 @@ def build_summary_cards(entries: List[ReportEntry]) -> List[Dict[str, Any]]:
             }
         )
     return cards
+
+
+def normalize_evidence_result_status(value: Any) -> str:
+    """Return only the bounded result-quality vocabulary used by Phase 2O-02."""
+    normalized = str(value).strip().upper()
+    if normalized == "WARNING":
+        return "WARN"
+    if normalized in EVIDENCE_RESULT_STATUSES:
+        return normalized
+    # FOUND describes availability, never result quality.
+    return "UNKNOWN"
+
+
+def build_home_evidence_health_cards(entries: List[ReportEntry]) -> List[Dict[str, Any]]:
+    """Project legacy report cards onto the three-field Home safe inventory."""
+    cards = []
+    for card in build_summary_cards(entries):
+        missing = bool(card["missing"])
+        cards.append(
+            {
+                "home_card_title": card["title"],
+                "home_card_normalized_status": (
+                    "MISSING"
+                    if missing
+                    else normalize_evidence_result_status(card["status"])
+                ),
+                "home_card_missing_flag": missing,
+            }
+        )
+    return cards
+
+
+def normalize_report_status_filter(value: Any) -> str:
+    candidate = str(value or "ALL").strip().upper()
+    return candidate if candidate in REPORT_STATUS_FILTERS else "ALL"
+
+
+def filter_dashboard_evidence(
+    entries: Sequence[DashboardEvidenceEntry],
+    active_status_filter: str,
+) -> List[DashboardEvidenceEntry]:
+    normalized_filter = normalize_report_status_filter(active_status_filter)
+    if normalized_filter == "ALL":
+        return list(entries)
+    return [
+        entry
+        for entry in entries
+        if entry.evidence_normalized_result_status == normalized_filter
+    ]
+
+
+def determine_reports_collection_state(
+    *,
+    reports_directory_present: bool,
+    available_count: int,
+    malformed_count: int,
+    unavailable_count: int,
+    collection_error: bool = False,
+) -> str:
+    """Apply the documented ERROR > MISSING > MALFORMED > UNAVAILABLE > EMPTY > READY precedence."""
+    if collection_error:
+        return "ERROR"
+    if not reports_directory_present:
+        return "MISSING"
+    if malformed_count:
+        return "MALFORMED"
+    if unavailable_count:
+        return "UNAVAILABLE"
+    if not available_count:
+        return "EMPTY"
+    return "READY"
+
+
+def build_reports_summary(
+    entries: Sequence[DashboardEvidenceEntry],
+    *,
+    reports_directory_present: bool,
+    active_status_filter: str = "ALL",
+    collection_error: bool = False,
+) -> Dict[str, Any]:
+    """Build the Phase 2O-02 Reports summary from the approved safe fields only."""
+    normalized_filter = normalize_report_status_filter(active_status_filter)
+    counts = {
+        status: sum(
+            entry.evidence_normalized_result_status == status for entry in entries
+        )
+        for status in EVIDENCE_RESULT_STATUSES
+    }
+    available_count = sum(
+        entry.evidence_availability_state == "FOUND" for entry in entries
+    )
+    filtered_count = len(filter_dashboard_evidence(entries, normalized_filter))
+    collection_state = determine_reports_collection_state(
+        reports_directory_present=reports_directory_present,
+        available_count=available_count,
+        malformed_count=counts["MALFORMED"],
+        unavailable_count=counts["UNAVAILABLE"],
+        collection_error=collection_error,
+    )
+    return {
+        "reports_directory_present": reports_directory_present,
+        "available_evidence_present": bool(available_count),
+        "total_count": len(entries),
+        "available_count": available_count,
+        "pass_count": counts["PASS"],
+        "warn_count": counts["WARN"],
+        "fail_count": counts["FAIL"],
+        "missing_count": counts["MISSING"],
+        "unknown_count": counts["UNKNOWN"],
+        "malformed_count": counts["MALFORMED"],
+        "unavailable_count": counts["UNAVAILABLE"],
+        "filtered_count": filtered_count,
+        "active_status_filter": normalized_filter,
+        "collection_state": collection_state,
+    }
 
 
 def build_day12_dashboard_summaries(reports_dir: Path) -> List[Dict[str, Any]]:
@@ -1465,7 +1618,7 @@ def create_app(
         entries = discover_reports(app.config["REPORTS_DIR"])
         return render_template(
             "dashboard_home.html",
-            summary_cards=build_summary_cards(entries),
+            home_evidence_cards=build_home_evidence_health_cards(entries),
             description=(
                 "A Python-based network automation and validation lab for "
                 "MikroTik RouterOS, Cisco switch topology checks, iperf3 "
@@ -1476,20 +1629,44 @@ def create_app(
 
     @app.route("/reports")
     def reports():
-        evidence_entries = collect_dashboard_evidence(
-            app.config["PROJECT_ROOT"],
-            app.config["REPORTS_DIR"],
+        active_status_filter = normalize_report_status_filter(
+            request.args.get("status", "ALL")
+        )
+        reports_directory_present = app.config["REPORTS_DIR"].is_dir()
+        collection_error = False
+        try:
+            evidence_entries = collect_dashboard_evidence(
+                app.config["PROJECT_ROOT"],
+                app.config["REPORTS_DIR"],
+            )
+            vrrp_evidence = discover_vrrp_evidence(app.config["PROJECT_ROOT"])
+            day12_summaries = build_day12_dashboard_summaries(
+                app.config["REPORTS_DIR"]
+            )
+        except Exception:  # Fixed safe ERROR state; raw exception text is never rendered.
+            evidence_entries = []
+            vrrp_evidence = []
+            day12_summaries = []
+            collection_error = True
+        filtered_evidence = filter_dashboard_evidence(
+            evidence_entries,
+            active_status_filter,
         )
         grouped: Dict[str, List[DashboardEvidenceEntry]] = {}
-        for entry in evidence_entries:
-            grouped.setdefault(entry.day, []).append(entry)
+        for entry in filtered_evidence:
+            grouped.setdefault(entry.evidence_day_label, []).append(entry)
         return render_template(
             "dashboard_reports.html",
             grouped_evidence=grouped,
-            vrrp_evidence=discover_vrrp_evidence(app.config["PROJECT_ROOT"]),
-            day12_summaries=build_day12_dashboard_summaries(app.config["REPORTS_DIR"]),
-            reports_exist=app.config["REPORTS_DIR"].exists(),
-            has_evidence=bool(evidence_entries),
+            reports_summary=build_reports_summary(
+                evidence_entries,
+                reports_directory_present=reports_directory_present,
+                active_status_filter=active_status_filter,
+                collection_error=collection_error,
+            ),
+            report_status_filters=REPORT_STATUS_FILTERS,
+            vrrp_evidence=vrrp_evidence,
+            day12_summaries=day12_summaries,
         )
 
     @app.route("/commands")

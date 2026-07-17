@@ -56,6 +56,16 @@
       font-size: 16px;
       max-width: 860px;
     }
+    .reviewer-conclusion {
+      background: var(--blue-bg);
+      border-left: 4px solid var(--blue);
+      color: var(--text);
+      font-size: 17px;
+      line-height: 1.55;
+      margin: 14px 0;
+      max-width: 860px;
+      padding: 12px 14px;
+    }
     .status-card {
       padding: 18px;
       display: flex;
@@ -127,6 +137,13 @@
     .flow h2 { color: #7a4d00; }
     .missing { margin-top: 12px; color: var(--fail); font-weight: 700; }
     .link { margin-top: 12px; }
+    .evidence-health { margin-top: 0; }
+    .availability {
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 750;
+      margin-top: 12px;
+    }
     @media (max-width: 960px) {
       .hero, .section-grid { grid-template-columns: 1fr; }
       .proof-grid, .quick-links, .summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -143,6 +160,7 @@
     <header class="hero-copy">
       <div class="eyebrow">Canonical reviewer entry point · Stage 0 Demo</div>
       <h1>Network Automation Lab - Portfolio Demo</h1>
+      <p class="reviewer-conclusion"><strong>Reviewer conclusion:</strong> This canonical Flask surface is ready for offline portfolio review with report-only Stage 0 boundaries. Evidence availability may vary by checkout and never triggers live collection.</p>
       <p class="value">This platform demonstrates safe network automation, evidence-based reporting, runner task orchestration, dashboard visibility, and AI-ready architecture for a small multi-vendor network lab.</p>
       <div class="note">Canonical reviewer entry point · report-only / demo-only. The <code>/commands</code> page is display-only during the Phase 2N Demo; do not submit a command.</div>
     </header>
@@ -156,6 +174,21 @@
       <div class="note">This demo does not require live router access. Live tests are separated from report-only and read-only tasks.</div>
     </aside>
   </div>
+
+  <section class="evidence-health" aria-labelledby="evidence-health-heading">
+    <h2 id="evidence-health-heading">Evidence Health</h2>
+    <p>Result quality and local availability are shown separately. A missing artifact is not inferred to be a pass, and no live check runs from this view.</p>
+    <div class="summary-grid">
+      {% for card in home_evidence_cards %}
+      <article class="summary-card">
+        <h3>{{ card.home_card_title }}</h3>
+        <span class="badge {{ card.home_card_normalized_status|status_class }}">Result: {{ card.home_card_normalized_status }}</span>
+        <p class="availability">Evidence availability: {% if card.home_card_missing_flag %}Missing{% else %}Available{% endif %}</p>
+      </article>
+      {% endfor %}
+    </div>
+    <div class="link"><a href="{{ url_for('reports') }}">Review the evidence summaries and safe drilldowns</a></div>
+  </section>
 
   <div class="section-grid">
     <section>
@@ -226,23 +259,4 @@
     </div>
   </section>
 
-  <section>
-    <h2>Report Readiness Snapshot</h2>
-    <p>These cards reflect generated local report availability. Missing HTML reports are expected on clean machines and do not trigger live tests.</p>
-    <div class="summary-grid">
-      {% for card in summary_cards %}
-      <article class="summary-card">
-        <div>
-          <h3>{{ card.title }}</h3>
-          <span class="badge {{ card.status|status_class }}">{{ card.status }}</span>
-        </div>
-        {% if card.report %}
-        <div class="link"><a href="{{ report_url(card.report.html_relative_path) }}">Open latest HTML report</a></div>
-        {% else %}
-        <div class="missing">HTML report not found</div>
-        {% endif %}
-      </article>
-      {% endfor %}
-    </div>
-  </section>
 {% endblock %}

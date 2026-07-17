@@ -436,7 +436,7 @@ provides:
 ### 13.1 Phase 2O-01 implementation chronology and handoff
 
 Review acceptance of this planning document did not itself authorize Phase
-2O-01. The complete current chronology is:
+2O-01. The Phase 2O-01 chronology at reconciliation time was:
 
 1. Phase 2O-01 continuation authorization is `DONE / AUTHORIZED`.
 2. The original implementation commit is
@@ -501,7 +501,72 @@ Review acceptance of this planning document did not itself authorize Phase
 This chronology records the completed technical/safety, documentation-fix, and
 integration-blocker correction review dispositions as `PASS`, but does not
 claim that this post-merge reconciliation has been reviewed. It does not
-authorize Phase 2O-02, any later Phase 2O slice, or Phase 2P.
+itself authorize Phase 2O-02, any later Phase 2O slice, or Phase 2P. A later,
+separate continuation-authorization decision authorized only the bounded Phase
+2O-02 implementation recorded below.
+
+### 13.2 Phase 2O-02 local implementation handoff
+
+**Conclusion: `DONE / LOCAL_ONLY / READY_FOR_INDEPENDENT_REVIEW`.** The bounded
+Phase 2O-02 Flask overview-evidence and reports-visualization implementation is
+complete locally on branch
+`codex/phase-2o-02-canonical-flask-overview-evidence-reports-visualization` from
+base `1c0fe027e547d4fa89f5ad09ca0f924eb9b6763a`. It has not yet passed
+independent review and is not merged, pushed, or integrated.
+
+The implementation record uses a stable self-reference instead of an
+impossible literal containing-commit SHA:
+
+```text
+PHASE_2O_02_IMPLEMENTATION_COMMIT_REFERENCE:
+THIS_COMMIT
+
+EXACT_IMPLEMENTATION_COMMIT_SHA_SOURCE:
+FINAL_TASK_RESULT_AND_INDEPENDENT_REVIEW_TARGET
+```
+
+The authorized change is limited to exactly seven files: `dashboard_app.py`,
+`templates/dashboard_home.html`, `templates/dashboard_reports.html`,
+`tests/test_phase_2o_02_canonical_flask_overview_evidence_and_reports_visualization.py`,
+`README.md`, this Phase 2O-00 plan, and the Phase 2O-02 implementation record.
+It adds only six presentation patterns: a Home conclusion block, three Home
+evidence-health cards, normalized Reports counts, GET-only status-filter links
+with a filtered-result count, native disclosure rows that retain the existing
+safe GET drill-down path, and deterministic collection/filter state panels.
+
+Presentation data is restricted to the approved Home card fields, safe evidence
+labels/type/result/availability fields, normalized aggregate counts, the active
+status filter, and the collection state. Availability facts are not promoted to
+results: for example, `FOUND` remains an availability fact and normalizes to
+result `UNKNOWN`. Filter input is allowlisted and invalid values fall back to
+`ALL`. Collection state precedence is deterministic:
+`ERROR > MISSING > MALFORMED > UNAVAILABLE > EMPTY > READY`; a filter no-match
+is reported separately and does not rewrite the collection state.
+
+The final implementation validation evidence is:
+
+- `git diff --check`: PASS, with informational Git line-ending warnings only.
+- Required affected pytest command: `107 passed`.
+- Full pytest: `1,921 passed`, with one existing `GetPassWarning`.
+- Report index: `PASS`, with `14/14` reports passing and zero fail, warn,
+  missing, or unknown results.
+- Rendered `/` and `/reports` review: PASS at 320, 768, and 1440 CSS pixels.
+- Reports state/filter review: PASS for `READY`, `EMPTY`, `MISSING`,
+  `MALFORMED`, `UNAVAILABLE`, `ERROR`, every allowlisted status filter, invalid
+  filter fallback, and filter-no-match handling.
+- Responsive/accessibility review: one page-level `h1`, visible conclusion and
+  state text, non-color status labels, visible focus, wrapping filter links,
+  no page-level horizontal overflow, and wide tables bounded within their own
+  scroll wrappers.
+- Server lifecycle: the task-owned loopback servers were stopped and TCP port
+  5000 was proven released.
+
+No route, method, POST path, form, button, JavaScript action, dependency,
+evidence source, execution path, topology, Next.js surface, or operational
+authority was added. Stage 0 and all repository safety boundaries remain
+preserved. The sole next candidate is an independent review of the exact Phase
+2O-02 implementation commit. Phase 2O-03 through Phase 2O-07 and Phase 2P remain
+`NOT_AUTHORIZED / NOT_STARTED`.
 
 ## 14. Explicit exclusions and deferred work
 
@@ -524,7 +589,7 @@ The following remain excluded and unauthorized:
 - Any further packaging, distribution, deployment, publication, merge, push,
   pull request, branch cleanup, or Phase 2P work not explicitly authorized by a
   separate task.
-- Phase 2O-02 through Phase 2O-07 implementation until each applicable slice
+- Phase 2O-03 through Phase 2O-07 implementation until each applicable slice
   receives its own fresh explicit authorization.
 
 ## 15. Documentation readability review

@@ -3,12 +3,14 @@
 {% block page_styles %}
   <style>
     :root {
-      --bg: #f4f7fb;
       --panel: #ffffff;
       --text: #172033;
       --muted: #667085;
       --border: #d8e0ec;
       --accent: #0f766e;
+      --accent-bg: #e9fbf8;
+      --blue: #175cd3;
+      --blue-bg: #eef6ff;
       --pass: #147a3d;
       --pass-bg: #e8f6ee;
       --fail: #b42318;
@@ -19,51 +21,60 @@
       --unknown-bg: #eef2f6;
     }
     h1 { margin: 0 0 8px; font-size: 30px; line-height: 1.15; }
-    h2 { margin: 26px 0 10px; font-size: 18px; }
-    p { margin: 0 0 18px; color: var(--muted); }
+    h2 { margin: 0 0 10px; font-size: 20px; }
+    h3 { margin: 20px 0 8px; font-size: 16px; }
+    p { margin: 0 0 14px; color: var(--muted); }
+    a { color: var(--blue); }
+    code { font-family: Consolas, "Courier New", monospace; overflow-wrap: anywhere; }
     section {
       background: var(--panel);
       border: 1px solid var(--border);
       border-radius: 8px;
-      padding: 16px;
-      margin-top: 14px;
       box-shadow: 0 10px 24px rgba(16, 24, 40, .07);
+      margin-top: 14px;
+      min-width: 0;
       overflow: hidden;
+      padding: 18px;
     }
-    .table-wrap { overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; }
-    th, td { border-bottom: 1px solid var(--border); padding: 10px; text-align: left; vertical-align: top; }
-    tr:last-child td { border-bottom: 0; }
-    th { color: var(--muted); font-weight: 800; white-space: nowrap; }
-    code { font-family: Consolas, "Courier New", monospace; overflow-wrap: anywhere; }
-    .badge {
-      display: inline-block;
-      min-width: 78px;
-      padding: 4px 9px;
-      border-radius: 999px;
-      font-size: 12px;
-      font-weight: 850;
-      text-align: center;
+    .reports-overview { border-top: 4px solid var(--accent); }
+    .state-panel {
+      background: var(--unknown-bg);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--unknown);
+      border-radius: 7px;
+      color: var(--text);
+      margin: 14px 0;
+      padding: 13px 14px;
     }
-    .pass { background: var(--pass-bg); color: var(--pass); }
-    .fail { background: var(--fail-bg); color: var(--fail); }
-    .warning { background: var(--warning-bg); color: var(--warning); }
-    .unknown, .malformed { background: var(--unknown-bg); color: var(--unknown); }
-    .empty {
-      background: #fff8eb;
-      border: 1px solid #f3d29b;
-      border-radius: 8px;
-      padding: 14px;
-      color: #7a4d00;
-      font-weight: 700;
+    .state-panel strong { display: block; margin-bottom: 4px; }
+    .state-ready { background: var(--pass-bg); border-left-color: var(--pass); }
+    .state-empty, .state-missing, .state-malformed, .state-unavailable {
+      background: var(--warning-bg);
+      border-left-color: var(--warning);
     }
+    .state-error { background: var(--fail-bg); border-left-color: var(--fail); }
+    .count-grid {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      margin: 14px 0;
+    }
+    .count-card {
+      background: #f9fbfd;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      min-width: 0;
+      padding: 12px;
+    }
+    .count-card dt { color: var(--muted); font-size: 12px; font-weight: 800; }
+    .count-card dd { color: var(--text); font-size: 24px; font-weight: 850; margin: 5px 0 0; }
     .filters {
       display: flex;
-      gap: 8px;
       flex-wrap: wrap;
-      margin: 12px 0 4px;
+      gap: 8px;
+      margin: 8px 0 12px;
     }
-    .filter-chip {
+    .filter-link {
       background: #eef7f6;
       border: 1px solid #b8ddd8;
       border-radius: 999px;
@@ -71,121 +82,189 @@
       display: inline-block;
       font-size: 12px;
       font-weight: 800;
-      padding: 5px 9px;
+      padding: 6px 10px;
+      text-decoration: none;
     }
-    .actions {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
+    .filter-link[aria-current="page"] {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #ffffff;
     }
-    .muted { color: var(--muted); }
-    a { color: #175cd3; }
-    @media (max-width: 620px) {
+    .filter-link:focus-visible, summary:focus-visible {
+      outline: 3px solid #f79009;
+      outline-offset: 3px;
+    }
+    .filtered-count { color: var(--text); margin-bottom: 0; }
+    .evidence-disclosure {
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      margin-top: 9px;
+      min-width: 0;
+    }
+    .evidence-disclosure summary {
+      cursor: pointer;
+      overflow-wrap: anywhere;
+      padding: 13px;
+    }
+    .summary-line { display: block; margin-top: 6px; }
+    .summary-title { color: var(--text); font-weight: 850; }
+    .summary-type, .availability-label { color: var(--muted); font-size: 13px; }
+    .disclosure-body { border-top: 1px solid var(--border); padding: 14px; }
+    .technical-grid {
+      display: grid;
+      gap: 7px 12px;
+      grid-template-columns: minmax(110px, .35fr) minmax(0, 1fr);
+      margin: 12px 0;
+    }
+    .technical-grid dt { color: var(--muted); font-weight: 800; }
+    .technical-grid dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+    .badge {
+      border-radius: 999px;
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 850;
+      margin-right: 8px;
+      min-width: 78px;
+      padding: 4px 9px;
+      text-align: center;
+    }
+    .pass { background: var(--pass-bg); color: var(--pass); }
+    .fail { background: var(--fail-bg); color: var(--fail); }
+    .warning { background: var(--warning-bg); color: var(--warning); }
+    .unknown, .malformed { background: var(--unknown-bg); color: var(--unknown); }
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; }
+    .table-wrap { max-width: 100%; overflow-x: auto; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td {
+      border-bottom: 1px solid var(--border);
+      padding: 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    tr:last-child td { border-bottom: 0; }
+    th { color: var(--muted); font-weight: 800; white-space: nowrap; }
+    .empty { color: #7a4d00; font-weight: 700; }
+    @media (max-width: 820px) {
+      .count-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 520px) {
       h1 { font-size: 25px; }
+      section { padding: 14px; }
+      .count-grid, .technical-grid { grid-template-columns: 1fr; }
+      .technical-grid dd { margin-bottom: 6px; }
     }
   </style>
 {% endblock %}
 {% block page_content %}
   <h1>Reports</h1>
-  <p>Local evidence browser for generated JSON and HTML reports. The dashboard reads report metadata only and never runs router, switch, VPN, or iperf3 workflows from this page.</p>
-  <p>UNKNOWN means the dashboard could not find a supported result field in the JSON report, or the HTML report has no matching JSON file to read status from.</p>
+  <p>Local evidence browser for generated JSON and HTML reports. Result quality is separate from artifact availability, and this GET-only page never starts collection or execution.</p>
 
-  {% if not reports_exist %}
-  <div class="empty">reports/ folder was not found. The dashboard is ready, but no generated reports are available yet.</div>
-  {% elif not has_evidence %}
-  <div class="empty">No report evidence was found yet. Run <code>python network_lab.py --report-index</code> or generate day-specific reports, then refresh this page.</div>
-  {% endif %}
-
-  <section>
-    <h2>HA / VRRP Evidence</h2>
-    <p>Day31-Day38 HA / VRRP docs, diagrams, profiles, generated reports, and Day39 dashboard integration status. This section is read-only and does not expose live VRRP execution.</p>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Group</th>
-            <th>Day</th>
-            <th>Artifact</th>
-            <th>Type</th>
-            <th>Status</th>
-            <th>Safety</th>
-            <th>Path</th>
-            <th>Demo relevance</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for item in vrrp_evidence %}
-          <tr>
-            <td>{{ item.group }}</td>
-            <td>{{ item.day }}</td>
-            <td>{{ item.title }}</td>
-            <td>{{ item.artifact_type }}</td>
-            <td><span class="badge {{ item.status|status_class }}">{{ item.status }}</span></td>
-            <td>{{ item.safety_level }}</td>
-            <td>
-              {% if item.exists and item.path.endswith('.json') %}
-              <a href="{{ json_report_url(item.path) }}"><code>{{ item.path }}</code></a>
-              {% elif item.exists %}
-              <a href="{{ evidence_url(item.path) }}"><code>{{ item.path }}</code></a>
-              {% else %}
-              <code>{{ item.path }}</code>
-              {% endif %}
-            </td>
-            <td>{{ item.demo_relevance }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+  <section class="reports-overview" aria-labelledby="reports-overview-heading">
+    <h2 id="reports-overview-heading">Evidence Review Summary</h2>
+    <div class="state-panel state-{{ reports_summary.collection_state|lower }}" data-collection-state="{{ reports_summary.collection_state }}" role="status">
+      <strong>Collection state: {{ reports_summary.collection_state }}</strong>
+      {% if reports_summary.collection_state == 'READY' %}
+      Evidence summaries are available for review. Availability alone is never counted as a passing result.
+      {% elif reports_summary.collection_state == 'EMPTY' %}
+      The reports directory is available, but no generated evidence is currently available. Run <code>python network_lab.py --task report-index</code> to review the local index without starting live work.
+      {% elif reports_summary.collection_state == 'MISSING' %}
+      The reports directory is not present. This view remains safe and does not attempt discovery, generation, or live collection.
+      {% elif reports_summary.collection_state == 'MALFORMED' %}
+      At least one available evidence item could not be parsed. Its result remains MALFORMED and is not inferred to pass.
+      {% elif reports_summary.collection_state == 'UNAVAILABLE' %}
+      Evidence metadata is present, but the referenced evidence is unavailable. No retry or collection action is exposed here.
+      {% else %}
+      Evidence collection could not be summarized safely. No raw exception, path, or environment detail is shown.
+      {% endif %}
     </div>
+
+    <dl class="count-grid" aria-label="Normalized evidence status counts">
+      <div class="count-card" data-count-field="total_count"><dt>Total evidence items</dt><dd>{{ reports_summary.total_count }}</dd></div>
+      <div class="count-card" data-count-field="available_count"><dt>Available artifacts</dt><dd>{{ reports_summary.available_count }}</dd></div>
+      <div class="count-card" data-count-field="pass_count"><dt>PASS results</dt><dd>{{ reports_summary.pass_count }}</dd></div>
+      <div class="count-card" data-count-field="warn_count"><dt>WARN results</dt><dd>{{ reports_summary.warn_count }}</dd></div>
+      <div class="count-card" data-count-field="fail_count"><dt>FAIL results</dt><dd>{{ reports_summary.fail_count }}</dd></div>
+      <div class="count-card" data-count-field="missing_count"><dt>MISSING results</dt><dd>{{ reports_summary.missing_count }}</dd></div>
+      <div class="count-card" data-count-field="unknown_count"><dt>UNKNOWN results</dt><dd>{{ reports_summary.unknown_count }}</dd></div>
+      <div class="count-card" data-count-field="malformed_count"><dt>MALFORMED results</dt><dd>{{ reports_summary.malformed_count }}</dd></div>
+      <div class="count-card" data-count-field="unavailable_count"><dt>UNAVAILABLE results</dt><dd>{{ reports_summary.unavailable_count }}</dd></div>
+    </dl>
+
+    <div role="navigation" aria-label="Report status filters">
+      <p><strong>Filter by normalized result status</strong></p>
+      <div class="filters">
+        {% for status_filter in report_status_filters %}
+        <a class="filter-link" href="{{ url_for('reports', status=status_filter) }}"{% if reports_summary.active_status_filter == status_filter %} aria-current="page"{% endif %}>{{ status_filter }}{% if reports_summary.active_status_filter == status_filter %} (current){% endif %}</a>
+        {% endfor %}
+      </div>
+    </div>
+    <p class="filtered-count"><strong>{{ reports_summary.filtered_count }}</strong> of {{ reports_summary.total_count }} evidence items match <strong>{{ reports_summary.active_status_filter }}</strong>.</p>
   </section>
 
-  <section>
-    <h2>WireGuard VPN Automation</h2>
-    <p>WireGuard Client Config Export + VPN Throughput Baseline.</p>
-    {% if not day12_summaries %}
-    <div class="empty">WireGuard VPN report not found. Expected a generated report under reports/&lt;device_name&gt;/.</div>
+  <section aria-labelledby="evidence-browser-heading">
+    <h2 id="evidence-browser-heading">Evidence Summaries and Safe Drilldowns</h2>
+    <p>Disclosure headings use only approved summary fields. Existing technical details remain subordinate and links retain the existing safe GET routes.</p>
+    {% if grouped_evidence %}
+      {% for day, entries in grouped_evidence.items() %}
+      <div class="day-group">
+        <h3>{{ day }}</h3>
+        {% for report in entries %}
+        <details class="evidence-disclosure">
+          <summary>
+            <span class="summary-title">{{ report.evidence_title }}</span>
+            <span class="summary-line summary-type">{{ report.evidence_report_type }}</span>
+            <span class="summary-line">
+              <span class="badge {{ report.evidence_normalized_result_status|status_class }}">Result: {{ report.evidence_normalized_result_status }}</span>
+              <span class="availability-label">Availability: {{ report.evidence_availability_state }}</span>
+            </span>
+          </summary>
+          <div class="disclosure-body">
+            <p>Technical evidence detail. These values do not change the normalized summary or grant execution authority.</p>
+            <dl class="technical-grid">
+              <dt>Device / scope</dt><dd>{{ report.device }}</dd>
+              <dt>Description</dt><dd>{{ report.description or 'No additional description.' }}</dd>
+              {% if report.notes %}<dt>Notes</dt><dd>{{ report.notes }}</dd>{% endif %}
+              {% if report.json_view_path %}<dt>JSON evidence</dt><dd><code>{{ report.json_path }}</code></dd>{% endif %}
+              {% if report.html_view_path %}<dt>HTML evidence</dt><dd><code>{{ report.html_path }}</code></dd>{% endif %}
+            </dl>
+            <div class="actions">
+              {% if report.json_view_path %}<a href="{{ json_report_url(report.json_view_path) }}">Preview safe JSON</a>{% endif %}
+              {% if report.html_view_path %}<a href="{{ report_url(report.html_view_path) }}">Open HTML evidence</a>{% endif %}
+              {% if not report.json_view_path and not report.html_view_path %}<span class="badge unknown">Evidence not generated</span>{% endif %}
+            </div>
+          </div>
+        </details>
+        {% endfor %}
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="state-panel state-empty" data-collection-state="FILTER_NO_MATCH" role="status">
+        <strong>Filter result: no match</strong>
+        {% if reports_summary.active_status_filter != 'ALL' %}
+        No evidence items match the selected allowlisted status. Choose another status link or ALL.
+        {% else %}
+        No evidence summaries are available for the current collection state.
+        {% endif %}
+      </div>
+    {% endif %}
+  </section>
+
+  <section aria-labelledby="vrrp-heading">
+    <h2 id="vrrp-heading">HA / VRRP Evidence</h2>
+    <p>Existing technical evidence remains read-only and does not expose live VRRP execution.</p>
+    {% if not vrrp_evidence %}
+    <div class="state-panel state-empty">No HA / VRRP technical evidence is available.</div>
     {% else %}
     <div class="table-wrap">
       <table>
-        <thead>
-          <tr>
-            <th>Device</th>
-            <th>Result</th>
-            <th>Interface</th>
-            <th>Peer</th>
-            <th>Client</th>
-            <th>Export Path</th>
-            <th>Handshake</th>
-            <th>Ping Gateway</th>
-            <th>Ping LAN Host</th>
-            <th>TCP 5201</th>
-            <th>iperf Fwd</th>
-            <th>iperf Rev</th>
-            <th>HTML</th>
-          </tr>
-        </thead>
+        <thead><tr><th>Group</th><th>Day</th><th>Artifact</th><th>Type</th><th>Status</th><th>Safety</th><th>Path</th><th>Demo relevance</th></tr></thead>
         <tbody>
-          {% for item in day12_summaries %}
+          {% for item in vrrp_evidence %}
           <tr>
-            <td>{{ item.device_name }}</td>
-            <td><span class="badge {{ item.overall_result|status_class }}">{{ item.overall_result }}</span></td>
-            <td>{{ item.interface_name }}</td>
-            <td>{{ item.peer_name }}</td>
-            <td>{{ item.client_address }}</td>
-            <td><code>{{ item.exported_config_path }}</code></td>
-            <td>{{ item.handshake_status }}</td>
-            <td>{{ item.ping_lan_gateway }}</td>
-            <td>{{ item.ping_lan_host }}</td>
-            <td>{{ item.tcp_5201 }}</td>
-            <td>{{ item.iperf_forward_mbps }}</td>
-            <td>{{ item.iperf_reverse_mbps }}</td>
-            <td>
-              {% if item.html_relative_path %}
-              <a href="{{ url_for('open_wireguard_vpn_report', device_name=item.device_folder) }}">Open HTML</a>
-              {% else %}
-              <span class="badge unknown">MISSING</span>
-              {% endif %}
-            </td>
+            <td>{{ item.group }}</td><td>{{ item.day }}</td><td>{{ item.title }}</td><td>{{ item.artifact_type }}</td>
+            <td><span class="badge {{ item.status|status_class }}">{{ item.status }}</span></td><td>{{ item.safety_level }}</td>
+            <td>{% if item.exists and item.path.endswith('.json') %}<a href="{{ json_report_url(item.path) }}"><code>{{ item.path }}</code></a>{% elif item.exists %}<a href="{{ evidence_url(item.path) }}"><code>{{ item.path }}</code></a>{% else %}<code>{{ item.path }}</code>{% endif %}</td>
+            <td>{{ item.demo_relevance }}</td>
           </tr>
           {% endfor %}
         </tbody>
@@ -194,73 +273,28 @@
     {% endif %}
   </section>
 
-  {% for day, entries in grouped_evidence.items() %}
-  <section>
-    <h2>{{ day }}</h2>
-    <div class="filters">
-      {% for item in entries|map(attribute='device')|unique %}
-      <span class="filter-chip">{{ item }}</span>
-      {% endfor %}
-    </div>
+  <section aria-labelledby="wireguard-heading">
+    <h2 id="wireguard-heading">WireGuard VPN Automation</h2>
+    <p>Existing WireGuard technical detail remains subordinate to the safe evidence summary.</p>
+    {% if not day12_summaries %}
+    <div class="state-panel state-empty">WireGuard VPN report not found. No generation or live access is triggered.</div>
+    {% else %}
     <div class="table-wrap">
       <table>
-        <thead>
-          <tr>
-            <th>Title</th>
-            <th>Device / scope</th>
-            <th>Report type</th>
-            <th>Status</th>
-            <th>JSON path</th>
-            <th>HTML path</th>
-            <th>Description</th>
-            <th>Open</th>
-          </tr>
-        </thead>
+        <thead><tr><th>Device</th><th>Result</th><th>Interface</th><th>Peer</th><th>Client</th><th>Export Path</th><th>Handshake</th><th>Ping Gateway</th><th>Ping LAN Host</th><th>TCP 5201</th><th>iperf Fwd</th><th>iperf Rev</th><th>HTML</th></tr></thead>
         <tbody>
-          {% for report in entries %}
+          {% for item in day12_summaries %}
           <tr>
-            <td>{{ report.title }}</td>
-            <td>{{ report.device }}</td>
-            <td>{{ report.report_type }}</td>
-            <td><span class="badge {{ report.status|status_class }}">{{ report.status }}</span></td>
-            <td>
-              {% if report.json_view_path %}
-              <code>{{ report.json_path }}</code>
-              {% else %}
-              <span class="badge unknown">{{ report.availability }}</span>
-              {% endif %}
-            </td>
-            <td>
-              {% if report.html_view_path %}
-              <code>{{ report.html_path }}</code>
-              {% else %}
-              <span class="badge unknown">{{ report.availability }}</span>
-              {% endif %}
-            </td>
-            <td>
-              {{ report.description }}
-              {% if report.notes %}
-              <div class="muted">{{ report.notes }}</div>
-              {% endif %}
-            </td>
-            <td>
-              <div class="actions">
-                {% if report.json_view_path %}
-                <a href="{{ json_report_url(report.json_view_path) }}">Preview JSON</a>
-                {% endif %}
-                {% if report.html_view_path %}
-                <a href="{{ report_url(report.html_view_path) }}">Open HTML</a>
-                {% endif %}
-                {% if not report.json_view_path and not report.html_view_path %}
-                <span class="badge unknown">Not generated yet</span>
-                {% endif %}
-              </div>
-            </td>
+            <td>{{ item.device_name }}</td><td><span class="badge {{ item.overall_result|status_class }}">{{ item.overall_result }}</span></td>
+            <td>{{ item.interface_name }}</td><td>{{ item.peer_name }}</td><td>{{ item.client_address }}</td><td><code>{{ item.exported_config_path }}</code></td>
+            <td>{{ item.handshake_status }}</td><td>{{ item.ping_lan_gateway }}</td><td>{{ item.ping_lan_host }}</td><td>{{ item.tcp_5201 }}</td>
+            <td>{{ item.iperf_forward_mbps }}</td><td>{{ item.iperf_reverse_mbps }}</td>
+            <td>{% if item.html_relative_path %}<a href="{{ url_for('open_wireguard_vpn_report', device_name=item.device_folder) }}">Open HTML</a>{% else %}<span class="badge unknown">MISSING</span>{% endif %}</td>
           </tr>
           {% endfor %}
         </tbody>
       </table>
     </div>
+    {% endif %}
   </section>
-  {% endfor %}
 {% endblock %}
