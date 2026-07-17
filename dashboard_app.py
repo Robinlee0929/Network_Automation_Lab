@@ -55,6 +55,7 @@ EVIDENCE_RESULT_STATUSES = (
     "MALFORMED",
     "UNAVAILABLE",
 )
+USABLE_EVIDENCE_RESULT_STATUSES = frozenset({"PASS", "WARN", "FAIL", "UNKNOWN"})
 REPORT_STATUS_FILTERS = ("ALL", *EVIDENCE_RESULT_STATUSES)
 
 
@@ -578,23 +579,23 @@ def filter_dashboard_evidence(
 def determine_reports_collection_state(
     *,
     reports_directory_present: bool,
-    available_count: int,
-    malformed_count: int,
-    unavailable_count: int,
+    entry_count: int,
+    usable_count: int,
+    malformed_available_count: int,
     collection_error: bool = False,
 ) -> str:
-    """Apply the documented ERROR > MISSING > MALFORMED > UNAVAILABLE > EMPTY > READY precedence."""
+    """Summarize bounded collection health without hiding usable evidence."""
     if collection_error:
         return "ERROR"
     if not reports_directory_present:
         return "MISSING"
-    if malformed_count:
-        return "MALFORMED"
-    if unavailable_count:
-        return "UNAVAILABLE"
-    if not available_count:
+    if not entry_count:
         return "EMPTY"
-    return "READY"
+    if usable_count:
+        return "READY"
+    if malformed_available_count:
+        return "MALFORMED"
+    return "UNAVAILABLE"
 
 
 def build_reports_summary(
@@ -612,15 +613,24 @@ def build_reports_summary(
         )
         for status in EVIDENCE_RESULT_STATUSES
     }
-    available_count = sum(
-        entry.evidence_availability_state == "FOUND" for entry in entries
+    available_entries = [
+        entry for entry in entries if entry.evidence_availability_state == "FOUND"
+    ]
+    available_count = len(available_entries)
+    usable_count = sum(
+        entry.evidence_normalized_result_status in USABLE_EVIDENCE_RESULT_STATUSES
+        for entry in available_entries
+    )
+    malformed_available_count = sum(
+        entry.evidence_normalized_result_status == "MALFORMED"
+        for entry in available_entries
     )
     filtered_count = len(filter_dashboard_evidence(entries, normalized_filter))
     collection_state = determine_reports_collection_state(
         reports_directory_present=reports_directory_present,
-        available_count=available_count,
-        malformed_count=counts["MALFORMED"],
-        unavailable_count=counts["UNAVAILABLE"],
+        entry_count=len(entries),
+        usable_count=usable_count,
+        malformed_available_count=malformed_available_count,
         collection_error=collection_error,
     )
     return {

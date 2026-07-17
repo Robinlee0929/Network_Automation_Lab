@@ -2,15 +2,19 @@
 
 ## Conclusion and status
 
-**Conclusion: `DONE / LOCAL_ONLY / READY_FOR_INDEPENDENT_REVIEW`.** The bounded
-Phase 2O-02 implementation is complete on branch
+**Conclusion: `DONE / LOCAL_ONLY / READY_FOR_INDEPENDENT_FIX_REVIEW`.** The
+bounded Phase 2O-02 review fix is applied locally on branch
 `codex/phase-2o-02-canonical-flask-overview-evidence-reports-visualization` from
-base commit `1c0fe027e547d4fa89f5ad09ca0f924eb9b6763a`.
+reviewed implementation commit
+`0548c6beab80a087ea02d00d49a213dd4336724a`. Independent review of that
+implementation returned `FAIL_FIX_REQUIRED` for the two findings recorded
+below.
 
-This record does not claim independent-review acceptance, integration, merge,
-push, deployment, or publication. It authorizes no additional phase or slice.
-The exact implementation commit is identified without a self-referential hash
-inside that commit:
+This record does not claim fix-review acceptance, implementation acceptance,
+integration, merge, push, deployment, publication, or pull-request creation. It
+authorizes no additional phase or slice. The original implementation commit is
+`0548c6beab80a087ea02d00d49a213dd4336724a`; its containing commit used this
+stable identity convention:
 
 ```text
 PHASE_2O_02_IMPLEMENTATION_COMMIT_REFERENCE:
@@ -18,6 +22,16 @@ THIS_COMMIT
 
 EXACT_IMPLEMENTATION_COMMIT_SHA_SOURCE:
 FINAL_TASK_RESULT_AND_INDEPENDENT_REVIEW_TARGET
+```
+
+The containing review-fix commit uses its own stable identity convention:
+
+```text
+PHASE_2O_02_REVIEW_FIX_COMMIT_REFERENCE:
+THIS_COMMIT
+
+EXACT_REVIEW_FIX_COMMIT_SHA_SOURCE:
+FINAL_TASK_RESULT_AND_INDEPENDENT_FIX_REVIEW_TARGET
 ```
 
 ## Phase goal and implementation boundary
@@ -29,7 +43,8 @@ only existing repository evidence. It adds no execution capability.
 The implementation consists of six bounded patterns:
 
 1. A conclusion-first summary on Home.
-2. Three evidence-health cards on Home.
+2. Seven category-based evidence-health cards on Home, corresponding to the
+   existing seven `build_summary_cards()` category groups.
 3. Normalized evidence counts on Reports.
 4. Allowlisted GET-only status-filter links and a filtered-result count.
 5. Native disclosure rows with the existing safe GET report drill-down kept
@@ -115,30 +130,40 @@ collection state.
 
 ### Collection states are deterministic
 
-The reports collection state uses this explicit precedence:
+The reports collection state uses this explicit decision order:
 
 ```text
-ERROR > MISSING > MALFORMED > UNAVAILABLE > EMPTY > READY
+ERROR > MISSING > EMPTY > READY when usable evidence exists >
+MALFORMED when no usable evidence exists > UNAVAILABLE
 ```
 
 - `ERROR` means safe evidence collection did not complete. Raw exception text
   is not rendered.
 - `MISSING` means the reports directory is absent.
-- `MALFORMED` means malformed evidence is present when no higher-priority state
-  applies.
-- `UNAVAILABLE` means unavailable evidence is present when no higher-priority
-  state applies.
 - `EMPTY` means the directory exists but contains no evidence entries.
-- `READY` means present evidence is ready for reviewer inspection.
+- `READY` means the non-empty collection has at least one safely available
+  `PASS`, `WARN`, `FAIL`, or `UNKNOWN` result. A reviewable `FAIL` or available
+  `UNKNOWN` is usable evidence.
+- `MALFORMED` means no usable evidence exists and at least one safely available
+  item is malformed.
+- `UNAVAILABLE` means the non-empty collection has no usable safely available
+  evidence and no safely available malformed item.
+
+Mixed usable collections remain `READY`. Their `malformed_count`,
+`unavailable_count`, `missing_count`, and `unknown_count` remain visible and
+accurate instead of being hidden by the collection-level conclusion.
 
 ## Reviewer-visible page behavior
 
 ### Home
 
-Home starts with a single clear reviewer conclusion and then shows three
-evidence-health cards. Each card states its title, normalized result, and
-availability or missing state. Existing proof points and safe navigation remain
-available below this conclusion-first summary.
+Home starts with a single clear reviewer conclusion and then shows seven
+category-based evidence-health cards corresponding to the existing seven
+`build_summary_cards()` category groups. No category was removed, and no new
+evidence source or presentation field was introduced. Each card states its
+title, normalized result, and availability or missing state. Existing proof
+points and safe navigation remain available below this conclusion-first
+summary.
 
 ### Reports
 
@@ -153,9 +178,30 @@ containers, so the page does not develop horizontal overflow. The page keeps
 one `h1`, visible focus indication, semantic native disclosures, and explicit
 text labels for states and results.
 
+## Independent review and bounded fix chronology
+
+Independent review targeted original implementation commit
+`0548c6beab80a087ea02d00d49a213dd4336724a` and returned
+`FAIL_FIX_REQUIRED`:
+
+- P1 found that mixed collections containing usable evidence were globally
+  downgraded to `MALFORMED` or `UNAVAILABLE`.
+- P2 found that this record and the Phase 2O-00 record stated an incorrect count
+  of three for the Home evidence-health cards while the implementation renders
+  seven existing category-based cards.
+
+The bounded local fix changes exactly `dashboard_app.py`, the authorized Phase
+2O-02 regression test, this implementation record, and the Phase 2O-00 planning
+record. It makes every mixed usable collection `READY`, preserves degraded
+counts, corrects both records to seven cards, and behaviorally verifies the
+seven rendered category titles. It changes no dependency, route, route method,
+safe-view boundary, evidence source, importer, POST behavior, action control,
+or execution path.
+
 ## Validation evidence
 
-The final pre-commit validation set produced the following results:
+The original implementation pre-commit validation set produced the following
+results:
 
 | Check | Result |
 | --- | --- |
@@ -165,14 +211,14 @@ The final pre-commit validation set produced the following results:
 | Full pytest | PASS: `1,921 passed`, one existing `GetPassWarning` |
 | `python network_lab.py --task report-index` | PASS: `14/14`, zero fail/warn/missing/unknown |
 
-The required affected command was:
+The original implementation required affected command was:
 
 ```text
 python -m pytest tests/test_phase_2o_02_canonical_flask_overview_evidence_and_reports_visualization.py tests/test_dashboard_app.py tests/test_phase_2o_01_canonical_flask_shell_and_ia_foundation.py tests/test_phase_2n_02_canonical_flask_demo_smoke.py tests/test_phase_2n_04_user_facing_safety_labels.py tests/test_dashboard_command_runner.py
 ```
 
-Rendered review used the actual Flask application at 320, 768, and 1440 CSS
-pixels for both `/` and `/reports`. It verified:
+Original implementation rendered review used the actual Flask application at
+320, 768, and 1440 CSS pixels for both `/` and `/reports`. It verified:
 
 - one `h1` per page;
 - visible Home conclusion and evidence-health text;
@@ -189,6 +235,28 @@ pixels for both `/` and `/reports`. It verified:
 The task-owned actual and controlled-state loopback servers were stopped after
 review. TCP port 5000 was then proven released. No unrelated process was
 terminated.
+
+The bounded review-fix validation passed:
+
+- authorized scope: exactly four modified files;
+- `git diff --check`: PASS, with informational line-ending warnings only;
+- required affected pytest command: `114 passed`;
+- full pytest: `1,928 passed`, with one existing `GetPassWarning`;
+- report index: `PASS`, with `14/14` reports passing and zero fail, warn,
+  missing, or unknown results;
+- rendered `/` and `/reports` review: PASS at 320, 768, and 1440 CSS pixels
+  across every required collection state, mixed usable case, filter, invalid
+  fallback, and filter-no-match state; and
+- server lifecycle: all three task-owned loopback servers stopped and ports
+  5000 through 5002 were released without terminating an unrelated process.
+
+The rendered review found seven Home category cards, no page-level horizontal
+overflow, table overflow bounded by intended wrappers, unchanged filter and
+native disclosure behavior, explicit non-color labels, rendered focus rules,
+logical headings and landmarks, no raw error, no action control, and no console
+error or warning. The exact fix commit identity is reported by the final task
+result and forms the independent fix-review target. This record does not claim
+fix-review `PASS`.
 
 ## Safety and authorization boundaries
 
@@ -222,8 +290,9 @@ Rejected and non-executing paths remain non-executing. Stage 0 remains
 
 ## Handoff
 
-The sole next candidate is an independent review of the exact Phase 2O-02
-implementation commit identified in the final task result. Phase 2O-03 through
-Phase 2O-07 and Phase 2P remain `NOT_AUTHORIZED / NOT_STARTED`. No merge, push,
-pull request, branch cleanup, or next-slice implementation is authorized by this
-record.
+The sole next candidate is
+`PHASE_2O_02_BOUNDED_REVIEW_FIX_COMMIT_REVIEW_ONLY`, an independent review of
+the exact review-fix commit identified in the final task result. Phase 2O-03
+through Phase 2O-07 and Phase 2P remain `NOT_AUTHORIZED / NOT_STARTED`. No
+integration, merge, push, pull request, branch cleanup, or next-slice
+implementation is authorized by this record. Stage 0 remains `PRESERVED`.

@@ -43,10 +43,15 @@ non-executing.
 | `PHASE_2O_01_INTEGRATION_METHOD` | `STRICT_FAST_FORWARD` |
 | `PHASE_2O_01_STATUS` | `DONE / MERGED_TO_MAIN / SYNCHRONIZED / POST_MERGE_STATUS_RECONCILIATION_READY_FOR_REVIEW` |
 | `PHASE_2O_IMPLEMENTATION_STATUS` | `IN_PROGRESS / NOT_READY` |
-| `PHASE_2O_02_THROUGH_2O_07_STATUS` | `NOT_AUTHORIZED / NOT_STARTED` |
+| `PHASE_2O_02_IMPLEMENTATION_COMMIT` | `0548c6beab80a087ea02d00d49a213dd4336724a` |
+| `PHASE_2O_02_IMPLEMENTATION_REVIEW_DECISION` | `FAIL_FIX_REQUIRED` |
+| `PHASE_2O_02_REVIEW_FIX_COMMIT` | `THIS_COMMIT` |
+| `PHASE_2O_02_REVIEW_FIX_STATUS` | `DONE / LOCAL_ONLY / READY_FOR_INDEPENDENT_FIX_REVIEW` |
+| `PHASE_2O_02_STATUS` | `DONE / LOCAL_ONLY / READY_FOR_INDEPENDENT_FIX_REVIEW` |
+| `PHASE_2O_03_THROUGH_2O_07_STATUS` | `NOT_AUTHORIZED / NOT_STARTED` |
 | `PHASE_2P_STATUS` | `NOT_AUTHORIZED / NOT_STARTED` |
 | `STAGE_0_BOUNDARY` | `PRESERVED` |
-| `NEXT_CANDIDATE` | `PHASE_2O_01_POST_MERGE_STATUS_RECONCILIATION_COMMIT_REVIEW_ONLY` |
+| `NEXT_CANDIDATE` | `PHASE_2O_02_BOUNDED_REVIEW_FIX_COMMIT_REVIEW_ONLY` |
 
 No provider, model, job, command, device, or production authority follows from a
 visual treatment, status label, navigation destination, reviewer view, or
@@ -505,17 +510,16 @@ itself authorize Phase 2O-02, any later Phase 2O slice, or Phase 2P. A later,
 separate continuation-authorization decision authorized only the bounded Phase
 2O-02 implementation recorded below.
 
-### 13.2 Phase 2O-02 local implementation handoff
+### 13.2 Phase 2O-02 original local implementation handoff
 
-**Conclusion: `DONE / LOCAL_ONLY / READY_FOR_INDEPENDENT_REVIEW`.** The bounded
-Phase 2O-02 Flask overview-evidence and reports-visualization implementation is
-complete locally on branch
+**Original conclusion: `DONE / LOCAL_ONLY / READY_FOR_INDEPENDENT_REVIEW`.** The
+bounded Phase 2O-02 Flask overview-evidence and reports-visualization
+implementation was completed locally on branch
 `codex/phase-2o-02-canonical-flask-overview-evidence-reports-visualization` from
-base `1c0fe027e547d4fa89f5ad09ca0f924eb9b6763a`. It has not yet passed
-independent review and is not merged, pushed, or integrated.
+base `1c0fe027e547d4fa89f5ad09ca0f924eb9b6763a` in original implementation
+commit `0548c6beab80a087ea02d00d49a213dd4336724a`.
 
-The implementation record uses a stable self-reference instead of an
-impossible literal containing-commit SHA:
+The original implementation record used this stable self-reference:
 
 ```text
 PHASE_2O_02_IMPLEMENTATION_COMMIT_REFERENCE:
@@ -525,25 +529,28 @@ EXACT_IMPLEMENTATION_COMMIT_SHA_SOURCE:
 FINAL_TASK_RESULT_AND_INDEPENDENT_REVIEW_TARGET
 ```
 
-The authorized change is limited to exactly seven files: `dashboard_app.py`,
-`templates/dashboard_home.html`, `templates/dashboard_reports.html`,
+The original authorized change was limited to exactly seven files:
+`dashboard_app.py`, `templates/dashboard_home.html`,
+`templates/dashboard_reports.html`,
 `tests/test_phase_2o_02_canonical_flask_overview_evidence_and_reports_visualization.py`,
 `README.md`, this Phase 2O-00 plan, and the Phase 2O-02 implementation record.
-It adds only six presentation patterns: a Home conclusion block, three Home
-evidence-health cards, normalized Reports counts, GET-only status-filter links
-with a filtered-result count, native disclosure rows that retain the existing
-safe GET drill-down path, and deterministic collection/filter state panels.
+It added only six presentation patterns: a Home conclusion block, seven
+category-based Home evidence-health cards corresponding to the existing seven
+`build_summary_cards()` category groups, normalized Reports counts, GET-only
+status-filter links with a filtered-result count, native disclosure rows that
+retain the existing safe GET drill-down path, and deterministic
+collection/filter state panels. No category was removed, and no additional
+evidence source or field was introduced.
 
 Presentation data is restricted to the approved Home card fields, safe evidence
 labels/type/result/availability fields, normalized aggregate counts, the active
 status filter, and the collection state. Availability facts are not promoted to
 results: for example, `FOUND` remains an availability fact and normalizes to
 result `UNKNOWN`. Filter input is allowlisted and invalid values fall back to
-`ALL`. Collection state precedence is deterministic:
-`ERROR > MISSING > MALFORMED > UNAVAILABLE > EMPTY > READY`; a filter no-match
-is reported separately and does not rewrite the collection state.
+`ALL`; a filter no-match is reported separately and does not rewrite the
+collection state.
 
-The final implementation validation evidence is:
+The original implementation validation evidence was:
 
 - `git diff --check`: PASS, with informational Git line-ending warnings only.
 - Required affected pytest command: `107 passed`.
@@ -563,10 +570,69 @@ The final implementation validation evidence is:
 
 No route, method, POST path, form, button, JavaScript action, dependency,
 evidence source, execution path, topology, Next.js surface, or operational
-authority was added. Stage 0 and all repository safety boundaries remain
-preserved. The sole next candidate is an independent review of the exact Phase
-2O-02 implementation commit. Phase 2O-03 through Phase 2O-07 and Phase 2P remain
-`NOT_AUTHORIZED / NOT_STARTED`.
+authority was added. Stage 0 and all repository safety boundaries remained
+preserved. At this original handoff, the sole next candidate was independent
+review of the exact Phase 2O-02 implementation commit.
+
+### 13.3 Phase 2O-02 bounded review-finding correction
+
+**Conclusion: `DONE / LOCAL_ONLY / READY_FOR_INDEPENDENT_FIX_REVIEW`.**
+Independent review targeted original implementation commit
+`0548c6beab80a087ea02d00d49a213dd4336724a` and returned
+`FAIL_FIX_REQUIRED` for exactly two findings:
+
+1. Mixed collections with usable evidence were globally downgraded to
+   `MALFORMED` or `UNAVAILABLE` instead of remaining `READY` while degraded
+   counts stayed visible.
+2. This Phase 2O-00 record and the Phase 2O-02 implementation record stated an
+   incorrect count of three for the Home evidence-health cards even though the
+   existing implementation renders seven category-based cards.
+
+The bounded fix is applied locally in exactly four files:
+
+1. `dashboard_app.py`
+2. `tests/test_phase_2o_02_canonical_flask_overview_evidence_and_reports_visualization.py`
+3. `docs/phase_2o/phase_2o_00_ux_ui_baseline_and_information_architecture_planning_only.md`
+4. `docs/phase_2o/phase_2o_02_canonical_flask_overview_evidence_and_reports_visualization_implementation.md`
+
+The review-fix commit uses this stable self-reference:
+
+```text
+PHASE_2O_02_REVIEW_FIX_COMMIT_REFERENCE:
+THIS_COMMIT
+
+EXACT_REVIEW_FIX_COMMIT_SHA_SOURCE:
+FINAL_TASK_RESULT_AND_INDEPENDENT_FIX_REVIEW_TARGET
+```
+
+The corrected collection model treats safely available `PASS`, `WARN`, `FAIL`,
+and `UNKNOWN` results as usable reviewer evidence. A non-empty mixed collection
+with any such entry remains `READY`; wholly unusable safely available malformed
+evidence is `MALFORMED`; otherwise a non-empty collection without usable safe
+evidence is `UNAVAILABLE`. `ERROR`, `MISSING`, and `EMPTY` retain their explicit
+conditions. Malformed, unavailable, missing, and unknown counts remain visible.
+
+Final bounded fix validation passed with exactly four modified files,
+`git diff --check`, `114` affected pytest tests, `1,928` full pytest tests with
+one existing warning, report-index `14/14 PASS`, and rendered `/` and `/reports`
+review at 320, 768, and 1440 CSS pixels. The rendered matrix covered every
+required degraded and mixed state, every status filter, invalid fallback, and
+filter-no-match; it found no page-level overflow, raw error, action control, or
+console issue. Native disclosure behavior, explicit non-color labels, rendered
+focus rules, headings, landmarks, and bounded table overflow remained intact.
+All three task-owned servers stopped and ports 5000 through 5002 were released.
+
+The seven existing Home card categories are preserved and behaviorally checked
+by their rendered titles. No dependency, route, route method, POST behavior,
+safe-view boundary, evidence source, importer, action control, or execution path
+was added or expanded. No push, merge, integration, pull request, or branch
+change occurred. Stage 0 remains `PRESERVED`; Phase 2O-03 through Phase 2O-07
+and Phase 2P remain `NOT_AUTHORIZED / NOT_STARTED`.
+
+The sole next candidate is
+`PHASE_2O_02_BOUNDED_REVIEW_FIX_COMMIT_REVIEW_ONLY`, targeting the exact fix
+commit reported in the final task result. This record does not claim fix-review
+`PASS`, implementation acceptance, or integration authorization.
 
 ## 14. Explicit exclusions and deferred work
 

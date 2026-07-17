@@ -221,6 +221,32 @@ def test_home_evidence_health_uses_only_normalized_safe_card_fields():
     assert by_title["WireGuard VPN"]["home_card_missing_flag"] is True
 
 
+def test_home_renders_exactly_seven_existing_category_evidence_health_cards(
+    phase_surface,
+):
+    _, client, _ = phase_surface
+    source = _html(client.get("/"))
+    evidence_health = re.search(
+        r'<section class="evidence-health"[^>]*>(.*?)</section>',
+        source,
+        re.DOTALL,
+    )
+
+    assert evidence_health is not None
+    assert re.findall(
+        r'<article class="summary-card">\s*<h3>([^<]+)</h3>',
+        evidence_health.group(1),
+    ) == [
+        "MikroTik baseline",
+        "Cisco topology",
+        "Lab topology summary",
+        "iperf3 performance",
+        "Performance regression",
+        "WireGuard VPN",
+        "HA / VRRP evidence",
+    ]
+
+
 def test_reports_summary_has_deterministic_exact_counts_and_separates_availability():
     summary = dashboard.build_reports_summary(
         _status_entries(),
@@ -241,7 +267,7 @@ def test_reports_summary_has_deterministic_exact_counts_and_separates_availabili
         "unavailable_count": 1,
         "filtered_count": 8,
         "active_status_filter": "ALL",
-        "collection_state": "MALFORMED",
+        "collection_state": "READY",
     }
 
 
@@ -367,11 +393,54 @@ def test_disclosure_headings_do_not_promote_prohibited_technical_fields(tmp_path
 @pytest.mark.parametrize(
     ("entries", "directory_present", "collection_error", "expected"),
     (
-        ([_entry("PASS")], True, False, "READY"),
-        ([], True, False, "EMPTY"),
-        ([], False, False, "MISSING"),
-        ([_entry("MALFORMED")], True, False, "MALFORMED"),
-        (
+        pytest.param([_entry("PASS")], True, False, "READY", id="ready"),
+        pytest.param([], True, False, "EMPTY", id="empty"),
+        pytest.param([], False, False, "MISSING", id="missing-directory"),
+        pytest.param(
+            [
+                _entry("MALFORMED", slug="malformed-one"),
+                _entry("MALFORMED", slug="malformed-two"),
+            ],
+            True,
+            False,
+            "MALFORMED",
+            id="all-malformed-available",
+        ),
+        pytest.param(
+            [
+                _entry("MALFORMED"),
+                _entry(
+                    "UNAVAILABLE",
+                    availability="UNAVAILABLE",
+                    available=False,
+                ),
+            ],
+            True,
+            False,
+            "MALFORMED",
+            id="no-usable-with-malformed-available",
+        ),
+        pytest.param(
+            [
+                _entry(
+                    "UNAVAILABLE",
+                    availability="UNAVAILABLE",
+                    slug="unavailable",
+                    available=False,
+                ),
+                _entry(
+                    "MISSING",
+                    availability="MISSING",
+                    slug="missing",
+                    available=False,
+                ),
+            ],
+            True,
+            False,
+            "UNAVAILABLE",
+            id="no-usable-safe-evidence",
+        ),
+        pytest.param(
             [
                 _entry("PASS", slug="available"),
                 _entry(
@@ -382,12 +451,48 @@ def test_disclosure_headings_do_not_promote_prohibited_technical_fields(tmp_path
             ],
             True,
             False,
-            "UNAVAILABLE",
+            "READY",
+            id="pass-plus-unavailable",
         ),
-        ([], True, True, "ERROR"),
+        pytest.param(
+            [_entry("PASS"), _entry("MALFORMED")],
+            True,
+            False,
+            "READY",
+            id="pass-plus-malformed",
+        ),
+        pytest.param(
+            [_entry("WARNING"), _entry("MALFORMED")],
+            True,
+            False,
+            "READY",
+            id="warn-plus-malformed",
+        ),
+        pytest.param(
+            [
+                _entry("FAIL"),
+                _entry(
+                    "UNAVAILABLE",
+                    availability="UNAVAILABLE",
+                    available=False,
+                ),
+            ],
+            True,
+            False,
+            "READY",
+            id="fail-plus-unavailable",
+        ),
+        pytest.param(
+            [_entry("UNKNOWN"), _entry("MALFORMED")],
+            True,
+            False,
+            "READY",
+            id="available-unknown-plus-malformed",
+        ),
+        pytest.param([], True, True, "ERROR", id="bounded-read-error"),
     ),
 )
-def test_collection_state_precedence_is_deterministic(
+def test_collection_state_decision_is_deterministic(
     entries, directory_present, collection_error, expected
 ):
     summary = dashboard.build_reports_summary(
@@ -468,7 +573,7 @@ def test_statuses_remain_understandable_without_color(phase_surface):
         assert f"{status} results" in text
     assert "Result: PASS" in text
     assert "Availability: FOUND" in text
-    assert "Collection state: MALFORMED" in text
+    assert "Collection state: READY" in text
 
 
 def test_home_and_reports_have_one_h1_and_logical_heading_order(phase_surface):
