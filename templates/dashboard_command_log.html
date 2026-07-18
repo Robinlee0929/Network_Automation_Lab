@@ -1,5 +1,5 @@
 {% extends "dashboard_base.html" %}
-{% block title %}Execution Log - Network Automation Lab Dashboard{% endblock %}
+{% block title %}Historical Execution Record - Network Automation Lab Dashboard{% endblock %}
 {% block page_styles %}
   <style>
     :root {
@@ -47,6 +47,8 @@
       color: #e5e7eb;
       white-space: pre-wrap;
       overflow-wrap: anywhere;
+      max-height: 28rem;
+      overflow: auto;
     }
     code { font-family: Consolas, "Courier New", monospace; }
     .badge {
@@ -70,37 +72,54 @@
   </style>
 {% endblock %}
 {% block page_content %}
-  <h1>Execution Log</h1>
-  <p><a href="{{ url_for('command_logs') }}">Back to execution logs</a></p>
+  <h1>Historical Execution Record</h1>
+  <p><a href="{{ url_for('command_logs') }}">Back to Historical Execution Records</a></p>
+  <div class="conclusion" role="note"><strong>Conclusion: recorded historical evidence.</strong> This detail describes a past local result; it is not a current execution, approval, or action surface.</div>
+  <div class="technical-notice" role="note">Only bounded, sanitized presentation fields are shown. Absolute working paths, unrestricted argument vectors, secrets, and raw exceptions are excluded.</div>
 
-  <section>
+  <section aria-labelledby="record-summary-heading">
+    <h2 id="record-summary-heading">Recorded summary</h2>
     <dl>
-      <dt>Log ID</dt>
-      <dd><code>{{ log.log_id }}</code></dd>
+      <dt>Record ID</dt>
+      <dd><code class="bounded-identifier">{{ log.log_id }}</code></dd>
       <dt>Command</dt>
-      <dd>{{ log.command_label }}</dd>
-      <dt>Command ID</dt>
-      <dd><code>{{ log.command_id }}</code></dd>
+      <dd><span class="bounded-value">{{ log.command_label }}</span></dd>
+      <dt>Reference key</dt>
+      <dd><code class="bounded-identifier">{{ log.command_id }}</code></dd>
       <dt>Status</dt>
       <dd><span class="badge {{ log.status|status_class }}">{{ log.status }}</span></dd>
       <dt>Exit code</dt>
-      <dd>{{ log.exit_code if log.exit_code is not none else "-" }}</dd>
+      <dd>{{ log.exit_label }}</dd>
       <dt>Started</dt>
-      <dd>{{ log.started_at }}</dd>
+      <dd><span class="bounded-value">{{ log.started_at }}</span></dd>
       <dt>Finished</dt>
-      <dd>{{ log.finished_at }}</dd>
+      <dd><span class="bounded-value">{{ log.finished_at }}</span></dd>
       <dt>Duration</dt>
-      <dd>{{ log.duration_seconds }}s</dd>
-      <dt>Working directory</dt>
-      <dd><code>{{ log.working_directory }}</code></dd>
-      <dt>Argv</dt>
-      <dd><code>{{ log.argv|join(" ") }}</code></dd>
+      <dd>{{ log.duration_label }}</dd>
     </dl>
   </section>
 
-  <h2>stdout</h2>
-  <pre><code>{{ log.stdout }}</code></pre>
+  <details>
+    <summary>Recorded standard output preview</summary>
+    {% if log.stdout_preview.text %}
+    <pre class="bounded-code"><code>{{ log.stdout_preview.text }}</code></pre>
+    {% else %}
+    <p>No recorded standard output is available.</p>
+    {% endif %}
+    {% if log.stdout_preview.truncated %}
+    <p><strong>Preview truncated:</strong> the bounded display limit was reached.</p>
+    {% endif %}
+  </details>
 
-  <h2>stderr</h2>
-  <pre><code>{{ log.stderr }}</code></pre>
+  <details>
+    <summary>Recorded standard error preview</summary>
+    {% if log.stderr_preview.text %}
+    <pre class="bounded-code"><code>{{ log.stderr_preview.text }}</code></pre>
+    {% else %}
+    <p>No recorded standard error is available.</p>
+    {% endif %}
+    {% if log.stderr_preview.truncated %}
+    <p><strong>Preview truncated:</strong> the bounded display limit was reached.</p>
+    {% endif %}
+  </details>
 {% endblock %}

@@ -57,14 +57,6 @@
       font-size: 12px;
       font-weight: 850;
     }
-    .argv {
-      background: #f8fafc;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 10px;
-      overflow-wrap: anywhere;
-      margin: 10px 0;
-    }
     .effect {
       background: #fff8eb;
       border: 1px solid #f3d29b;
@@ -130,9 +122,9 @@
 {% endblock %}
 {% block page_content %}
   <h1>Command Allowlist Reference</h1>
-  <p>This page presents static command metadata and historical demonstration records for reviewer orientation.</p>
-  <div class="note" role="note"><strong>Phase 2N Stage 0 Demo · display-only / demo-only.</strong> No command can be submitted or executed from this page. No Run control or command POST form is rendered.</div>
-  <div class="note">Registry availability and timeout metadata are reference information only. Backend command routes remain outside this Demo surface.</div>
+  <div class="conclusion" role="note"><strong>Conclusion: static allowlist reference only.</strong> Registered entries and syntax examples are committed reviewer references, not a selectable workflow.</div>
+  <div class="note" role="note"><strong>Phase 2N Stage 0 Demo · display-only / demo-only.</strong> No command can be submitted or executed from this page. No command action control or command POST form is rendered.</div>
+  <p>Approved descriptions and existing static examples are presented for reviewer orientation. Registry state grants no current execution authority.</p>
 
   <section>
     <h2>Registered Command Examples</h2>
@@ -144,8 +136,8 @@
           <span class="category">{{ item.category }}</span>
           <p class="meta">{{ item.description }}</p>
           <div class="effect">{{ item.effect }}</div>
-          <div class="argv"><code>{{ item.argv|join(" ") }}</code></div>
-          <p class="meta">Timeout: {{ item.timeout_seconds }} seconds</p>
+          <p class="meta"><strong>Reference key:</strong> <code class="bounded-identifier">{{ item.command_id }}</code></p>
+          <p class="meta"><strong>Availability label:</strong> {{ "AVAILABLE REFERENCE" if item.available else "UNAVAILABLE REFERENCE" }}</p>
           {% if not item.enabled %}
           <p class="meta">{{ item.unavailable_reason }}</p>
           {% endif %}
@@ -156,36 +148,39 @@
   </section>
 
   <section>
-    <h2>Historical Demonstration Records</h2>
-    <p class="meta">Existing local records are shown read-only. They do not indicate that a new command can be started from this page.</p>
+    <h2>Historical Execution Records</h2>
+    <p class="meta">Existing local records are historical, display-only evidence. They do not indicate that a new command can be started from this page.</p>
     {% if recent_logs %}
-    <table>
-      <thead>
-        <tr>
-          <th>Started</th>
-          <th>Command</th>
-          <th>Status</th>
-          <th>Exit</th>
-          <th>Duration</th>
-          <th>Log</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for log in recent_logs %}
-        <tr>
-          <td>{{ log.started_at }}</td>
-          <td>{{ log.command_label }}</td>
-          <td><span class="badge {{ log.status|status_class }}">{{ log.status }}</span></td>
-          <td>{{ log.exit_code if log.exit_code is not none else "-" }}</td>
-          <td>{{ log.duration_seconds }}s</td>
-          <td><a href="{{ url_for('command_log_detail', log_id=log.log_id) }}">Open</a></td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-    <p class="meta"><a href="{{ url_for('command_logs') }}">View historical records</a></p>
+    <div class="table-wrap">
+      <table>
+        <caption>Most recent bounded historical record summaries</caption>
+        <thead>
+          <tr>
+            <th>Started</th>
+            <th>Command</th>
+            <th>Status</th>
+            <th>Exit</th>
+            <th>Duration</th>
+            <th>Detail</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for log in recent_logs %}
+          <tr>
+            <td><span class="bounded-value">{{ log.started_at }}</span></td>
+            <td><span class="bounded-value">{{ log.command_label }}</span></td>
+            <td><span class="badge {{ log.status|status_class }}">{{ log.status }}</span></td>
+            <td>{{ log.exit_label }}</td>
+            <td>{{ log.duration_label }}</td>
+            <td>{% if log.detail_available %}<a href="{{ url_for('command_log_detail', log_id=log.log_id) }}">Open historical detail</a>{% else %}Unavailable{% endif %}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <p class="meta"><a href="{{ url_for('command_logs') }}">View all Historical Execution Records</a></p>
     {% else %}
-    <div class="empty">No historical demonstration records were found.</div>
+    <div class="empty">No Historical Execution Records are available.</div>
     {% endif %}
   </section>
 

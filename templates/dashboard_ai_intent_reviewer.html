@@ -158,9 +158,18 @@
     .gate-status.deferred {
       color: #7a4d00;
     }
+    .review-state {
+      display: grid;
+      grid-template-columns: 180px minmax(0, 1fr);
+      gap: 9px 14px;
+      margin: 0;
+    }
+    .review-state dt { color: var(--muted); font-weight: 800; }
+    .review-state dd { margin: 0; overflow-wrap: anywhere; }
     @media (max-width: 720px) {
       h1 { font-size: 25px; }
       .summary-grid, .day-grid, .chain-grid, .scenario-grid, .status-row { grid-template-columns: 1fr; }
+      .review-state { grid-template-columns: 1fr; }
       th, td { display: block; width: 100%; }
       tr { display: block; margin-bottom: 10px; }
     }
@@ -168,8 +177,24 @@
 {% endblock %}
 {% block page_content %}
   <h1>AI Intent Reviewer Entry Point</h1>
-  <p>Reviewer-friendly dashboard view for the Day57-Day94 AI intent workflow. It explains the demo path, links to the committed docs, scenario pack, traceability map, acceptance runbook, sign-off package, offline mock runtime skeleton, contract validation layer, reviewer quality trace, Day69 evidence drilldown, Day70 AI runtime readiness gate, Day71 controlled entry design, Day72 input contract validator, Day73 mock AI decision pipeline, Day74 dry-run plan builder, Day75 manual review approval envelope, Day76 controlled runtime audit trail, Day77 runtime safety gate, Day78 controlled runtime safety case, Day79 read-only task contract, Day80 read-only broker skeleton, Day81 broker review queue, Day82 reviewer decision audit summary, Day93 guarded fake adapter contract, and Day94 adapter boundary regression matrix while keeping the no-execution boundary visible.</p>
-  <div class="note">This page is report-only. It does not call an AI model, listen to voice input, execute mapped tasks, open SSH, connect to devices, or change network configuration.</div>
+  <div class="conclusion" role="note"><strong>Conclusion: historical and design-time reviewer evidence only.</strong> The committed artifacts document past mock decisions and future safety designs; they do not provide an active AI runtime.</div>
+  <div class="technical-notice" role="note"><strong>This page is report-only.</strong> Stage 0 remains locked. This page performs no provider or model call, prompt submission, queue or broker mutation, adapter or job creation, mapped-task execution, SSH, or live-device access.</div>
+  <p>Reviewer-friendly dashboard view for the Day57-Day95 AI intent workflow. It explains the demo path, links to the committed docs, scenario pack, traceability map, acceptance runbook, sign-off package, offline mock runtime skeleton, contract validation layer, reviewer quality trace, Day69 evidence drilldown, Day70 AI runtime readiness gate, Day71 controlled entry design, Day72 input contract validator, Day73 mock AI decision pipeline, Day74 dry-run plan builder, Day75 manual review approval envelope, Day76 controlled runtime audit trail, Day77 runtime safety gate, Day78 controlled runtime safety case, Day79 read-only task contract, Day80 read-only broker skeleton, Day81 broker review queue, Day82 reviewer decision audit summary, Day93 guarded fake adapter contract, Day94 adapter boundary regression matrix, and Day95 adapter result normalization while keeping the no-execution boundary visible.</p>
+  <p>Reviewer-friendly view of the committed Day57-Day95 evidence chain, with documentation and report references kept subordinate to explicit review and safety states.</p>
+
+  <section aria-labelledby="review-state-heading">
+    <h2 id="review-state-heading">Current reviewer state</h2>
+    <dl class="review-state">
+      <dt>Conclusion</dt>
+      <dd>REVIEW EVIDENCE ONLY</dd>
+      <dt>Runtime status</dt>
+      <dd>NOT ENABLED</dd>
+      <dt>Safety state</dt>
+      <dd>STAGE 0 · DISPLAY-ONLY · NO EXECUTION AUTHORITY</dd>
+      <dt>Evidence chain</dt>
+      <dd>Committed documentation and deterministic mock/report references</dd>
+    </dl>
+  </section>
 
   <section>
     <h2>What This Workflow Is</h2>

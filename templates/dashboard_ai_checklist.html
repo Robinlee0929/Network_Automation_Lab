@@ -58,27 +58,31 @@
 {% endblock %}
 {% block page_content %}
   <h1>AI Review Checklist</h1>
-  <p>Checklist for confirming whether the Day11 dashboard behavior matches the safe command execution requirements.</p>
-  <div class="note">Use this page as review evidence. It lists what should be true and where to verify it in the code or dashboard.</div>
+  <div class="conclusion" role="note"><strong>Conclusion: static reviewer evidence only.</strong> Checklist state records review expectations; it grants no runtime, provider, model, command, or live-device authority.</div>
+  <p>Checklist for confirming whether the documented dashboard safety requirements remain visible and reviewable.</p>
+  <div class="note">Use this page as committed evidence. It exposes no prompt, input, action control, or execution workflow.</div>
 
   <section>
     <div class="table-wrap">
       <table>
+        <caption>Static requirement, evidence label, and non-operational review status</caption>
         <thead>
           <tr>
+            <th>Status</th>
             <th>Category</th>
-            <th>Item</th>
-            <th>Expected</th>
-            <th>Evidence to Check</th>
+            <th>Requirement</th>
+            <th>Expected boundary</th>
+            <th>Bounded evidence label</th>
           </tr>
         </thead>
         <tbody>
           {% for row in checklist %}
           <tr>
+            <td><strong>STATIC EVIDENCE</strong></td>
             <td><span class="category">{{ row.category }}</span></td>
             <td>{{ row.item }}</td>
             <td>{{ row.expected }}</td>
-            <td><code>{{ row.evidence }}</code></td>
+            <td><code class="bounded-value">{{ row.evidence }}</code></td>
           </tr>
           {% endfor %}
         </tbody>

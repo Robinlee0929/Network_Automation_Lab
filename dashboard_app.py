@@ -57,6 +57,56 @@ EVIDENCE_RESULT_STATUSES = (
 )
 USABLE_EVIDENCE_RESULT_STATUSES = frozenset({"PASS", "WARN", "FAIL", "UNKNOWN"})
 REPORT_STATUS_FILTERS = ("ALL", *EVIDENCE_RESULT_STATUSES)
+RECORD_IDENTIFIER_MAX_CHARS = 120
+RECORD_LABEL_MAX_CHARS = 160
+OUTPUT_PREVIEW_MAX_CHARS = 4000
+OUTPUT_PREVIEW_MAX_LINES = 80
+JSON_PREVIEW_MAX_CHARS = 8000
+JSON_SUMMARY_FIELDS = (
+    "schema_version",
+    "title",
+    "day",
+    "phase",
+    "scope",
+    "mode",
+    "report_type",
+    "decision",
+)
+PROHIBITED_JSON_FIELD_MARKERS = (
+    "password",
+    "secret",
+    "token",
+    "api_key",
+    "private_key",
+    "preshared_key",
+    "credential",
+    "working_directory",
+    "argv",
+    "environment",
+    "username",
+    "home_directory",
+    "provider",
+    "model_config",
+    "management_address",
+    "device_identity",
+    "config_backup",
+)
+RECORD_STATUSES = frozenset(
+    {"PASS", "FAIL", "WARN", "ERROR", "TIMEOUT", "MALFORMED", "UNKNOWN"}
+)
+SAFE_LOG_ID_PATTERN = re.compile(r"^[A-Za-z0-9_-]{1,120}$")
+WINDOWS_ABSOLUTE_PATH_PATTERN = re.compile(
+    r"(?i)(?<![A-Za-z0-9_])(?:[A-Z]:[\\/][^\s<>\"']+)"
+)
+HOME_PATH_PATTERN = re.compile(r"(?i)(?:/home/|/users/)[^\s<>\"']+")
+PRIVATE_IPV4_PATTERN = re.compile(
+    r"\b(?:10(?:\.\d{1,3}){3}|192\.168(?:\.\d{1,3}){2}|"
+    r"172\.(?:1[6-9]|2\d|3[01])(?:\.\d{1,3}){2})\b"
+)
+INLINE_SECRET_PATTERN = re.compile(
+    r"(?i)\b(password|token|api[_-]?key|secret|private[_-]?key)"
+    r"\s*[:=]\s*[^\s,;]+"
+)
 
 
 @dataclass
@@ -311,11 +361,52 @@ def safe_report_path(
     return None
 
 
+def _redact_prohibited_text(value: Any) -> str:
+    text = "" if value is None else str(value)
+    if contains_unredacted_private_key(text):
+        return "PrivateKey: REDACTED"
+    text = INLINE_SECRET_PATTERN.sub(lambda match: f"{match.group(1)}=[REDACTED]", text)
+    text = WINDOWS_ABSOLUTE_PATH_PATTERN.sub("[REDACTED PATH]", text)
+    text = HOME_PATH_PATTERN.sub("[REDACTED PATH]", text)
+    return PRIVATE_IPV4_PATTERN.sub("[REDACTED PRIVATE ADDRESS]", text)
+
+
+def _bounded_safe_text(
+    value: Any,
+    *,
+    max_chars: int,
+    fallback: str = "Unavailable",
+) -> str:
+    text = _redact_prohibited_text(value).strip()
+    if not text:
+        return fallback
+    if len(text) <= max_chars:
+        return text
+    return f"{text[:max_chars].rstrip()}\u2026"
+
+
+def _sanitize_preview_value(value: Any) -> Any:
+    if isinstance(value, dict):
+        sanitized: Dict[str, Any] = {}
+        for key, item in value.items():
+            key_text = _bounded_safe_text(key, max_chars=RECORD_LABEL_MAX_CHARS)
+            if any(marker in key_text.lower() for marker in PROHIBITED_JSON_FIELD_MARKERS):
+                sanitized[key_text] = "[REDACTED]"
+            else:
+                sanitized[key_text] = _sanitize_preview_value(item)
+        return sanitized
+    if isinstance(value, list):
+        return [_sanitize_preview_value(item) for item in value]
+    if isinstance(value, str):
+        return _redact_prohibited_text(value)
+    return value
+
+
 def sanitize_json_preview(value: Any) -> Any:
     masked = mask_secret_values(value)
     if contains_unredacted_private_key(masked):
-        return _redact_private_key_strings(masked)
-    return masked
+        masked = _redact_private_key_strings(masked)
+    return _sanitize_preview_value(masked)
 
 
 def _redact_private_key_strings(value: Any) -> Any:
@@ -330,32 +421,130 @@ def _redact_private_key_strings(value: Any) -> Any:
     return value
 
 
+def _allowlisted_json_summary(safe_data: Any) -> Dict[str, str]:
+    if not isinstance(safe_data, dict):
+        return {}
+    summary: Dict[str, str] = {}
+    for field in JSON_SUMMARY_FIELDS:
+        value = safe_data.get(field)
+        if isinstance(value, (str, int, float, bool)):
+            summary[field] = _bounded_safe_text(
+                value,
+                max_chars=RECORD_LABEL_MAX_CHARS,
+            )
+    return summary
+
+
+def _bounded_json_detail(safe_data: Any) -> Dict[str, Any]:
+    pretty = json.dumps(safe_data, indent=2, sort_keys=True)
+    if len(pretty) <= JSON_PREVIEW_MAX_CHARS:
+        return {"text": pretty, "truncated": False}
+    return {
+        "text": pretty[:JSON_PREVIEW_MAX_CHARS].rstrip(),
+        "truncated": True,
+    }
+
+
 def load_json_preview(json_path: Path) -> Dict[str, Any]:
     try:
         data = json.loads(Path(json_path).read_text(encoding="utf-8"))
-    except json.JSONDecodeError as exc:
+    except json.JSONDecodeError:
         return {
             "status": "MALFORMED",
-            "summary": {"error": f"Invalid JSON: {exc.msg}"},
+            "summary": {},
             "pretty": "",
+            "pretty_truncated": False,
+            "state_copy": "This JSON evidence is malformed and cannot be previewed safely.",
         }
-    except OSError as exc:
+    except OSError:
         return {
             "status": "UNKNOWN",
-            "summary": {"error": f"Could not read JSON report: {exc}"},
+            "summary": {},
             "pretty": "",
+            "pretty_truncated": False,
+            "state_copy": "This JSON evidence is unavailable and cannot be previewed safely.",
         }
 
     safe_data = sanitize_json_preview(data)
-    summary = safe_data if isinstance(safe_data, dict) else {"value": safe_data}
-    if isinstance(summary, dict) and len(summary) > 12:
-        summary = dict(list(summary.items())[:12])
-        summary["_preview_note"] = "Showing first 12 top-level fields."
+    detail = _bounded_json_detail(safe_data)
     return {
         "status": normalize_dashboard_status(infer_report_result(data)),
-        "summary": summary,
-        "pretty": json.dumps(safe_data, indent=2, sort_keys=True),
+        "summary": _allowlisted_json_summary(safe_data),
+        "pretty": detail["text"],
+        "pretty_truncated": detail["truncated"],
+        "state_copy": (
+            "A fixed allowlisted summary and bounded sanitized detail are available."
+        ),
     }
+
+
+def _normalize_record_status(value: Any) -> str:
+    normalized = str(value or "").strip().upper()
+    if normalized == "WARNING":
+        return "WARN"
+    return normalized if normalized in RECORD_STATUSES else "UNKNOWN"
+
+
+def _bounded_output_preview(value: Any) -> Dict[str, Any]:
+    text = _redact_prohibited_text(value).replace("\r\n", "\n").replace("\r", "\n")
+    lines = text.split("\n")
+    truncated = len(lines) > OUTPUT_PREVIEW_MAX_LINES
+    bounded = "\n".join(lines[:OUTPUT_PREVIEW_MAX_LINES])
+    if len(bounded) > OUTPUT_PREVIEW_MAX_CHARS:
+        bounded = bounded[:OUTPUT_PREVIEW_MAX_CHARS]
+        truncated = True
+    return {
+        "text": bounded.rstrip(),
+        "truncated": truncated,
+    }
+
+
+def project_execution_log(log: Dict[str, Any]) -> Dict[str, Any]:
+    raw_log_id = str(log.get("log_id") or "")
+    safe_log_id = (
+        raw_log_id
+        if SAFE_LOG_ID_PATTERN.fullmatch(raw_log_id)
+        else "Unavailable"
+    )
+    duration = log.get("duration_seconds")
+    duration_label = (
+        f"{round(float(duration), 3)}s"
+        if isinstance(duration, (int, float)) and duration >= 0
+        else "Not recorded"
+    )
+    exit_code = log.get("exit_code")
+    exit_label = str(exit_code) if isinstance(exit_code, int) else "Not recorded"
+    return {
+        "log_id": safe_log_id,
+        "detail_available": safe_log_id != "Unavailable",
+        "command_id": _bounded_safe_text(
+            log.get("command_id"),
+            max_chars=RECORD_IDENTIFIER_MAX_CHARS,
+        ),
+        "command_label": _bounded_safe_text(
+            log.get("command_label"),
+            max_chars=RECORD_LABEL_MAX_CHARS,
+        ),
+        "status": _normalize_record_status(log.get("status")),
+        "exit_label": exit_label,
+        "started_at": _bounded_safe_text(
+            log.get("started_at"),
+            max_chars=RECORD_LABEL_MAX_CHARS,
+            fallback="Not recorded",
+        ),
+        "finished_at": _bounded_safe_text(
+            log.get("finished_at"),
+            max_chars=RECORD_LABEL_MAX_CHARS,
+            fallback="Not recorded",
+        ),
+        "duration_label": duration_label,
+        "stdout_preview": _bounded_output_preview(log.get("stdout", "")),
+        "stderr_preview": _bounded_output_preview(log.get("stderr", "")),
+    }
+
+
+def project_execution_logs(logs: Iterable[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    return [project_execution_log(log) for log in logs]
 
 
 def collect_dashboard_evidence(
@@ -1682,7 +1871,9 @@ def create_app(
     @app.route("/commands")
     def commands():
         registry = build_command_registry(PROJECT_ROOT)
-        logs = list_execution_logs(app.config["EXECUTION_LOGS_DIR"])
+        logs = project_execution_logs(
+            list_execution_logs(app.config["EXECUTION_LOGS_DIR"])
+        )
         return render_template(
             "dashboard_commands.html",
             commands=list(registry.values()),
@@ -1707,7 +1898,9 @@ def create_app(
     def command_logs():
         return render_template(
             "dashboard_command_logs.html",
-            logs=list_execution_logs(app.config["EXECUTION_LOGS_DIR"]),
+            logs=project_execution_logs(
+                list_execution_logs(app.config["EXECUTION_LOGS_DIR"])
+            ),
         )
 
     @app.route("/commands/logs/<log_id>")
@@ -1715,7 +1908,10 @@ def create_app(
         log = load_execution_log(app.config["EXECUTION_LOGS_DIR"], log_id)
         if log is None:
             abort(404)
-        return render_template("dashboard_command_log.html", log=log)
+        return render_template(
+            "dashboard_command_log.html",
+            log=project_execution_log(log),
+        )
 
     @app.route("/ai-checklist")
     def ai_checklist():

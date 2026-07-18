@@ -671,6 +671,58 @@ created. Phase 2O remains `IN_PROGRESS / NOT_READY`; Phase 2O-03 through Phase
 `PRESERVED`. The sole next candidate is
 `PHASE_2O_02_POST_MERGE_STATUS_RECONCILIATION_COMMIT_REVIEW_ONLY`.
 
+### 13.5 Phase 2O-03 bounded implementation handoff
+
+**Current conclusion:** Phase 2O-02 is accepted and synchronized on `main` at
+`10cec5ca1911140decdba7b84f54667698dcedae`, and its reconciliation review
+returned `PASS`. A later continuation decision authorized the bounded Phase
+2O-03 canonical Flask display-only and technical-detail presentation.
+
+The first Phase 2O-03 implementation attempt stopped before editing with
+`EXACT_SCOPE_TEST_CONTRACT_CONFLICT`; it modified no file and created no commit.
+A separate scope-correction decision authorized visible-label expectation
+updates in exactly two existing regression tests. The corrected implementation
+scope is exactly fourteen files: `dashboard_app.py`, seven named Flask
+templates, the new Phase 2O-03 test, the two existing label-regression tests,
+`README.md`, this plan, and the Phase 2O-03 implementation record. No wildcard,
+fifteenth file, dependency, or lockfile is authorized.
+
+The controlling active label is `Historical Execution Records`. Superseded
+visible labels are removed without hidden compatibility content, and every
+existing route, navigation, accessibility, Stage 0, no-form, no-button, and
+zero-execution test assertion remains active. The selected implementation adds
+conclusion-first display-only notices, bounded historical summaries, sanitized
+and truncated output previews, fixed allowlisted JSON summary projection,
+bounded subordinate JSON detail, static AI Checklist evidence, historical or
+design-time AI Intent evidence, semantic tables/lists, native disclosures,
+visible focus, and narrow-screen reflow.
+
+Safe technical data is limited to fixed copy, approved command labels and
+descriptions, static examples, bounded record identifiers, normalized statuses,
+recorded timestamps and result indicators, sanitized bounded output/JSON,
+fixed checklist and reviewer evidence labels, and approved repository-relative
+references. Absolute/private paths, usernames, environment values, secrets,
+provider/model configuration, unrestricted arguments, arbitrary input, raw
+exceptions, tracebacks, unbounded output, private/management addresses,
+configuration content, topology, and mutable execution state remain prohibited.
+
+The implementation introduces no route or HTTP-method change, POST behavior,
+form, action control, runner/registry/log/report/persistence behavior change,
+provider/API/model integration, job/importer, queue/scheduler/broker/worker,
+SSH/NETCONF/RESTCONF/live-device path, dependency, Next.js change, later slice,
+or Phase 2P authority. Stage 0 remains `PRESERVED`.
+
+The exact implementation validation and rendered-review results are recorded in
+the Phase 2O-03 implementation record. The exact targeted suite passed 125
+tests, full pytest passed 1,939 tests with one existing terminal warning,
+report-index passed 14/14, and rendered review passed all six routes across 24
+route/viewport combinations including 400% equivalent reflow and required edge
+states. No page-level overflow, console warning/error, form, button, script, or
+execution control was observed.
+After successful local implementation, the sole next candidate is independent
+review of the exact Phase 2O-03 commit. No push, merge, integration, pull request,
+Phase 2O-04, or Phase 2P action is implied.
+
 ## 14. Explicit exclusions and deferred work
 
 The following remain excluded and unauthorized:
@@ -692,7 +744,7 @@ The following remain excluded and unauthorized:
 - Any further packaging, distribution, deployment, publication, merge, push,
   pull request, branch cleanup, or Phase 2P work not explicitly authorized by a
   separate task.
-- Phase 2O-03 through Phase 2O-07 implementation until each applicable slice
+- Phase 2O-04 through Phase 2O-07 implementation until each applicable slice
   receives its own fresh explicit authorization.
 
 ## 15. Documentation readability review

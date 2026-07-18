@@ -20,6 +20,7 @@
       padding: 16px;
       margin-top: 14px;
       box-shadow: 0 10px 24px rgba(16, 24, 40, .07);
+      min-width: 0;
     }
     table { width: 100%; border-collapse: collapse; }
     th, td { border-bottom: 1px solid var(--border); padding: 10px; text-align: left; vertical-align: top; }
@@ -54,23 +55,35 @@
   </style>
 {% endblock %}
 {% block page_content %}
-  <h1>JSON Preview</h1>
-  <p><code>{{ report_path }}</code></p>
-  <section>
-    <h2>Summary</h2>
-    <table>
-      <tbody>
-        <tr><th>Status</th><td><span class="badge">{{ preview.status }}</span></td></tr>
-        {% for key, value in preview.summary.items() %}
-        <tr><th>{{ key }}</th><td><code>{{ value }}</code></td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
+  <h1>Safe JSON Evidence Preview</h1>
+  <div class="conclusion" role="note"><strong>Conclusion: normalized, redacted, and non-executing evidence.</strong> The summary uses a fixed code-defined allowlist before any subordinate detail is shown.</div>
+  <div class="technical-notice" role="note">This preview never executes, imports, or regenerates the report. Unknown keys are excluded from the summary, and detailed content is sanitized and bounded.</div>
+  <p><strong>Repository-relative evidence reference:</strong> <code class="bounded-identifier">{{ report_path }}</code></p>
+  <section aria-labelledby="json-summary-heading">
+    <h2 id="json-summary-heading">Allowlisted summary</h2>
+    <p>{{ preview.state_copy }}</p>
+    <div class="table-wrap">
+      <table>
+        <caption>Normalized status and approved summary fields</caption>
+        <tbody>
+          <tr><th>Normalized status</th><td><span class="badge {{ preview.status|status_class }}">{{ preview.status }}</span></td></tr>
+          {% for key, value in preview.summary.items() %}
+          <tr><th>{{ key }}</th><td><code class="bounded-value">{{ value }}</code></td></tr>
+          {% endfor %}
+          {% if not preview.summary %}
+          <tr><th>Approved fields</th><td>No approved summary fields are available.</td></tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
   </section>
   {% if preview.pretty %}
-  <section>
-    <h2>Raw JSON</h2>
-    <pre>{{ preview.pretty }}</pre>
-  </section>
+  <details>
+    <summary>Show bounded sanitized JSON detail</summary>
+    <pre class="bounded-code">{{ preview.pretty }}</pre>
+    {% if preview.pretty_truncated %}
+    <p><strong>Preview truncated:</strong> the bounded JSON display limit was reached.</p>
+    {% endif %}
+  </details>
   {% endif %}
 {% endblock %}

@@ -23,7 +23,7 @@ NAVIGATION = (
     ("Home", "/"),
     ("Reports", "/reports"),
     ("Commands", "/commands"),
-    ("Execution Logs", "/commands/logs"),
+    ("Historical Execution Records", "/commands/logs"),
     ("AI Intent Reviewer", "/ai-intent-reviewer"),
     ("AI Checklist", "/ai-checklist"),
 )
