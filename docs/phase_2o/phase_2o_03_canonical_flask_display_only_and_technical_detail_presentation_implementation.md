@@ -2,15 +2,16 @@
 
 ## 1. Conclusion and current status
 
-**Conclusion: the original Phase 2O-03 implementation received independent
-review `FAIL_FIX_REQUIRED`; its strictly bounded correction is complete in this
-commit and is ready for independent fix review.** The correction preserves the
-six existing Flask GET surfaces as display-only, historical-only, or static
-reviewer evidence and preserves Stage 0.
+**Conclusion: bounded fix commit
+`9ff474822a94d0f79ff45b061af590186b425def` received independent review `PASS`,
+making the cumulative Phase 2O-03 implementation `ACCEPTED`; the accepted
+target is merged to and synchronized on `main`.** The implementation preserves
+the six existing Flask GET surfaces as display-only, historical-only, or
+static reviewer evidence and preserves Stage 0.
 
-This record does not claim that the review fix has independently passed. It
-does not authorize integration, merge, push, pull request creation, Phase
-2O-04, or Phase 2P. No route, method, POST behavior, action control, execution
+This bounded three-document post-merge reconciliation is ready for independent
+review and does not claim that review has passed. It does not authorize Phase
+2O-04 or Phase 2P. No route, method, POST behavior, action control, execution
 path, evidence source, dependency, lockfile, provider/model integration, live
 device access, or Next.js behavior is added.
 
@@ -40,6 +41,10 @@ Windows private paths containing spaces, incomplete exact-boundary and
 indirect no-side-effect tests, insufficient rendered disclosure/reflow
 evidence, two negative terminology assertions outside the Phase 2N-04 test
 authorization, and stale Phase 2O status/handoff text.
+
+The strictly bounded correction was committed as
+`9ff474822a94d0f79ff45b061af590186b425def`. Independent review of that exact
+commit returned `PASS`, so the cumulative implementation is `ACCEPTED`.
 
 ## 3. Exact fourteen-file scope
 
@@ -189,9 +194,27 @@ form, button, POST/execution control, or prohibited sentinel. The task-owned
 loopback server was stopped, its port was released, and its temporary harness
 was removed from outside the repository.
 
-The final task result remains the authoritative source for exact command text
-and the fix SHA. These local validation results do not constitute an
-independent review `PASS`.
+The fix task's final result remains the authoritative source for its exact
+command text and fix SHA. Those local validation results did not by themselves
+constitute an independent review `PASS`; the later independent review of exact
+fix commit `9ff474822a94d0f79ff45b061af590186b425def` supplied that controlling
+`PASS` decision.
+
+### 6.3 Integration validation
+
+Local `main` advanced from base
+`10cec5ca1911140decdba7b84f54667698dcedae` to accepted target
+`9ff474822a94d0f79ff45b061af590186b425def` by strict fast-forward only. Before
+the first push, accepted-range `git diff --check` passed, the exact seven-file
+targeted suite passed `129` tests, full pytest passed `1,943` tests with one
+existing terminal warning, and report-index passed `14/14`.
+
+Focused synthetic checks passed for structured provider/model removal,
+historical provider/model redaction, complete removal of Windows private paths
+containing spaces and their suffixes, exact/one-over output and JSON bounds,
+and source immutability. No browser matrix was repeated because the accepted
+target had already passed independent browser review and these checks revealed
+no contradiction.
 
 ## 7. Safety and handoff
 
@@ -224,21 +247,42 @@ EXACT_REVIEW_FIX_COMMIT_SHA_SOURCE:
 FINAL_TASK_RESULT_AND_INDEPENDENT_FIX_REVIEW_TARGET
 ```
 
-No push, merge, integration, pull request, branch cleanup, later Phase 2O slice,
-or Phase 2P work is authorized. After the successful local fix commit, the sole
-next candidate is independent review of that exact bounded review-fix commit.
+The accepted target was normally pushed to trusted `origin/main` and freshly
+verified there. The fully merged local source branch was safely deleted with a
+non-force operation; no remote source branch was created or deleted. No merge
+commit, squash, rebase, cherry-pick, reset, tag, release, or force push was
+used.
+
+The bounded post-merge reconciliation uses this stable self-reference:
+
+```text
+PHASE_2O_03_POST_MERGE_RECONCILIATION_COMMIT_REFERENCE:
+THIS_COMMIT
+
+EXACT_RECONCILIATION_COMMIT_SHA_SOURCE:
+FINAL_TASK_RESULT_AND_INDEPENDENT_POST_MERGE_REVIEW_TARGET
+```
+
+Phase 2O-03 is `DONE / ACCEPTED / MERGED_TO_MAIN / SYNCHRONIZED`. This
+reconciliation changes only the three authorized documentation files and is
+not yet independently reviewed. Phase 2O remains `IN_PROGRESS / NOT_READY`;
+Phase 2O-04 through Phase 2O-07 and Phase 2P remain
+`NOT_AUTHORIZED / NOT_STARTED`; Stage 0 remains `PRESERVED`. The sole next
+candidate is
+`PHASE_2O_03_POST_MERGE_STATUS_RECONCILIATION_COMMIT_REVIEW_ONLY`.
 
 ## 8. Documentation readability review
 
-- The record begins with the original review failure and bounded correction
-  status, without claiming that the correction has passed independent review.
+- The record begins with the accepted and synchronized conclusion while
+  preserving the original review failure and bounded-fix chronology.
 - The purpose, original fourteen-file scope, narrower five-file correction,
   presentation boundary, allowed technical data, and prohibited data are
   separated and explicit.
 - Stage 0 and every forbidden operational boundary remain visible and use the
   same terminology as the Phase 2O plan and README.
 - Original validation and its `FAIL_FIX_REQUIRED` disposition are separated
-  from the corrected test contract and final-result evidence source.
+  from the corrected test contract, independent fix-review `PASS`, and
+  integration validation.
 - Long explanations are split into focused sections and the handoff names only
-  the next independent fix-review candidate; it does not imply later-phase
-  authority.
+  the post-merge reconciliation review candidate; it does not imply
+  later-phase authority.

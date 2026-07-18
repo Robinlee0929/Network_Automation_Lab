@@ -59,12 +59,18 @@ non-executing.
 | `PHASE_2O_03_CORRECTED_SCOPE` | `AUTHORIZED / EXACT_14_FILE_SCOPE` |
 | `PHASE_2O_03_IMPLEMENTATION_COMMIT` | `d18e6ccac87e45e7cc983bb09be1c50f07c0c6c2` |
 | `PHASE_2O_03_IMPLEMENTATION_REVIEW_DECISION` | `FAIL_FIX_REQUIRED` |
-| `PHASE_2O_03_REVIEW_FIX_COMMIT_REFERENCE` | `THIS_COMMIT` |
-| `PHASE_2O_03_REVIEW_FIX_STATUS` | `DONE / LOCAL_ONLY / READY_FOR_INDEPENDENT_FIX_REVIEW` |
+| `PHASE_2O_03_REVIEW_FIX_COMMIT` | `9ff474822a94d0f79ff45b061af590186b425def` |
+| `PHASE_2O_03_REVIEW_FIX_DECISION` | `PASS` |
+| `PHASE_2O_03_CUMULATIVE_IMPLEMENTATION_STATUS` | `ACCEPTED` |
+| `PHASE_2O_03_INTEGRATION_TARGET` | `9ff474822a94d0f79ff45b061af590186b425def` |
+| `PHASE_2O_03_INTEGRATION_METHOD` | `STRICT_FAST_FORWARD` |
+| `PHASE_2O_03_POST_MERGE_RECONCILIATION_COMMIT_REFERENCE` | `THIS_COMMIT` |
+| `PHASE_2O_03_POST_MERGE_RECONCILIATION_REVIEW_STATUS` | `READY_FOR_INDEPENDENT_REVIEW / NOT_YET_REVIEWED` |
+| `PHASE_2O_03_STATUS` | `DONE / ACCEPTED / MERGED_TO_MAIN / SYNCHRONIZED` |
 | `PHASE_2O_04_THROUGH_2O_07_STATUS` | `NOT_AUTHORIZED / NOT_STARTED` |
 | `PHASE_2P_STATUS` | `NOT_AUTHORIZED / NOT_STARTED` |
 | `STAGE_0_BOUNDARY` | `PRESERVED` |
-| `NEXT_CANDIDATE` | `PHASE_2O_03_BOUNDED_REVIEW_FIX_COMMIT_REVIEW_ONLY` |
+| `NEXT_CANDIDATE` | `PHASE_2O_03_POST_MERGE_STATUS_RECONCILIATION_COMMIT_REVIEW_ONLY` |
 
 No provider, model, job, command, device, or production authority follows from a
 visual treatment, status label, navigation destination, reviewer view, or
@@ -660,11 +666,11 @@ Phase 2O-07 and Phase 2P remain `NOT_AUTHORIZED / NOT_STARTED`; Stage 0 remains
 
 ### 13.5 Phase 2O-03 bounded implementation handoff
 
-**Current conclusion:** The original Phase 2O-03 implementation commit
+**Historical handoff at fix creation:** The original Phase 2O-03 implementation commit
 `d18e6ccac87e45e7cc983bb09be1c50f07c0c6c2` received independent review
 `FAIL_FIX_REQUIRED`. The strictly bounded five-file correction is complete in
 this commit and is `DONE / LOCAL_ONLY / READY_FOR_INDEPENDENT_FIX_REVIEW`; it
-does not claim that the fix has passed independent review.
+did not claim at that handoff that the fix had passed independent review.
 
 The first Phase 2O-03 implementation attempt stopped before editing with
 `EXACT_SCOPE_TEST_CONTRACT_CONFLICT`; it modified no file and created no commit.
@@ -736,12 +742,65 @@ EXACT_REVIEW_FIX_COMMIT_SHA_SOURCE:
 FINAL_TASK_RESULT_AND_INDEPENDENT_FIX_REVIEW_TARGET
 ```
 
-The final task result is the authoritative source for the exact review-fix SHA
-and validation results. This commit adds no route, method, action control,
+The fix task's final result is the authoritative source for the exact review-fix
+SHA and validation results. That commit added no route, method, action control,
 provider/model runtime, execution behavior, dependency, or live path. Stage 0
-remains `PRESERVED`. The sole next candidate is independent review of this
-exact Phase 2O-03 bounded review-fix commit. Phase 2O-04, push, merge, pull
-request, integration, and Phase 2P remain unauthorized.
+remained `PRESERVED`. At that historical handoff, the sole next candidate was
+independent review of the exact Phase 2O-03 bounded review-fix commit, and
+Phase 2O-04, push, merge, pull request, integration, and Phase 2P were
+unauthorized. Section 13.6 records the later controlling review and integration
+outcome.
+
+### 13.6 Phase 2O-03 integration and post-merge status reconciliation
+
+**Current conclusion:** Independent review of bounded fix commit
+`9ff474822a94d0f79ff45b061af590186b425def` returned `PASS`, making the
+cumulative Phase 2O-03 implementation `ACCEPTED`. Local `main` advanced from
+base `10cec5ca1911140decdba7b84f54667698dcedae` to that accepted target by
+strict fast-forward only and was normally pushed and verified on trusted
+`origin/main`. Phase 2O-03 is now
+`DONE / ACCEPTED / MERGED_TO_MAIN / SYNCHRONIZED`; this bounded documentation
+reconciliation is ready for independent review and does not claim that review
+has passed.
+
+Before the first push, accepted-range `git diff --check` passed, the exact
+seven-file targeted suite passed `129` tests, full pytest passed `1,943` tests
+with one existing terminal warning, and report-index passed `14/14`. Focused
+synthetic checks also passed for structured provider/model removal, historical
+provider/model redaction, Windows private paths containing spaces and suffix
+removal, output and JSON boundaries, and source immutability. No full browser
+matrix was required because the accepted target had already passed independent
+browser review and the focused checks revealed no contradiction.
+
+Fresh remote verification proved trusted `origin/main` at accepted target
+`9ff474822a94d0f79ff45b061af590186b425def`. The fully merged local source
+branch was then deleted with the safe non-force operation; no remote source
+branch was created or deleted. The integration used no merge commit, squash,
+rebase, cherry-pick, reset, tag, release, or force push.
+
+This reconciliation changes only README and the two applicable Phase 2O
+records. It changes no application, template, test, dependency, workflow,
+configuration, route, method, action control, runner, provider/model runtime,
+execution behavior, or live-device boundary. Stage 0 remains `PRESERVED`;
+Phase 2O remains `IN_PROGRESS / NOT_READY`; Phase 2O-04 through Phase 2O-07
+and Phase 2P remain `NOT_AUTHORIZED / NOT_STARTED`.
+
+The reconciliation commit uses this stable self-reference because a commit
+cannot contain its own final SHA:
+
+```text
+PHASE_2O_03_POST_MERGE_RECONCILIATION_COMMIT_REFERENCE:
+THIS_COMMIT
+
+EXACT_RECONCILIATION_COMMIT_SHA_SOURCE:
+FINAL_TASK_RESULT_AND_INDEPENDENT_POST_MERGE_REVIEW_TARGET
+```
+
+The final task result is the authoritative source for this reconciliation
+commit's exact SHA and second-push result. This document does not claim that
+the future independent reconciliation review has passed. The sole next
+candidate is
+`PHASE_2O_03_POST_MERGE_STATUS_RECONCILIATION_COMMIT_REVIEW_ONLY`.
 
 ## 14. Explicit exclusions and deferred work
 
