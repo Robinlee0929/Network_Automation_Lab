@@ -91,14 +91,42 @@ PROHIBITED_JSON_FIELD_MARKERS = (
     "device_identity",
     "config_backup",
 )
+PROHIBITED_PROVIDER_MODEL_FIELDS = frozenset(
+    {
+        "provider",
+        "providerconfig",
+        "providerid",
+        "providername",
+        "runtimeprovider",
+        "model",
+        "modelconfig",
+        "modelid",
+        "modelname",
+        "runtimemodel",
+    }
+)
 RECORD_STATUSES = frozenset(
     {"PASS", "FAIL", "WARN", "ERROR", "TIMEOUT", "MALFORMED", "UNKNOWN"}
 )
 SAFE_LOG_ID_PATTERN = re.compile(r"^[A-Za-z0-9_-]{1,120}$")
 WINDOWS_ABSOLUTE_PATH_PATTERN = re.compile(
-    r"(?i)(?<![A-Za-z0-9_])(?:[A-Z]:[\\/][^\s<>\"']+)"
+    r'''(?ix)
+    (?:
+        "[A-Z]:[\\/][^"\r\n]*"
+        | '[A-Z]:[\\/][^'\r\n]*'
+        | (?<![A-Za-z0-9_])[A-Z]:[\\/][^\r\n<>"']*
+    )
+    '''
 )
-HOME_PATH_PATTERN = re.compile(r"(?i)(?:/home/|/users/)[^\s<>\"']+")
+HOME_PATH_PATTERN = re.compile(
+    r'''(?ix)
+    (?:
+        "(?:/home/|/users/)[^"\r\n]*"
+        | '(?:/home/|/users/)[^'\r\n]*'
+        | (?<![A-Za-z0-9_])(?:/home/|/users/)[^\r\n<>"']*
+    )
+    '''
+)
 PRIVATE_IPV4_PATTERN = re.compile(
     r"\b(?:10(?:\.\d{1,3}){3}|192\.168(?:\.\d{1,3}){2}|"
     r"172\.(?:1[6-9]|2\d|3[01])(?:\.\d{1,3}){2})\b"
@@ -107,6 +135,25 @@ INLINE_SECRET_PATTERN = re.compile(
     r"(?i)\b(password|token|api[_-]?key|secret|private[_-]?key)"
     r"\s*[:=]\s*[^\s,;]+"
 )
+PROVIDER_MODEL_TEXT_PATTERN = re.compile(
+    r'''(?ixm)
+    (?<![A-Za-z0-9_])
+    ["']?
+    (?:
+        provider(?:[ _-]?(?:name|id|config))?
+        | model(?:[ _-]?(?:name|id|config))?
+    )
+    ["']?
+    [ \t]*[:=][ \t]*
+    (?:
+        "(?:\\.|[^"\r\n])*"
+        | '(?:\\.|[^'\r\n])*'
+        | [^,\r\n;}\]]+
+    )
+    '''
+)
+PRIVATE_PATH_REDACTION = "[REDACTED PRIVATE PATH]"
+PROVIDER_MODEL_REDACTION = "[REDACTED PROVIDER/MODEL FIELD]"
 
 
 @dataclass
@@ -366,8 +413,9 @@ def _redact_prohibited_text(value: Any) -> str:
     if contains_unredacted_private_key(text):
         return "PrivateKey: REDACTED"
     text = INLINE_SECRET_PATTERN.sub(lambda match: f"{match.group(1)}=[REDACTED]", text)
-    text = WINDOWS_ABSOLUTE_PATH_PATTERN.sub("[REDACTED PATH]", text)
-    text = HOME_PATH_PATTERN.sub("[REDACTED PATH]", text)
+    text = PROVIDER_MODEL_TEXT_PATTERN.sub(PROVIDER_MODEL_REDACTION, text)
+    text = WINDOWS_ABSOLUTE_PATH_PATTERN.sub(PRIVATE_PATH_REDACTION, text)
+    text = HOME_PATH_PATTERN.sub(PRIVATE_PATH_REDACTION, text)
     return PRIVATE_IPV4_PATTERN.sub("[REDACTED PRIVATE ADDRESS]", text)
 
 
@@ -390,7 +438,10 @@ def _sanitize_preview_value(value: Any) -> Any:
         sanitized: Dict[str, Any] = {}
         for key, item in value.items():
             key_text = _bounded_safe_text(key, max_chars=RECORD_LABEL_MAX_CHARS)
-            if any(marker in key_text.lower() for marker in PROHIBITED_JSON_FIELD_MARKERS):
+            normalized_key = re.sub(r"[^a-z0-9]+", "", key_text.casefold())
+            if normalized_key in PROHIBITED_PROVIDER_MODEL_FIELDS:
+                continue
+            if any(marker in key_text.casefold() for marker in PROHIBITED_JSON_FIELD_MARKERS):
                 sanitized[key_text] = "[REDACTED]"
             else:
                 sanitized[key_text] = _sanitize_preview_value(item)
@@ -440,7 +491,7 @@ def _bounded_json_detail(safe_data: Any) -> Dict[str, Any]:
     if len(pretty) <= JSON_PREVIEW_MAX_CHARS:
         return {"text": pretty, "truncated": False}
     return {
-        "text": pretty[:JSON_PREVIEW_MAX_CHARS].rstrip(),
+        "text": pretty[:JSON_PREVIEW_MAX_CHARS],
         "truncated": True,
     }
 

@@ -1,5 +1,8 @@
 import json
 import re
+import socket
+import subprocess
+import urllib.request
 from html.parser import HTMLParser
 from pathlib import Path
 
@@ -68,9 +71,23 @@ def phase_2o_03_surface(tmp_path, monkeypatch):
                 "mode": "report_only",
                 "arbitrary_summary_sentinel": "SUMMARY-SENTINEL-NOT-ALLOWLISTED",
                 "password": "JSON-SECRET-SENTINEL",
-                "private_path": r"C:\Users\private-reviewer\evidence.json",
+                "provider": "STRUCTURED-PROVIDER-SENTINEL",
+                "Provider-Name": "MIXED-PROVIDER-SENTINEL",
+                "model": "STRUCTURED-MODEL-SENTINEL",
+                "model_name": "STRUCTURED-MODEL-NAME-SENTINEL",
+                "MODEL_id": "MIXED-MODEL-SENTINEL",
+                "private_path": (
+                    r"C:\Users\Synthetic Reviewer\Private Folder\evidence file.json"
+                ),
+                "forward_private_path": (
+                    "C:/Users/Synthetic Reviewer/Private Folder/forward evidence.json"
+                ),
                 "management_address": "192.168.44.10",
-                "nested": {"safe_note": "sanitized subordinate detail"},
+                "nested": {
+                    "model-config": "NESTED-MODEL-SENTINEL",
+                    "runtime_provider": "NESTED-PROVIDER-SENTINEL",
+                    "safe_note": "sanitized subordinate detail",
+                },
             }
         ),
         encoding="utf-8",
@@ -83,7 +100,12 @@ def phase_2o_03_surface(tmp_path, monkeypatch):
     long_output = (
         "first line\nsecond line\n"
         "token=OUTPUT-SECRET-SENTINEL\n"
-        "private path C:\\Users\\private-reviewer\\result.txt\n"
+        "provider=OUTPUT-PROVIDER-SENTINEL\n"
+        "model: OUTPUT-MODEL-SENTINEL\n"
+        "MODEL_NAME = OUTPUT-MODEL-NAME-SENTINEL\n"
+        '{"Provider-Id":"OUTPUT-PROVIDER-ID-SENTINEL"}\n'
+        'quoted private path "C:\\Users\\Synthetic Reviewer\\Private Folder\\result file.txt"\n'
+        "forward private path C:/Users/Synthetic Reviewer/Private Folder/forward result.txt\n"
         "private address 10.10.10.10\n"
         + ("LONG-UNBROKEN-CONTENT-" * 420)
     )
@@ -179,6 +201,56 @@ def test_all_six_get_surfaces_have_no_action_markup_and_reach_no_execution_path(
     assert execution_calls == []
 
 
+def test_all_six_get_surfaces_reach_no_forbidden_indirect_side_effect_primitive(
+    phase_2o_03_surface, monkeypatch
+):
+    app, client, execution_calls, _ = phase_2o_03_surface
+    forbidden_attempts = []
+
+    def fail_forbidden(name):
+        def fail(*args, **kwargs):
+            forbidden_attempts.append((name, args, kwargs))
+            raise AssertionError(f"GET presentation reached forbidden primitive: {name}")
+
+        return fail
+
+    monkeypatch.setattr(subprocess, "run", fail_forbidden("subprocess.run"))
+    monkeypatch.setattr(subprocess, "Popen", fail_forbidden("subprocess.Popen"))
+    monkeypatch.setattr(socket, "create_connection", fail_forbidden("socket.connect"))
+    monkeypatch.setattr(urllib.request, "urlopen", fail_forbidden("provider-http"))
+    for attribute in ("write_text", "write_bytes", "mkdir", "touch"):
+        monkeypatch.setattr(Path, attribute, fail_forbidden(f"Path.{attribute}"))
+
+    forbidden_route_names = {
+        "execute_registered_command",
+        "create_job",
+        "import_report",
+        "provider_model_runtime_call",
+        "write_text",
+        "write_bytes",
+        "urlopen",
+        "create_connection",
+        "Popen",
+    }
+    for endpoint in (
+        "commands",
+        "command_logs",
+        "command_log_detail",
+        "preview_json_report",
+        "ai_checklist",
+        "ai_intent_reviewer",
+    ):
+        assert forbidden_route_names.isdisjoint(
+            app.view_functions[endpoint].__code__.co_names
+        )
+
+    for path in TARGET_ROUTES:
+        assert client.get(path).status_code == 200
+
+    assert execution_calls == []
+    assert forbidden_attempts == []
+
+
 def test_canonical_historical_terminology_and_conclusion_first_safety_copy(
     phase_2o_03_surface,
 ):
@@ -239,7 +311,16 @@ def test_historical_detail_bounds_output_preserves_whitespace_and_hides_prohibit
     assert "first line\nsecond line" in source
     assert "Preview truncated:" in source
     assert "OUTPUT-SECRET-SENTINEL" not in source
-    assert "private-reviewer" not in source
+    assert "OUTPUT-PROVIDER-SENTINEL" not in source
+    assert "OUTPUT-MODEL-SENTINEL" not in source
+    assert "OUTPUT-MODEL-NAME-SENTINEL" not in source
+    assert "OUTPUT-PROVIDER-ID-SENTINEL" not in source
+    assert "Synthetic Reviewer" not in source
+    assert "Private Folder" not in source
+    assert "result file.txt" not in source
+    assert "forward result.txt" not in source
+    assert dashboard.PROVIDER_MODEL_REDACTION in source
+    assert dashboard.PRIVATE_PATH_REDACTION in source
     assert "10.10.10.10" not in source
     assert "ARGV-PRIVATE-SENTINEL" not in source
     assert "working directory" not in source.lower()
@@ -247,10 +328,84 @@ def test_historical_detail_bounds_output_preserves_whitespace_and_hides_prohibit
     assert projected["stdout_preview"]["truncated"] is True
 
 
+def test_historical_output_provider_model_forms_and_private_paths_are_fully_redacted():
+    provider_model_text = (
+        "provider=PROVIDER-EQUALS-SENTINEL\n"
+        "model: MODEL-COLON-SENTINEL\n"
+        "Model-Name = MODEL-NAME-SENTINEL\n"
+        '{"Provider_Id":"PROVIDER-JSON-SENTINEL"}'
+    )
+    redacted_provider_model = dashboard._redact_prohibited_text(provider_model_text)
+    for sentinel in (
+        "PROVIDER-EQUALS-SENTINEL",
+        "MODEL-COLON-SENTINEL",
+        "MODEL-NAME-SENTINEL",
+        "PROVIDER-JSON-SENTINEL",
+    ):
+        assert sentinel not in redacted_provider_model
+    assert dashboard.PROVIDER_MODEL_REDACTION in redacted_provider_model
+    ordinary_prose = "This explanatory model remains ordinary reviewer prose."
+    assert dashboard._redact_prohibited_text(ordinary_prose) == ordinary_prose
+
+    path_cases = (
+        r"C:\Users\Synthetic Reviewer\Private Folder\evidence file.json",
+        r'"C:\Users\Synthetic Reviewer\Private Folder\quoted evidence.json"',
+        "path=C:/Users/Synthetic Reviewer/Private Folder/forward evidence.json,",
+        (
+            "[C:\\Users\\Synthetic Reviewer\\Private Folder\\bracketed evidence.json]"
+            "\nSAFE-NEXT-LINE"
+        ),
+    )
+    for source_path in path_cases:
+        redacted_path = dashboard._redact_prohibited_text(source_path)
+        assert "Synthetic Reviewer" not in redacted_path
+        assert "Reviewer" not in redacted_path
+        assert "Private Folder" not in redacted_path
+        assert "evidence" not in redacted_path
+        assert dashboard.PRIVATE_PATH_REDACTION in redacted_path
+
+
+def test_output_and_json_preview_limits_hold_exactly_at_and_one_over_boundaries():
+    exact_lines = "\n".join(
+        f"bounded-line-{index}" for index in range(dashboard.OUTPUT_PREVIEW_MAX_LINES)
+    )
+    at_line_limit = dashboard._bounded_output_preview(exact_lines)
+    over_line_limit = dashboard._bounded_output_preview(
+        f"{exact_lines}\nmodel=DISCARDED-LINE-SENTINEL"
+    )
+    assert at_line_limit["truncated"] is False
+    assert len(at_line_limit["text"].splitlines()) == dashboard.OUTPUT_PREVIEW_MAX_LINES
+    assert over_line_limit["truncated"] is True
+    assert len(over_line_limit["text"].splitlines()) == dashboard.OUTPUT_PREVIEW_MAX_LINES
+    assert "DISCARDED-LINE-SENTINEL" not in over_line_limit["text"]
+
+    exact_chars = "x" * dashboard.OUTPUT_PREVIEW_MAX_CHARS
+    at_char_limit = dashboard._bounded_output_preview(exact_chars)
+    over_char_limit = dashboard._bounded_output_preview(
+        exact_chars + "DISCARDED-CHAR-SENTINEL"
+    )
+    assert at_char_limit == {"text": exact_chars, "truncated": False}
+    assert over_char_limit == {"text": exact_chars, "truncated": True}
+    assert "DISCARDED-CHAR-SENTINEL" not in over_char_limit["text"]
+
+    empty_detail_size = len(json.dumps({"allowed": ""}, indent=2, sort_keys=True))
+    exact_json = {
+        "allowed": "j" * (dashboard.JSON_PREVIEW_MAX_CHARS - empty_detail_size)
+    }
+    at_json_limit = dashboard._bounded_json_detail(exact_json)
+    over_json_limit = dashboard._bounded_json_detail(
+        {"allowed": exact_json["allowed"] + "k"}
+    )
+    assert len(at_json_limit["text"]) == dashboard.JSON_PREVIEW_MAX_CHARS
+    assert at_json_limit["truncated"] is False
+    assert len(over_json_limit["text"]) == dashboard.JSON_PREVIEW_MAX_CHARS
+    assert over_json_limit["truncated"] is True
+
+
 def test_json_preview_uses_normalized_allowlist_and_bounded_sanitized_detail(
     phase_2o_03_surface,
 ):
-    _, client, _, _ = phase_2o_03_surface
+    _, client, _, reports_root = phase_2o_03_surface
     source, probe = _page(
         client.get("/reports/json/reports/sample/safe.json")
     )
@@ -269,10 +424,26 @@ def test_json_preview_uses_normalized_allowlist_and_bounded_sanitized_detail(
     assert "arbitrary_summary_sentinel" not in summary.group(1)
     assert "SUMMARY-SENTINEL-NOT-ALLOWLISTED" not in summary.group(1)
     assert "JSON-SECRET-SENTINEL" not in source
-    assert "private-reviewer" not in source
+    assert "STRUCTURED-PROVIDER-SENTINEL" not in source
+    assert "MIXED-PROVIDER-SENTINEL" not in source
+    assert "STRUCTURED-MODEL-SENTINEL" not in source
+    assert "STRUCTURED-MODEL-NAME-SENTINEL" not in source
+    assert "MIXED-MODEL-SENTINEL" not in source
+    assert "NESTED-MODEL-SENTINEL" not in source
+    assert "NESTED-PROVIDER-SENTINEL" not in source
+    assert "Provider-Name" not in source
+    assert "MODEL_id" not in source
+    assert "model_name" not in source
+    assert "model-config" not in source
+    assert "runtime_provider" not in source
+    assert "Synthetic Reviewer" not in source
+    assert "Private Folder" not in source
+    assert "evidence file.json" not in source
+    assert "forward evidence.json" not in source
+    assert "sanitized subordinate detail" in source
     assert "192.168.44.10" not in source
     assert "[REDACTED]" in source
-    assert "[REDACTED PATH]" in source
+    assert dashboard.PRIVATE_PATH_REDACTION in source
     assert dashboard.sanitize_json_preview({"note": "192.168.44.10"}) == {
         "note": "[REDACTED PRIVATE ADDRESS]"
     }
@@ -280,6 +451,29 @@ def test_json_preview_uses_normalized_allowlist_and_bounded_sanitized_detail(
     assert probe.count("caption") == 1
     assert probe.count("details") == 1
     assert probe.count("summary") == 1
+
+    preview_path = reports_root / "sample" / "safe.json"
+    preview = dashboard.load_json_preview(preview_path)
+    assert preview_path.is_file()
+    assert '"model"' not in preview["pretty"]
+    assert "model_name" not in preview["pretty"]
+    assert "Provider-Name" not in preview["pretty"]
+    assert "MODEL_id" not in preview["pretty"]
+    assert "model-config" not in preview["pretty"]
+    assert "runtime_provider" not in preview["pretty"]
+    assert "sanitized subordinate detail" in preview["pretty"]
+    assert set(preview["summary"]).isdisjoint(
+        {"provider", "Provider-Name", "model", "model_name", "MODEL_id"}
+    )
+    ordered = dashboard.sanitize_json_preview(
+        {
+            "allowed_before": "before",
+            "model-name": "ORDER-MODEL-SENTINEL",
+            "allowed_after": "after",
+        }
+    )
+    assert list(ordered) == ["allowed_before", "allowed_after"]
+    assert ordered == {"allowed_before": "before", "allowed_after": "after"}
 
 
 def test_json_malformed_unreadable_missing_traversal_and_extension_states_are_safe(
@@ -359,6 +553,37 @@ def test_all_target_pages_preserve_heading_semantics_stage_zero_and_non_color_te
     assert "PASS" in collection
     assert "PASS" in detail
     assert "PASS" in json_page
+
+
+def test_rendered_detail_pages_expose_closed_keyboard_focusable_bounded_disclosures(
+    phase_2o_03_surface,
+):
+    _, client, _, _ = phase_2o_03_surface
+    log_source, log_probe = _page(client.get("/commands/logs/sample-log"))
+    json_source, json_probe = _page(
+        client.get("/reports/json/reports/sample/safe.json")
+    )
+
+    assert log_probe.count("details") == 2
+    assert log_probe.count("summary") == 2
+    assert json_probe.count("details") == 1
+    assert json_probe.count("summary") == 1
+    for probe in (log_probe, json_probe):
+        detail_attributes = [attrs for tag, attrs in probe.tags if tag == "details"]
+        assert detail_attributes
+        assert all("open" not in attrs for attrs in detail_attributes)
+
+    for source in (log_source, json_source):
+        assert "summary:focus-visible" in source
+        assert "outline: 3px solid" in source
+        assert 'class="bounded-code"' in source
+        assert "overflow-wrap: anywhere" in source
+        assert "max-height: 28rem" in source
+        assert "@media (max-width: 420px)" in source
+
+    assert '<div class="table-wrap">' in json_source
+    assert ".table-wrap { max-width: 100%; overflow-x: auto; }" in json_source
+    assert "@media (max-width: 620px)" in json_source
 
 
 def test_shared_css_exposes_focus_reflow_and_bounded_overflow_contracts():

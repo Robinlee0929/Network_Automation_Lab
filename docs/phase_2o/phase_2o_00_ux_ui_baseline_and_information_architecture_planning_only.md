@@ -51,13 +51,20 @@ non-executing.
 | `PHASE_2O_02_CUMULATIVE_IMPLEMENTATION_STATUS` | `ACCEPTED` |
 | `PHASE_2O_02_INTEGRATION_TARGET` | `00862075494bc7a76dd478bee9d1742d53d43167` |
 | `PHASE_2O_02_INTEGRATION_METHOD` | `STRICT_FAST_FORWARD` |
-| `PHASE_2O_02_STATUS` | `DONE / MERGED_TO_MAIN / SYNCHRONIZED / POST_MERGE_STATUS_RECONCILIATION_READY_FOR_REVIEW` |
-| `PHASE_2O_02_POST_MERGE_RECONCILIATION_COMMIT_REFERENCE` | `THIS_COMMIT` |
-| `EXACT_RECONCILIATION_COMMIT_SHA_SOURCE` | `FINAL_TASK_RESULT_AND_INDEPENDENT_POST_MERGE_REVIEW_TARGET` |
-| `PHASE_2O_03_THROUGH_2O_07_STATUS` | `NOT_AUTHORIZED / NOT_STARTED` |
+| `PHASE_2O_02_POST_MERGE_RECONCILIATION_COMMIT` | `10cec5ca1911140decdba7b84f54667698dcedae` |
+| `PHASE_2O_02_POST_MERGE_RECONCILIATION_REVIEW_DECISION` | `PASS` |
+| `PHASE_2O_02_STATUS` | `DONE / ACCEPTED / MERGED_TO_MAIN / SYNCHRONIZED` |
+| `PHASE_2O_03_CONTINUATION_AUTHORIZATION` | `AUTHORIZED` |
+| `PHASE_2O_03_INITIAL_ATTEMPT` | `BLOCKED / EXACT_SCOPE_TEST_CONTRACT_CONFLICT / NO_EDITS / NO_COMMIT` |
+| `PHASE_2O_03_CORRECTED_SCOPE` | `AUTHORIZED / EXACT_14_FILE_SCOPE` |
+| `PHASE_2O_03_IMPLEMENTATION_COMMIT` | `d18e6ccac87e45e7cc983bb09be1c50f07c0c6c2` |
+| `PHASE_2O_03_IMPLEMENTATION_REVIEW_DECISION` | `FAIL_FIX_REQUIRED` |
+| `PHASE_2O_03_REVIEW_FIX_COMMIT_REFERENCE` | `THIS_COMMIT` |
+| `PHASE_2O_03_REVIEW_FIX_STATUS` | `DONE / LOCAL_ONLY / READY_FOR_INDEPENDENT_FIX_REVIEW` |
+| `PHASE_2O_04_THROUGH_2O_07_STATUS` | `NOT_AUTHORIZED / NOT_STARTED` |
 | `PHASE_2P_STATUS` | `NOT_AUTHORIZED / NOT_STARTED` |
 | `STAGE_0_BOUNDARY` | `PRESERVED` |
-| `NEXT_CANDIDATE` | `PHASE_2O_02_POST_MERGE_STATUS_RECONCILIATION_COMMIT_REVIEW_ONLY` |
+| `NEXT_CANDIDATE` | `PHASE_2O_03_BOUNDED_REVIEW_FIX_COMMIT_REVIEW_ONLY` |
 
 No provider, model, job, command, device, or production authority follows from a
 visual treatment, status label, navigation destination, reviewer view, or
@@ -638,45 +645,26 @@ was added or expanded. The independent bounded-fix review later returned
 ### 13.4 Phase 2O-02 integration and post-merge status reconciliation
 
 **Current conclusion:** Phase 2O-02 is
-`DONE / MERGED_TO_MAIN / SYNCHRONIZED / POST_MERGE_STATUS_RECONCILIATION_READY_FOR_REVIEW`.
-Local `main` advanced from
-`1c0fe027e547d4fa89f5ad09ca0f924eb9b6763a` to accepted target
-`00862075494bc7a76dd478bee9d1742d53d43167` using `STRICT_FAST_FORWARD`. No merge
-commit, squash, rebase, cherry-pick, or reset occurred.
+`DONE / ACCEPTED / MERGED_TO_MAIN / SYNCHRONIZED`. Its bounded implementation
+and review-fix target `00862075494bc7a76dd478bee9d1742d53d43167` was integrated
+by strict fast-forward. The post-merge reconciliation commit
+`10cec5ca1911140decdba7b84f54667698dcedae` was pushed, synchronized, and
+independently reviewed `PASS`.
 
-Pre-first-push validation passed `git diff --check`, the exact targeted suite
-with `114 passed`, full pytest with `1,928 passed` and one existing terminal
-warning, and report-index with `14/14 PASS`. The accepted target was normally
-pushed to trusted `origin/main` and freshly verified there. The fully merged
-local source branch was safely deleted; no remote source branch was created or
-deleted.
-
-This bounded reconciliation changes only `README.md`, this Phase 2O-00 plan,
-and the Phase 2O-02 implementation record. It changes no application, test,
-template, dependency, runtime, or safety behavior. Its stable identity is:
-
-```text
-PHASE_2O_02_POST_MERGE_RECONCILIATION_COMMIT_REFERENCE:
-THIS_COMMIT
-
-EXACT_RECONCILIATION_COMMIT_SHA_SOURCE:
-FINAL_TASK_RESULT_AND_INDEPENDENT_POST_MERGE_REVIEW_TARGET
-```
-
-The final task result supplies this reconciliation commit's exact SHA and
-second-push result. This record does not claim that its own independent review
-has passed or that its second push had already occurred when its tree was
-created. Phase 2O remains `IN_PROGRESS / NOT_READY`; Phase 2O-03 through Phase
-2O-07 and Phase 2P remain `NOT_AUTHORIZED / NOT_STARTED`; Stage 0 remains
-`PRESERVED`. The sole next candidate is
-`PHASE_2O_02_POST_MERGE_STATUS_RECONCILIATION_COMMIT_REVIEW_ONLY`.
+The accepted Phase 2O-02 history changed no route, execution, provider, model,
+live-device, or Stage 0 boundary. A later and separate continuation decision
+used that accepted state only as the base for the bounded Phase 2O-03
+authorization. Phase 2O remains `IN_PROGRESS / NOT_READY`; Phase 2O-04 through
+Phase 2O-07 and Phase 2P remain `NOT_AUTHORIZED / NOT_STARTED`; Stage 0 remains
+`PRESERVED`.
 
 ### 13.5 Phase 2O-03 bounded implementation handoff
 
-**Current conclusion:** Phase 2O-02 is accepted and synchronized on `main` at
-`10cec5ca1911140decdba7b84f54667698dcedae`, and its reconciliation review
-returned `PASS`. A later continuation decision authorized the bounded Phase
-2O-03 canonical Flask display-only and technical-detail presentation.
+**Current conclusion:** The original Phase 2O-03 implementation commit
+`d18e6ccac87e45e7cc983bb09be1c50f07c0c6c2` received independent review
+`FAIL_FIX_REQUIRED`. The strictly bounded five-file correction is complete in
+this commit and is `DONE / LOCAL_ONLY / READY_FOR_INDEPENDENT_FIX_REVIEW`; it
+does not claim that the fix has passed independent review.
 
 The first Phase 2O-03 implementation attempt stopped before editing with
 `EXACT_SCOPE_TEST_CONTRACT_CONFLICT`; it modified no file and created no commit.
@@ -712,16 +700,48 @@ provider/API/model integration, job/importer, queue/scheduler/broker/worker,
 SSH/NETCONF/RESTCONF/live-device path, dependency, Next.js change, later slice,
 or Phase 2P authority. Stage 0 remains `PRESERVED`.
 
-The exact implementation validation and rendered-review results are recorded in
-the Phase 2O-03 implementation record. The exact targeted suite passed 125
-tests, full pytest passed 1,939 tests with one existing terminal warning,
-report-index passed 14/14, and rendered review passed all six routes across 24
-route/viewport combinations including 400% equivalent reflow and required edge
-states. No page-level overflow, console warning/error, form, button, script, or
-execution control was observed.
-After successful local implementation, the sole next candidate is independent
-review of the exact Phase 2O-03 commit. No push, merge, integration, pull request,
-Phase 2O-04, or Phase 2P action is implied.
+The original green validation did not establish the complete safe-display
+contract. Independent review found that provider/model-identifying fields could
+remain visible in nested structured JSON detail and historical output, and that
+Windows private paths containing spaces could be only partially redacted. It
+also found missing exact-boundary and indirect no-side-effect tests, two
+unauthorized negative terminology assertions in the historical Phase 2N-04
+test, insufficient rendered disclosure/reflow evidence, and stale handoff
+status in the Phase 2O records.
+
+This correction is limited to `dashboard_app.py`, the dedicated Phase 2O-03
+test, the Phase 2N-04 historical label test, this plan, and the Phase 2O-03
+implementation record. Provider/model keys are normalized across casing and
+separator variants and omitted recursively from structured detail. Historical
+provider/model field-value forms use fixed-value redaction. Quoted and
+unquoted Windows private paths, including paths with spaces and forward or
+backward separators, are fully replaced by a fixed private-path marker.
+
+The dedicated tests now cover nested provider/model fields, allowed-field
+survival, helper and rendered historical redaction, complete spaced-path
+redaction, exact and one-over line/character/JSON bounds, indirect forbidden
+GET primitives, active terminology negatives, and rendered closed native
+disclosures with focus and bounded reflow contracts. The Phase 2N-04 test
+removes exactly the two unauthorized negative assertions while retaining the
+positive `Historical Execution Records` assertion and all pre-existing safety
+negatives.
+
+The review-fix commit uses this stable self-reference:
+
+```text
+PHASE_2O_03_REVIEW_FIX_COMMIT_REFERENCE:
+THIS_COMMIT
+
+EXACT_REVIEW_FIX_COMMIT_SHA_SOURCE:
+FINAL_TASK_RESULT_AND_INDEPENDENT_FIX_REVIEW_TARGET
+```
+
+The final task result is the authoritative source for the exact review-fix SHA
+and validation results. This commit adds no route, method, action control,
+provider/model runtime, execution behavior, dependency, or live path. Stage 0
+remains `PRESERVED`. The sole next candidate is independent review of this
+exact Phase 2O-03 bounded review-fix commit. Phase 2O-04, push, merge, pull
+request, integration, and Phase 2P remain unauthorized.
 
 ## 14. Explicit exclusions and deferred work
 
@@ -754,8 +774,8 @@ The following remain excluded and unauthorized:
   separated.
 - Current facts cite repository files or Phase 2N records; recommendations and
   assumptions are labeled.
-- `DONE / MERGED_TO_MAIN / SYNCHRONIZED /
-  POST_MERGE_STATUS_RECONCILIATION_READY_FOR_REVIEW`, `IN_PROGRESS / NOT_READY`,
+- `DONE / ACCEPTED / MERGED_TO_MAIN / SYNCHRONIZED`, `FAIL_FIX_REQUIRED`,
+  `READY_FOR_INDEPENDENT_FIX_REVIEW`, `IN_PROGRESS / NOT_READY`,
   `NOT_AUTHORIZED / NOT_STARTED`, and `PRESERVED` are used consistently.
 - Flask canonical and Next.js secondary terminology matches the Phase 2N closure.
 - Acceptance criteria and later-slice evidence are concrete and verifiable.

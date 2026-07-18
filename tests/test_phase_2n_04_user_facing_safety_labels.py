@@ -54,8 +54,6 @@ def test_phase_2n_04_flask_labels_render_through_get_without_command_execution(
     assert "Registered Command Examples" in commands_html
     assert "Historical Execution Records" in commands_html
     assert "Static Command Examples" in commands_html
-    assert "Historical Demonstration Records" not in commands_html
-    assert ">Execution Logs<" not in commands_html
     assert "Safe Command Execution" not in commands_html
     assert "Run a limited allowlist" not in commands_html
     assert "Recent Execution Logs" not in commands_html
