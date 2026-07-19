@@ -15,12 +15,21 @@ export function NetworkNav() {
 
   return (
     <nav className="network-nav" aria-label="Network automation sections">
-      <span className="eyebrow">Secondary Stage 0 surface · report-only / demo-only</span>
-      {links.map((link) => (
-        <Link aria-current={pathname === link.href ? "page" : undefined} href={link.href} key={link.href}>
-          {link.label}
-        </Link>
-      ))}
+      <p className="network-nav-label">Secondary Stage 0 surface · report-only / demo-only</p>
+      <ul className="network-nav-list">
+        {links.map((link) => {
+          const isCurrent = pathname === link.href;
+
+          return (
+            <li key={link.href}>
+              <Link aria-current={isCurrent ? "page" : undefined} href={link.href}>
+                <span>{link.label}</span>
+                {isCurrent ? <span className="network-current-marker">Current section</span> : null}
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
     </nav>
   );
 }

@@ -90,6 +90,7 @@ describe("ReportsClient", () => {
 
   it("keeps the Reports navigation matched to a page and preserves Evidence", () => {
     const workspace = process.cwd();
+    const networkLayout = path.join(workspace, "app", "network", "layout.tsx");
     const reportsPage = path.join(workspace, "app", "network", "reports", "page.tsx");
     const dayResultsPage = path.join(workspace, "app", "network", "day-results", "page.tsx");
     const navigation = readFileSync(
@@ -98,6 +99,7 @@ describe("ReportsClient", () => {
     );
     const ignoreRules = readFileSync(path.join(workspace, ".gitignore"), "utf8");
 
+    expect(existsSync(networkLayout)).toBe(true);
     expect(existsSync(reportsPage)).toBe(true);
     expect(existsSync(dayResultsPage)).toBe(true);
     expect(navigation).toContain('{ href: "/network/reports", label: "Reports" }');
@@ -105,9 +107,11 @@ describe("ReportsClient", () => {
     expect(ignoreRules).toContain("reports/");
     expect(ignoreRules).toContain("!app/network/reports/**");
 
+    const layoutSource = readFileSync(networkLayout, "utf8");
     const routeSource = readFileSync(reportsPage, "utf8");
+    expect(layoutSource).toContain("<NetworkNav />");
     expect(routeSource).toContain("importDayResults()");
-    expect(routeSource).toContain("<NetworkNav />");
+    expect(routeSource).not.toContain("<NetworkNav />");
     expect(routeSource).not.toContain("notFound(");
   });
 });

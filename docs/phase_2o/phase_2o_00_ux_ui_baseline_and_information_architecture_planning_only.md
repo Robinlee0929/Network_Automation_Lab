@@ -65,12 +65,15 @@ non-executing.
 | `PHASE_2O_03_INTEGRATION_TARGET` | `9ff474822a94d0f79ff45b061af590186b425def` |
 | `PHASE_2O_03_INTEGRATION_METHOD` | `STRICT_FAST_FORWARD` |
 | `PHASE_2O_03_POST_MERGE_RECONCILIATION_COMMIT_REFERENCE` | `THIS_COMMIT` |
-| `PHASE_2O_03_POST_MERGE_RECONCILIATION_REVIEW_STATUS` | `READY_FOR_INDEPENDENT_REVIEW / NOT_YET_REVIEWED` |
+| `PHASE_2O_03_POST_MERGE_RECONCILIATION_REVIEW_STATUS` | `PASS / NO_MATERIAL_FINDINGS` |
 | `PHASE_2O_03_STATUS` | `DONE / ACCEPTED / MERGED_TO_MAIN / SYNCHRONIZED` |
-| `PHASE_2O_04_THROUGH_2O_07_STATUS` | `NOT_AUTHORIZED / NOT_STARTED` |
+| `PHASE_2O_04_INITIAL_IMPLEMENTATION_ATTEMPT` | `BLOCKED / EXACT_SCOPE_TEST_CONTRACT_CONFLICT` |
+| `PHASE_2O_04_SCOPE_CORRECTION_DECISION` | `AUTHORIZED / EXACT_12_FILE_MAXIMUM` |
+| `PHASE_2O_04_IMPLEMENTATION_STATUS` | `DONE / LOCAL_ONLY / READY_FOR_INDEPENDENT_REVIEW` |
+| `PHASE_2O_05_THROUGH_2O_07_STATUS` | `NOT_AUTHORIZED / NOT_STARTED` |
 | `PHASE_2P_STATUS` | `NOT_AUTHORIZED / NOT_STARTED` |
 | `STAGE_0_BOUNDARY` | `PRESERVED` |
-| `NEXT_CANDIDATE` | `PHASE_2O_03_POST_MERGE_STATUS_RECONCILIATION_COMMIT_REVIEW_ONLY` |
+| `SOLE_NEXT_CANDIDATE` | `PHASE_2O_04_IMPLEMENTATION_COMMIT_REVIEW_ONLY` |
 
 No provider, model, job, command, device, or production authority follows from a
 visual treatment, status label, navigation destination, reviewer view, or
@@ -802,6 +805,65 @@ the future independent reconciliation review has passed. The sole next
 candidate is
 `PHASE_2O_03_POST_MERGE_STATUS_RECONCILIATION_COMMIT_REVIEW_ONLY`.
 
+### 13.7 Phase 2O-04 bounded implementation handoff
+
+**Current conclusion:** Phase 2O-04 implementation is
+`DONE / LOCAL_ONLY / READY_FOR_INDEPENDENT_REVIEW`. The bounded presentation-only
+change gives the four existing `/network/*` routes one shared secondary Next.js
+Stage 0 shell, continues to name the Flask dashboard at
+`http://127.0.0.1:5000/` as canonical, and preserves the report-only, dry-run,
+mock-only, demo-only, and non-executing boundary. Phase 2O remains
+`IN_PROGRESS / NOT_READY`; Phase 2O-05 through Phase 2O-07 and Phase 2P remain
+`NOT_AUTHORIZED / NOT_STARTED`.
+
+The first implementation attempt stopped with
+`EXACT_SCOPE_TEST_CONTRACT_CONFLICT`. A separate scope-correction decision
+authorized only `components/network/ReportsClient.test.tsx`, accepted the
+preserved eight-file dirty state, and raised the cumulative maximum from 11 to
+12 files. The corrected test assigns `NetworkNav` rendering to
+`app/network/layout.tsx` and verifies that the Reports route does not duplicate
+it while retaining the route, importer, HTTP-200, metadata-only, empty-state,
+package-integrity, and negative-safety contracts.
+
+The shared shell contains no `<main>` and no data, importer, API, provider,
+model, persistence, job, or execution logic. Each route retains its existing
+data/importer call and client component, with exactly one route-level `<main>`,
+one page `<h1>`, the shared skip target, exact four-link navigation, and
+`aria-current="page"`. The shell distinguishes `EMPTY`, `MISSING`,
+`UNAVAILABLE`, `ERROR`, and `BLOCKED` without broadening any capability.
+
+Targeted validation passed 3 Reports tests and 14 Phase/safety tests. Full
+Vitest passed 70 tests; typecheck, zero-warning lint, the Next.js 25/25-page
+production build, 1,943 pytest tests with one existing terminal warning, and
+report-index 14/14 passed. Browser QA of all four routes at 320, 768, and 1440
+CSS px found one main and one H1 per route, correct current-route semantics,
+visible focus, working primary-content skip behavior, readable state vocabulary,
+bounded dense content, no page-level horizontal overflow, no execution-style
+control, no framework overlay, and no console warning/error. Native 400% zoom
+was not available and was not substituted with a 320 CSS-pixel viewport.
+
+No dependency, lockfile, route path or method, API route, importer, data source,
+runtime, persistence, provider/model call, job/command control, queue, scheduler,
+worker, agent loop, SSH/NETCONF/RESTCONF/live-device behavior, configuration
+backup/change, production execution path, topology, or older AI workbench was
+changed. Stage 0 remains `PRESERVED`.
+
+The implementation commit uses a stable self-reference because a commit cannot
+contain its own final SHA:
+
+```text
+PHASE_2O_04_IMPLEMENTATION_COMMIT_REFERENCE:
+THIS_COMMIT
+
+EXACT_IMPLEMENTATION_COMMIT_SHA_SOURCE:
+FINAL_TASK_RESULT_AND_INDEPENDENT_REVIEW_TARGET
+```
+
+The final task result is the authoritative source for the exact local commit
+SHA. This record does not claim review, acceptance, integration, push, merge,
+synchronization, or closure. The sole next candidate is
+`PHASE_2O_04_IMPLEMENTATION_COMMIT_REVIEW_ONLY`.
+
 ## 14. Explicit exclusions and deferred work
 
 The following remain excluded and unauthorized:
@@ -823,7 +885,7 @@ The following remain excluded and unauthorized:
 - Any further packaging, distribution, deployment, publication, merge, push,
   pull request, branch cleanup, or Phase 2P work not explicitly authorized by a
   separate task.
-- Phase 2O-04 through Phase 2O-07 implementation until each applicable slice
+- Phase 2O-05 through Phase 2O-07 implementation until each applicable slice
   receives its own fresh explicit authorization.
 
 ## 15. Documentation readability review

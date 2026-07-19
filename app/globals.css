@@ -361,31 +361,123 @@ textarea:focus {
   margin-left: 10px;
 }
 
-.network-page {
+.network-shell {
   min-height: 100vh;
+  min-width: 0;
   padding: 24px;
 }
 
-.network-header {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 20px;
-  width: min(1320px, 100%);
-  margin: 0 auto 18px;
+.network-skip-link {
+  position: fixed;
+  z-index: 100;
+  top: 8px;
+  left: 50%;
+  max-width: calc(100% - 32px);
+  padding: 10px 14px;
+  border: 3px solid #0f172a;
+  border-radius: 8px;
+  background: #fff;
+  color: #0f172a;
+  font-weight: 800;
+  text-align: center;
+  text-decoration: none;
+  transform: translate(-50%, -180%);
 }
 
-.network-header h1 {
+.network-skip-link:focus {
+  transform: translate(-50%, 0);
+}
+
+.network-shell-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.65fr);
+  gap: 18px;
+  width: min(1320px, 100%);
+  margin: 0 auto 18px;
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.network-shell-intro,
+.network-nav,
+.network-shell-content,
+.network-page {
+  min-width: 0;
+}
+
+.network-shell-title {
   margin: 6px 0 0;
   font-size: 2rem;
+  font-weight: 800;
   letter-spacing: 0;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+.network-shell-copy {
+  max-width: 72ch;
+  margin: 12px 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.network-canonical-link {
+  display: inline-flex;
+  max-width: 100%;
+  padding: 9px 12px;
+  border: 2px solid #0f766e;
+  border-radius: 8px;
+  color: #115e59;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+  text-underline-offset: 3px;
+}
+
+.network-shell-note,
+.network-stage-boundary {
+  margin: 10px 0 0;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.network-shell-note {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.network-stage-boundary {
+  font-weight: 700;
 }
 
 .network-nav {
+  align-self: start;
+}
+
+.network-nav-label {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1.45;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+.network-nav-list {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  justify-content: flex-end;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.network-nav-list li {
+  min-width: 0;
 }
 
 .network-nav a,
@@ -400,10 +492,14 @@ textarea:focus {
 }
 
 .network-nav a {
+  flex-direction: column;
+  align-items: flex-start;
+  max-width: 100%;
   padding: 0 12px;
   border: 1px solid #cbd5e1;
   background: #fff;
   color: #1e293b;
+  overflow-wrap: anywhere;
 }
 
 .network-nav a:hover {
@@ -414,6 +510,83 @@ textarea:focus {
   border-color: #5eead4;
   background: #f0fdfa;
   color: #115e59;
+  text-decoration: underline;
+  text-decoration-thickness: 3px;
+  text-underline-offset: 4px;
+}
+
+.network-current-marker {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.network-state-vocabulary {
+  grid-column: 1 / -1;
+  min-width: 0;
+  border-top: 1px solid var(--border);
+  padding-top: 14px;
+}
+
+.network-state-vocabulary summary {
+  width: fit-content;
+  max-width: 100%;
+  cursor: pointer;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.network-state-vocabulary dl {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr));
+  gap: 10px;
+  margin: 14px 0 0;
+}
+
+.network-state-vocabulary dl > div {
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface-muted);
+}
+
+.network-state-vocabulary dt {
+  font-weight: 900;
+}
+
+.network-state-vocabulary dd {
+  margin: 5px 0 0;
+  color: var(--muted);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.network-shell :where(a, summary):focus-visible {
+  outline: 3px solid #0f172a;
+  outline-offset: 3px;
+  box-shadow: 0 0 0 3px #facc15;
+}
+
+.network-page {
+  width: 100%;
+}
+
+.network-page:focus {
+  outline: none;
+}
+
+.network-route-header {
+  width: min(1320px, 100%);
+  margin: 0 auto 18px;
+}
+
+.network-route-header h1 {
+  margin: 0;
+  font-size: 2rem;
+  letter-spacing: 0;
+  overflow-wrap: anywhere;
 }
 
 .network-grid {
@@ -845,13 +1018,13 @@ textarea:focus {
     margin-left: 0;
   }
 
-  .network-page {
+  .network-shell {
     padding: 16px;
   }
 
-  .network-header {
-    align-items: flex-start;
-    flex-direction: column;
+  .network-shell-header {
+    grid-template-columns: 1fr;
+    padding: 16px;
   }
 
   .network-grid,
@@ -862,6 +1035,14 @@ textarea:focus {
   }
 
   .network-nav {
-    justify-content: flex-start;
+    width: 100%;
+  }
+}
+
+@media (max-width: 420px) {
+  .network-nav-list,
+  .network-nav-list li,
+  .network-nav a {
+    width: 100%;
   }
 }
