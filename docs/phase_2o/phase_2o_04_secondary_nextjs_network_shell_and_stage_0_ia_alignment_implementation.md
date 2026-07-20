@@ -2,17 +2,35 @@
 
 ## 1. Conclusion and status
 
-**Conclusion:** The bounded Phase 2O-04 implementation is complete locally and
-is ready only for an independent implementation-commit review. The four
-existing `/network/*` routes now share one secondary Next.js Stage 0 shell while
-the Flask dashboard at `http://127.0.0.1:5000/` remains explicitly named as the
-canonical reviewer surface. The implementation changes presentation only,
-preserves every Stage 0 prohibition, and does not authorize Phase 2O-05 through
-Phase 2O-07 or Phase 2P.
+**Conclusion:** Independent review of Phase 2O-04 implementation commit
+`2643b24497011ea31c507d6f567daf5f20287a5d` returned `FAIL_FIX_REQUIRED` solely
+for stale Phase 2O-03 and Phase 2O-04 status wording. Technical, source, test,
+safety, and rendered results passed. This bounded documentation correction
+resolves the one material documentation finding and is ready only for an
+independent fix-commit review. The four existing `/network/*` routes share one
+secondary Next.js Stage 0 shell while the Flask dashboard at
+`http://127.0.0.1:5000/` remains explicitly named as the canonical reviewer
+surface. The implementation changes presentation only, preserves every Stage 0
+prohibition, and does not authorize Phase 2O-05 through Phase 2O-07 or Phase 2P.
 
 ```text
 PHASE_2O_04_IMPLEMENTATION_STATUS:
-DONE / LOCAL_ONLY / READY_FOR_INDEPENDENT_REVIEW
+DONE / LOCAL_ONLY / REVIEWED / FAIL_FIX_REQUIRED
+
+PHASE_2O_04_IMPLEMENTATION_COMMIT:
+2643b24497011ea31c507d6f567daf5f20287a5d
+
+PHASE_2O_04_IMPLEMENTATION_REVIEW_DECISION:
+FAIL_FIX_REQUIRED
+
+PHASE_2O_04_IMPLEMENTATION_TECHNICAL_AND_SAFETY_RESULT:
+PASS
+
+PHASE_2O_04_IMPLEMENTATION_REMAINING_FINDING:
+STALE_PHASE_2O_03_AND_PHASE_2O_04_STATUS_WORDING
+
+PHASE_2O_04_DOCUMENTATION_REVIEW_FIX_STATUS:
+DONE / LOCAL_ONLY / READY_FOR_INDEPENDENT_FIX_REVIEW
 
 PHASE_2O_STATUS:
 IN_PROGRESS / NOT_READY
@@ -27,11 +45,12 @@ STAGE_0_BOUNDARY:
 PRESERVED
 
 SOLE_NEXT_CANDIDATE:
-PHASE_2O_04_IMPLEMENTATION_COMMIT_REVIEW_ONLY
+PHASE_2O_04_BOUNDED_DOCUMENTATION_REVIEW_FIX_COMMIT_REVIEW_ONLY
 ```
 
-This record does not claim that the implementation is reviewed, accepted,
-merged, pushed, synchronized, or closed.
+This record claims the completed implementation-review decision above. It does
+not claim that this documentation correction is independently reviewed,
+accepted, merged, pushed, synchronized, or closed.
 
 ## 2. Task identity and continuation history
 
@@ -53,7 +72,7 @@ Reports route page. A separate scope-correction decision returned `AUTHORIZED`,
 added only `components/network/ReportsClient.test.tsx` to the allowlist, accepted
 the preserved eight-file dirty state, and raised the cumulative maximum from 11
 to 12 files. This continuation preserved that state, made the exact authorized
-test-contract correction, completed documentation and validation, and creates
+test-contract correction, completed documentation and validation, and created
 one local-only implementation commit.
 
 ## 3. Exact cumulative changed-file scope
@@ -125,8 +144,9 @@ do not grant an operation, retry, provider, job, command, or device authority.
 
 The network-only CSS adds a skip link that becomes visible when focused, a
 high-contrast `:focus-visible` outline, wrapping navigation, a non-color current
-route marker, safe long-label wrapping, bounded dense-content containers,
-narrow-screen reflow, and reduced-motion handling. The existing unrelated AI
+route marker, safe long-label wrapping, bounded dense-content containers, and
+narrow-screen reflow. The implementation introduced no animation or transition,
+so no new `prefers-reduced-motion` rule was required. The existing unrelated AI
 workbenches were not restyled.
 
 Rendered QA used the task-owned production server at
@@ -186,10 +206,22 @@ assertions. No unrelated test refactor or production workaround was added.
 | `python -m pytest` | `PASS` — 1,943 passed, 1 documented existing terminal warning in 103.84 seconds |
 | `python network_lab.py --task report-index` | `PASS` — total 14, pass 14, fail 0, warn 0, missing 0, unknown 0 |
 
-The single pytest warning was the existing `GetPassWarning: Can not control echo
-on the terminal` from
+The implementation run's single pytest warning was the existing
+`GetPassWarning: Can not control echo on the terminal` from
 `tests/test_day13_multi_router_wireguard_validation.py::test_multi_device_live_validation_reminds_before_next_router`.
 It did not indicate a Phase 2O-04 regression or safety issue.
+
+The independent implementation review also passed all 1,943 pytest tests and
+reproduced zero warnings. The difference between the implementation run's one
+documented terminal warning and the review run's zero warnings was non-material.
+
+```text
+IMPLEMENTATION_RUN_PYTEST:
+1,943 passed with one documented terminal warning.
+
+INDEPENDENT_REVIEW_PYTEST:
+1,943 passed with zero warnings reproduced.
+```
 
 `package.json` and `package-lock.json` remained byte-for-byte unchanged. No
 dependency was added. The production build and React/Next.js review found no
@@ -209,12 +241,11 @@ four route client components, `components/network/Phase2N04DemoPresentation.tsx`
 the older AI workbenches, `AGENTS.md`, package files, and configuration files
 remain unchanged.
 
-## 10. Local-only handoff
+## 10. Review chronology and local-only handoff
 
-This commit is intentionally local only. It is not pushed, merged, tagged,
-published, deployed, synchronized, or represented as independently reviewed.
-Its exact final SHA must come from the final task result and becomes the only
-valid independent review target:
+The implementation commit was intentionally local only. It was not pushed,
+merged, tagged, published, deployed, or synchronized. Its historical handoff
+used the following stable self-reference:
 
 ```text
 PHASE_2O_04_IMPLEMENTATION_COMMIT_REFERENCE:
@@ -224,10 +255,48 @@ EXACT_IMPLEMENTATION_COMMIT_SHA_SOURCE:
 FINAL_TASK_RESULT_AND_INDEPENDENT_REVIEW_TARGET
 ```
 
-The sole next candidate is a fresh
-`PHASE_2O_04_IMPLEMENTATION_COMMIT_REVIEW_ONLY` task. That review cannot itself
-authorize integration, Phase 2O-05 through Phase 2O-07, Phase 2P, or any live or
-production capability.
+The exact implementation review target was
+`2643b24497011ea31c507d6f567daf5f20287a5d`. Independent review returned
+`FAIL_FIX_REQUIRED`: technical, source, test, safety, and rendered results were
+`PASS`; documentation accuracy was `FAIL`; material findings totaled one; and
+the sole material finding was
+`STALE_PHASE_2O_03_AND_PHASE_2O_04_STATUS_WORDING`.
+
+```text
+IMPLEMENTATION_REVIEW_TARGET:
+2643b24497011ea31c507d6f567daf5f20287a5d
+
+IMPLEMENTATION_REVIEW_DECISION:
+FAIL_FIX_REQUIRED
+
+TECHNICAL_SOURCE_TEST_SAFETY_RENDERED_RESULT:
+PASS
+
+DOCUMENTATION_ACCURACY_RESULT:
+FAIL
+
+MATERIAL_FINDINGS:
+1
+```
+
+This bounded correction changes only the two Phase 2O documents named in its
+task scope. It uses a stable self-reference because a commit cannot contain its
+own final SHA:
+
+```text
+PHASE_2O_04_DOCUMENTATION_REVIEW_FIX_COMMIT_REFERENCE:
+THIS_COMMIT
+
+EXACT_DOCUMENTATION_REVIEW_FIX_COMMIT_SHA_SOURCE:
+FINAL_TASK_RESULT_AND_INDEPENDENT_FIX_REVIEW_TARGET
+```
+
+Its status is `DONE / LOCAL_ONLY / READY_FOR_INDEPENDENT_FIX_REVIEW`. The final
+task result is the authoritative source for the exact documentation correction
+commit SHA. The sole next candidate is
+`PHASE_2O_04_BOUNDED_DOCUMENTATION_REVIEW_FIX_COMMIT_REVIEW_ONLY`. That review
+cannot itself authorize integration, Phase 2O-05 through Phase 2O-07, Phase 2P,
+or any live or production capability.
 
 ## 11. Documentation readability review
 
