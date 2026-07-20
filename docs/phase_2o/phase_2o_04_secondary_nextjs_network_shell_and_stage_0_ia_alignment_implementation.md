@@ -4,17 +4,24 @@
 
 **Conclusion:** Independent review of Phase 2O-04 implementation commit
 `2643b24497011ea31c507d6f567daf5f20287a5d` returned `FAIL_FIX_REQUIRED` solely
-for stale Phase 2O-03 and Phase 2O-04 status wording. Technical, source, test,
-safety, and rendered results passed. This bounded documentation correction
-resolves the one material documentation finding and is ready only for an
-independent fix-commit review. The four existing `/network/*` routes share one
-secondary Next.js Stage 0 shell while the Flask dashboard at
-`http://127.0.0.1:5000/` remains explicitly named as the canonical reviewer
-surface. The implementation changes presentation only, preserves every Stage 0
-prohibition, and does not authorize Phase 2O-05 through Phase 2O-07 or Phase 2P.
+for stale Phase 2O-03 and Phase 2O-04 status wording; technical, source, test,
+safety, and rendered results passed. First documentation-fix commit
+`4546f3f441ecaa14f208eee928da33b0ac9b5769` received independent review
+`FAIL_FIX_REQUIRED` for the remaining stale unqualified wording. Second
+documentation-fix commit `7153cb9bcd328489057012a66dc5777e32cc0b26`
+received independent review `PASS`, so the cumulative Phase 2O-04
+implementation is `ACCEPTED / LOCAL_ONLY`. A later integration-authorization
+decision returned `NOT_AUTHORIZED` because this record and README still
+contained obsolete current handoffs; integration is `NOT_STARTED`. This bounded
+two-document status correction is ready only for independent review. The four
+existing `/network/*` routes still share one secondary Next.js Stage 0 shell
+while the Flask dashboard at `http://127.0.0.1:5000/` remains explicitly named
+as the canonical reviewer surface. No implementation behavior changes, every
+Stage 0 prohibition remains preserved, and Phase 2O-05 through Phase 2O-07 and
+Phase 2P remain `NOT_AUTHORIZED / NOT_STARTED`.
 
 ```text
-PHASE_2O_04_IMPLEMENTATION_STATUS:
+PHASE_2O_04_IMPLEMENTATION_COMMIT_STATUS:
 DONE / LOCAL_ONLY / REVIEWED / FAIL_FIX_REQUIRED
 
 PHASE_2O_04_IMPLEMENTATION_COMMIT:
@@ -26,11 +33,32 @@ FAIL_FIX_REQUIRED
 PHASE_2O_04_IMPLEMENTATION_TECHNICAL_AND_SAFETY_RESULT:
 PASS
 
-PHASE_2O_04_IMPLEMENTATION_REMAINING_FINDING:
+PHASE_2O_04_IMPLEMENTATION_REVIEW_ORIGINAL_FINDING:
 STALE_PHASE_2O_03_AND_PHASE_2O_04_STATUS_WORDING
 
-PHASE_2O_04_DOCUMENTATION_REVIEW_FIX_STATUS:
-DONE / LOCAL_ONLY / READY_FOR_INDEPENDENT_FIX_REVIEW
+PHASE_2O_04_FIRST_DOCUMENTATION_REVIEW_FIX_COMMIT:
+4546f3f441ecaa14f208eee928da33b0ac9b5769
+
+PHASE_2O_04_FIRST_DOCUMENTATION_REVIEW_FIX_REVIEW_DECISION:
+FAIL_FIX_REQUIRED
+
+PHASE_2O_04_SECOND_DOCUMENTATION_REVIEW_FIX_COMMIT:
+7153cb9bcd328489057012a66dc5777e32cc0b26
+
+PHASE_2O_04_SECOND_DOCUMENTATION_REVIEW_FIX_REVIEW_DECISION:
+PASS
+
+PHASE_2O_04_CUMULATIVE_IMPLEMENTATION_STATUS:
+ACCEPTED / LOCAL_ONLY
+
+PHASE_2O_04_LATEST_INTEGRATION_AUTHORIZATION_DECISION:
+NOT_AUTHORIZED
+
+PHASE_2O_04_INTEGRATION_STATUS:
+NOT_STARTED
+
+PHASE_2O_04_DOCUMENTATION_STATUS_CORRECTION:
+DONE / LOCAL_ONLY / READY_FOR_INDEPENDENT_REVIEW
 
 PHASE_2O_STATUS:
 IN_PROGRESS / NOT_READY
@@ -45,12 +73,14 @@ STAGE_0_BOUNDARY:
 PRESERVED
 
 SOLE_NEXT_CANDIDATE:
-PHASE_2O_04_BOUNDED_DOCUMENTATION_REVIEW_FIX_COMMIT_REVIEW_ONLY
+PHASE_2O_04_POST_INTEGRATION_AUTHORIZATION_DOCUMENTATION_STATUS_FIX_COMMIT_REVIEW_ONLY
 ```
 
-This record claims the completed implementation-review decision above. It does
-not claim that this documentation correction is independently reviewed,
-accepted, merged, pushed, synchronized, or closed.
+This record claims the completed implementation review, first documentation-fix
+review, second documentation-fix review, and later integration-authorization
+decision above. It does not claim that this documentation-status correction is
+independently reviewed or that integration, merge, push, synchronization,
+cleanup, closure, or a later phase is authorized or complete.
 
 ## 2. Task identity and continuation history
 
@@ -241,7 +271,7 @@ four route client components, `components/network/Phase2N04DemoPresentation.tsx`
 the older AI workbenches, `AGENTS.md`, package files, and configuration files
 remain unchanged.
 
-## 10. Review chronology and local-only handoff
+## 10. Review, authorization, and local-only handoff chronology
 
 The implementation commit was intentionally local only. It was not pushed,
 merged, tagged, published, deployed, or synchronized. Its historical handoff
@@ -279,9 +309,9 @@ MATERIAL_FINDINGS:
 1
 ```
 
-This bounded correction changes only the two Phase 2O documents named in its
-task scope. It uses a stable self-reference because a commit cannot contain its
-own final SHA:
+The first bounded documentation correction changed only the two Phase 2O
+documents named in its task scope. It used a stable self-reference because a
+commit cannot contain its own final SHA:
 
 ```text
 PHASE_2O_04_DOCUMENTATION_REVIEW_FIX_COMMIT_REFERENCE:
@@ -291,12 +321,42 @@ EXACT_DOCUMENTATION_REVIEW_FIX_COMMIT_SHA_SOURCE:
 FINAL_TASK_RESULT_AND_INDEPENDENT_FIX_REVIEW_TARGET
 ```
 
-Its status is `DONE / LOCAL_ONLY / READY_FOR_INDEPENDENT_FIX_REVIEW`. The final
-task result is the authoritative source for the exact documentation correction
-commit SHA. The sole next candidate is
-`PHASE_2O_04_BOUNDED_DOCUMENTATION_REVIEW_FIX_COMMIT_REVIEW_ONLY`. That review
-cannot itself authorize integration, Phase 2O-05 through Phase 2O-07, Phase 2P,
+The first correction's final task result identified its exact commit as
+`4546f3f441ecaa14f208eee928da33b0ac9b5769`. Independent review returned
+`FAIL_FIX_REQUIRED` for one remaining documentation finding:
+`STALE_UNQUALIFIED_PHASE_2O_04_UNAUTHORIZED_WORDING_IN_SECTIONS_12_AND_13_4`.
+The second bounded documentation correction commit
+`7153cb9bcd328489057012a66dc5777e32cc0b26` resolved that finding. Its
+independent review returned `PASS`, making the cumulative Phase 2O-04
+implementation `ACCEPTED / LOCAL_ONLY`.
+
+A later, separate integration-authorization decision returned `NOT_AUTHORIZED`
+because README and this implementation record still contained obsolete current
+handoffs. Integration therefore remains `NOT_STARTED`. That decision did not
+reverse the second documentation-fix review or the cumulative local acceptance,
+and it did not authorize merge, push, synchronization, cleanup, a later slice,
 or any live or production capability.
+
+This bounded status correction changes only README and this implementation
+record. It uses a distinct stable self-reference because a commit cannot contain
+its own final SHA:
+
+```text
+PHASE_2O_04_DOCUMENTATION_STATUS_CORRECTION_COMMIT_REFERENCE:
+THIS_COMMIT
+
+EXACT_DOCUMENTATION_STATUS_CORRECTION_COMMIT_SHA_SOURCE:
+FINAL_TASK_RESULT_AND_INDEPENDENT_REVIEW_TARGET
+```
+
+Its status is `DONE / LOCAL_ONLY / READY_FOR_INDEPENDENT_REVIEW`. The final task
+result is the authoritative source for the exact status-correction commit SHA.
+The sole next candidate is
+`PHASE_2O_04_POST_INTEGRATION_AUTHORIZATION_DOCUMENTATION_STATUS_FIX_COMMIT_REVIEW_ONLY`.
+Only after that exact commit receives an independent `PASS` review may
+integration authorization be retried in a fresh task. This handoff does not
+authorize integration, Phase 2O-05 through Phase 2O-07, Phase 2P, or any live or
+production capability.
 
 ## 11. Documentation readability review
 
