@@ -73,13 +73,18 @@ non-executing.
 | `PHASE_2O_04_IMPLEMENTATION_REVIEW_DECISION` | `FAIL_FIX_REQUIRED` |
 | `PHASE_2O_04_IMPLEMENTATION_STATUS` | `DONE / LOCAL_ONLY / REVIEWED / FAIL_FIX_REQUIRED` |
 | `PHASE_2O_04_IMPLEMENTATION_TECHNICAL_AND_SAFETY_RESULT` | `PASS` |
-| `PHASE_2O_04_IMPLEMENTATION_REMAINING_FINDING` | `STALE_PHASE_2O_03_AND_PHASE_2O_04_STATUS_WORDING` |
-| `PHASE_2O_04_DOCUMENTATION_REVIEW_FIX_COMMIT_REFERENCE` | `THIS_COMMIT` |
-| `PHASE_2O_04_DOCUMENTATION_REVIEW_FIX_STATUS` | `DONE / LOCAL_ONLY / READY_FOR_INDEPENDENT_FIX_REVIEW` |
+| `PHASE_2O_04_IMPLEMENTATION_REVIEW_ORIGINAL_FINDING` | `STALE_PHASE_2O_03_AND_PHASE_2O_04_STATUS_WORDING` |
+| `PHASE_2O_04_FIRST_DOCUMENTATION_REVIEW_FIX_COMMIT` | `4546f3f441ecaa14f208eee928da33b0ac9b5769` |
+| `PHASE_2O_04_FIRST_DOCUMENTATION_REVIEW_FIX_REVIEW_DECISION` | `FAIL_FIX_REQUIRED` |
+| `PHASE_2O_04_FIRST_DOCUMENTATION_REVIEW_FIX_STATUS` | `DONE / LOCAL_ONLY / REVIEWED / FAIL_FIX_REQUIRED` |
+| `PHASE_2O_04_REMAINING_DOCUMENTATION_FINDING` | `STALE_UNQUALIFIED_PHASE_2O_04_UNAUTHORIZED_WORDING_IN_SECTIONS_12_AND_13_4` |
+| `PHASE_2O_04_SECOND_DOCUMENTATION_REVIEW_FIX_COMMIT_REFERENCE` | `THIS_COMMIT` |
+| `PHASE_2O_04_SECOND_DOCUMENTATION_REVIEW_FIX_FINDING_DISPOSITION` | `CORRECTED / PENDING_INDEPENDENT_SECOND_FIX_REVIEW` |
+| `PHASE_2O_04_SECOND_DOCUMENTATION_REVIEW_FIX_STATUS` | `DONE / LOCAL_ONLY / READY_FOR_INDEPENDENT_SECOND_FIX_REVIEW` |
 | `PHASE_2O_05_THROUGH_2O_07_STATUS` | `NOT_AUTHORIZED / NOT_STARTED` |
 | `PHASE_2P_STATUS` | `NOT_AUTHORIZED / NOT_STARTED` |
 | `STAGE_0_BOUNDARY` | `PRESERVED` |
-| `SOLE_NEXT_CANDIDATE` | `PHASE_2O_04_BOUNDED_DOCUMENTATION_REVIEW_FIX_COMMIT_REVIEW_ONLY` |
+| `SOLE_NEXT_CANDIDATE` | `PHASE_2O_04_SECOND_BOUNDED_DOCUMENTATION_REVIEW_FIX_COMMIT_REVIEW_ONLY` |
 
 No provider, model, job, command, device, or production authority follows from a
 visual treatment, status label, navigation destination, reviewer view, or
@@ -429,7 +434,10 @@ through Phase 2O-07.
 
 The sequence retains seven identifiers but revises the placeholder candidate into
 explicit framework responsibilities, cross-cutting acceptance, dependency gates,
-and a separate closure review. All entries are `NOT_AUTHORIZED / NOT_STARTED`.
+and a separate closure review. When this Phase 2O-00 sequence was originally
+proposed, every later slice was `NOT_AUTHORIZED / NOT_STARTED`. The status table
+and Sections 13.1 through 13.7 record the later, separately authorized and
+completed Phase 2O-01 through Phase 2O-04 work and control the current status.
 
 | Slice | Mode | Surface | Purpose | Allowed scope | Forbidden scope | Prerequisites | Required acceptance evidence | Separate authorization required |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -659,19 +667,28 @@ was added or expanded. The independent bounded-fix review later returned
 
 ### 13.4 Phase 2O-02 integration and post-merge status reconciliation
 
-**Current conclusion:** Phase 2O-02 is
+**Historical conclusion at the completion of Phase 2O-02:** Phase 2O-02 was
 `DONE / ACCEPTED / MERGED_TO_MAIN / SYNCHRONIZED`. Its bounded implementation
-and review-fix target `00862075494bc7a76dd478bee9d1742d53d43167` was integrated
-by strict fast-forward. The post-merge reconciliation commit
+and review-fix target `00862075494bc7a76dd478bee9d1742d53d43167` had been
+integrated by strict fast-forward. The post-merge reconciliation commit
 `10cec5ca1911140decdba7b84f54667698dcedae` was pushed, synchronized, and
 independently reviewed `PASS`.
 
 The accepted Phase 2O-02 history changed no route, execution, provider, model,
-live-device, or Stage 0 boundary. A later and separate continuation decision
-used that accepted state only as the base for the bounded Phase 2O-03
-authorization. Phase 2O remains `IN_PROGRESS / NOT_READY`; Phase 2O-04 through
-Phase 2O-07 and Phase 2P remain `NOT_AUTHORIZED / NOT_STARTED`; Stage 0 remains
-`PRESERVED`.
+live-device, or Stage 0 boundary. At that historical point, Phase 2O remained
+`IN_PROGRESS / NOT_READY`; Phase 2O-04 through Phase 2O-07 and Phase 2P were
+`NOT_AUTHORIZED / NOT_STARTED`; and Stage 0 remained `PRESERVED`.
+
+**Later controlling chronology:** A separate continuation decision used the
+accepted Phase 2O-02 state only as the base for bounded Phase 2O-03. Phase
+2O-03 was independently reviewed, integrated, and synchronized. A later,
+separate decision authorized Phase 2O-04. Phase 2O-04 implementation commit
+`2643b24497011ea31c507d6f567daf5f20287a5d` was completed locally and
+independently reviewed `FAIL_FIX_REQUIRED` because of documentation accuracy
+findings; its technical and safety result was `PASS`. It is not accepted,
+merged, pushed, synchronized, or closed. Phase 2O remains
+`IN_PROGRESS / NOT_READY`; Phase 2O-05 through Phase 2O-07 and Phase 2P remain
+`NOT_AUTHORIZED / NOT_STARTED`; and Stage 0 remains `PRESERVED`.
 
 ### 13.5 Phase 2O-03 bounded implementation handoff
 
@@ -822,13 +839,17 @@ Phase 2O-03 handoff is not the current next candidate.
 `DONE / LOCAL_ONLY / REVIEWED / FAIL_FIX_REQUIRED`. Independent implementation
 review found the technical, source, test, safety, and rendered results `PASS`,
 but documentation accuracy `FAIL` with one material finding:
-`STALE_PHASE_2O_03_AND_PHASE_2O_04_STATUS_WORDING`. This bounded documentation
-correction resolves that sole finding and is
-`DONE / LOCAL_ONLY / READY_FOR_INDEPENDENT_FIX_REVIEW`. The implementation's
-presentation-only change gives the four existing `/network/*` routes one shared
-secondary Next.js Stage 0 shell, continues to name the Flask dashboard at
-`http://127.0.0.1:5000/` as canonical, and preserves the report-only, dry-run,
-mock-only, demo-only, and non-executing boundary. Phase 2O remains
+`STALE_PHASE_2O_03_AND_PHASE_2O_04_STATUS_WORDING`. The first bounded
+documentation correction, commit
+`4546f3f441ecaa14f208eee928da33b0ac9b5769`, received independent review
+`FAIL_FIX_REQUIRED` for one remaining documentation finding:
+`STALE_UNQUALIFIED_PHASE_2O_04_UNAUTHORIZED_WORDING_IN_SECTIONS_12_AND_13_4`.
+This second bounded documentation correction resolves those two stale passages
+and is `DONE / LOCAL_ONLY / READY_FOR_INDEPENDENT_SECOND_FIX_REVIEW`. The
+implementation's presentation-only change gives the four existing `/network/*`
+routes one shared secondary Next.js Stage 0 shell, continues to name the Flask
+dashboard at `http://127.0.0.1:5000/` as canonical, and preserves the
+report-only, dry-run, mock-only, demo-only, and non-executing boundary. Phase 2O remains
 `IN_PROGRESS / NOT_READY`; Phase 2O-05 through Phase 2O-07 and Phase 2P remain
 `NOT_AUTHORIZED / NOT_STARTED`.
 
@@ -885,8 +906,7 @@ against `2643b24497011ea31c507d6f567daf5f20287a5d` and returned
 not authorize integration, push, merge, synchronization, closure, or a later
 phase.
 
-This bounded documentation correction uses a stable self-reference because a
-commit cannot contain its own final SHA:
+The first bounded documentation correction used this stable self-reference:
 
 ```text
 PHASE_2O_04_DOCUMENTATION_REVIEW_FIX_COMMIT_REFERENCE:
@@ -896,12 +916,30 @@ EXACT_DOCUMENTATION_REVIEW_FIX_COMMIT_SHA_SOURCE:
 FINAL_TASK_RESULT_AND_INDEPENDENT_FIX_REVIEW_TARGET
 ```
 
-The correction status is
-`DONE / LOCAL_ONLY / READY_FOR_INDEPENDENT_FIX_REVIEW`. Its final task result is
-the authoritative source for the exact correction commit SHA. This record does
-not claim that the correction has been independently reviewed, accepted,
-integrated, pushed, merged, synchronized, or closed. The sole next candidate is
-`PHASE_2O_04_BOUNDED_DOCUMENTATION_REVIEW_FIX_COMMIT_REVIEW_ONLY`.
+Its final task result identified the exact first correction commit as
+`4546f3f441ecaa14f208eee928da33b0ac9b5769`. Independent review of that commit
+returned `FAIL_FIX_REQUIRED` for the sole remaining finding named above. That
+review did not authorize integration, push, merge, synchronization, closure, or
+a later phase.
+
+This second bounded documentation correction uses a distinct stable
+self-reference because a commit cannot contain its own final SHA:
+
+```text
+PHASE_2O_04_SECOND_DOCUMENTATION_REVIEW_FIX_COMMIT_REFERENCE:
+THIS_COMMIT
+
+EXACT_SECOND_DOCUMENTATION_REVIEW_FIX_COMMIT_SHA_SOURCE:
+FINAL_TASK_RESULT_AND_INDEPENDENT_SECOND_FIX_REVIEW_TARGET
+```
+
+The second correction status is
+`DONE / LOCAL_ONLY / READY_FOR_INDEPENDENT_SECOND_FIX_REVIEW`. Its final task
+result is the authoritative source for the exact second correction commit SHA.
+This record does not claim that the second correction has been independently
+reviewed, accepted, integrated, pushed, merged, synchronized, or closed. The
+sole next candidate is
+`PHASE_2O_04_SECOND_BOUNDED_DOCUMENTATION_REVIEW_FIX_COMMIT_REVIEW_ONLY`.
 
 ## 14. Explicit exclusions and deferred work
 
@@ -935,7 +973,7 @@ The following remain excluded and unauthorized:
 - Current facts cite repository files or Phase 2N records; recommendations and
   assumptions are labeled.
 - `DONE / REVIEWED / MERGED_TO_MAIN / SYNCHRONIZED`, `FAIL_FIX_REQUIRED`,
-  `READY_FOR_INDEPENDENT_FIX_REVIEW`, `IN_PROGRESS / NOT_READY`,
+  `READY_FOR_INDEPENDENT_SECOND_FIX_REVIEW`, `IN_PROGRESS / NOT_READY`,
   `NOT_AUTHORIZED / NOT_STARTED`, and `PRESERVED` are used consistently.
 - Flask canonical and Next.js secondary terminology matches the Phase 2N closure.
 - Acceptance criteria and later-slice evidence are concrete and verifiable.
