@@ -10,11 +10,18 @@ safety, and rendered results passed. First documentation-fix commit
 `FAIL_FIX_REQUIRED` for the remaining stale unqualified wording. Second
 documentation-fix commit `7153cb9bcd328489057012a66dc5777e32cc0b26`
 received independent review `PASS`, so the cumulative Phase 2O-04
-implementation is `ACCEPTED / LOCAL_ONLY`. A later integration-authorization
+implementation is `ACCEPTED / LOCAL_ONLY`. The first integration-authorization
 decision returned `NOT_AUTHORIZED` because this record and README still
-contained obsolete current handoffs; integration is `NOT_STARTED`. This bounded
-two-document status correction is ready only for independent review. The four
-existing `/network/*` routes still share one secondary Next.js Stage 0 shell
+contained obsolete current handoffs. Post-authorization documentation-status
+correction commit `1e6561344b53161da85dac0e912bfead425af125` corrected those
+handoffs and received independent review `PASS` with zero material findings.
+The latest integration-authorization decision nevertheless returned
+`NOT_AUTHORIZED` solely because the current documentation still routed reviewers
+back to that completed review; topology, cumulative scope, implementation
+behavior, and Stage 0 safety did not fail. Integration remains `NOT_STARTED`.
+This bounded two-document correction establishes a stable
+`CONDITIONAL_EXTERNAL_REVIEW_GATE`. The four existing `/network/*` routes still
+share one secondary Next.js Stage 0 shell
 while the Flask dashboard at `http://127.0.0.1:5000/` remains explicitly named
 as the canonical reviewer surface. No implementation behavior changes, every
 Stage 0 prohibition remains preserved, and Phase 2O-05 through Phase 2O-07 and
@@ -51,14 +58,35 @@ PASS
 PHASE_2O_04_CUMULATIVE_IMPLEMENTATION_STATUS:
 ACCEPTED / LOCAL_ONLY
 
+PHASE_2O_04_FIRST_INTEGRATION_AUTHORIZATION_DECISION:
+NOT_AUTHORIZED
+
+PHASE_2O_04_FIRST_INTEGRATION_AUTHORIZATION_FAILURE_DOMAIN:
+STALE_DOCUMENTATION_STATUS_AND_HANDOFFS_ONLY
+
+PHASE_2O_04_POST_AUTHORIZATION_DOCUMENTATION_STATUS_FIX_COMMIT:
+1e6561344b53161da85dac0e912bfead425af125
+
+PHASE_2O_04_POST_AUTHORIZATION_DOCUMENTATION_STATUS_FIX_REVIEW_DECISION:
+PASS
+
+PHASE_2O_04_POST_AUTHORIZATION_DOCUMENTATION_STATUS_FIX_MATERIAL_FINDINGS:
+0
+
 PHASE_2O_04_LATEST_INTEGRATION_AUTHORIZATION_DECISION:
 NOT_AUTHORIZED
+
+PHASE_2O_04_LATEST_INTEGRATION_AUTHORIZATION_FAILURE_DOMAIN:
+STALE_CURRENT_DOCUMENTATION_HANDOFF_ONLY
 
 PHASE_2O_04_INTEGRATION_STATUS:
 NOT_STARTED
 
-PHASE_2O_04_DOCUMENTATION_STATUS_CORRECTION:
-DONE / LOCAL_ONLY / READY_FOR_INDEPENDENT_REVIEW
+PHASE_2O_04_CURRENT_DOCUMENTATION_STATUS_CORRECTION:
+DONE / LOCAL_ONLY
+
+CURRENT_HANDOFF:
+CONDITIONAL_EXTERNAL_REVIEW_GATE
 
 PHASE_2O_STATUS:
 IN_PROGRESS / NOT_READY
@@ -72,15 +100,16 @@ NOT_AUTHORIZED / NOT_STARTED
 STAGE_0_BOUNDARY:
 PRESERVED
 
-SOLE_NEXT_CANDIDATE:
-PHASE_2O_04_POST_INTEGRATION_AUTHORIZATION_DOCUMENTATION_STATUS_FIX_COMMIT_REVIEW_ONLY
 ```
 
-This record claims the completed implementation review, first documentation-fix
-review, second documentation-fix review, and later integration-authorization
-decision above. It does not claim that this documentation-status correction is
-independently reviewed or that integration, merge, push, synchronization,
-cleanup, closure, or a later phase is authorized or complete.
+This record claims the completed implementation review, both documentation-fix
+reviews, both integration-authorization decisions, and the independent `PASS`
+review of commit `1e6561344b53161da85dac0e912bfead425af125`. A commit cannot
+authoritatively declare its own independent review result. The external review
+task and exact commit evidence therefore control the review state of the commit
+containing this correction. This record does not claim that integration, merge,
+push, synchronization, cleanup, closure, or a later phase is authorized or
+complete.
 
 ## 2. Task identity and continuation history
 
@@ -330,16 +359,20 @@ The second bounded documentation correction commit
 independent review returned `PASS`, making the cumulative Phase 2O-04
 implementation `ACCEPTED / LOCAL_ONLY`.
 
-A later, separate integration-authorization decision returned `NOT_AUTHORIZED`
+A first, separate integration-authorization decision returned `NOT_AUTHORIZED`
 because README and this implementation record still contained obsolete current
-handoffs. Integration therefore remains `NOT_STARTED`. That decision did not
-reverse the second documentation-fix review or the cumulative local acceptance,
-and it did not authorize merge, push, synchronization, cleanup, a later slice,
-or any live or production capability.
+handoffs. Post-authorization documentation-status correction commit
+`1e6561344b53161da85dac0e912bfead425af125` corrected those handoffs and received
+independent review `PASS` with zero material findings. A fresh integration-
+authorization decision still returned `NOT_AUTHORIZED`, solely because the
+documentation continued to route reviewers backward to that already-completed
+review. Neither decision reversed the second documentation-fix review or the
+cumulative local acceptance, and topology, cumulative scope, implementation
+behavior, and Stage 0 safety did not fail. Integration remains `NOT_STARTED`.
 
-This bounded status correction changes only README and this implementation
-record. It uses a distinct stable self-reference because a commit cannot contain
-its own final SHA:
+This bounded stable-handoff correction changes only README and this
+implementation record. It uses a stable self-reference because a commit cannot
+contain its own final SHA:
 
 ```text
 PHASE_2O_04_DOCUMENTATION_STATUS_CORRECTION_COMMIT_REFERENCE:
@@ -349,14 +382,31 @@ EXACT_DOCUMENTATION_STATUS_CORRECTION_COMMIT_SHA_SOURCE:
 FINAL_TASK_RESULT_AND_INDEPENDENT_REVIEW_TARGET
 ```
 
-Its status is `DONE / LOCAL_ONLY / READY_FOR_INDEPENDENT_REVIEW`. The final task
-result is the authoritative source for the exact status-correction commit SHA.
-The sole next candidate is
-`PHASE_2O_04_POST_INTEGRATION_AUTHORIZATION_DOCUMENTATION_STATUS_FIX_COMMIT_REVIEW_ONLY`.
-Only after that exact commit receives an independent `PASS` review may
-integration authorization be retried in a fresh task. This handoff does not
-authorize integration, Phase 2O-05 through Phase 2O-07, Phase 2P, or any live or
-production capability.
+```text
+CURRENT_HANDOFF:
+CONDITIONAL_EXTERNAL_REVIEW_GATE
+```
+
+If the exact commit containing this correction has not received an independent
+`PASS` review, the sole next action is an independent read-only review of that
+exact commit. If that exact commit has received an independent `PASS` review and
+the result has not been superseded, the sole next action is a fresh Phase 2O-04
+integration-authorization decision. The external review task and exact commit
+evidence are authoritative.
+
+A commit cannot authoritatively declare its own independent review result. Once
+an external independent `PASS` review exists for the exact current correction
+commit, no additional documentation-only commit is required solely to copy that
+commit's own `PASS` result into the repository. This stable rule prevents a
+self-referential status loop; it does not waive independent review, integration
+authorization, topology validation, cumulative-scope validation, test/build
+validation, or Stage 0 safety validation.
+
+The only possible path remains: exact stable-handoff correction commit,
+independent review of that commit, fresh integration-authorization decision,
+and—only if separately authorized—a strict-fast-forward integration task. This
+handoff does not authorize integration, merge, push, synchronization, cleanup,
+Phase 2O-05 through Phase 2O-07, Phase 2P, or any live or production capability.
 
 ## 11. Documentation readability review
 
