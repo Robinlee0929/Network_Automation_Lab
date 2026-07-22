@@ -479,54 +479,163 @@ git diff --check
 
 ### 9.2 Deterministic exact changed-file scope validation
 
-Run this read-only validation after the future implementation has produced its
-resulting `HEAD` and before reporting completion. Replace every
-`<IMPLEMENTATION_BASE>` token below with the same exact full commit SHA supplied
-by the fresh Phase 2O continuation-authorization decision. That SHA must be the
-implementation task's verified starting `HEAD`; it must not be inferred from
-`main`, `origin/main`, a merge base, or the future implementation commit itself.
+This validation has two mandatory stages. Stage A binds the future implementation
+to the exact authorization-supplied starting commit before any implementation
+file is edited, generated, staged, or committed. Stage B validates the resulting
+commit against that same preserved commit and tree identity. Merely resolving a
+supplied SHA as a valid commit is insufficient.
+
+The stable sequence is: authorization supplies exact base `B`; implementation
+starts only when `HEAD == B`; the task preserves `B` and `B^{tree}`;
+implementation creates result `H`; final validation verifies that literal `B`
+is an ancestor of `H`; final validation compares literal `B` directly with `H`;
+and the task reports `H` for independent review. The future result SHA is not a
+prerequisite and must not be inserted into this plan before it exists.
 
 Run each Git command below as a separate, independent tool call. Do not batch,
-chain, pipe, wrap, alias, or combine them. Preserve each command's stdout
-verbatim for the non-Git comparison step.
+chain, pipe, wrap, alias, or combine them. Preserve each required stdout value
+verbatim as task-local execution evidence and include the resolved base commit,
+base tree, and result commit in the final structured implementation report. Do
+not create a repository file solely to store these values.
 
-1. Verify that the literal implementation base resolves to itself exactly:
+#### Stage A — mandatory pre-implementation base binding
 
-   ```text
-   git rev-parse <IMPLEMENTATION_BASE>^{commit}
-   ```
+The fresh Phase 2O continuation-authorization decision must supply one explicit
+full starting commit SHA as `AUTHORIZED_IMPLEMENTATION_BASE_INPUT`. Before any
+implementation modification, resolve and preserve it as
+`AUTHORIZED_IMPLEMENTATION_BASE_COMMIT`, resolve and preserve its exact tree as
+`AUTHORIZED_IMPLEMENTATION_BASE_TREE`, and obtain
+`ACTUAL_PRE_IMPLEMENTATION_HEAD` from `HEAD^{commit}`:
 
-   The command must return the same full 40-character SHA. Any other output or
-   non-zero exit blocks validation.
+```powershell
+$AuthorizedBaseInput = "<AUTHORIZATION_SUPPLIED_SHA>"
 
-2. Capture the complete tracked change status relative to the exact base:
+if ($AuthorizedBaseInput -cnotmatch '^[0-9a-fA-F]{40}$') {
+    throw "Authorized implementation base must be one full commit SHA."
+}
 
-   ```text
-   git diff --name-status --find-renames --diff-filter=ACDMRTUXB <IMPLEMENTATION_BASE>...HEAD --
-   ```
+$AuthorizedBaseCommit = (
+    git rev-parse --verify "$AuthorizedBaseInput^{commit}"
+).Trim()
 
-3. Capture all untracked, non-ignored paths in a second independent call:
+if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($AuthorizedBaseCommit)) {
+    throw "Authorized implementation base is not a valid commit: $AuthorizedBaseInput"
+}
 
-   ```text
-   git ls-files --others --exclude-standard --
-   ```
+$ActualPreImplementationHead = (
+    git rev-parse --verify "HEAD^{commit}"
+).Trim()
 
-4. Capture any staged or unstaged tracked worktree entry in a third independent
-   call:
+if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($ActualPreImplementationHead)) {
+    throw "Unable to resolve the pre-implementation HEAD."
+}
 
-   ```text
-   git status --porcelain --untracked-files=no
-   ```
+if ($ActualPreImplementationHead -cne $AuthorizedBaseCommit) {
+    throw @"
+Incorrect implementation starting HEAD.
+Authorized: $AuthorizedBaseCommit
+Actual:     $ActualPreImplementationHead
+"@
+}
 
-5. Run the whitespace/error check independently against the same range:
+$AuthorizedBaseTree = (
+    git rev-parse --verify "$AuthorizedBaseCommit^{tree}"
+).Trim()
 
-   ```text
-   git diff --check <IMPLEMENTATION_BASE>...HEAD --
-   ```
+if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($AuthorizedBaseTree)) {
+    throw "Unable to resolve the authorized implementation base tree."
+}
+```
+
+Any mismatch is an immediate stop condition; no implementation is permitted
+after it. The authorization-supplied base must not be replaced by a merge base,
+current `main`, `origin/main`, a parent approximation, branch or tag name,
+remote-tracking ref, sibling, ancestor, descendant, or another valid commit.
+Such a ref or commit is acceptable only when its fully resolved commit equals
+the exact authorization-supplied SHA and the actual starting `HEAD` equals that
+same commit.
+
+#### Stage B — mandatory post-implementation exact-tree validation
+
+Only after the implementation result commit exists, resolve and preserve
+`IMPLEMENTATION_RESULT_HEAD`:
+
+```powershell
+$ImplementationResultHead = (
+    git rev-parse --verify "HEAD^{commit}"
+).Trim()
+
+if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($ImplementationResultHead)) {
+    throw "Unable to resolve the implementation result HEAD."
+}
+```
+
+Verify that the exact preserved authorized base is an ancestor of that result:
+
+```powershell
+git merge-base --is-ancestor `
+    $AuthorizedBaseCommit `
+    $ImplementationResultHead
+
+if ($LASTEXITCODE -ne 0) {
+    throw "The exact authorized implementation base is not an ancestor of the result HEAD."
+}
+```
+
+Re-resolve the preserved base tree and require the same tree identity. Git
+commit and tree objects are immutable, but this check proves final validation
+did not silently substitute a different valid base:
+
+```powershell
+$RecheckedAuthorizedBaseTree = (
+    git rev-parse --verify "$AuthorizedBaseCommit^{tree}"
+).Trim()
+
+if ($LASTEXITCODE -ne 0 -or $RecheckedAuthorizedBaseTree -cne $AuthorizedBaseTree) {
+    throw "Authorized implementation base tree evidence does not match."
+}
+```
+
+Capture the complete tracked change status by comparing the literal preserved
+base commit directly with the result commit:
+
+```text
+git diff --name-status --find-renames --diff-filter=ACDMRTUXB <EXACT_AUTHORIZED_BASE> <IMPLEMENTATION_RESULT_HEAD> --
+```
+
+Capture all untracked, non-ignored paths in a second independent call:
+
+```text
+git ls-files --others --exclude-standard --
+```
+
+Capture any staged or unstaged tracked worktree entry in a third independent
+call:
+
+```text
+git status --porcelain --untracked-files=no
+```
+
+Run the whitespace/error check independently against the same two literal
+commits:
+
+```text
+git diff --check <EXACT_AUTHORIZED_BASE> <IMPLEMENTATION_RESULT_HEAD> --
+```
+
+The authoritative changed-file calculation must use two explicit commit
+arguments or an equivalent literal tree-to-tree comparison. It must not use
+`git diff <base>...<head>`, a separately calculated merge base,
+`git diff <branch-name>...HEAD`, or `git diff origin/main...HEAD`. Three-dot
+diff uses the merge base, which can differ from the literal supplied base. A
+wrong sibling commit can therefore produce the same changed-path set and pass
+path-only validation unless Stage A first binds `HEAD` exactly and Stage B
+compares the approved base tree directly with the result tree.
 
 Then run the following non-Git PowerShell comparison in its own tool call.
 Replace the three stdout placeholders verbatim with the captured output from
-steps 2 through 4. Preserve tabs in the name-status output. Empty command output
+the Stage B tracked, untracked, and worktree commands. Preserve tabs in the
+name-status output. Empty command output
 must replace its placeholder with an empty here-string; it must not be replaced
 with explanatory text.
 
@@ -652,6 +761,27 @@ state and must not fetch or contact a remote.
 `git diff --check` remains a separate whitespace/error check. It supplies no
 changed-file scope evidence and cannot replace the deterministic validation
 above.
+
+Required wrong-base validation and review evidence must cover all of these
+cases:
+
+1. With authorized base `B` and actual pre-implementation `HEAD == B`, Stage A
+   passes and preserves `B` and `B^{tree}`.
+2. Another valid commit `W`, where `W != B`, fails Stage A even though `W`
+   resolves successfully.
+3. A sibling `W`, or a descendant of a sibling, fails Stage A when `W != B`
+   even if `merge-base(W, H) = B` and `git diff W...H` would produce the same
+   changed-path set as `git diff B...H`.
+4. A branch, tag, `main`, or `origin/main` that resolves to a different valid
+   commit fails; ref validity cannot substitute for equality with the
+   authorization-supplied SHA.
+5. A result `H` that is not descended from exact base `B` fails
+   `git merge-base --is-ancestor B H`, even when its changed-path count is 14.
+6. Substituting another valid commit during final validation fails the preserved
+   commit/tree identity checks.
+7. A literal comparison that does not use the preserved `B` fails validation.
+8. Correct count, exact path-set equality, or an equivalent three-dot path diff
+   cannot rescue any wrong-base case.
 
 The targeted safe-presentation tests must connect every matrix classification
 to evidence:
