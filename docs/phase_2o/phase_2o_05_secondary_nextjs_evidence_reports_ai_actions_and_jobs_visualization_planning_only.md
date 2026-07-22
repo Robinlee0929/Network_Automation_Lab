@@ -383,7 +383,7 @@ AUTHORIZED_EXISTING_TEST_FILES:
 AUTHORIZED_NEW_PRESENTATION_HELPER:
 - components/network/Phase2O05SafePresentation.ts
 
-AUTHORIZED_NEW_TEST_FILES_IF_NEEDED:
+AUTHORIZED_REQUIRED_NEW_TEST_FILES:
 - components/network/Phase2O05SafePresentation.test.ts
 
 AUTHORIZED_DOCUMENTATION_FILES:
@@ -412,6 +412,12 @@ The exact future changed-file list is:
 12. `README.md`
 13. `docs/phase_2o/phase_2o_00_ux_ui_baseline_and_information_architecture_planning_only.md`
 14. `docs/phase_2o/phase_2o_05_secondary_nextjs_evidence_reports_ai_actions_and_jobs_visualization_implementation.md` — new
+
+All 14 paths above are mandatory for the future implementation. File 10,
+`components/network/Phase2O05SafePresentation.test.ts`, is required rather than
+optional or implementation-dependent. An implementation that changes only 13
+of the listed files fails scope validation, as does omission of any other listed
+file. A fifteenth changed file is not authorized.
 
 The four existing route pages, shared layout, navigation, all `lib/network-ai/**`
 files, all API routes, stores, schemas, importers, packages, lockfiles, and data
@@ -471,6 +477,182 @@ python network_lab.py --task report-index
 git diff --check
 ```
 
+### 9.2 Deterministic exact changed-file scope validation
+
+Run this read-only validation after the future implementation has produced its
+resulting `HEAD` and before reporting completion. Replace every
+`<IMPLEMENTATION_BASE>` token below with the same exact full commit SHA supplied
+by the fresh Phase 2O continuation-authorization decision. That SHA must be the
+implementation task's verified starting `HEAD`; it must not be inferred from
+`main`, `origin/main`, a merge base, or the future implementation commit itself.
+
+Run each Git command below as a separate, independent tool call. Do not batch,
+chain, pipe, wrap, alias, or combine them. Preserve each command's stdout
+verbatim for the non-Git comparison step.
+
+1. Verify that the literal implementation base resolves to itself exactly:
+
+   ```text
+   git rev-parse <IMPLEMENTATION_BASE>^{commit}
+   ```
+
+   The command must return the same full 40-character SHA. Any other output or
+   non-zero exit blocks validation.
+
+2. Capture the complete tracked change status relative to the exact base:
+
+   ```text
+   git diff --name-status --find-renames --diff-filter=ACDMRTUXB <IMPLEMENTATION_BASE>...HEAD --
+   ```
+
+3. Capture all untracked, non-ignored paths in a second independent call:
+
+   ```text
+   git ls-files --others --exclude-standard --
+   ```
+
+4. Capture any staged or unstaged tracked worktree entry in a third independent
+   call:
+
+   ```text
+   git status --porcelain --untracked-files=no
+   ```
+
+5. Run the whitespace/error check independently against the same range:
+
+   ```text
+   git diff --check <IMPLEMENTATION_BASE>...HEAD --
+   ```
+
+Then run the following non-Git PowerShell comparison in its own tool call.
+Replace the three stdout placeholders verbatim with the captured output from
+steps 2 through 4. Preserve tabs in the name-status output. Empty command output
+must replace its placeholder with an empty here-string; it must not be replaced
+with explanatory text.
+
+```powershell
+$trackedNameStatusText = @'
+<EXACT_STDOUT_FROM_TRACKED_NAME_STATUS>
+'@
+$untrackedText = @'
+<EXACT_STDOUT_FROM_UNTRACKED_PATHS>
+'@
+$trackedWorktreeText = @'
+<EXACT_STDOUT_FROM_TRACKED_WORKTREE_STATUS>
+'@
+
+[string[]]$expectedPaths = @(
+    "app/globals.css"
+    "components/network/DayResultsClient.tsx"
+    "components/network/ReportsClient.tsx"
+    "components/network/AiActionsClient.tsx"
+    "components/network/JobsClient.tsx"
+    "components/network/Phase2N04DemoPresentation.ts"
+    "components/network/Phase2O05SafePresentation.ts"
+    "components/network/ReportsClient.test.tsx"
+    "components/network/Phase2N04SafetyLabels.test.ts"
+    "components/network/Phase2O05SafePresentation.test.ts"
+    "tests/test_network_phase1_ui_presentation.py"
+    "README.md"
+    "docs/phase_2o/phase_2o_00_ux_ui_baseline_and_information_architecture_planning_only.md"
+    "docs/phase_2o/phase_2o_05_secondary_nextjs_evidence_reports_ai_actions_and_jobs_visualization_implementation.md"
+)
+
+function Convert-CapturedLines([string]$text) {
+    return [string[]]@(
+        $text -split "`r?`n" |
+            ForEach-Object { $_.TrimEnd() } |
+            Where-Object { $_ }
+    )
+}
+
+function Normalize-GitPath([string]$path) {
+    return $path.Trim().Replace("\", "/")
+}
+
+$actualTrackedList = [System.Collections.Generic.List[string]]::new()
+$deletedEntries = [System.Collections.Generic.List[string]]::new()
+$renamedOrCopiedEntries = [System.Collections.Generic.List[string]]::new()
+$unexpectedStatusEntries = [System.Collections.Generic.List[string]]::new()
+
+foreach ($entry in (Convert-CapturedLines $trackedNameStatusText)) {
+    [string[]]$parts = $entry -split "`t"
+    $status = $parts[0]
+    if ($status -match '^[AM]$' -and $parts.Count -eq 2) {
+        $actualTrackedList.Add((Normalize-GitPath $parts[1]))
+    } elseif ($status -eq 'D') {
+        $deletedEntries.Add($entry)
+    } elseif ($status -match '^[RC][0-9]{0,3}$') {
+        $renamedOrCopiedEntries.Add($entry)
+    } else {
+        $unexpectedStatusEntries.Add($entry)
+    }
+}
+
+[string[]]$actualTracked = $actualTrackedList.ToArray()
+[string[]]$untrackedPaths = @(
+    Convert-CapturedLines $untrackedText | ForEach-Object { Normalize-GitPath $_ }
+)
+[string[]]$trackedWorktreeEntries = @(Convert-CapturedLines $trackedWorktreeText)
+
+[Array]::Sort($expectedPaths, [StringComparer]::Ordinal)
+[Array]::Sort($actualTracked, [StringComparer]::Ordinal)
+[Array]::Sort($untrackedPaths, [StringComparer]::Ordinal)
+
+[string[]]$missingPaths = @(
+    $expectedPaths | Where-Object { $actualTracked -cnotcontains $_ }
+)
+[string[]]$unexpectedPaths = @(
+    $actualTracked | Where-Object { $expectedPaths -cnotcontains $_ }
+)
+[string[]]$expectedUntrackedPaths = @(
+    $untrackedPaths | Where-Object { $expectedPaths -ccontains $_ }
+)
+[string[]]$unexpectedUntrackedPaths = @(
+    $untrackedPaths | Where-Object { $expectedPaths -cnotcontains $_ }
+)
+
+Write-Output "Expected tracked count: 14"
+Write-Output "Actual tracked count: $($actualTracked.Count)"
+Write-Output "Missing paths: $($missingPaths -join ', ')"
+Write-Output "Unexpected paths: $($unexpectedPaths -join ', ')"
+Write-Output "Deleted entries: $($deletedEntries -join ', ')"
+Write-Output "Renamed/copied entries: $($renamedOrCopiedEntries -join ', ')"
+Write-Output "Unexpected status entries: $($unexpectedStatusEntries -join ', ')"
+Write-Output "Expected-scope untracked paths: $($expectedUntrackedPaths -join ', ')"
+Write-Output "Outside-scope untracked paths: $($unexpectedUntrackedPaths -join ', ')"
+Write-Output "Uncommitted tracked worktree entries: $($trackedWorktreeEntries -join ', ')"
+
+$scopeFailed =
+    $expectedPaths.Count -ne 14 -or
+    $actualTracked.Count -ne 14 -or
+    $missingPaths.Count -ne 0 -or
+    $unexpectedPaths.Count -ne 0 -or
+    $deletedEntries.Count -ne 0 -or
+    $renamedOrCopiedEntries.Count -ne 0 -or
+    $unexpectedStatusEntries.Count -ne 0 -or
+    $expectedUntrackedPaths.Count -ne 0 -or
+    $unexpectedUntrackedPaths.Count -ne 0 -or
+    $trackedWorktreeEntries.Count -ne 0
+
+if ($scopeFailed) {
+    Write-Error "Phase 2O-05 exact 14-file implementation scope validation failed."
+    exit 1
+}
+
+Write-Output "PASS: resulting HEAD changes exactly the required 14 paths."
+```
+
+This contract compares both count and case-sensitive normalized path contents.
+Missing, extra, deleted, renamed, copied, untracked, or uncommitted tracked
+paths make the comparison return non-zero. Any untracked path fails whether it
+falls inside the expected list or outside it. The commands use only local Git
+state and must not fetch or contact a remote.
+
+`git diff --check` remains a separate whitespace/error check. It supplies no
+changed-file scope evidence and cannot replace the deterministic validation
+above.
+
 The targeted safe-presentation tests must connect every matrix classification
 to evidence:
 
@@ -492,7 +674,7 @@ to evidence:
 - immutability: projection helpers do not mutate the source objects and no
   importer/store/API/provider/device function is invoked by rejected inputs.
 
-### 9.2 Rendered browser review
+### 9.3 Rendered browser review
 
 Review all four routes with normal recorded data and the applicable synthetic or
 task-owned non-destructive empty, malformed/rejected, loading, error, and
