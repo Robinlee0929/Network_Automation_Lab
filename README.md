@@ -154,7 +154,8 @@ Current Phase 2O status:
 - Phase 2O-04 implementation commit `2643b24497011ea31c507d6f567daf5f20287a5d` received independent review `FAIL_FIX_REQUIRED` solely for stale status wording; its technical, source, test, safety, and rendered results passed. First documentation-fix commit `4546f3f441ecaa14f208eee928da33b0ac9b5769` then received independent review `FAIL_FIX_REQUIRED`, while second documentation-fix commit `7153cb9bcd328489057012a66dc5777e32cc0b26` received independent review `PASS`. At that historical point, the cumulative implementation became `ACCEPTED / LOCAL_ONLY`.
 - The first integration-authorization decisions remained `NOT_AUTHORIZED` only because current handoff wording was stale. Post-authorization status correction `1e6561344b53161da85dac0e912bfead425af125` and stable-handoff correction `bc8b22934191187c18f1c1fc3c498cc2cc03c30f` each received independent review `PASS`. Phase 2O-00 handoff reconciliation `413814ceefe5160cecda6bcfdd5c0f24c05cdcbb` then received independent review `PASS` with zero material findings, and a fresh integration-authorization decision returned `AUTHORIZED`.
 - Local `main` advanced from `93cf3bba0c74e7eec685dbc1f7925c0ceca218c7` to `413814ceefe5160cecda6bcfdd5c0f24c05cdcbb` by strict fast-forward only. Complete post-fast-forward validation passed, and local `main` was pushed to `origin/main` with the non-force refspec `refs/heads/main:refs/heads/main`. Local `main`, local tracking `origin/main`, and remote `main` were verified at the integrated commit. The fully merged local source branch was safely deleted; no remote source branch was deleted.
-- The current Phase 2O-04 cumulative status is `ACCEPTED / MERGED_TO_MAIN`; integration and non-force push are `COMPLETED`; synchronization is `LOCAL_MAIN_TRACKING_AND_REMOTE_MAIN_MATCH`. This bounded three-document post-merge reconciliation is the only current documentation task and requires independent review. Phase 2O remains `IN_PROGRESS / NOT_READY`; Stage 0 remains `PRESERVED`; Phase 2O-05 through Phase 2O-07 and Phase 2P remain `NOT_AUTHORIZED / NOT_STARTED`.
+- Phase 2O-04 is `DONE / MERGED_TO_MAIN / SYNCHRONIZED / RECONCILED`. Its bounded post-merge reconciliation commit `5fc25f9035ee23ee98147e15caeb044e3ed405ba` is the completed `main` baseline. The later continuation decision identified Phase 2O-05 as the sole sequential candidate but withheld implementation authorization until a complete per-component safe-field matrix and exact bounded scope existed.
+- Phase 2O-05 prerequisite planning is `DONE / LOCAL_ONLY / READY_FOR_INDEPENDENT_REVIEW`. The [controlling prerequisite plan](docs/phase_2o/phase_2o_05_secondary_nextjs_evidence_reports_ai_actions_and_jobs_visualization_planning_only.md) supplies 109 field-level Evidence, Reports, AI Actions, and Jobs decisions, the retained HTTP-200 Reports empty-state contract, dependency decision `NO`, exact future 14-file boundary, validation plan, and stable conditional handoff. Phase 2O-05 implementation remains `NOT_AUTHORIZED / NOT_STARTED`; Phase 2O-06 through Phase 2O-07 and Phase 2P remain `NOT_AUTHORIZED / NOT_STARTED`; Phase 2O remains `IN_PROGRESS / NOT_READY`; Stage 0 remains `PRESERVED`.
 
 The Phase 2O-02 post-merge reconciliation uses a stable self-reference because
 a Git commit cannot contain its own final hash:
@@ -411,28 +412,29 @@ Phase 2N is `ACCEPTED / CLOSED` on `main`. The external result's `GENERATED_OUTP
 CURRENT_HANDOFF:
 CONDITIONAL_EXTERNAL_REVIEW_GATE
 
-PHASE_2O_04_POST_MERGE_STATUS_RECONCILIATION_COMMIT_REFERENCE:
+PHASE_2O_05_PREREQUISITE_PLANNING_COMMIT_REFERENCE:
 THIS_COMMIT
 
-EXACT_POST_MERGE_STATUS_RECONCILIATION_COMMIT_SHA_SOURCE:
-FINAL_TASK_RESULT_AND_INDEPENDENT_POST_MERGE_REVIEW_TARGET
+EXACT_PREREQUISITE_PLANNING_COMMIT_SHA_SOURCE:
+FINAL_TASK_RESULT_AND_INDEPENDENT_REVIEW_TARGET
 ```
 
-Phase 2O-04 is `ACCEPTED / MERGED_TO_MAIN`. Strict-fast-forward integration,
-the non-force main push, three-ref synchronization, and safe local source-branch
-cleanup are complete. This three-document reconciliation is
-`DONE / LOCAL_ONLY / READY_FOR_INDEPENDENT_POST_MERGE_RECONCILIATION_REVIEW`.
+Phase 2O-04 is fully integrated and reconciled. Phase 2O-05 prerequisite
+planning is `DONE / LOCAL_ONLY / READY_FOR_INDEPENDENT_REVIEW`; implementation
+is `NOT_AUTHORIZED / NOT_STARTED`.
 
-If the exact post-merge reconciliation commit has not received an independent
-`PASS` review, the sole next action is independent review of that exact commit.
-If it has received an independent `PASS` review and that result remains
-unsuperseded, the sole next action is a separately authorized integration
-decision for that exact documentation commit. A commit cannot authoritatively
-self-record a later external review result, so no additional documentation-only
-commit is required solely to make the reviewed commit record its own `PASS`.
+If the exact Phase 2O-05 prerequisite-planning commit has not received an
+independent `PASS` review, the sole next action is independent review of that
+exact commit.
+If that exact commit has received an independent `PASS` review and remains
+unsuperseded, the sole next action is a fresh Phase 2O continuation-authorization
+decision for the exact candidate and exact boundary. A commit cannot
+authoritatively self-record a later external review result, so no additional
+documentation-only commit is required solely to make the reviewed commit record
+its own `PASS`.
 
-This conditional handoff does not authorize integration of this reconciliation,
-another push, branch cleanup, Phase 2O-05 through Phase 2O-07, Phase 2P, or any
+This conditional handoff does not authorize Phase 2O-05 implementation, merge,
+push, remote contact, branch cleanup, Phase 2O-06, Phase 2O-07, Phase 2P, or any
 provider, API, model, secret, POST, job, command, runner, importer, scheduler,
 queue, broker, worker, agent-loop, live-device, SSH, NETCONF, RESTCONF,
 configuration-change, or production-execution capability.
@@ -770,7 +772,8 @@ Current Phase 2H / 2I / 2J / 2K / 2L progress snapshot:
 | 63 | 2O-02 | Canonical Flask Overview, Evidence, and Reports Visualization / Integrated with Post-merge Status Reconciliation | DONE / MERGED_TO_MAIN / SYNCHRONIZED / POST_MERGE_STATUS_RECONCILIATION_READY_FOR_REVIEW | Original implementation `0548c6beab80a087ea02d00d49a213dd4336724a` received `FAIL_FIX_REQUIRED`; bounded fix `00862075494bc7a76dd478bee9d1742d53d43167` received independent review `PASS`, making the cumulative implementation `ACCEPTED`; local `main` reached the accepted target by strict fast-forward, pre-first-push validation passed 114 targeted and 1,928 full tests plus report-index 14/14, and the target was normally pushed and verified on remote `main`; the fully merged local source branch was safely deleted and no remote source branch was created or deleted; this three-document reconciliation uses `THIS_COMMIT`, is not independently reviewed, and does not authorize Phase 2O-03 or Phase 2P; the sole next candidate is `PHASE_2O_02_POST_MERGE_STATUS_RECONCILIATION_COMMIT_REVIEW_ONLY` |
 | 64 | 2O-03 | Canonical Flask Display-only and Technical-detail Presentation / Integrated with Post-merge Status Reconciliation | DONE / REVIEWED / MERGED_TO_MAIN / SYNCHRONIZED | Original implementation `d18e6ccac87e45e7cc983bb09be1c50f07c0c6c2` received `FAIL_FIX_REQUIRED`; bounded fix `9ff474822a94d0f79ff45b061af590186b425def` received independent review `PASS`, making the cumulative implementation `ACCEPTED`; reconciliation commit `2aaf4126ff939d4fb67228efff7b45ec6d1a161a` subsequently received independent post-merge review `PASS` with no material findings; Stage 0 remains `PRESERVED`; Phase 2O-04 and Phase 2P remain `NOT_AUTHORIZED / NOT_STARTED`; the sole next candidate is the separate post-2O-03 continuation authorization decision. |
 | 65 | 2O post-2O-03 | Continuation Authorization Decision / Review-only | DONE / AUTHORIZED | The independent continuation decision authorized exactly one bounded Phase 2O-04 presentation-only implementation from expected base `93cf3bba0c74e7eec685dbc1f7925c0ceca218c7`. It did not authorize a later slice, Phase 2P, dependency change, route/API/importer/runtime change, provider/model behavior, job/command control, or execution capability. Stage 0 remained `PRESERVED`. |
-| 66 | 2O-04 | Secondary Next.js Network Shell and Stage 0 IA Alignment / Integrated with Post-merge Status Reconciliation | ACCEPTED / MERGED_TO_MAIN / POST_MERGE_STATUS_RECONCILIATION_PENDING_EXTERNAL_REVIEW | The initial implementation attempt stopped at `EXACT_SCOPE_TEST_CONTRACT_CONFLICT`. Implementation `2643b24497011ea31c507d6f567daf5f20287a5d` and first documentation fix `4546f3f441ecaa14f208eee928da33b0ac9b5769` received documentation-only `FAIL_FIX_REQUIRED` results; second fix `7153cb9bcd328489057012a66dc5777e32cc0b26`, status correction `1e6561344b53161da85dac0e912bfead425af125`, stable handoff `bc8b22934191187c18f1c1fc3c498cc2cc03c30f`, and Phase 2O-00 handoff reconciliation `413814ceefe5160cecda6bcfdd5c0f24c05cdcbb` received independent `PASS` reviews. A fresh decision authorized integration. Local `main` strict-fast-forwarded from `93cf3bba0c74e7eec685dbc1f7925c0ceca218c7` to `413814ceefe5160cecda6bcfdd5c0f24c05cdcbb`; post-fast-forward validation passed; an exact non-force main push completed; local, tracking, and remote main synchronized; and the fully merged local source branch was safely deleted without deleting a remote branch. This three-document reconciliation now requires independent review under the non-recursive conditional external-review gate. Phase 2O remains `IN_PROGRESS / NOT_READY`; Stage 0 remains `PRESERVED`; Phase 2O-05 through Phase 2O-07 and Phase 2P remain `NOT_AUTHORIZED / NOT_STARTED`. |
+| 66 | 2O-04 | Secondary Next.js Network Shell and Stage 0 IA Alignment / Integrated and Reconciled | DONE / MERGED_TO_MAIN / SYNCHRONIZED / RECONCILED | The initial implementation attempt stopped at `EXACT_SCOPE_TEST_CONTRACT_CONFLICT`. Implementation `2643b24497011ea31c507d6f567daf5f20287a5d` and first documentation fix `4546f3f441ecaa14f208eee928da33b0ac9b5769` received documentation-only `FAIL_FIX_REQUIRED` results; second fix `7153cb9bcd328489057012a66dc5777e32cc0b26`, status correction `1e6561344b53161da85dac0e912bfead425af125`, stable handoff `bc8b22934191187c18f1c1fc3c498cc2cc03c30f`, and Phase 2O-00 handoff reconciliation `413814ceefe5160cecda6bcfdd5c0f24c05cdcbb` received independent `PASS` reviews. A fresh decision authorized integration. Local `main` strict-fast-forwarded from `93cf3bba0c74e7eec685dbc1f7925c0ceca218c7` to `413814ceefe5160cecda6bcfdd5c0f24c05cdcbb`; post-fast-forward validation and the exact non-force push completed. Post-merge reconciliation commit `5fc25f9035ee23ee98147e15caeb044e3ed405ba` is the completed local, tracking, and remote `main` baseline. Phase 2O remains `IN_PROGRESS / NOT_READY`; Stage 0 remains `PRESERVED`. |
+| 67 | 2O-05 prerequisite | Safe-field Matrix and Bounded-scope Planning Only | DONE / LOCAL_ONLY / READY_FOR_INDEPENDENT_REVIEW | The controlling prerequisite plan classifies 109 field-level decisions across Evidence, Reports, AI Actions, and Jobs, cites current schemas/components/importers/APIs/artifacts/tests, preserves the Reports HTTP-200 empty state, resolves dependency change as `NO`, and defines an exact future 14-file presentation/test/docs boundary. It changes no application behavior and does not authorize implementation. The exact planning commit must receive independent review; if that review returns `PASS` and remains unsuperseded, the sole next action is a fresh Phase 2O continuation-authorization decision. Phase 2O-06 through Phase 2O-07 and Phase 2P remain unauthorized and unstarted. |
 
 2K-09 result: the README now clarifies that the MIT License covers code usage rights such as cloning, reviewing, learning from, running local deterministic checks, and forking under the license terms. It also states that the license does not grant operational authorization for SSH, live device access, NETCONF, RESTCONF, API/model/provider calls, secrets access, config backup/change, or autonomous execution.
 

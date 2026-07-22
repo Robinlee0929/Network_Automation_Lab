@@ -99,11 +99,14 @@ non-executing.
 | `PHASE_2O_04_LOCAL_SOURCE_BRANCH_CLEANUP` | `COMPLETED / SAFE DELETE` |
 | `PHASE_2O_04_REMOTE_SOURCE_BRANCH` | `NOT DELETED` |
 | `PHASE_2O_04_CUMULATIVE_STATUS` | `ACCEPTED / MERGED_TO_MAIN` |
-| `PHASE_2O_04_STATUS` | `INTEGRATED / POST_MERGE_STATUS_RECONCILIATION_PENDING_EXTERNAL_REVIEW` |
-| `PHASE_2O_04_POST_MERGE_RECONCILIATION` | `CURRENT DOCUMENTATION TASK ONLY` |
-| `PHASE_2O_04_POST_MERGE_STATUS_RECONCILIATION_STATUS` | `DONE / LOCAL_ONLY / READY_FOR_INDEPENDENT_POST_MERGE_RECONCILIATION_REVIEW` |
-| `PHASE_2O_04_CURRENT_HANDOFF` | `CONDITIONAL_EXTERNAL_REVIEW_GATE` |
-| `PHASE_2O_05_THROUGH_2O_07_STATUS` | `NOT_AUTHORIZED / NOT_STARTED` |
+| `PHASE_2O_04_POST_MERGE_RECONCILIATION_COMMIT` | `5fc25f9035ee23ee98147e15caeb044e3ed405ba` |
+| `PHASE_2O_04_STATUS` | `DONE / MERGED_TO_MAIN / SYNCHRONIZED / RECONCILED` |
+| `PHASE_2O_04_POST_MERGE_RECONCILIATION_STATUS` | `COMPLETED` |
+| `PHASE_2O_04_CURRENT_HANDOFF` | `COMPLETED / SUPERSEDED_BY_PHASE_2O_05_PREREQUISITE_PLANNING` |
+| `PHASE_2O_05_PREREQUISITE_PLANNING_STATUS` | `DONE / LOCAL_ONLY / READY_FOR_INDEPENDENT_REVIEW` |
+| `PHASE_2O_05_PREREQUISITE_PLANNING_COMMIT_REFERENCE` | `THIS_COMMIT` |
+| `PHASE_2O_05_IMPLEMENTATION_STATUS` | `NOT_AUTHORIZED / NOT_STARTED` |
+| `PHASE_2O_06_THROUGH_2O_07_STATUS` | `NOT_AUTHORIZED / NOT_STARTED` |
 | `PHASE_2P_STATUS` | `NOT_AUTHORIZED / NOT_STARTED` |
 | `STAGE_0_BOUNDARY` | `PRESERVED` |
 
@@ -457,8 +460,9 @@ The sequence retains seven identifiers but revises the placeholder candidate int
 explicit framework responsibilities, cross-cutting acceptance, dependency gates,
 and a separate closure review. When this Phase 2O-00 sequence was originally
 proposed, every later slice was `NOT_AUTHORIZED / NOT_STARTED`. The status table
-and Sections 13.1 through 13.7 record the later, separately authorized and
-completed Phase 2O-01 through Phase 2O-04 work and control the current status.
+and Sections 13.1 through 13.8 record the later, separately authorized and
+completed Phase 2O-01 through Phase 2O-04 work plus the current Phase 2O-05
+prerequisite planning handoff.
 
 | Slice | Mode | Surface | Purpose | Allowed scope | Forbidden scope | Prerequisites | Required acceptance evidence | Separate authorization required |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -717,10 +721,14 @@ reconciliation `413814ceefe5160cecda6bcfdd5c0f24c05cdcbb`, received independent
 `PASS` reviews. Fresh authorization then allowed strict-fast-forward integration
 from `93cf3bba0c74e7eec685dbc1f7925c0ceca218c7` through
 `413814ceefe5160cecda6bcfdd5c0f24c05cdcbb`; the non-force push,
-synchronization, and safe local source-branch cleanup completed. Phase 2O-04 is
-now `ACCEPTED / MERGED_TO_MAIN`, while this post-merge reconciliation awaits
-independent review. Phase 2O remains
-`IN_PROGRESS / NOT_READY`; Phase 2O-05 through Phase 2O-07 and Phase 2P remain
+synchronization, and safe local source-branch cleanup completed. The later
+post-merge reconciliation commit `5fc25f9035ee23ee98147e15caeb044e3ed405ba`
+completed the Phase 2O-04 record on `main`; Phase 2O-04 is now
+`DONE / MERGED_TO_MAIN / SYNCHRONIZED / RECONCILED`. A later continuation decision
+identified Phase 2O-05 as the sole candidate but withheld implementation
+authorization pending the prerequisite evidence now recorded in Section 13.8.
+Phase 2O remains `IN_PROGRESS / NOT_READY`; Phase 2O-05 implementation, Phase
+2O-06 through Phase 2O-07, and Phase 2P remain
 `NOT_AUTHORIZED / NOT_STARTED`; and Stage 0 remains `PRESERVED`.
 
 ### 13.5 Phase 2O-03 bounded implementation handoff
@@ -880,14 +888,15 @@ test, safety, and rendered results were `PASS`. First documentation fix
 `413814ceefe5160cecda6bcfdd5c0f24c05cdcbb` also received independent `PASS`
 reviews. A fresh decision authorized integration; strict-fast-forward
 integration, non-force push, three-ref synchronization, and safe local
-source-branch cleanup are complete. This post-merge reconciliation is
-`DONE / LOCAL_ONLY / READY_FOR_INDEPENDENT_POST_MERGE_RECONCILIATION_REVIEW`.
+source-branch cleanup are complete. Post-merge reconciliation commit
+`5fc25f9035ee23ee98147e15caeb044e3ed405ba` completed the Phase 2O-04 record on
+`main`; Phase 2O-04 is `DONE / MERGED_TO_MAIN / SYNCHRONIZED / RECONCILED`.
 The implementation's presentation-only change gives the four existing `/network/*`
 routes one shared secondary Next.js Stage 0 shell, continues to name the Flask
 dashboard at `http://127.0.0.1:5000/` as canonical, and preserves the
 report-only, dry-run, mock-only, demo-only, and non-executing boundary. Phase 2O
-remains `IN_PROGRESS / NOT_READY`; Phase 2O-05 through Phase 2O-07 and Phase 2P
-remain `NOT_AUTHORIZED / NOT_STARTED`.
+remains `IN_PROGRESS / NOT_READY`. Phase 2O-05 implementation, Phase 2O-06
+through Phase 2O-07, and Phase 2P remain `NOT_AUTHORIZED / NOT_STARTED`.
 
 The first implementation attempt stopped with
 `EXACT_SCOPE_TEST_CONTRACT_CONFLICT`. A separate scope-correction decision
@@ -1003,7 +1012,7 @@ exact non-force `refs/heads/main:refs/heads/main` refspec, after which local
 `main`, local tracking `origin/main`, and remote `main` matched. The fully merged
 local source branch was safely deleted; no remote source branch was deleted.
 
-This bounded three-document post-merge status reconciliation uses a stable
+The bounded three-document post-merge status reconciliation used a stable
 self-reference because a commit cannot contain its own final SHA:
 
 ```text
@@ -1014,30 +1023,49 @@ EXACT_POST_MERGE_STATUS_RECONCILIATION_COMMIT_SHA_SOURCE:
 FINAL_TASK_RESULT_AND_INDEPENDENT_POST_MERGE_REVIEW_TARGET
 ```
 
+The final task result identified that reconciliation commit as
+`5fc25f9035ee23ee98147e15caeb044e3ed405ba`; it is now the completed `main`
+baseline. Its former conditional handoff is historical and does not compete
+with the current Phase 2O-05 prerequisite-planning handoff below. The completed
+Phase 2O-04 work is not authority for a new implementation or integration.
+
+### 13.8 Phase 2O-05 prerequisite safe-field matrix and bounded-scope planning
+
+**Current conclusion:** Phase 2O-05 prerequisite planning is
+`DONE / LOCAL_ONLY / READY_FOR_INDEPENDENT_REVIEW`. The
+[controlling prerequisite plan](phase_2o_05_secondary_nextjs_evidence_reports_ai_actions_and_jobs_visualization_planning_only.md)
+contains 109 field-level decisions across Evidence, Reports, AI Actions, and
+Jobs, exact repository evidence, the retained HTTP-200 Reports empty-state
+contract, dependency decision `NO`, an exact future 14-file boundary, explicit
+exclusions, state/UX contracts, and automated/rendered validation requirements.
+
+This planning task changes no application behavior. Phase 2O-05 implementation
+is `NOT_AUTHORIZED / NOT_STARTED`; Phase 2O-06 through Phase 2O-07 and Phase 2P
+remain `NOT_AUTHORIZED / NOT_STARTED`; Phase 2O remains
+`IN_PROGRESS / NOT_READY`; and Stage 0 remains `PRESERVED`.
+
 ```text
+PHASE_2O_05_PREREQUISITE_PLANNING_COMMIT_REFERENCE:
+THIS_COMMIT
+
+EXACT_PREREQUISITE_PLANNING_COMMIT_SHA_SOURCE:
+FINAL_TASK_RESULT_AND_INDEPENDENT_REVIEW_TARGET
+
 CURRENT_HANDOFF:
 CONDITIONAL_EXTERNAL_REVIEW_GATE
 ```
 
-If the exact post-merge reconciliation commit lacks an independent `PASS`
-review, the sole next action is independent review of that exact commit. If it
-has an independent `PASS` review and that result is unsuperseded, the sole next
-action is a fresh integration-authorization decision for that exact
-documentation commit. External exact-commit review evidence is controlling only
-after commit identity, parent, scope, and unsuperseded state are verified.
+If the exact Phase 2O-05 prerequisite-planning commit has not received an
+independent `PASS` review, the sole next action is independent review of that
+exact commit. If that exact commit has received an independent `PASS` review
+and the result remains unsuperseded, the sole next action is a fresh Phase 2O
+continuation-authorization decision for the exact candidate and exact boundary.
 
-A commit cannot authoritatively declare its own independent review result. No
-additional documentation-only commit is required solely to make this
-reconciliation commit self-record its own `PASS` review result. This stable
-rule prevents a self-referential status loop; it does not waive independent
-review, fresh integration authorization for the new documentation commit,
-topology and scope checks, required validation, or Stage 0 safety review.
-
-The completed Phase 2O-04 integration is historical fact, not authority for a
-new integration. This reconciliation authorizes no merge, push, remote contact,
-branch cleanup, Phase 2O-05 through Phase 2O-07, Phase 2P, or live or production
-capability. Phase 2O remains `IN_PROGRESS / NOT_READY`; Stage 0 remains
-`PRESERVED`.
+A commit cannot authoritatively declare its own later independent review result.
+No additional documentation-only commit is required solely to make the reviewed
+planning commit self-record its own `PASS`. This handoff authorizes no
+implementation, merge, push, remote contact, branch cleanup, later slice, or
+live/production capability.
 
 ## 14. Explicit exclusions and deferred work
 
