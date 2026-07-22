@@ -77,14 +77,23 @@ non-executing.
 | `PHASE_2O_04_FIRST_DOCUMENTATION_REVIEW_FIX_COMMIT` | `4546f3f441ecaa14f208eee928da33b0ac9b5769` |
 | `PHASE_2O_04_FIRST_DOCUMENTATION_REVIEW_FIX_REVIEW_DECISION` | `FAIL_FIX_REQUIRED` |
 | `PHASE_2O_04_FIRST_DOCUMENTATION_REVIEW_FIX_STATUS` | `DONE / LOCAL_ONLY / REVIEWED / FAIL_FIX_REQUIRED` |
-| `PHASE_2O_04_REMAINING_DOCUMENTATION_FINDING` | `STALE_UNQUALIFIED_PHASE_2O_04_UNAUTHORIZED_WORDING_IN_SECTIONS_12_AND_13_4` |
-| `PHASE_2O_04_SECOND_DOCUMENTATION_REVIEW_FIX_COMMIT_REFERENCE` | `THIS_COMMIT` |
-| `PHASE_2O_04_SECOND_DOCUMENTATION_REVIEW_FIX_FINDING_DISPOSITION` | `CORRECTED / PENDING_INDEPENDENT_SECOND_FIX_REVIEW` |
-| `PHASE_2O_04_SECOND_DOCUMENTATION_REVIEW_FIX_STATUS` | `DONE / LOCAL_ONLY / READY_FOR_INDEPENDENT_SECOND_FIX_REVIEW` |
+| `PHASE_2O_04_FIRST_FIX_REVIEW_REMAINING_DOCUMENTATION_FINDING` | `STALE_UNQUALIFIED_PHASE_2O_04_UNAUTHORIZED_WORDING_IN_SECTIONS_12_AND_13_4` |
+| `PHASE_2O_04_SECOND_DOCUMENTATION_REVIEW_FIX_COMMIT` | `7153cb9bcd328489057012a66dc5777e32cc0b26` |
+| `PHASE_2O_04_SECOND_DOCUMENTATION_REVIEW_FIX_REVIEW_DECISION` | `PASS` |
+| `PHASE_2O_04_CUMULATIVE_IMPLEMENTATION_STATUS` | `ACCEPTED / LOCAL_ONLY` |
+| `PHASE_2O_04_FIRST_INTEGRATION_AUTHORIZATION_DECISION` | `NOT_AUTHORIZED` |
+| `PHASE_2O_04_POST_AUTHORIZATION_DOCUMENTATION_STATUS_FIX_COMMIT` | `1e6561344b53161da85dac0e912bfead425af125` |
+| `PHASE_2O_04_POST_AUTHORIZATION_DOCUMENTATION_STATUS_FIX_REVIEW_DECISION` | `PASS` |
+| `PHASE_2O_04_STABLE_EXTERNAL_REVIEW_HANDOFF_FIX_COMMIT` | `bc8b22934191187c18f1c1fc3c498cc2cc03c30f` |
+| `PHASE_2O_04_STABLE_EXTERNAL_REVIEW_HANDOFF_FIX_REVIEW_DECISION` | `PASS` |
+| `PHASE_2O_04_LATEST_INTEGRATION_AUTHORIZATION_DECISION` | `NOT_AUTHORIZED` |
+| `PHASE_2O_04_LATEST_INTEGRATION_AUTHORIZATION_FAILURE_DOMAIN` | `STALE_PHASE_2O_00_CURRENT_HANDOFF_AFTER_STABLE_FIX` |
+| `PHASE_2O_04_INTEGRATION_STATUS` | `NOT_STARTED` |
+| `PHASE_2O_04_CURRENT_AUTHORIZATION_STATUS` | `NOT_AUTHORIZED / PENDING_CURRENT_CORRECTION_REVIEW_AND_FRESH_INTEGRATION_AUTHORIZATION_DECISION` |
+| `PHASE_2O_04_CURRENT_HANDOFF` | `CONDITIONAL_EXTERNAL_REVIEW_GATE` |
 | `PHASE_2O_05_THROUGH_2O_07_STATUS` | `NOT_AUTHORIZED / NOT_STARTED` |
 | `PHASE_2P_STATUS` | `NOT_AUTHORIZED / NOT_STARTED` |
 | `STAGE_0_BOUNDARY` | `PRESERVED` |
-| `SOLE_NEXT_CANDIDATE` | `PHASE_2O_04_SECOND_BOUNDED_DOCUMENTATION_REVIEW_FIX_COMMIT_REVIEW_ONLY` |
 
 No provider, model, job, command, device, or production authority follows from a
 visual treatment, status label, navigation destination, reviewer view, or
@@ -685,8 +694,12 @@ accepted Phase 2O-02 state only as the base for bounded Phase 2O-03. Phase
 separate decision authorized Phase 2O-04. Phase 2O-04 implementation commit
 `2643b24497011ea31c507d6f567daf5f20287a5d` was completed locally and
 independently reviewed `FAIL_FIX_REQUIRED` because of documentation accuracy
-findings; its technical and safety result was `PASS`. It is not accepted,
-merged, pushed, synchronized, or closed. Phase 2O remains
+findings; its technical and safety result was `PASS`. At that review point, it
+was not accepted, merged, pushed, synchronized, or closed. Second documentation
+fix commit `7153cb9bcd328489057012a66dc5777e32cc0b26` later received independent
+review `PASS`, making the cumulative Phase 2O-04 implementation
+`ACCEPTED / LOCAL_ONLY`. Integration remains `NOT_STARTED` and
+`NOT_AUTHORIZED`. Phase 2O remains
 `IN_PROGRESS / NOT_READY`; Phase 2O-05 through Phase 2O-07 and Phase 2P remain
 `NOT_AUTHORIZED / NOT_STARTED`; and Stage 0 remains `PRESERVED`.
 
@@ -834,24 +847,23 @@ Phase 2O-03 handoff is not the current next candidate.
 
 ### 13.7 Phase 2O-04 bounded implementation handoff
 
-**Current conclusion:** Phase 2O-04 implementation commit
-`2643b24497011ea31c507d6f567daf5f20287a5d` is
-`DONE / LOCAL_ONLY / REVIEWED / FAIL_FIX_REQUIRED`. Independent implementation
-review found the technical, source, test, safety, and rendered results `PASS`,
-but documentation accuracy `FAIL` with one material finding:
-`STALE_PHASE_2O_03_AND_PHASE_2O_04_STATUS_WORDING`. The first bounded
-documentation correction, commit
-`4546f3f441ecaa14f208eee928da33b0ac9b5769`, received independent review
-`FAIL_FIX_REQUIRED` for one remaining documentation finding:
-`STALE_UNQUALIFIED_PHASE_2O_04_UNAUTHORIZED_WORDING_IN_SECTIONS_12_AND_13_4`.
-This second bounded documentation correction resolves those two stale passages
-and is `DONE / LOCAL_ONLY / READY_FOR_INDEPENDENT_SECOND_FIX_REVIEW`. The
+**Current conclusion:** Phase 2O-04 cumulative implementation is
+`ACCEPTED / LOCAL_ONLY`. Implementation commit
+`2643b24497011ea31c507d6f567daf5f20287a5d` received independent review
+`FAIL_FIX_REQUIRED` only for documentation accuracy; its technical, source,
+test, safety, and rendered results were `PASS`. First documentation fix
+`4546f3f441ecaa14f208eee928da33b0ac9b5769` received independent review
+`FAIL_FIX_REQUIRED`, while second documentation fix
+`7153cb9bcd328489057012a66dc5777e32cc0b26` received independent review
+`PASS`. Integration remains `NOT_STARTED` and `NOT_AUTHORIZED` pending
+successful independent review of the exact current Phase 2O-00 handoff
+correction commit and a fresh integration-authorization decision. The
 implementation's presentation-only change gives the four existing `/network/*`
 routes one shared secondary Next.js Stage 0 shell, continues to name the Flask
 dashboard at `http://127.0.0.1:5000/` as canonical, and preserves the
-report-only, dry-run, mock-only, demo-only, and non-executing boundary. Phase 2O remains
-`IN_PROGRESS / NOT_READY`; Phase 2O-05 through Phase 2O-07 and Phase 2P remain
-`NOT_AUTHORIZED / NOT_STARTED`.
+report-only, dry-run, mock-only, demo-only, and non-executing boundary. Phase 2O
+remains `IN_PROGRESS / NOT_READY`; Phase 2O-05 through Phase 2O-07 and Phase 2P
+remain `NOT_AUTHORIZED / NOT_STARTED`.
 
 The first implementation attempt stopped with
 `EXACT_SCOPE_TEST_CONTRACT_CONFLICT`. A separate scope-correction decision
@@ -922,7 +934,7 @@ returned `FAIL_FIX_REQUIRED` for the sole remaining finding named above. That
 review did not authorize integration, push, merge, synchronization, closure, or
 a later phase.
 
-This second bounded documentation correction uses a distinct stable
+The second bounded documentation correction used a distinct stable
 self-reference because a commit cannot contain its own final SHA:
 
 ```text
@@ -933,13 +945,64 @@ EXACT_SECOND_DOCUMENTATION_REVIEW_FIX_COMMIT_SHA_SOURCE:
 FINAL_TASK_RESULT_AND_INDEPENDENT_SECOND_FIX_REVIEW_TARGET
 ```
 
-The second correction status is
-`DONE / LOCAL_ONLY / READY_FOR_INDEPENDENT_SECOND_FIX_REVIEW`. Its final task
-result is the authoritative source for the exact second correction commit SHA.
-This record does not claim that the second correction has been independently
-reviewed, accepted, integrated, pushed, merged, synchronized, or closed. The
-sole next candidate is
+At that historical handoff, the second correction status was
+`DONE / LOCAL_ONLY / READY_FOR_INDEPENDENT_SECOND_FIX_REVIEW`, and the sole next
+candidate was
 `PHASE_2O_04_SECOND_BOUNDED_DOCUMENTATION_REVIEW_FIX_COMMIT_REVIEW_ONLY`.
+The final task result identified the exact correction commit as
+`7153cb9bcd328489057012a66dc5777e32cc0b26`; its later independent review
+returned `PASS`, making the cumulative Phase 2O-04 implementation
+`ACCEPTED / LOCAL_ONLY`.
+
+A first integration-authorization decision returned `NOT_AUTHORIZED` because
+README and the Phase 2O-04 implementation record still contained obsolete
+current handoffs. Post-authorization documentation-status correction commit
+`1e6561344b53161da85dac0e912bfead425af125` corrected those handoffs and
+received independent review `PASS`. A later authorization decision remained
+`NOT_AUTHORIZED` because the current handoff still routed reviewers to that
+completed review. Stable external-review handoff fix commit
+`bc8b22934191187c18f1c1fc3c498cc2cc03c30f` established the non-recursive
+conditional gate and received independent exact-commit review `PASS`. The most
+recent integration-authorization decision still returned `NOT_AUTHORIZED`
+because this Phase 2O-00 record retained the competing stale current handoff
+historicalized above. Integration remains `NOT_STARTED`.
+
+This bounded Phase 2O-00 handoff correction uses a stable self-reference because
+a commit cannot contain its own final SHA:
+
+```text
+PHASE_2O_04_PHASE_2O_00_CURRENT_HANDOFF_CORRECTION_COMMIT_REFERENCE:
+THIS_COMMIT
+
+EXACT_PHASE_2O_00_CURRENT_HANDOFF_CORRECTION_COMMIT_SHA_SOURCE:
+FINAL_TASK_RESULT_AND_INDEPENDENT_REVIEW_TARGET
+```
+
+```text
+CURRENT_HANDOFF:
+CONDITIONAL_EXTERNAL_REVIEW_GATE
+```
+
+If the exact current documentation correction commit lacks an independent
+`PASS` review, the sole next action is independent review of that exact commit.
+If it has an independent `PASS` review and that result is unsuperseded, the sole
+next action is a fresh Phase 2O-04 integration-authorization decision. External
+exact-commit review evidence is controlling only after the commit identity,
+parent, scope, and unsuperseded state are verified.
+
+A commit cannot authoritatively declare its own independent review result. No
+additional documentation-only commit is required solely to copy this current
+correction commit's own `PASS` review result into the repository. This stable
+rule prevents a self-referential status loop; it does not waive independent
+review, fresh integration authorization, topology and cumulative-scope checks,
+required validation, or Stage 0 safety review.
+
+The permitted process is this bounded one-file correction, independent review
+of its exact commit, a fresh integration-authorization decision after an
+unsuperseded `PASS`, and only if that decision is `AUTHORIZED`, a separate
+strict-fast-forward integration task. This record does not authorize
+integration, merge, push, remote synchronization, source-branch cleanup, Phase
+2O-05 through Phase 2O-07, Phase 2P, or any live or production capability.
 
 ## 14. Explicit exclusions and deferred work
 
@@ -973,8 +1036,9 @@ The following remain excluded and unauthorized:
 - Current facts cite repository files or Phase 2N records; recommendations and
   assumptions are labeled.
 - `DONE / REVIEWED / MERGED_TO_MAIN / SYNCHRONIZED`, `FAIL_FIX_REQUIRED`,
-  `READY_FOR_INDEPENDENT_SECOND_FIX_REVIEW`, `IN_PROGRESS / NOT_READY`,
-  `NOT_AUTHORIZED / NOT_STARTED`, and `PRESERVED` are used consistently.
+  `ACCEPTED / LOCAL_ONLY`, `CONDITIONAL_EXTERNAL_REVIEW_GATE`,
+  `IN_PROGRESS / NOT_READY`, `NOT_AUTHORIZED / NOT_STARTED`, and `PRESERVED`
+  are used consistently.
 - Flask canonical and Next.js secondary terminology matches the Phase 2N closure.
 - Acceptance criteria and later-slice evidence are concrete and verifiable.
 - Long findings are split into sections and tables.
