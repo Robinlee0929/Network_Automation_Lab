@@ -1242,4 +1242,33 @@ textarea:focus {
   .network-nav a {
     width: 100%;
   }
+
+  .result-list,
+  .evidence-group,
+  .result-row {
+    min-width: 0;
+  }
+
+  .result-row {
+    grid-template-columns: 20px minmax(0, 1fr);
+  }
+
+  .result-row > span,
+  .result-row > .kind-badge,
+  .result-row > .status-badge {
+    grid-column: 2;
+  }
+
+  .result-row > .kind-badge,
+  .result-row > .status-badge {
+    justify-self: start;
+  }
+
+  .result-row strong,
+  .result-row small {
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
 }

@@ -133,6 +133,41 @@ def test_responsive_focus_and_native_table_contracts_are_present():
     assert 'role="table"' not in jobs
 
 
+def test_evidence_rows_reflow_without_narrow_internal_overflow():
+    css = read("app/globals.css")
+    narrow_css = css.partition("@media (max-width: 420px)")[2]
+
+    assert narrow_css
+    assert (
+        ".result-list,\n"
+        "  .evidence-group,\n"
+        "  .result-row {\n"
+        "    min-width: 0;\n"
+        "  }"
+    ) in narrow_css
+    assert (
+        ".result-row {\n"
+        "    grid-template-columns: 20px minmax(0, 1fr);\n"
+        "  }"
+    ) in narrow_css
+    assert (
+        ".result-row > span,\n"
+        "  .result-row > .kind-badge,\n"
+        "  .result-row > .status-badge {\n"
+        "    grid-column: 2;\n"
+        "  }"
+    ) in narrow_css
+    assert (
+        ".result-row strong,\n"
+        "  .result-row small {\n"
+        "    overflow: visible;\n"
+        "    text-overflow: clip;\n"
+        "    white-space: normal;\n"
+        "    overflow-wrap: anywhere;\n"
+        "  }"
+    ) in narrow_css
+
+
 def test_ai_actions_reads_only_recorded_data_without_submission_controls():
     source = read("components/network/AiActionsClient.tsx")
 

@@ -2,26 +2,36 @@
 
 ## 1. Conclusion and status
 
-**Conclusion:** Phase 2O-05 implementation is `DONE / LOCAL_ONLY /
-READY_FOR_INDEPENDENT_IMPLEMENTATION_REVIEW`. The four existing secondary
-Next.js `/network/*` routes now present safely projected Stage 0 evidence,
-reports, recorded AI-action context, static catalog references, and recorded job
-metadata. The Flask dashboard remains the canonical reviewer surface. No route,
-method, importer, store, provider, model, device, execution, or persistence
-responsibility was added.
+**Conclusion:** The original Phase 2O-05 implementation received independent
+review result `FAIL_FIX_REQUIRED` for `P2O05-REV-001`. A bounded three-file
+responsive correction is now `DONE / LOCAL_ONLY /
+READY_FOR_INDEPENDENT_FIX_COMMIT_REVIEW`. The correction reflows only the 320px
+Evidence result cards, adds a deterministic regression contract, and corrects
+the original browser-QA record. The four existing secondary Next.js
+`/network/*` routes continue to present safely projected Stage 0 evidence,
+reports, recorded AI-action context, static catalog references, and recorded
+job metadata. The Flask dashboard remains the canonical reviewer surface. No
+route, method, importer, store, provider, model, device, execution, or
+persistence responsibility was added.
 
 ```text
 PHASE_2O_05_IMPLEMENTATION_STATUS:
-DONE / LOCAL_ONLY / READY_FOR_INDEPENDENT_IMPLEMENTATION_REVIEW
+DONE / LOCAL_ONLY / INDEPENDENT_REVIEW_FOUND_BOUNDED_FIX_REQUIRED
 
-PHASE_2O_05_IMPLEMENTATION_COMMIT_REFERENCE:
+PHASE_2O_05_IMPLEMENTATION_COMMIT:
+a4761d89cb63a22ea104dd5e18082e3c5f2765f0
+
+PHASE_2O_05_IMPLEMENTATION_REVIEW_RESULT:
+FAIL_FIX_REQUIRED / P2O05-REV-001
+
+PHASE_2O_05_BOUNDED_FIX_STATUS:
+DONE / LOCAL_ONLY / READY_FOR_INDEPENDENT_FIX_COMMIT_REVIEW
+
+PHASE_2O_05_BOUNDED_FIX_COMMIT_REFERENCE:
 THIS_COMMIT
 
-EXACT_IMPLEMENTATION_COMMIT_SHA_SOURCE:
-FINAL_TASK_RESULT_AND_INDEPENDENT_IMPLEMENTATION_REVIEW_TARGET
-
 CURRENT_HANDOFF:
-INDEPENDENT_IMPLEMENTATION_REVIEW_REQUIRED
+INDEPENDENT_FIX_COMMIT_REVIEW_REQUIRED
 
 PHASE_2O_STATUS:
 IN_PROGRESS / NOT_READY
@@ -37,8 +47,9 @@ PRESERVED
 ```
 
 A commit cannot authoritatively declare its own independent review result. The
-final task report supplies the exact commit SHA for independent review. This
-record does not authorize merge, push, remote contact, integration, Phase
+final fix-task report supplies the exact bounded-fix commit SHA for independent
+review. This record does not claim that the fix has passed review and does not
+authorize merge, push, remote contact, synchronization, integration, Phase
 2O-06, or any later work.
 
 ## 2. Task identity and fixed baseline
@@ -53,6 +64,18 @@ record does not authorize merge, push, remote contact, integration, Phase
 | Feature branch | `codex/phase-2o-05-prerequisite-safe-field-matrix-planning` |
 | Implementation boundary | `PRESENTATION_ONLY / GET_ONLY / SAFE_PROJECTION_ONLY` |
 | Safety boundary | `REPORT_ONLY / DRY_RUN / MOCK_ONLY / DEMO_ONLY / NON_EXECUTING` |
+
+The bounded review fix is separately identified as follows:
+
+| Field | Value |
+| --- | --- |
+| Task mode | `FIX_IMPLEMENTATION_ONLY` |
+| Task subtype | `PHASE_2O_05_BOUNDED_320PX_EVIDENCE_RESPONSIVE_REVIEW_FIX_ONLY` |
+| Controlling implementation commit | `a4761d89cb63a22ea104dd5e18082e3c5f2765f0` |
+| Controlling review result | `FAIL_FIX_REQUIRED` |
+| Controlling finding | `P2O05-REV-001` |
+| Fix boundary | `320PX_EVIDENCE_RESPONSIVE_PRESENTATION_ONLY` |
+| Fix handoff | `INDEPENDENT_FIX_COMMIT_REVIEW_REQUIRED` |
 
 The controlling planning record's singular safe-field matrix remains the only
 matrix: 109 data rows and 13 columns. This implementation consumes that
@@ -79,6 +102,15 @@ The implementation is limited to these 14 authorized paths:
 
 No package, configuration, API-route, data-store, importer, runner, adapter, or
 historical Day 1–160 artifact is in scope.
+
+The later bounded review correction changes exactly three paths already inside
+that original 14-file boundary:
+
+1. `app/globals.css`
+2. `tests/test_network_phase1_ui_presentation.py`
+3. `docs/phase_2o/phase_2o_05_secondary_nextjs_evidence_reports_ai_actions_and_jobs_visualization_implementation.md`
+
+It changes no component markup and adds, deletes, or renames no file.
 
 ## 4. Implemented presentation behavior
 
@@ -132,11 +164,30 @@ immutability, malformed records, and job fail-closed behavior. Presentation
 tests cover safe HTTP-200 rendering, Stage 0 labels, route contracts, absence of
 provider/job/execution controls, and current shell compatibility.
 
-## 7. Rendered browser validation
+## 7. Initial browser validation and independent review correction
 
 The task-owned local Next.js development server was used only for browser
 validation, then its exact process was stopped and port 3105 was confirmed
-released. All four routes passed rendered checks at 320, 768, and 1440 CSS px:
+released. The original implementation task reported that all four routes passed
+rendered checks at 320, 768, and 1440 CSS px. Independent implementation review
+later disproved the 320px Evidence portion of that claim:
+
+```text
+INDEPENDENT_REVIEW_RESULT:
+FAIL_FIX_REQUIRED
+
+FINDING_ID:
+P2O05-REV-001
+
+INITIAL_320PX_EVIDENCE_QA_CLAIM:
+WITHDRAWN
+```
+
+At 320px, the original `.result-list` had internal horizontal overflow and the
+primary Evidence text column was severely compressed, making category,
+recorded result, and recorded date unreadable. The original task's other
+recorded observations remain part of the chronology, but they do not override
+this independent finding:
 
 - one route-level `<main>` and one page `<h1>`;
 - no page-level horizontal overflow;
@@ -149,11 +200,59 @@ released. All four routes passed rendered checks at 320, 768, and 1440 CSS px:
 - the skip link and focused controls had visible high-contrast focus styling;
 - no browser console warning/error or Next.js runtime/build overlay appeared.
 
-The 400% browser-zoom attempt was performed and reset. The browser automation
-surface did not expose a reliable CSS viewport value at native zoom, so the
-repeatable 320 CSS-pixel reflow check is the authoritative narrow-layout
-evidence. The empty local Jobs store did not provide a rendered populated table;
-the table projection and markup contract are covered by source and unit tests.
+The original 400% browser-zoom attempt was performed and reset. The browser
+automation surface did not expose a reliable CSS viewport value at native zoom,
+so the repeatable 320 CSS-pixel reflow check remains the authoritative
+narrow-layout mechanism. The empty local Jobs store did not provide a rendered
+populated table; the table projection and markup contract are covered by source
+and unit tests.
+
+### 7.1 Bounded correction
+
+The fix adds a narrow-only Evidence row reflow under the existing 420px
+breakpoint. The icon and primary text retain a two-column first row; the fixed
+kind and status badges reflow below in the text column. Category, recorded
+result, and recorded date switch from ellipsis to normal wrapping at this
+breakpoint. Explicit zero minimum widths prevent the Evidence list, group, and
+row from imposing a wider min-content size. The existing 768px and 1440px
+four-column presentation remains unchanged.
+
+`tests/test_network_phase1_ui_presentation.py` now asserts the exact narrow
+reflow, zero-minimum-width, badge-placement, and readable-text wrapping
+contract. No TypeScript, React, component, route, API, schema, store, package,
+or lockfile change was needed.
+
+### 7.2 Bounded-fix validation
+
+| Command or check | Exact result |
+| --- | --- |
+| `python -m pytest tests/test_network_phase1_ui_presentation.py` | `PASS` — 8 passed |
+| `npm run test:unit` | `PASS` — 6 files, 79 tests passed |
+| `python -m pytest` | `PASS` — 1,944 passed |
+| `npm run typecheck` | `PASS` |
+| `npm run lint` | `PASS` — zero warnings |
+| `npm run build` | `PASS` — Next.js 15.5.19 compiled successfully and generated 25/25 pages |
+| `python network_lab.py --task report-index` | `PASS` — total 14, pass 14, fail 0, warn 0, missing 0, unknown 0 |
+
+The task-owned browser server was local-only, stopped after validation, and
+port 3107 was confirmed released. `/network/day-results` produced these
+measurements:
+
+| Viewport | Evidence list client/scroll width | Minimum primary text width | Page client/scroll width | Result |
+| --- | --- | --- | --- | --- |
+| 320px | `224 / 224` | `172px` | `305 / 305` | `PASS` |
+| 768px | `672 / 672` | `386px` | `753 / 753` | `PASS` |
+| 1440px | `538 / 538` | `252px` | `1425 / 1425` | `PASS` |
+
+At every viewport, category, recorded result, recorded date, kind badge, and
+status badge remained present; no measured result row overflowed. Selecting the
+`FAIL` filter produced 3 records and reset restored all 56 records. Browser
+console warning/error output was empty, and no runtime, hydration, or visible
+framework overlay error appeared.
+
+The correction remains local-only. It has not received independent fix-commit
+review and does not claim acceptance, integration authorization, merge, push,
+synchronization, or Phase 2O-06 authorization.
 
 ## 8. Documentation readability review
 
@@ -165,22 +264,22 @@ status. This documentation review introduced no runtime or execution behavior.
 
 ## 9. Stable review handoff
 
-The sole next action is an independent read-only implementation review of the
-exact commit reported by this task:
+The sole next action is an independent read-only review of the exact bounded-fix
+commit reported by this task:
 
 ```text
-PHASE_2O_05_IMPLEMENTATION_COMMIT_REFERENCE:
+PHASE_2O_05_BOUNDED_FIX_COMMIT_REFERENCE:
 THIS_COMMIT
 
-EXACT_IMPLEMENTATION_COMMIT_SHA_SOURCE:
-FINAL_TASK_RESULT_AND_INDEPENDENT_IMPLEMENTATION_REVIEW_TARGET
+EXACT_BOUNDED_FIX_COMMIT_SHA_SOURCE:
+FINAL_TASK_RESULT_AND_INDEPENDENT_FIX_COMMIT_REVIEW_TARGET
 
 CURRENT_HANDOFF:
-INDEPENDENT_IMPLEMENTATION_REVIEW_REQUIRED
+INDEPENDENT_FIX_COMMIT_REVIEW_REQUIRED
 ```
 
-An external independent review result and its exact commit evidence control the
-review state. This stable self-reference prevents a recursive documentation
-commit while preserving the independent-review requirement. It grants no
-authority to merge, push, contact a remote, integrate, clean up the branch, or
-start another phase.
+An external independent fix-commit review result and its exact commit evidence
+control the review state. This stable self-reference prevents a recursive
+documentation commit while preserving the independent-review requirement. It
+grants no authority to merge, push, contact a remote, synchronize, integrate,
+clean up the branch, or start another phase.
