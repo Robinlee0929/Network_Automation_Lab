@@ -597,11 +597,27 @@ if ($LASTEXITCODE -ne 0 -or $RecheckedAuthorizedBaseTree -cne $AuthorizedBaseTre
 ```
 
 Capture the complete tracked change status by comparing the literal preserved
-base commit directly with the result commit:
+base commit directly with the result commit. The authoritative command consumes
+the preserved variables directly and has no caller-supplied base or result
+parameter:
 
-```text
-git diff --name-status --find-renames --diff-filter=ACDMRTUXB <EXACT_AUTHORIZED_BASE> <IMPLEMENTATION_RESULT_HEAD> --
+```powershell
+$AuthoritativeNameStatus = @(
+    git diff --name-status --no-renames --diff-filter=ACDMRTUXB `
+        $AuthorizedBaseCommit `
+        $ImplementationResultHead `
+        --
+)
+
+if ($LASTEXITCODE -ne 0) {
+    throw "Unable to compare the exact authorized base with the implementation result."
+}
 ```
+
+Preserve this command's stdout verbatim as
+`BOUND_AUTHORITATIVE_NAME_STATUS_STDOUT`. Exact path validation below may
+consume only that captured output; it must not run or accept a second
+independently parameterized name-status comparison.
 
 Capture all untracked, non-ignored paths in a second independent call:
 
@@ -617,31 +633,50 @@ git status --porcelain --untracked-files=no
 ```
 
 Run the whitespace/error check independently against the same two literal
-commits:
+commits, again using the preserved variables directly:
 
-```text
-git diff --check <EXACT_AUTHORIZED_BASE> <IMPLEMENTATION_RESULT_HEAD> --
+```powershell
+git diff --check `
+    $AuthorizedBaseCommit `
+    $ImplementationResultHead `
+    --
+
+if ($LASTEXITCODE -ne 0) {
+    throw "git diff --check failed for the exact authorized base-to-result range."
+}
 ```
 
-The authoritative changed-file calculation must use two explicit commit
-arguments or an equivalent literal tree-to-tree comparison. It must not use
-`git diff <base>...<head>`, a separately calculated merge base,
-`git diff <branch-name>...HEAD`, or `git diff origin/main...HEAD`. Three-dot
-diff uses the merge base, which can differ from the literal supplied base. A
-wrong sibling commit can therefore produce the same changed-path set and pass
-path-only validation unless Stage A first binds `HEAD` exactly and Stage B
-compares the approved base tree directly with the result tree.
+The name-status and diff-check commands consume the same preserved
+`$AuthorizedBaseCommit` and `$ImplementationResultHead` variables. Callers may
+not provide alternative Stage B base or result parameters. A branch, tag,
+`main`, `origin/main`, raw SHA argument, merge base, same-tree sibling, ancestor,
+descendant, or other commit must not replace either preserved variable.
+`$AuthorizedBaseCommit` originates only from the authorization-supplied base
+validated before implementation, and `$ImplementationResultHead` originates
+only from the actual resulting `HEAD^{commit}`. Stage B must not re-read or
+accept a second independently supplied base or result value, and neither
+preserved variable may be reassigned before final validation.
+
+The authoritative changed-file calculation therefore uses the literal
+preserved commit pair directly. It must not use `git diff <base>...<head>`, a
+separately calculated merge base, `git diff <branch-name>...HEAD`, or
+`git diff origin/main...HEAD`. Three-dot diff uses the merge base, which can
+differ from the literal supplied base. A wrong sibling commit can therefore
+produce the same changed-path set and pass path-only validation unless Stage A
+first binds `HEAD` exactly and Stage B consumes only the preserved identities.
 
 Then run the following non-Git PowerShell comparison in its own tool call.
 Replace the three stdout placeholders verbatim with the captured output from
-the Stage B tracked, untracked, and worktree commands. Preserve tabs in the
-name-status output. Empty command output
+the bound Stage B name-status command, untracked command, and worktree command.
+The first placeholder must contain only `BOUND_AUTHORITATIVE_NAME_STATUS_STDOUT`;
+no output from another base/result comparison is permitted. Preserve tabs in
+the name-status output. Empty command output
 must replace its placeholder with an empty here-string; it must not be replaced
 with explanatory text.
 
 ```powershell
 $trackedNameStatusText = @'
-<EXACT_STDOUT_FROM_TRACKED_NAME_STATUS>
+<EXACT_BOUND_AUTHORITATIVE_NAME_STATUS_STDOUT>
 '@
 $untrackedText = @'
 <EXACT_STDOUT_FROM_UNTRACKED_PATHS>
@@ -762,26 +797,36 @@ state and must not fetch or contact a remote.
 changed-file scope evidence and cannot replace the deterministic validation
 above.
 
-Required wrong-base validation and review evidence must cover all of these
-cases:
+The existing Stage A cases remain mandatory: exact `HEAD == B` passes; invalid
+base input fails; any valid `W != B`, including a sibling or descendant of a
+sibling, fails; branch, tag, `main`, and `origin/main` substitutions fail; and a
+result not descended from `B` fails the exact-base ancestry check.
 
-1. With authorized base `B` and actual pre-implementation `HEAD == B`, Stage A
-   passes and preserves `B` and `B^{tree}`.
-2. Another valid commit `W`, where `W != B`, fails Stage A even though `W`
-   resolves successfully.
-3. A sibling `W`, or a descendant of a sibling, fails Stage A when `W != B`
-   even if `merge-base(W, H) = B` and `git diff W...H` would produce the same
-   changed-path set as `git diff B...H`.
-4. A branch, tag, `main`, or `origin/main` that resolves to a different valid
-   commit fails; ref validity cannot substitute for equality with the
-   authorization-supplied SHA.
-5. A result `H` that is not descended from exact base `B` fails
-   `git merge-base --is-ancestor B H`, even when its changed-path count is 14.
-6. Substituting another valid commit during final validation fails the preserved
-   commit/tree identity checks.
-7. A literal comparison that does not use the preserved `B` fails validation.
-8. Correct count, exact path-set equality, or an equivalent three-dot path diff
-   cannot rescue any wrong-base case.
+Required Stage B identity-binding validation and review evidence must also
+cover all of these cases:
+
+1. A different valid commit used as the diff base is rejected because the
+   command accepts no base argument other than `$AuthorizedBaseCommit`.
+2. A sibling commit used as the diff base is rejected.
+3. A same-tree sibling used as the diff base is rejected even when it would
+   produce the same changed-path set as the preserved base.
+4. A branch or tag cannot replace `$AuthorizedBaseCommit`.
+5. `main` or `origin/main` cannot replace `$AuthorizedBaseCommit`.
+6. A different result commit cannot replace `$ImplementationResultHead`.
+7. An independently supplied Stage B SHA that differs from either preserved
+   value is rejected; Stage B accepts no such parameter.
+8. A correct count or exact path set cannot rescue a command whose commit
+   identity is wrong.
+9. If ancestry and tree checks pass for preserved `B` and `H`, a command that
+   attempts to diff `W` against `H` still fails because the authoritative
+   command itself invokes `$AuthorizedBaseCommit` and `$ImplementationResultHead`
+   directly and exposes no independently replaceable base argument.
+10. A command that uses preserved `B` with an unpreserved substitute result
+    fails because the authoritative command exposes no independently replaceable
+    result argument and must use `$ImplementationResultHead` directly.
+
+Exact path-set equality, a count of 14, or an equivalent three-dot path diff
+cannot rescue any wrong-base or wrong-result identity case.
 
 The targeted safe-presentation tests must connect every matrix classification
 to evidence:
