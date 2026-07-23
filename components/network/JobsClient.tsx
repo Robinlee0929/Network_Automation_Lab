@@ -1,28 +1,37 @@
 "use client";
 
 import { RefreshCcw } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { NetworkJob } from "@/lib/network-ai/schemas";
+import { projectJobsCollection } from "./Phase2O05SafePresentation";
+
+function jobsFromPayload(value: unknown) {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) {
+    return null;
+  }
+  return "jobs" in value ? value.jobs : null;
+}
 
 export function JobsClient({ initialJobs }: { initialJobs: NetworkJob[] }) {
-  const [jobs, setJobs] = useState(initialJobs);
-  const [error, setError] = useState("");
+  const [jobs, setJobs] = useState<unknown>(initialJobs);
+  const [readError, setReadError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const collection = useMemo(() => projectJobsCollection(jobs), [jobs]);
 
   async function refreshJobs(options: { quiet?: boolean } = {}) {
     setIsLoading(true);
     if (!options.quiet) {
-      setError("");
+      setReadError(false);
     }
     try {
       const response = await fetch("/api/network/jobs");
-      const payload = await response.json();
+      const payload: unknown = await response.json();
       if (!response.ok) {
-        throw new Error(payload.error ?? "Refresh jobs failed.");
+        throw new Error("Recorded jobs read failed.");
       }
-      setJobs(payload.jobs);
-    } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "Refresh jobs failed.");
+      setJobs(jobsFromPayload(payload));
+    } catch {
+      setReadError(true);
     } finally {
       setIsLoading(false);
     }
@@ -33,43 +42,98 @@ export function JobsClient({ initialJobs }: { initialJobs: NetworkJob[] }) {
   }, []);
 
   return (
-    <section className="network-panel network-panel-wide">
+    <section
+      className="network-panel network-panel-wide"
+      aria-labelledby="recorded-jobs-heading"
+    >
       <div className="network-toolbar">
-        <h2>Network Jobs</h2>
-        <button className="icon-action-button" disabled={isLoading} onClick={() => refreshJobs()} type="button">
+        <h2 id="recorded-jobs-heading">Recorded Jobs</h2>
+        <button
+          className="icon-action-button"
+          disabled={isLoading}
+          onClick={() => refreshJobs()}
+          type="button"
+        >
           <RefreshCcw aria-hidden="true" size={18} />
-          <span>{isLoading ? "Refreshing" : "Refresh"}</span>
+          <span>{isLoading ? "Reloading recorded jobs" : "Reload recorded jobs"}</span>
         </button>
       </div>
-      {error && <div className="error-box">{error}</div>}
-      <div className="job-table" role="table" aria-label="Network jobs">
-        <div className="job-row job-row-head" role="row">
-          <span>Job</span>
-          <span>Status</span>
-          <span>Action</span>
-          <span>Target</span>
-          <span>Vendor</span>
-          <span>Risk</span>
-          <span>Approval</span>
-          <span>Created</span>
-          <span>Source</span>
+
+      <p className="safe-state" data-state="unavailable" id="jobs-stage-0-boundary">
+        UNAVAILABLE — runner, queue, scheduler, worker, approval, and execution
+        capability are not present in Stage 0.
+      </p>
+
+      {isLoading ? (
+        <p className="safe-state" data-state="loading" role="status">
+          Reloading recorded local job metadata…
+        </p>
+      ) : null}
+      {readError ? (
+        <p className="safe-state" data-state="error" role="alert">
+          Unable to read recorded jobs. Previously projected rows, if any, are stale
+          local records.
+        </p>
+      ) : null}
+      {collection.rejectedCount > 0 ? (
+        <p className="safe-state" data-state="rejected" role="status">
+          REJECTED — {collection.rejectedCount} recorded row
+          {collection.rejectedCount === 1 ? "" : "s"} withheld as malformed.
+        </p>
+      ) : null}
+
+      {collection.state === "AVAILABLE" ? (
+        <div
+          aria-describedby="jobs-stage-0-boundary"
+          aria-label="Safely projected recorded jobs; scroll horizontally when needed"
+          className="safe-table-scroll"
+          role="region"
+          tabIndex={0}
+        >
+          <table className="safe-job-table">
+            <caption>Recorded local job metadata · non-executing</caption>
+            <thead>
+              <tr>
+                <th scope="col">Recorded job ID</th>
+                <th scope="col">Recorded status</th>
+                <th scope="col">Catalog action</th>
+                <th scope="col">Platform</th>
+                <th scope="col">Risk</th>
+                <th scope="col">Approval</th>
+                <th scope="col">Read-only property</th>
+                <th scope="col">Recorded date</th>
+                <th scope="col">Recorded reason</th>
+              </tr>
+            </thead>
+            <tbody>
+              {collection.items.map((job) => (
+                <tr key={job.internalKey}>
+                  <td>{job.visibleId}</td>
+                  <td>{job.status}</td>
+                  <td>{job.action}</td>
+                  <td>{job.platform}</td>
+                  <td>{job.risk}</td>
+                  <td>{job.approvalFlag}</td>
+                  <td>{job.readOnly}</td>
+                  <td>{job.recordedDate}</td>
+                  <td>{job.reason}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-        {jobs.map((job) => (
-          <div className="job-row" key={job.id} role="row">
-            <span>{job.id}</span>
-            <span>{job.blockedReason ? `${job.status}: ${job.blockedReason}` : job.status}</span>
-            <span>{job.actionId}</span>
-            <span>{job.targetDevice ?? "N/A"}</span>
-            <span>{job.vendor ?? "unknown"}</span>
-            <span>{job.riskLevel}</span>
-            <span>{job.requiresApproval ? "required" : "not required"}</span>
-            <span>{job.createdAt}</span>
-            <span>{job.parseResultId ?? job.source ?? "manual"}</span>
-          </div>
-        ))}
-      </div>
-      <div className="status-strip">Runner not enabled in Phase 1.</div>
-      {!jobs.length && <p className="muted-copy">No jobs have been created in this server session.</p>}
+      ) : null}
+
+      {collection.state === "EMPTY" ? (
+        <p className="safe-state" data-state="empty" role="status">
+          EMPTY — no recorded jobs in this local store.
+        </p>
+      ) : null}
+      {collection.state === "ERROR" ? (
+        <p className="safe-state" data-state="error" role="alert">
+          ERROR — no safely displayable recorded jobs.
+        </p>
+      ) : null}
     </section>
   );
 }

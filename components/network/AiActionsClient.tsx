@@ -1,39 +1,46 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import type { AvailableAction, ParseResultRecord } from "@/lib/network-ai/schemas";
+import { useEffect, useMemo, useState } from "react";
+import type { AvailableAction } from "@/lib/network-ai/schemas";
 import { AiActionsStage0Presentation } from "./Phase2N04DemoPresentation";
+import {
+  projectActionCatalog,
+  projectParseResult
+} from "./Phase2O05SafePresentation";
 
-type ParseResponse = {
-  parseResult: ParseResultRecord | null;
-};
+function parseResultFromPayload(value: unknown) {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) {
+    return null;
+  }
+  return "parseResult" in value ? value.parseResult : null;
+}
 
 export function AiActionsClient({ actions }: { actions: AvailableAction[] }) {
-  const [parseResult, setParseResult] = useState<ParseResultRecord | null>(null);
-  const [error, setError] = useState("");
+  const [parseResult, setParseResult] = useState<unknown>(null);
+  const [readError, setReadError] = useState(false);
   const [isLoadingLatest, setIsLoadingLatest] = useState(false);
-
-  const output = parseResult?.output ?? null;
-  const recommendedAction = actions.find((action) => action.id === output?.recommendedActionId) ?? null;
+  const catalog = useMemo(() => projectActionCatalog(actions), [actions]);
+  const recorded = useMemo(() => projectParseResult(parseResult), [parseResult]);
 
   useEffect(() => {
     let ignore = false;
 
     async function loadLatestParseResult() {
       setIsLoadingLatest(true);
-      setError("");
+      setReadError(false);
       try {
         const response = await fetch("/api/network/ai/parse-request/latest");
-        const payload = (await response.json()) as ParseResponse;
+        const payload: unknown = await response.json();
         if (!response.ok) {
-          throw new Error("Load latest parse result failed.");
+          throw new Error("Recorded parse read failed.");
         }
-        if (!ignore && payload.parseResult) {
-          setParseResult(payload.parseResult);
-        }
-      } catch (caught) {
         if (!ignore) {
-          setError(caught instanceof Error ? caught.message : "Load latest parse result failed.");
+          setParseResult(parseResultFromPayload(payload));
+        }
+      } catch {
+        if (!ignore) {
+          setParseResult(null);
+          setReadError(true);
         }
       } finally {
         if (!ignore) {
@@ -52,82 +59,129 @@ export function AiActionsClient({ actions }: { actions: AvailableAction[] }) {
   return (
     <div className="network-grid">
       <AiActionsStage0Presentation />
-      <section className="network-panel">
-        {error && <div className="error-box">{error}</div>}
-        {isLoadingLatest && <div className="status-strip">Loading latest parse result...</div>}
-      </section>
 
-      <section className="network-panel">
+      <section
+        className="network-panel"
+        aria-labelledby="recorded-recommendation-heading"
+      >
         <div className="network-toolbar">
-          <h2>Recorded Recommendation</h2>
-          <span>Read-only</span>
+          <h2 id="recorded-recommendation-heading">Recorded Recommendation</h2>
+          <span>UNAVAILABLE — parsing and execution</span>
         </div>
-        <dl className="detail-grid">
-          <div>
-            <dt>Intent</dt>
-            <dd>{output?.intent ?? "unknown"}</dd>
-          </div>
-          <div>
-            <dt>Action</dt>
-            <dd>{recommendedAction?.id ?? "unknown"}</dd>
-          </div>
-          <div>
-            <dt>Device</dt>
-            <dd>{output?.targetDevice ?? "missing"}</dd>
-          </div>
-          <div>
-            <dt>Approval</dt>
-            <dd>{output?.requiresApproval ? "required" : "not required"}</dd>
-          </div>
-          <div>
-            <dt>Vendor</dt>
-            <dd>{output?.vendor ?? "unknown"}</dd>
-          </div>
-          <div>
-            <dt>Recorded Job Eligibility</dt>
-            <dd>{output?.jobCreationAllowed ? "yes" : "no"}</dd>
-          </div>
-          <div>
-            <dt>Blocked Reason</dt>
-            <dd>{output?.blockedReason ?? "none"}</dd>
-          </div>
-          <div>
-            <dt>Missing Fields</dt>
-            <dd>{output?.missingFields.length ? output.missingFields.join(", ") : "none"}</dd>
-          </div>
-          <div>
-            <dt>Parse Result</dt>
-            <dd>{parseResult?.id ?? "none"}</dd>
-          </div>
-          <div>
-            <dt>Created</dt>
-            <dd>{parseResult?.createdAt ?? "none"}</dd>
-          </div>
-        </dl>
-        {output?.missingFields.length ? (
-          <div className="status-strip">Missing: {output.missingFields.join(", ")}</div>
+
+        {isLoadingLatest ? (
+          <p className="safe-state" data-state="loading" role="status">
+            Loading the recorded parse result…
+          </p>
         ) : null}
-        <pre className="network-pre">
-          {parseResult
-            ? JSON.stringify(parseResult.output, null, 2)
-            : "No recorded parse result is available."}
-        </pre>
+        {readError ? (
+          <p className="safe-state" data-state="error" role="alert">
+            Unable to read the recorded parse result.
+          </p>
+        ) : null}
+        {!isLoadingLatest && !readError && recorded.state === "EMPTY" ? (
+          <p className="safe-state" data-state="empty" role="status">
+            EMPTY — No recorded parse result is available. Provider parsing remains
+            UNAVAILABLE in Stage 0.
+          </p>
+        ) : null}
+        {!isLoadingLatest && !readError && recorded.state === "REJECTED" ? (
+          <p className="safe-state" data-state="rejected" role="status">
+            REJECTED — recorded parse detail is unavailable.
+          </p>
+        ) : null}
+        {!isLoadingLatest && !readError && recorded.state === "AVAILABLE" ? (
+          <>
+            <p className="safe-state" data-state="available" role="status">
+              Recorded recommendation available · non-executing.
+            </p>
+            <dl className="detail-grid">
+              <div>
+                <dt>Intent</dt>
+                <dd>{recorded.intent}</dd>
+              </div>
+              <div>
+                <dt>Catalog recommendation</dt>
+                <dd>{recorded.recommendation}</dd>
+              </div>
+              <div>
+                <dt>Risk</dt>
+                <dd>{recorded.risk}</dd>
+              </div>
+              <div>
+                <dt>Approval</dt>
+                <dd>{recorded.approvalFlag}</dd>
+              </div>
+              <div>
+                <dt>Safety</dt>
+                <dd>{recorded.safetyResult}</dd>
+              </div>
+              <div>
+                <dt>Job eligibility</dt>
+                <dd>{recorded.jobEligibility}</dd>
+              </div>
+              <div>
+                <dt>Reason</dt>
+                <dd>{recorded.reason}</dd>
+              </div>
+              <div>
+                <dt>Date</dt>
+                <dd>{recorded.recordedDate}</dd>
+              </div>
+            </dl>
+            <div>
+              <h3>Recorded missing-field flags</h3>
+              <ul className="safe-flag-list">
+                {recorded.missingFields.map((field) => (
+                  <li key={field}>{field}</li>
+                ))}
+              </ul>
+            </div>
+            <p className="safe-state" data-state="unavailable">
+              Recorded detail withheld; parsing, approval, and job creation are
+              unavailable.
+            </p>
+          </>
+        ) : null}
       </section>
 
-      <section className="network-panel network-panel-wide">
+      <section
+        className="network-panel network-panel-wide"
+        aria-labelledby="allowlist-reference-heading"
+      >
         <div className="network-toolbar">
-          <h2>Allowlist Reference</h2>
-          <span>{actions.length} static entries</span>
+          <h2 id="allowlist-reference-heading">Allowlist Reference</h2>
+          <span>
+            {catalog.length} static catalog entr
+            {catalog.length === 1 ? "y" : "ies"}
+          </span>
         </div>
-        <div className="action-grid">
-          {actions.map((action) => (
-            <article className="action-card" key={action.id}>
-              <h3>{action.id}</h3>
-              <p>{action.description}</p>
-              <span>{action.readOnly ? "read-only" : "config-change"}</span>
-            </article>
-          ))}
-        </div>
+
+        <p className="safe-state" data-state="unavailable">
+          UNAVAILABLE — no request, provider, approval, job creation, or execution
+          control exists on this surface.
+        </p>
+
+        {catalog.length ? (
+          <div className="action-grid">
+            {catalog.map((action) => (
+              <article className="action-card" key={action.id}>
+                <h3>{action.label}</h3>
+                <p className="safe-catalog-id">Static catalog ID: {action.id}</p>
+                <p>{action.reviewerCopy}</p>
+                <ul className="safe-flag-list">
+                  <li>{action.readOnly}</li>
+                  <li>{action.configurationCapability}</li>
+                  <li>{action.risk}</li>
+                </ul>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <p className="safe-state" data-state="empty" role="status">
+            EMPTY — No static action references available.
+          </p>
+        )}
       </section>
     </div>
   );

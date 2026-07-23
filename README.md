@@ -155,7 +155,8 @@ Current Phase 2O status:
 - The first integration-authorization decisions remained `NOT_AUTHORIZED` only because current handoff wording was stale. Post-authorization status correction `1e6561344b53161da85dac0e912bfead425af125` and stable-handoff correction `bc8b22934191187c18f1c1fc3c498cc2cc03c30f` each received independent review `PASS`. Phase 2O-00 handoff reconciliation `413814ceefe5160cecda6bcfdd5c0f24c05cdcbb` then received independent review `PASS` with zero material findings, and a fresh integration-authorization decision returned `AUTHORIZED`.
 - Local `main` advanced from `93cf3bba0c74e7eec685dbc1f7925c0ceca218c7` to `413814ceefe5160cecda6bcfdd5c0f24c05cdcbb` by strict fast-forward only. Complete post-fast-forward validation passed, and local `main` was pushed to `origin/main` with the non-force refspec `refs/heads/main:refs/heads/main`. Local `main`, local tracking `origin/main`, and remote `main` were verified at the integrated commit. The fully merged local source branch was safely deleted; no remote source branch was deleted.
 - Phase 2O-04 is `DONE / MERGED_TO_MAIN / SYNCHRONIZED / RECONCILED`. Its bounded post-merge reconciliation commit `5fc25f9035ee23ee98147e15caeb044e3ed405ba` is the completed `main` baseline. The later continuation decision identified Phase 2O-05 as the sole sequential candidate but withheld implementation authorization until a complete per-component safe-field matrix and exact bounded scope existed.
-- Phase 2O-05 prerequisite planning is `DONE / LOCAL_ONLY / READY_FOR_INDEPENDENT_REVIEW`. The [controlling prerequisite plan](docs/phase_2o/phase_2o_05_secondary_nextjs_evidence_reports_ai_actions_and_jobs_visualization_planning_only.md) supplies 109 field-level Evidence, Reports, AI Actions, and Jobs decisions, the retained HTTP-200 Reports empty-state contract, dependency decision `NO`, exact future 14-file boundary, validation plan, and stable conditional handoff. Phase 2O-05 implementation remains `NOT_AUTHORIZED / NOT_STARTED`; Phase 2O-06 through Phase 2O-07 and Phase 2P remain `NOT_AUTHORIZED / NOT_STARTED`; Phase 2O remains `IN_PROGRESS / NOT_READY`; Stage 0 remains `PRESERVED`.
+- Phase 2O-05 prerequisite planning is `DONE / REVIEWED / LOCAL CANDIDATE`. The [controlling prerequisite plan](docs/phase_2o/phase_2o_05_secondary_nextjs_evidence_reports_ai_actions_and_jobs_visualization_planning_only.md) supplies the singular 109-row safe-field matrix, retained HTTP-200 Reports empty-state contract, dependency decision `NO`, exact 14-file boundary, validation plan, and identity-bound result contract.
+- The separately authorized Phase 2O-05 implementation is `DONE / LOCAL_ONLY / READY_FOR_INDEPENDENT_REVIEW`. Evidence, Reports, AI Actions, and Jobs now consume one pure fail-closed presentation boundary; unknown, malformed, raw, private, provider/model, device, command, secret, and operational values are withheld or mapped to fixed states. Stage 0 remains presentation-only and non-executing. The implementation commit is identified by `THIS_COMMIT` in the implementation record and by the final task result; it is not merged or pushed and requires a fresh independent review. Phase 2O-06 through Phase 2O-07 and Phase 2P remain `NOT_AUTHORIZED / NOT_STARTED`; Phase 2O remains `IN_PROGRESS / NOT_READY`.
 
 The Phase 2O-02 post-merge reconciliation uses a stable self-reference because
 a Git commit cannot contain its own final hash:
@@ -410,31 +411,26 @@ Phase 2N is `ACCEPTED / CLOSED` on `main`. The external result's `GENERATED_OUTP
 
 ```text
 CURRENT_HANDOFF:
-CONDITIONAL_EXTERNAL_REVIEW_GATE
+INDEPENDENT_IMPLEMENTATION_REVIEW_REQUIRED
 
-PHASE_2O_05_PREREQUISITE_PLANNING_COMMIT_REFERENCE:
+PHASE_2O_05_IMPLEMENTATION_COMMIT_REFERENCE:
 THIS_COMMIT
 
-EXACT_PREREQUISITE_PLANNING_COMMIT_SHA_SOURCE:
-FINAL_TASK_RESULT_AND_INDEPENDENT_REVIEW_TARGET
+EXACT_IMPLEMENTATION_COMMIT_SHA_SOURCE:
+FINAL_TASK_RESULT_AND_INDEPENDENT_IMPLEMENTATION_REVIEW_TARGET
 ```
 
 Phase 2O-04 is fully integrated and reconciled. Phase 2O-05 prerequisite
-planning is `DONE / LOCAL_ONLY / READY_FOR_INDEPENDENT_REVIEW`; implementation
-is `NOT_AUTHORIZED / NOT_STARTED`.
+planning is `DONE / REVIEWED / LOCAL CANDIDATE`. The exact bounded implementation
+is `DONE / LOCAL_ONLY / READY_FOR_INDEPENDENT_REVIEW`.
 
-If the exact Phase 2O-05 prerequisite-planning commit has not received an
-independent `PASS` review, the sole next action is independent review of that
-exact commit.
-If that exact commit has received an independent `PASS` review and remains
-unsuperseded, the sole next action is a fresh Phase 2O continuation-authorization
-decision for the exact candidate and exact boundary. A commit cannot
-authoritatively self-record a later external review result, so no additional
-documentation-only commit is required solely to make the reviewed commit record
-its own `PASS`.
+The sole next action is a fresh independent `REVIEW_ONLY` task for the exact
+implementation commit reported by the final task result. A commit cannot
+authoritatively self-record its own SHA or later external review result, so the
+stable `THIS_COMMIT` reference avoids a recursive amend loop.
 
-This conditional handoff does not authorize Phase 2O-05 implementation, merge,
-push, remote contact, branch cleanup, Phase 2O-06, Phase 2O-07, Phase 2P, or any
+This handoff does not authorize a review fix, integration, merge, push, remote
+contact, branch cleanup, Phase 2O-06, Phase 2O-07, Phase 2P, or any
 provider, API, model, secret, POST, job, command, runner, importer, scheduler,
 queue, broker, worker, agent-loop, live-device, SSH, NETCONF, RESTCONF,
 configuration-change, or production-execution capability.
@@ -773,7 +769,8 @@ Current Phase 2H / 2I / 2J / 2K / 2L progress snapshot:
 | 64 | 2O-03 | Canonical Flask Display-only and Technical-detail Presentation / Integrated with Post-merge Status Reconciliation | DONE / REVIEWED / MERGED_TO_MAIN / SYNCHRONIZED | Original implementation `d18e6ccac87e45e7cc983bb09be1c50f07c0c6c2` received `FAIL_FIX_REQUIRED`; bounded fix `9ff474822a94d0f79ff45b061af590186b425def` received independent review `PASS`, making the cumulative implementation `ACCEPTED`; reconciliation commit `2aaf4126ff939d4fb67228efff7b45ec6d1a161a` subsequently received independent post-merge review `PASS` with no material findings; Stage 0 remains `PRESERVED`; Phase 2O-04 and Phase 2P remain `NOT_AUTHORIZED / NOT_STARTED`; the sole next candidate is the separate post-2O-03 continuation authorization decision. |
 | 65 | 2O post-2O-03 | Continuation Authorization Decision / Review-only | DONE / AUTHORIZED | The independent continuation decision authorized exactly one bounded Phase 2O-04 presentation-only implementation from expected base `93cf3bba0c74e7eec685dbc1f7925c0ceca218c7`. It did not authorize a later slice, Phase 2P, dependency change, route/API/importer/runtime change, provider/model behavior, job/command control, or execution capability. Stage 0 remained `PRESERVED`. |
 | 66 | 2O-04 | Secondary Next.js Network Shell and Stage 0 IA Alignment / Integrated and Reconciled | DONE / MERGED_TO_MAIN / SYNCHRONIZED / RECONCILED | The initial implementation attempt stopped at `EXACT_SCOPE_TEST_CONTRACT_CONFLICT`. Implementation `2643b24497011ea31c507d6f567daf5f20287a5d` and first documentation fix `4546f3f441ecaa14f208eee928da33b0ac9b5769` received documentation-only `FAIL_FIX_REQUIRED` results; second fix `7153cb9bcd328489057012a66dc5777e32cc0b26`, status correction `1e6561344b53161da85dac0e912bfead425af125`, stable handoff `bc8b22934191187c18f1c1fc3c498cc2cc03c30f`, and Phase 2O-00 handoff reconciliation `413814ceefe5160cecda6bcfdd5c0f24c05cdcbb` received independent `PASS` reviews. A fresh decision authorized integration. Local `main` strict-fast-forwarded from `93cf3bba0c74e7eec685dbc1f7925c0ceca218c7` to `413814ceefe5160cecda6bcfdd5c0f24c05cdcbb`; post-fast-forward validation and the exact non-force push completed. Post-merge reconciliation commit `5fc25f9035ee23ee98147e15caeb044e3ed405ba` is the completed local, tracking, and remote `main` baseline. Phase 2O remains `IN_PROGRESS / NOT_READY`; Stage 0 remains `PRESERVED`. |
-| 67 | 2O-05 prerequisite | Safe-field Matrix and Bounded-scope Planning Only | DONE / LOCAL_ONLY / READY_FOR_INDEPENDENT_REVIEW | The controlling prerequisite plan classifies 109 field-level decisions across Evidence, Reports, AI Actions, and Jobs, cites current schemas/components/importers/APIs/artifacts/tests, preserves the Reports HTTP-200 empty state, resolves dependency change as `NO`, and defines an exact future 14-file presentation/test/docs boundary. It changes no application behavior and does not authorize implementation. The exact planning commit must receive independent review; if that review returns `PASS` and remains unsuperseded, the sole next action is a fresh Phase 2O continuation-authorization decision. Phase 2O-06 through Phase 2O-07 and Phase 2P remain unauthorized and unstarted. |
+| 67 | 2O-05 prerequisite | Safe-field Matrix and Bounded-scope Planning Only | DONE / REVIEWED / LOCAL CANDIDATE | The controlling prerequisite plan classifies 109 field-level decisions across Evidence, Reports, AI Actions, and Jobs, preserves the Reports HTTP-200 empty state, resolves dependency change as `NO`, and defines the exact 14-file presentation/test/docs boundary. Its review-fix chain and fresh implementation authorization completed without expanding Stage 0. |
+| 68 | 2O-05 | Secondary Next.js Evidence, Reports, AI Actions, and Jobs Visualization | DONE / LOCAL_ONLY / READY_FOR_INDEPENDENT_REVIEW | The exact 14-file implementation adds one pure fail-closed presentation helper and applies it to all four existing secondary routes. It renders only approved fixed projections and explicit `AVAILABLE`, `EMPTY`, `UNAVAILABLE`, `REJECTED`, and `ERROR` states; preserves the HTTP-200 Reports empty state and GET-only recorded-data reads; adds no dependency, route, API, schema, store, provider/model call, secret handling, job execution, queue, scheduler, worker, polling, live access, or production path. The exact implementation commit is reported externally and requires fresh independent review before any fix or integration decision. |
 
 2K-09 result: the README now clarifies that the MIT License covers code usage rights such as cloning, reviewing, learning from, running local deterministic checks, and forking under the license terms. It also states that the license does not grant operational authorization for SSH, live device access, NETCONF, RESTCONF, API/model/provider calls, secrets access, config backup/change, or autonomous execution.
 

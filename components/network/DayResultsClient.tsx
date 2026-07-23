@@ -2,181 +2,70 @@
 
 import { FileJson } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import type { AnalysisRecord, DayResult, DayResultKind } from "@/lib/network-ai/schemas";
+import type { AnalysisRecord, DayResult } from "@/lib/network-ai/schemas";
 import { EvidenceStage0Presentation } from "./Phase2N04DemoPresentation";
+import {
+  projectAnalysisRecord,
+  projectEvidenceCollection,
+  type SafeEvidenceItem,
+  type SafeRecordedStatus
+} from "./Phase2O05SafePresentation";
 
-type ExecutionBoundary = "report_only" | "read_only_action_candidate" | "approval_required" | "blocked";
+type StatusFilter = "ALL" | SafeRecordedStatus;
 
-const evidenceTypeLabels: Record<DayResultKind, string> = {
-  device_report: "Device Check Report",
-  phase_gate_report: "Readiness Gate Review",
-  summary_report: "Project Summary",
-  test_report: "Test Evidence",
-  unknown: "Uncategorized Evidence"
-};
+const statusOptions: StatusFilter[] = [
+  "ALL",
+  "PASS",
+  "WARN",
+  "FAIL",
+  "BLOCKED",
+  "REVIEW",
+  "UNKNOWN"
+];
 
-const evidenceGroupLabels: Record<DayResultKind, string> = {
-  device_report: "Device Check Reports",
-  phase_gate_report: "Readiness Gate Reviews",
-  test_report: "Test Evidence",
-  summary_report: "Project Summaries",
-  unknown: "Uncategorized Evidence"
-};
-
-const evidenceTypeRanks: Record<DayResultKind, number> = {
-  device_report: 1,
-  phase_gate_report: 2,
-  test_report: 3,
-  summary_report: 4,
-  unknown: 5
-};
-
-const executionBoundaryLabels: Record<ExecutionBoundary, string> = {
-  report_only: "Report-only",
-  read_only_action_candidate: "Read-only candidate",
-  approval_required: "Approval required",
-  blocked: "Blocked"
-};
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
+function analysisFromPayload(value: unknown) {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) {
+    return null;
+  }
+  return "analysis" in value ? (value.analysis as unknown) : null;
 }
 
-export function getEvidenceTypeLabel(resultKind: DayResultKind) {
-  return evidenceTypeLabels[resultKind] ?? evidenceTypeLabels.unknown;
-}
-
-export function getEvidenceTypeRank(resultKind: DayResultKind) {
-  return evidenceTypeRanks[resultKind] ?? evidenceTypeRanks.unknown;
-}
-
-export function getSourceDayNumber(dayLabel: string | null | undefined, sourceDay?: string | null) {
-  const source = sourceDay ?? dayLabel ?? "";
-  const match = source.match(/day\s*[-_]?(\d{1,3})/i);
-  return match ? Number(match[1]) : -1;
-}
-
-function evidenceTitle(result: DayResult) {
-  const fallbackFile = result.sourcePath.split(/[\\/]/).pop();
-  return result.reportTitle ?? result.checkType ?? fallbackFile ?? "Untitled Evidence";
-}
-
-function resultSource(result: DayResult) {
-  return result.sourceDay ?? result.dayLabel ?? "Unknown Source";
-}
-
-function resultStatus(result: DayResult) {
-  return result.status || "UNKNOWN";
-}
-
-function statusTone(status: string) {
-  const normalized = status.toLowerCase();
-  if (normalized.includes("pass") || normalized.includes("success") || normalized === "ok") {
-    return "success";
-  }
-  if (normalized.includes("warn") || normalized.includes("warning")) {
-    return "warning";
-  }
-  if (normalized.includes("fail") || normalized.includes("block")) {
-    return "danger";
-  }
-  return "neutral";
-}
-
-function boundaryTone(boundary: ExecutionBoundary) {
-  if (boundary === "read_only_action_candidate") {
-    return "info";
-  }
-  if (boundary === "approval_required") {
-    return "warning";
-  }
-  if (boundary === "blocked") {
-    return "danger";
-  }
-  return "neutral";
-}
-
-export function deriveExecutionBoundary(result: DayResult): ExecutionBoundary {
-  if (
-    result.resultKind === "phase_gate_report" ||
-    result.resultKind === "summary_report" ||
-    result.resultKind === "test_report"
-  ) {
-    return "report_only";
-  }
-
-  if (result.resultKind !== "device_report") {
-    return "blocked";
-  }
-
-  if (!result.deviceName) {
-    return "blocked";
-  }
-
-  if (isRecord(result.parsedResult)) {
-    const risk = result.parsedResult.riskLevel ?? result.parsedResult.risk;
-    const requiresApproval = result.parsedResult.requiresApproval;
-    if (
-      requiresApproval === true ||
-      risk === "medium" ||
-      risk === "high" ||
-      resultStatus(result).toLowerCase().includes("fail")
-    ) {
-      return "approval_required";
-    }
-  }
-
-  return "read_only_action_candidate";
-}
-
-export function sortEvidenceItems(items: DayResult[]) {
-  return [...items].sort((left, right) => {
-    const rankDelta = getEvidenceTypeRank(left.resultKind) - getEvidenceTypeRank(right.resultKind);
-    if (rankDelta !== 0) {
-      return rankDelta;
-    }
-
-    const dayDelta =
-      getSourceDayNumber(right.dayLabel, right.sourceDay) -
-      getSourceDayNumber(left.dayLabel, left.sourceDay);
-    if (dayDelta !== 0) {
-      return dayDelta;
-    }
-
-    const createdDelta = Date.parse(right.createdAt) - Date.parse(left.createdAt);
-    if (Number.isFinite(createdDelta) && createdDelta !== 0) {
-      return createdDelta;
-    }
-
-    return evidenceTitle(left).localeCompare(evidenceTitle(right));
-  });
+function groupedEvidence(items: SafeEvidenceItem[]) {
+  return items.reduce<Array<{ category: string; items: SafeEvidenceItem[] }>>(
+    (groups, item) => {
+      const existing = groups.find((group) => group.category === item.category);
+      if (existing) {
+        existing.items.push(item);
+      } else {
+        groups.push({ category: item.category, items: [item] });
+      }
+      return groups;
+    },
+    []
+  );
 }
 
 export function DayResultsClient({ results }: { results: DayResult[] }) {
-  const sortedResults = useMemo(() => sortEvidenceItems(results), [results]);
-  const [selectedId, setSelectedId] = useState(sortedResults[0]?.id ?? "");
-  const [analysis, setAnalysis] = useState<AnalysisRecord | null>(null);
-  const [error, setError] = useState("");
+  const collection = useMemo(() => projectEvidenceCollection(results), [results]);
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("ALL");
+  const [selectedId, setSelectedId] = useState(collection.items[0]?.internalId ?? "");
+  const [analysis, setAnalysis] = useState<AnalysisRecord | unknown | null>(null);
+  const [readError, setReadError] = useState(false);
   const [isLoadingLatest, setIsLoadingLatest] = useState(false);
 
-  const selected = useMemo(
-    () => sortedResults.find((result) => result.id === selectedId) ?? sortedResults[0] ?? null,
-    [sortedResults, selectedId]
-  );
-
-  const groupedResults = useMemo(
+  const visibleItems = useMemo(
     () =>
-      sortedResults.reduce<Array<{ kind: DayResultKind; items: DayResult[] }>>((groups, result) => {
-        const existing = groups.find((group) => group.kind === result.resultKind);
-        if (existing) {
-          existing.items.push(result);
-        } else {
-          groups.push({ kind: result.resultKind, items: [result] });
-        }
-        return groups;
-      }, []),
-    [sortedResults]
+      statusFilter === "ALL"
+        ? collection.items
+        : collection.items.filter((item) => item.status === statusFilter),
+    [collection.items, statusFilter]
   );
+  const selected =
+    visibleItems.find((item) => item.internalId === selectedId) ??
+    visibleItems[0] ??
+    null;
+  const groups = useMemo(() => groupedEvidence(visibleItems), [visibleItems]);
+  const safeAnalysis = useMemo(() => projectAnalysisRecord(analysis), [analysis]);
 
   useEffect(() => {
     let ignore = false;
@@ -184,22 +73,22 @@ export function DayResultsClient({ results }: { results: DayResult[] }) {
     async function loadLatestAnalysis(reportId: string) {
       setIsLoadingLatest(true);
       setAnalysis(null);
-      setError("");
+      setReadError(false);
       try {
         const response = await fetch(
           `/api/network/reports/${encodeURIComponent(reportId)}/analysis/latest`
         );
-        const payload = await response.json();
+        const payload: unknown = await response.json();
         if (!response.ok) {
-          throw new Error(payload.error ?? "Load latest analysis failed.");
+          throw new Error("Recorded analysis read failed.");
         }
         if (!ignore) {
-          setAnalysis(payload.analysis ?? null);
+          setAnalysis(analysisFromPayload(payload));
         }
-      } catch (caught) {
+      } catch {
         if (!ignore) {
           setAnalysis(null);
-          setError(caught instanceof Error ? caught.message : "Load latest analysis failed.");
+          setReadError(true);
         }
       } finally {
         if (!ignore) {
@@ -208,152 +97,226 @@ export function DayResultsClient({ results }: { results: DayResult[] }) {
       }
     }
 
-    if (selected?.id) {
-      loadLatestAnalysis(selected.id);
+    if (selected?.internalId) {
+      loadLatestAnalysis(selected.internalId);
     } else {
       setAnalysis(null);
+      setReadError(false);
     }
 
     return () => {
       ignore = true;
     };
-  }, [selected?.id]);
+  }, [selected?.internalId]);
 
   return (
     <div className="network-grid">
       <EvidenceStage0Presentation />
-      <section className="network-panel">
+
+      <section className="network-panel" aria-labelledby="evidence-collection-heading">
         <div className="network-toolbar">
-          <h2>Imported Evidence</h2>
-          <span>{results.length} evidence items</span>
+          <h2 id="evidence-collection-heading">Imported Evidence</h2>
+          <span role="status" aria-live="polite">
+            {visibleItems.length} safely displayable item
+            {visibleItems.length === 1 ? "" : "s"}
+          </span>
         </div>
+
+        <div className="safe-filter-bar">
+          <label htmlFor="evidence-status-filter">
+            Recorded status
+            <select
+              id="evidence-status-filter"
+              value={statusFilter}
+              onChange={(event) => setStatusFilter(event.target.value as StatusFilter)}
+            >
+              {statusOptions.map((status) => (
+                <option key={status} value={status}>
+                  {status === "ALL" ? "All recorded statuses" : status}
+                </option>
+              ))}
+            </select>
+          </label>
+          <button
+            className="safe-secondary-button"
+            type="button"
+            onClick={() => {
+              setStatusFilter("ALL");
+              setSelectedId(collection.items[0]?.internalId ?? "");
+            }}
+          >
+            Reset evidence view
+          </button>
+        </div>
+
+        {collection.rejectedCount > 0 ? (
+          <p className="safe-state" data-state="rejected" role="status">
+            REJECTED — {collection.rejectedCount} recorded item
+            {collection.rejectedCount === 1 ? "" : "s"} withheld as malformed.
+          </p>
+        ) : null}
+
         <div className="result-list">
-          {groupedResults.map((group) => (
-            <div className="evidence-group" key={group.kind}>
-              <h3>{evidenceGroupLabels[group.kind]}</h3>
-              {group.items.map((result) => {
-                const boundary = deriveExecutionBoundary(result);
-                const status = resultStatus(result);
-                return (
-                  <button
-                    className="result-row evidence-row"
-                    data-active={result.id === selected?.id}
-                    key={result.id}
-                    onClick={() => {
-                      setSelectedId(result.id);
-                    }}
-                    type="button"
-                  >
-                    <FileJson aria-hidden="true" size={18} />
-                    <span>
-                      <strong>{getEvidenceTypeLabel(result.resultKind)}</strong>
-                      <small>
-                        {resultSource(result)} · {status} · {executionBoundaryLabels[boundary]}
-                      </small>
-                      <small>{evidenceTitle(result)}</small>
-                    </span>
-                    <b className="kind-badge">{result.resultKind}</b>
-                    <em className="status-badge" data-tone={statusTone(status)}>
-                      {status}
-                    </em>
-                  </button>
-                );
-              })}
+          {groups.map((group) => (
+            <div className="evidence-group" key={group.category}>
+              <h3>{group.category}</h3>
+              {group.items.map((item) => (
+                <button
+                  aria-pressed={item.internalId === selected?.internalId}
+                  className="result-row evidence-row"
+                  data-active={item.internalId === selected?.internalId}
+                  key={item.internalId}
+                  onClick={() => setSelectedId(item.internalId)}
+                  type="button"
+                >
+                  <FileJson aria-hidden="true" size={18} />
+                  <span>
+                    <strong>{item.category}</strong>
+                    <small>
+                      {item.dayLabel} · Recorded result: {item.status}
+                    </small>
+                    <small>Recorded: {item.recordedDate}</small>
+                  </span>
+                  <b className="kind-badge">Recorded evidence</b>
+                  <em className="status-badge" data-tone={item.statusTone}>
+                    {item.status}
+                  </em>
+                </button>
+              ))}
             </div>
           ))}
-          {!sortedResults.length && <p className="muted-copy">No JSON or TXT evidence found.</p>}
         </div>
+
+        {collection.state === "EMPTY" ? (
+          <p className="safe-state" data-state="empty" role="status">
+            EMPTY — no recorded evidence is available in the local collection.
+          </p>
+        ) : null}
+        {collection.state === "ERROR" ? (
+          <p className="safe-state" data-state="error" role="alert">
+            ERROR — no safely displayable recorded evidence.
+          </p>
+        ) : null}
+        {collection.state === "AVAILABLE" && visibleItems.length === 0 ? (
+          <p className="safe-state" data-state="empty" role="status">
+            EMPTY — no matching recorded evidence.
+          </p>
+        ) : null}
       </section>
 
-      <section className="network-panel">
+      <section className="network-panel" aria-labelledby="selected-evidence-heading">
         <div className="network-toolbar">
-          <h2>Selected Evidence</h2>
-          <span>Read-only evidence</span>
+          <h2 id="selected-evidence-heading">Selected Evidence</h2>
+          <span>Recorded evidence · non-executing</span>
         </div>
         {selected ? (
           <>
             <dl className="detail-grid">
               <div>
-                <dt>Source</dt>
-                <dd>{resultSource(selected)}</dd>
+                <dt>Artifact category</dt>
+                <dd>{selected.category}</dd>
               </div>
               <div>
-                <dt>Type</dt>
+                <dt>Recorded grouping</dt>
+                <dd>{selected.dayLabel}</dd>
+              </div>
+              <div>
+                <dt>Recorded result</dt>
                 <dd>
-                  {getEvidenceTypeLabel(selected.resultKind)}
-                  <small className="raw-kind">{selected.resultKind}</small>
-                </dd>
-              </div>
-              <div>
-                <dt>Target</dt>
-                <dd>{selected.deviceName ?? "N/A"}</dd>
-              </div>
-              <div>
-                <dt>Check</dt>
-                <dd>{selected.checkType}</dd>
-              </div>
-              <div>
-                <dt>Status</dt>
-                <dd>
-                  <span className="status-badge" data-tone={statusTone(resultStatus(selected))}>
-                    {resultStatus(selected)}
+                  <span className="status-badge" data-tone={selected.statusTone}>
+                    {selected.status}
                   </span>
                 </dd>
               </div>
               <div>
-                <dt>Boundary</dt>
-                <dd>
-                  <span
-                    className="boundary-badge"
-                    data-tone={boundaryTone(deriveExecutionBoundary(selected))}
-                  >
-                    {executionBoundaryLabels[deriveExecutionBoundary(selected)]}
-                  </span>
-                </dd>
+                <dt>Recorded date</dt>
+                <dd>{selected.recordedDate}</dd>
+              </div>
+              <div>
+                <dt>Source identity</dt>
+                <dd>Source path and device identity withheld</dd>
+              </div>
+              <div>
+                <dt>Technical detail</dt>
+                <dd>Technical payload is not displayed on this surface</dd>
               </div>
             </dl>
-            <h3 className="pre-heading">Raw Evidence JSON</h3>
-            <pre className="network-pre">{selected.rawOutput}</pre>
+            {selected.malformed ? (
+              <p className="safe-state" data-state="rejected" role="status">
+                REJECTED — malformed local evidence.
+              </p>
+            ) : null}
           </>
         ) : (
-          <p className="muted-copy">No evidence selected.</p>
+          <p className="safe-state" data-state="empty">
+            EMPTY — no evidence selected.
+          </p>
         )}
-        {error && <div className="error-box">{error}</div>}
       </section>
 
-      <section className="network-panel network-panel-wide">
+      <section
+        className="network-panel network-panel-wide"
+        aria-labelledby="recorded-analysis-heading"
+      >
         <div className="network-toolbar">
-          <h2>Historical Analysis Record</h2>
-          <span>{analysis?.output.riskLevel ?? (isLoadingLatest ? "loading" : "waiting")}</span>
+          <h2 id="recorded-analysis-heading">Historical Analysis Record</h2>
+          <span>UNAVAILABLE — provider analysis</span>
         </div>
-        {analysis ? (
+
+        {isLoadingLatest ? (
+          <p className="safe-state" data-state="loading" role="status">
+            Loading the recorded analysis…
+          </p>
+        ) : null}
+        {readError ? (
+          <p className="safe-state" data-state="error" role="alert">
+            Unable to read the recorded analysis.
+          </p>
+        ) : null}
+        {!isLoadingLatest && !readError && safeAnalysis.state === "EMPTY" ? (
+          <p className="safe-state" data-state="empty" role="status">
+            No recorded analysis. Provider analysis remains UNAVAILABLE in Stage 0.
+          </p>
+        ) : null}
+        {!isLoadingLatest && !readError && safeAnalysis.state === "REJECTED" ? (
+          <p className="safe-state" data-state="rejected" role="status">
+            REJECTED — recorded analysis detail is unavailable.
+          </p>
+        ) : null}
+        {!isLoadingLatest && !readError && safeAnalysis.state === "AVAILABLE" ? (
           <>
+            <p className="safe-state" data-state="available" role="status">
+              Recorded analysis available. Recorded detail is limited to approved
+              presentation fields.
+            </p>
             <dl className="detail-grid">
               <div>
-                <dt>Analysis</dt>
-                <dd>{analysis.id}</dd>
+                <dt>Risk</dt>
+                <dd>{safeAnalysis.risk}</dd>
               </div>
               <div>
-                <dt>Created</dt>
-                <dd>{analysis.createdAt}</dd>
+                <dt>Approval</dt>
+                <dd>{safeAnalysis.approvalFlag}</dd>
               </div>
               <div>
-                <dt>Model</dt>
-                <dd>{analysis.model}</dd>
+                <dt>Human review</dt>
+                <dd>{safeAnalysis.humanReviewFlag}</dd>
               </div>
               <div>
-                <dt>Job Allowed</dt>
-                <dd>{analysis.safety.jobCreationAllowed ? "yes" : "no"}</dd>
+                <dt>Job eligibility</dt>
+                <dd>{safeAnalysis.jobEligibility}</dd>
+              </div>
+              <div>
+                <dt>Date</dt>
+                <dd>{safeAnalysis.recordedDate}</dd>
+              </div>
+              <div>
+                <dt>Current capability</dt>
+                <dd>Provider analysis and job creation unavailable in Stage 0</dd>
               </div>
             </dl>
-            {analysis.safety.reason && <div className="status-strip">{analysis.safety.reason}</div>}
-            <pre className="network-pre">{JSON.stringify(analysis.output, null, 2)}</pre>
           </>
-        ) : (
-          <pre className="network-pre">
-            {isLoadingLatest ? "Loading latest analysis..." : "尚未分析"}
-          </pre>
-        )}
+        ) : null}
       </section>
     </div>
   );

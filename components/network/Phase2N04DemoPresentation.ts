@@ -16,7 +16,7 @@ function note(strongText: string, detail: string) {
 export function EvidenceStage0Presentation() {
   return note(
     "Stage 0 safe Demo · report-only · provider-unavailable.",
-    " Provider analysis controls are not rendered on this Demo surface. Review evidence and any existing analysis record as read-only information."
+    " Provider analysis controls are not rendered. This surface presents only safely projected recorded evidence; device identity, source paths, and technical payload remain withheld."
   );
 }
 
@@ -26,7 +26,7 @@ export function AiActionsStage0Presentation() {
     null,
     note(
       "Stage 0 safe Demo · demo-only · provider-unavailable.",
-      " Provider parsing and job-creation controls are not rendered. This surface shows only the existing action catalog and any recorded parse result."
+      " Provider parsing and job-creation controls are not rendered. This surface shows only fixed static catalog references and safely projected recorded metadata."
     ),
     createElement(
       "section",
@@ -40,7 +40,7 @@ export function AiActionsStage0Presentation() {
       createElement(
         "p",
         { className: "muted-copy" },
-        "Request input is unavailable in the Stage 0 Demo. No provider request can be submitted from this page."
+        "Request input is unavailable in the Stage 0 Demo. No provider request can be submitted from this page. Approval, job creation, and execution are also unavailable."
       )
     )
   );

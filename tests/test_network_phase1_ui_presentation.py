@@ -8,7 +8,7 @@ def read(relative_path: str) -> str:
     return (ROOT / relative_path).read_text(encoding="utf-8")
 
 
-def test_day_results_ui_is_presented_as_automation_evidence():
+def test_day_results_ui_remains_recorded_automation_evidence():
     day_results = read("components/network/DayResultsClient.tsx")
     nav = read("components/network/NetworkNav.tsx")
     page = read("app/network/day-results/page.tsx")
@@ -27,109 +27,162 @@ def test_day_results_ui_is_presented_as_automation_evidence():
         "Imported Evidence",
         "Selected Evidence",
         'label: "Evidence"',
-        "evidence items",
+        "Recorded evidence · non-executing",
     ]:
         assert new_copy in combined
 
 
-def test_evidence_cards_are_evidence_first_with_day_as_metadata():
+def test_evidence_uses_only_safe_projection_fields_and_fixed_states():
     source = read("components/network/DayResultsClient.tsx")
 
-    for label in [
-        "Device Check Report",
-        "Readiness Gate Review",
-        "Project Summary",
-        "Test Evidence",
-        "Uncategorized Evidence",
-    ]:
-        assert label in source
+    assert "projectEvidenceCollection" in source
+    assert "projectAnalysisRecord" in source
+    assert "Recorded result:" in source
+    assert "Recorded:" in source
+    assert "Source path and device identity withheld" in source
+    assert "Technical payload is not displayed on this surface" in source
+    assert "EMPTY — no matching recorded evidence" in source
+    assert "Unable to read the recorded analysis" in source
 
-    assert "<strong>{getEvidenceTypeLabel(result.resultKind)}</strong>" in source
-    assert "{resultSource(result)} · {status} · {executionBoundaryLabels[boundary]}" in source
-    assert "<strong>{result.dayLabel}</strong>" not in source
-
-
-def test_evidence_sorting_prefers_type_then_source_day_then_created_at():
-    source = read("components/network/DayResultsClient.tsx")
-
-    assert "getEvidenceTypeLabel" in source
-    assert "getEvidenceTypeRank" in source
-    assert "getSourceDayNumber" in source
-    assert "sortEvidenceItems" in source
-    assert "getEvidenceTypeRank(left.resultKind) - getEvidenceTypeRank(right.resultKind)" in source
-    assert "getSourceDayNumber(right.dayLabel, right.sourceDay)" in source
-    assert "Date.parse(right.createdAt) - Date.parse(left.createdAt)" in source
-
-
-def test_selected_evidence_uses_user_facing_fields_and_boundary_labels():
-    source = read("components/network/DayResultsClient.tsx")
-
-    for field in ["Source", "Type", "Target", "Check", "Status", "Boundary"]:
-        assert f"<dt>{field}</dt>" in source
-
-    for label in [
-        "Report-only",
+    for unsafe_expression in [
+        "result.deviceName",
+        "result.reportTitle",
+        "result.checkType",
+        "selected.rawOutput",
+        "analysis.model",
+        "analysis.id",
+        "analysis.safety.reason",
+        "JSON.stringify",
+        "Raw Evidence JSON",
+        "deriveExecutionBoundary",
         "Read-only candidate",
         "Approval required",
-        "Blocked",
-        "Historical Analysis Record",
-        "Raw Evidence JSON",
     ]:
-        assert label in source
+        assert unsafe_expression not in source
 
 
-def test_primary_button_contrast_and_icon_current_color_are_locked():
+def test_evidence_sorting_and_filtering_use_closed_safe_fields():
+    client = read("components/network/DayResultsClient.tsx")
+    helper = read("components/network/Phase2O05SafePresentation.ts")
+
+    assert 'type StatusFilter = "ALL" | SafeRecordedStatus' in client
+    assert 'id="evidence-status-filter"' in client
+    assert "Reset evidence view" in client
+    assert "item.status === statusFilter" in client
+
+    assert "left.categoryRank - right.categoryRank" in helper
+    assert "right.dayNumber - left.dayNumber" in helper
+    assert "right.recordedTimestamp - left.recordedTimestamp" in helper
+    assert "normalizeRecordedStatus" in helper
+    assert "normalizeSourceDay" in helper
+    assert "normalizeRecordedDate" in helper
+
+
+def test_safe_presentation_boundary_is_pure_and_fail_closed():
+    source = read("components/network/Phase2O05SafePresentation.ts")
+
+    for projection in [
+        "projectEvidenceCollection",
+        "projectReportsCollection",
+        "projectAnalysisRecord",
+        "projectActionCatalog",
+        "projectParseResult",
+        "projectJobsCollection",
+    ]:
+        assert f"function {projection}" in source
+
+    for prohibited in [
+        "JSON.stringify",
+        "dangerouslySetInnerHTML",
+        "fetch(",
+        "writeFile",
+        "readFile",
+        "createNetworkJob",
+        "listNetworkJobs",
+        "importDayResults",
+        "getLatestAnalysis",
+        "getLatestParse",
+        "openai",
+    ]:
+        assert prohibited not in source
+
+    assert "Object.keys(value).every" in source
+    assert '"Identifier withheld"' in source
+    assert '"Recorded reason withheld"' in source
+    assert '"Unknown catalog reference"' in source
+
+
+def test_responsive_focus_and_native_table_contracts_are_present():
     css = read("app/globals.css")
-    components = "\n".join(
-        [
-            read("components/network/DayResultsClient.tsx"),
-            read("components/network/AiActionsClient.tsx"),
-            read("components/network/ReportsClient.tsx"),
-            read("components/network/JobsClient.tsx"),
-        ]
-    )
+    jobs = read("components/network/JobsClient.tsx")
 
-    assert ".network-toolbar > span" in css
-    assert ".network-toolbar span," not in css
-    assert "background: #0f766e;" in css
-    assert "color: #fff;" in css
-    assert ".icon-action-button span" in css
-    assert "color: currentColor;" in css
-    assert ".icon-action-button:disabled" in css
-    assert "background: #e2e8f0;" in css
-    assert "color: #64748b;" in css
-    assert "cursor: not-allowed;" in css
+    assert '.network-shell :where(a, button, select, summary, [tabindex="0"]):focus-visible' in css
+    assert "outline: 3px solid #0f172a;" in css
+    assert ".safe-table-scroll" in css
+    assert "overflow-x: auto;" in css
+    assert ".safe-job-table" in css
+    assert "@media (max-width: 860px)" in css
+    assert "@media (max-width: 420px)" in css
 
-    assert "text-slate-500" not in components
-    assert "text-gray-500" not in components
+    assert "<table" in jobs
+    assert "<caption>" in jobs
+    assert '<th scope="col">' in jobs
+    assert 'role="region"' in jobs
+    assert "tabIndex={0}" in jobs
+    assert 'aria-describedby="jobs-stage-0-boundary"' in jobs
+    assert 'role="table"' not in jobs
 
 
-def test_ai_actions_reloads_latest_parse_result_without_submission_controls():
+def test_ai_actions_reads_only_recorded_data_without_submission_controls():
     source = read("components/network/AiActionsClient.tsx")
 
     assert 'fetch("/api/network/ai/parse-request/latest")' in source
-    assert "setParseResult(payload.parseResult)" in source
-    assert "<dt>Parse Result</dt>" in source
-    assert "<dt>Created</dt>" in source
-    assert "parseResult?.id" in source
-    assert "parseResult?.createdAt" in source
+    assert "projectActionCatalog" in source
+    assert "projectParseResult" in source
+    assert "Recorded Recommendation" in source
+    assert "Allowlist Reference" in source
+    assert "UNAVAILABLE — no request, provider, approval, job creation, or execution" in source
     assert "<AiActionsStage0Presentation />" in source
-    assert "setUserRequest(" not in source
-    assert "setInventoryText(" not in source
-    assert 'fetch("/api/network/ai/parse-request"' not in source
-    assert "/api/network/jobs/create" not in source
-    assert "parseRequest" not in source
-    assert "createJob" not in source
+
+    for prohibited in [
+        "setUserRequest(",
+        "setInventoryText(",
+        'fetch("/api/network/ai/parse-request"',
+        "/api/network/jobs/create",
+        "parseRequest",
+        "createJob",
+        "JSON.stringify",
+        "<textarea",
+        "output?.targetDevice",
+        "output?.vendor",
+        "parseResult?.id",
+        "parseResult?.userRequest",
+    ]:
+        assert prohibited not in source
 
 
-def test_jobs_client_reloads_jobs_and_does_not_offer_phase1_run_behavior():
+def test_jobs_client_uses_get_only_recorded_projection_without_execution_state():
     source = read("components/network/JobsClient.tsx")
 
     assert 'fetch("/api/network/jobs")' in source
-    assert "<span>Vendor</span>" in source
-    assert "<span>Created</span>" in source
-    assert "<span>Source</span>" in source
-    assert "job.parseResultId ?? job.source" in source
-    assert "Runner not enabled in Phase 1" in source
-    assert "Run Job" not in source
-    assert "onClick={run" not in source
+    assert "projectJobsCollection" in source
+    assert "Reload recorded jobs" in source
+    assert "Recorded local job metadata · non-executing" in source
+    assert "EMPTY — no recorded jobs in this local store" in source
+    assert "ERROR — no safely displayable recorded jobs" in source
+    assert "runner, queue, scheduler, worker" in source
+
+    for prohibited in [
+        "Run Job",
+        "onClick={run",
+        "/api/network/jobs/create",
+        "job.targetDevice",
+        "job.params",
+        "job.source",
+        "job.parseResultId",
+        "setInterval",
+        "setTimeout",
+        "WebSocket",
+        "EventSource",
+    ]:
+        assert prohibited not in source

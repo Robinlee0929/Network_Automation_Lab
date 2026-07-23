@@ -34,7 +34,8 @@ describe("ReportsClient", () => {
   it("renders the reviewer-facing empty state without a not-found or external operation", () => {
     const markup = renderToStaticMarkup(createElement(ReportsClient, { reports: [] }));
 
-    expect(markup).toContain("0 reports");
+    expect(markup).toContain("0 safely displayable reports");
+    expect(markup).toContain("EMPTY");
     expect(markup).toContain("No report evidence is currently available");
     expect(markup).toContain("This page is working");
     expect(markup).toContain("no external service or device operation is required");
@@ -57,7 +58,7 @@ describe("ReportsClient", () => {
       })
     );
 
-    expect(markup).toContain("2 reports");
+    expect(markup).toContain("2 safely displayable reports");
     expect(markup).toContain("Device Check Report");
     expect(markup).toContain("Project Summary");
     expect(markup).toContain("Day 12");
@@ -66,6 +67,9 @@ describe("ReportsClient", () => {
     expect(markup).toContain("Unknown date");
     expect(markup).toContain("PASS");
     expect(markup).toContain("UNKNOWN");
+    expect(markup).toContain("Recorded: 2026-07-13");
+    expect(markup).toContain("UNAVAILABLE");
+    expect(markup).toContain("technical payload");
 
     for (const value of [
       prohibitedSentinels.id,
@@ -86,6 +90,33 @@ describe("ReportsClient", () => {
     expect(markup).not.toContain("AI Summary");
     expect(markup).not.toContain("analyze-report");
     expect(markup).not.toContain("All Missing Reports");
+    expect(markup).not.toContain("JSON.stringify");
+    expect(markup).not.toContain("<pre");
+    expect(markup).not.toContain("href=");
+  });
+
+  it("fails closed when no malformed report has a safe internal identity", () => {
+    const markup = renderToStaticMarkup(
+      createElement(ReportsClient, {
+        reports: [
+          report({
+            id: "C:/private/SENSITIVE_IDENTIFIER.json",
+            rawOutput: "SENSITIVE_RAW_ERROR_TRACEBACK",
+            parsedResult: {
+              provider: "SENSITIVE_PROVIDER",
+              token: "SENSITIVE_SECRET"
+            }
+          })
+        ]
+      })
+    );
+
+    expect(markup).toContain("ERROR — no safely displayable recorded reports");
+    expect(markup).toContain("1 recorded report withheld as malformed");
+    expect(markup).not.toContain("SENSITIVE_IDENTIFIER");
+    expect(markup).not.toContain("SENSITIVE_RAW_ERROR_TRACEBACK");
+    expect(markup).not.toContain("SENSITIVE_PROVIDER");
+    expect(markup).not.toContain("SENSITIVE_SECRET");
   });
 
   it("keeps the Reports navigation matched to a page and preserves Evidence", () => {
