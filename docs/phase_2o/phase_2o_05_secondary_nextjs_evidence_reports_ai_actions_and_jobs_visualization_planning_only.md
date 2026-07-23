@@ -570,6 +570,65 @@ if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($ImplementationResultHe
 }
 ```
 
+`$ImplementationResultHead` is the preserved and controlling result commit
+identity. Current `HEAD` is mutable and must not be assumed unchanged after
+that initial capture. Immediately before any final authoritative Stage B
+validation, independently re-resolve current `HEAD^{commit}` into a separate
+variable and require exact commit-SHA equality:
+
+```powershell
+$RecheckedImplementationResultHead = (
+    git rev-parse --verify "HEAD^{commit}"
+).Trim()
+
+if (
+    $LASTEXITCODE -ne 0 -or
+    [string]::IsNullOrWhiteSpace($RecheckedImplementationResultHead)
+) {
+    throw "Unable to re-resolve current HEAD before final Stage B validation."
+}
+
+if ($RecheckedImplementationResultHead -cne $ImplementationResultHead) {
+    throw @"
+Current HEAD no longer equals the preserved implementation result HEAD.
+Preserved result: $ImplementationResultHead
+Current HEAD:     $RecheckedImplementationResultHead
+"@
+}
+```
+
+This equality gate must pass before exact-base ancestry validation, preserved
+base-tree verification, either authoritative diff command, tracked-path
+parsing, exact count or path-set validation, mismatch reporting, or the final
+validation result. Stage B must fail before those operations when current
+`HEAD` cannot resolve as a commit or when its full commit SHA differs from
+`$ImplementationResultHead`.
+
+Tree equality, path-set equality, and ancestry are insufficient substitutes for
+result commit identity. The gate must reject all of these cases:
+
+1. current `HEAD` cannot be resolved as a commit;
+2. `HEAD` changes after `$ImplementationResultHead` is captured;
+3. `HEAD` is reset to another valid commit;
+4. `HEAD` advances to a descendant commit;
+5. `HEAD` moves to a sibling commit;
+6. `HEAD` moves to a same-tree but different commit;
+7. amend or rebase replaces the preserved result commit;
+8. a cherry-picked equivalent commit has identical content but a different SHA;
+9. another commit produces the same exact 14-path diff;
+10. exact-base ancestry still passes while current `HEAD` differs from the
+    preserved result;
+11. the base tree and result path set are unchanged while result commit identity
+    differs; and
+12. a script attempts to overwrite `$ImplementationResultHead` with the newly
+    observed `HEAD` instead of failing.
+
+`$RecheckedImplementationResultHead` is comparison evidence only. Stage B must
+not assign it back to `$ImplementationResultHead`, must not accept a second
+externally supplied result SHA, and must continue using the initially preserved
+`$ImplementationResultHead` as the result argument for every authoritative
+validation command.
+
 Verify that the exact preserved authorized base is an ancestor of that result:
 
 ```powershell
