@@ -103,9 +103,16 @@ non-executing.
 | `PHASE_2O_04_STATUS` | `DONE / MERGED_TO_MAIN / SYNCHRONIZED / RECONCILED` |
 | `PHASE_2O_04_POST_MERGE_RECONCILIATION_STATUS` | `COMPLETED` |
 | `PHASE_2O_04_CURRENT_HANDOFF` | `COMPLETED / SUPERSEDED_BY_PHASE_2O_05_PREREQUISITE_PLANNING` |
-| `PHASE_2O_05_PREREQUISITE_PLANNING_STATUS` | `DONE / LOCAL_ONLY / READY_FOR_INDEPENDENT_REVIEW` |
-| `PHASE_2O_05_PREREQUISITE_PLANNING_COMMIT_REFERENCE` | `THIS_COMMIT` |
-| `PHASE_2O_05_IMPLEMENTATION_STATUS` | `NOT_AUTHORIZED / NOT_STARTED` |
+| `PHASE_2O_05_PREREQUISITE_PLANNING_STATUS` | `DONE / REVIEWED` |
+| `PHASE_2O_05_PREREQUISITE_PLANNING_COMMIT` | `3a45e7fa7f5af1a36d57487b56192dae0f66ea87` |
+| `PHASE_2O_05_IMPLEMENTATION_REVIEW_STATUS` | `ACCEPTED / ALL_MATERIAL_FINDINGS_RESOLVED` |
+| `PHASE_2O_05_INTEGRATED_MAIN_TIP` | `236488db9ac320f73b96172961648b33e36e500c` |
+| `PHASE_2O_05_INTEGRATION_STATUS` | `DONE / MERGED_TO_MAIN / PUSHED / SYNCHRONIZED / SAFE_LOCAL_BRANCH_CLEANUP_COMPLETE` |
+| `PHASE_2O_05_LOCAL_SOURCE_BRANCH_STATUS` | `PASS / SAFELY_DELETED` |
+| `PHASE_2O_05_REMOTE_BRANCH_STATUS` | `NOT_DELETED` |
+| `PHASE_2O_05_STATUS` | `DONE / MERGED_TO_MAIN / SYNCHRONIZED / POST_MERGE_STATUS_RECONCILIATION_READY_FOR_REVIEW` |
+| `PHASE_2O_05_POST_MERGE_RECONCILIATION_STATUS` | `DONE / LOCAL_ONLY / READY_FOR_INDEPENDENT_POST_MERGE_RECONCILIATION_REVIEW` |
+| `PHASE_2O_05_CURRENT_HANDOFF` | `INDEPENDENT_POST_MERGE_RECONCILIATION_REVIEW_REQUIRED` |
 | `PHASE_2O_06_THROUGH_2O_07_STATUS` | `NOT_AUTHORIZED / NOT_STARTED` |
 | `PHASE_2P_STATUS` | `NOT_AUTHORIZED / NOT_STARTED` |
 | `STAGE_0_BOUNDARY` | `PRESERVED` |
@@ -1032,8 +1039,8 @@ integration.
 
 ### 13.8 Phase 2O-05 prerequisite safe-field matrix and bounded-scope planning
 
-**Current conclusion:** Phase 2O-05 prerequisite planning is
-`DONE / REVIEWED / LOCAL CANDIDATE`. The
+**Historical planning conclusion:** Phase 2O-05 prerequisite planning completed
+and received independent review `PASS`. The
 [controlling prerequisite plan](phase_2o_05_secondary_nextjs_evidence_reports_ai_actions_and_jobs_visualization_planning_only.md)
 contains 109 field-level decisions across Evidence, Reports, AI Actions, and
 Jobs, exact repository evidence, the retained HTTP-200 Reports empty-state
@@ -1054,14 +1061,17 @@ PREREQUISITE_PLANNING_REVIEW:
 PASS / EXTERNAL RESULT
 ```
 
-The prerequisite planning result is historical evidence for the bounded
-implementation below. It does not authorize a review fix, integration, merge,
-push, branch cleanup, later slice, or live/production capability.
+The prerequisite planning result remains historical evidence for the bounded
+implementation below. Its former local-only and conditional-review handoffs do
+not compete with the completed implementation, review, and integration history.
+It does not independently authorize a later slice or live/production capability.
 
 ### 13.9 Phase 2O-05 bounded secondary Next.js visualization implementation
 
-**Current conclusion:** The exact Phase 2O-05 implementation is
-`DONE / LOCAL_ONLY / READY_FOR_INDEPENDENT_REVIEW`.
+**Current conclusion:** Phase 2O-05 is
+`DONE / MERGED_TO_MAIN / SYNCHRONIZED /
+POST_MERGE_STATUS_RECONCILIATION_READY_FOR_REVIEW`. Its cumulative
+implementation review status is `ACCEPTED / ALL_MATERIAL_FINDINGS_RESOLVED`.
 
 The implementation applies one pure fail-closed presentation boundary to the
 existing Evidence, Reports, AI Actions, and Jobs clients. Only approved fixed
@@ -1082,21 +1092,52 @@ execution path. Stage 0 remains `PRESERVED`.
 AUTHORIZED_IMPLEMENTATION_BASE:
 3a45e7fa7f5af1a36d57487b56192dae0f66ea87
 
-PHASE_2O_05_IMPLEMENTATION_COMMIT_REFERENCE:
+PHASE_2O_05_IMPLEMENTATION_COMMIT:
+a4761d89cb63a22ea104dd5e18082e3c5f2765f0
+
+PHASE_2O_05_FIRST_BOUNDED_FIX_COMMIT:
+120ef3096e86b7a3045495271486b78845d6f6e6
+
+PHASE_2O_05_SECOND_BOUNDED_FIX_AND_INTEGRATED_MAIN_TIP:
+236488db9ac320f73b96172961648b33e36e500c
+
+PHASE_2O_05_IMPLEMENTATION_REVIEW_STATUS:
+ACCEPTED / ALL_MATERIAL_FINDINGS_RESOLVED
+
+PHASE_2O_05_INTEGRATION_STATUS:
+DONE / MERGED_TO_MAIN / PUSHED / SYNCHRONIZED /
+SAFE_LOCAL_BRANCH_CLEANUP_COMPLETE
+
+PHASE_2O_05_POST_MERGE_RECONCILIATION_STATUS:
+DONE / LOCAL_ONLY /
+READY_FOR_INDEPENDENT_POST_MERGE_RECONCILIATION_REVIEW
+
+PHASE_2O_05_POST_MERGE_STATUS_RECONCILIATION_COMMIT_REFERENCE:
 THIS_COMMIT
 
-EXACT_IMPLEMENTATION_COMMIT_SHA_SOURCE:
-FINAL_TASK_RESULT_AND_INDEPENDENT_IMPLEMENTATION_REVIEW_TARGET
-
 CURRENT_HANDOFF:
-INDEPENDENT_IMPLEMENTATION_REVIEW_REQUIRED
+INDEPENDENT_POST_MERGE_RECONCILIATION_REVIEW_REQUIRED
 ```
 
-A commit cannot authoritatively declare its own later independent review result.
-The final task result supplies the exact implementation SHA, and a fresh
-independent `REVIEW_ONLY` task must inspect that exact commit. This handoff
-authorizes no review fix, integration, merge, push, remote contact, branch
-cleanup, Phase 2O-06, Phase 2O-07, Phase 2P, or live/production capability.
+Original implementation commit `a4761d89cb63a22ea104dd5e18082e3c5f2765f0`
+received independent finding `P2O05-REV-001`. Responsive fix
+`120ef3096e86b7a3045495271486b78845d6f6e6` resolved it, and the first-fix
+review identified `P2O05-FIX-REV-001` and `P2O05-FIX-REV-002`. Second bounded
+fix `236488db9ac320f73b96172961648b33e36e500c` resolved both findings and
+received a final independent review `PASS` with zero material findings.
+
+Local `main` reached that tip by strict fast-forward only, without a merge
+commit, squash, rebase, or cherry-pick. The main push was non-force, and local
+`main`, local tracking `origin/main`, and actual remote `main` were synchronized
+at the integrated tip when integration completed. The fully merged local source
+branch was safely deleted; no remote branch was deleted.
+
+This four-document reconciliation remains local-only and cannot authoritatively
+declare its own later independent review result. The final task result supplies
+its exact SHA. A fresh independent `REVIEW_ONLY` task must inspect that exact
+commit. This handoff authorizes no reconciliation integration, merge, push,
+remote contact, branch cleanup, Phase 2O-06, Phase 2O-07, Phase 2P, or
+live/production capability.
 
 Phase 2O remains `IN_PROGRESS / NOT_READY`; Phase 2O-06 through Phase 2O-07 and
 Phase 2P remain `NOT_AUTHORIZED / NOT_STARTED`.
