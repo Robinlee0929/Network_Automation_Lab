@@ -4,15 +4,18 @@
 
 **Conclusion:** The original Phase 2O-05 implementation received independent
 review result `FAIL_FIX_REQUIRED` for `P2O05-REV-001`. A bounded three-file
-responsive correction is now `DONE / LOCAL_ONLY /
-READY_FOR_INDEPENDENT_FIX_COMMIT_REVIEW`. The correction reflows only the 320px
-Evidence result cards, adds a deterministic regression contract, and corrects
-the original browser-QA record. The four existing secondary Next.js
-`/network/*` routes continue to present safely projected Stage 0 evidence,
-reports, recorded AI-action context, static catalog references, and recorded
-job metadata. The Flask dashboard remains the canonical reviewer surface. No
-route, method, importer, store, provider, model, device, execution, or
-persistence responsibility was added.
+responsive correction resolved that responsive finding, but its independent
+review returned `FAIL_FIX_REQUIRED` for `P2O05-FIX-REV-001` and
+`P2O05-FIX-REV-002`. A second bounded two-file test-and-documentation correction
+is now `DONE / LOCAL_ONLY /
+READY_FOR_INDEPENDENT_SECOND_FIX_COMMIT_REVIEW`. It replaces the
+formatting-coupled CSS regression test with a semantic contract and corrects
+this record's inaccurate cross-document status claim. The four existing
+secondary Next.js `/network/*` routes remain unchanged and continue to present
+safely projected Stage 0 evidence, reports, recorded AI-action context, static
+catalog references, and recorded job metadata. The Flask dashboard remains the
+canonical reviewer surface. No route, method, importer, store, provider, model,
+device, execution, or persistence responsibility was added.
 
 ```text
 PHASE_2O_05_IMPLEMENTATION_STATUS:
@@ -24,14 +27,23 @@ a4761d89cb63a22ea104dd5e18082e3c5f2765f0
 PHASE_2O_05_IMPLEMENTATION_REVIEW_RESULT:
 FAIL_FIX_REQUIRED / P2O05-REV-001
 
-PHASE_2O_05_BOUNDED_FIX_STATUS:
-DONE / LOCAL_ONLY / READY_FOR_INDEPENDENT_FIX_COMMIT_REVIEW
+PHASE_2O_05_FIRST_BOUNDED_FIX_COMMIT:
+120ef3096e86b7a3045495271486b78845d6f6e6
 
-PHASE_2O_05_BOUNDED_FIX_COMMIT_REFERENCE:
+PHASE_2O_05_FIRST_BOUNDED_FIX_REVIEW_RESULT:
+FAIL_FIX_REQUIRED / P2O05-FIX-REV-001 / P2O05-FIX-REV-002
+
+P2O05_REV_001_STATUS:
+RESOLVED / INDEPENDENTLY_CONFIRMED
+
+PHASE_2O_05_SECOND_BOUNDED_FIX_STATUS:
+DONE / LOCAL_ONLY / READY_FOR_INDEPENDENT_SECOND_FIX_COMMIT_REVIEW
+
+PHASE_2O_05_SECOND_BOUNDED_FIX_COMMIT_REFERENCE:
 THIS_COMMIT
 
 CURRENT_HANDOFF:
-INDEPENDENT_FIX_COMMIT_REVIEW_REQUIRED
+INDEPENDENT_SECOND_FIX_COMMIT_REVIEW_REQUIRED
 
 PHASE_2O_STATUS:
 IN_PROGRESS / NOT_READY
@@ -47,10 +59,10 @@ PRESERVED
 ```
 
 A commit cannot authoritatively declare its own independent review result. The
-final fix-task report supplies the exact bounded-fix commit SHA for independent
-review. This record does not claim that the fix has passed review and does not
-authorize merge, push, remote contact, synchronization, integration, Phase
-2O-06, or any later work.
+final second-fix task report supplies the exact second bounded-fix commit SHA
+for independent review. This record does not claim that the second fix has
+passed review and does not authorize merge, push, remote contact,
+synchronization, integration, Phase 2O-06, or any later work.
 
 ## 2. Task identity and fixed baseline
 
@@ -76,6 +88,18 @@ The bounded review fix is separately identified as follows:
 | Controlling finding | `P2O05-REV-001` |
 | Fix boundary | `320PX_EVIDENCE_RESPONSIVE_PRESENTATION_ONLY` |
 | Fix handoff | `INDEPENDENT_FIX_COMMIT_REVIEW_REQUIRED` |
+
+The second bounded review fix is separately identified as follows:
+
+| Field | Value |
+| --- | --- |
+| Task mode | `FIX_IMPLEMENTATION_ONLY` |
+| Task subtype | `PHASE_2O_05_SECOND_BOUNDED_TEST_AND_DOCUMENTATION_REVIEW_FIX_ONLY` |
+| Controlling first-fix commit | `120ef3096e86b7a3045495271486b78845d6f6e6` |
+| Controlling first-fix review result | `FAIL_FIX_REQUIRED` |
+| Controlling findings | `P2O05-FIX-REV-001`; `P2O05-FIX-REV-002` |
+| Fix boundary | `TEST_AND_DOCUMENTATION_ONLY` |
+| Fix handoff | `INDEPENDENT_SECOND_FIX_COMMIT_REVIEW_REQUIRED` |
 
 The controlling planning record's singular safe-field matrix remains the only
 matrix: 109 data rows and 13 columns. This implementation consumes that
@@ -111,6 +135,15 @@ that original 14-file boundary:
 3. `docs/phase_2o/phase_2o_05_secondary_nextjs_evidence_reports_ai_actions_and_jobs_visualization_implementation.md`
 
 It changes no component markup and adds, deletes, or renames no file.
+
+The second bounded review correction changes exactly two existing paths:
+
+1. `tests/test_network_phase1_ui_presentation.py`
+2. `docs/phase_2o/phase_2o_05_secondary_nextjs_evidence_reports_ai_actions_and_jobs_visualization_implementation.md`
+
+It does not change `app/globals.css`, README, the Phase 2O-00 document,
+TypeScript, React, routes, APIs, schemas, stores, runtime code, packages, or
+lockfiles. It adds, deletes, or renames no file.
 
 ## 4. Implemented presentation behavior
 
@@ -250,35 +283,83 @@ status badge remained present; no measured result row overflowed. Selecting the
 console warning/error output was empty, and no runtime, hydration, or visible
 framework overlay error appeared.
 
-The correction remains local-only. It has not received independent fix-commit
-review and does not claim acceptance, integration authorization, merge, push,
-synchronization, or Phase 2O-06 authorization.
+At its original handoff, the correction remained local-only and had not yet
+received independent fix-commit review. That handoff claimed no acceptance,
+integration authorization, merge, push, synchronization, or Phase 2O-06
+authorization. Section 7.3 records the subsequent independent result.
+
+### 7.3 First fix review and second bounded correction
+
+Independent review of the first bounded fix confirmed `P2O05-REV-001` resolved
+at 320px, 768px, and 1440px. That review nevertheless returned
+`FAIL_FIX_REQUIRED` for two acceptance findings:
+
+- `P2O05-FIX-REV-001`: the Python regression test compared complete multiline
+  CSS fragments and therefore depended on indentation, spacing, and line
+  breaks;
+- `P2O05-FIX-REV-002`: this record incorrectly claimed that README and the
+  Phase 2O-00 record used the same current status.
+
+The second bounded correction keeps the responsive stylesheet and all runtime
+files byte-for-byte unchanged. The Python test now extracts the 420px media
+query, parses selector declarations, and compares the required property/value
+pairs without depending on declaration order or source formatting. An
+in-memory reformatted variant splits grouped selectors into individual rules,
+reverses selector and declaration order, and changes whitespace; it still
+passes. A separate in-memory mutation removes `overflow-wrap: anywhere` and is
+rejected without writing the stylesheet.
+
+The observed second-fix validation results are:
+
+| Command or check | Exact result |
+| --- | --- |
+| `python -m pytest tests/test_network_phase1_ui_presentation.py` | `PASS` — 10 passed |
+| `python -m pytest tests/test_network_phase1_ui_presentation.py tests/test_network_day_result_normalization.py tests/test_network_ai_analysis_persistence.py tests/test_network_ai_workflow_persistence.py tests/test_network_ai_action_recommendation_safety.py` | `PASS` — 30 passed |
+| `npm run test:unit -- components/network/Phase2O05SafePresentation.test.ts components/network/ReportsClient.test.tsx components/network/Phase2N04SafetyLabels.test.ts components/network/Phase2O04NetworkShell.test.ts` | `PASS` — 4 files, 23 tests passed |
+| `npm run test:unit` | `PASS` — 6 files, 79 tests passed |
+| `npm run typecheck` | `PASS` |
+| `npm run lint` | `PASS` — zero warnings |
+| `npm run build` | `PASS` — Next.js 15.5.19 compiled successfully and generated 25/25 pages |
+| `python -m pytest` | `PASS` — 1,946 passed |
+| `python network_lab.py --task report-index` | `PASS` — total 14, pass 14, fail 0, warn 0, missing 0, unknown 0 |
+| Formatting-invariance proof | `PASS` — in-memory only |
+| Negative semantic mutation proof | `PASS` — missing `overflow-wrap: anywhere` rejected in memory |
+
+Browser QA was not rerun because this correction cannot change CSS or runtime
+bytes and the responsive finding already has independent browser evidence.
+The result remains local-only and requires a fresh independent review of the
+exact second-fix commit.
 
 ## 8. Documentation readability review
 
 This record begins with a decision, explains the phase purpose independently,
 separates allowed and forbidden scope, lists concrete acceptance evidence, uses
 the established Stage 0 and canonical/secondary terminology, and keeps current
-handoffs explicit. README and the Phase 2O-00 record use the same current
-status. This documentation review introduced no runtime or execution behavior.
+handoffs explicit. README and the Phase 2O-00 document retain the earlier Phase
+2O-05 `DONE / LOCAL_ONLY / READY_FOR_INDEPENDENT_REVIEW` handoff because both
+files were outside the first bounded responsive-fix authorization and remain
+outside this second bounded fix. They were intentionally not changed, and this
+record does not claim that repository status documents are currently
+synchronized. This documentation review introduced no runtime or execution
+behavior.
 
 ## 9. Stable review handoff
 
-The sole next action is an independent read-only review of the exact bounded-fix
-commit reported by this task:
+The sole next action is an independent read-only review of the exact second
+bounded-fix commit reported by this task:
 
 ```text
-PHASE_2O_05_BOUNDED_FIX_COMMIT_REFERENCE:
+PHASE_2O_05_SECOND_BOUNDED_FIX_COMMIT_REFERENCE:
 THIS_COMMIT
 
-EXACT_BOUNDED_FIX_COMMIT_SHA_SOURCE:
-FINAL_TASK_RESULT_AND_INDEPENDENT_FIX_COMMIT_REVIEW_TARGET
+EXACT_SECOND_BOUNDED_FIX_COMMIT_SHA_SOURCE:
+FINAL_TASK_RESULT_AND_INDEPENDENT_SECOND_FIX_COMMIT_REVIEW_TARGET
 
 CURRENT_HANDOFF:
-INDEPENDENT_FIX_COMMIT_REVIEW_REQUIRED
+INDEPENDENT_SECOND_FIX_COMMIT_REVIEW_REQUIRED
 ```
 
-An external independent fix-commit review result and its exact commit evidence
+An external independent second-fix review result and its exact commit evidence
 control the review state. This stable self-reference prevents a recursive
 documentation commit while preserving the independent-review requirement. It
 grants no authority to merge, push, contact a remote, synchronize, integrate,

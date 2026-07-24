@@ -1,11 +1,133 @@
+import re
 from pathlib import Path
+
+import pytest
 
 
 ROOT = Path(__file__).resolve().parents[1]
 
+EVIDENCE_NARROW_CONTRACT = {
+    ".result-list": {"min-width": "0"},
+    ".evidence-group": {"min-width": "0"},
+    ".result-row": {
+        "min-width": "0",
+        "grid-template-columns": "20px minmax(0, 1fr)",
+    },
+    ".result-row > span": {"grid-column": "2"},
+    ".result-row > .kind-badge": {
+        "grid-column": "2",
+        "justify-self": "start",
+    },
+    ".result-row > .status-badge": {
+        "grid-column": "2",
+        "justify-self": "start",
+    },
+    ".result-row strong": {
+        "overflow": "visible",
+        "text-overflow": "clip",
+        "white-space": "normal",
+        "overflow-wrap": "anywhere",
+    },
+    ".result-row small": {
+        "overflow": "visible",
+        "text-overflow": "clip",
+        "white-space": "normal",
+        "overflow-wrap": "anywhere",
+    },
+}
+
 
 def read(relative_path: str) -> str:
     return (ROOT / relative_path).read_text(encoding="utf-8")
+
+
+def _matching_closing_brace(source: str, opening_brace: int) -> int:
+    depth = 0
+    for index in range(opening_brace, len(source)):
+        if source[index] == "{":
+            depth += 1
+        elif source[index] == "}":
+            depth -= 1
+            if depth == 0:
+                return index
+    raise AssertionError("CSS block is missing a closing brace")
+
+
+def _narrow_media_body(css: str) -> str:
+    media_query = re.search(
+        r"@media\s*\(\s*max-width\s*:\s*420px\s*\)\s*\{",
+        css,
+        flags=re.IGNORECASE,
+    )
+    assert media_query, "Missing max-width: 420px media query"
+    opening_brace = css.find("{", media_query.start())
+    closing_brace = _matching_closing_brace(css, opening_brace)
+    return css[opening_brace + 1 : closing_brace]
+
+
+def _normalize_selector(selector: str) -> str:
+    normalized = re.sub(r"\s+", " ", selector.strip())
+    return re.sub(r"\s*>\s*", " > ", normalized)
+
+
+def _parse_declarations(body: str) -> dict[str, str]:
+    declarations: dict[str, str] = {}
+    for declaration in body.split(";"):
+        if not declaration.strip():
+            continue
+        property_name, separator, value = declaration.partition(":")
+        assert separator, f"Malformed CSS declaration: {declaration.strip()}"
+        declarations[property_name.strip().lower()] = re.sub(
+            r"\s+",
+            " ",
+            value.strip(),
+        )
+    return declarations
+
+
+def _parse_rules(css_body: str) -> dict[str, dict[str, str]]:
+    rules: dict[str, dict[str, str]] = {}
+    source = re.sub(r"/\*.*?\*/", "", css_body, flags=re.DOTALL)
+    cursor = 0
+    while True:
+        opening_brace = source.find("{", cursor)
+        if opening_brace == -1:
+            break
+        closing_brace = _matching_closing_brace(source, opening_brace)
+        selectors = source[cursor:opening_brace]
+        declarations = _parse_declarations(source[opening_brace + 1 : closing_brace])
+        for selector in selectors.split(","):
+            normalized_selector = _normalize_selector(selector)
+            if normalized_selector:
+                rules.setdefault(normalized_selector, {}).update(declarations)
+        cursor = closing_brace + 1
+    return rules
+
+
+def _assert_evidence_narrow_contract(css: str) -> dict[str, dict[str, str]]:
+    rules = _parse_rules(_narrow_media_body(css))
+    assert EVIDENCE_NARROW_CONTRACT.keys() <= rules.keys()
+    for selector, required_declarations in EVIDENCE_NARROW_CONTRACT.items():
+        for property_name, expected_value in required_declarations.items():
+            actual_value = rules[selector].get(property_name)
+            assert actual_value == expected_value, (
+                f"{selector} requires {property_name}: {expected_value}; "
+                f"got {actual_value}"
+            )
+    return rules
+
+
+def _reformatted_narrow_contract(css: str) -> str:
+    rules = _assert_evidence_narrow_contract(css)
+    rule_fragments = []
+    for selector in reversed(tuple(EVIDENCE_NARROW_CONTRACT)):
+        declarations = rules[selector]
+        compact_declarations = ";".join(
+            f"{property_name}:{value}"
+            for property_name, value in reversed(tuple(declarations.items()))
+        )
+        rule_fragments.append(f"\n{selector}\n{{{compact_declarations};}}")
+    return "@media  ( max-width : 420px ) {" + "".join(rule_fragments) + "\n}"
 
 
 def test_day_results_ui_remains_recorded_automation_evidence():
@@ -135,37 +257,31 @@ def test_responsive_focus_and_native_table_contracts_are_present():
 
 def test_evidence_rows_reflow_without_narrow_internal_overflow():
     css = read("app/globals.css")
-    narrow_css = css.partition("@media (max-width: 420px)")[2]
+    _assert_evidence_narrow_contract(css)
 
-    assert narrow_css
-    assert (
-        ".result-list,\n"
-        "  .evidence-group,\n"
-        "  .result-row {\n"
-        "    min-width: 0;\n"
-        "  }"
-    ) in narrow_css
-    assert (
-        ".result-row {\n"
-        "    grid-template-columns: 20px minmax(0, 1fr);\n"
-        "  }"
-    ) in narrow_css
-    assert (
-        ".result-row > span,\n"
-        "  .result-row > .kind-badge,\n"
-        "  .result-row > .status-badge {\n"
-        "    grid-column: 2;\n"
-        "  }"
-    ) in narrow_css
-    assert (
-        ".result-row strong,\n"
-        "  .result-row small {\n"
-        "    overflow: visible;\n"
-        "    text-overflow: clip;\n"
-        "    white-space: normal;\n"
-        "    overflow-wrap: anywhere;\n"
-        "  }"
-    ) in narrow_css
+
+def test_evidence_narrow_contract_ignores_insignificant_formatting():
+    css = read("app/globals.css")
+    reformatted_css = _reformatted_narrow_contract(css)
+
+    assert reformatted_css != css
+    _assert_evidence_narrow_contract(reformatted_css)
+
+
+def test_evidence_narrow_contract_rejects_missing_required_declaration():
+    css = read("app/globals.css")
+    narrow_body = _narrow_media_body(css)
+    mutated_body, mutation_count = re.subn(
+        r"overflow-wrap\s*:\s*anywhere\s*;",
+        "",
+        narrow_body,
+        count=1,
+    )
+
+    assert mutation_count == 1
+    mutated_css = css.replace(narrow_body, mutated_body, 1)
+    with pytest.raises(AssertionError, match="overflow-wrap"):
+        _assert_evidence_narrow_contract(mutated_css)
 
 
 def test_ai_actions_reads_only_recorded_data_without_submission_controls():
