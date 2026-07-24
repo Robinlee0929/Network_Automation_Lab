@@ -56,12 +56,23 @@ PASS / SAFELY_DELETED
 PHASE_2O_05_REMOTE_BRANCH_STATUS:
 NOT_DELETED
 
-PHASE_2O_05_POST_MERGE_RECONCILIATION_STATUS:
-DONE / LOCAL_ONLY /
-READY_FOR_INDEPENDENT_POST_MERGE_RECONCILIATION_REVIEW
+PHASE_2O_05_POST_MERGE_RECONCILIATION_COMMIT:
+47a92b9cedeee6a25b5d5cfa502158290221736d
 
-CURRENT_HANDOFF:
-INDEPENDENT_POST_MERGE_RECONCILIATION_REVIEW_REQUIRED
+PHASE_2O_05_POST_MERGE_RECONCILIATION_REVIEW_RESULT:
+FAIL_FIX_REQUIRED /
+P2O05-RECON-REV-001 /
+P2O05-RECON-REV-002
+
+PHASE_2O_05_RECONCILIATION_FIX_STATUS:
+DONE / LOCAL_ONLY /
+READY_FOR_INDEPENDENT_RECONCILIATION_FIX_COMMIT_REVIEW
+
+PHASE_2O_05_RECONCILIATION_FIX_COMMIT_REFERENCE:
+THIS_COMMIT
+
+CURRENT_PHASE_2O_05_HANDOFF:
+READY_FOR_INDEPENDENT_RECONCILIATION_FIX_COMMIT_REVIEW
 
 PHASE_2O_STATUS:
 IN_PROGRESS / NOT_READY
@@ -346,9 +357,12 @@ The observed second-fix validation results are:
 | Negative semantic mutation proof | `PASS` — missing `overflow-wrap: anywhere` rejected in memory |
 
 Browser QA was not rerun because this correction cannot change CSS or runtime
-bytes and the responsive finding already has independent browser evidence.
-The result remains local-only and requires a fresh independent review of the
-exact second-fix commit.
+bytes and the responsive finding already has independent browser evidence. At
+that historical second-fix handoff, the result remained local-only and required
+a fresh independent review of the exact second-fix commit
+`236488db9ac320f73b96172961648b33e36e500c`. That review subsequently returned
+`PASS` with zero material findings, preserving the second-fix chronology without
+leaving its review as a present-tense pending action.
 
 ## 8. Documentation readability review
 
@@ -373,23 +387,33 @@ merged local source branch
 no remote branch was deleted.
 
 Phase 2O-05 is `DONE / MERGED_TO_MAIN / SYNCHRONIZED /
-POST_MERGE_STATUS_RECONCILIATION_READY_FOR_REVIEW`. The sole next action is an
-independent read-only review of this exact four-document reconciliation commit:
+POST_MERGE_STATUS_RECONCILIATION_READY_FOR_REVIEW`. Historical four-document
+reconciliation commit `47a92b9cedeee6a25b5d5cfa502158290221736d`
+received independent review result `FAIL_FIX_REQUIRED` for
+`P2O05-RECON-REV-001` and `P2O05-RECON-REV-002`. The sole current pending
+action is an independent read-only review of this bounded reconciliation-fix
+commit:
 
 ```text
-PHASE_2O_05_POST_MERGE_STATUS_RECONCILIATION_COMMIT_REFERENCE:
+HISTORICAL_PHASE_2O_05_POST_MERGE_RECONCILIATION_COMMIT:
+47a92b9cedeee6a25b5d5cfa502158290221736d
+
+HISTORICAL_PHASE_2O_05_POST_MERGE_RECONCILIATION_REVIEW_RESULT:
+FAIL_FIX_REQUIRED /
+P2O05-RECON-REV-001 /
+P2O05-RECON-REV-002
+
+PHASE_2O_05_RECONCILIATION_FIX_COMMIT_REFERENCE:
 THIS_COMMIT
 
-EXACT_POST_MERGE_STATUS_RECONCILIATION_COMMIT_SHA_SOURCE:
-FINAL_TASK_RESULT_AND_INDEPENDENT_POST_MERGE_REVIEW_TARGET
-
-CURRENT_HANDOFF:
-INDEPENDENT_POST_MERGE_RECONCILIATION_REVIEW_REQUIRED
+CURRENT_PHASE_2O_05_HANDOFF:
+READY_FOR_INDEPENDENT_RECONCILIATION_FIX_COMMIT_REVIEW
 ```
 
-This reconciliation is `DONE / LOCAL_ONLY /
-READY_FOR_INDEPENDENT_POST_MERGE_RECONCILIATION_REVIEW`. Its stable
+This bounded fix is `DONE / LOCAL_ONLY /
+READY_FOR_INDEPENDENT_RECONCILIATION_FIX_COMMIT_REVIEW`. Its stable
 self-reference prevents a recursive documentation commit while preserving the
-independent-review requirement. It grants no authority to integrate the
-reconciliation, merge, push, contact a remote, clean up the working branch, or
-start Phase 2O-06 or any other phase.
+independent-review requirement. The current handoff is a fresh independent
+read-only review of this bounded reconciliation-fix commit. It grants no
+authority to integrate the reconciliation, merge, push, contact a remote, clean
+up the working branch, or start Phase 2O-06 or any other phase.
