@@ -333,6 +333,86 @@ def _generic_child_identity_evidence(
     ]
 
 
+def _build_runtime_evidence(
+    *,
+    process_pid: int,
+    process_exit_code: int | None,
+    process_exited: bool,
+    statuses: dict[str, int],
+    child_identities: list[ChildProcessIdentity],
+    classification: ChildProcessClassification,
+    post_cleanup_live_child_ids: list[int],
+    unexpected_live_child_ids: list[int],
+    bridge_exited_automatically: bool,
+    port_closed: bool,
+) -> dict[str, object]:
+    runtime_bridge_detected = classification.runtime_bridge is not None
+    return {
+        "interpreter_classification": (
+            "environment_runtime_bridge"
+            if runtime_bridge_detected
+            else "direct_runtime"
+        ),
+        "environment_runtime_bridge_detected": runtime_bridge_detected,
+        "exact_identity_match": runtime_bridge_detected,
+        "executable_paths_redacted": True,
+        "pid": process_pid,
+        "address": HOST,
+        "port": PORT,
+        "startup_timeout_seconds": STARTUP_TIMEOUT_SECONDS,
+        "http_statuses": statuses,
+        "request_method": "GET",
+        "command_run_post_performed": False,
+        "non_local_network_contact_performed": False,
+        "child_process_ids": [child.pid for child in child_identities],
+        "pre_cleanup_child_identities": _generic_child_identity_evidence(
+            child_identities,
+            classification.runtime_bridge,
+        ),
+        "classified_runtime_bridge_pid": (
+            classification.runtime_bridge.pid
+            if classification.runtime_bridge is not None
+            else None
+        ),
+        "post_cleanup_child_state": [
+            {
+                "pid": child.pid,
+                "alive": child.pid in post_cleanup_live_child_ids,
+            }
+            for child in child_identities
+        ],
+        "unexpected_live_children": unexpected_live_child_ids,
+        "identity_aware_contract_result": (
+            classification.unexpected_children == ()
+            and bridge_exited_automatically
+            and unexpected_live_child_ids == []
+        ),
+        "process_exit_code": process_exit_code,
+        "process_exited": process_exited,
+        "child_processes_exited": post_cleanup_live_child_ids == [],
+        "port_closed": port_closed,
+    }
+
+
+def _json_string_values(
+    value: object,
+    selector: str = "$",
+) -> list[tuple[str, str]]:
+    if isinstance(value, str):
+        return [(selector, value)]
+    if isinstance(value, dict):
+        values: list[tuple[str, str]] = []
+        for key, item in value.items():
+            values.extend(_json_string_values(item, f"{selector}.{key}"))
+        return values
+    if isinstance(value, list):
+        values = []
+        for index, item in enumerate(value):
+            values.extend(_json_string_values(item, f"{selector}[{index}]"))
+        return values
+    return []
+
+
 def _wait_for_get(path: str, process: subprocess.Popen[str]) -> tuple[int, str]:
     deadline = time.monotonic() + STARTUP_TIMEOUT_SECONDS
     last_error = "no response"
@@ -424,44 +504,18 @@ def test_canonical_flask_process_lifecycle_and_get_only_routes() -> None:
             process.stdout.close()
 
         port_closed = _wait_for_port_closed()
-        evidence = {
-            "interpreter": sys.executable,
-            "pid": process.pid,
-            "address": HOST,
-            "port": PORT,
-            "startup_timeout_seconds": STARTUP_TIMEOUT_SECONDS,
-            "http_statuses": statuses,
-            "request_method": "GET",
-            "command_run_post_performed": False,
-            "non_local_network_contact_performed": False,
-            "child_process_ids": [child.pid for child in child_identities],
-            "pre_cleanup_child_identities": _generic_child_identity_evidence(
-                child_identities,
-                classification.runtime_bridge,
-            ),
-            "classified_runtime_bridge_pid": (
-                classification.runtime_bridge.pid
-                if classification.runtime_bridge is not None
-                else None
-            ),
-            "post_cleanup_child_state": [
-                {
-                    "pid": child.pid,
-                    "alive": child.pid in post_cleanup_live_child_ids,
-                }
-                for child in child_identities
-            ],
-            "unexpected_live_children": unexpected_live_child_ids,
-            "identity_aware_contract_result": (
-                classification.unexpected_children == ()
-                and bridge_exited_automatically
-                and unexpected_live_child_ids == []
-            ),
-            "process_exit_code": process.returncode,
-            "process_exited": process.poll() is not None,
-            "child_processes_exited": post_cleanup_live_child_ids == [],
-            "port_closed": port_closed,
-        }
+        evidence = _build_runtime_evidence(
+            process_pid=process.pid,
+            process_exit_code=process.returncode,
+            process_exited=process.poll() is not None,
+            statuses=statuses,
+            child_identities=child_identities,
+            classification=classification,
+            post_cleanup_live_child_ids=post_cleanup_live_child_ids,
+            unexpected_live_child_ids=unexpected_live_child_ids,
+            bridge_exited_automatically=bridge_exited_automatically,
+            port_closed=port_closed,
+        )
         print("PHASE_2N_02_RUNTIME_EVIDENCE=" + json.dumps(evidence, sort_keys=True))
         assert process.poll() is not None, "The exact spawned Flask process did not exit"
         assert classification.unexpected_children == (), (
@@ -510,6 +564,79 @@ def _synthetic_classification(
         executable=executable,
         base_executable=base_executable,
     )
+
+
+def _synthetic_runtime_evidence(
+    child: ChildProcessIdentity,
+) -> dict[str, object]:
+    classification = _synthetic_classification([child])
+    return _build_runtime_evidence(
+        process_pid=SYNTHETIC_PARENT_PID,
+        process_exit_code=0,
+        process_exited=True,
+        statuses={route: 200 for route in GET_ROUTES},
+        child_identities=[child],
+        classification=classification,
+        post_cleanup_live_child_ids=[],
+        unexpected_live_child_ids=[],
+        bridge_exited_automatically=True,
+        port_closed=True,
+    )
+
+
+def test_runtime_evidence_redacts_supplied_private_path_values() -> None:
+    synthetic_private_root = ntpath.join("C:\\", "synthetic-profile", "private")
+    synthetic_executable = ntpath.join(
+        synthetic_private_root,
+        "venv",
+        "Scripts",
+        "python.exe",
+    )
+    synthetic_base_executable = ntpath.join(
+        synthetic_private_root,
+        "runtime",
+        "python.exe",
+    )
+    child = _synthetic_child(full_image_path=synthetic_base_executable)
+    classification = _classify_child_processes(
+        [child],
+        parent_pid=SYNTHETIC_PARENT_PID,
+        platform_name="nt",
+        executable=synthetic_executable,
+        base_executable=synthetic_base_executable,
+    )
+    evidence = _build_runtime_evidence(
+        process_pid=SYNTHETIC_PARENT_PID,
+        process_exit_code=0,
+        process_exited=True,
+        statuses={route: 200 for route in GET_ROUTES},
+        child_identities=[child],
+        classification=classification,
+        post_cleanup_live_child_ids=[],
+        unexpected_live_child_ids=[],
+        bridge_exited_automatically=True,
+        port_closed=True,
+    )
+
+    assert "interpreter" not in evidence
+    for selector, value in _json_string_values(evidence):
+        for sensitive_value in (
+            synthetic_private_root,
+            synthetic_executable,
+            synthetic_base_executable,
+        ):
+            assert sensitive_value not in value, (
+                f"private runtime value exposed at {selector}"
+            )
+
+
+def test_runtime_evidence_exposes_generic_bridge_classification() -> None:
+    evidence = _synthetic_runtime_evidence(_synthetic_child())
+
+    assert evidence["interpreter_classification"] == "environment_runtime_bridge"
+    assert evidence["environment_runtime_bridge_detected"] is True
+    assert evidence["exact_identity_match"] is True
+    assert evidence["executable_paths_redacted"] is True
 
 
 def test_runtime_bridge_classifier_accepts_exact_single_base_executable() -> None:

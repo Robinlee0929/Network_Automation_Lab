@@ -4,9 +4,11 @@ Status: DONE / LOCAL_ONLY / READY_FOR_INDEPENDENT_CORRECTION_REVIEW
 
 ## Conclusion
 
-The bounded Phase 2N-02 lifecycle test-contract correction is complete in its
-separate local worktree. The correction replaces the Windows PID-only child
-check with a fail-closed identity-aware contract. It accepts only the exact
+The bounded Phase 2N-02 lifecycle test-contract correction and its
+post-commit private-path redaction are complete in the separate local
+worktree. The two-commit correction chain replaces the Windows PID-only child
+check with a fail-closed identity-aware contract and removes a private
+interpreter path from printed reviewer evidence. It accepts only the exact
 single environment runtime bridge established by the controlling diagnosis,
 continues to reject every unexplained child, and re-samples captured child
 state after exact parent termination.
@@ -20,15 +22,22 @@ synchronization, worktree cleanup, or Phase 2O-06 completion.
 ## Task identity and authority
 
 - Task mode: `implementation / FIX_IMPLEMENTATION_ONLY`.
-- Task subtype:
+- Initial correction task subtype:
   `PHASE_2N_02_CHILD_PROCESS_LIFECYCLE_TEST_CONTRACT_BOUNDED_CORRECTION_ONLY`.
+- Post-commit redaction task subtype:
+  `PHASE_2N_02_CORRECTION_POST_COMMIT_PRIVATE_PATH_REDACTION_ONLY`.
 - Phase: Phase 2N-02 validation-contract correction.
 - Parent context: blocked Phase 2O-06 implementation continuation.
 - Starting base: `7c501469a4d0468b5e3394a2f43c7605d8754245`.
 - Correction branch:
   `codex/phase-2n-02-child-process-lifecycle-test-contract-correction`.
 - Work was isolated in the authorized sibling correction worktree.
-- Exactly one local commit is authorized only after all validation passes.
+- The first correction commit is
+  `d53a3bdd696e2f43595314e53370c980f444a38c`.
+- A separate review authorized exactly one descendant local redaction commit
+  with message `test(phase-2n): redact private runtime path evidence` after all
+  fresh validation passes.
+- Amend, squash, rebase, and history rewrite remain prohibited.
 - Integration, push, remote contact, and worktree removal remain unauthorized.
 
 The controlling authorization was
@@ -43,6 +52,20 @@ It authorized exactly the test and implementation-record paths below.
 No optional, sibling, substitute, README, production Flask, historical Phase
 2N, Phase 2O-06, dependency, configuration, workflow, or report source file is
 in scope.
+
+## Post-commit finding and redaction authorization
+
+The first correction commit retained an `interpreter` field in
+`PHASE_2N_02_RUNTIME_EVIDENCE` whose value came directly from
+`sys.executable`. That reviewer-facing field exposed a private absolute path
+and contradicted this record's private-path exclusion claim. Functional
+classifier, lifecycle, cleanup, route, and regression results remained valid,
+but the correction was blocked from independent review pending redaction.
+
+A separate review-only decision authorized one bounded second commit in the
+same two files. It required removal of that field, generic non-sensitive
+identity evidence, deterministic redaction tests, fresh validation, and
+preservation of the first commit and primary Phase 2O-06 dirty state.
 
 ## Root-cause diagnosis
 
@@ -104,10 +127,13 @@ runtime bridge must disappear automatically. Any captured PID still alive is
 reported as unexpected and fails the test. The original pre-cleanup list is no
 longer treated as final liveness proof.
 
-Runtime evidence exposes only generic identity data: PID, parent PID,
-filename, path accessibility, bridge classification, post-cleanup alive state,
-and unexpected-live PID values. Private absolute executable paths are neither
-printed nor recorded here.
+Runtime evidence now exposes only generic identity data: PID, parent PID,
+filename, path accessibility, fixed interpreter classification, runtime-bridge
+detection, exact-identity-match result, paths-redacted state, post-cleanup
+alive state, and unexpected-live PID values. Full executable paths remain
+internal inputs to normalized exact identity comparison. They are not used as
+printed evidence, persisted here, or replaced by a basename or redacted value
+for security classification.
 
 ## Focused classifier coverage
 
@@ -128,6 +154,12 @@ Twelve deterministic cases in the same test file cover:
 
 The classifier cases use synthetic generic paths and create no live process.
 
+Two additional deterministic evidence tests prove that the former
+`interpreter` field is absent, the four generic classification/redaction fields
+are present, and recursively inspected JSON string values do not expose
+supplied synthetic private-path values. Failure messages identify only a JSON
+selector and never echo a matching value.
+
 ## Preserved lifecycle behavior
 
 The correction retains all five GET-only routes, `127.0.0.1`, port 5000, the
@@ -142,23 +174,25 @@ pytest 8.4.2. No dependency was installed, updated, copied, or linked.
 
 | Validation | Result |
 | --- | --- |
-| Focused classifier selection | PASS: 12 passed, 2 deselected in 1.37s |
-| Complete Phase 2N-02 file | PASS: 14 passed in 2.16s |
-| Lifecycle independent run 1 | PASS: 1 passed in 1.69s; five HTTP 200 responses; bridge classified; child exited; port closed |
-| Lifecycle independent run 2 | PASS: 1 passed in 1.60s; five HTTP 200 responses; bridge classified; child exited; port closed |
-| Lifecycle independent run 3 | PASS: 1 passed in 1.66s; five HTTP 200 responses; bridge classified; child exited; port closed |
-| Initial full pytest in fresh sibling worktree | Environment-only failure: 28 existing Python/Node tests could not resolve the untracked local Node dependency tree; 1,930 passed |
-| Representative dependency-resolution probe | PASS after using the primary worktree's existing dependency tree read-only through `NODE_PATH` |
-| Controlling full pytest | PASS: 1,958 passed in 55.18s |
+| Focused private-path evidence tests | PASS: 2 passed, 14 deselected in 0.48s |
+| Existing classifier and cleanup selection | PASS: 12 passed, 4 deselected in 0.25s |
+| Complete Phase 2N-02 file | PASS: 16 passed in 2.46s |
+| Lifecycle independent run 1 | PASS: 1 passed in 1.91s; five HTTP 200 responses; bridge classified; child exited; port closed |
+| Lifecycle independent run 2 | PASS: 1 passed in 1.85s; five HTTP 200 responses; bridge classified; child exited; port closed |
+| Lifecycle independent run 3 | PASS: 1 passed in 1.73s; five HTTP 200 responses; bridge classified; child exited; port closed |
+| Runtime-evidence private-path scan | PASS; exactly one structured lifecycle record parsed; required generic evidence present; no sensitive candidate or home/profile path found |
+| Controlling full pytest | PASS: 1,960 passed in 60.04s |
 | Report index | Exit 0; WARN; total 14, pass 1, missing 13; all missing entries are optional local reports; fail 0, warn 0, unknown 0 |
-| Whitespace before documentation | Exit 0; only a non-failing LF-to-CRLF working-copy notice |
-| Final exact scope | PASS: one modified test and one new implementation record; no other changed or untracked path |
-| External pytest base cleanup | PASS: all eight task-owned external base directories are absent |
+| Documentation private-path scan | PASS; no Windows user-profile path, POSIX home path, or retained runtime literal found |
+| Whitespace and exact scope | PASS; cumulative and working changes remain limited to the same two authorized files |
+| Primary Phase 2O-06 preservation | PASS; exact branch, HEAD, three dirty paths, empty staged set, and all three controlling SHA-256 values preserved |
+| External validation cleanup | PASS; task-owned basetemps and captured output removed after evidence extraction |
 
-Pytest cache writes were disabled and every pytest run used a unique external
-task-owned base directory outside both worktrees. The controlling full run used
-the already-present dependency tree read-only; it performed no package install
-or environment repair.
+Pytest cache writes were disabled and every pytest process used a unique
+external task-owned base directory outside both worktrees. Captured output was
+also external and was removed after evidence extraction. The controlling full
+run used the already-present dependency tree read-only through `NODE_PATH`; it
+performed no package install, update, copy, link, or environment repair.
 
 ## Safety boundary and non-goals
 
@@ -194,6 +228,7 @@ ACCEPTANCE_CRITERIA_CONCRETE_AND_VERIFIABLE: PASS
 LONG_SECTIONS_SPLIT_FOR_READABILITY: PASS
 TERMINOLOGY_CONSISTENT_WITH_PHASE_2N_RECORDS: PASS
 PRIVATE_LOCAL_EXECUTABLE_PATHS_EXCLUDED: PASS
+RUNTIME_EVIDENCE_AND_DOCUMENTATION_CONSISTENT: PASS
 NO_INTEGRATION_OR_NEXT_PHASE_AUTHORITY_IMPLIED: PASS
 FINAL_READABILITY_RESULT: PASS
 ```
@@ -201,9 +236,9 @@ FINAL_READABILITY_RESULT: PASS
 ## Independent-review handoff
 
 The only next candidate is a fresh independent review of the exact local
-correction commit. Review PASS, integration authorization, merge, push, main
-synchronization, worktree removal, branch deletion, and Phase 2O-06
-reconciliation require separate future tasks.
+two-commit correction chain. Review PASS, integration authorization, merge,
+push, main synchronization, worktree removal, branch deletion, and Phase
+2O-06 reconciliation require separate future tasks.
 
 ## Final status
 
