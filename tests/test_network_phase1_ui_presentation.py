@@ -36,6 +36,17 @@ EVIDENCE_NARROW_CONTRACT = {
     },
 }
 
+AI_ACTIONS_NARROW_REFLOW_CONTRACT = {
+    ".status-strip": {
+        "align-items": "flex-start",
+        "flex-direction": "column",
+    },
+    ".network-toolbar": {
+        "align-items": "flex-start",
+        "flex-direction": "column",
+    },
+}
+
 
 def read(relative_path: str) -> str:
     return (ROOT / relative_path).read_text(encoding="utf-8")
@@ -121,6 +132,34 @@ def _reformatted_narrow_contract(css: str) -> str:
     rules = _assert_evidence_narrow_contract(css)
     rule_fragments = []
     for selector in reversed(tuple(EVIDENCE_NARROW_CONTRACT)):
+        declarations = rules[selector]
+        compact_declarations = ";".join(
+            f"{property_name}:{value}"
+            for property_name, value in reversed(tuple(declarations.items()))
+        )
+        rule_fragments.append(f"\n{selector}\n{{{compact_declarations};}}")
+    return "@media  ( max-width : 420px ) {" + "".join(rule_fragments) + "\n}"
+
+
+def _assert_ai_actions_narrow_reflow_contract(
+    css: str,
+) -> dict[str, dict[str, str]]:
+    rules = _parse_rules(_narrow_media_body(css))
+    assert AI_ACTIONS_NARROW_REFLOW_CONTRACT.keys() <= rules.keys()
+    for selector, required_declarations in AI_ACTIONS_NARROW_REFLOW_CONTRACT.items():
+        for property_name, expected_value in required_declarations.items():
+            actual_value = rules[selector].get(property_name)
+            assert actual_value == expected_value, (
+                f"{selector} requires {property_name}: {expected_value}; "
+                f"got {actual_value}"
+            )
+    return rules
+
+
+def _reformatted_ai_actions_narrow_reflow_contract(css: str) -> str:
+    rules = _assert_ai_actions_narrow_reflow_contract(css)
+    rule_fragments = []
+    for selector in reversed(tuple(AI_ACTIONS_NARROW_REFLOW_CONTRACT)):
         declarations = rules[selector]
         compact_declarations = ";".join(
             f"{property_name}:{value}"
@@ -282,6 +321,51 @@ def test_evidence_narrow_contract_rejects_missing_required_declaration():
     mutated_css = css.replace(narrow_body, mutated_body, 1)
     with pytest.raises(AssertionError, match="overflow-wrap"):
         _assert_evidence_narrow_contract(mutated_css)
+
+
+def test_ai_actions_status_and_toolbar_reflow_at_narrow_width():
+    css = read("app/globals.css")
+    _assert_ai_actions_narrow_reflow_contract(css)
+
+
+def test_ai_actions_narrow_reflow_contract_ignores_formatting_and_selector_order():
+    css = read("app/globals.css")
+    reformatted_css = _reformatted_ai_actions_narrow_reflow_contract(css)
+
+    assert reformatted_css != css
+    _assert_ai_actions_narrow_reflow_contract(reformatted_css)
+
+
+def test_ai_actions_narrow_reflow_rejects_missing_align_items():
+    css = read("app/globals.css")
+    narrow_body = _narrow_media_body(css)
+    mutated_body, mutation_count = re.subn(
+        r"align-items\s*:\s*flex-start\s*;",
+        "",
+        narrow_body,
+        count=1,
+    )
+
+    assert mutation_count == 1
+    mutated_css = css.replace(narrow_body, mutated_body, 1)
+    with pytest.raises(AssertionError, match="align-items"):
+        _assert_ai_actions_narrow_reflow_contract(mutated_css)
+
+
+def test_ai_actions_narrow_reflow_rejects_missing_flex_direction():
+    css = read("app/globals.css")
+    narrow_body = _narrow_media_body(css)
+    mutated_body, mutation_count = re.subn(
+        r"flex-direction\s*:\s*column\s*;",
+        "",
+        narrow_body,
+        count=1,
+    )
+
+    assert mutation_count == 1
+    mutated_css = css.replace(narrow_body, mutated_body, 1)
+    with pytest.raises(AssertionError, match="flex-direction"):
+        _assert_ai_actions_narrow_reflow_contract(mutated_css)
 
 
 def test_ai_actions_reads_only_recorded_data_without_submission_controls():

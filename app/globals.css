@@ -1237,6 +1237,12 @@ textarea:focus {
 }
 
 @media (max-width: 420px) {
+  .status-strip,
+  .network-toolbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
   .network-nav-list,
   .network-nav-list li,
   .network-nav a {
