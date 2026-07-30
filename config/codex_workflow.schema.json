@@ -1,0 +1,571 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Codex Workflow Governance Configuration",
+  "description": "Schema for the inert, repository-versioned workflow governance contract.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "workflow_version",
+    "default_profile",
+    "classification_precedence",
+    "profiles",
+    "validation_profiles",
+    "same_scope_correction",
+    "baseline_policy",
+    "integration_closure"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "integer",
+      "const": 1
+    },
+    "workflow_version": {
+      "type": "integer",
+      "const": 2
+    },
+    "default_profile": {
+      "type": "string",
+      "const": "standard"
+    },
+    "classification_precedence": {
+      "type": "array",
+      "prefixItems": [
+        {
+          "const": "high_risk"
+        },
+        {
+          "const": "standard"
+        },
+        {
+          "const": "low_risk"
+        }
+      ],
+      "items": false,
+      "minItems": 3,
+      "maxItems": 3,
+      "uniqueItems": true
+    },
+    "profiles": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "low_risk",
+        "standard",
+        "high_risk"
+      ],
+      "properties": {
+        "low_risk": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/profile"
+            },
+            {
+              "properties": {
+                "normal_task_target": {
+                  "const": 1
+                },
+                "normal_task_target_is_hard_limit": {
+                  "const": false
+                },
+                "independent_review_required": {
+                  "const": false
+                },
+                "implementation_validation": {
+                  "const": "fast"
+                },
+                "integration_validation": {
+                  "const": "fast"
+                },
+                "strict_gated_workflow": {
+                  "const": false
+                }
+              }
+            }
+          ]
+        },
+        "standard": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/profile"
+            },
+            {
+              "properties": {
+                "normal_task_target": {
+                  "const": 3
+                },
+                "normal_task_target_is_hard_limit": {
+                  "const": false
+                },
+                "independent_review_required": {
+                  "const": true
+                },
+                "implementation_validation": {
+                  "const": "phase"
+                },
+                "integration_validation": {
+                  "const": "full"
+                },
+                "strict_gated_workflow": {
+                  "const": false
+                }
+              }
+            }
+          ]
+        },
+        "high_risk": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/profile"
+            },
+            {
+              "properties": {
+                "normal_task_target": {
+                  "const": null
+                },
+                "normal_task_target_is_hard_limit": {
+                  "const": false
+                },
+                "independent_review_required": {
+                  "const": true
+                },
+                "implementation_validation": {
+                  "const": "full"
+                },
+                "integration_validation": {
+                  "const": "full"
+                },
+                "strict_gated_workflow": {
+                  "const": true
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "validation_profiles": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "fast",
+        "phase",
+        "full"
+      ],
+      "properties": {
+        "fast": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/validation_profile"
+            },
+            {
+              "properties": {
+                "scope": {
+                  "const": [
+                    "changed_files",
+                    "directly_related_validation"
+                  ]
+                },
+                "full_suite_required": {
+                  "const": false
+                },
+                "intended_stages": {
+                  "const": [
+                    "low_risk_implementation",
+                    "narrow_feedback"
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        "phase": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/validation_profile"
+            },
+            {
+              "properties": {
+                "scope": {
+                  "const": [
+                    "relevant_module",
+                    "phase"
+                  ]
+                },
+                "full_suite_required": {
+                  "const": false
+                },
+                "intended_stages": {
+                  "const": [
+                    "standard_implementation",
+                    "pre_commit_confidence"
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        "full": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/validation_profile"
+            },
+            {
+              "properties": {
+                "scope": {
+                  "const": [
+                    "repository"
+                  ]
+                },
+                "full_suite_required": {
+                  "const": true
+                },
+                "intended_stages": {
+                  "const": [
+                    "integration",
+                    "shared_runtime_change",
+                    "safety_contract_change",
+                    "explicit_full_validation"
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "same_scope_correction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "enabled",
+        "normal_additional_commit_target",
+        "normal_additional_commit_target_is_hard_limit",
+        "additional_security_correction_requires_authorization",
+        "additional_security_correction_requires_cumulative_review",
+        "require_review_recorded_findings",
+        "require_cumulative_file_subset",
+        "allow_cumulative_file_expansion",
+        "allow_requirement_expansion",
+        "allow_safety_boundary_expansion",
+        "allow_external_access_expansion",
+        "allow_history_rewrite",
+        "require_targeted_validation",
+        "require_independent_cumulative_review"
+      ],
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "const": true
+        },
+        "normal_additional_commit_target": {
+          "type": "integer",
+          "const": 1,
+          "description": "Non-binding normal-path planning target; it grants no authorization, is not a hard limit, and must not force preserving a known vulnerability, rewriting reviewed history, weakening a correction, or expanding scope."
+        },
+        "normal_additional_commit_target_is_hard_limit": {
+          "type": "boolean",
+          "const": false,
+          "description": "Confirms that the normal target is not an absolute security limit."
+        },
+        "additional_security_correction_requires_authorization": {
+          "type": "boolean",
+          "const": true,
+          "description": "Every additional security correction requires separate explicit authorization; new P1 findings, replacement bypasses, safety regressions, or defects needing another bounded correction are qualifying examples, not automatic or unlimited authorization."
+        },
+        "additional_security_correction_requires_cumulative_review": {
+          "type": "boolean",
+          "const": true,
+          "description": "Every additional correction requires complete cumulative independent review and remains subject to recorded findings, bounded scope, no unauthorized requirement, safety-boundary, or external-access expansion, no history rewrite, and targeted validation."
+        },
+        "require_review_recorded_findings": {
+          "type": "boolean",
+          "const": true
+        },
+        "require_cumulative_file_subset": {
+          "type": "boolean",
+          "const": true
+        },
+        "allow_cumulative_file_expansion": {
+          "type": "boolean",
+          "const": false
+        },
+        "allow_requirement_expansion": {
+          "type": "boolean",
+          "const": false
+        },
+        "allow_safety_boundary_expansion": {
+          "type": "boolean",
+          "const": false
+        },
+        "allow_external_access_expansion": {
+          "type": "boolean",
+          "const": false
+        },
+        "allow_history_rewrite": {
+          "type": "boolean",
+          "const": false
+        },
+        "require_targeted_validation": {
+          "type": "boolean",
+          "const": true
+        },
+        "require_independent_cumulative_review": {
+          "type": "boolean",
+          "const": true
+        }
+      }
+    },
+    "baseline_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "accept_exact_head",
+        "accept_authorized_descendant",
+        "accept_unrelated_descendant",
+        "accept_branch_divergence",
+        "require_authorized_intervening_commits",
+        "require_cumulative_scope_subset",
+        "reject_unapproved_merge_commits",
+        "reject_unauthorized_dirty_paths",
+        "result_values"
+      ],
+      "properties": {
+        "accept_exact_head": {
+          "type": "boolean",
+          "const": true
+        },
+        "accept_authorized_descendant": {
+          "type": "boolean",
+          "const": true
+        },
+        "accept_unrelated_descendant": {
+          "type": "boolean",
+          "const": false
+        },
+        "accept_branch_divergence": {
+          "type": "boolean",
+          "const": false
+        },
+        "require_authorized_intervening_commits": {
+          "type": "boolean",
+          "const": true
+        },
+        "require_cumulative_scope_subset": {
+          "type": "boolean",
+          "const": true
+        },
+        "reject_unapproved_merge_commits": {
+          "type": "boolean",
+          "const": true
+        },
+        "reject_unauthorized_dirty_paths": {
+          "type": "boolean",
+          "const": true
+        },
+        "result_values": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "const": "exact"
+            },
+            {
+              "const": "authorized_descendant"
+            },
+            {
+              "const": "unrelated_descendant"
+            },
+            {
+              "const": "diverged"
+            },
+            {
+              "const": "unauthorized_dirty_state"
+            },
+            {
+              "const": "not_verified"
+            }
+          ],
+          "items": false,
+          "minItems": 6,
+          "maxItems": 6,
+          "uniqueItems": true
+        }
+      }
+    },
+    "integration_closure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "description",
+        "combined_integration_and_closure_allowed",
+        "operations_require_separate_authorization",
+        "require_independent_review_pass",
+        "require_exact_integration_candidate",
+        "require_expected_main_baseline",
+        "require_remote_trust",
+        "require_full_validation",
+        "strict_fast_forward_only",
+        "status_update_in_same_task",
+        "branch_cleanup_after_verified_sync",
+        "reconciliation_only_on_discrepancy",
+        "terminal_closure_task_required"
+      ],
+      "properties": {
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "combined_integration_and_closure_allowed": {
+          "type": "boolean",
+          "const": true
+        },
+        "operations_require_separate_authorization": {
+          "type": "boolean",
+          "const": true
+        },
+        "require_independent_review_pass": {
+          "type": "boolean",
+          "const": true
+        },
+        "require_exact_integration_candidate": {
+          "type": "boolean",
+          "const": true
+        },
+        "require_expected_main_baseline": {
+          "type": "boolean",
+          "const": true
+        },
+        "require_remote_trust": {
+          "type": "boolean",
+          "const": true
+        },
+        "require_full_validation": {
+          "type": "boolean",
+          "const": true
+        },
+        "strict_fast_forward_only": {
+          "type": "boolean",
+          "const": true
+        },
+        "status_update_in_same_task": {
+          "type": "boolean",
+          "const": true
+        },
+        "branch_cleanup_after_verified_sync": {
+          "type": "boolean",
+          "const": true
+        },
+        "reconciliation_only_on_discrepancy": {
+          "type": "boolean",
+          "const": true
+        },
+        "terminal_closure_task_required": {
+          "type": "boolean",
+          "const": false
+        }
+      }
+    }
+  },
+  "$defs": {
+    "profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "description",
+        "examples",
+        "normal_task_target",
+        "normal_task_target_is_hard_limit",
+        "independent_review_required",
+        "implementation_validation",
+        "integration_validation",
+        "strict_gated_workflow"
+      ],
+      "properties": {
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "examples": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "normal_task_target": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "normal_task_target_is_hard_limit": {
+          "type": "boolean"
+        },
+        "independent_review_required": {
+          "type": "boolean"
+        },
+        "implementation_validation": {
+          "enum": [
+            "fast",
+            "phase",
+            "full"
+          ]
+        },
+        "integration_validation": {
+          "enum": [
+            "fast",
+            "phase",
+            "full"
+          ]
+        },
+        "strict_gated_workflow": {
+          "type": "boolean"
+        }
+      }
+    },
+    "validation_profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "description",
+        "scope",
+        "full_suite_required",
+        "intended_stages"
+      ],
+      "properties": {
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scope": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "full_suite_required": {
+          "type": "boolean"
+        },
+        "intended_stages": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,148 @@
+schema_version: 1
+workflow_version: 2
+default_profile: standard
+
+classification_precedence:
+  - high_risk
+  - standard
+  - low_risk
+
+profiles:
+  low_risk:
+    description: >-
+      Non-behavioral work only; excludes CSS layout, production UI behavior,
+      executable test logic, safety classification, evidence projection,
+      redaction, API behavior, external access, and Stage Gate changes.
+    examples:
+      - documentation wording
+      - source-code comments
+      - non-executable text
+      - equivalent status wording
+    normal_task_target: 1
+    normal_task_target_is_hard_limit: false
+    independent_review_required: false
+    implementation_validation: fast
+    integration_validation: fast
+    strict_gated_workflow: false
+  standard:
+    description: >-
+      Behavioral work covering CSS and visible UI behavior, executable test
+      logic, API display and safe transformation, evidence projection,
+      redaction, and reviewer-facing behavior; excludes all high-risk traits.
+    examples:
+      - CSS layout and visible UI behavior
+      - executable test pass or fail logic
+      - API display and safe data transformation
+      - evidence projection and redaction
+      - reviewer-facing behavior
+    normal_task_target: 3
+    normal_task_target_is_hard_limit: false
+    independent_review_required: true
+    implementation_validation: phase
+    integration_validation: full
+    strict_gated_workflow: false
+  high_risk:
+    description: >-
+      Strictly gated work involving live devices or device protocols, secrets
+      or credentials, provider or model calls, external writes, production
+      execution, configuration changes, or Stage Gate changes.
+    examples:
+      - live-device access
+      - SSH, NETCONF, RESTCONF, or equivalent device protocols
+      - secrets or credentials
+      - provider, external API, or model calls
+      - external writes
+      - production execution paths
+      - configuration-change behavior
+      - Stage Gate changes
+    normal_task_target: null
+    normal_task_target_is_hard_limit: false
+    independent_review_required: true
+    implementation_validation: full
+    integration_validation: full
+    strict_gated_workflow: true
+
+validation_profiles:
+  fast:
+    description: Targeted validation for low-risk implementation and narrow feedback.
+    scope:
+      - changed_files
+      - directly_related_validation
+    full_suite_required: false
+    intended_stages:
+      - low_risk_implementation
+      - narrow_feedback
+  phase:
+    description: Relevant module or Phase-level validation for standard work.
+    scope:
+      - relevant_module
+      - phase
+    full_suite_required: false
+    intended_stages:
+      - standard_implementation
+      - pre_commit_confidence
+  full:
+    description: Repository-wide integration and safety-contract validation.
+    scope:
+      - repository
+    full_suite_required: true
+    intended_stages:
+      - integration
+      - shared_runtime_change
+      - safety_contract_change
+      - explicit_full_validation
+
+same_scope_correction:
+  enabled: true
+  # Non-binding normal-path planning target; not an authorization grant or hard limit.
+  # Reaching it must not preserve a known vulnerability, rewrite reviewed history,
+  # weaken a correction, or expand file scope without authorization.
+  normal_additional_commit_target: 1
+  normal_additional_commit_target_is_hard_limit: false
+  # New P1 findings, replacement bypasses, safety regressions, or defects requiring
+  # another bounded correction require separate authorization; commits are not unlimited.
+  additional_security_correction_requires_authorization: true
+  additional_security_correction_requires_cumulative_review: true
+  require_review_recorded_findings: true
+  require_cumulative_file_subset: true
+  allow_cumulative_file_expansion: false
+  allow_requirement_expansion: false
+  allow_safety_boundary_expansion: false
+  allow_external_access_expansion: false
+  allow_history_rewrite: false
+  require_targeted_validation: true
+  require_independent_cumulative_review: true
+
+baseline_policy:
+  accept_exact_head: true
+  accept_authorized_descendant: true
+  accept_unrelated_descendant: false
+  accept_branch_divergence: false
+  require_authorized_intervening_commits: true
+  require_cumulative_scope_subset: true
+  reject_unapproved_merge_commits: true
+  reject_unauthorized_dirty_paths: true
+  result_values:
+    - exact
+    - authorized_descendant
+    - unrelated_descendant
+    - diverged
+    - unauthorized_dirty_state
+    - not_verified
+
+integration_closure:
+  description: >-
+    Declarative only; workflow version 2 remains inactive until separately
+    reviewed and activated.
+  combined_integration_and_closure_allowed: true
+  operations_require_separate_authorization: true
+  require_independent_review_pass: true
+  require_exact_integration_candidate: true
+  require_expected_main_baseline: true
+  require_remote_trust: true
+  require_full_validation: true
+  strict_fast_forward_only: true
+  status_update_in_same_task: true
+  branch_cleanup_after_verified_sync: true
+  reconciliation_only_on_discrepancy: true
+  terminal_closure_task_required: false
