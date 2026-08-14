@@ -68,12 +68,16 @@ http://127.0.0.1:5000/
 
 Stop the server with `Ctrl+C` after the walkthrough.
 
-If the local environment cannot start Flask, use the committed screenshots
-instead:
+If the local environment cannot start Flask, use only the current-suitable
+screenshots identified under Offline Demo Materials:
 
 ```text
 docs/demo/day52_offline_demo_package/screenshots/
 ```
+
+The retained `dashboard_commands.png` is historical, superseded evidence of the
+pre-display-only command UI. It is not a fallback for the current `/commands`
+surface.
 
 The Next.js application is a secondary Stage-0 evidence interface. It is not
 required for this canonical walkthrough and does not displace the Flask entry
@@ -181,12 +185,15 @@ docs/demo/offline_interview_demo_kit/troubleshooting_guide.md
 The directory name is historical and remains unchanged so existing evidence
 references continue to work.
 
-Recommended screenshot order:
+Current-suitable fallback screenshot order:
 
 1. `dashboard_home.png`
 2. `dashboard_reports.png`
-3. `dashboard_commands.png`
-4. `dashboard_ai_checklist.png`
+3. `dashboard_ai_checklist.png`
+
+`dashboard_commands.png` remains in the package for historical traceability.
+It shows the superseded pre-display-only interface and is not current or
+recommended `/commands` evidence.
 
 ## What Can Be Reviewed Without Live Lab Access
 
@@ -195,7 +202,8 @@ A reviewer can inspect:
 - Python and TypeScript source organization;
 - unit, regression, safety, and presentation tests;
 - architecture, safety, Phase, and roadmap documents;
-- dashboard structure and committed screenshots;
+- dashboard structure and the current-suitable committed screenshots identified
+  above;
 - report-index behavior and report interpretation;
 - committed summaries and any available local report evidence;
 - dry-run and mock reviewer-evidence chains.
@@ -218,6 +226,7 @@ The August release remains Stage 0. For this public review:
 - do not treat display metadata as execution authorization;
 - do not submit or simulate unavailable dashboard action controls.
 
-Use committed documentation, tests, screenshots, summaries, and local
-report-only/dashboard views. Any future read-only or live integration requires
-a separate Stage gate and task-specific user approval.
+Use committed documentation, tests, the current-suitable screenshots identified
+above, summaries, and local report-only/dashboard views. Any future read-only
+or live integration requires a separate Stage gate and task-specific user
+approval.

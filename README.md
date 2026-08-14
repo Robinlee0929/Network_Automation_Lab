@@ -287,12 +287,17 @@ review aids:
 8. Stop the local dashboard with `Ctrl+C`.
 
 For a shorter portfolio walkthrough, follow the
-[Public Reviewer Walkthrough](docs/portfolio/public_reviewer_walkthrough.md) or
-use the committed screenshots under:
+[Public Reviewer Walkthrough](docs/portfolio/public_reviewer_walkthrough.md).
+If Flask is unavailable, use the current-suitable home, reports, and AI
+checklist screenshots under:
 
 ```text
 docs/demo/day52_offline_demo_package/screenshots/
 ```
+
+The retained `dashboard_commands.png` is historical, superseded evidence of the
+pre-display-only command UI. Do not use it as evidence of the current
+`/commands` surface.
 
 ## Safety Boundaries
 
