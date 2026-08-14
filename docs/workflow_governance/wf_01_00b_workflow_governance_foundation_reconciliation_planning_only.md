@@ -1,8 +1,28 @@
 # WF-01-00B Workflow Governance Foundation Reconciliation Plan
 
-Status: **CURRENT / PLANNING_ONLY**
+Status: **HISTORICAL PLANNING EVIDENCE / SUPERSEDED FOR CURRENT RELEASE STATUS**
 Activation status: **NOT ACTIVE**
-Integration status: **LOCAL_ONLY / NOT MERGED / NOT PUSHED**
+Foundation integration status: **INTEGRATED ON MAIN**
+
+## Current release supersession note
+
+This document preserves the WF-01-00B planning baseline and its historical
+decision sequence. It is no longer the repository-facing source for current
+August release status or authorization.
+
+The workflow governance foundation contract and hardened helpers are integrated
+on `main`. Workflow version 2 remains **INACTIVE** and receives no activation
+authority from this record. Later work progressed through an unfinished
+WF-01-03B research candidate and ended with terminal release status
+**DEFERRED_SECURITY_RESEARCH_BLOCKED**. That candidate is **NOT INCLUDED IN THE
+AUGUST RELEASE** and does not block release closure for the Stage-0 product.
+WF-01-03C through WF-01-03F are **DEFERRED FUTURE WORK** outside the August
+critical path.
+
+Use the Current Release Status in the repository `README.md` for the concise
+release-facing summary. The remaining sections and tables below are retained as
+historical planning evidence and must not be interpreted as current
+implementation, integration, migration, activation, or later-WF authorization.
 
 ## 1. Executive decision
 
@@ -276,6 +296,12 @@ WF-01-03 must define a separate dependency-resolution boundary for Node-enabled 
 This task does not install dependencies or create, inspect, or remove a junction.
 
 ## 10. Updated plan table
+
+> **Historical snapshot:** The following table records the sequence proposed at
+> WF-01-00B planning time. It is preserved for traceability and is superseded for
+> current release status by the note above. In particular, its WF-01-03 row does
+> not override the later terminal WF-01-03B deferral or authorize WF-01-03C
+> through WF-01-03F.
 
 | Order | Work item | Status |
 | ---: | --- | --- |

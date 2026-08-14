@@ -1,70 +1,174 @@
 # Public Reviewer Walkthrough
 
+## Conclusion
+
+Network Automation Lab is ready for a local Stage-0 portfolio review through
+committed documentation, tests, screenshots, report evidence, and the canonical
+Flask dashboard. The walkthrough is display- and report-oriented: it does not
+require or authorize live devices, SSH, configuration changes, provider/model
+calls, secrets, or command execution from the dashboard.
+
 ## One-Sentence Project Positioning
 
-Network Automation Lab is a safety-first Python portfolio project that turns MikroTik, Cisco, WireGuard, VRRP, and performance validation workflows into repeatable test evidence, reports, and a local dashboard.
+Network Automation Lab is a safety-first Python portfolio project that turns
+MikroTik, Cisco, WireGuard, VRRP, and performance-validation work into
+repeatable test logic, structured evidence, reports, and local reviewer
+interfaces.
 
 ## What Problem This Project Solves
 
-Network checks are often proven with ad hoc SSH sessions, screenshots, and copied command output. This project shows how those checks can be organized like a QA automation platform:
+Network checks are often proved with ad hoc terminal sessions, screenshots, and
+copied output. This project shows how those checks can instead be organized like
+a QA platform:
 
-- Scripts collect or generate structured evidence.
-- Reports use readable PASS / FAIL / WARN status.
-- Dashboard pages make local evidence easier to review.
-- Safety levels separate report-only, read-only, dry-run, guarded-live, and controlled failover workflows.
-- Public review can happen without touching real lab devices.
+- deterministic code and tests define expected behavior;
+- reports use readable PASS, FAIL, WARN, and unavailable states;
+- dashboard pages make bounded local evidence easier to review;
+- dry-run, mock, report-only, historical, and gated capabilities remain
+  distinguishable;
+- public review can happen without contacting a lab device.
+
+Historical records include workflows that had separate read-only or guarded
+boundaries. Those records do not change the current Stage-0 public review path.
 
 ## Suggested Reading Order
 
 1. `README.md`
-2. `docs/portfolio/public_reviewer_walkthrough.md`
-3. `docs/demo/offline_interview_demo_kit/README.md`
-4. `docs/demo/day52_offline_demo_package/README.md`
-5. `docs/roadmap/day55_public_repository_readiness_review.md`
-6. `docs/roadmap/day54_public_facing_portfolio_demo_wording_audit.md`
+2. `AGENTS.md`
+3. `docs/portfolio/public_reviewer_walkthrough.md`
+4. `docs/phase_2n/phase_2n_01_canonical_quick_start_and_demo_runbook_documentation_only.md`
+5. `docs/phase_2n/phase_2n_05_final_user_facing_acceptance_review_phase_closure_review_only.md`
+6. `docs/demo/offline_interview_demo_kit/README.md`
 
-For a shorter review, read this document first, then open the dashboard screenshots in `docs/demo/day52_offline_demo_package/screenshots/`.
+For a shorter review, read the release status and safety sections in
+`README.md`, then follow the dashboard sequence below.
 
-## How To Start The Local Dashboard
+## Start the Canonical Local Dashboard
 
-From the repository root:
+From the repository root, create and activate a Python environment, then install
+the committed requirements:
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
+```
+
+Start the canonical Flask dashboard:
 
 ```powershell
 python dashboard_app.py
 ```
 
-Then open:
+Open:
 
 ```text
 http://127.0.0.1:5000/
 ```
 
-If dependencies are not installed, review the committed screenshots instead:
+Stop the server with `Ctrl+C` after the walkthrough.
+
+If the local environment cannot start Flask, use the committed screenshots
+instead:
 
 ```text
 docs/demo/day52_offline_demo_package/screenshots/
 ```
 
-## Dashboard Pages To Review
+The Next.js application is a secondary Stage-0 evidence interface. It is not
+required for this canonical walkthrough and does not displace the Flask entry
+point.
 
-| Route | What to look for |
+## Dashboard Pages to Review
+
+| Route | What to review | Current interaction boundary |
+| --- | --- | --- |
+| `/` | Project positioning, Stage-0 status, evidence health, proof points, and navigation | Local display surface |
+| `/reports` | Evidence summaries, status filters, missing states, safe JSON previews, and bounded artifact links | GET-oriented evidence browsing |
+| `/commands` | Registered command descriptions and historical execution records | **Display-only; no Run or POST control is rendered** |
+| `/ai-checklist` | Static AI and safety checklist evidence | Display-only |
+| `/ai-intent-reviewer` | Static intent examples, mock-runtime evidence, readiness gates, and safety boundaries | Display-only; no mapped-task execution |
+
+The `/commands` page documents registry entries and historical records for
+review. It does not expose a selectable execution workflow, does not grant
+command authority, and must not be described or demonstrated as a live command
+console.
+
+The AI checklist and intent reviewer are also evidence surfaces. They do not
+invoke a model, submit a provider request, create a job, execute a mapped task,
+or contact a device.
+
+## Recommended Walkthrough
+
+1. Open `/` and explain that Flask is the canonical reviewer interface.
+2. Identify the Stage-0 status and the distinction between evidence availability
+   and validation quality.
+3. Open `/reports` and review the summary counts and status filters.
+4. Open one available safe JSON or HTML detail, if present.
+5. Show an empty, missing, unavailable, or blocked state when local evidence is
+   absent; do not trigger live collection to fill the gap.
+6. Open `/commands` and explain that it is display-only and contains no Run
+   or POST control.
+7. Open `/ai-checklist` and `/ai-intent-reviewer` to show the explicit
+   safety and no-execution boundary.
+8. Optionally run the report-only index or repository tests.
+9. Stop Flask with `Ctrl+C`.
+
+## Validate the Local Evidence
+
+Run the Python regression suite when a full local code check is appropriate:
+
+```powershell
+python -m pytest
+```
+
+Run the report index as a local report-only evidence scan:
+
+```powershell
+python network_lab.py --task report-index
+```
+
+`report-index` reads local metadata and evidence paths. It does not connect
+to routers, switches, VPN peers, SSH, WireGuard, VRRP, or iperf3 endpoints.
+
+It may return `WARN` when optional generated reports are missing from
+`reports/`. That is acceptable only when:
+
+- `fail=0`;
+- every missing item is optional generated evidence;
+- the output still provides a usable evidence inventory.
+
+A required-evidence failure or any non-zero failure count is not an acceptable
+optional-artifact warning.
+
+## How to Interpret Reports
+
+Reports are evidence artifacts, not unbounded terminal dumps.
+
+| Status | Meaning |
 | --- | --- |
-| `/` | Project positioning, demo status, proof points, quick links, and no-live-router boundary. |
-| `/reports` | Evidence browser for generated JSON/HTML reports, grouped report metadata, and missing-report visibility. |
-| `/commands` | Safe command execution model, allowlisted command cards, disabled lab workflows, and execution logs. |
-| `/ai-checklist` | Review evidence for AI/safety boundaries and command execution controls. |
+| `PASS` | The checked condition passed |
+| `FAIL` | A required condition failed or required evidence is invalid |
+| `WARN` | A non-blocking issue or documented optional-evidence gap |
+| `MISSING` | An expected local generated artifact is absent |
+| `UNKNOWN` | Evidence exists but exposes no supported result field |
+| `UNAVAILABLE` | The evidence source or bounded projection cannot be used |
+| `ERROR` | Evidence could not be processed safely |
+| `BLOCKED` | A safety or authorization gate prevented the action |
 
-These pages are local review surfaces. Opening them does not require SSH, live device access, VPN access, WireGuard access, VRRP failover, iperf3, or router/switch configuration changes.
+Start with the overall result, then review failures and warnings. Inspect
+expected/actual detail only when deeper troubleshooting is needed. Availability
+alone is not a PASS.
 
 ## Offline Demo Materials
 
-Start here:
+Start with:
 
 ```text
 docs/demo/offline_interview_demo_kit/README.md
 ```
 
-Useful supporting files:
+Supporting files include:
 
 ```text
 docs/demo/offline_interview_demo_kit/demo_checklist.md
@@ -74,15 +178,8 @@ docs/demo/offline_interview_demo_kit/no_live_dependency_statement.md
 docs/demo/offline_interview_demo_kit/troubleshooting_guide.md
 ```
 
-The folder name is historical. It remains unchanged so existing Day47-Day53 references continue to work.
-
-## Screenshots
-
-Committed dashboard screenshots are available here:
-
-```text
-docs/demo/day52_offline_demo_package/screenshots/
-```
+The directory name is historical and remains unchanged so existing evidence
+references continue to work.
 
 Recommended screenshot order:
 
@@ -91,67 +188,36 @@ Recommended screenshot order:
 3. `dashboard_commands.png`
 4. `dashboard_ai_checklist.png`
 
-These screenshots are useful when a reviewer cannot run Flask locally or when the repository is being reviewed without live lab access.
-
-## How To Interpret Reports
-
-Reports are evidence artifacts, not raw terminal dumps.
-
-| Status | Meaning |
-| --- | --- |
-| PASS | Expected condition matched. |
-| FAIL | Required condition failed or required evidence was missing. |
-| WARN | Non-blocking issue, drift, missing optional generated evidence, or review note. |
-| MISSING | Expected local generated report is not present. |
-| UNKNOWN | The report exists but does not expose a supported status field. |
-
-Start with the overall status, then read failed or warning items, then inspect expected/actual fields only when deeper troubleshooting is needed.
-
-## Why `report-index` May Return WARN
-
-Run this only as a report-only local evidence scan:
-
-```powershell
-python network_lab.py --task report-index
-```
-
-This command reads local metadata and report files. It does not connect to live devices and does not run router, switch, VPN, WireGuard, VRRP, SSH, or iperf3 workflows.
-
-It may return WARN when optional generated local reports are missing from `reports/`. That is expected on clean public checkouts because generated reports are intentionally local and generally ignored by Git.
-
-WARN is acceptable when all of these are true:
-
-- `fail=0`.
-- Missing items are optional generated local reports.
-- The output still provides report visibility and refreshed local index files.
-
-WARN is not acceptable if required evidence fails or if `fail` is greater than zero.
-
 ## What Can Be Reviewed Without Live Lab Access
 
-A public reviewer can review:
+A reviewer can inspect:
 
-- Python source organization.
-- Unit tests.
-- README and roadmap docs.
-- Safety levels and no-live-device boundaries.
-- Dashboard page structure.
-- Committed dashboard screenshots.
-- Offline demo package.
-- Report-index behavior and report interpretation.
+- Python and TypeScript source organization;
+- unit, regression, safety, and presentation tests;
+- architecture, safety, Phase, and roadmap documents;
+- dashboard structure and committed screenshots;
+- report-index behavior and report interpretation;
+- committed summaries and any available local report evidence;
+- dry-run and mock reviewer-evidence chains.
 
-No router, switch, VPN, VRRP, WireGuard, SSH, iperf3, firewall, or live lab access is required for this public review path.
+No router, switch, VPN, VRRP, WireGuard, SSH, NETCONF, RESTCONF, iperf3,
+firewall, provider/model service, secret, or private lab configuration is
+required for this path.
 
 ## Safety Boundaries
 
-For public review, do not run live workflows. The safe review path has:
+The August release remains Stage 0. For this public review:
 
-- No live network tests.
-- No SSH.
-- No device access.
-- No router, switch, firewall, VPN, WireGuard, VRRP, NAT, IP, interface, route, or device configuration changes.
-- No iperf3 live test.
-- No `config.json` dependency.
-- No `config.json` changes.
+- do not run live network tests;
+- do not use SSH, NETCONF, or RESTCONF;
+- do not connect to or configure a device;
+- do not change router, switch, firewall, VPN, WireGuard, VRRP, NAT, IP,
+  interface, or route state;
+- do not run a live iperf3 scenario;
+- do not use provider/API/model calls or secrets;
+- do not treat display metadata as execution authorization;
+- do not submit or simulate unavailable dashboard action controls.
 
-Use committed documentation, tests, screenshots, and local report-only/dashboard views for review.
+Use committed documentation, tests, screenshots, summaries, and local
+report-only/dashboard views. Any future read-only or live integration requires
+a separate Stage gate and task-specific user approval.
