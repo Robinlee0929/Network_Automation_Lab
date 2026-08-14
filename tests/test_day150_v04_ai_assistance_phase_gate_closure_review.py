@@ -299,11 +299,14 @@ def test_day150_docs_and_readme_preserve_required_closure_boundaries():
         assert "next_phase_allowed: false" in doc
 
     assert "## Day150" in ai_readme
-    assert "README_STATUS_SYNC_ONLY" in readme
-    assert "status summary only" in readme
-    assert "does not replace formal safety planning documents" in readme
-    assert "phase gate documents" in readme
-    assert "deferred risk register" in readme
-    assert "formal closure review evidence" in readme
-    assert "PHASE_GATE_CLOSED_REVIEW_ONLY" in readme
-    assert "NEXT_PHASE_ALLOWED_FALSE" in readme
+    for fragment in (
+        "## Current Release Status",
+        "Stage-0 Network Automation Lab",
+        "Workflow Version 2",
+        "INACTIVE",
+        "DEFERRED_SECURITY_RESEARCH_BLOCKED",
+        "NOT INCLUDED IN RELEASE",
+        "WF-01-03C through WF-01-03F",
+        "Historical records describe the state and authorization boundary",
+    ):
+        assert fragment in readme

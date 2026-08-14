@@ -94,7 +94,7 @@ SPEC: Dict[str, Any] = {
         {"surface": "Day160 roadmap doc", "path": ROADMAP_DOC.as_posix(), "required_fragments": (TASK_NAME, STATUS_LABEL, "phase_gate_approval: false", "next_phase_allowed: false")},
         {"surface": "Day160 AI doc", "path": AI_DOC.as_posix(), "required_fragments": (TITLE, "Day155 reopen rationale present", "Day159 safety regression matrix present", "next_phase_allowed remains false")},
         {"surface": "AI intent README", "path": "docs/ai-intent/README.md", "required_fragments": ("## Day160", "v0.5 AI Assistance Phase Gate Review", "next_phase_allowed=false")},
-        {"surface": "README", "path": "README.md", "required_fragments": ("Current project status after Day160", STATUS_LABEL, "NEXT_PHASE_ALLOWED_FALSE")},
+        {"surface": "README", "path": "README.md", "required_fragments": ("## Current Release Status", "Stage-0 Network Automation Lab", "Workflow Version 2", "DEFERRED_SECURITY_RESEARCH_BLOCKED", "WF-01-03C through WF-01-03F")},
         {"surface": "task registry", "path": "network_lab_task_registry.py", "required_fragments": (TASK_NAME,)},
         {"surface": "CLI dispatch", "path": "network_lab_cli_dispatch.py", "required_fragments": (TASK_NAME, "_run_day160_v05_ai_assistance_phase_gate_review")},
         {"surface": "network_lab task catalog and report-index", "path": "network_lab.py", "required_fragments": ("DAY160_V05_AI_ASSISTANCE_PHASE_GATE_REVIEW_TASK_ID", "day160_v05_ai_assistance_phase_gate_review")},

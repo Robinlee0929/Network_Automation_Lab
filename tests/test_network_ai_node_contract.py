@@ -70,8 +70,9 @@ def test_network_ai_readme_documents_safe_flow_and_env_contract():
     env_example = read(".env.example")
 
     assert "Network Automation AI Node" in readme
-    assert "parse -> recommend -> validate -> create job -> approve -> execute" in readme
-    assert "AI Node cannot" in readme
+    assert "secondary Stage-0 interface" in readme
+    assert "does not activate provider, model, job, or" in readme
+    assert "device execution" in readme
     assert "OPENAI_API_KEY=" in env_example
     assert "OPENAI_MODEL=gpt-5-mini" in env_example
     assert ".env.local" in gitignore

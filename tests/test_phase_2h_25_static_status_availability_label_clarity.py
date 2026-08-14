@@ -81,10 +81,10 @@ def test_phase_2h_25_static_dashboard_html_contains_label_clarity_copy():
     assert "<script" not in html.lower()
 
 
-def test_phase_2h_25_readme_trail_is_registered_without_task_registry_claim():
-    readme_text = Path("README.md").read_text(encoding="utf-8")
+def test_phase_2h_25_formal_record_preserves_static_label_clarity_boundary():
+    doc_text = DOC_PATH.read_text(encoding="utf-8")
 
-    assert "Phase 2H-25 implements the Static Status and Availability Label Clarity" in readme_text
-    assert str(DOC_PATH).replace("\\", "/") in readme_text
-    assert "adds static reviewer-facing explanations for existing labels only" in readme_text
-    assert "adds no runtime discovery, filesystem probing, or execution behavior" in readme_text
+    assert "AUTHORIZED_SLICE: Static Status and Availability Label Clarity" in doc_text
+    assert "adds static reviewer-facing explanations for existing dashboard status" in doc_text
+    assert "not a live filesystem check" in doc_text
+    assert "reviewer guidance only and do not change dashboard behavior" in doc_text

@@ -324,5 +324,8 @@ def test_day155_docs_preserve_rationale_scope_boundaries():
         assert "next_phase_allowed: false" in doc
 
     assert "## Day155" in ai_readme
-    assert "Current project status after Day155" in readme
-    assert "V05_AI_ASSISTANCE_REOPEN_RATIONALE_REVIEW_READY" in readme
+    assert "## Current Release Status" in readme
+    assert "Stage-0 Network Automation Lab" in readme
+    assert "Workflow Version 2" in readme
+    assert "DEFERRED_SECURITY_RESEARCH_BLOCKED" in readme
+    assert "WF-01-03C through WF-01-03F" in readme

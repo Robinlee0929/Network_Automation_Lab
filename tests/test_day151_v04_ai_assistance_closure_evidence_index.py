@@ -300,7 +300,8 @@ def test_day151_docs_and_readme_preserve_required_closure_index_boundaries():
         assert "next_phase_allowed: false" in doc
 
     assert "## Day151" in ai_readme
-    assert "Current project status after Day151" in readme
-    assert "CLOSURE_EVIDENCE_INDEX_READY" in readme
-    assert "PHASE_GATE_CLOSED_REVIEW_ONLY" in readme
-    assert "NEXT_PHASE_ALLOWED_FALSE" in readme
+    assert "## Current Release Status" in readme
+    assert "Stage-0 Network Automation Lab" in readme
+    assert "Workflow Version 2" in readme
+    assert "DEFERRED_SECURITY_RESEARCH_BLOCKED" in readme
+    assert "WF-01-03C through WF-01-03F" in readme

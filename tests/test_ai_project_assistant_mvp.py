@@ -98,5 +98,5 @@ def test_automation_ai_node_schemas_and_prompts_are_workflow_ready() -> None:
     assert "JSON.parse" in route_handler
     assert "ensureHumanReview" in route_handler
     assert "自動化平台 AI 節點 MVP" in page
-    assert "workflow engine" in readme
-    assert "approval flow" in readme
+    assert "intended human-guided flow" in readme
+    assert "execution capabilities remain gated" in readme

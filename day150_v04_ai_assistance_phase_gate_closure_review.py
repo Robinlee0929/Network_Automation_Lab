@@ -548,14 +548,15 @@ def _path_exists(project_root: Path, relative_path: str) -> bool:
 
 def _readme_is_status_summary_only(readme_text: str) -> bool:
     required = (
-        "README_STATUS_SYNC_ONLY",
-        "status summary",
-        "does not replace",
-        "formal safety planning",
-        "phase gate",
-        "deferred risk register",
-        "formal closure review evidence",
-        "NEXT_PHASE_ALLOWED_FALSE",
+        "## Current Release Status",
+        "Stage-0 Network Automation Lab",
+        "Workflow Version 2",
+        "INACTIVE",
+        "DEFERRED_SECURITY_RESEARCH_BLOCKED",
+        "NOT INCLUDED IN RELEASE",
+        "WF-01-03C through WF-01-03F",
+        "Deferred future work / post-release",
+        "Historical records describe the state and authorization boundary",
     )
     forbidden = (
         "ready-for-execution",

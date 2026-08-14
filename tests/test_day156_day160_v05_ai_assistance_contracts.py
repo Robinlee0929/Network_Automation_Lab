@@ -254,9 +254,14 @@ def test_day156_day160_docs_preserve_v05_boundaries():
     readme = (PROJECT_ROOT / "README.md").read_text(encoding="utf-8")
     ai_readme = (PROJECT_ROOT / "docs/ai-intent/README.md").read_text(encoding="utf-8")
 
-    assert "Current project status after Day160" in readme
-    assert "V05_AI_ASSISTANCE_PHASE_GATE_REVIEW_READY" in readme
-    assert "NEXT_PHASE_ALLOWED_FALSE" in readme
+    for fragment in (
+        "## Current Release Status",
+        "Stage-0 Network Automation Lab",
+        "Workflow Version 2",
+        "DEFERRED_SECURITY_RESEARCH_BLOCKED",
+        "WF-01-03C through WF-01-03F",
+    ):
+        assert fragment in readme
     assert "## Day160" in ai_readme
     assert "next_phase_allowed=false" in ai_readme
 

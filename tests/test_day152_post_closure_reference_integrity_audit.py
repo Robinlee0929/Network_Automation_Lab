@@ -241,6 +241,11 @@ def test_day152_docs_and_readme_preserve_post_closure_boundaries():
         assert "next_phase_allowed: false" in doc
 
     assert "## Day152" in ai_readme
-    assert "Current project status after Day152" in readme
-    assert "POST_CLOSURE_REFERENCE_INTEGRITY_AUDITED" in readme
-    assert "Day151 remains the closure evidence index authority" in readme
+    for fragment in (
+        "## Current Release Status",
+        "Stage-0 Network Automation Lab",
+        "Workflow Version 2",
+        "DEFERRED_SECURITY_RESEARCH_BLOCKED",
+        "WF-01-03C through WF-01-03F",
+    ):
+        assert fragment in readme

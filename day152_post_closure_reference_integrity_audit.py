@@ -101,10 +101,11 @@ REFERENCE_TARGETS: Tuple[Dict[str, Any], ...] = (
         "surface": "README",
         "path": "README.md",
         "required_fragments": (
-            "Current project status after Day152",
-            "Day151 remains the closure evidence index authority",
-            "Post-Closure Reference Integrity Audit",
-            "NEXT_PHASE_ALLOWED_FALSE",
+            "## Current Release Status",
+            "Stage-0 Network Automation Lab",
+            "Workflow Version 2",
+            "DEFERRED_SECURITY_RESEARCH_BLOCKED",
+            "WF-01-03C through WF-01-03F",
         ),
     },
     {

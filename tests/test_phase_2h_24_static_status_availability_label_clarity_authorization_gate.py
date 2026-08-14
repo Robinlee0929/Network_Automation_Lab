@@ -97,10 +97,10 @@ def test_phase_2h_24_keeps_current_static_labels_as_future_subject_only():
     assert "modify committed static dashboard HTML" in doc_text
 
 
-def test_phase_2h_24_readme_trail_is_registered_without_task_registry_claim():
-    readme_text = Path("README.md").read_text(encoding="utf-8")
+def test_phase_2h_24_formal_record_preserves_authorization_without_implementation():
+    doc_text = DOC_PATH.read_text(encoding="utf-8")
 
-    assert "Phase 2H-24 records the Static Status and Availability Label Clarity" in readme_text
-    assert str(DOC_PATH).replace("\\", "/") in readme_text
-    assert "authorizes only one future static label-clarity implementation slice" in readme_text
-    assert "performs no implementation in Phase 2H-24" in readme_text
+    assert "AUTHORIZED_SLICE: Static Status and Availability Label Clarity" in doc_text
+    assert "Phase 2H-24 remains planning-only and performs no implementation." in doc_text
+    assert "does not require real automation, live lab access, runtime command execution" in doc_text
+    assert "no runtime discovery" in doc_text

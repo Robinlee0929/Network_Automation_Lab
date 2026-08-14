@@ -285,6 +285,8 @@ def test_day154_docs_preserve_scope_boundaries():
         assert "agents_md_pre_read_required: true" in doc
 
     assert "## Day154" in ai_readme
-    assert "Current project status after Day154" in readme
-    assert "POST_CLOSURE_EVIDENCE_BASELINE_LOCK_REVIEW_READY" in readme
-    assert "SDD Operating Contract Draft" in readme
+    assert "## Current Release Status" in readme
+    assert "Stage-0 Network Automation Lab" in readme
+    assert "Workflow Version 2" in readme
+    assert "DEFERRED_SECURITY_RESEARCH_BLOCKED" in readme
+    assert "WF-01-03C through WF-01-03F" in readme

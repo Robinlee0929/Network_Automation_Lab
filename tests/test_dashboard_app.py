@@ -1393,14 +1393,17 @@ def test_dashboard_evidence_route_serves_safe_docs_and_rejects_json_raw(tmp_path
     assert client.get("/reports/evidence/topology_profiles/day33_vrrp_topology_dry_run.json").status_code == 404
 
 
-def test_readme_contains_day12_section_and_safety_notes():
+def test_day12_contract_and_current_readme_preserve_safety_boundaries():
     readme = Path("README.md").read_text(encoding="utf-8")
+    day12_source = Path("mikrotik_day12_wireguard_vpn_automation.py").read_text(encoding="utf-8")
 
-    assert "## Day12 WireGuard VPN Automation" in readme
-    assert "exports/wireguard/<filename>.conf" in readme
-    assert "reports/<device_name>/day12_wireguard_vpn_automation_report.json" in readme
-    assert "Reports must show `PrivateKey` as `REDACTED`" in readme
-    assert "Dashboard must not display full `.conf` content" in readme
+    assert "The August 2026 release baseline is a local Stage-0 product" in readme
+    assert "supported release path is designed for local portfolio review" in readme
+    assert "require a router, switch, VPN peer, SSH session" in readme
+    assert "day12_wireguard_vpn_automation_report.json" in day12_source
+    assert "PrivateKey leaked into report data." in day12_source
+    assert "PrivateKey: REDACTED" in day12_source
+    assert "Saved config does not include SSH password, PrivateKey, or exported .conf content." in day12_source
 
 
 
