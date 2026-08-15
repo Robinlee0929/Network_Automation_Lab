@@ -144,14 +144,84 @@
       font-weight: 750;
       margin-top: 12px;
     }
+    .journey-section { margin-top: 0; }
+    .journey-intro {
+      color: var(--text);
+      font-size: 16px;
+      line-height: 1.55;
+      max-width: 920px;
+    }
+    .journey-path {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      list-style: none;
+      margin-top: 16px;
+      padding: 0;
+    }
+    .journey-path li {
+      background: #f9fbfd;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      color: var(--muted);
+      margin: 0;
+      min-width: 0;
+      padding: 13px;
+    }
+    .journey-path strong {
+      color: var(--text);
+      display: block;
+      margin-bottom: 5px;
+    }
+    .scenario-grid, .boundary-grid {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      margin-top: 16px;
+    }
+    .scenario-card, .boundary-card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      min-width: 0;
+      padding: 16px;
+    }
+    .scenario-card.allowed { background: var(--pass-bg); border-color: #a9d8bb; }
+    .scenario-card.rejected { background: var(--fail-bg); border-color: #efb4ae; }
+    .scenario-card h3, .boundary-card h3 { margin-top: 10px; }
+    .scenario-detail {
+      display: grid;
+      gap: 7px 12px;
+      grid-template-columns: minmax(110px, .35fr) minmax(0, 1fr);
+      margin: 12px 0;
+    }
+    .scenario-detail dt { color: var(--muted); font-weight: 800; }
+    .scenario-detail dd { color: var(--text); margin: 0; overflow-wrap: anywhere; }
+    .journey-conclusion {
+      background: var(--blue-bg);
+      border-left: 4px solid var(--blue);
+      color: var(--text);
+      line-height: 1.55;
+      margin-top: 16px;
+      max-width: none;
+      padding: 13px 14px;
+    }
+    .journey-evidence-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-top: 12px;
+    }
+    .journey-evidence-links a { font-weight: 800; }
     @media (max-width: 960px) {
       .hero, .section-grid { grid-template-columns: 1fr; }
       .proof-grid, .quick-links, .summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .journey-path { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
     @media (max-width: 620px) {
       h1 { font-size: 27px; }
       .hero-copy, .status-card, section { padding: 16px; }
       .proof-grid, .quick-links, .summary-grid { grid-template-columns: 1fr; }
+      .journey-path, .scenario-grid, .boundary-grid, .scenario-detail { grid-template-columns: 1fr; }
     }
   </style>
 {% endblock %}
@@ -161,7 +231,8 @@
       <div class="eyebrow">Canonical reviewer entry point · Stage 0 Demo</div>
       <h1>Network Automation Lab - Portfolio Demo</h1>
       <p class="reviewer-conclusion"><strong>Reviewer conclusion:</strong> This canonical Flask surface is ready for offline portfolio review with report-only Stage 0 boundaries. Evidence availability may vary by checkout and never triggers live collection.</p>
-      <p class="value">This platform demonstrates safe network automation, evidence-based reporting, runner task orchestration, dashboard visibility, and AI-ready architecture for a small multi-vendor network lab.</p>
+      <p class="value">Network Automation Lab is a safety-first network-validation and automation QA platform for Network Engineers and Automation Reviewers. It turns bounded requests into deterministic decisions, structured evidence, and reviewer-visible conclusions before any future live-device capability is considered.</p>
+      <p class="link"><a href="#stage0-interview-journey"><strong>Open the 3-minute Stage-0 journey</strong></a></p>
       <div class="note">Canonical reviewer entry point · report-only / demo-only. The <code>/commands</code> page is display-only during the Phase 2N Demo; do not submit a command.</div>
     </header>
 
@@ -174,6 +245,73 @@
       <div class="note">This demo does not require live router access. Live tests are separated from report-only and read-only tasks.</div>
     </aside>
   </div>
+
+  <section class="journey-section" id="stage0-interview-journey" aria-labelledby="stage0-interview-journey-heading">
+    <div class="eyebrow">Current product workflow · existing committed evidence</div>
+    <h2 id="stage0-interview-journey-heading">How a Stage-0 request becomes reviewer evidence</h2>
+    <p class="journey-intro"><strong>Primary user: Network Engineer / Automation Reviewer.</strong> Ad hoc network checks are difficult to repeat, compare, review, audit, and automate safely. This journey shows how the current platform evaluates bounded inputs without contacting a live device.</p>
+
+    <ol class="journey-path" aria-label="Current Stage-0 workflow">
+      <li><strong>1. Bounded request</strong>A deterministic fixture describes the requested validation intent.</li>
+      <li><strong>2. Safety decision</strong>Validation classifies the request as allowed or rejected.</li>
+      <li><strong>3. Fake boundary</strong>Only an allowed request can reach deterministic fake-adapter processing.</li>
+      <li><strong>4. Evidence</strong>The result and safety flags are normalized into structured JSON and HTML.</li>
+      <li><strong>5. Review</strong>A reviewer inspects the decision, result, and no-live-execution proof.</li>
+    </ol>
+
+    <div class="scenario-grid">
+      <article class="scenario-card allowed" data-demo-scenario="allowed">
+        <span class="badge pass">ALLOW</span>
+        <h3>Allowed bounded example</h3>
+        <dl class="scenario-detail">
+          <dt>Request</dt><dd>Normalize fake identity evidence</dd>
+          <dt>Why allowed</dt><dd>Read-only identity intent is explicitly bounded to the fake adapter.</dd>
+          <dt>Safe result</dt><dd><code>FAKE_RESULT_READY</code> with simulated identity <code>lab-router-simulated</code>.</dd>
+          <dt>Boundary proof</dt><dd>Fake adapter invoked; real adapter, SSH, device access, and live execution all remain false.</dd>
+        </dl>
+      </article>
+
+      <article class="scenario-card rejected" data-demo-scenario="rejected">
+        <span class="badge fail">REJECT</span>
+        <h3>Unsafe request rejected</h3>
+        <dl class="scenario-detail">
+          <dt>Request</dt><dd>Set interface address</dd>
+          <dt>Why rejected</dt><dd>The request is write-capable and outside the Stage-0 boundary.</dd>
+          <dt>Safe result</dt><dd>No adapter result is created.</dd>
+          <dt>Boundary proof</dt><dd>Rejected before adapter invocation; fake adapter, real adapter, SSH, device access, and live execution all remain false.</dd>
+        </dl>
+      </article>
+    </div>
+
+    <p class="journey-conclusion"><strong>Reviewer conclusion:</strong> Existing Day95 evidence proves that an allowed bounded input can produce deterministic fake-adapter evidence, while an unsafe input fails closed before adapter invocation. This accepted Stage-0 interview path performs no live-device action.</p>
+
+    <div class="boundary-grid">
+      <article class="boundary-card">
+        <h3>Implemented in this Stage-0 journey</h3>
+        <ul>
+          <li>Deterministic validation and safety classification</li>
+          <li>Fake-adapter and report-only processing</li>
+          <li>Structured evidence with negative safety proof</li>
+          <li>GET-only reviewer presentation and safe drilldown</li>
+        </ul>
+      </article>
+      <article class="boundary-card">
+        <h3>Intentionally outside this accepted demo path</h3>
+        <ul>
+          <li>Provider-backed operations or model invocation</li>
+          <li>Controls for local command or job execution</li>
+          <li>Live SSH, NETCONF, RESTCONF, or device configuration</li>
+          <li>Production approval, queue, scheduler, worker, or orchestration</li>
+        </ul>
+      </article>
+    </div>
+
+    <p class="note">This is more than a one-off script: the request, guard decision, normalized evidence, negative safety proof, reviewer surface, and regression tests form a traceable validation chain. Other internal or legacy surfaces elsewhere in the repository are outside this accepted Stage-0 journey.</p>
+    <div class="journey-evidence-links" aria-label="Day95 evidence drilldowns">
+      <a href="{{ json_report_url('reports/lab-summary/day95_adapter_result_normalization.json') }}">Preview the bounded Day95 JSON evidence</a>
+      <a href="{{ report_url('reports/lab-summary/day95_adapter_result_normalization.html') }}">Open the reviewer-facing Day95 HTML evidence</a>
+    </div>
+  </section>
 
   <section class="evidence-health" aria-labelledby="evidence-health-heading">
     <h2 id="evidence-health-heading">Evidence Health</h2>
@@ -236,6 +374,10 @@
   <section>
     <h2>Quick Links</h2>
     <div class="quick-links">
+      <a class="quick-link" href="#stage0-interview-journey">
+        <strong>Stage-0 Demo Journey</strong>
+        <span>Follow one allowed fake-adapter request and one unsafe request rejected before adapter invocation.</span>
+      </a>
       <a class="quick-link" href="{{ url_for('reports') }}">
         <strong>Reports</strong>
         <span>Browse report index evidence, VRRP artifacts, WireGuard summaries, and safe JSON previews.</span>

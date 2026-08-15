@@ -137,6 +137,28 @@ separate reviewed activation decision.
 └── package.json              # secondary Next.js application metadata
 ```
 
+## Interview / Demo Quick Path
+
+Network Automation Lab is a safety-first network-validation and automation QA
+platform for Network Engineers and Automation Reviewers. The shortest current
+walkthrough uses the canonical Flask dashboard:
+
+```bash
+python dashboard_app.py
+```
+
+Open `http://127.0.0.1:5000/` and select **Open the 3-minute Stage-0 journey**.
+The journey uses committed Day95 evidence to compare one allowed read-only
+fake-adapter request with one write-capable request rejected before adapter
+invocation. It connects the request, safety decision, deterministic evidence,
+and reviewer conclusion without requiring repository-history context.
+
+This accepted Stage-0 demo path is GET-only. It does not invoke provider-backed
+operations, expose local command or job execution controls, contact devices by
+SSH, NETCONF, or RESTCONF, change configuration, or demonstrate production
+approval and orchestration. Other internal or legacy surfaces in the repository
+are outside this interview path.
+
 ## Quick Start
 
 ### 1. Clone the repository
@@ -395,17 +417,11 @@ retained separately and is intentionally excluded from the public release.
 
 ## Known Limitations / Future Work
 
-### August release critical path
+### Current release baseline
 
-After this documentation reconciliation, the bounded August sequence is:
-
-1. diagnose and fix the known GitHub main CI red-X in a separate task;
-2. verify GitHub CI;
-3. perform product and actual user-flow acceptance;
-4. run final regression;
-5. review release-candidate repository hygiene;
-6. verify final GitHub CI green state;
-7. close the release and portfolio milestone by 2026-08-31.
+The v0.3 release and its bounded post-release maintenance cycle are complete.
+The current public portfolio path remains the local Stage-0 reviewer experience;
+future capabilities stay behind their separate authorization and safety gates.
 
 ### Post-release or deferred
 
