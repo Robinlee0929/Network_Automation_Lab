@@ -198,7 +198,6 @@ export async function analyzeReportWithAi(input: {
 export async function parseNetworkRequestWithAi(input: {
   userRequest: string;
   deviceInventory?: unknown;
-  availableActions?: unknown;
 }) {
   const actions = getAvailableActions();
   const systemPrompt = [
@@ -219,8 +218,7 @@ export async function parseNetworkRequestWithAi(input: {
   const generated = await generateNetworkJson(systemPrompt, {
     userRequest: input.userRequest,
     deviceInventory: input.deviceInventory ?? null,
-    availableActions: actions,
-    userSuppliedAvailableActions: input.availableActions ?? null
+    availableActions: actions
   });
 
   const validation = validateParseRequestOutput(withParseReadinessDefaults(generated.parsed));

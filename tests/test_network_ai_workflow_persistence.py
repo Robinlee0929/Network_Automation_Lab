@@ -88,6 +88,9 @@ function loadTs(relativePath) {
       if (request === "@/lib/network-ai/parseResultStore") {
         return loadTs("lib/network-ai/parseResultStore.ts");
       }
+      if (request === "@/lib/network-ai/providerDemo") {
+        return loadTs("lib/network-ai/providerDemo.ts");
+      }
       if (request === "@/lib/network-ai/jobs") {
         return loadTs("lib/network-ai/jobs.ts");
       }
@@ -125,16 +128,54 @@ const inventory = {
   ]
 };
 
+process.env.NETWORK_AI_PROVIDER_DEMO_ENABLED = "0";
+const disabledResponse = await parseRoute.POST(
+  new Request("http://local", {
+    method: "POST",
+    body: JSON.stringify({ userRequest: "Check LAB-DEMO-ROUTER" })
+  })
+);
+const disabledPayload = await disabledResponse.json();
+
+process.env.NETWORK_AI_PROVIDER_DEMO_ENABLED = "1";
+const emptyResponse = await parseRoute.POST(
+  new Request("http://local", {
+    method: "POST",
+    body: JSON.stringify({ userRequest: "   " })
+  })
+);
+const emptyPayload = await emptyResponse.json();
+
+const oversizedResponse = await parseRoute.POST(
+  new Request("http://local", {
+    method: "POST",
+    body: JSON.stringify({ userRequest: "x".repeat(501) })
+  })
+);
+const oversizedPayload = await oversizedResponse.json();
+
+const expandedBodyResponse = await parseRoute.POST(
+  new Request("http://local", {
+    method: "POST",
+    body: JSON.stringify({
+      userRequest: "Check LAB-DEMO-ROUTER",
+      availableActions: [{ id: "reboot_device" }],
+      command: "/system reboot"
+    })
+  })
+);
+const expandedBodyPayload = await expandedBodyResponse.json();
+
 const parseResponse = await parseRoute.POST(
   new Request("http://local", {
     method: "POST",
     body: JSON.stringify({
-      userRequest: "請幫我檢查 HEX-S-2025-LAB01 的 WAN/LAN 狀態",
-      deviceInventory: inventory
+      userRequest: "請幫我檢查 HEX-S-2025-LAB01 的 WAN/LAN 狀態"
     })
   })
 );
 const parsePayload = await parseResponse.json();
+const storedParseResult = parseStore.getLatestParseResultRecord();
 
 const latestResponse = await latestRoute.GET();
 const latestPayload = await latestResponse.json();
@@ -144,12 +185,12 @@ const createResponse = await createRoute.POST(
     method: "POST",
     body: JSON.stringify({
       actionId: parsePayload.parseResult.output.recommendedActionId,
-      targetDevice: parsePayload.parseResult.output.targetDevice,
-      vendor: parsePayload.parseResult.output.vendor,
+      targetDevice: storedParseResult.output.targetDevice,
+      vendor: storedParseResult.output.vendor,
       deviceInventory: inventory,
       params: {
         source: "ai-actions",
-        parseResultId: parsePayload.parseResult.id,
+        parseResultId: storedParseResult.id,
         intent: parsePayload.parseResult.output.intent
       }
     })
@@ -179,12 +220,21 @@ const mismatch = jobs.createNetworkJob({
   targetDevice: "HEX-S-2025-LAB01",
   vendor: "mikrotik",
   deviceInventory: { devices: [{ name: "core-switch", vendor: "cisco" }] },
-  params: { source: "direct-test", parseResultId: parsePayload.parseResult.id }
+  params: { source: "direct-test", parseResultId: storedParseResult.id }
 }).job;
 
 process.stdout.write(JSON.stringify({
+  disabledStatus: disabledResponse.status,
+  disabledPayload,
+  emptyStatus: emptyResponse.status,
+  emptyPayload,
+  oversizedStatus: oversizedResponse.status,
+  oversizedPayload,
+  expandedBodyStatus: expandedBodyResponse.status,
+  expandedBodyPayload,
   missingLatestPayload,
   parsePayload,
+  storedParseResult,
   latestPayload,
   createPayload,
   jobsPayload,
@@ -205,6 +255,7 @@ def run_workflow_check(tmp_path: Path) -> dict:
     env = os.environ.copy()
     env["NETWORK_AI_PARSE_RESULT_STORE_PATH"] = str(tmp_path / "parse-results.json")
     env["NETWORK_AI_JOB_STORE_PATH"] = str(tmp_path / "jobs.json")
+    env["NETWORK_AI_PROVIDER_DEMO_ENABLED"] = "1"
     completed = subprocess.run(
         ["node", "-e", NODE_WORKFLOW_PERSISTENCE],
         cwd=ROOT,
@@ -221,12 +272,33 @@ def test_parse_request_post_creates_persistent_record_and_latest_api_reads_it(tm
     result = run_workflow_check(tmp_path)
 
     parse_result = result["parsePayload"]["parseResult"]
-    assert parse_result["id"].startswith("parse_")
-    assert parse_result["userRequest"] == "請幫我檢查 HEX-S-2025-LAB01 的 WAN/LAN 狀態"
     assert parse_result["output"]["jobCreationAllowed"] is True
     assert parse_result["output"]["blockedReason"] is None
-    assert result["latestPayload"]["parseResult"]["id"] == parse_result["id"]
-    assert result["parseStoreFile"][0]["id"] == parse_result["id"]
+    assert "id" not in parse_result
+    assert "userRequest" not in parse_result
+    assert "deviceInventorySnapshot" not in parse_result
+    assert result["latestPayload"]["parseResult"] == parse_result
+    assert result["storedParseResult"]["id"].startswith("parse_")
+    assert result["storedParseResult"]["userRequest"] == (
+        "請幫我檢查 HEX-S-2025-LAB01 的 WAN/LAN 狀態"
+    )
+    assert result["parseStoreFile"][0]["id"] == result["storedParseResult"]["id"]
+    assert result["parseStoreFile"][0]["deviceInventorySnapshot"]["context"] == "synthetic-local-demo-only"
+
+
+def test_parse_request_route_requires_opt_in_and_rejects_invalid_or_expanded_input(tmp_path):
+    result = run_workflow_check(tmp_path)
+
+    assert result["disabledStatus"] == 400
+    assert "disabled" in result["disabledPayload"]["error"]
+    assert result["emptyStatus"] == 400
+    assert result["emptyPayload"]["error"] == "userRequest is required."
+    assert result["oversizedStatus"] == 400
+    assert "500 characters or fewer" in result["oversizedPayload"]["error"]
+    assert result["expandedBodyStatus"] == 400
+    assert result["expandedBodyPayload"]["error"] == (
+        "Only userRequest is accepted by the local recommendation preview."
+    )
 
 
 def test_latest_parse_result_returns_null_when_store_is_empty(tmp_path):
@@ -249,7 +321,7 @@ def test_create_job_from_allowed_parse_result_persists_and_jobs_api_lists_it(tmp
     assert job["riskLevel"] == "low"
     assert job["requiresApproval"] is False
     assert job["source"] == "ai-actions"
-    assert job["parseResultId"] == parse_result["id"]
+    assert job["parseResultId"] == result["storedParseResult"]["id"]
     assert jobs_payload[0]["id"] == job["id"]
     assert any(stored_job["id"] == job["id"] for stored_job in result["jobStoreFile"])
 

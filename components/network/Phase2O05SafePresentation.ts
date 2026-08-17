@@ -59,7 +59,8 @@ export type SafeCatalogItem = {
 };
 
 export type SafeParseProjection =
-  | { state: "EMPTY" | "REJECTED" }
+  | { state: "EMPTY" }
+  | { state: "REJECTED" }
   | {
       state: "AVAILABLE";
       intent: string;

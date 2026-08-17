@@ -368,26 +368,28 @@ def test_ai_actions_narrow_reflow_rejects_missing_flex_direction():
         _assert_ai_actions_narrow_reflow_contract(mutated_css)
 
 
-def test_ai_actions_reads_only_recorded_data_without_submission_controls():
+def test_ai_actions_keeps_default_stage0_and_bounds_opt_in_preview_controls():
     source = read("components/network/AiActionsClient.tsx")
 
     assert 'fetch("/api/network/ai/parse-request/latest")' in source
+    assert 'fetch("/api/network/ai/parse-request"' in source
     assert "projectActionCatalog" in source
     assert "projectParseResult" in source
     assert "Recorded Recommendation" in source
     assert "Allowlist Reference" in source
     assert "UNAVAILABLE — no request, provider, approval, job creation, or execution" in source
     assert "<AiActionsStage0Presentation />" in source
+    assert "providerDemoEnabled ?" in source
+    assert "Optional Local AI Recommendation Preview" in source
+    assert "JSON.stringify({ userRequest: trimmed })" in source
+    assert "<textarea" in source
 
     for prohibited in [
-        "setUserRequest(",
         "setInventoryText(",
-        'fetch("/api/network/ai/parse-request"',
         "/api/network/jobs/create",
-        "parseRequest",
         "createJob",
-        "JSON.stringify",
-        "<textarea",
+        "availableActions:",
+        "deviceInventory:",
         "output?.targetDevice",
         "output?.vendor",
         "parseResult?.id",

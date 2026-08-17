@@ -78,6 +78,29 @@ export function getLatestParseResultRecord() {
   return listParseResultRecords(1)[0] ?? null;
 }
 
+export function selectParseResultPresentationFields(
+  record: ParseResultRecord | null
+) {
+  if (!record) {
+    return null;
+  }
+
+  const output = record.output;
+  return {
+    output: {
+      intent: output.intent,
+      recommendedActionId: output.recommendedActionId,
+      missingFields: output.missingFields,
+      riskLevel: output.riskLevel,
+      requiresApproval: output.requiresApproval,
+      blocked: output.blocked,
+      jobCreationAllowed: output.jobCreationAllowed,
+      blockedReason: output.blockedReason
+    },
+    createdAt: record.createdAt
+  };
+}
+
 export function clearParseResultStoreForTests() {
   writeStore([]);
 }

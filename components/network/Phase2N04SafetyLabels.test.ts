@@ -81,13 +81,13 @@ describe("Phase 2N-04 user-facing safety labels", () => {
     expect(aiActions).toContain("<AiActionsStage0Presentation />");
     expect(aiActions).toContain("Allowlist Reference");
     expect(aiActions).toContain("Provider parsing remains");
-    expect(aiActions).not.toContain("parseRequest");
+    expect(aiActions).toContain("providerDemoEnabled ?");
+    expect(aiActions).toContain('fetch("/api/network/ai/parse-request"');
     expect(aiActions).not.toContain("createJob");
-    expect(aiActions).not.toContain('fetch("/api/network/ai/parse-request"');
     expect(aiActions).not.toContain("/api/network/jobs/create");
     expect(aiActions).not.toContain("icon-action-button");
-    expect(aiActions).not.toContain("<textarea");
-    expect(aiActions).not.toContain("JSON.stringify");
+    expect(aiActions).toContain("<textarea");
+    expect(aiActions).toContain("JSON.stringify({ userRequest: trimmed })");
     expect(aiActions).not.toContain("output?.targetDevice");
 
     expect(jobs).toContain('fetch("/api/network/jobs")');

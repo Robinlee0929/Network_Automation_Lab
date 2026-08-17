@@ -242,6 +242,15 @@ August release path. See the
 [canonical Quick Start and demo runbook](docs/phase_2n/phase_2n_01_canonical_quick_start_and_demo_runbook_documentation_only.md)
 for the recorded primary/secondary boundary.
 
+An **Optional Local AI Recommendation Preview** is available only on the
+secondary `/network/ai-actions` page when
+`NETWORK_AI_PROVIDER_DEMO_ENABLED=1` is set in `.env.local`. It also requires
+`OPENAI_API_KEY`, which is used only by the server-side provider client. The
+default remains `NETWORK_AI_PROVIDER_DEMO_ENABLED=0`, so the canonical Flask
+Stage-0 demo stays provider-free. The preview classifies a request against the
+fixed Action Catalog and stops at a sanitized recommendation; it does not create
+jobs, generate commands, contact devices, or execute network operations.
+
 ## Core Capabilities
 
 ### Evidence discovery and presentation

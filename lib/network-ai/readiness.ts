@@ -186,8 +186,11 @@ export function sanitizeParseRequestResult(input: {
   const blocked = !jobCreationAllowed;
 
   return {
-    ...output,
+    intent: output.intent,
+    targetDevice: output.targetDevice,
     vendor: (inventoryVendor ?? output.vendor) as Vendor,
+    interfaceName: output.interfaceName,
+    vlanId: output.vlanId,
     recommendedActionId: knownActionId,
     missingFields: Array.from(missingFields),
     riskLevel,

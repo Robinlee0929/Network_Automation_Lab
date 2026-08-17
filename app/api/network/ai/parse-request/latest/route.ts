@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
-import { getLatestParseResultRecord } from "@/lib/network-ai/parseResultStore";
+import {
+  getLatestParseResultRecord,
+  selectParseResultPresentationFields
+} from "@/lib/network-ai/parseResultStore";
 
 export async function GET() {
-  return NextResponse.json({ parseResult: getLatestParseResultRecord() });
+  return NextResponse.json({
+    parseResult: selectParseResultPresentationFields(getLatestParseResultRecord())
+  });
 }

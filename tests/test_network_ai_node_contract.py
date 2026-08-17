@@ -42,6 +42,10 @@ def test_network_ai_routes_are_server_side_and_do_not_return_api_keys_to_fronten
     assert "gpt-5-mini" in openai_client
     assert "analyzeReportWithAi" in analyze_route
     assert "parseNetworkRequestWithAi" in parse_route
+    assert "isNetworkAiProviderDemoEnabled" in parse_route
+    assert "LOCAL_DEMO_DEVICE_INVENTORY" in parse_route
+    assert "selectParseResultPresentationFields" in parse_route
+    assert "availableActions: body.availableActions" not in parse_route
     assert all("OPENAI_API_KEY" not in source for source in frontend_sources)
     assert all('from "openai"' not in source for source in frontend_sources)
 
@@ -75,4 +79,5 @@ def test_network_ai_readme_documents_safe_flow_and_env_contract():
     assert "device execution" in readme
     assert "OPENAI_API_KEY=" in env_example
     assert "OPENAI_MODEL=gpt-5-mini" in env_example
+    assert "NETWORK_AI_PROVIDER_DEMO_ENABLED=0" in env_example
     assert ".env.local" in gitignore

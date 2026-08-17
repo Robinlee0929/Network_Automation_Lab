@@ -249,6 +249,14 @@ export function validateParseRequestOutput(value: unknown): ValidationResult<Par
     return { ok: false, error: "AI request parser output must be a JSON object." };
   }
 
+  const allowedFields = new Set(Object.keys(parseRequestOutputJsonSchema.properties));
+  if (Object.keys(value).some((field) => !allowedFields.has(field))) {
+    return {
+      ok: false,
+      error: "AI request parser output contained an unsupported field."
+    };
+  }
+
   const nullableStrings = ["targetDevice", "interfaceName", "recommendedActionId"];
   for (const field of nullableStrings) {
     const fieldValue = value[field];

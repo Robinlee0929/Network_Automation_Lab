@@ -30,7 +30,7 @@ const pageContracts = [
       'import { getAvailableActions } from "@/lib/network-ai/actions";'
     ],
     dataCall: "const actions = getAvailableActions();",
-    client: "<AiActionsClient actions={actions} />"
+    client: "providerDemoEnabled={providerDemoEnabled}"
   },
   {
     path: "app/network/reports/page.tsx",
