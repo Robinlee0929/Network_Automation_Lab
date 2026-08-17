@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 
 import dashboard_app as dashboard
+import stage0_useful_result_presentation as stage0
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -45,14 +46,21 @@ def _journey_section(source: str) -> str:
     return source[start:end]
 
 
+def _scenario_section(source: str, scenario: str) -> str:
+    marker = source.index(f'data-demo-scenario="{scenario}"')
+    start = source.rfind("<article", 0, marker)
+    end = source.index("</article>", marker) + len("</article>")
+    return source[start:end]
+
+
 def test_committed_day95_evidence_supports_the_projected_allowed_and_rejected_examples():
     payload = json.loads(DAY95_JSON.read_text(encoding="utf-8"))
     scenarios = {
         scenario["scenario_id"]: scenario for scenario in payload["scenario_records"]
     }
 
-    allowed = scenarios["D95-S01-readonly-identity"]
-    assert allowed["intent"] == "Normalize fake identity evidence"
+    allowed = scenarios["D95-S02-readonly-interfaces-multiline"]
+    assert allowed["intent"] == "Normalize fake multi-line interface evidence"
     assert allowed["guard_decision"] == "ALLOW"
     assert allowed["fake_adapter_invoked"] is True
     assert allowed["real_adapter_invoked"] is False
@@ -60,7 +68,7 @@ def test_committed_day95_evidence_supports_the_projected_allowed_and_rejected_ex
     assert allowed["adapter_result"]["result_status"] == "FAKE_RESULT_READY"
     assert (
         allowed["adapter_result"]["result_payload"]["simulated_output"]
-        == "name: lab-router-simulated"
+        == "ether1 running\nbridge-lan running\nwireguard-lab disabled"
     )
 
     rejected = scenarios["D95-S03-reject-write-capable"]
@@ -72,6 +80,43 @@ def test_committed_day95_evidence_supports_the_projected_allowed_and_rejected_ex
     assert rejected["real_adapter_invoked"] is False
     assert rejected["live_execution_invoked"] is False
     assert rejected["adapter_result"] is None
+
+
+def test_stage0_projection_reuses_day96_for_allowed_only_and_never_fabricates_rejected(
+    monkeypatch,
+):
+    payload = json.loads(DAY95_JSON.read_text(encoding="utf-8"))
+    parser_calls = []
+    existing_parser = stage0.parse_normalized_fake_adapter_result
+
+    def record_parser_call(adapter_result):
+        parser_calls.append(adapter_result["scenario_id"])
+        return existing_parser(adapter_result)
+
+    monkeypatch.setattr(
+        stage0,
+        "parse_normalized_fake_adapter_result",
+        record_parser_call,
+    )
+    presentation = stage0.build_stage0_useful_result_presentation(payload)
+
+    allowed = presentation["allowed"]
+    assert parser_calls == ["D95-S02-readonly-interfaces-multiline"]
+    assert allowed["parsed_result"]["parser_status"] == "PARSED"
+    assert allowed["useful_result"] == {
+        "label": "Simulated Stage-0 result",
+        "record_count": 3,
+        "status_counts": {"running": 2, "disabled": 1},
+        "findings": [{"name": "wireguard-lab", "status": "disabled"}],
+        "source": "Deterministic fake adapter",
+        "live_device_contacted": False,
+    }
+
+    rejected = presentation["rejected"]
+    assert rejected["adapter_invoked"] is False
+    assert rejected["adapter_result"] is None
+    assert rejected["parsed_result"] is None
+    assert rejected["useful_result"] is None
 
 
 def test_canonical_home_get_exposes_a_complete_three_minute_stage0_journey(
@@ -93,9 +138,17 @@ def test_canonical_home_get_exposes_a_complete_three_minute_stage0_journey(
     assert "Safety decision" in journey
     assert "Fake boundary" in journey
     assert "Structured evidence" in journey
+    assert "Useful result" in journey
     assert "Reviewer conclusion" in journey
-    assert "Normalize fake identity evidence" in journey
+    assert "Normalize fake multi-line interface evidence" in journey
     assert "FAKE_RESULT_READY" in journey
+    assert "Simulated Stage-0 result" in journey
+    assert "3 interface records parsed" in journey
+    assert "2 running" in journey
+    assert "1 disabled" in journey
+    assert "wireguard-lab — disabled" in journey
+    assert "Deterministic fake adapter" in journey
+    assert "Live device contacted" in journey
     assert "Set interface address" in journey
     assert "Rejected before adapter invocation" in journey
     assert "Implemented in this Stage-0 journey" in journey
@@ -127,6 +180,7 @@ def test_stage0_journey_is_get_only_safe_linked_and_does_not_mutate_evidence(
     assert response.status_code == 200
     journey = _journey_section(response.get_data(as_text=True))
     lower = journey.lower()
+    rejected = _scenario_section(journey, "rejected")
 
     assert "<form" not in lower
     assert "<button" not in lower
@@ -148,6 +202,8 @@ def test_stage0_journey_is_get_only_safe_linked_and_does_not_mutate_evidence(
     assert "no live-device action" in lower
     assert "does not invoke provider-backed operations" not in lower
     assert "provider-backed operations or model invocation" in lower
+    assert 'data-stage0-useful-result="absent"' in rejected
+    assert "no adapter result, parsed result, or useful result is created" in rejected.lower()
     assert evidence_hash_before == _sha256(DAY95_JSON)
     assert evidence_mtime_before == DAY95_JSON.stat().st_mtime_ns
     assert forbidden_writes == []

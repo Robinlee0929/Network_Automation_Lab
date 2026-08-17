@@ -154,7 +154,7 @@
     .journey-path {
       display: grid;
       gap: 10px;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
+      grid-template-columns: repeat(6, minmax(0, 1fr));
       list-style: none;
       margin-top: 16px;
       padding: 0;
@@ -196,6 +196,16 @@
     }
     .scenario-detail dt { color: var(--muted); font-weight: 800; }
     .scenario-detail dd { color: var(--text); margin: 0; overflow-wrap: anywhere; }
+    .useful-result {
+      background: #f9fbfd;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      margin-top: 14px;
+      padding: 14px;
+    }
+    .useful-result h4 { margin: 0 0 10px; }
+    .useful-result ul { margin: 8px 0; }
+    .useful-result-meta { margin: 12px 0 0; }
     .journey-conclusion {
       background: var(--blue-bg);
       border-left: 4px solid var(--blue);
@@ -255,8 +265,9 @@
       <li><strong>1. Bounded request</strong>A deterministic fixture describes the requested validation intent.</li>
       <li><strong>2. Safety decision</strong>Validation classifies the request as allowed or rejected.</li>
       <li><strong>3. Fake boundary</strong>Only an allowed request can reach deterministic fake-adapter processing.</li>
-      <li><strong>4. Evidence</strong>The result and safety flags are normalized into structured JSON and HTML.</li>
-      <li><strong>5. Review</strong>A reviewer inspects the decision, result, and no-live-execution proof.</li>
+      <li><strong>4. Useful result</strong>The existing parser turns simulated output into a bounded reviewer summary.</li>
+      <li><strong>5. Evidence</strong>The result and safety flags remain visible as structured evidence.</li>
+      <li><strong>6. Review</strong>A reviewer inspects the useful result and no-live-execution proof.</li>
     </ol>
 
     <div class="scenario-grid">
@@ -264,26 +275,48 @@
         <span class="badge pass">ALLOW</span>
         <h3>Allowed bounded example</h3>
         <dl class="scenario-detail">
-          <dt>Request</dt><dd>Normalize fake identity evidence</dd>
-          <dt>Why allowed</dt><dd>Read-only identity intent is explicitly bounded to the fake adapter.</dd>
-          <dt>Safe result</dt><dd><code>FAKE_RESULT_READY</code> with simulated identity <code>lab-router-simulated</code>.</dd>
+          <dt>Request</dt><dd>{{ stage0_result.allowed.request }}</dd>
+          <dt>Why allowed</dt><dd>{{ stage0_result.allowed.reason }}</dd>
+          <dt>Evidence status</dt><dd><code>{{ stage0_result.allowed.result_status }}</code></dd>
           <dt>Boundary proof</dt><dd>Fake adapter invoked; real adapter, SSH, device access, and live execution all remain false.</dd>
         </dl>
+        {% if stage0_result.allowed.useful_result %}
+          <div class="useful-result" data-stage0-useful-result="present">
+            <h4>{{ stage0_result.allowed.useful_result.label }}</h4>
+            <strong>Result Summary</strong>
+            <ul>
+              <li>{{ stage0_result.allowed.useful_result.record_count }} interface records parsed</li>
+              {% for status, count in stage0_result.allowed.useful_result.status_counts.items() %}
+                <li>{{ count }} {{ status }}</li>
+              {% endfor %}
+            </ul>
+            <strong>Finding</strong>
+            <ul>
+              {% for finding in stage0_result.allowed.useful_result.findings %}
+                <li>{{ finding.name }} — {{ finding.status }}</li>
+              {% endfor %}
+            </ul>
+            <dl class="scenario-detail useful-result-meta">
+              <dt>Source</dt><dd>{{ stage0_result.allowed.useful_result.source }}</dd>
+              <dt>Live device contacted</dt><dd>{{ "Yes" if stage0_result.allowed.useful_result.live_device_contacted else "No" }}</dd>
+            </dl>
+          </div>
+        {% endif %}
       </article>
 
       <article class="scenario-card rejected" data-demo-scenario="rejected">
         <span class="badge fail">REJECT</span>
         <h3>Unsafe request rejected</h3>
         <dl class="scenario-detail">
-          <dt>Request</dt><dd>Set interface address</dd>
+          <dt>Request</dt><dd>{{ stage0_result.rejected.request }}</dd>
           <dt>Why rejected</dt><dd>The request is write-capable and outside the Stage-0 boundary.</dd>
-          <dt>Safe result</dt><dd>No adapter result is created.</dd>
+          <dt>Safe result</dt><dd data-stage0-useful-result="absent">No adapter result, parsed result, or useful result is created.</dd>
           <dt>Boundary proof</dt><dd>Rejected before adapter invocation; fake adapter, real adapter, SSH, device access, and live execution all remain false.</dd>
         </dl>
       </article>
     </div>
 
-    <p class="journey-conclusion"><strong>Reviewer conclusion:</strong> Existing Day95 evidence proves that an allowed bounded input can produce deterministic fake-adapter evidence, while an unsafe input fails closed before adapter invocation. This accepted Stage-0 interview path performs no live-device action.</p>
+    <p class="journey-conclusion"><strong>Reviewer conclusion:</strong> Existing Day95 evidence and the Day96 parser produce a useful simulated result for an allowed bounded input, while an unsafe input fails closed before adapter invocation and receives no fabricated result. This accepted Stage-0 interview path performs no live-device action.</p>
 
     <div class="boundary-grid">
       <article class="boundary-card">

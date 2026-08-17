@@ -27,6 +27,9 @@ from intent_controlled_ai_runtime_entry import get_day71_controlled_entry_design
 from intent_offline_mock_runtime import build_mock_runtime_report
 from intent_reviewer_report_quality import build_reviewer_quality_report
 from network_lab import discover_report_visibility, discover_vrrp_evidence, infer_report_result, mask_secret_values
+from stage0_useful_result_presentation import (
+    load_stage0_useful_result_presentation,
+)
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent
@@ -1869,6 +1872,12 @@ def create_app(
         return render_template(
             "dashboard_home.html",
             home_evidence_cards=build_home_evidence_health_cards(entries),
+            stage0_result=load_stage0_useful_result_presentation(
+                PROJECT_ROOT
+                / "reports"
+                / "lab-summary"
+                / "day95_adapter_result_normalization.json"
+            ),
             description=(
                 "A Python-based network automation and validation lab for "
                 "MikroTik RouterOS, Cisco switch topology checks, iperf3 "
