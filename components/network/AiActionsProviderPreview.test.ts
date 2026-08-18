@@ -272,6 +272,37 @@ describe("Optional Local AI Recommendation Preview", () => {
     );
   });
 
+  it("withholds Safe Outcome for mixed and non-bounded false-safe requests", () => {
+    for (const userRequest of [
+      "Check WAN and LAN status for LAB-DEMO-ROUTER, then change ether2 to VLAN 20.",
+      "Change interface ether2 on LAB-DEMO-ROUTER to VLAN 30."
+    ]) {
+      const sanitized = sanitizeParseRequestResult({
+        output: readOnlyModelOutput(),
+        userRequest,
+        deviceInventory: LOCAL_DEMO_DEVICE_INVENTORY
+      });
+      const outcome = buildSafeOutcome({
+        userRequest,
+        output: sanitized,
+        deviceInventory: LOCAL_DEMO_DEVICE_INVENTORY
+      });
+
+      expect(sanitized.riskLevel).not.toBe("low");
+      expect(sanitized).toMatchObject({
+        requiresApproval: true,
+        blocked: true,
+        jobCreationAllowed: false
+      });
+      expect(outcome).toEqual({
+        type: "BLOCKED_NO_OUTCOME",
+        reason: "No safe outcome is available for this request.",
+        jobCreated: false,
+        executed: false
+      });
+    }
+  });
+
   it("makes Scenario B unavailable for missing or inconsistent synthetic context", () => {
     const sanitized = sanitizeParseRequestResult({
       output: configurationModelOutput(),

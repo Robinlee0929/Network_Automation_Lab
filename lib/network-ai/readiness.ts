@@ -19,6 +19,14 @@ function normalize(value: string) {
   return value.trim().toLowerCase();
 }
 
+function maxRiskLevel(
+  current: ParseRequestOutput["riskLevel"],
+  candidate: ParseRequestOutput["riskLevel"]
+) {
+  const rank = { low: 0, medium: 1, high: 2 } as const;
+  return rank[current] >= rank[candidate] ? current : candidate;
+}
+
 function stringField(record: Record<string, unknown>, fields: string[]) {
   for (const field of fields) {
     const value = record[field];
@@ -97,6 +105,19 @@ function userRequestMentionsSpecificInterface(userRequest: string) {
   ) || /\bport\s+\d+\b/i.test(userRequest);
 }
 
+function userRequestHasExplicitVlanMutation(userRequest: string) {
+  const mutationClauses = userRequest.match(
+    /\b(?:change|set|move|assign)\b[^.!?\r\n]{0,160}/gi
+  );
+
+  return Boolean(
+    mutationClauses?.some(
+      (clause) =>
+        userRequestMentionsSpecificInterface(clause) && /\bvlan\s*\d{1,4}\b/i.test(clause)
+    )
+  );
+}
+
 function addMissing(missingFields: Set<string>, field: string) {
   missingFields.add(field);
 }
@@ -115,6 +136,8 @@ export function sanitizeParseRequestResult(input: {
   const inventoryVendor = inferInventoryVendor(readiness.matchedDevice);
   const configChangeIntent =
     output.intent === "change_access_vlan" || output.intent === "update_description";
+  const explicitVlanMutation = userRequestHasExplicitVlanMutation(input.userRequest);
+  const configurationCapable = configChangeIntent || explicitVlanMutation;
   const missingFields = new Set<string>();
 
   if (!output.targetDevice) {
@@ -150,7 +173,7 @@ export function sanitizeParseRequestResult(input: {
   }
 
   let blockedReason: string | null = null;
-  let requiresApproval = output.requiresApproval || configChangeIntent;
+  let requiresApproval = output.requiresApproval || configurationCapable;
   let jobCreationAllowed = false;
   let riskLevel = output.riskLevel;
 
@@ -160,22 +183,28 @@ export function sanitizeParseRequestResult(input: {
 
   if (knownActionId === "backup_config") {
     requiresApproval = true;
-    riskLevel = "medium";
+    riskLevel = maxRiskLevel(riskLevel, "medium");
     blockedReason = blockedReason ?? BACKUP_CONFIG_BLOCKED_REASON;
   }
 
-  if (configChangeIntent) {
+  if (configurationCapable) {
     requiresApproval = true;
-    riskLevel = riskLevel === "low" ? "medium" : riskLevel;
+    riskLevel = maxRiskLevel(riskLevel, "medium");
     blockedReason = blockedReason ?? CONFIG_CHANGE_BLOCKED_REASON;
   }
 
   if (action && action.riskLevel !== "low") {
     requiresApproval = true;
-    riskLevel = action.riskLevel;
+    riskLevel = maxRiskLevel(riskLevel, action.riskLevel);
   }
 
-  if (action && action.readOnly && action.riskLevel === "low" && readiness.ready && !configChangeIntent) {
+  if (
+    action &&
+    action.readOnly &&
+    action.riskLevel === "low" &&
+    readiness.ready &&
+    !configurationCapable
+  ) {
     jobCreationAllowed = true;
   }
 
