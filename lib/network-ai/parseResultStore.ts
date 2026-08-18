@@ -1,6 +1,7 @@
 import { createHash, randomUUID } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
+import { buildSafeOutcome } from "./safeOutcome";
 import type { ParseRequestOutput, ParseResultRecord } from "./schemas";
 
 const STORE_PATH =
@@ -97,6 +98,11 @@ export function selectParseResultPresentationFields(
       jobCreationAllowed: output.jobCreationAllowed,
       blockedReason: output.blockedReason
     },
+    safeOutcome: buildSafeOutcome({
+      userRequest: record.userRequest,
+      output,
+      deviceInventory: record.deviceInventorySnapshot
+    }),
     createdAt: record.createdAt
   };
 }

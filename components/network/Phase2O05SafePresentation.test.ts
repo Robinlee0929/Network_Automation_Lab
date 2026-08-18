@@ -2,6 +2,10 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 
+import { selectParseResultPresentationFields } from "../../lib/network-ai/parseResultStore";
+import { LOCAL_DEMO_DEVICE_INVENTORY } from "../../lib/network-ai/providerDemo";
+import type { ParseResultRecord } from "../../lib/network-ai/schemas";
+
 import {
   normalizeRecordedDate,
   normalizeRecordedStatus,
@@ -11,7 +15,8 @@ import {
   projectEvidenceCollection,
   projectJobsCollection,
   projectParseResult,
-  projectReportsCollection
+  projectReportsCollection,
+  projectSafeOutcome
 } from "./Phase2O05SafePresentation";
 
 const sensitiveSentinels = {
@@ -247,6 +252,210 @@ describe("Phase2O05SafePresentation", () => {
       recordedDate: "Recorded parse date: 2026-07-23"
     });
     assertNoSensitiveOutput(projected);
+  });
+
+  it("projects only exact closed Safe Outcome variants", () => {
+    const readOnly = projectSafeOutcome({
+      type: "READ_ONLY_RESULT",
+      title: "WAN/LAN Check Result",
+      interfaces: [
+        { role: "WAN", name: "ether1", status: "RUNNING" },
+        { role: "LAN", name: "bridge-lan", status: "RUNNING" }
+      ],
+      source: "Deterministic synthetic Stage-0 data",
+      synthetic: true,
+      liveDeviceContacted: false
+    });
+    expect(readOnly).toEqual({
+      state: "READ_ONLY_RESULT",
+      heading: "WAN/LAN Result",
+      interfaces: [
+        { role: "WAN", name: "ether1", status: "RUNNING" },
+        { role: "LAN", name: "bridge-lan", status: "RUNNING" }
+      ],
+      source: "Deterministic synthetic Stage-0 data",
+      syntheticLabel: "SYNTHETIC / DEMO / NON-LIVE",
+      liveDeviceContacted: "NO"
+    });
+
+    const availablePreview = projectSafeOutcome({
+      type: "CONFIGURATION_PREVIEW",
+      state: "AVAILABLE",
+      vendor: "MikroTik",
+      platform: "RouterOS 7",
+      requestedChange: "ether2 → VLAN 20",
+      preview: [
+        "/interface bridge port",
+        'set [find where bridge="bridge-lan" and interface="ether2"] pvid=20 ingress-filtering=yes frame-types=admit-only-untagged-and-priority-tagged',
+        "/interface bridge vlan",
+        'add bridge="bridge-lan" vlan-ids=20 tagged="bridge-lan" untagged="ether2"'
+      ],
+      source: "SERVER-OWNED TEMPLATE",
+      templateId: "routeros_bridge_access_vlan_v1",
+      previewOnly: true,
+      executed: false,
+      approvalRequired: true,
+      safety: "BLOCKED",
+      jobEligible: false
+    });
+    expect(availablePreview).toMatchObject({
+      state: "CONFIGURATION_PREVIEW_AVAILABLE",
+      heading: "Configuration Guidance",
+      vendor: "MikroTik",
+      platform: "RouterOS 7",
+      requestedChange: "ether2 → VLAN 20",
+      source: "SERVER-OWNED TEMPLATE",
+      templateId: "routeros_bridge_access_vlan_v1",
+      status: "PREVIEW ONLY",
+      execution: "NOT EXECUTED",
+      approval: "REQUIRED",
+      safety: "BLOCKED",
+      jobEligibility: "NO"
+    });
+
+    expect(
+      projectSafeOutcome({
+        type: "CONFIGURATION_PREVIEW",
+        state: "UNAVAILABLE",
+        reason: "Missing required server-owned synthetic context",
+        previewOnly: true,
+        executed: false,
+        approvalRequired: true,
+        safety: "BLOCKED",
+        jobEligible: false
+      })
+    ).toEqual({
+      state: "CONFIGURATION_PREVIEW_UNAVAILABLE",
+      heading: "Configuration Guidance",
+      reason: "Missing required server-owned synthetic context",
+      status: "PREVIEW ONLY",
+      execution: "NOT EXECUTED",
+      approval: "REQUIRED",
+      safety: "BLOCKED",
+      jobEligibility: "NO"
+    });
+
+    for (const hostile of [
+      { ...readOnly, command: sensitiveSentinels.command },
+      {
+        type: "CONFIGURATION_PREVIEW",
+        state: "AVAILABLE",
+        preview: [sensitiveSentinels.command]
+      },
+      {
+        type: "BLOCKED_NO_OUTCOME",
+        reason: sensitiveSentinels.userText,
+        jobCreated: false,
+        executed: false
+      }
+    ]) {
+      const projection = projectSafeOutcome(hostile);
+      expect(projection).toEqual({
+        state: "BLOCKED_NO_OUTCOME",
+        heading: "No Safe Outcome Available",
+        reason: "No safe outcome is available for this request.",
+        jobCreated: "NO",
+        execution: "NOT EXECUTED"
+      });
+      assertNoSensitiveOutput(projection);
+    }
+  });
+
+  it("adds only a bounded server-built Safe Outcome to the API presentation", () => {
+    const record: ParseResultRecord = {
+      id: "parse_test",
+      userRequest: "Check WAN and LAN status for LAB-DEMO-ROUTER.",
+      deviceInventoryHash: sensitiveSentinels.secret,
+      deviceInventorySnapshot: structuredClone(LOCAL_DEMO_DEVICE_INVENTORY),
+      output: {
+        intent: "run_check",
+        targetDevice: "LAB-DEMO-ROUTER",
+        vendor: "mikrotik",
+        interfaceName: null,
+        vlanId: null,
+        recommendedActionId: "wan_lan_check",
+        missingFields: [],
+        riskLevel: "low",
+        requiresApproval: false,
+        blocked: false,
+        jobCreationAllowed: true,
+        blockedReason: null,
+        notes: [sensitiveSentinels.provider]
+      },
+      createdAt: "2026-07-23T01:02:03.000Z"
+    };
+    const selected = selectParseResultPresentationFields(record);
+
+    expect(selected).toMatchObject({
+      output: {
+        intent: "run_check",
+        riskLevel: "low",
+        requiresApproval: false,
+        blocked: false,
+        jobCreationAllowed: true
+      },
+      safeOutcome: {
+        type: "READ_ONLY_RESULT",
+        source: "Deterministic synthetic Stage-0 data",
+        liveDeviceContacted: false
+      },
+      createdAt: "2026-07-23T01:02:03.000Z"
+    });
+    expect(selected).not.toHaveProperty("userRequest");
+    expect(selected).not.toHaveProperty("deviceInventorySnapshot");
+    expect(selected).not.toHaveProperty("deviceInventoryHash");
+    expect(selected?.output).not.toHaveProperty("notes");
+    assertNoSensitiveOutput(selected);
+  });
+
+  it("keeps safety metadata separate from Safe Outcome UI and adds no execution control", () => {
+    const clientSource = readFileSync(
+      path.join(process.cwd(), "components", "network", "AiActionsClient.tsx"),
+      "utf8"
+    );
+    const presentationSource = readFileSync(
+      path.join(
+        process.cwd(),
+        "components",
+        "network",
+        "Phase2O05SafePresentation.ts"
+      ),
+      "utf8"
+    );
+    const uiSource = `${clientSource}\n${presentationSource}`;
+
+    for (const label of [
+      "Intent",
+      "Recommended Action",
+      "Risk",
+      "Approval",
+      "Safety Result",
+      "Job Eligibility",
+      "Reason",
+      "Safe Outcome",
+      "WAN/LAN Result",
+      "Configuration Guidance",
+      "No Safe Outcome Available",
+      "SYNTHETIC / DEMO / NON-LIVE",
+      "Live device contacted",
+      "PREVIEW ONLY",
+      "NOT EXECUTED"
+    ]) {
+      expect(uiSource).toContain(label);
+    }
+    for (const control of [
+      ">Run<",
+      ">Execute<",
+      ">Apply<",
+      ">Deploy<",
+      ">Create Job<",
+      ">Approve and Run<",
+      ">Send to Device<",
+      ">Push Configuration<"
+    ]) {
+      expect(clientSource).not.toContain(control);
+    }
+    expect(clientSource).not.toContain("/api/network/jobs/create");
   });
 
   it("validates Jobs top-level shape and withholds prohibited nested data", () => {

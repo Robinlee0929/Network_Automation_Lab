@@ -6,6 +6,7 @@ import { AiActionsStage0Presentation } from "./Phase2N04DemoPresentation";
 import {
   projectActionCatalog,
   projectParseResult,
+  type SafeOutcomeProjection,
   type SafeParseProjection
 } from "./Phase2O05SafePresentation";
 
@@ -20,6 +21,129 @@ function parseResultFromPayload(value: unknown) {
     return null;
   }
   return "parseResult" in value ? value.parseResult : null;
+}
+
+function SafeOutcomeDetails({ outcome }: { outcome: SafeOutcomeProjection }) {
+  if (outcome.state === "READ_ONLY_RESULT") {
+    return (
+      <section aria-label="Safe Outcome">
+        <h3>Safe Outcome</h3>
+        <p className="safe-state" data-state="available" role="status">
+          {outcome.heading} · {outcome.syntheticLabel}
+        </p>
+        <dl className="detail-grid">
+          {outcome.interfaces.map((item) => (
+            <div key={item.role}>
+              <dt>{item.role}</dt>
+              <dd>
+                {item.name} · {item.status}
+              </dd>
+            </div>
+          ))}
+          <div>
+            <dt>Source</dt>
+            <dd>{outcome.source}</dd>
+          </div>
+          <div>
+            <dt>Live device contacted</dt>
+            <dd>{outcome.liveDeviceContacted}</dd>
+          </div>
+        </dl>
+      </section>
+    );
+  }
+
+  if (outcome.state === "CONFIGURATION_PREVIEW_AVAILABLE") {
+    return (
+      <section aria-label="Safe Outcome">
+        <h3>Safe Outcome</h3>
+        <p className="safe-state" data-state="unavailable" role="status">
+          {outcome.heading} · guidance available does not permit execution.
+        </p>
+        <dl className="detail-grid">
+          <div>
+            <dt>Vendor</dt>
+            <dd>{outcome.vendor}</dd>
+          </div>
+          <div>
+            <dt>Platform</dt>
+            <dd>{outcome.platform}</dd>
+          </div>
+          <div>
+            <dt>Requested Change</dt>
+            <dd>{outcome.requestedChange}</dd>
+          </div>
+          <div>
+            <dt>Status</dt>
+            <dd>{outcome.status}</dd>
+          </div>
+          <div>
+            <dt>Execution</dt>
+            <dd>{outcome.execution}</dd>
+          </div>
+          <div>
+            <dt>Approval</dt>
+            <dd>{outcome.approval}</dd>
+          </div>
+          <div>
+            <dt>Safety</dt>
+            <dd>{outcome.safety}</dd>
+          </div>
+          <div>
+            <dt>Job Eligibility</dt>
+            <dd>{outcome.jobEligibility}</dd>
+          </div>
+          <div>
+            <dt>Source</dt>
+            <dd>{outcome.source}</dd>
+          </div>
+          <div>
+            <dt>Template</dt>
+            <dd>{outcome.templateId}</dd>
+          </div>
+        </dl>
+        <div>
+          <h4>Review-only Command Preview</h4>
+          <pre style={{ maxWidth: "100%", overflowWrap: "anywhere", whiteSpace: "pre-wrap" }}>
+            <code>{outcome.preview.join("\n")}</code>
+          </pre>
+        </div>
+      </section>
+    );
+  }
+
+  if (outcome.state === "CONFIGURATION_PREVIEW_UNAVAILABLE") {
+    return (
+      <section aria-label="Safe Outcome">
+        <h3>Safe Outcome</h3>
+        <p className="safe-state" data-state="unavailable" role="status">
+          {outcome.heading} · UNAVAILABLE
+        </p>
+        <p>{outcome.reason}</p>
+        <ul className="safe-flag-list">
+          <li>Status: {outcome.status}</li>
+          <li>Execution: {outcome.execution}</li>
+          <li>Approval: {outcome.approval}</li>
+          <li>Safety: {outcome.safety}</li>
+          <li>Job Eligibility: {outcome.jobEligibility}</li>
+        </ul>
+      </section>
+    );
+  }
+
+  return (
+    <section aria-label="Safe Outcome">
+      <h3>Safe Outcome</h3>
+      <p className="safe-state" data-state="rejected" role="status">
+        {outcome.heading}
+      </p>
+      <ul className="safe-flag-list">
+        <li>{outcome.reason}</li>
+        <li>Job created: {outcome.jobCreated}</li>
+        <li>Execution: {outcome.execution}</li>
+      </ul>
+    </section>
+  );
 }
 
 function RecommendationDetails({ result }: { result: SafeParseProjection }) {
@@ -82,6 +206,7 @@ function RecommendationDetails({ result }: { result: SafeParseProjection }) {
           ))}
         </ul>
       </div>
+      <SafeOutcomeDetails outcome={result.safeOutcome} />
     </>
   );
 }

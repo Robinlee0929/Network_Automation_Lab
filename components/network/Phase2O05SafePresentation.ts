@@ -72,6 +72,52 @@ export type SafeParseProjection =
       jobEligibility: string;
       reason: string;
       recordedDate: string;
+      safeOutcome: SafeOutcomeProjection;
+    };
+
+export type SafeOutcomeProjection =
+  | {
+      state: "READ_ONLY_RESULT";
+      heading: "WAN/LAN Result";
+      interfaces: [
+        { role: "WAN"; name: "ether1"; status: "RUNNING" },
+        { role: "LAN"; name: "bridge-lan"; status: "RUNNING" }
+      ];
+      source: "Deterministic synthetic Stage-0 data";
+      syntheticLabel: "SYNTHETIC / DEMO / NON-LIVE";
+      liveDeviceContacted: "NO";
+    }
+  | {
+      state: "CONFIGURATION_PREVIEW_AVAILABLE";
+      heading: "Configuration Guidance";
+      vendor: "MikroTik";
+      platform: "RouterOS 7";
+      requestedChange: "ether2 → VLAN 20";
+      preview: readonly string[];
+      source: "SERVER-OWNED TEMPLATE";
+      templateId: "routeros_bridge_access_vlan_v1";
+      status: "PREVIEW ONLY";
+      execution: "NOT EXECUTED";
+      approval: "REQUIRED";
+      safety: "BLOCKED";
+      jobEligibility: "NO";
+    }
+  | {
+      state: "CONFIGURATION_PREVIEW_UNAVAILABLE";
+      heading: "Configuration Guidance";
+      reason: "Missing required server-owned synthetic context";
+      status: "PREVIEW ONLY";
+      execution: "NOT EXECUTED";
+      approval: "REQUIRED";
+      safety: "BLOCKED";
+      jobEligibility: "NO";
+    }
+  | {
+      state: "BLOCKED_NO_OUTCOME";
+      heading: "No Safe Outcome Available";
+      reason: "No safe outcome is available for this request.";
+      jobCreated: "NO";
+      execution: "NOT EXECUTED";
     };
 
 export type SafeJobProjection = {
@@ -174,8 +220,28 @@ const safeJobKeys = new Set([
   "createdAt"
 ]);
 
+const safeConfigurationPreview = [
+  "/interface bridge port",
+  'set [find where bridge="bridge-lan" and interface="ether2"] pvid=20 ingress-filtering=yes frame-types=admit-only-untagged-and-priority-tagged',
+  "/interface bridge vlan",
+  'add bridge="bridge-lan" vlan-ids=20 tagged="bridge-lan" untagged="ether2"'
+] as const;
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function hasExactKeys(value: Record<string, unknown>, expected: readonly string[]) {
+  const keys = Object.keys(value);
+  return keys.length === expected.length && keys.every((key) => expected.includes(key));
+}
+
+function hasExactPreview(value: unknown) {
+  return (
+    Array.isArray(value) &&
+    value.length === safeConfigurationPreview.length &&
+    value.every((line, index) => line === safeConfigurationPreview[index])
+  );
 }
 
 function safeInternalId(value: unknown) {
@@ -437,6 +503,157 @@ function reasonLabel(value: unknown) {
     : "Recorded reason withheld";
 }
 
+function blockedNoOutcomeProjection(): SafeOutcomeProjection {
+  return {
+    state: "BLOCKED_NO_OUTCOME",
+    heading: "No Safe Outcome Available",
+    reason: "No safe outcome is available for this request.",
+    jobCreated: "NO",
+    execution: "NOT EXECUTED"
+  };
+}
+
+export function projectSafeOutcome(value: unknown): SafeOutcomeProjection {
+  if (!isRecord(value) || typeof value.type !== "string") {
+    return blockedNoOutcomeProjection();
+  }
+
+  if (
+    value.type === "READ_ONLY_RESULT" &&
+    hasExactKeys(value, [
+      "type",
+      "title",
+      "interfaces",
+      "source",
+      "synthetic",
+      "liveDeviceContacted"
+    ]) &&
+    value.title === "WAN/LAN Check Result" &&
+    value.source === "Deterministic synthetic Stage-0 data" &&
+    value.synthetic === true &&
+    value.liveDeviceContacted === false &&
+    Array.isArray(value.interfaces) &&
+    value.interfaces.length === 2
+  ) {
+    const [wan, lan] = value.interfaces;
+    if (
+      isRecord(wan) &&
+      hasExactKeys(wan, ["role", "name", "status"]) &&
+      wan.role === "WAN" &&
+      wan.name === "ether1" &&
+      wan.status === "RUNNING" &&
+      isRecord(lan) &&
+      hasExactKeys(lan, ["role", "name", "status"]) &&
+      lan.role === "LAN" &&
+      lan.name === "bridge-lan" &&
+      lan.status === "RUNNING"
+    ) {
+      return {
+        state: "READ_ONLY_RESULT",
+        heading: "WAN/LAN Result",
+        interfaces: [
+          { role: "WAN", name: "ether1", status: "RUNNING" },
+          { role: "LAN", name: "bridge-lan", status: "RUNNING" }
+        ],
+        source: "Deterministic synthetic Stage-0 data",
+        syntheticLabel: "SYNTHETIC / DEMO / NON-LIVE",
+        liveDeviceContacted: "NO"
+      };
+    }
+  }
+
+  if (value.type === "CONFIGURATION_PREVIEW" && value.state === "AVAILABLE") {
+    if (
+      hasExactKeys(value, [
+        "type",
+        "state",
+        "vendor",
+        "platform",
+        "requestedChange",
+        "preview",
+        "source",
+        "templateId",
+        "previewOnly",
+        "executed",
+        "approvalRequired",
+        "safety",
+        "jobEligible"
+      ]) &&
+      value.vendor === "MikroTik" &&
+      value.platform === "RouterOS 7" &&
+      value.requestedChange === "ether2 → VLAN 20" &&
+      hasExactPreview(value.preview) &&
+      value.source === "SERVER-OWNED TEMPLATE" &&
+      value.templateId === "routeros_bridge_access_vlan_v1" &&
+      value.previewOnly === true &&
+      value.executed === false &&
+      value.approvalRequired === true &&
+      value.safety === "BLOCKED" &&
+      value.jobEligible === false
+    ) {
+      return {
+        state: "CONFIGURATION_PREVIEW_AVAILABLE",
+        heading: "Configuration Guidance",
+        vendor: "MikroTik",
+        platform: "RouterOS 7",
+        requestedChange: "ether2 → VLAN 20",
+        preview: safeConfigurationPreview,
+        source: "SERVER-OWNED TEMPLATE",
+        templateId: "routeros_bridge_access_vlan_v1",
+        status: "PREVIEW ONLY",
+        execution: "NOT EXECUTED",
+        approval: "REQUIRED",
+        safety: "BLOCKED",
+        jobEligibility: "NO"
+      };
+    }
+  }
+
+  if (
+    value.type === "CONFIGURATION_PREVIEW" &&
+    value.state === "UNAVAILABLE" &&
+    hasExactKeys(value, [
+      "type",
+      "state",
+      "reason",
+      "previewOnly",
+      "executed",
+      "approvalRequired",
+      "safety",
+      "jobEligible"
+    ]) &&
+    value.reason === "Missing required server-owned synthetic context" &&
+    value.previewOnly === true &&
+    value.executed === false &&
+    value.approvalRequired === true &&
+    value.safety === "BLOCKED" &&
+    value.jobEligible === false
+  ) {
+    return {
+      state: "CONFIGURATION_PREVIEW_UNAVAILABLE",
+      heading: "Configuration Guidance",
+      reason: "Missing required server-owned synthetic context",
+      status: "PREVIEW ONLY",
+      execution: "NOT EXECUTED",
+      approval: "REQUIRED",
+      safety: "BLOCKED",
+      jobEligibility: "NO"
+    };
+  }
+
+  if (
+    value.type === "BLOCKED_NO_OUTCOME" &&
+    hasExactKeys(value, ["type", "reason", "jobCreated", "executed"]) &&
+    value.reason === "No safe outcome is available for this request." &&
+    value.jobCreated === false &&
+    value.executed === false
+  ) {
+    return blockedNoOutcomeProjection();
+  }
+
+  return blockedNoOutcomeProjection();
+}
+
 export function projectParseResult(value: unknown): SafeParseProjection {
   if (value === null || value === undefined) {
     return { state: "EMPTY" };
@@ -468,7 +685,8 @@ export function projectParseResult(value: unknown): SafeParseProjection {
       output.jobCreationAllowed
     )} · job creation unavailable in Stage 0`,
     reason: reasonLabel(output.blockedReason),
-    recordedDate: `Recorded parse date: ${recorded.label}`
+    recordedDate: `Recorded parse date: ${recorded.label}`,
+    safeOutcome: projectSafeOutcome(value.safeOutcome)
   };
 }
 
