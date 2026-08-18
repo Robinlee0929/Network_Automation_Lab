@@ -107,20 +107,12 @@ function hasExactReadOnlySafety(output: ParseRequestOutput) {
   );
 }
 
-function hasExactConfigurationSafety(output: ParseRequestOutput) {
+function hasAuthoritativeConfigurationSafety(output: ParseRequestOutput) {
   return (
-    output.intent === "change_access_vlan" &&
-    output.targetDevice === "LAB-DEMO-ROUTER" &&
-    output.vendor === "mikrotik" &&
-    output.interfaceName === "ether2" &&
-    output.vlanId === 20 &&
-    output.missingFields.length === 0 &&
-    output.riskLevel === "medium" &&
+    (output.riskLevel === "medium" || output.riskLevel === "high") &&
     output.requiresApproval === true &&
     output.blocked === true &&
-    output.jobCreationAllowed === false &&
-    output.blockedReason ===
-      "Config change requires approval and is not executable in Phase 1"
+    output.jobCreationAllowed === false
   );
 }
 
@@ -243,7 +235,7 @@ export function buildSafeOutcome(input: {
   }
 
   if (input.userRequest === SAFE_OUTCOME_CONFIGURATION_REQUEST) {
-    if (!hasExactConfigurationSafety(input.output)) {
+    if (!hasAuthoritativeConfigurationSafety(input.output)) {
       return blockedNoOutcome();
     }
     if (!device || !hasConfigurationContext(device)) {

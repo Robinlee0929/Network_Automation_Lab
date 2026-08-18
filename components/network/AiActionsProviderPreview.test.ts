@@ -63,6 +63,27 @@ function configurationModelOutput(): ParseRequestOutput {
   };
 }
 
+function blockedUnknownOutput(
+  overrides: Partial<ParseRequestOutput> = {}
+): ParseRequestOutput {
+  return {
+    intent: "unknown",
+    targetDevice: "LAB-DEMO-ROUTER",
+    vendor: "mikrotik",
+    interfaceName: null,
+    vlanId: null,
+    recommendedActionId: null,
+    missingFields: ["recommendedActionId"],
+    riskLevel: "high",
+    requiresApproval: true,
+    blocked: true,
+    jobCreationAllowed: false,
+    blockedReason: "Config change requires approval and is not executable in Phase 1",
+    notes: ["Untrusted provider note"],
+    ...overrides
+  };
+}
+
 function mutableDemoInventory() {
   const inventory = structuredClone(LOCAL_DEMO_DEVICE_INVENTORY) as unknown as {
     devices: Array<Record<string, unknown>>;
@@ -272,6 +293,61 @@ describe("Optional Local AI Recommendation Preview", () => {
     );
   });
 
+  it("releases exact Scenario B from authoritative safety while preserving UNKNOWN intent", () => {
+    const sanitized = sanitizeParseRequestResult({
+      output: blockedUnknownOutput(),
+      userRequest: SAFE_OUTCOME_CONFIGURATION_REQUEST,
+      deviceInventory: LOCAL_DEMO_DEVICE_INVENTORY
+    });
+    const outcome = buildSafeOutcome({
+      userRequest: SAFE_OUTCOME_CONFIGURATION_REQUEST,
+      output: sanitized,
+      deviceInventory: LOCAL_DEMO_DEVICE_INVENTORY
+    });
+
+    expect(sanitized).toMatchObject({
+      intent: "unknown",
+      riskLevel: "high",
+      requiresApproval: true,
+      blocked: true,
+      jobCreationAllowed: false
+    });
+    expect(outcome).toMatchObject({
+      type: "CONFIGURATION_PREVIEW",
+      state: "AVAILABLE",
+      preview: SAFE_OUTCOME_CONFIGURATION_PREVIEW,
+      source: "SERVER-OWNED TEMPLATE",
+      previewOnly: true,
+      executed: false,
+      approvalRequired: true,
+      safety: "BLOCKED",
+      jobEligible: false
+    });
+    expect(JSON.stringify(outcome)).not.toContain("Untrusted provider note");
+  });
+
+  it("withholds exact Scenario B when any authoritative safety invariant is weak", () => {
+    for (const output of [
+      blockedUnknownOutput({ riskLevel: "low" }),
+      blockedUnknownOutput({ requiresApproval: false }),
+      blockedUnknownOutput({ blocked: false }),
+      blockedUnknownOutput({ jobCreationAllowed: true })
+    ]) {
+      expect(
+        buildSafeOutcome({
+          userRequest: SAFE_OUTCOME_CONFIGURATION_REQUEST,
+          output,
+          deviceInventory: LOCAL_DEMO_DEVICE_INVENTORY
+        })
+      ).toEqual({
+        type: "BLOCKED_NO_OUTCOME",
+        reason: "No safe outcome is available for this request.",
+        jobCreated: false,
+        executed: false
+      });
+    }
+  });
+
   it("withholds Safe Outcome for mixed and non-bounded false-safe requests", () => {
     for (const userRequest of [
       "Check WAN and LAN status for LAB-DEMO-ROUTER, then change ether2 to VLAN 20.",
@@ -295,6 +371,30 @@ describe("Optional Local AI Recommendation Preview", () => {
         jobCreationAllowed: false
       });
       expect(outcome).toEqual({
+        type: "BLOCKED_NO_OUTCOME",
+        reason: "No safe outcome is available for this request.",
+        jobCreated: false,
+        executed: false
+      });
+    }
+  });
+
+  it("withholds the canonical preview for observation, counterfactual, and hostile requests", () => {
+    for (const userRequest of [
+      "Show VLAN 20 configuration.",
+      "Check whether ether2 VLAN changed.",
+      "Review changes to VLAN 20.",
+      "What would change if ether2 moved to VLAN 20?",
+      "Can you check whether WAN and LAN are up on LAB-DEMO-ROUTER?",
+      "Give me the RouterOS command to reboot LAB-DEMO-ROUTER."
+    ]) {
+      expect(
+        buildSafeOutcome({
+          userRequest,
+          output: blockedUnknownOutput(),
+          deviceInventory: LOCAL_DEMO_DEVICE_INVENTORY
+        })
+      ).toEqual({
         type: "BLOCKED_NO_OUTCOME",
         reason: "No safe outcome is available for this request.",
         jobCreated: false,
@@ -361,26 +461,7 @@ describe("Optional Local AI Recommendation Preview", () => {
     }
   });
 
-  it("fails closed for non-bounded Scenario B parameters and hostile Scenario C fields", () => {
-    for (const output of [
-      { ...configurationModelOutput(), interfaceName: "ether3" },
-      { ...configurationModelOutput(), vlanId: 21 },
-      { ...configurationModelOutput(), targetDevice: "OTHER-ROUTER" }
-    ]) {
-      const sanitized = sanitizeParseRequestResult({
-        output,
-        userRequest: SAFE_OUTCOME_CONFIGURATION_REQUEST,
-        deviceInventory: LOCAL_DEMO_DEVICE_INVENTORY
-      });
-      expect(
-        buildSafeOutcome({
-          userRequest: SAFE_OUTCOME_CONFIGURATION_REQUEST,
-          output: sanitized,
-          deviceInventory: LOCAL_DEMO_DEVICE_INVENTORY
-        }).type
-      ).toBe("BLOCKED_NO_OUTCOME");
-    }
-
+  it("fails closed for hostile Scenario C fields", () => {
     const hostileBase: ParseRequestOutput = {
       intent: "unknown",
       targetDevice: "LAB-DEMO-ROUTER",
