@@ -1,0 +1,105 @@
+name: Feature or improvement request
+description: Suggest a bounded improvement or future capability proposal.
+title: "[Feature] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form to propose a bounded improvement. An Issue, milestone, pull request, or merge does not authorize a capability or advance the project beyond Stage-0.
+
+        Future Stage-1+ ideas may be discussed here, but remain planning or proposal only until a separate explicit capability gate and task-specific authorization are approved.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or opportunity
+      description: What contributor or reviewer need would this address?
+    validations:
+      required: true
+
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Proposed outcome
+      description: Describe the bounded result you would like to see without assuming implementation authority.
+    validations:
+      required: true
+
+  - type: textarea
+    id: value
+    attributes:
+      label: Contributor or user value
+      description: Who benefits, and how would the improvement help them?
+    validations:
+      required: true
+
+  - type: dropdown
+    id: affected-area
+    attributes:
+      label: Affected area
+      options:
+        - Canonical Flask reviewer dashboard
+        - Secondary Next.js evidence/demo interface
+        - Validation or reporting
+        - Parser or fixture behavior
+        - Safe CI or test tooling
+        - Documentation or contributor guidance
+        - Safety or governance documentation
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Suggested acceptance criteria
+      description: List concrete, reviewer-verifiable conditions for a successful bounded change.
+      placeholder: |
+        - [ ] Criterion one
+        - [ ] Criterion two
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Optional. Describe simpler or safer alternatives you considered.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: stage-relationship
+    attributes:
+      label: Proposed Stage relationship
+      description: This classification is a proposal, not authorization.
+      options:
+        - Stage-0 improvement only
+        - Future Stage-1 read-only planning idea
+        - Future Stage-2 read-only adapter idea
+        - Later execution-capable idea
+        - Unsure
+    validations:
+      required: true
+
+  - type: textarea
+    id: safety-boundary
+    attributes:
+      label: Safety and scope considerations
+      description: Note relevant fail-closed, evidence, or capability-gate considerations. Do not include secrets or private infrastructure details.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: acknowledgements
+    attributes:
+      label: Proposal acknowledgements
+      options:
+        - label: I understand that creating an Issue, milestone, pull request, or merge does not authorize a capability or Stage advancement.
+          required: true
+        - label: I understand that future Stage-1+ ideas remain planning or proposal only until separately authorized.
+          required: true
+        - label: I understand that requesting SSH, NETCONF, RESTCONF, configuration changes, production execution, or autonomous AI execution does not make those capabilities approved.
+          required: true
+        - label: I have not included secrets, credentials, tokens, private infrastructure, private configuration, or other sensitive data.
+          required: true
