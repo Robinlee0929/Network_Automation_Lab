@@ -1,0 +1,22 @@
+name: Security reporting contact request
+description: Request a private channel for reporting a potential security issue without posting vulnerability details publicly.
+title: "[Security contact request] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This is not a vulnerability report form. Do not post vulnerability descriptions, proof-of-concept material, reproduction steps, impact details, exploit details, credentials, private IPs, device configuration, or private infrastructure information.
+
+        Read [SECURITY.md](https://github.com/Robinlee0929/Network_Automation_Lab/security/policy). This public Issue should request a private reporting path only.
+
+  - type: checkboxes
+    id: private-path-only
+    attributes:
+      label: Private reporting path request
+      options:
+        - label: I have read [SECURITY.md](https://github.com/Robinlee0929/Network_Automation_Lab/security/policy).
+          required: true
+        - label: I have not included vulnerability, exploitation, reproduction, impact, credential, or private infrastructure details.
+          required: true
+        - label: I am requesting a private reporting path only.
+          required: true

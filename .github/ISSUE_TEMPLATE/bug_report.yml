@@ -1,0 +1,113 @@
+name: Bug report
+description: Report a reproducible problem in the supported Stage-0 project path.
+title: "[Bug] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve Network Automation Lab. Use this form for reproducible problems in the supported Stage-0 path.
+
+        Do not disclose a suspected security vulnerability here. Read [SECURITY.md](https://github.com/Robinlee0929/Network_Automation_Lab/security/policy) and use only the minimal, non-sensitive security contact request to ask for a private reporting path.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem description
+      description: Describe the problem clearly and concisely.
+      placeholder: What went wrong?
+    validations:
+      required: true
+
+  - type: dropdown
+    id: affected-area
+    attributes:
+      label: Affected area
+      description: Select the closest supported Stage-0 area.
+      options:
+        - Canonical Flask reviewer dashboard
+        - Secondary Next.js evidence/demo interface
+        - Validation or reporting
+        - Parser or fixture behavior
+        - Safe CI or test tooling
+        - Documentation
+        - Other Stage-0-supported surface
+    validations:
+      required: true
+
+  - type: input
+    id: commit
+    attributes:
+      label: Commit or version
+      description: Provide the commit SHA, branch, or release version if known.
+      placeholder: "Example: main at abc1234"
+    validations:
+      required: false
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction steps
+      description: Provide the smallest safe, local steps that reproduce the problem.
+      placeholder: |
+        1. Start from...
+        2. Run or open...
+        3. Observe...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What did you expect to happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: What happened instead?
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Include relevant non-sensitive details such as operating system, Python or Node version, browser, and local interface used.
+      placeholder: "Example: Windows 11, Python 3.13, canonical Flask dashboard"
+    validations:
+      required: false
+
+  - type: dropdown
+    id: stage-path
+    attributes:
+      label: Stage-0 path
+      description: Where does the problem occur?
+      options:
+        - Default Stage-0 path
+        - Optional provider/demo mode
+        - Unknown
+    validations:
+      required: true
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Non-sensitive logs or evidence
+      description: Add only sanitized logs, screenshots, or reviewer-visible evidence that contain no secrets, private infrastructure, or exploit details.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: acknowledgements
+    attributes:
+      label: Safety acknowledgements
+      options:
+        - label: I have read [SECURITY.md](https://github.com/Robinlee0929/Network_Automation_Lab/security/policy) and this is not a public vulnerability disclosure.
+          required: true
+        - label: I have not included secrets, credentials, tokens, private infrastructure, private IP or device inventory, production configuration, or exploit details.
+          required: true
+        - label: I understand that suspected security vulnerabilities must not be disclosed through this bug form.
+          required: true
