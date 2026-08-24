@@ -1,4 +1,5 @@
 import { getOpenAIClient, getOpenAIModel } from "@/lib/ai/openaiClient";
+import { assertLegacyAiProviderEnabled } from "./../ai/providerPolicy";
 import { getAvailableActions, isAvailableActionId } from "./actions";
 import { sanitizeParseRequestResult } from "./readiness";
 import {
@@ -158,6 +159,7 @@ export async function analyzeReportWithAi(input: {
   reportText: string;
   deviceContext?: unknown;
 }) {
+  assertLegacyAiProviderEnabled();
   const actions = getAvailableActions();
   const systemPrompt = [
     "You are a Network Automation AI Node for a Router/Switch automation platform.",

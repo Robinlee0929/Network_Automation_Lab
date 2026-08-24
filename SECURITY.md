@@ -100,6 +100,17 @@ is disabled by default and uses synthetic inventory. Its presence does not
 make other provider-capable or legacy/internal routes part of the supported
 Stage-0 path, and it does not authorize device or job execution.
 
+The supported Network AI recommendation preview is separately gated by
+`NETWORK_AI_PROVIDER_DEMO_ENABLED`. Legacy/general provider workbenches and the
+historical report analyzer fail closed by default through
+`LEGACY_AI_PROVIDER_ENABLED`; only the exact value `1` intentionally enables
+them for local use. A server-side provider credential such as
+`OPENAI_API_KEY` is still required when enabled, but credential presence is not
+feature authorization. Submitted text is sent to the configured external
+provider, so secrets, credentials, private device data, and private lab data
+must not be submitted. No provider route in this scope gains device, job,
+command, or configuration-execution authority.
+
 Future read-only lab access and later execution-capable stages remain governed
 by the Actual Automation Integration Plan. A date, milestone, issue, pull
 request, merge, or code path does not activate a capability.

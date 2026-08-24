@@ -218,6 +218,14 @@ export function validateAnalyzeReportOutput(value: unknown): ValidationResult<An
     return { ok: false, error: "AI report analyzer output must be a JSON object." };
   }
 
+  const allowedFields = new Set(Object.keys(analyzeReportOutputJsonSchema.properties));
+  if (Object.keys(value).some((field) => !allowedFields.has(field))) {
+    return {
+      ok: false,
+      error: "AI report analyzer output contained an unsupported field."
+    };
+  }
+
   const requiredArrays = [
     "findings",
     "warnings",

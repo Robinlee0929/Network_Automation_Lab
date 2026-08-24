@@ -103,10 +103,10 @@ Its current public review surfaces include:
 | `/ai-checklist` | Static AI and safety review checklist |
 | `/ai-intent-reviewer` | Static intent, mock-runtime, readiness-gate, and safety evidence |
 
-The Next.js Network Automation AI Node is a secondary Stage-0 interface. It
-provides bounded presentation of committed or local evidence, but it does not
-replace the Flask Quick Start and does not activate provider, model, job, or
-device execution.
+The Next.js Network Automation AI Node is a secondary Stage-0 interface. Its
+supported default presentation provides bounded committed or local evidence;
+it does not replace the Flask Quick Start
+and does not activate provider, model, job, or device execution.
 
 ### Governance and safety layer
 
@@ -250,6 +250,65 @@ default remains `NETWORK_AI_PROVIDER_DEMO_ENABLED=0`, so the canonical Flask
 Stage-0 demo stays provider-free. The preview classifies a request against the
 fixed Action Catalog and stops at a sanitized recommendation; it does not create
 jobs, generate commands, contact devices, or execute network operations.
+
+Legacy/general provider workbenches at `/ai`, `/automation/ai-nodes`, and the
+historical `/api/network/ai/analyze-report` route remain outside the canonical
+provider-free Stage-0 reviewer path. They fail closed by default through
+`LEGACY_AI_PROVIDER_ENABLED=0` and require the separate exact local opt-in
+`LEGACY_AI_PROVIDER_ENABLED=1` plus a server-side `OPENAI_API_KEY`. Enabling
+them sends submitted text to the configured external provider, so do not use
+secrets, credentials, private device data, or private lab data. Provider
+credential presence is not feature authorization, and neither flag grants
+device, job, command, or configuration-execution capability.
+
+## Get Involved
+
+Contributions to the current Stage-0 baseline are welcome. Start with the
+[contributor guide](CONTRIBUTING.md), review the [security policy](SECURITY.md),
+and browse the [general Issues list](https://github.com/Robinlee0929/Network_Automation_Lab/issues)
+or [currently open issues labeled `good first issue`](https://github.com/Robinlee0929/Network_Automation_Lab/issues?q=is%3Aissue%20state%3Aopen%20label%3A%22good%20first%20issue%22).
+Newcomer-friendly work may include UI and accessibility improvements, parser
+tests, deterministic parser fixes, and fail-closed evidence handling.
+
+The normal contribution flow is:
+
+1. Choose an Issue or propose a bounded improvement.
+2. Read [CONTRIBUTING.md](CONTRIBUTING.md) and [SECURITY.md](SECURITY.md).
+3. Create a focused branch in your fork or local clone.
+4. Implement one narrow, reviewable change.
+5. Run targeted validation plus the repository-required checks.
+6. Open a pull request without assuming repository write access.
+7. Let Safe CI validate the pull request.
+8. Address maintainer review; the maintainer performs the merge.
+
+`main` is protected, so normal changes go through a pull request and Safe CI.
+For suspected vulnerabilities, follow [SECURITY.md](SECURITY.md). Do not post
+exploit details, credentials, secrets, or private infrastructure data in a
+public Issue; the public security-contact path is only for requesting a private
+reporting channel.
+
+## Public Roadmap
+
+Stage 0 is the current public baseline and is in final open-source/security
+closure. It now includes contributor and security guidance, Issue and pull
+request templates, newcomer-friendly Issues, and protected-`main` governance
+through pull requests and Safe CI.
+
+| Stage | Purpose | Status |
+| --- | --- | --- |
+| **Stage 0 — Current public baseline** | Mock-only, dry-run, report-only, reviewer-visible, fail-closed validation and evidence | **Current / closure in progress** |
+| **Stage 1 — Read-only Lab Integration Planning** | Define contracts, allowlists, failure behavior, evidence, and the credential boundary without live access | **Future / requires separate approval** |
+| **Stage 2 — Narrow Read-only Lab Adapter** | Gate one lab target, one transport, a small read-only allowlist, normalized real output, and no-mutation evidence | **Future / separately gated** |
+| **Stage 3 — Controlled Config Plan Generation** | Produce human-reviewable configuration plans only; no apply | **Future / separate gate** |
+| **Stage 4 — Controlled Change Execution** | Permit narrowly approved lab changes with explicit safeguards and evidence | **Future / separate gate** |
+| **Stage 5 — Production-like Platform** | Add mature access control, audit, rollback, monitoring, and human approval | **Long-term / not currently authorized** |
+
+Stage 2 exit is the planned major-development pause point. A roadmap item,
+Issue, pull request, merge, date, or milestone does **not** activate a
+capability. Every Stage advancement requires separate explicit authorization
+and validation. Live-device access, SSH, NETCONF, RESTCONF, configuration
+changes, production execution, secrets handling, provider/model integration,
+and autonomous execution therefore remain unauthorized by this roadmap.
 
 ## Core Capabilities
 
@@ -451,6 +510,8 @@ deliberately non-executing public review path.
 
 ### Start here
 
+- [Contributing guide](CONTRIBUTING.md)
+- [Security policy](SECURITY.md)
 - [Repository rules and task safety](AGENTS.md)
 - [Public Reviewer Walkthrough](docs/portfolio/public_reviewer_walkthrough.md)
 - [Canonical Quick Start and demo runbook](docs/phase_2n/phase_2n_01_canonical_quick_start_and_demo_runbook_documentation_only.md)
