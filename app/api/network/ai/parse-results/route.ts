@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
-import { listParseResultRecords } from "@/lib/network-ai/parseResultStore";
 
 export async function GET() {
-  return NextResponse.json({ parseResults: listParseResultRecords() });
+  return NextResponse.json(
+    {
+      error: "This legacy parse-results endpoint is retired. Use the bounded latest-result projection instead."
+    },
+    { status: 410 }
+  );
 }
