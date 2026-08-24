@@ -1,7 +1,12 @@
 import { NextResponse } from "next/server";
 import { getOpenAIClient, getOpenAIModel } from "./openaiClient";
 import { AI_DRAFT_NOTICE } from "./prompts";
-import { ensureHumanReview, type AiNodeResponse } from "./schemas";
+import {
+  LEGACY_AI_PROVIDER_DISABLED_MESSAGE,
+  LegacyAiProviderDisabledError,
+  assertLegacyAiProviderEnabled
+} from "./providerPolicy";
+import { ensureHumanReview, validateAiNodeOutput, type AiNodeResponse } from "./schemas";
 
 type GenerateAiDraftOptions = {
   systemPrompt: string;
@@ -18,6 +23,7 @@ function normalizeDraft(text: string) {
 }
 
 export async function generateAiDraft({ systemPrompt, userInput }: GenerateAiDraftOptions) {
+  assertLegacyAiProviderEnabled();
   const client = getOpenAIClient();
   const model = getOpenAIModel();
 
@@ -69,6 +75,7 @@ export async function generateAiNodeJson<TOutput extends { needsHumanReview: boo
 }: GenerateAiDraftOptions & {
   nodeType: string;
 }): Promise<AiNodeResponse<TOutput>> {
+  assertLegacyAiProviderEnabled();
   const client = getOpenAIClient();
   const model = getOpenAIModel();
 
@@ -92,14 +99,14 @@ export async function generateAiNodeJson<TOutput extends { needsHumanReview: boo
   }
 
   const rawJson = extractJsonObject(text);
-  let parsed: TOutput;
+  let parsed: unknown;
   try {
-    parsed = JSON.parse(rawJson) as TOutput;
+    parsed = JSON.parse(rawJson) as unknown;
   } catch {
     throw new Error("OpenAI response was not valid JSON.");
   }
 
-  const output = ensureHumanReview(parsed);
+  const output = ensureHumanReview(validateAiNodeOutput<TOutput>(nodeType, parsed));
 
   return {
     nodeType,
@@ -115,6 +122,15 @@ export function validationError(error: string) {
 }
 
 export function aiError(error: unknown) {
-  const message = error instanceof Error ? error.message : "OpenAI API request failed.";
-  return NextResponse.json({ error: message }, { status: 500 });
+  if (error instanceof LegacyAiProviderDisabledError) {
+    return NextResponse.json(
+      { error: LEGACY_AI_PROVIDER_DISABLED_MESSAGE },
+      { status: 503 }
+    );
+  }
+
+  return NextResponse.json(
+    { error: "AI provider request failed." },
+    { status: 500 }
+  );
 }

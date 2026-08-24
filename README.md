@@ -103,10 +103,10 @@ Its current public review surfaces include:
 | `/ai-checklist` | Static AI and safety review checklist |
 | `/ai-intent-reviewer` | Static intent, mock-runtime, readiness-gate, and safety evidence |
 
-The Next.js Network Automation AI Node is a secondary Stage-0 interface. It
-provides bounded presentation of committed or local evidence, but it does not
-replace the Flask Quick Start and does not activate provider, model, job, or
-device execution.
+The Next.js Network Automation AI Node is a secondary Stage-0 interface. Its
+supported default presentation provides bounded committed or local evidence;
+it does not replace the Flask Quick Start
+and does not activate provider, model, job, or device execution.
 
 ### Governance and safety layer
 
@@ -250,6 +250,16 @@ default remains `NETWORK_AI_PROVIDER_DEMO_ENABLED=0`, so the canonical Flask
 Stage-0 demo stays provider-free. The preview classifies a request against the
 fixed Action Catalog and stops at a sanitized recommendation; it does not create
 jobs, generate commands, contact devices, or execute network operations.
+
+Legacy/general provider workbenches at `/ai`, `/automation/ai-nodes`, and the
+historical `/api/network/ai/analyze-report` route remain outside the canonical
+provider-free Stage-0 reviewer path. They fail closed by default through
+`LEGACY_AI_PROVIDER_ENABLED=0` and require the separate exact local opt-in
+`LEGACY_AI_PROVIDER_ENABLED=1` plus a server-side `OPENAI_API_KEY`. Enabling
+them sends submitted text to the configured external provider, so do not use
+secrets, credentials, private device data, or private lab data. Provider
+credential presence is not feature authorization, and neither flag grants
+device, job, command, or configuration-execution capability.
 
 ## Get Involved
 
