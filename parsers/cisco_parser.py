@@ -138,13 +138,39 @@ def parse_show_interfaces_status(output: str) -> Dict[str, Dict[str, str]]:
 
 def parse_show_vlan_brief(output: str) -> Dict[str, Dict[str, Any]]:
     vlans: Dict[str, Dict[str, Any]] = {}
+    current_vlan_id = ""
+
     for line in output.splitlines():
         stripped = line.strip()
         if not stripped or stripped.lower().startswith(("vlan", "----")):
+            current_vlan_id = ""
             continue
+
         match = re.match(r"^(\d+)\s+(\S+)\s+(\S+)\s*(.*)$", stripped)
         if not match:
+            continuation_ports = [
+                port.strip().rstrip(",") for port in stripped.split()
+            ]
+            valid_continuation = bool(
+                current_vlan_id
+                and line[:1].isspace()
+                and continuation_ports
+                and all(
+                    re.fullmatch(
+                        r"[A-Za-z][A-Za-z-]*\d+(?:/\d+)*(?:\.\d+)?",
+                        port,
+                    )
+                    for port in continuation_ports
+                )
+            )
+            if valid_continuation:
+                vlans[current_vlan_id]["ports"].extend(
+                    _normalize_interface_name(port) for port in continuation_ports
+                )
+            else:
+                current_vlan_id = ""
             continue
+
         vlan_id, name, status, ports_text = match.groups()
         ports = [
             _normalize_interface_name(port.strip().rstrip(","))
@@ -157,6 +183,7 @@ def parse_show_vlan_brief(output: str) -> Dict[str, Dict[str, Any]]:
             "status": status.lower(),
             "ports": ports,
         }
+        current_vlan_id = vlan_id
     return vlans
 
 

@@ -105,6 +105,49 @@ def test_cisco_parsers_extract_expected_fields():
     assert stp["vlan_blocking_ports"]["VLAN0001"] == 0
 
 
+def test_parse_show_vlan_brief_includes_wrapped_ports():
+    output = """
+VLAN Name                             Status    Ports
+---- -------------------------------- --------- -------------------------------
+1    default                          active    Gi0/1, Gi0/2,
+                                                Gi0/3, GigabitEthernet0/4
+                                                Fa0/5
+20   users                            active    Gi0/6
+"""
+
+    vlans = cisco_parser.parse_show_vlan_brief(output)
+
+    assert vlans["1"]["ports"] == ["Gi0/1", "Gi0/2", "Gi0/3", "Gi0/4", "Fa0/5"]
+    assert vlans["20"]["ports"] == ["Gi0/6"]
+
+
+def test_parse_show_vlan_brief_ignores_orphan_and_malformed_continuations():
+    output = """
+                                                Gi0/99
+1    default                          active    Gi0/1
+                                                not-a-port
+                                                Gi0/2
+20   users                            active    Gi0/3
+"""
+
+    vlans = cisco_parser.parse_show_vlan_brief(output)
+
+    assert vlans["1"]["ports"] == ["Gi0/1"]
+    assert vlans["20"]["ports"] == ["Gi0/3"]
+
+
+def test_parse_show_vlan_brief_preserves_single_line_output():
+    vlans = cisco_parser.parse_show_vlan_brief(SHOW_VLAN_BRIEF)
+
+    assert vlans["1"] == {
+        "vlan_id": "1",
+        "name": "default",
+        "status": "active",
+        "ports": ["Gi0/1", "Gi0/5", "Gi0/7", "Gi0/8"],
+    }
+    assert vlans["1002"]["ports"] == []
+
+
 def test_evaluate_topology_passes_expected_profile():
     checks, parsed = cisco_validation.evaluate_topology(sample_config(), sample_outputs())
     statuses = {check["name"]: check["result"] for check in checks}
