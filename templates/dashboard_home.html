@@ -222,6 +222,17 @@
       margin-top: 12px;
     }
     .journey-evidence-links a { font-weight: 800; }
+    .journey-evidence-failure {
+      background: var(--unknown-bg);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--unknown);
+      border-radius: 8px;
+      margin-top: 16px;
+      padding: 16px;
+    }
+    .journey-evidence-failure h3 { margin-top: 12px; }
+    .journey-evidence-failure p { color: var(--text); }
+    .journey-evidence-failure ul { margin-top: 12px; }
     @media (max-width: 960px) {
       .hero, .section-grid { grid-template-columns: 1fr; }
       .proof-grid, .quick-links, .summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -261,6 +272,7 @@
     <h2 id="stage0-interview-journey-heading">How a Stage-0 request becomes reviewer evidence</h2>
     <p class="journey-intro"><strong>Primary user: Network Engineer / Automation Reviewer.</strong> Ad hoc network checks are difficult to repeat, compare, review, audit, and automate safely. This journey shows how the current platform evaluates bounded inputs without contacting a live device.</p>
 
+    {% if stage0_result.evidence_status == "AVAILABLE" %}
     <ol class="journey-path" aria-label="Current Stage-0 workflow">
       <li><strong>1. Bounded request</strong>A deterministic fixture describes the requested validation intent.</li>
       <li><strong>2. Safety decision</strong>Validation classifies the request as allowed or rejected.</li>
@@ -344,6 +356,26 @@
       <a href="{{ json_report_url('reports/lab-summary/day95_adapter_result_normalization.json') }}">Preview the bounded Day95 JSON evidence</a>
       <a href="{{ report_url('reports/lab-summary/day95_adapter_result_normalization.html') }}">Open the reviewer-facing Day95 HTML evidence</a>
     </div>
+    {% else %}
+      <div
+        class="journey-evidence-failure"
+        data-stage0-evidence-state="{{ stage0_result.evidence_status }}"
+      >
+        <span class="badge unknown">EVIDENCE {{ stage0_result.evidence_status }}</span>
+        {% if stage0_result.evidence_status == "MALFORMED" %}
+          <h3>Stage-0 journey evidence is malformed</h3>
+          <p>The available data cannot be used as valid Stage-0 evidence, so no result is inferred from it.</p>
+        {% else %}
+          <h3>Stage-0 journey evidence is unavailable</h3>
+          <p>No valid Stage-0 result is inferred while the committed evidence is unavailable.</p>
+        {% endif %}
+        <ul>
+          <li>No live fallback was attempted.</li>
+          <li>No adapter, runner, command, provider, or device execution occurred.</li>
+          <li>No allowed or rejected useful result was fabricated.</li>
+        </ul>
+      </div>
+    {% endif %}
   </section>
 
   <section class="evidence-health" aria-labelledby="evidence-health-heading">

@@ -16,11 +16,45 @@ from intent_readonly_output_parser_prototype import (
 
 ALLOWED_SCENARIO_ID = "D95-S02-readonly-interfaces-multiline"
 REJECTED_SCENARIO_ID = "D95-S03-reject-write-capable"
+EVIDENCE_AVAILABLE = "AVAILABLE"
+EVIDENCE_UNAVAILABLE = "UNAVAILABLE"
+EVIDENCE_MALFORMED = "MALFORMED"
 
 
 def load_stage0_useful_result_presentation(report_path: Path) -> Dict[str, Any]:
     """Load committed Day95 evidence and build the bounded Stage-0 view model."""
-    report = json.loads(Path(report_path).read_text(encoding="utf-8"))
+    try:
+        report_text = Path(report_path).read_text(encoding="utf-8")
+    except FileNotFoundError:
+        return _build_unavailable_presentation(
+            EVIDENCE_UNAVAILABLE,
+            "EVIDENCE_MISSING",
+        )
+    except UnicodeDecodeError:
+        return _build_unavailable_presentation(
+            EVIDENCE_MALFORMED,
+            "EVIDENCE_INVALID_ENCODING",
+        )
+    except OSError:
+        return _build_unavailable_presentation(
+            EVIDENCE_UNAVAILABLE,
+            "EVIDENCE_UNREADABLE",
+        )
+
+    try:
+        report = json.loads(report_text)
+    except json.JSONDecodeError:
+        return _build_unavailable_presentation(
+            EVIDENCE_MALFORMED,
+            "EVIDENCE_INVALID_JSON",
+        )
+
+    if not isinstance(report, dict):
+        return _build_unavailable_presentation(
+            EVIDENCE_MALFORMED,
+            "EVIDENCE_INVALID_SHAPE",
+        )
+
     return build_stage0_useful_result_presentation(report)
 
 
@@ -44,6 +78,8 @@ def build_stage0_useful_result_presentation(
         useful_result = _project_interface_result(adapter_result, parsed_result)
 
     return {
+        "evidence_status": EVIDENCE_AVAILABLE,
+        "reason_code": None,
         "allowed": {
             "request": allowed.get("intent"),
             "reason": allowed.get("reason"),
@@ -63,6 +99,35 @@ def build_stage0_useful_result_presentation(
             "guard_decision": rejected.get("guard_decision"),
             "adapter_invoked": rejected.get("adapter_invoked") is True,
             "adapter_result": rejected.get("adapter_result"),
+            "parsed_result": None,
+            "useful_result": None,
+        },
+    }
+
+
+def _build_unavailable_presentation(
+    evidence_status: str,
+    reason_code: str,
+) -> Dict[str, Any]:
+    """Return a fixed fail-closed model without evidence-derived results."""
+    return {
+        "evidence_status": evidence_status,
+        "reason_code": reason_code,
+        "allowed": {
+            "request": None,
+            "reason": None,
+            "guard_decision": None,
+            "adapter_invoked": False,
+            "result_status": None,
+            "parsed_result": None,
+            "useful_result": None,
+        },
+        "rejected": {
+            "request": None,
+            "reason": None,
+            "guard_decision": None,
+            "adapter_invoked": False,
+            "adapter_result": None,
             "parsed_result": None,
             "useful_result": None,
         },
