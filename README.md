@@ -289,15 +289,17 @@ reporting channel.
 
 ## Public Roadmap
 
-Stage 0 is the current public baseline and is in final open-source/security
-closure. It now includes contributor and security guidance, Issue and pull
-request templates, newcomer-friendly Issues, and protected-`main` governance
-through pull requests and Safe CI.
+Stage 0 is the formally closed public baseline. Its closure is recorded in the
+[Stage 0 Formal Closure](docs/automation_readiness/stage0_formal_closure.md).
+It includes contributor and security guidance, Issue and pull request
+templates, newcomer-friendly Issues, and protected-`main` governance through
+pull requests and Safe CI. Stage 1 is available only at its planning entry; no
+Stage 1 implementation or live capability is authorized.
 
 | Stage | Purpose | Status |
 | --- | --- | --- |
-| **Stage 0 — Current public baseline** | Mock-only, dry-run, report-only, reviewer-visible, fail-closed validation and evidence | **Current / closure in progress** |
-| **Stage 1 — Read-only Lab Integration Planning** | Define contracts, allowlists, failure behavior, evidence, and the credential boundary without live access | **Future / requires separate approval** |
+| **Stage 0 — Closed public baseline** | Mock-only, dry-run, report-only, reviewer-visible, fail-closed validation and evidence | **CLOSED** |
+| **Stage 1 — Read-only Lab Integration Planning** | Define contracts, allowlists, failure behavior, evidence, and the credential boundary without live access | **PLANNING ENTRY / implementation not authorized** |
 | **Stage 2 — Narrow Read-only Lab Adapter** | Gate one lab target, one transport, a small read-only allowlist, normalized real output, and no-mutation evidence | **Future / separately gated** |
 | **Stage 3 — Controlled Config Plan Generation** | Produce human-reviewable configuration plans only; no apply | **Future / separate gate** |
 | **Stage 4 — Controlled Change Execution** | Permit narrowly approved lab changes with explicit safeguards and evidence | **Future / separate gate** |
@@ -391,8 +393,10 @@ pre-display-only command UI. Do not use it as evidence of the current
 
 ## Safety Boundaries
 
-The August release remains **Stage 0**. Its supported reviewer path is local,
-report-oriented, dry-run/mock-only, and display-only.
+The August release remains the formally closed **Stage 0** baseline. Its
+supported reviewer path is local, report-oriented, dry-run/mock-only, and
+display-only. Closure changes the delivery-stage status, not the operational
+safety boundary.
 
 ### Currently supported safe paths
 
@@ -468,7 +472,8 @@ release lanes; they are not performed by documentation-only changes.
 
 | Area | August 2026 status |
 | --- | --- |
-| Stage-0 Network Automation Lab | Current release baseline |
+| Stage-0 Network Automation Lab | **CLOSED** at `main@aff250735ade18e4c274be8ac53c9672bb2cb07f` |
+| Stage-1 Read-only Lab Integration Planning | **PLANNING ENTRY / implementation not authorized** |
 | Canonical reviewer interface | Flask dashboard on `127.0.0.1:5000` |
 | Secondary Next.js interface | Available as a bounded Stage-0 evidence surface |
 | WF-01 workflow foundation | Contract and hardened helpers integrated on `main` |
@@ -516,6 +521,7 @@ deliberately non-executing public review path.
 - [Public Reviewer Walkthrough](docs/portfolio/public_reviewer_walkthrough.md)
 - [Canonical Quick Start and demo runbook](docs/phase_2n/phase_2n_01_canonical_quick_start_and_demo_runbook_documentation_only.md)
 - [Accepted Stage-0 user-facing baseline](docs/phase_2n/phase_2n_05_final_user_facing_acceptance_review_phase_closure_review_only.md)
+- [Stage 0 formal closure](docs/automation_readiness/stage0_formal_closure.md)
 
 ### Architecture and safety
 

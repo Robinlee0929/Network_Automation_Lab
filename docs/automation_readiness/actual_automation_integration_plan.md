@@ -26,7 +26,10 @@ Read-only lab access may only happen after explicit user approval. Config change
 
 ### Stage 0: Mock-only / Dry-run Platform
 
-Status: Current default.
+Status: CLOSED at
+`main@aff250735ade18e4c274be8ac53c9672bb2cb07f`. Its operational safety
+boundary remains the default until a later capability is separately authorized,
+implemented, and validated.
 
 Allowed:
 
@@ -50,9 +53,15 @@ Exit gate:
 - Safety boundaries remain visible in documentation, tests, and report evidence.
 - User explicitly approves planning for the next read-only lab integration stage.
 
+Closure decision: PASS. The owner accepted the completed S0-EXIT review and
+authorized formal Stage 0 closure. See
+[Stage 0 Formal Closure](stage0_formal_closure.md).
+
 ### Stage 1: Read-only Lab Integration Planning
 
-Status: Future planning only.
+Status: PLANNING ENTRY. Planning-only scope is owner-approved; no planning task
+is started by the Stage 0 closure record, and no Stage 1 implementation is
+authorized.
 
 Allowed:
 
@@ -194,6 +203,12 @@ No-Go applies when any of the following is true:
 
 Default decision: NO-GO for real automation.
 
-The platform remains Stage 0 mock-only / dry-run by default. Any movement toward read-only lab access, controlled plan generation, controlled change execution, or production-like behavior must be introduced by an explicit capability gate and separate user approval.
+Stage 0 is formally closed as a delivery stage, but its mock-only, dry-run,
+report-only operational boundary remains the default. Stage 1 is at its
+planning-only entry; this status activates no adapter, protocol, provider,
+credential, device, or execution capability. Any movement toward read-only lab
+access, controlled plan generation, controlled change execution, or
+production-like behavior must be introduced by an explicit capability gate and
+separate user approval.
 
 This document does not start Phase 2C-10 or any implementation phase. It does not create a second safety matrix. It is a durable planning reference for future review and approval decisions.
