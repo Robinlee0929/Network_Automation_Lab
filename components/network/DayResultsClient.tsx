@@ -45,13 +45,121 @@ function groupedEvidence(items: SafeEvidenceItem[]) {
   );
 }
 
+function HistoricalAnalysisRecord({ reportId }: { reportId: string | null }) {
+  const [analysis, setAnalysis] = useState<AnalysisRecord | unknown | null>(null);
+  const [readError, setReadError] = useState(false);
+  const [isLoadingLatest, setIsLoadingLatest] = useState(Boolean(reportId));
+  const safeAnalysis = useMemo(() => projectAnalysisRecord(analysis), [analysis]);
+
+  useEffect(() => {
+    if (!reportId) {
+      return;
+    }
+
+    let ignore = false;
+    const requestedReportId = reportId;
+
+    async function loadLatestAnalysis() {
+      try {
+        const response = await fetch(
+          `/api/network/reports/${encodeURIComponent(requestedReportId)}/analysis/latest`
+        );
+        const payload: unknown = await response.json();
+        if (!response.ok) {
+          throw new Error("Recorded analysis read failed.");
+        }
+        if (!ignore) {
+          setAnalysis(analysisFromPayload(payload));
+          setIsLoadingLatest(false);
+        }
+      } catch {
+        if (!ignore) {
+          setAnalysis(null);
+          setReadError(true);
+          setIsLoadingLatest(false);
+        }
+      }
+    }
+
+    void loadLatestAnalysis();
+
+    return () => {
+      ignore = true;
+    };
+  }, [reportId]);
+
+  return (
+    <section
+      className="network-panel network-panel-wide"
+      aria-labelledby="recorded-analysis-heading"
+    >
+      <div className="network-toolbar">
+        <h2 id="recorded-analysis-heading">Historical Analysis Record</h2>
+        <span>UNAVAILABLE — provider analysis</span>
+      </div>
+
+      {isLoadingLatest ? (
+        <p className="safe-state" data-state="loading" role="status">
+          Loading the recorded analysis…
+        </p>
+      ) : null}
+      {readError ? (
+        <p className="safe-state" data-state="error" role="alert">
+          Unable to read the recorded analysis.
+        </p>
+      ) : null}
+      {!isLoadingLatest && !readError && safeAnalysis.state === "EMPTY" ? (
+        <p className="safe-state" data-state="empty" role="status">
+          No recorded analysis. Provider analysis remains UNAVAILABLE in Stage 0.
+        </p>
+      ) : null}
+      {!isLoadingLatest && !readError && safeAnalysis.state === "REJECTED" ? (
+        <p className="safe-state" data-state="rejected" role="status">
+          REJECTED — recorded analysis detail is unavailable.
+        </p>
+      ) : null}
+      {!isLoadingLatest && !readError && safeAnalysis.state === "AVAILABLE" ? (
+        <>
+          <p className="safe-state" data-state="available" role="status">
+            Recorded analysis available. Recorded detail is limited to approved
+            presentation fields.
+          </p>
+          <dl className="detail-grid">
+            <div>
+              <dt>Risk</dt>
+              <dd>{safeAnalysis.risk}</dd>
+            </div>
+            <div>
+              <dt>Approval</dt>
+              <dd>{safeAnalysis.approvalFlag}</dd>
+            </div>
+            <div>
+              <dt>Human review</dt>
+              <dd>{safeAnalysis.humanReviewFlag}</dd>
+            </div>
+            <div>
+              <dt>Job eligibility</dt>
+              <dd>{safeAnalysis.jobEligibility}</dd>
+            </div>
+            <div>
+              <dt>Date</dt>
+              <dd>{safeAnalysis.recordedDate}</dd>
+            </div>
+            <div>
+              <dt>Current capability</dt>
+              <dd>Provider analysis and job creation unavailable in Stage 0</dd>
+            </div>
+          </dl>
+        </>
+      ) : null}
+    </section>
+  );
+}
+
 export function DayResultsClient({ results }: { results: DayResult[] }) {
   const collection = useMemo(() => projectEvidenceCollection(results), [results]);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("ALL");
   const [selectedId, setSelectedId] = useState(collection.items[0]?.internalId ?? "");
-  const [analysis, setAnalysis] = useState<AnalysisRecord | unknown | null>(null);
-  const [readError, setReadError] = useState(false);
-  const [isLoadingLatest, setIsLoadingLatest] = useState(false);
 
   const visibleItems = useMemo(
     () =>
@@ -65,49 +173,6 @@ export function DayResultsClient({ results }: { results: DayResult[] }) {
     visibleItems[0] ??
     null;
   const groups = useMemo(() => groupedEvidence(visibleItems), [visibleItems]);
-  const safeAnalysis = useMemo(() => projectAnalysisRecord(analysis), [analysis]);
-
-  useEffect(() => {
-    let ignore = false;
-
-    async function loadLatestAnalysis(reportId: string) {
-      setIsLoadingLatest(true);
-      setAnalysis(null);
-      setReadError(false);
-      try {
-        const response = await fetch(
-          `/api/network/reports/${encodeURIComponent(reportId)}/analysis/latest`
-        );
-        const payload: unknown = await response.json();
-        if (!response.ok) {
-          throw new Error("Recorded analysis read failed.");
-        }
-        if (!ignore) {
-          setAnalysis(analysisFromPayload(payload));
-        }
-      } catch {
-        if (!ignore) {
-          setAnalysis(null);
-          setReadError(true);
-        }
-      } finally {
-        if (!ignore) {
-          setIsLoadingLatest(false);
-        }
-      }
-    }
-
-    if (selected?.internalId) {
-      loadLatestAnalysis(selected.internalId);
-    } else {
-      setAnalysis(null);
-      setReadError(false);
-    }
-
-    return () => {
-      ignore = true;
-    };
-  }, [selected?.internalId]);
 
   return (
     <div className="network-grid">
@@ -254,70 +319,10 @@ export function DayResultsClient({ results }: { results: DayResult[] }) {
         )}
       </section>
 
-      <section
-        className="network-panel network-panel-wide"
-        aria-labelledby="recorded-analysis-heading"
-      >
-        <div className="network-toolbar">
-          <h2 id="recorded-analysis-heading">Historical Analysis Record</h2>
-          <span>UNAVAILABLE — provider analysis</span>
-        </div>
-
-        {isLoadingLatest ? (
-          <p className="safe-state" data-state="loading" role="status">
-            Loading the recorded analysis…
-          </p>
-        ) : null}
-        {readError ? (
-          <p className="safe-state" data-state="error" role="alert">
-            Unable to read the recorded analysis.
-          </p>
-        ) : null}
-        {!isLoadingLatest && !readError && safeAnalysis.state === "EMPTY" ? (
-          <p className="safe-state" data-state="empty" role="status">
-            No recorded analysis. Provider analysis remains UNAVAILABLE in Stage 0.
-          </p>
-        ) : null}
-        {!isLoadingLatest && !readError && safeAnalysis.state === "REJECTED" ? (
-          <p className="safe-state" data-state="rejected" role="status">
-            REJECTED — recorded analysis detail is unavailable.
-          </p>
-        ) : null}
-        {!isLoadingLatest && !readError && safeAnalysis.state === "AVAILABLE" ? (
-          <>
-            <p className="safe-state" data-state="available" role="status">
-              Recorded analysis available. Recorded detail is limited to approved
-              presentation fields.
-            </p>
-            <dl className="detail-grid">
-              <div>
-                <dt>Risk</dt>
-                <dd>{safeAnalysis.risk}</dd>
-              </div>
-              <div>
-                <dt>Approval</dt>
-                <dd>{safeAnalysis.approvalFlag}</dd>
-              </div>
-              <div>
-                <dt>Human review</dt>
-                <dd>{safeAnalysis.humanReviewFlag}</dd>
-              </div>
-              <div>
-                <dt>Job eligibility</dt>
-                <dd>{safeAnalysis.jobEligibility}</dd>
-              </div>
-              <div>
-                <dt>Date</dt>
-                <dd>{safeAnalysis.recordedDate}</dd>
-              </div>
-              <div>
-                <dt>Current capability</dt>
-                <dd>Provider analysis and job creation unavailable in Stage 0</dd>
-              </div>
-            </dl>
-          </>
-        ) : null}
-      </section>
+      <HistoricalAnalysisRecord
+        key={selected ? `report:${selected.internalId}` : "selection:none"}
+        reportId={selected?.internalId ?? null}
+      />
     </div>
   );
 }

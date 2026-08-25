@@ -163,8 +163,8 @@ describe("Phase 2O-04 secondary Next.js network shell", () => {
   it("preserves the network redirect and package lock boundary", () => {
     const redirectPage = source("app/network/page.tsx");
     const packageHashes = {
-      "package.json": "992519ae69f4280c108bde201aa9213d0fe6e929a3f603d860f9da4d371ed148",
-      "package-lock.json": "4f1128b7a80ddc2c14378127ddcaf2509c23a2ad89e463c04acaddef5ff3f7f7"
+      "package.json": "70313efc24dbbff232ffe0c3af9ffeba1fd9633b680f13465dee2c2474a592bc",
+      "package-lock.json": "c8d7c4ec4b7f488c992f759627e097ddbaee6de2636af2c6f4329bd10cc2c984"
     } as const;
 
     expect(redirectPage).toContain('redirect("/network/day-results")');

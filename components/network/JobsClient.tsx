@@ -12,24 +12,26 @@ function jobsFromPayload(value: unknown) {
   return "jobs" in value ? value.jobs : null;
 }
 
+async function readJobs() {
+  const response = await fetch("/api/network/jobs");
+  const payload: unknown = await response.json();
+  if (!response.ok) {
+    throw new Error("Recorded jobs read failed.");
+  }
+  return jobsFromPayload(payload);
+}
+
 export function JobsClient({ initialJobs }: { initialJobs: NetworkJob[] }) {
   const [jobs, setJobs] = useState<unknown>(initialJobs);
   const [readError, setReadError] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const collection = useMemo(() => projectJobsCollection(jobs), [jobs]);
 
-  async function refreshJobs(options: { quiet?: boolean } = {}) {
+  async function refreshJobs() {
     setIsLoading(true);
-    if (!options.quiet) {
-      setReadError(false);
-    }
+    setReadError(false);
     try {
-      const response = await fetch("/api/network/jobs");
-      const payload: unknown = await response.json();
-      if (!response.ok) {
-        throw new Error("Recorded jobs read failed.");
-      }
-      setJobs(jobsFromPayload(payload));
+      setJobs(await readJobs());
     } catch {
       setReadError(true);
     } finally {
@@ -38,7 +40,30 @@ export function JobsClient({ initialJobs }: { initialJobs: NetworkJob[] }) {
   }
 
   useEffect(() => {
-    refreshJobs({ quiet: true });
+    let ignore = false;
+
+    async function loadInitialJobs() {
+      try {
+        const initialRefresh = await readJobs();
+        if (!ignore) {
+          setJobs(initialRefresh);
+        }
+      } catch {
+        if (!ignore) {
+          setReadError(true);
+        }
+      } finally {
+        if (!ignore) {
+          setIsLoading(false);
+        }
+      }
+    }
+
+    void loadInitialJobs();
+
+    return () => {
+      ignore = true;
+    };
   }, []);
 
   return (
