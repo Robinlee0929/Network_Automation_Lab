@@ -1,53 +1,82 @@
 # Network Automation Lab
 
-## Project Summary
+**A safety-first network validation and automation QA portfolio built around
+repeatable tests, structured evidence, reviewer-facing interfaces, and explicit
+execution gates.**
 
-Network Automation Lab is a safety-first network automation and testing portfolio
-project. It demonstrates how network validation can be planned, reviewed, tested,
-and presented as structured evidence without granting live automation authority
-by default.
+Network validation is often demonstrated through one-off terminal sessions,
+screenshots, and copied output that are difficult to repeat, compare, test, or
+review. Network Automation Lab treats that work as a small QA platform: local
+inputs are validated deterministically, results become machine-readable and
+human-readable evidence, and unsafe or unavailable paths fail closed.
 
 The August 2026 release baseline is a local Stage-0 product:
 
-- Python validation and reporting utilities;
-- a canonical Flask reviewer dashboard;
-- a secondary Next.js evidence interface;
-- deterministic dry-run, mock, and report-oriented workflows;
-- structured JSON, HTML, and text evidence;
-- explicit safety gates for anything that could reach a device or external
-  provider.
-
-The supported release path is designed for local portfolio review. It does not
-require a router, switch, VPN peer, SSH session, cloud provider, model API, or
+The supported release path is designed for local portfolio review. It remains
+mock-only, dry-run, report-only, and display-oriented; Stage 1 is at its planning
+entry and does not authorize implementation or live access. Reviewers do not
+require a router, switch, VPN peer, SSH session, provider account, model API, or
 private lab configuration.
+
+## Engineering Highlights
+
+- Repeatable validation logic and retained evidence for MikroTik, Cisco,
+  WireGuard, VRRP, and iperf3 scenarios.
+- Structured JSON, HTML, and text evidence with bounded reviewer summaries.
+- Fail-closed handling for missing, malformed, unavailable, rejected, or
+  blocked evidence.
+- A canonical Flask reviewer dashboard plus a secondary Next.js evidence
+  interface.
+- Automated regression coverage for parsers, safety boundaries, report
+  projection, CLI behavior, and presentation.
+- Explicit separation between report-only, dry-run, mock, historical, and
+  separately gated future capabilities.
+
+## Interview / Demo Quick Path
+
+**Review in 3 Minutes**
+
+Start the canonical local reviewer dashboard:
+
+```bash
+python dashboard_app.py
+```
+
+Open `http://127.0.0.1:5000/` and select **Open the 3-minute Stage-0 journey**.
+The walkthrough uses committed Day95 evidence to compare an allowed read-only
+fake-adapter request with a write-capable request rejected before adapter
+invocation, connecting the request, safety decision, deterministic evidence,
+and reviewer conclusion.
+
+This accepted Stage-0 demo path is GET-only. It does not contact devices,
+invoke provider-backed operations, expose command or job execution controls,
+change configuration, or demonstrate production approval.
+Other internal or legacy surfaces are outside this interview path. For a
+documentation-first tour, use the
+[Public Reviewer Walkthrough](docs/portfolio/public_reviewer_walkthrough.md).
+
+## Contribute in 15 Minutes
+
+Many beginner-friendly issues are designed to run entirely offline. When an
+issue is labeled and scoped that way, you can contribute without physical
+network hardware, credentials, private infrastructure, SSH access, or a cloud
+or model-provider account.
+
+1. Browse the [open `good first issue` list](https://github.com/Robinlee0929/Network_Automation_Lab/issues?q=is%3Aissue%20state%3Aopen%20label%3A%22good%20first%20issue%22)
+   or the [general Issues list](https://github.com/Robinlee0929/Network_Automation_Lab/issues).
+2. Read [CONTRIBUTING.md](CONTRIBUTING.md) and the safety guidance in
+   [SECURITY.md](SECURITY.md).
+3. Pick one bounded issue whose stated setup and scope fit your environment.
+4. Make one focused change and run the issue-specific validation plus the
+   repository-required checks.
+5. Open a focused pull request; Safe CI validates the change and a maintainer
+   reviews it.
 
 ![AI-assisted workflow overview](docs/assets/readme-ai-assisted-workflow.png)
 
-The diagram summarizes the intended human-guided flow: local inputs and existing
-evidence are reviewed through bounded tools and display surfaces, while later
-execution capabilities remain gated.
-
-## What This Project Demonstrates
-
-Network validation is often proved through one-off terminal sessions,
-screenshots, and manually copied output. That approach is difficult to repeat,
-compare, test, or review. This project instead treats network validation like a
-small QA platform.
-
-It demonstrates:
-
-- repeatable validation logic for MikroTik, Cisco, WireGuard, VRRP, and iperf3
-  scenarios;
-- clear separation between report-only, dry-run, mock, historical, and
-  separately gated capabilities;
-- machine-readable evidence with reviewer-friendly summaries;
-- fail-closed handling of missing, malformed, unavailable, or blocked evidence;
-- local dashboards that expose status and evidence without turning the public
-  review flow into a device console;
-- automated regression coverage for parsers, safety boundaries, report
-  projection, CLI behavior, and presentation;
-- documentation and evidence trails that explain both supported behavior and
-  deliberate limitations.
+The diagram summarizes the intended human-guided flow: local inputs and
+existing evidence are reviewed through bounded tools and display surfaces,
+while later execution capabilities remain gated.
 
 Historical Day and Phase records remain under [docs/](docs/). They are retained
 as engineering evidence, not reproduced as a chronological diary in this
@@ -136,28 +165,6 @@ separate reviewed activation decision.
 ├── requirements.txt          # Python requirements
 └── package.json              # secondary Next.js application metadata
 ```
-
-## Interview / Demo Quick Path
-
-Network Automation Lab is a safety-first network-validation and automation QA
-platform for Network Engineers and Automation Reviewers. The shortest current
-walkthrough uses the canonical Flask dashboard:
-
-```bash
-python dashboard_app.py
-```
-
-Open `http://127.0.0.1:5000/` and select **Open the 3-minute Stage-0 journey**.
-The journey uses committed Day95 evidence to compare one allowed read-only
-fake-adapter request with one write-capable request rejected before adapter
-invocation. It connects the request, safety decision, deterministic evidence,
-and reviewer conclusion without requiring repository-history context.
-
-This accepted Stage-0 demo path is GET-only. It does not invoke provider-backed
-operations, expose local command or job execution controls, contact devices by
-SSH, NETCONF, or RESTCONF, change configuration, or demonstrate production
-approval and orchestration. Other internal or legacy surfaces in the repository
-are outside this interview path.
 
 ## Quick Start
 
@@ -260,32 +267,6 @@ them sends submitted text to the configured external provider, so do not use
 secrets, credentials, private device data, or private lab data. Provider
 credential presence is not feature authorization, and neither flag grants
 device, job, command, or configuration-execution capability.
-
-## Get Involved
-
-Contributions to the current Stage-0 baseline are welcome. Start with the
-[contributor guide](CONTRIBUTING.md), review the [security policy](SECURITY.md),
-and browse the [general Issues list](https://github.com/Robinlee0929/Network_Automation_Lab/issues)
-or [currently open issues labeled `good first issue`](https://github.com/Robinlee0929/Network_Automation_Lab/issues?q=is%3Aissue%20state%3Aopen%20label%3A%22good%20first%20issue%22).
-Newcomer-friendly work may include UI and accessibility improvements, parser
-tests, deterministic parser fixes, and fail-closed evidence handling.
-
-The normal contribution flow is:
-
-1. Choose an Issue or propose a bounded improvement.
-2. Read [CONTRIBUTING.md](CONTRIBUTING.md) and [SECURITY.md](SECURITY.md).
-3. Create a focused branch in your fork or local clone.
-4. Implement one narrow, reviewable change.
-5. Run targeted validation plus the repository-required checks.
-6. Open a pull request without assuming repository write access.
-7. Let Safe CI validate the pull request.
-8. Address maintainer review; the maintainer performs the merge.
-
-`main` is protected, so normal changes go through a pull request and Safe CI.
-For suspected vulnerabilities, follow [SECURITY.md](SECURITY.md). Do not post
-exploit details, credentials, secrets, or private infrastructure data in a
-public Issue; the public security-contact path is only for requesting a private
-reporting channel.
 
 ## Public Roadmap
 
