@@ -77,7 +77,9 @@ or model-provider account.
 5. Open a focused pull request; Safe CI validates the change and a maintainer
    reviews it.
 
-![AI-assisted workflow overview](docs/assets/readme-ai-assisted-workflow.png)
+![Human-guided validation workflow](docs/assets/readme-human-guided-validation-workflow.png)
+
+For implementation-level detail, see the [detailed AI-assisted workflow](docs/assets/readme-ai-assisted-workflow.png).
 
 The diagram summarizes the intended human-guided flow: local inputs and
 existing evidence are reviewed through bounded tools and display surfaces,
