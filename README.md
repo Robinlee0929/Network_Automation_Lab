@@ -55,6 +55,11 @@ Other internal or legacy surfaces are outside this interview path. For a
 documentation-first tour, use the
 [Public Reviewer Walkthrough](docs/portfolio/public_reviewer_walkthrough.md).
 
+For a no-install preview, view the committed
+[home](docs/demo/day52_offline_demo_package/screenshots/dashboard_home.png) and
+[reports](docs/demo/day52_offline_demo_package/screenshots/dashboard_reports.png)
+screenshots. These show reviewer displays, not proof of live-device execution.
+
 ## Contribute in 15 Minutes
 
 Many beginner-friendly issues are designed to run entirely offline. When an
