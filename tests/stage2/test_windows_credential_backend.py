@@ -173,7 +173,7 @@ def _native_boundary_harness(
     monkeypatch.setattr(ctypes, "string_at", guarded_string_at)
     monkeypatch.setattr(module.sys, "platform", "win32")
     if not read_succeeds:
-        monkeypatch.setattr(ctypes, "get_last_error", lambda: 1168)
+        monkeypatch.setattr(ctypes, "get_last_error", lambda: 1168, raising=False)
 
     backend = build_stage2_windows_credential_backend(_configuration())
     return backend, fake_library, state
