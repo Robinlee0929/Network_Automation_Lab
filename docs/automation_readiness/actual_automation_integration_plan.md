@@ -89,6 +89,28 @@ Exit gate:
 
 Status: Future-only, approval required.
 
+#### Canonical bounded VRRP read-only sequence
+
+The following sequence records the accepted bounded components and the next
+separately gated boundaries. Merged bounded components do not activate the
+Stage-2 adapter or authorize live access. Delivery-time status statements in
+the individual records remain historical context for those bounded changes.
+
+| Slice | Canonical scope | Current boundary |
+| --- | --- | --- |
+| S2-RO-01 | [Minimal VRRP request and evidence contract](stage2_vrrp_readonly_s2_ro_01_contract.md) | Accepted offline contract |
+| S2-RO-02 | [Fixed target registry](stage2_vrrp_readonly_s2_ro_02_target_registry.md) | Accepted offline contract |
+| S2-RO-03 | [Credential resolver](stage2_vrrp_readonly_s2_ro_03_credential_resolver.md) | Accepted offline contract |
+| S2-RO-04 | [Windows Credential Manager read backend](stage2_vrrp_readonly_s2_ro_04_windows_credential_backend.md) | Accepted bounded backend; no credential was read by this sequence index |
+| S2-RO-05 | [Authorization envelope and durable replay ledger](stage2_vrrp_readonly_s2_ro_05_authorization_envelope_ledger.md) | Accepted offline/local contract; not execution authority |
+| S2-RO-06 | [Owner verifier and exact approval source](stage2_vrrp_readonly_s2_ro_06_owner_verifier.md) | Accepted bounded verifier; not execution authority |
+| S2-RO-07 | [Immutable offline known-host snapshot](stage2_vrrp_readonly_s2_ro_07_known_host_snapshot.md) | Formally closed; no transport authority |
+| S2-RO-08 | [Immutable VRRP read-only command policy](stage2_vrrp_readonly_s2_ro_08_command_policy.md) | Canonical scope defined; implementation not started |
+| S2-RO-09 | SSH transport handoff reserved by S2-RO-07 and S2-RO-08 | Future-only; no implementation or authorization |
+
+The S2-RO-07 → S2-RO-08 → S2-RO-09 order is authoritative for scope
+discovery. It does not imply automatic authorization between slices.
+
 Allowed only after explicit user approval:
 
 - A narrowly scoped read-only adapter for a lab environment.
