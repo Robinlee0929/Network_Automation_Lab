@@ -2,18 +2,17 @@
 
 ## Decision summary
 
-S2-RO-08 is the offline, code-native positive command policy for the one
-accepted Stage-2 operation, `mikrotik.vrrp_status`. Its future implementation
-will map that exact operation to the exact RouterOS command
-`/interface/vrrp/print` and issue an immutable, non-authorizing command
+S2-RO-08 implements the offline, code-native positive command policy for the
+one accepted Stage-2 operation, `mikrotik.vrrp_status`. It maps that exact
+operation to the exact RouterOS command
+`/interface/vrrp/print` and issues an immutable, non-authorizing command
 specification for the separately gated S2-RO-09 transport.
 
-This document defines scope only. It does not implement S2-RO-08, create a
-command execution path, or authorize S2-RO-09.
+Status: implementation candidate pending validation and independent review.
+The implementation creates no command execution path and does not authorize
+S2-RO-09.
 
 `VALID COMMAND POLICY != EXECUTION AUTHORIZATION`
-
-`S2-RO-08 DEFINED != S2-RO-08 IMPLEMENTED`
 
 `S2-RO-08 IMPLEMENTED OFFLINE != S2-RO-09 TRANSPORT AUTHORIZED`
 
@@ -109,9 +108,9 @@ closes that gap before any transport exists.
 
 ## First bounded implementation slice
 
-The first separately authorized implementation must be exactly one production
-module, one synthetic test module, and the existing canonical document updated
-from definition status to implementation-candidate status:
+The separately authorized implementation is exactly one production module,
+one synthetic test module, and this canonical document synchronized to the
+implementation-candidate status:
 
 ```text
 validation_framework/stage2_vrrp_readonly_command_policy.py
@@ -126,7 +125,7 @@ implementation must stop for a new scope decision.
 
 ## Allowed boundary
 
-The future S2-RO-08 implementation may:
+The S2-RO-08 implementation:
 
 - import the fixed S2-RO-01 operation and command-policy identifiers;
 - define one code-native singleton positive policy;
@@ -174,7 +173,7 @@ S2-RO-08 may not add or perform:
 
 ## Input and output contracts
 
-The only command-resolution operation is expected to be
+The only command-resolution operation is
 `resolve_stage2_vrrp_readonly_command(request)`. It consumes one exact
 S2-RO-01 `Stage2VrrpObservationRequest`, revalidates the exact concrete type and
 all fixed fields, and accepts no other parameter. Subclasses, lookalikes,
@@ -182,10 +181,12 @@ reconstructed invalid objects, scalar subclasses, missing dependencies, and
 requests with an unknown or altered operation reject before a specification is
 issued.
 
-The lookup returns one exact immutable command-specification type. It is policy
-data for S2-RO-09, not a transport callback, callable, shell argument list, or
-execution ticket. It must have a bounded representation and no mutable export,
-serialization requirement, or authority-bearing handle.
+The lookup returns one exact
+`Stage2VrrpReadOnlyCommandSpecification`. The public failure surface is
+`Stage2VrrpCommandPolicyFailure` and `Stage2VrrpCommandPolicyError`. The result
+is policy data for S2-RO-09, not a transport callback, callable, shell argument
+list, or execution ticket. It has a bounded representation and no mutable
+export, serialization API, or authority-bearing handle.
 
 ## Fail-closed conditions
 
@@ -312,5 +313,7 @@ S2-RO-09 work is authorized by this document.
 - [S2-RO-05 authorization envelope and replay ledger](stage2_vrrp_readonly_s2_ro_05_authorization_envelope_ledger.md)
 - [S2-RO-06 Owner verifier](stage2_vrrp_readonly_s2_ro_06_owner_verifier.md)
 - [S2-RO-07 known-host snapshot and S2-RO-09 handoff](stage2_vrrp_readonly_s2_ro_07_known_host_snapshot.md)
+- [S2-RO-08 implementation](../../validation_framework/stage2_vrrp_readonly_command_policy.py)
+- [Synthetic S2-RO-08 tests](../../tests/stage2/test_vrrp_readonly_command_policy.py)
 - [Retained Day88 command allowlist design](../ai/intent_real_readonly_executor_adapter_design.md)
 - [Retained Day89 adapter safety boundary](../ai/real_adapter_safety_boundary_spec.md)
