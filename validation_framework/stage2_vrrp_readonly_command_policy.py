@@ -18,7 +18,7 @@ from validation_framework.stage2_vrrp_readonly_contract import (
 _SCHEMA_VERSION = "s2-ro-08.command-policy.v1"
 _OPERATION_ID = "mikrotik.vrrp_status"
 _COMMAND_POLICY_VERSION = "policy.stage2.vrrp-readonly.v1"
-_COMMAND_TEXT = "/interface/vrrp/print"
+_COMMAND_TEXT = "/interface vrrp print detail"
 _POLICY_BINDINGS = (
     (_OPERATION_ID, _COMMAND_POLICY_VERSION, _COMMAND_TEXT),
 )
@@ -84,9 +84,14 @@ def _validated_request(request: object) -> None:
 
 
 def _validated_policy() -> tuple[str, str, str]:
-    expected = ((_OPERATION_ID, _COMMAND_POLICY_VERSION, _COMMAND_TEXT),)
+    expected = (("mikrotik.vrrp_status", "policy.stage2.vrrp-readonly.v1",
+                 "/interface vrrp print detail"),)
     if (
-        type(_SOURCE_OPERATION_ID) is not str
+        type(_SCHEMA_VERSION) is not str
+        or _SCHEMA_VERSION != "s2-ro-08.command-policy.v1"
+        or type(_COMMAND_TEXT) is not str
+        or _COMMAND_TEXT != expected[0][2]
+        or type(_SOURCE_OPERATION_ID) is not str
         or _SOURCE_OPERATION_ID != _OPERATION_ID
         or type(_SOURCE_POLICY_VERSION) is not str
         or _SOURCE_POLICY_VERSION != _COMMAND_POLICY_VERSION

@@ -125,7 +125,7 @@ def test_exact_request_resolves_one_non_authorizing_command_specification():
         "schema_version": "s2-ro-08.command-policy.v1",
         "operation_id": "mikrotik.vrrp_status",
         "command_policy_version": "policy.stage2.vrrp-readonly.v1",
-        "command_text": "/interface/vrrp/print",
+        "command_text": "/interface vrrp print detail",
         "read_only": True,
         "execution_authorized": False,
     }
@@ -142,7 +142,7 @@ def test_exact_request_resolves_one_non_authorizing_command_specification():
         "mikrotik.vrrp-status",
         "Mikrotik.vrrp_status",
         "mikrotik.vrrp_status ",
-        "/interface/vrrp/print",
+        "/interface vrrp print detail",
         "default",
     ),
 )
@@ -209,12 +209,12 @@ def test_wrong_types_scalar_subclasses_lookalikes_and_subclasses_reject():
             (
                 "mikrotik.vrrp_status",
                 "policy.stage2.vrrp-readonly.v1",
-                "/interface/vrrp/print",
+                "/interface vrrp print detail",
             ),
             (
                 "mikrotik.vrrp_status",
                 "policy.stage2.vrrp-readonly.v1",
-                "/interface/vrrp/print",
+                "/interface vrrp print detail",
             ),
         ),
         (
@@ -225,7 +225,7 @@ def test_wrong_types_scalar_subclasses_lookalikes_and_subclasses_reject():
             ),
         ),
         {
-            "mikrotik.vrrp_status": "/interface/vrrp/print",
+            "mikrotik.vrrp_status": "/interface vrrp print detail",
         },
     ),
 )
@@ -244,7 +244,7 @@ def test_policy_mapping_is_one_exact_immutable_tuple():
         (
             "mikrotik.vrrp_status",
             "policy.stage2.vrrp-readonly.v1",
-            "/interface/vrrp/print",
+            "/interface vrrp print detail",
         ),
     )
     assert type(subject._POLICY_BINDINGS) is tuple
@@ -257,7 +257,7 @@ def test_command_and_execution_cannot_be_supplied_or_overridden():
     resolver = subject.resolve_stage2_vrrp_readonly_command
     for kwargs in (
         {"command_text": "/interface/vrrp/set"},
-        {"command_text": "/interface/vrrp/print;set disabled=yes"},
+        {"command_text": "/interface vrrp print detail;set disabled=yes"},
         {"execution_authorized": True},
         {"backend": "SSH"},
         {"transport": "SSH"},
@@ -328,7 +328,7 @@ def test_no_alias_default_fallback_discovery_enumeration_or_registration_surface
 
 def test_resolution_reaches_no_external_credential_transport_or_execution_boundary():
     result = subject.resolve_stage2_vrrp_readonly_command(request())
-    assert result.command_text == "/interface/vrrp/print"
+    assert result.command_text == "/interface vrrp print detail"
     assert result.execution_authorized is False
 
 
@@ -382,3 +382,23 @@ def test_source_has_only_offline_standard_library_and_s2_ro_01_dependency():
 def test_error_requires_an_exact_bounded_category():
     with pytest.raises(TypeError):
         subject.Stage2VrrpCommandPolicyError("rejected request detail")
+
+@pytest.mark.parametrize('command', [
+    '/interface/vrrp/print', '/interface vrrp print detail suffix',
+    'prefix /interface vrrp print detail', '/interface vrrp print detail\n',
+    '/interface vrrp print detail\r', '/interface vrrp print detail;set x=y',
+    '/interface vrrp print detail|x', '/interface vrrp print detail>x',
+    '/interface vrrp set disabled=yes',
+])
+def test_explicit_command_override_rejection(command):
+    with pytest.raises(TypeError):
+        subject.resolve_stage2_vrrp_readonly_command(request(), command_text=command)
+
+
+def test_command_constant_and_binding_cannot_drift_together(monkeypatch):
+    monkeypatch.setattr(subject, '_COMMAND_TEXT', 'wrong')
+    monkeypatch.setattr(subject, '_POLICY_BINDINGS', (
+        ('mikrotik.vrrp_status', 'policy.stage2.vrrp-readonly.v1', 'wrong'),
+    ))
+    assert_failure(Failure.INVALID_POLICY,
+                   lambda: subject.resolve_stage2_vrrp_readonly_command(request()))
