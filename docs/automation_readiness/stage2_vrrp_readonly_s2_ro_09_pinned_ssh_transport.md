@@ -3,14 +3,19 @@
 ## Decision summary
 
 S2-RO-09 implements one bounded pinned SSH transport primitive for the exact
-command `/interface vrrp print detail`. Status: validated implementation
-candidate; independent security review PASS. Ready for separate local-commit
-authorization. It is not connected to a CLI, runner, or live entrypoint.
+command `/interface vrrp print detail`. The current compatibility remediation
+adds only `diffie-hellman-group-exchange-sha256`, with a 2048-bit minimum for
+both the request and the server's actual group. Status: validated offline
+remediation candidate; independent security review PASS, zero unresolved
+material findings. Ready for separate local-commit authorization. The original
+slice's delivery evidence is retained below as historical context.
 No live operation is authorized by this document or by a successful result.
 
 The Owner approved a private Paramiko `Transport.preferred_keys` override to
 enforce raw `ssh-ed25519` negotiation. This correction is part of this slice;
-it does not modify Paramiko or any prior-slice contract.
+it does not modify Paramiko or any prior-slice contract. The compatibility
+remediation also uses a private GEX subclass and registry, without changing
+installed dependencies or global Paramiko state.
 
 ## Allowed scope
 
@@ -61,7 +66,7 @@ Paramiko must complete cryptographic KEX/server-signature verification before
 | Setting | Exact allowlist |
 | --- | --- |
 | Server host keys | `ssh-ed25519` |
-| KEX | `ecdh-sha2-nistp256`, `diffie-hellman-group16-sha512`, `diffie-hellman-group14-sha256` |
+| KEX | `ecdh-sha2-nistp256`, `diffie-hellman-group16-sha512`, `diffie-hellman-group14-sha256`, `diffie-hellman-group-exchange-sha256` |
 | Ciphers | `aes256-ctr`, `aes192-ctr`, `aes128-ctr` |
 | MACs | `hmac-sha2-512-etm@openssh.com`, `hmac-sha2-256-etm@openssh.com`, `hmac-sha2-512`, `hmac-sha2-256` |
 | Compression | `none` |
@@ -72,12 +77,38 @@ Thus `SecurityOptions.key_types = ("ssh-ed25519",)` alone is insufficient.
 An offline test uses inert, uninitialized Transport objects with the actual
 SecurityOptions/property implementations to reproduce this behavior and prove
 that the private subclass returns exactly `("ssh-ed25519",)` instead. The
-subclass overrides only this property. No package/global monkeypatch is used
+subclass preserves this property override. No package/global monkeypatch is used
 by production code. A drifted effective tuple fails before `start_client`.
 
 SSH certificates are not inherently insecure. They are outside this slice's
 raw-key pin model, which defines no CA or certificate-validation semantics.
 The negotiation restriction never replaces the post-KEX complete-blob check.
+
+### Bounded GEX SHA-256 compatibility
+
+Paramiko 3.5.1 natively registers GEX SHA-256. It does not register the exact
+`curve25519-sha256` name; its `curve25519-sha256@libssh.org` identifier is
+distinct. Neither Curve25519 identifier, ML-KEM, nor any SHA-1 KEX is added
+to Stage-2 policy. The existing three KEX algorithms retain their order and
+GEX SHA-256 is appended. Cipher, MAC, compression, raw-key pinning, deadlines,
+authentication, command, retry, and cleanup policies are unchanged.
+
+The private `_Stage2GexSHA256` requests minimum/preferred/maximum sizes of
+2048/2048/8192 bits. Paramiko's native group-reply parser has a hardcoded
+1024-bit lower bound independent of `min_bits`; changing that attribute alone
+would not enforce this contract. The private parser inspects the positive
+group modulus from a copy of the message and rejects sizes outside 2048–8192
+bits before native exponent generation or a GEX-init packet. It then delegates
+to the native SHA-256 implementation with the original message intact.
+This is a group-size restriction, not a new primality validation guarantee.
+
+`_Stage2PinnedTransport` owns an immutable copy of the native KEX registry
+with only the GEX SHA-256 entry replaced. An effective mapping check rejects
+a missing or native lower-floor entry before `start_client`. There is no
+fallback, global monkeypatch, package edit, or public algorithm override.
+Offline tests exercise actual Paramiko KEXINIT dispatch on an uninitialized
+transport, synthetic group replies below/at/above the limits, the wire request,
+mapping drift, unchanged native state, and rejection before auth with cleanup.
 
 Authentication is one `auth_password(username, secret_blob, event=...,
 fallback=False)` call. Paramiko 3.5.1's password path preserves bytes through
@@ -181,7 +212,29 @@ The two real Win32 trust-root tests and the
 Flask process/socket lifecycle test remain explicitly classified safety skips.
 No S2-RO-09 test may skip. No dependency or requirements change is needed.
 
-### Recorded candidate evidence
+### Current KEX remediation evidence
+
+- Base commit: `2a71dc8eb5d7dcb12f5c3b1e533a339d2744ecea`.
+- Base tree: `48eec05773e8a731ad953f5e86ab5a4e80ec67d1`.
+- Focused: 156 collected, 156 passed, zero failures or skips.
+- Stage 2: 1,562 collected, 1,560 passed, zero failures, two safety skips.
+- Full pytest: 3,688 collected, 3,685 passed, zero failures, three safety skips.
+- Report-index: 14/14 PASS, zero failures, warnings, or missing entries.
+- Exact three-file scope, UTF-8/LF without BOM, and `git diff --check`: PASS.
+- Independent read-only security review: PASS; zero unresolved material findings.
+- Documentation readability review: PASS.
+
+Validation used the guarded offline setup described above with Python 3.13,
+Paramiko 3.5.1, and pytest 8.4.2. The same two Win32 tests and one Flask
+lifecycle test were skipped for safety; no S2-RO-09 test skipped. The commands
+inside the guard invoke pytest with `-p no:cacheprovider --color=no -ra`, then
+`tests/stage2/test_pinned_ssh_transport.py -q`, `tests/stage2 -q`, or `-q` for
+the three respective suites. Report-index runs `network_lab.py --task
+report-index` through the same guard. All transport and GEX evidence is
+synthetic: no real socket, loopback, device, known-host asset, credential,
+private signing key, or authorization consumption was used.
+
+### Historical original-slice candidate evidence
 
 - Focused: 136 collected, 136 passed, zero failures or skips.
 - Stage 2: 1,144 collected, 1,142 passed, zero failures, two safety skips.
