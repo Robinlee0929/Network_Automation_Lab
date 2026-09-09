@@ -23,10 +23,14 @@ _AUXILIARY = frozenset({
     'mtu', 'mac-address', 'arp', 'arp-timeout', 'interface',
     'group-authority', 'preemption-mode', 'authentication', 'on-backup',
     'on-master', 'on-fail', 'v3-protocol', 'sync-connection-tracking',
-    'connection-tracking-mode',
+    'connection-tracking-mode', 'v3-checksum-as-v2',
 })
 _LEGEND = ('Flags: X - DISABLED; I - INVALID; G - GRP-AUTHORITY, '
            'g - GRP-MEMBER; R - RUNNING; M - MASTER, B - BACKUP, F - FAILURE')
+_LEGEND_PAIRS = frozenset({
+    'X - DISABLED', 'I - INVALID', 'G - GRP-AUTHORITY', 'g - GRP-MEMBER',
+    'R - RUNNING', 'M - MASTER', 'B - BACKUP', 'F - FAILURE',
+})
 _START = _re.compile(r'([0-9]+) +(?:([XIGgRMBF]+)(?: +|$))?(.*)')
 _FIELD = _re.compile(r'([a-z][a-z0-9-]*)=("[^"\\\r\n]*"|[^ "\\\r\n]+)(?: +|$)')
 _INTEGER = _re.compile(r'(?:0|[1-9][0-9]{0,5})')
@@ -99,6 +103,17 @@ def _number(value):
     return int(value)
 
 
+def _is_supported_legend(line):
+    # Preserve only the exact legacy comma format; subsets use semicolons.
+    if line == _LEGEND:
+        return True
+    if not line.startswith('Flags: '):
+        return False
+    pairs = line[len('Flags: '):].split('; ')
+    return (all(pair in _LEGEND_PAIRS for pair in pairs)
+            and len(set(pairs)) == len(pairs))
+
+
 def _record(flags, body):
     failure = Stage2VrrpParserFailure
     if len(set(flags)) != len(flags) or sum(c in flags for c in 'MBF') > 1:
@@ -159,14 +174,21 @@ def _parse(text):
         stripped = line.strip(' ')
         if not stripped:
             continue
-        if stripped == _LEGEND:
-            if groups or legend_seen:
+        if stripped.startswith('Flags:'):
+            if groups or legend_seen or not _is_supported_legend(line):
                 _fail(failure.MALFORMED_OUTPUT)
             legend_seen = True
             continue
-        if stripped.count(chr(34)) % 2:
-            _fail(failure.MALFORMED_OUTPUT)
         match = _START.fullmatch(stripped)
+        body = match[3] if match else stripped
+        if match and body.startswith(';;;'):
+            # A comment-only physical header supplies no field values.
+            # Reject all '=' text so mixed comment/field lines cannot hide data.
+            if (body != ';;;' and not body.startswith(';;; ')) or '=' in body:
+                _fail(failure.MALFORMED_OUTPUT)
+            body = ''
+        if body.count(chr(34)) % 2:
+            _fail(failure.MALFORMED_OUTPUT)
         if match:
             if len(match[1]) > 5:
                 _fail(failure.AMBIGUOUS_RECORD)
@@ -174,7 +196,7 @@ def _parse(text):
             if index in seen_indexes or len(groups) == 32:
                 _fail(failure.AMBIGUOUS_RECORD)
             seen_indexes.add(index)
-            groups.append([match[2] or '', match[3]])
+            groups.append([match[2] or '', body])
         elif groups and line.startswith(' ') and not stripped[0].isdigit():
             groups[-1][1] += ' ' + stripped
         else:

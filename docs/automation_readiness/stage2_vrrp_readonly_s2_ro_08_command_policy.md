@@ -6,20 +6,29 @@ S2-RO-08 provides one immutable command policy and a bounded offline parser
 for `mikrotik.vrrp_status`. The sole command is `/interface vrrp print detail`.
 Neither component executes that command or grants execution authority.
 
-Status: validated implementation candidate; independent security review PASS.
+Current RouterOS 7.24.2 compatibility remediation: implementation candidate
+for independent review. The bounded extension supports dynamic Flags legend
+subsets, comment-only record headers, and `v3-checksum-as-v2`. It preserves
+fail-closed parsing and grants no live-run or retry authority.
+
+Original S2-RO-08 delivery status (historical): validated implementation
+candidate; independent security review PASS.
 Ready for separate local-commit authorization. S2-RO-09 remains future-only.
 The sequence index's earlier planning status is historical; this document
 records the Owner-authorized expanded S2-RO-08 implementation boundary.
 
 ## Allowed scope and files
 
-The five-file candidate consists of:
+The original five-file candidate consists of:
 
 - [Command policy](../../validation_framework/stage2_vrrp_readonly_command_policy.py)
 - [Command-policy tests](../../tests/stage2/test_vrrp_readonly_command_policy.py)
 - [Offline parser](../../validation_framework/stage2_vrrp_readonly_parser.py)
 - [Parser tests](../../tests/stage2/test_vrrp_readonly_parser.py)
 - This document.
+
+The current compatibility remediation changes only the parser, its tests,
+and this existing document. Command policy and evidence contracts are unchanged.
 
 The parser and tests are separate modules to keep command identity validation
 independent of untrusted-output parsing. S2-RO-01 through S2-RO-07 remain
@@ -61,8 +70,10 @@ The parser uses the indexed, flag-based detail format demonstrated by
 `routeros_vrrp_detail` in the Day35 VRRP failover tests and the retained
 historical bounded Stage-2 adapter. The S2-RO-01 contract defines normalized
 field types and limits. Older simplified `state=...` test inputs are not an
-accepted compatibility format. No live output or general RouterOS discovery
-was used to broaden the grammar.
+accepted compatibility format. The original grammar used offline repository
+evidence. The current extension addresses three Owner-reported RouterOS 7.24.2
+output characteristics; tests retain only synthetic data. Codex performs no
+device collection or general RouterOS discovery for this remediation.
 
 References:
 
@@ -83,9 +94,33 @@ replacement decoding, truncation, and partial success are prohibited.
 Each record starts with a decimal index, spaces, optional flags, and fields.
 The index is at most five digits; numeric index duplicates reject even when
 spelled with leading zeros. Indented continuation lines may contain complete
-fields. Values cannot span lines. One exact Day35 flag legend is optional
-before all records. Other headers, comments, banners, and trailing fragments
-reject. A legend without records and whitespace-only output reject.
+fields. Values cannot span lines. One supported Flags legend is optional before
+all records. Other headers, banners, and trailing fragments reject. A legend
+without records and whitespace-only output reject.
+
+The legend line must begin exactly `Flags: `, followed by at least one exact
+flag-description pair. Supported mappings are `X - DISABLED`, `I - INVALID`,
+`G - GRP-AUTHORITY`, `g - GRP-MEMBER`, `R - RUNNING`, `M - MASTER`,
+`B - BACKUP`, and `F - FAILURE`. Any nonempty subset is accepted, with pairs
+separated only by `; `. Unknown flags, wrong descriptions, duplicate flags,
+malformed separators, and surrounding spaces reject as MALFORMED_OUTPUT.
+For example, `Flags: R - RUNNING; M - MASTER` is accepted. The one exact
+legacy Day35 legend remains an explicit compatibility exception:
+
+```text
+Flags: X - DISABLED; I - INVALID; G - GRP-AUTHORITY, g - GRP-MEMBER; R - RUNNING; M - MASTER, B - BACKUP, F - FAILURE
+```
+
+A physical record-start line may instead end in a comment-only remainder:
+`0 RM ;;; synthetic VRRP comment`. The remainder must be exactly `;;;` or
+start with `;;; `; `;;`, `;;;;`, and attached text such as `;;;text` reject.
+Any `=` in that remainder rejects as MALFORMED_OUTPUT, preventing mixed
+comment/field headers. All required fields must then come from ordinary
+indented continuation lines. Standalone and continuation-line comments reject.
+Comment text is discarded before field parsing, cannot alter normalized facts,
+and is absent from returned objects, logs, and canonical evidence. Printable
+quotes in comments are inert; field values still cannot span physical lines.
+The outer UTF-8, control-character, and byte-limit checks apply to comments too.
 
 Spaces, LF, CRLF, and blank lines are accepted within the global byte bound.
 Tabs, bare CR, terminal escapes, prohibited control/format characters, and
@@ -109,12 +144,20 @@ Flags X/I/R set disabled/invalid/running. M/B/F select MASTER/BACKUP/FAILURE;
 absence means UNKNOWN. Repeated flags or multiple role flags reject. The
 repository legend's G/g flags carry no S2-RO-01 evidence field and are discarded.
 
-Optional Day35 auxiliary keys are exactly: `mtu`, `mac-address`, `arp`,
+Optional auxiliary keys are exactly: `mtu`, `mac-address`, `arp`,
 `arp-timeout`, `interface`, `group-authority`, `preemption-mode`,
 `authentication`, `on-backup`, `on-master`, `on-fail`, `v3-protocol`,
-`sync-connection-tracking`, and `connection-tracking-mode`. Their token syntax
+`sync-connection-tracking`, `connection-tracking-mode`, and
+`v3-checksum-as-v2`. The last key is the sole auxiliary allowlist addition for
+the current compatibility remediation. Their token syntax
 is validated and their contents discarded; they are not semantically validated
 or executed, including callback-shaped text.
+
+Neither auxiliary values nor comments become evidence fields. Their original
+bytes still contribute to the existing complete-output byte count and digest.
+Unobserved `password`, `remote-address`, `connection-tracking-port`, and
+`group-master` fields remain unsupported; broader support requires a separate
+compatibility decision.
 
 Unknown keys and all duplicate keys reject, including auxiliary duplicates.
 One through 32 complete records are required. Duplicate indexes or instance
@@ -174,11 +217,44 @@ Win32 APIs or changing installed packages. Validation uses non-TTY output;
 pytest's TTY-only Colorama wrapper is not emulated. An unexpected native path
 is a stop condition, not permission to extend the guard.
 
-Completion requires zero unresolved material findings and preservation of the
-five-file boundary. Passing validation permits only a request for local-commit
-authorization; it does not authorize staging, commit, push, merge, or transport.
+The current remediation must preserve its three-file boundary and pass guarded
+parser/contract/command-policy tests, Stage-2 regressions, full pytest, and
+report-index before its separately Owner-authorized local commit. Independent
+review remains a separate step; the original review below does not cover the
+new remediation. No push, PR, merge, fresh authorization, replay consumption,
+SSH, or second live attempt is authorized. A future live validation requires a
+new package and new direct Owner authorization; spent authorization stays spent.
 
-### Recorded candidate validation
+### RouterOS 7.24.2 remediation validation
+
+Guarded offline validation with Python 3.13.7 and pytest 8.4.2 passed:
+
+| Validation | Collected | Passed | Failed | Safety skips |
+| --- | --- | --- | --- | --- |
+| Parser, contract, command policy | 256 | 256 | 0 | 0 |
+| Stage-2 regression | 1,633 | 1,631 | 0 | 2 |
+| Full pytest | 3,759 | 3,756 | 0 | 3 |
+
+Report-index: 14/14 PASS, zero failures, warnings, missing, or unknown entries.
+Whitespace and documentation readability review: PASS. Independent remediation
+review remains pending; these results establish readiness for that review only.
+
+The existing offline launcher invokes pytest with
+`-p no:cacheprovider --color=no -ra`, followed by these target arguments:
+
+- `tests/stage2/test_vrrp_readonly_parser.py tests/stage2/test_vrrp_readonly_contract.py tests/stage2/test_vrrp_readonly_command_policy.py`
+- `tests/stage2`
+- No target arguments for the full suite.
+
+Its report-index mode invokes `network_lab.py --task report-index` under the
+same guard. The only skips are the two native Win32 tests and the Flask
+process/socket lifecycle test classified below. No parser test skips. The
+initial focused run found one new test fixture accidentally forming valid CRLF;
+it was corrected to contain a bare CR and all subsequent validations passed.
+Only synthetic parser inputs were used. No device command, credential read,
+private-key access, or real replay consumption occurred.
+
+### Original candidate validation (historical)
 
 - Focused: 101 collected, 101 passed, zero failures or skips.
 - Stage 2: 1,008 collected, 1,006 passed, zero failures, two safety skips.
