@@ -84,6 +84,35 @@ SSH certificates are not inherently insecure. They are outside this slice's
 raw-key pin model, which defines no CA or certificate-validation semantics.
 The negotiation restriction never replaces the post-KEX complete-blob check.
 
+### Live compatibility finding and remediation trigger
+
+A separately authorized, non-authenticated real Lab1 diagnostic against
+`192.168.88.2:22` opened no SSH channel and recorded
+`PRIMARY_DIAGNOSIS = NO_COMMON_KEX`, with Paramiko classification
+`IncompatiblePeer`. The remote KEX proposal included
+`mlkem768x25519-sha256`, `curve25519-sha256`,
+`diffie-hellman-group-exchange-sha256`, and `ext-info-s`. The then-current
+Stage-2 KEX allowlist was `ecdh-sha2-nistp256`,
+`diffie-hellman-group16-sha512`, and
+`diffie-hellman-group14-sha256`; therefore
+`KEX_INTERSECTION_WITH_STAGE2 = []`.
+
+Other negotiation dimensions did have compatible intersections: host key
+`ssh-ed25519`; ciphers `aes256-ctr` and `aes192-ctr`; MACs
+`hmac-sha2-512` and `hmac-sha2-256`; and compression `none`.
+
+This diagnostic directly triggered the bounded compatibility remediation: add
+exactly `diffie-hellman-group-exchange-sha256` while retaining
+`STAGE2_GEX_MINIMUM_BITS = 2048`, `STAGE2_GEX_PREFERRED_BITS = 2048`, and
+`STAGE2_GEX_MAXIMUM_BITS = 8192`, bounding GEX to 2048–8192 bits. No other KEX
+was added. The remediation did not add `mlkem768x25519-sha256`,
+`curve25519-sha256`, `curve25519-sha256@libssh.org`, or any SHA-1 KEX.
+
+`POST_REMEDIATION_LIVE_CONNECTION_RESULT = NOT_YET_VERIFIED`.
+Post-remediation live success is not yet verified; this evidence does not
+establish a successful SSH handshake, host-key observation or known-host trust,
+authentication, RouterOS command execution, or a Stage-2 real live run.
+
 ### Bounded GEX SHA-256 compatibility
 
 Paramiko 3.5.1 natively registers GEX SHA-256. It does not register the exact
