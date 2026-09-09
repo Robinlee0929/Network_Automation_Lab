@@ -13,6 +13,7 @@ import threading
 from types import SimpleNamespace
 
 import paramiko
+from paramiko.kex_gex import KexGexSHA256
 import pytest
 
 from validation_framework import stage2_pinned_ssh_transport as sut
@@ -21,6 +22,7 @@ from validation_framework import stage2_pinned_ssh_transport as sut
 F = sut.Stage2PinnedSshTransportFailure
 BLOB = b"\x00\x00\x00\x0bssh-ed25519\x00\x00\x00\x20" + bytes(range(32))
 SECRET = b"synthetic-secret-\xff"
+GEX = "diffie-hellman-group-exchange-sha256"
 
 
 def issued(kind, **values):
@@ -78,6 +80,8 @@ class Boundary:
         self.algorithm = "ssh-ed25519"
         self.blob = BLOB
         self.keys = ("ssh-ed25519",)
+        self.kex_info = dict(sut._Stage2PinnedTransport._kex_info)
+        self.gex_prime = None
         self.active_close = True
         self.authenticated = True
         self.active = True
@@ -119,6 +123,8 @@ class Boundary:
         boundary = self
 
         class Transport:
+            _kex_info = boundary.kex_info
+
             @property
             def preferred_keys(self):
                 boundary.call("effective_keys")
@@ -130,6 +136,9 @@ class Boundary:
 
             def start_client(self, *, event):
                 boundary.call("start_client", vars(boundary.options).copy())
+                if boundary.gex_prime is not None:
+                    self._kex_info[GEX](self).parse_next(
+                        31, gex_group(boundary.gex_prime))
                 event.set()
 
             def is_active(self):
@@ -548,12 +557,166 @@ def test_actual_paramiko_negotiation_correction_without_constructor():
     assert private.preferred_keys == ("ssh-ed25519",)
     options = private.get_security_options()
     assert options.key_types == ("ssh-ed25519",)
-    assert options.kex == ("ecdh-sha2-nistp256", "diffie-hellman-group16-sha512", "diffie-hellman-group14-sha256")
+    assert options.kex == ("ecdh-sha2-nistp256", "diffie-hellman-group16-sha512",
+                           "diffie-hellman-group14-sha256", GEX)
+    assert private.preferred_kex == options.kex
     assert options.ciphers == ("aes256-ctr", "aes192-ctr", "aes128-ctr")
     assert options.digests == ("hmac-sha2-512-etm@openssh.com", "hmac-sha2-256-etm@openssh.com", "hmac-sha2-512", "hmac-sha2-256")
     assert options.compression == ("none",)
     assert base.preferred_keys != private.preferred_keys
-    assert set(sut._Stage2PinnedTransport.__dict__) - {"__module__", "__doc__", "preferred_keys", "__firstlineno__", "__static_attributes__"} == set()
+    assert set(sut._Stage2PinnedTransport.__dict__) - {"__module__", "__doc__", "preferred_keys", "_kex_info", "__firstlineno__", "__static_attributes__"} == set()
+
+
+def gex_group(prime):
+    message = paramiko.Message()
+    message.add_mpint(prime)
+    message.add_mpint(2)
+    return paramiko.Message(message.asbytes())
+
+
+class GexBoundary:
+    """Only the in-memory packet methods needed by the native GEX parser."""
+
+    server_mode = False
+
+    def __init__(self):
+        self.sent = []
+        self.expected = []
+
+    def _send_message(self, message):
+        self.sent.append(message.asbytes())
+
+    def _expect_packet(self, *types):
+        self.expected.append(types)
+
+    def _log(self, *args):
+        pass
+
+
+def test_native_registry_and_private_gex_isolation():
+    registry = paramiko.Transport._kex_info
+    before = registry.copy()
+    native_attributes = dict(vars(KexGexSHA256))
+    native_policy = (KexGexSHA256.min_bits, KexGexSHA256.preferred_bits,
+                     KexGexSHA256.max_bits)
+    assert registry[GEX] is KexGexSHA256
+    assert "curve25519-sha256" not in registry
+    assert "curve25519-sha256@libssh.org" in registry
+    private = object.__new__(sut._Stage2PinnedTransport)
+    private.disabled_algorithms = {}
+    sut._harden(private)
+    assert private._kex_info is not registry
+    assert dict(private._kex_info) == {**registry, GEX: sut._Stage2GexSHA256}
+    assert private._kex_info[GEX] is sut._Stage2GexSHA256
+    with pytest.raises(TypeError):
+        private._kex_info[GEX] = KexGexSHA256
+    # Exercise the registered class, not a separately constructed substitute.
+    transport = GexBoundary()
+    engine = private._kex_info[GEX](transport)
+    assert isinstance(engine, KexGexSHA256)
+    assert engine.hash_algo is hashlib.sha256
+    assert (engine.min_bits, engine.preferred_bits, engine.max_bits) == (2048, 2048, 8192)
+    engine.start_kex()
+    request = paramiko.Message(transport.sent[0])
+    assert request.get_byte() == b"\x22"
+    assert (request.get_int(), request.get_int(), request.get_int()) == (2048, 2048, 8192)
+    assert request.get_remainder() == b""
+    assert transport.expected == [(31,)]
+    assert paramiko.Transport._kex_info is registry and registry == before
+    assert dict(vars(KexGexSHA256)) == native_attributes
+    assert native_policy == (1024, 2048, 8192)
+    assert (KexGexSHA256.min_bits, KexGexSHA256.preferred_bits,
+            KexGexSHA256.max_bits) == native_policy
+
+
+def test_native_kexinit_dispatch_uses_hardened_gex_without_transport_constructor():
+    private = object.__new__(sut._Stage2PinnedTransport)
+    private.disabled_algorithms = {}
+    private.server_mode = False
+    private.agreed_on_strict_kex = False
+    private._log = lambda *args: None
+    sut._harden(private)
+    packet = paramiko.Message()
+    packet.add_bytes(bytes(16))
+    for algorithms in ([GEX], ["ssh-ed25519"], ["aes256-ctr"], ["aes256-ctr"],
+                       ["hmac-sha2-256"], ["hmac-sha2-256"], ["none"], ["none"], [], []):
+        packet.add_list(algorithms)
+    packet.add_boolean(False)
+    packet.add_int(0)
+    private._parse_kex_init(paramiko.Message(packet.asbytes()))
+    assert type(private.kex_engine) is sut._Stage2GexSHA256
+    assert private.kex_engine.transport is private
+    assert private.host_key_type == "ssh-ed25519"
+    assert private.local_cipher == private.remote_cipher == "aes256-ctr"
+    assert private.local_mac == private.remote_mac == "hmac-sha2-256"
+    assert private.local_compression == private.remote_compression == "none"
+
+
+@pytest.mark.parametrize("excluded", [
+    "diffie-hellman-group-exchange-sha1", "diffie-hellman-group14-sha1",
+    "diffie-hellman-group1-sha1", "mlkem768x25519-sha256",
+    "curve25519-sha256", "curve25519-sha256@libssh.org",
+])
+def test_disallowed_kex_not_effective(excluded):
+    private = object.__new__(sut._Stage2PinnedTransport)
+    private.disabled_algorithms = {}
+    sut._harden(private)
+    assert excluded not in private.preferred_kex
+
+
+@pytest.mark.parametrize("prime", [0, -1, -(1 << 2047), 1 << 1023,
+                                   (1 << 2047) - 1, 1 << 8192])
+def test_gex_rejects_actual_out_of_range_group_before_crypto(monkeypatch, prime):
+    transport = GexBoundary()
+    engine = sut._Stage2PinnedTransport._kex_info[GEX](transport)
+
+    def forbidden():
+        pytest.fail("rejected group reached exponent generation")
+
+    monkeypatch.setattr(engine, "_generate_x", forbidden)
+    with pytest.raises(paramiko.SSHException, match="Stage-2 GEX group size rejected"):
+        engine.parse_next(31, gex_group(prime))
+    assert engine.p is None and engine.x is None and engine.e is None
+    assert transport.sent == transport.expected == []
+
+
+@pytest.mark.parametrize("bits", [2048, 3072, 8192])
+def test_gex_accepts_bounded_group_without_consuming_parser_input(monkeypatch, bits):
+    transport = GexBoundary()
+    engine = sut._Stage2PinnedTransport._kex_info[GEX](transport)
+    # Synthetic integers test size dispatch only, not group primality.
+    prime = (1 << bits) - 1
+    monkeypatch.setattr(engine, "_generate_x", lambda: setattr(engine, "x", 2))
+    engine.parse_next(31, gex_group(prime))
+    assert engine.p == prime and engine.g == 2 and engine.e == 4
+    assert transport.expected == [(33,)]
+    reply = paramiko.Message(transport.sent[0])
+    assert reply.get_byte() == b"\x20" and reply.get_mpint() == 4
+    assert reply.get_remainder() == b""
+
+
+@pytest.mark.parametrize("replacement", [None, KexGexSHA256])
+def test_gex_mapping_cannot_silently_fall_back(inputs, boundary, replacement):
+    if replacement is None:
+        del boundary.kex_info[GEX]
+    else:
+        boundary.kex_info[GEX] = replacement
+    rejected(inputs, F.SSH_NEGOTIATION_FAILED)
+    names = [name for name, _ in boundary.calls]
+    assert names.count("connect") == 1
+    assert not set(names) & {"start_client", "remote_key", "auth", "open_session", "exec"}
+    assert boundary.socket_closed == boundary.transport_closed == 1
+    assert boundary.channel_closed == 0
+
+
+def test_undersized_gex_negotiation_fails_closed_without_retry_or_auth(inputs, boundary):
+    boundary.gex_prime = (1 << 2047) - 1
+    rejected(inputs, F.SSH_NEGOTIATION_FAILED)
+    names = [name for name, _ in boundary.calls]
+    assert names.count("connect") == names.count("start_client") == 1
+    assert not set(names) & {"remote_key", "auth", "open_session", "exec"}
+    assert boundary.socket_closed == boundary.transport_closed == 1
+    assert boundary.channel_closed == 0
 
 
 def test_actual_paramiko_password_bytes_path():

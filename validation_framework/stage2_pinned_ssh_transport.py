@@ -13,8 +13,10 @@ import re as _re
 import socket as _socket
 import threading as _threading
 import time as _time
+from types import MappingProxyType as _MappingProxyType
 
 import paramiko as _paramiko
+from paramiko.kex_gex import KexGexSHA256 as _KexGexSHA256
 
 from validation_framework.stage2_mikrotik_target_registry import (
     Stage2FixedTargetEndpoint as _Endpoint,
@@ -31,7 +33,7 @@ from validation_framework.stage2_vrrp_readonly_command_policy import (
 
 _KEYS = ("ssh-ed25519",)
 _KEX = ("ecdh-sha2-nistp256", "diffie-hellman-group16-sha512",
-        "diffie-hellman-group14-sha256")
+        "diffie-hellman-group14-sha256", "diffie-hellman-group-exchange-sha256")
 _CIPHERS = ("aes256-ctr", "aes192-ctr", "aes128-ctr")
 _MACS = ("hmac-sha2-512-etm@openssh.com", "hmac-sha2-256-etm@openssh.com",
          "hmac-sha2-512", "hmac-sha2-256")
@@ -95,8 +97,29 @@ def _call(code, operation, *args, **kwargs):
     return value
 
 
+class _Stage2GexSHA256(_KexGexSHA256):
+    """Enforce the requested group range on the server's actual reply too."""
+
+    min_bits = 2048
+    preferred_bits = 2048
+    max_bits = 8192
+
+    def _parse_kexdh_gex_group(self, message):
+        # Paramiko 3.5.1's parser hardcodes 1024, ignoring min_bits here.
+        # Inspect a copy without consuming the original parser's input.
+        prime = _paramiko.Message(message.get_remainder()).get_mpint()
+        if prime <= 0 or not 2048 <= prime.bit_length() <= 8192:
+            raise _paramiko.SSHException("Stage-2 GEX group size rejected")
+        return super()._parse_kexdh_gex_group(message)
+
+
 class _Stage2PinnedTransport(_paramiko.Transport):
-    """Exclude certificates: the accepted trust model pins a raw key only."""
+    """Pin raw keys and a private GEX implementation without global changes."""
+
+    _kex_info = _MappingProxyType({
+        **_paramiko.Transport._kex_info,
+        "diffie-hellman-group-exchange-sha256": _Stage2GexSHA256,
+    })
 
     @property
     def preferred_keys(self):
@@ -240,6 +263,9 @@ def _harden(transport):
     if (type(transport.preferred_keys) is not tuple
             or transport.preferred_keys != ("ssh-ed25519",)):
         raise ValueError("effective key policy rejected")
+    if (transport._kex_info.get("diffie-hellman-group-exchange-sha256")
+            is not _Stage2GexSHA256):
+        raise ValueError("effective GEX implementation rejected")
 
 
 class _PendingOperation:
