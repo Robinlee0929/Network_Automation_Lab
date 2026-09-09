@@ -17,6 +17,17 @@ from validation_framework.stage2_vrrp_readonly_contract import (
 
 F = subject.Stage2VrrpParserFailure
 VALID = b'0 RM name="vrrp-lan" vrid=88 priority=150 interval=1s version=3\n'
+ROUTEROS_7_24 = (
+    b'Flags: R - RUNNING; M - MASTER\n'
+    b'0 RM ;;; synthetic VRRP comment\n'
+    b'    name="vrrp-lan" mtu=1500 mac-address=00:00:5E:00:01:58 '
+    b'arp=enabled arp-timeout=auto interface=bridge\n'
+    b'    group-authority="" vrid=88 priority=150 interval=1s '
+    b'preemption-mode=yes authentication=none on-backup=""\n'
+    b'    on-master="" on-fail="" version=3 v3-protocol=ipv4 '
+    b'v3-checksum-as-v2=no sync-connection-tracking=no\n'
+    b'    connection-tracking-mode=passive-active\n'
+)
 
 
 def parse(raw=VALID):
@@ -211,3 +222,147 @@ def test_exact_parser_dependency_boundary():
         'validation_framework.stage2_vrrp_readonly_contract',
         'validation_framework.stage2_vrrp_readonly_command_policy',
     }
+
+
+@pytest.mark.parametrize(('legend', 'flags'), [
+    ('Flags: X - DISABLED; I - INVALID; G - GRP-AUTHORITY, '
+     'g - GRP-MEMBER; R - RUNNING; M - MASTER, B - BACKUP, F - FAILURE', 'RM'),
+    ('Flags: R - RUNNING; M - MASTER', 'RM'),
+    ('Flags: B - BACKUP', 'B'),
+    ('Flags: R - RUNNING; B - BACKUP', 'RB'),
+    ('Flags: F - FAILURE', 'F'),
+    ('Flags: X - DISABLED; I - INVALID', 'XI'),
+    ('Flags: G - GRP-AUTHORITY; g - GRP-MEMBER', 'Gg'),
+    ('Flags: M - MASTER; R - RUNNING', 'RM'),
+    ('Flags: X - DISABLED; I - INVALID; G - GRP-AUTHORITY; '
+     'g - GRP-MEMBER; R - RUNNING; M - MASTER; B - BACKUP; F - FAILURE', 'RM'),
+])
+def test_legacy_and_bounded_subset_legends(legend, flags):
+    raw = VALID.replace(b' RM ', b' ' + flags.encode() + b' ')
+    assert parse(legend.encode() + b'\n' + raw).records == parse(raw).records
+
+
+@pytest.mark.parametrize('legend', [
+    'Flags:', 'Flags: ', 'Flags:R - RUNNING', 'Flags:  R - RUNNING',
+    ' Flags: R - RUNNING', 'flags: R - RUNNING', 'Flags: R - RUNNING ',
+    'Flags: Z - UNKNOWN', 'Flags: R - MASTER', 'Flags: g - GRP-AUTHORITY',
+    'Flags: R - RUNNING; R - RUNNING',
+    'Flags: R - RUNNING;M - MASTER',
+    'Flags: R - RUNNING;  M - MASTER',
+    'Flags: R - RUNNING, M - MASTER',
+    'Flags: R - RUNNING;; M - MASTER',
+    'Flags: R - RUNNING; ', 'Flags: R - RUNNING;',
+    'Flags: R-RUNNING', 'Flags: RR - RUNNING',
+])
+def test_malformed_unknown_or_duplicate_legend_rejected(legend):
+    rejected(legend.encode() + b'\n' + VALID, F.MALFORMED_OUTPUT)
+
+
+def test_legend_remains_optional_unique_and_before_records():
+    legend = b'Flags: R - RUNNING; M - MASTER\n'
+    rejected(legend + legend + VALID, F.MALFORMED_OUTPUT)
+    rejected(VALID + legend, F.MALFORMED_OUTPUT)
+    rejected(legend, F.EMPTY_OUTPUT)
+
+
+@pytest.mark.parametrize('comment', [
+    b';;; synthetic VRRP comment', b';;;', b';;;   synthetic',
+    b';;; inert " quote', b';;; MASTER BACKUP FAILURE disabled priority 0',
+])
+def test_comment_only_record_header_is_inert(comment):
+    raw = VALID.replace(b'0 RM ', b'0 RM ' + comment + b'\n    ')
+    assert parse(raw).records == parse().records
+
+
+@pytest.mark.parametrize('comment', [
+    b';; synthetic', b';;;; synthetic', b';;;synthetic', b'! synthetic',
+    b';;; synthetic name=x vrid=1', b';;; name="hidden"',
+    b';;; unknown=x', b';;; synthetic=metadata',
+])
+def test_malformed_or_mixed_comment_header_rejected(comment):
+    raw = VALID.replace(b'0 RM ', b'0 RM ' + comment + b'\n    ')
+    rejected(raw, F.MALFORMED_OUTPUT)
+
+
+@pytest.mark.parametrize('raw', [
+    b';;; synthetic\n' + VALID,
+    VALID + b'    ;;; synthetic\n',
+    VALID.replace(b' vrid=88', b'\n    ;;; synthetic\n    vrid=88'),
+    VALID.rstrip() + b' ;;; synthetic\n',
+])
+def test_comment_form_rejected_outside_record_header(raw):
+    rejected(raw, F.MALFORMED_OUTPUT)
+
+
+@pytest.mark.parametrize('text', [
+    b'\t', b'\r', b'\x1b[0m', b'\x00', b'\xef\xbb\xbf',
+    '\u2028'.encode(), '\u2029'.encode(),
+])
+def test_comment_does_not_bypass_outer_text_policy(text):
+    raw = ROUTEROS_7_24.replace(b'synthetic VRRP comment', b'before' + text + b'after')
+    rejected(raw, F.MALFORMED_OUTPUT)
+
+
+@pytest.mark.parametrize(('field', 'value'), [
+    (b'name', b'"vrrp-lan"'), (b'vrid', b'88'), (b'priority', b'150'),
+    (b'interval', b'1s'), (b'version', b'3'),
+])
+def test_comment_does_not_supply_missing_required_fields(field, value):
+    raw = ROUTEROS_7_24.replace(field + b'=' + value + b' ', b'')
+    rejected(raw, F.MISSING_REQUIRED_FIELD)
+
+
+@pytest.mark.parametrize(('flags', 'category'), [
+    (b'MB', F.AMBIGUOUS_RECORD), (b'MF', F.AMBIGUOUS_RECORD),
+    (b'BF', F.AMBIGUOUS_RECORD), (b'MBF', F.AMBIGUOUS_RECORD),
+    (b'RRM', F.AMBIGUOUS_RECORD), (b'Z', F.MALFORMED_OUTPUT),
+])
+def test_comment_does_not_bypass_flag_validation(flags, category):
+    rejected(ROUTEROS_7_24.replace(b'0 RM ', b'0 ' + flags + b' '), category)
+
+
+def test_checksum_auxiliary_field_is_bounded_and_duplicates_reject():
+    raw = VALID.replace(b'\n', b' v3-checksum-as-v2=no\n')
+    assert parse(raw).records == parse().records
+    rejected(raw.replace(b'=no', b'=no v3-checksum-as-v2=no'), F.DUPLICATE_FIELD)
+    rejected(ROUTEROS_7_24 + b'    v3-checksum-as-v2=no\n', F.DUPLICATE_FIELD)
+
+
+@pytest.mark.parametrize('field', [
+    b'unknown=x', b'password=""', b'remote-address=192.0.2.1',
+    b'connection-tracking-port=1', b'group-master=""',
+])
+def test_unobserved_fields_remain_unsupported(field):
+    rejected(ROUTEROS_7_24 + b'    ' + field + b'\n', F.UNSUPPORTED_VALUE)
+
+
+def test_routeros_7_24_structure_and_evidence_exclude_inert_metadata(capsys, caplog):
+    result = parse(ROUTEROS_7_24)
+    assert dataclasses.asdict(result.records[0]) == dict(
+        instance_name='vrrp-lan', vrid=88, priority=150, interval_ms=1000,
+        version=3, running=True, role='MASTER', disabled=False, invalid=False,
+    )
+    assert {field.name for field in dataclasses.fields(result)} == {
+        'records', 'raw_output_byte_count', 'raw_output_sha256',
+    }
+    assert result.raw_output_sha256 == hashlib.sha256(ROUTEROS_7_24).hexdigest()
+    assert result.raw_output_byte_count == len(ROUTEROS_7_24)
+    evidence = Stage2VrrpObservationEvidence(
+        schema_version='1.0', operation_id='mikrotik.vrrp_status',
+        run_id=request().run_id, target_ref=request().target_ref,
+        authorization_ref=request().authorization_ref,
+        command_policy_version='policy.stage2.vrrp-readonly.v1',
+        attempt_count=1, retry_count=0, duration_ms=1,
+        raw_output_byte_count=result.raw_output_byte_count,
+        raw_output_sha256=result.raw_output_sha256, records=result.records,
+    )
+    for excluded in (b'synthetic VRRP comment', b';;;', b'v3-checksum-as-v2', b'mtu=1500'):
+        assert excluded not in evidence.to_canonical_bytes()
+        assert excluded.decode() not in repr(dataclasses.asdict(result))
+        assert excluded.decode() not in repr(result)
+    assert evidence.execution_authorized is result.execution_authorized is False
+    changed_comment = parse(ROUTEROS_7_24.replace(b'synthetic VRRP comment', b'other'))
+    assert changed_comment.records == result.records
+    assert changed_comment.raw_output_sha256 != result.raw_output_sha256
+    assert capsys.readouterr() == ('', '')
+    assert caplog.records == []
