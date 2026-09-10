@@ -8,6 +8,11 @@ Flask dashboard. The walkthrough is display- and report-oriented: it does not
 require or authorize live devices, SSH, configuration changes, provider/model
 calls, secrets, or command execution from the dashboard.
 
+**Stage 2 is CLOSED / LIVE PROVEN** for the separately Owner-authorized
+MikroTik Lab1 VRRP workflow. Its recorded result can be explained offline using
+the [canonical closure evidence summary](../automation_readiness/actual_automation_integration_plan.md#stage-2-read-only-lab-adapter).
+Stage 3 is **NOT STARTED**.
+
 ## One-Sentence Project Positioning
 
 Network Automation Lab is a safety-first Python portfolio project that turns
@@ -30,6 +35,28 @@ a QA platform:
 
 Historical records include workflows that had separate read-only or guarded
 boundaries. Those records do not change the current Stage-0 public review path.
+
+## Recorded Stage-2 Result: Interview Talk Track
+
+"Stage 2 is live-proven for one bounded MikroTik VRRP read-only workflow. A
+fresh Owner authorization was verified and consumed once through replay
+protection. Pinned host trust and a dedicated read-only credential bound the
+operation to Lab1 (`target.mikrotik.lab01`), `mikrotik.vrrp_status`. It executed
+exactly `/interface vrrp print detail` once with zero retries, strictly parsed
+the observed RouterOS 7.24.2 result, and produced valid canonical evidence."
+
+"Two earlier attempts failed closed: first on real RouterOS parser drift after
+command execution, then on temporary caller instrumentation before any command
+was emitted. The third passed. The temporary guard was restored; it is not a
+permanent runtime component."
+
+Use this as a discussion of completed evidence, not a command to rerun during
+the demo. The proof covers one Lab1 device and operation only. It does not
+establish generic RouterOS/model/version support, multi-vendor live execution,
+arbitrary CLI, write/config automation, automated retries, production HA
+readiness, fleet orchestration, autonomous remediation, anti-rollback replay
+protection, or Stage-3 functionality. Another live attempt requires fresh exact
+Owner authorization. The dashboard walkthrough below stays offline.
 
 ## Suggested Reading Order
 
@@ -206,7 +233,9 @@ A reviewer can inspect:
   above;
 - report-index behavior and report interpretation;
 - committed summaries and any available local report evidence;
-- dry-run and mock reviewer-evidence chains.
+- dry-run and mock reviewer-evidence chains;
+- the canonical documentation summary of the closed, bounded Stage-2 live
+  validation, without recovering raw stdout or repeating the operation.
 
 No router, switch, VPN, VRRP, WireGuard, SSH, NETCONF, RESTCONF, iperf3,
 firewall, provider/model service, secret, or private lab configuration is
@@ -227,6 +256,6 @@ The August release remains Stage 0. For this public review:
 - do not submit or simulate unavailable dashboard action controls.
 
 Use committed documentation, tests, the current-suitable screenshots identified
-above, summaries, and local report-only/dashboard views. Any future read-only
-or live integration requires a separate Stage gate and task-specific user
-approval.
+above, summaries, and local report-only/dashboard views. The completed Stage-2
+validation does not change this public review boundary. Any additional live
+attempt requires fresh task-specific Owner approval and applicable safety gates.
