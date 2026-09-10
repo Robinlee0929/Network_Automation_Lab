@@ -10,13 +10,16 @@ review. Network Automation Lab treats that work as a small QA platform: local
 inputs are validated deterministically, results become machine-readable and
 human-readable evidence, and unsafe or unavailable paths fail closed.
 
-The August 2026 release baseline is a local Stage-0 product:
+**Stage 2: CLOSED / LIVE PROVEN** for one Owner-authorized MikroTik Lab1 VRRP
+read-only workflow, with observed RouterOS 7.24.2 compatibility, one exact
+command, zero retries, and valid canonical evidence.
+[Closure scope and evidence](docs/automation_readiness/actual_automation_integration_plan.md#stage-2-read-only-lab-adapter).
 
-The supported release path is designed for local portfolio review. It remains
-mock-only, dry-run, report-only, and display-oriented; Stage 1 is at its planning
-entry and does not authorize implementation or live access. Reviewers do not
+The August 2026 Stage-0 release remains the supported local portfolio review
+path: mock-only, dry-run, report-only, and display-oriented. Reviewers do not
 require a router, switch, VPN peer, SSH session, provider account, model API, or
-private lab configuration.
+private lab configuration. The recorded Stage-2 success grants no new live
+authority. Stage 3 is **NOT STARTED**.
 
 ## Engineering Highlights
 
@@ -51,6 +54,16 @@ and reviewer conclusion.
 This accepted Stage-0 demo path is GET-only. It does not contact devices,
 invoke provider-backed operations, expose command or job execution controls,
 change configuration, or demonstrate production approval.
+
+For the recorded Stage-2 result, explain: a fresh Owner authorization was
+verified and consumed once through replay protection; pinned host trust and a
+dedicated read-only credential bound the workflow to MikroTik Lab1
+`target.mikrotik.lab01`, operation `mikrotik.vrrp_status`. It executed exactly
+`/interface vrrp print detail` once with zero retries, strictly parsed the
+observed RouterOS 7.24.2 result, and produced canonical evidence. Two earlier
+attempts failed closed before the third passed. This is an evidence discussion,
+not a live demo procedure.
+
 Other internal or legacy surfaces are outside this interview path. For a
 documentation-first tour, use the
 [Public Reviewer Walkthrough](docs/portfolio/public_reviewer_walkthrough.md).
@@ -281,20 +294,28 @@ Stage 0 is the formally closed public baseline. Its closure is recorded in the
 [Stage 0 Formal Closure](docs/automation_readiness/stage0_formal_closure.md).
 It includes contributor and security guidance, Issue and pull request
 templates, newcomer-friendly Issues, and protected-`main` governance through
-pull requests and Safe CI. Stage 1 is available only at its planning entry; no
-Stage 1 implementation or live capability is authorized.
+pull requests and Safe CI. Stage 1's planning entry is retained as historical
+context. The separately authorized, bounded Stage-2 validation is now closed;
+the canonical [Stage model](docs/automation_readiness/actual_automation_integration_plan.md)
+records its proof and limits.
 
 | Stage | Purpose | Status |
 | --- | --- | --- |
 | **Stage 0 — Closed public baseline** | Mock-only, dry-run, report-only, reviewer-visible, fail-closed validation and evidence | **CLOSED** |
-| **Stage 1 — Read-only Lab Integration Planning** | Define contracts, allowlists, failure behavior, evidence, and the credential boundary without live access | **PLANNING ENTRY / implementation not authorized** |
-| **Stage 2 — Narrow Read-only Lab Adapter** | Gate one lab target, one transport, a small read-only allowlist, normalized real output, and no-mutation evidence | **Future / separately gated** |
-| **Stage 3 — Controlled Config Plan Generation** | Produce human-reviewable configuration plans only; no apply | **Future / separate gate** |
+| **Stage 1 — Read-only Lab Integration Planning** | Historical planning entry for contracts, allowlists, failure behavior, evidence, and credential boundaries | Historical planning record; see the bounded Stage-2 outcome below |
+| **Stage 2 — Narrow Read-only Lab Adapter** | MikroTik Lab1 only; RouterOS 7.24.2 observed VRRP read-only shape; one exact command, zero retries, canonical evidence | **CLOSED / LIVE PROVEN** |
+| **Stage 3 — Controlled Config Plan Generation** | Future human-reviewable configuration plans only; no apply | **NOT STARTED / requires separate Owner authorization** |
 | **Stage 4 — Controlled Change Execution** | Permit narrowly approved lab changes with explicit safeguards and evidence | **Future / separate gate** |
 | **Stage 5 — Production-like Platform** | Add mature access control, audit, rollback, monitoring, and human approval | **Long-term / not currently authorized** |
 
-Stage 2 exit is the planned major-development pause point. A roadmap item,
-Issue, pull request, merge, date, or milestone does **not** activate a
+The bounded Stage-2 exit is the major-development pause point. Closure proves
+only the recorded Lab1 operation. It does not establish generic RouterOS or
+every MikroTik model/version, multi-vendor live execution, arbitrary CLI,
+write/config automation, automated retries, production HA readiness, fleet
+orchestration, autonomous remediation, anti-rollback replay protection, or
+Stage-3 functionality.
+
+A roadmap item, Issue, pull request, merge, date, or milestone does **not** activate a
 capability. Every Stage advancement requires separate explicit authorization
 and validation. Live-device access, SSH, NETCONF, RESTCONF, configuration
 changes, production execution, secrets handling, provider/model integration,
@@ -409,8 +430,9 @@ The release grants no automatic authority for:
 - queue, scheduler, worker, broker, or autonomous agent loops;
 - production execution paths.
 
-Any later read-only or live integration requires a separate Stage gate, a
-bounded implementation and validation plan, and task-specific user approval.
+Any additional live attempt or scope expansion requires separate task-specific
+Owner approval and the applicable safety gates. The completed Stage-2 attempt
+is historical evidence, not reusable authorization.
 An MIT software license permits code use under its terms; it does not override
 these operational safety boundaries.
 
@@ -458,10 +480,12 @@ release lanes; they are not performed by documentation-only changes.
 
 ## Current Release Status
 
-| Area | August 2026 status |
+| Area | Current status (August baseline with Stage-2 closure) |
 | --- | --- |
 | Stage-0 Network Automation Lab | **CLOSED** at `main@aff250735ade18e4c274be8ac53c9672bb2cb07f` |
-| Stage-1 Read-only Lab Integration Planning | **PLANNING ENTRY / implementation not authorized** |
+| Stage-1 Read-only Lab Integration Planning | Historical planning-entry record; see Stage-2 closure |
+| Stage-2 bounded MikroTik Lab1 VRRP validation | **CLOSED / LIVE PROVEN** on `main@39da163d80e5d8b2dde215eb6c0979448d0739fd`; closure review PASS |
+| Stage 3 | **NOT STARTED / requires separate Owner authorization** |
 | Canonical reviewer interface | Flask dashboard on `127.0.0.1:5000` |
 | Secondary Next.js interface | Available as a bounded Stage-0 evidence surface |
 | WF-01 workflow foundation | Contract and hardened helpers integrated on `main` |
@@ -493,7 +517,12 @@ future capabilities stay behind their separate authorization and safety gates.
   acceptance gates.
 - Address Node/NVM coexistence only if a later environment-maintenance task
   requires it.
-- Introduce read-only or live-device automation only through later Stage gates.
+- Expand the proven Lab1 read-only workflow only through separately authorized
+  safety gates.
+- Keep the post-merge Safe CI maintenance findings OPEN: npm has 5
+  vulnerabilities (2 moderate, 2 high, 1 critical), and Next.js emitted 7
+  filesystem-tracing warnings. These are non-Stage-2-blocking maintenance items;
+  Stage-2 closure does not resolve them.
 
 Current limitations also include variable local report availability, no
 guarantee that every clean checkout contains generated evidence, and a
@@ -533,7 +562,7 @@ deliberately non-executing public review path.
 - [Portfolio evidence history](docs/portfolio_evidence/)
 
 Historical records describe the state and authorization boundary at the time
-they were written. Use the concise Current Release Status above for the August
-2026 repository-facing status.
+they were written. Use Current Release Status above and the canonical Stage
+model for the August baseline and subsequent bounded Stage-2 closure.
 
 This project is distributed under the [MIT License](LICENSE).

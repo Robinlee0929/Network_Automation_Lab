@@ -1,5 +1,11 @@
 # Actual Automation Integration Plan
 
+**Decision summary: Stage 2 is CLOSED / LIVE PROVEN** for the separately
+Owner-authorized MikroTik Lab1 VRRP read-only workflow on observed RouterOS
+7.24.2 output. The third one-shot attempt passed and the closure review passed.
+The default public review path remains Stage-0 offline evidence browsing.
+Stage 3 is **NOT STARTED / requires separate Owner authorization**.
+
 ## 1. Purpose
 
 This planning reference defines the gate-based conditions that must be met before the Network Automation Lab can move from mock-only and dry-run automation toward actual automation integration.
@@ -8,7 +14,10 @@ The document is documentation-only. It does not authorize live device access, SS
 
 ## 2. Current Safety Position
 
-The current platform safety position remains mock-only, dry-run, report-only, and reviewer-visible unless a future approved safety gate explicitly changes that boundary.
+The default platform safety position remains mock-only, dry-run, report-only,
+and reviewer-visible. The separately approved Stage-2 one-shot validation is
+recorded below as completed evidence. It provides no standing permission for
+another live attempt or broader capability.
 
 Phase 2C Interview MVP does not authorize live device access. It is intended to demonstrate safe planning, static evidence, local reports, reviewer workflows, and dry-run behavior without contacting routers, switches, controllers, provider APIs, model APIs, or other live infrastructure.
 
@@ -59,9 +68,10 @@ authorized formal Stage 0 closure. See
 
 ### Stage 1: Read-only Lab Integration Planning
 
-Status: PLANNING ENTRY. Planning-only scope is owner-approved; no planning task
-is started by the Stage 0 closure record, and no Stage 1 implementation is
-authorized.
+Historical entry status: PLANNING ENTRY. The Stage 0 closure record itself
+authorized planning only and did not start implementation. This retained
+planning boundary is distinct from the subsequently authorized, completed
+Stage-2 workflow recorded below.
 
 Allowed:
 
@@ -87,14 +97,85 @@ Exit gate:
 
 ### Stage 2: Read-only Lab Adapter
 
-Status: Future-only, approval required.
+Status: **CLOSED / LIVE PROVEN**. The third real one-shot validation passed
+under its exact Owner authorization; formal closure review is PASS. This
+records a completed bounded operation and does not authorize another attempt.
+
+#### Proven scope and result
+
+- Device: one specified MikroTik **Lab1**, identified publicly only as
+  `target.mikrotik.lab01`.
+- Operation: `mikrotik.vrrp_status`; exact allowlisted read-only command
+  `/interface vrrp print detail`, executed **once**, with **zero retries**.
+- Compatibility: the observed RouterOS **7.24.2** output shape passed the
+  strict parser and produced **valid canonical evidence**.
+- Normalized demo result: `vrrp-lan`, `MASTER`, VRID `88`, priority
+  `150`, running `true`.
+- Raw device output was **not persisted**.
+
+```text
+STAGE2_REAL_LIVE_ONE_SHOT_VALIDATION = PASS
+STAGE2_RUNTIME_CHAIN_PROVEN = YES
+ROUTEROS_7_24_PARSER_COMPATIBILITY_PROVEN_LIVE = YES
+CALLER_GUARD_RESTORATION_PROVEN = YES
+STAGE2_CLOSURE_REVIEW = PASS
+STAGE2_STATUS = CLOSED / LIVE PROVEN
+```
+
+#### Three live attempts
+
+| Attempt | Classification and reached boundary | Cause and resolution |
+| --- | --- | --- |
+| 1 | **FAIL-CLOSED**; the exact RouterOS command executed | RouterOS 7.24.2 parser compatibility drift. Subsequently remediated by a bounded parser fix merged through PR #79. |
+| 2 | **FAIL-CLOSED**; SSH/session reached; **no RouterOS command emitted** | Temporary caller-side observability guard defect. Production runtime defect **NOT ESTABLISHED**. |
+| 3 | **PASS**; exact command once, zero retries; valid canonical evidence produced | The bounded Stage-2 real-device one-shot chain was proven and closure review passed. |
+
+The first two attempts demonstrate fail-closed behavior; they do not represent
+successful Stage-2 live closure. The temporary caller guard was restored after
+the successful invocation and is not a permanent product/runtime component.
+
+#### Proven authority chain and limits
+
+Trusted configuration → canonical request → Owner authorization → replay
+protection → pinned device trust → read-only credential → exact command policy
+→ pinned SSH → strict vendor parser → canonical evidence.
+
+The successful validation recorded one live-entrypoint call, one replay
+consumption, one credential resolution, one TCP connection, one SSH handshake,
+one authentication, one session, and one RouterOS command, with retry = 0.
+AI does not own or bypass these authorities.
+
+This closure proves only one specified Lab1, one VRRP read-only operation, one
+exact allowlisted command, and the observed RouterOS 7.24.2 output in a one-shot
+safety chain. It does **not** establish generic RouterOS support, all MikroTik
+versions/models, multi-vendor live support, arbitrary CLI, write/config
+automation, automated retries, production HA readiness, fleet orchestration,
+autonomous remediation, an anti-rollback guarantee, or Stage-3 functionality.
+Any further attempt needs fresh exact Owner authorization; scope expansion
+needs separate review and applicable safety gates.
+
+#### Closure evidence and code baseline
+
+The closed live workflow used authoritative
+`main@39da163d80e5d8b2dde215eb6c0979448d0739fd`,
+tree `54b33650ced903e5e9457869617958317b5beba3`.
+
+The externally retained closure receipt has SHA256
+`3a83858ef47bd5253df9ad382f2d1bbae01f1626a4c73c22c367bf6284ad0120`.
+This public summary uses the approved logical target identifier and normalized
+demo result. It excludes device addresses, local retention paths, credential
+contents and locators, private trust/replay identifiers, and raw RouterOS stdout.
+
+The existing post-merge Safe CI evidence passed for that main baseline.
+Open npm and Next.js maintenance items remain separate in the
+[project status](../../README.md#post-release-or-deferred); closure does not
+resolve them.
 
 #### Canonical bounded VRRP read-only sequence
 
-The following sequence records the accepted bounded components and the next
-separately gated boundaries. Merged bounded components do not activate the
-Stage-2 adapter or authorize live access. Delivery-time status statements in
-the individual records remain historical context for those bounded changes.
+The following sequence indexes components used by the closed bounded workflow.
+Delivery-time statements in the individual records remain historical context.
+Neither this index nor component integration grants fresh execution authority.
 
 | Slice | Canonical scope | Current boundary |
 | --- | --- | --- |
@@ -105,8 +186,10 @@ the individual records remain historical context for those bounded changes.
 | S2-RO-05 | [Authorization envelope and durable replay ledger](stage2_vrrp_readonly_s2_ro_05_authorization_envelope_ledger.md) | Accepted offline/local contract; not execution authority |
 | S2-RO-06 | [Owner verifier and exact approval source](stage2_vrrp_readonly_s2_ro_06_owner_verifier.md) | Accepted bounded verifier; not execution authority |
 | S2-RO-07 | [Immutable offline known-host snapshot](stage2_vrrp_readonly_s2_ro_07_known_host_snapshot.md) | Formally closed; no transport authority |
-| S2-RO-08 | [Immutable VRRP read-only command policy](stage2_vrrp_readonly_s2_ro_08_command_policy.md) | Canonical scope defined; implementation not started |
-| S2-RO-09 | SSH transport handoff reserved by S2-RO-07 and S2-RO-08 | Future-only; no implementation or authorization |
+| S2-RO-08 | [Immutable VRRP read-only command policy](stage2_vrrp_readonly_s2_ro_08_command_policy.md) | Implemented bounded policy used by the proven workflow |
+| S2-RO-09 | [Pinned SSH transport](stage2_vrrp_readonly_s2_ro_09_pinned_ssh_transport.md) | Implemented bounded transport used by the proven workflow |
+| S2-RO-10 | [Trusted runtime composition](stage2_vrrp_readonly_s2_ro_10_trusted_runtime_composition.md) | Composed authority chain proven for this exact operation |
+| S2-RO-11 | [One-shot live entrypoint](stage2_vrrp_readonly_s2_ro_11_live_entrypoint.md) | Exact Owner-authorized one-shot invocation proven |
 
 The S2-RO-07 → S2-RO-08 → S2-RO-09 order is authoritative for scope
 discovery. It does not imply automatic authorization between slices.
@@ -134,7 +217,7 @@ Exit gate:
 
 ### Stage 3: Controlled Config Plan Generation
 
-Status: Future-only, approval required.
+Status: **NOT STARTED / requires separate Owner authorization**.
 
 Allowed only after separate approval:
 
@@ -223,14 +306,13 @@ No-Go applies when any of the following is true:
 
 ## 6. Default Decision
 
-Default decision: NO-GO for real automation.
+Default decision: NO-GO for unapproved real automation.
 
-Stage 0 is formally closed as a delivery stage, but its mock-only, dry-run,
-report-only operational boundary remains the default. Stage 1 is at its
-planning-only entry; this status activates no adapter, protocol, provider,
-credential, device, or execution capability. Any movement toward read-only lab
-access, controlled plan generation, controlled change execution, or
-production-like behavior must be introduced by an explicit capability gate and
-separate user approval.
+Stage 0 remains the default mock-only, dry-run, report-only public review path.
+Stage 2 is CLOSED / LIVE PROVEN only for the recorded Owner-authorized Lab1
+VRRP read-only operation. This closure activates no new adapter, protocol,
+provider, credential, device, or execution capability and permits no repeat
+attempt. Stage 3 remains NOT STARTED. Further live access or scope expansion
+requires the applicable capability gates and separate exact Owner approval.
 
 This document does not start Phase 2C-10 or any implementation phase. It does not create a second safety matrix. It is a durable planning reference for future review and approval decisions.
