@@ -306,7 +306,11 @@ No-Go applies when any of the following is true:
 
 ## 6. Default Decision
 
-Default decision: NO-GO for unapproved real automation.
+Default decision: NO-GO for real automation.
+
+This is the default policy. The completed Stage-2 live run is bounded historical
+evidence of a prior explicit Owner authorization and grants no standing live
+authority. Every new live access requires fresh exact Owner authorization.
 
 Stage 0 remains the default mock-only, dry-run, report-only public review path.
 Stage 2 is CLOSED / LIVE PROVEN only for the recorded Owner-authorized Lab1

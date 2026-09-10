@@ -15,8 +15,9 @@ read-only workflow, with observed RouterOS 7.24.2 compatibility, one exact
 command, zero retries, and valid canonical evidence.
 [Closure scope and evidence](docs/automation_readiness/actual_automation_integration_plan.md#stage-2-read-only-lab-adapter).
 
-The August 2026 Stage-0 release remains the supported local portfolio review
-path: mock-only, dry-run, report-only, and display-oriented. Reviewers do not
+The August 2026 release baseline is a local Stage-0 product.
+The supported release path is designed for local portfolio review: mock-only,
+dry-run, report-only, and display-oriented. Reviewers do not
 require a router, switch, VPN peer, SSH session, provider account, model API, or
 private lab configuration. The recorded Stage-2 success grants no new live
 authority. Stage 3 is **NOT STARTED**.
