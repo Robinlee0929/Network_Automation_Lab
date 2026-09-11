@@ -14,8 +14,14 @@ from validation_framework.stage2_mikrotik_credential_resolver import (
     STAGE2_CREDENTIAL_BACKEND_KIND,
     STAGE2_CREDENTIAL_LOCATOR_REF,
     STAGE2_FIXED_CREDENTIAL_REF,
+    STAGE2_SECOND_CREDENTIAL_REF,
+    STAGE2_SECOND_CREDENTIAL_LOCATOR_REF,
     Stage2CredentialBinding,
     build_stage2_fixed_credential_resolver,
+)
+from validation_framework.stage2_mikrotik_target_registry import (
+    STAGE2_FIXED_TARGET_REF,
+    STAGE2_SECOND_TARGET_REF,
 )
 from validation_framework.stage2_windows_credential_backend import (
     MAX_CREDENTIAL_SECRET_BLOB_LENGTH,
@@ -33,6 +39,16 @@ from validation_framework.stage2_windows_credential_backend import (
 _SYNTHETIC_TARGET = "synthetic.stage2.test.windows-credential-target"
 _SYNTHETIC_USERNAME = "synthetic-readonly-user"
 _SYNTHETIC_SECRET = b"synthetic-secret-bytes"
+
+
+@pytest.fixture(autouse=True)
+def _deny_real_windows_library(monkeypatch):
+    """Native-layout tests may install a fake DLL; a real DLL is never allowed."""
+
+    def denied(*args, **kwargs):
+        pytest.fail("real Windows credential library access is forbidden")
+
+    monkeypatch.setattr(ctypes, "WinDLL", denied, raising=False)
 
 
 class FakeWindowsCredentialApi:
@@ -334,7 +350,7 @@ def test_read_call_has_no_target_backend_locator_or_windows_options():
 @pytest.mark.parametrize(
     "changes",
     [
-        {"locator_ref": "locator.stage2.mikrotik.lab02.readonly"},
+        {"locator_ref": "locator.stage2.mikrotik.lab03.readonly"},
         {"locator_ref": None},
         {"credential_target": ""},
         {"credential_target": " target"},
@@ -700,3 +716,236 @@ def test_fixed_policy_matches_accepted_s2_ro_03_binding():
     assert binding.credential_ref == STAGE2_FIXED_CREDENTIAL_REF
     assert binding.backend_kind == STAGE2_CREDENTIAL_BACKEND_KIND
     assert binding.locator_ref == STAGE2_CREDENTIAL_LOCATOR_REF
+
+
+# Non-secret logical identities and synthetic records, never real store data.
+_LAB_PAIRS = (
+    (STAGE2_FIXED_TARGET_REF, STAGE2_FIXED_CREDENTIAL_REF),
+    (STAGE2_SECOND_TARGET_REF, STAGE2_SECOND_CREDENTIAL_REF),
+)
+_LAB_LOCATORS = (
+    STAGE2_CREDENTIAL_LOCATOR_REF,
+    STAGE2_SECOND_CREDENTIAL_LOCATOR_REF,
+)
+
+
+def _lab_backend(lab, *, result=None, error=None):
+    fake = FakeWindowsCredentialApi(result=result, error=error)
+    configuration = _configuration(
+        locator_ref=_LAB_LOCATORS[lab],
+        credential_target=f"synthetic.stage2.test.lab{lab + 1}.credential-record",
+    )
+    return build_stage2_windows_credential_backend(
+        configuration, windows_api=fake
+    ), fake, configuration
+
+
+@pytest.mark.parametrize("lab", [0, 1])
+def test_target_aware_exact_binding_reads_once_with_immutable_redacted_output(lab):
+    target, credential_ref = _LAB_PAIRS[lab]
+    binding = build_stage2_fixed_credential_resolver().resolve_for_target(
+        target, credential_ref
+    )
+    backend, fake, configuration = _lab_backend(lab, result=_record())
+    before = tuple(getattr(binding, item.name) for item in fields(binding))
+
+    result = backend.read_for_target(target, binding)
+
+    assert fake.read_calls == [configuration.credential_target]
+    assert type(result) is Stage2ResolvedCredential
+    assert result.username == _SYNTHETIC_USERNAME
+    assert type(result.secret_blob) is bytes
+    assert result.secret_blob == _SYNTHETIC_SECRET
+    assert {item.name for item in fields(result)} == {"username", "secret_blob"}
+    assert before == tuple(getattr(binding, item.name) for item in fields(binding))
+    for attribute, value in (("username", "changed"), ("secret_blob", b"changed")):
+        with pytest.raises(FrozenInstanceError):
+            setattr(result, attribute, value)
+    assert not hasattr(result, "__dict__")
+    with pytest.raises(TypeError):
+        json.dumps(result)
+    rendered = " ".join(repr(item) + str(item) for item in (
+        configuration, backend, _record(), result
+    ))
+    for private_value in (
+        configuration.credential_target, _SYNTHETIC_USERNAME, _SYNTHETIC_SECRET.decode()
+    ):
+        assert private_value not in rendered
+
+
+def test_lab_identities_and_trusted_locators_are_distinct():
+    resolver = build_stage2_fixed_credential_resolver()
+    first, second = (resolver.resolve_for_target(*pair) for pair in _LAB_PAIRS)
+    assert first.credential_ref != second.credential_ref
+    assert first.locator_ref != second.locator_ref
+    assert first.backend_kind == second.backend_kind == STAGE2_CREDENTIAL_BACKEND_KIND
+    assert _lab_backend(0)[2].credential_target != _lab_backend(1)[2].credential_target
+
+
+@pytest.mark.parametrize("target_lab", [0, 1])
+@pytest.mark.parametrize("credential_lab", [0, 1])
+@pytest.mark.parametrize("binding_locator_lab", [0, 1])
+@pytest.mark.parametrize("configuration_lab", [0, 1])
+def test_exact_tuple_matrix_rejects_every_cross_lab_combination_before_read(
+    target_lab, credential_lab, binding_locator_lab, configuration_lab
+):
+    backend, fake, configuration = _lab_backend(configuration_lab, result=_record())
+    binding = _tampered_binding(
+        credential_ref=_LAB_PAIRS[credential_lab][1],
+        locator_ref=_LAB_LOCATORS[binding_locator_lab],
+    )
+    if target_lab == credential_lab == binding_locator_lab == configuration_lab:
+        assert backend.read_for_target(_LAB_PAIRS[target_lab][0], binding) == (
+            Stage2ResolvedCredential(_SYNTHETIC_USERNAME, _SYNTHETIC_SECRET)
+        )
+        assert fake.read_calls == [configuration.credential_target]
+    else:
+        with pytest.raises(Stage2WindowsCredentialError):
+            backend.read_for_target(_LAB_PAIRS[target_lab][0], binding)
+        assert fake.read_calls == []
+
+
+@pytest.mark.parametrize("configuration_lab", [0, 1])
+def test_legacy_read_cannot_retrieve_lab2_or_use_lab2_configuration(configuration_lab):
+    backend, fake, _ = _lab_backend(configuration_lab, result=_record())
+    resolver = build_stage2_fixed_credential_resolver()
+    second = resolver.resolve_for_target(*_LAB_PAIRS[1])
+    _assert_error(lambda: backend.read(second), Stage2WindowsCredentialFailure.UNSUPPORTED_LOCATOR)
+    assert fake.read_calls == []
+    if configuration_lab == 1:
+        _assert_error(lambda: backend.read(_binding()), Stage2WindowsCredentialFailure.UNSUPPORTED_LOCATOR)
+        assert fake.read_calls == []
+
+
+class _ReferenceSubclass(str):
+    pass
+
+
+def _invalid_variants(reference):
+    return (
+        None, {}, "", reference.upper(), reference + ".alias", reference[:-1],
+        reference + "*", " " + reference, reference + "\n", reference + "\x00",
+        reference.replace("lab0", "lab"), _ReferenceSubclass(reference),
+        reference.replace("mikrotik", "mikrotіk"),  # synthetic Unicode lookalike
+    )
+
+
+@pytest.mark.parametrize("lab", [0, 1])
+@pytest.mark.parametrize("field", ["target_ref", "credential_ref", "locator_ref"])
+def test_alias_prefix_case_type_and_unknown_references_reject_before_read(lab, field):
+    target, credential_ref = _LAB_PAIRS[lab]
+    backend, fake, _ = _lab_backend(lab, result=_record())
+    original = {
+        "target_ref": target, "credential_ref": credential_ref,
+        "locator_ref": _LAB_LOCATORS[lab],
+    }
+    unknown = original[field].replace(f"lab0{lab + 1}", "lab03")
+    for variant in (*_invalid_variants(original[field]), unknown):
+        values = dict(original, **{field: variant})
+        binding = _tampered_binding(
+            credential_ref=values["credential_ref"], locator_ref=values["locator_ref"]
+        )
+        with pytest.raises(Stage2WindowsCredentialError) as captured:
+            backend.read_for_target(values["target_ref"], binding)
+        assert captured.value.__context__ is None
+        assert captured.value.__cause__ is None
+        assert fake.read_calls == []
+
+
+@pytest.mark.parametrize("lab", [0, 1])
+def test_unknown_or_confused_configuration_locators_reject_without_read(lab):
+    fake = FakeWindowsCredentialApi(result=_record())
+    for locator in (*_invalid_variants(_LAB_LOCATORS[lab]), "locator.unknown.readonly"):
+        with pytest.raises(Stage2WindowsCredentialError):
+            configuration = _configuration(locator_ref=locator)
+            build_stage2_windows_credential_backend(configuration, windows_api=fake)
+        assert fake.read_calls == []
+
+
+def test_unknown_target_credential_and_locator_together_reject_without_read():
+    backend, fake, _ = _lab_backend(0, result=_record())
+    binding = _tampered_binding(
+        credential_ref="credential.unknown.lab", locator_ref="locator.unknown.lab"
+    )
+    _assert_error(
+        lambda: backend.read_for_target("target.unknown.lab", binding),
+        Stage2WindowsCredentialFailure.INVALID_BINDING,
+    )
+    assert fake.read_calls == []
+
+
+@pytest.mark.parametrize("lab", [0, 1])
+def test_target_aware_api_requires_pair_and_has_no_caller_overrides(lab):
+    target, credential_ref = _LAB_PAIRS[lab]
+    binding = build_stage2_fixed_credential_resolver().resolve_for_target(target, credential_ref)
+    backend, fake, _ = _lab_backend(lab, result=_record())
+    parameters = inspect.signature(backend.read_for_target).parameters
+    assert list(parameters) == ["target_ref", "binding"]
+    assert all(value.default is inspect.Parameter.empty for value in parameters.values())
+    for name in ("locator_ref", "credential_target", "backend_kind", "credential_type", "read_flags"):
+        with pytest.raises(TypeError):
+            backend.read_for_target(target, binding, **{name: "synthetic-override"})
+        assert fake.read_calls == []
+    with pytest.raises(TypeError):
+        backend.read_for_target(binding)
+    assert fake.read_calls == []
+
+
+@pytest.mark.parametrize("lab", [0, 1])
+@pytest.mark.parametrize("kind", ["missing", "error", "malformed"])
+def test_target_aware_failures_remain_sanitized_with_one_read_and_no_fallback(lab, kind):
+    unsafe = f"{_SYNTHETIC_USERNAME}:{_SYNTHETIC_SECRET.decode()}"
+    backend, fake, configuration = _lab_backend(
+        lab, result=object() if kind == "malformed" else None,
+        error=OSError(unsafe) if kind == "error" else None,
+    )
+    code = {
+        "missing": Stage2WindowsCredentialFailure.CREDENTIAL_NOT_FOUND,
+        "error": Stage2WindowsCredentialFailure.CREDENTIAL_READ_FAILED,
+        "malformed": Stage2WindowsCredentialFailure.MALFORMED_CREDENTIAL_RECORD,
+    }[kind]
+    binding = build_stage2_fixed_credential_resolver().resolve_for_target(*_LAB_PAIRS[lab])
+    error = _assert_error(lambda: backend.read_for_target(_LAB_PAIRS[lab][0], binding), code)
+    assert error.__context__ is None
+    assert error.__cause__ is None
+    assert fake.read_calls == [configuration.credential_target]
+
+
+@pytest.mark.parametrize("lab", [0, 1])
+def test_target_aware_binding_objects_and_backend_kinds_are_exact(lab):
+    backend, fake, _ = _lab_backend(lab, result=_record())
+    for binding in (None, {}, object(), "binding"):
+        _assert_error(
+            lambda: backend.read_for_target(_LAB_PAIRS[lab][0], binding),
+            Stage2WindowsCredentialFailure.INVALID_BINDING,
+        )
+        assert fake.read_calls == []
+    for kind in (None, "OTHER_BACKEND", _ReferenceSubclass(STAGE2_CREDENTIAL_BACKEND_KIND)):
+        binding = _tampered_binding(backend_kind=kind)
+        _assert_error(
+            lambda: backend.read_for_target(_LAB_PAIRS[lab][0], binding),
+            Stage2WindowsCredentialFailure.UNSUPPORTED_BACKEND,
+        )
+        assert fake.read_calls == []
+
+
+@pytest.mark.parametrize("lab", [0, 1])
+def test_target_aware_policy_uses_s2_ro_03_authority_and_never_real_reader(monkeypatch, lab):
+    resolver = build_stage2_fixed_credential_resolver()
+    binding = resolver.resolve_for_target(*_LAB_PAIRS[lab])
+    calls = []
+    original = type(resolver).resolve_for_target
+
+    def observed(self, target_ref, credential_ref):
+        calls.append((target_ref, credential_ref))
+        return original(self, target_ref, credential_ref)
+
+    def denied(*args):
+        pytest.fail("real credential primitive must not be invoked")
+
+    monkeypatch.setattr(type(resolver), "resolve_for_target", observed)
+    monkeypatch.setattr(module, "_read_windows_credential_exact", denied)
+    backend, fake, configuration = _lab_backend(lab, result=_record())
+    backend.read_for_target(_LAB_PAIRS[lab][0], binding)
+    assert calls == [_LAB_PAIRS[lab]]
+    assert fake.read_calls == [configuration.credential_target]

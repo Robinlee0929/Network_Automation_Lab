@@ -1,10 +1,10 @@
 """Bounded Windows Credential Manager reader for the Stage 2 VRRP lab.
 
-The public operation consumes the exact immutable S2-RO-03 binding and performs
-one credential read through an injected narrow API.  A real Windows target is
-trusted runtime configuration: it is never accepted by ``read`` and no target
-value is committed here.  Windows libraries are loaded only when the real API
-adapter is explicitly invoked.
+The target-aware operation checks the supplied binding against S2-RO-03 and its
+trusted configuration before one read through an injected narrow API. Legacy
+``read(binding)`` remains Lab1-only. A real Windows target is trusted runtime
+configuration, never an operational read argument. Windows libraries are loaded
+only when the real API adapter is explicitly invoked.
 """
 
 from __future__ import annotations
@@ -18,8 +18,12 @@ from validation_framework.stage2_mikrotik_credential_resolver import (
     STAGE2_CREDENTIAL_BACKEND_KIND,
     STAGE2_CREDENTIAL_LOCATOR_REF,
     STAGE2_FIXED_CREDENTIAL_REF,
+    STAGE2_SECOND_CREDENTIAL_LOCATOR_REF,
     Stage2CredentialBinding,
+    Stage2CredentialResolverError,
+    build_stage2_fixed_credential_resolver,
 )
+from validation_framework.stage2_mikrotik_target_registry import STAGE2_FIXED_TARGET_REF
 
 
 MAX_WINDOWS_CREDENTIAL_TARGET_LENGTH: Final = 512
@@ -68,7 +72,10 @@ class Stage2TrustedWindowsCredentialConfiguration:
     def __post_init__(self) -> None:
         if (
             type(self.locator_ref) is not str
-            or self.locator_ref != STAGE2_CREDENTIAL_LOCATOR_REF
+            or self.locator_ref not in (
+                STAGE2_CREDENTIAL_LOCATOR_REF,
+                STAGE2_SECOND_CREDENTIAL_LOCATOR_REF,
+            )
             or not _is_bounded_windows_target(self.credential_target)
         ):
             _fail(Stage2WindowsCredentialFailure.INVALID_TRUSTED_CONFIGURATION)
@@ -161,9 +168,45 @@ class Stage2WindowsCredentialBackend:
     __str__ = __repr__
 
     def read(self, binding: object) -> Stage2ResolvedCredential:
-        """Perform exactly one read after validating the immutable binding."""
+        """Compatible Lab1-only operation; cannot retrieve a Lab2 binding."""
 
         _validate_binding(binding)
+        return self.read_for_target(STAGE2_FIXED_TARGET_REF, binding)
+
+    def read_for_target(
+        self, target_ref: object, binding: object
+    ) -> Stage2ResolvedCredential:
+        """Read only an S2-RO-03 exact pair matching trusted configuration.
+
+        Neither the logical target nor the binding can override the configured
+        Windows record. This policy check is not Owner/live authorization.
+        """
+
+        if type(binding) is not Stage2CredentialBinding:
+            _fail(Stage2WindowsCredentialFailure.INVALID_BINDING)
+        if (
+            type(binding.backend_kind) is not str
+            or binding.backend_kind != STAGE2_CREDENTIAL_BACKEND_KIND
+        ):
+            _fail(Stage2WindowsCredentialFailure.UNSUPPORTED_BACKEND)
+        invalid_pair = False
+        try:
+            expected_binding = build_stage2_fixed_credential_resolver().resolve_for_target(
+                target_ref, binding.credential_ref
+            )
+        except Stage2CredentialResolverError:
+            invalid_pair = True
+        if invalid_pair:
+            _fail(Stage2WindowsCredentialFailure.INVALID_BINDING)
+        if (
+            type(binding.locator_ref) is not str
+            or binding.locator_ref != expected_binding.locator_ref
+        ):
+            _fail(Stage2WindowsCredentialFailure.UNSUPPORTED_LOCATOR)
+        self._configuration.__post_init__()
+        if self._configuration.locator_ref != expected_binding.locator_ref:
+            _fail(Stage2WindowsCredentialFailure.UNSUPPORTED_LOCATOR)
+
         failure: Stage2WindowsCredentialFailure | None = None
         try:
             record = self._windows_api.read_exact(
