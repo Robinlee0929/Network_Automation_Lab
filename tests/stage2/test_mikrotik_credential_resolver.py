@@ -11,6 +11,8 @@ from validation_framework.stage2_mikrotik_credential_resolver import (
     STAGE2_CREDENTIAL_BACKEND_KIND,
     STAGE2_CREDENTIAL_LOCATOR_REF,
     STAGE2_FIXED_CREDENTIAL_REF,
+    STAGE2_SECOND_CREDENTIAL_REF,
+    STAGE2_SECOND_CREDENTIAL_LOCATOR_REF,
     Stage2CredentialBinding,
     Stage2CredentialResolverError,
     Stage2CredentialResolverFailure,
@@ -18,6 +20,8 @@ from validation_framework.stage2_mikrotik_credential_resolver import (
     build_stage2_fixed_credential_resolver,
 )
 from validation_framework.stage2_mikrotik_target_registry import (
+    STAGE2_FIXED_TARGET_REF,
+    STAGE2_SECOND_TARGET_REF,
     parse_stage2_fixed_target_registry,
 )
 from validation_framework.stage2_vrrp_readonly_contract import (
@@ -65,6 +69,8 @@ def test_public_surface_and_fixed_policy_constants_are_exact():
         "STAGE2_CREDENTIAL_BACKEND_KIND",
         "STAGE2_CREDENTIAL_LOCATOR_REF",
         "STAGE2_FIXED_CREDENTIAL_REF",
+        "STAGE2_SECOND_CREDENTIAL_REF",
+        "STAGE2_SECOND_CREDENTIAL_LOCATOR_REF",
         "Stage2CredentialBinding",
         "Stage2CredentialResolverError",
         "Stage2CredentialResolverFailure",
@@ -113,7 +119,7 @@ def test_resolver_and_binding_are_frozen_slotted_and_safe_in_repr():
     assert STAGE2_CREDENTIAL_LOCATOR_REF not in repr(binding)
     assert STAGE2_CREDENTIAL_LOCATOR_REF not in repr(resolver)
     assert repr(binding) == "Stage2CredentialBinding(<fixed-non-secret-binding>)"
-    assert repr(resolver) == "Stage2FixedCredentialResolver(<one-fixed-binding>)"
+    assert repr(resolver) == "Stage2FixedCredentialResolver(<two-fixed-bindings>)"
 
 
 @pytest.mark.parametrize(
@@ -393,3 +399,191 @@ def test_backend_kind_is_declarative_identity_not_credential_retrieval():
             "win32cred",
         }
     )
+
+
+def test_exact_two_target_pairs_have_distinct_fixed_credential_authority():
+    resolver = build_stage2_fixed_credential_resolver()
+    lab1 = resolver.resolve_for_target(
+        STAGE2_FIXED_TARGET_REF, STAGE2_FIXED_CREDENTIAL_REF
+    )
+    lab2 = resolver.resolve_for_target(
+        STAGE2_SECOND_TARGET_REF, STAGE2_SECOND_CREDENTIAL_REF
+    )
+
+    assert lab1 is resolver.resolve(STAGE2_FIXED_CREDENTIAL_REF)
+    assert lab2 is resolver.resolve_for_target(
+        STAGE2_SECOND_TARGET_REF, STAGE2_SECOND_CREDENTIAL_REF
+    )
+    assert lab1.credential_ref == "credential.mikrotik.lab01"
+    assert lab2.credential_ref == "credential.mikrotik.lab02"
+    assert lab2.locator_ref == "locator.stage2.mikrotik.lab02.readonly"
+    assert lab1.credential_ref != lab2.credential_ref
+    assert lab1.locator_ref != lab2.locator_ref
+    assert lab1.backend_kind == lab2.backend_kind == STAGE2_CREDENTIAL_BACKEND_KIND
+    assert lab2 == build_stage2_fixed_credential_resolver().resolve_for_target(
+        STAGE2_SECOND_TARGET_REF, STAGE2_SECOND_CREDENTIAL_REF
+    )
+    assert {item.name for item in fields(lab2)} == {
+        "credential_ref", "backend_kind", "locator_ref"
+    }
+
+
+@pytest.mark.parametrize(
+    "target_ref,credential_ref",
+    [
+        (STAGE2_FIXED_TARGET_REF, STAGE2_SECOND_CREDENTIAL_REF),
+        (STAGE2_SECOND_TARGET_REF, STAGE2_FIXED_CREDENTIAL_REF),
+    ],
+)
+def test_cross_lab_pair_rejects_before_any_downstream_boundary(
+    target_ref, credential_ref,
+):
+    resolver = build_stage2_fixed_credential_resolver()
+    downstream_calls = []
+
+    def resolve_then_forward(reference):
+        binding = resolver.resolve_for_target(target_ref, reference)
+        downstream_calls.append(binding)
+
+    _assert_error(
+        resolve_then_forward, credential_ref,
+        Stage2CredentialResolverFailure.TARGET_CREDENTIAL_MISMATCH,
+    )
+    assert downstream_calls == []
+
+
+@pytest.mark.parametrize("credential_ref", [
+    STAGE2_FIXED_CREDENTIAL_REF, STAGE2_SECOND_CREDENTIAL_REF,
+])
+@pytest.mark.parametrize("target_ref", [
+    "target.mikrotik.lab03", "target.mikrotik", "target.mikrotik.lab0l",
+    "target.mikrotik.lab01.readonly", "target.mikrotik.lab02.readonly",
+    "target.other.lab02",
+])
+def test_target_aware_unknown_third_alias_prefix_and_suffix_reject(
+    target_ref, credential_ref,
+):
+    resolver = build_stage2_fixed_credential_resolver()
+    _assert_error(
+        lambda value: resolver.resolve_for_target(value, credential_ref),
+        target_ref, Stage2CredentialResolverFailure.UNKNOWN_TARGET,
+    )
+
+
+@pytest.mark.parametrize("target_ref", [
+    "TARGET.MIKROTIK.LAB02", " target.mikrotik.lab01", "target.mikrotik.lab02 ",
+    "target.mikrotik.*", "target.mikrotik/../lab02", "target.mikrotik.lab02\n",
+    "target://mikrotik/lab02", "target." + "a" * 160,
+    "target.mikrotik.l\u0430b02", "", None, True, 1, {}, b"target.mikrotik.lab02",
+])
+def test_target_aware_malformed_targets_have_sanitized_failures(target_ref):
+    resolver = build_stage2_fixed_credential_resolver()
+    _assert_error(
+        lambda value: resolver.resolve_for_target(value, STAGE2_SECOND_CREDENTIAL_REF),
+        target_ref, Stage2CredentialResolverFailure.INVALID_TARGET_REFERENCE,
+    )
+
+
+@pytest.mark.parametrize("target_ref", [STAGE2_FIXED_TARGET_REF, STAGE2_SECOND_TARGET_REF])
+@pytest.mark.parametrize("credential_ref", [
+    "credential.mikrotik.lab03", "credential.mikrotik", "credential.mikrotik.lab0l",
+    "credential.mikrotik.lab01.readonly", "credential.mikrotik.lab02.readonly",
+])
+def test_target_aware_unknown_credential_cannot_override_binding(target_ref, credential_ref):
+    resolver = build_stage2_fixed_credential_resolver()
+    _assert_error(
+        lambda value: resolver.resolve_for_target(target_ref, value),
+        credential_ref, Stage2CredentialResolverFailure.UNKNOWN_CREDENTIAL,
+    )
+
+
+@pytest.mark.parametrize("target_ref", [STAGE2_FIXED_TARGET_REF, STAGE2_SECOND_TARGET_REF])
+@pytest.mark.parametrize("credential_ref", [
+    "CREDENTIAL.MIKROTIK.LAB02", " credential.mikrotik.lab02",
+    "credential.mikrotik.lab02 ", "credential.mikrotik.lab02\n",
+    "credential.mikrotik.*", "credential.mikrotik/../lab02",
+    "credential.mikrotik.password", "credential.mikrotik.l\u0430b02",
+    "", None, True, 1, {}, b"credential.mikrotik.lab02",
+])
+def test_target_aware_malformed_credentials_have_sanitized_failures(
+    target_ref, credential_ref,
+):
+    resolver = build_stage2_fixed_credential_resolver()
+    _assert_error(
+        lambda value: resolver.resolve_for_target(target_ref, value),
+        credential_ref, Stage2CredentialResolverFailure.INVALID_CREDENTIAL_REFERENCE,
+    )
+
+
+def test_two_binding_configuration_is_immutable_and_has_no_override_or_default():
+    resolver = build_stage2_fixed_credential_resolver()
+    lab2 = resolver.resolve_for_target(STAGE2_SECOND_TARGET_REF, STAGE2_SECOND_CREDENTIAL_REF)
+    with pytest.raises(FrozenInstanceError):
+        resolver._lab2_binding = resolver._binding
+    with pytest.raises(FrozenInstanceError):
+        lab2.credential_ref = STAGE2_FIXED_CREDENTIAL_REF
+    with pytest.raises(Stage2CredentialResolverError):
+        Stage2FixedCredentialResolver(lab2)
+    with pytest.raises(TypeError):
+        Stage2FixedCredentialResolver(resolver._binding, _lab2_binding=lab2)
+    with pytest.raises(TypeError):
+        resolver.resolve_for_target(STAGE2_SECOND_TARGET_REF)
+    with pytest.raises(TypeError):
+        resolver.resolve_for_target(
+            STAGE2_SECOND_TARGET_REF, STAGE2_SECOND_CREDENTIAL_REF,
+            locator_ref=STAGE2_CREDENTIAL_LOCATOR_REF,
+        )
+    parameters = inspect.signature(resolver.resolve_for_target).parameters
+    assert list(parameters) == ["target_ref", "credential_ref"]
+    assert all(item.default is inspect.Parameter.empty for item in parameters.values())
+    assert not hasattr(lab2, "__dict__")
+    assert lab2.locator_ref not in repr(lab2) + repr(resolver)
+    assert lab2.credential_ref not in repr(lab2) + repr(resolver)
+
+
+@pytest.mark.parametrize("credential_ref,locator_ref", [
+    (STAGE2_FIXED_CREDENTIAL_REF, STAGE2_SECOND_CREDENTIAL_LOCATOR_REF),
+    (STAGE2_SECOND_CREDENTIAL_REF, STAGE2_CREDENTIAL_LOCATOR_REF),
+    ("credential.mikrotik.lab03", "locator.stage2.mikrotik.lab03.readonly"),
+    (STAGE2_SECOND_CREDENTIAL_REF, "locator.stage2.other"),
+])
+def test_binding_records_reject_cross_lab_and_unknown_locator_pairs(credential_ref, locator_ref):
+    with pytest.raises(Stage2CredentialResolverError) as error:
+        Stage2CredentialBinding(credential_ref, STAGE2_CREDENTIAL_BACKEND_KIND, locator_ref)
+    assert str(error.value) == "INVALID_RESOLVER_CONFIGURATION"
+
+
+def test_target_aware_request_composition_preserves_endpoint_and_request():
+    registry = parse_stage2_fixed_target_registry([
+        _target_record(), dict(_target_record(), target_ref=STAGE2_SECOND_TARGET_REF,
+                              address="192.0.2.20"),
+    ])
+    request = parse_stage2_vrrp_observation_request(_request(
+        target_ref=STAGE2_SECOND_TARGET_REF, credential_ref=STAGE2_SECOND_CREDENTIAL_REF,
+    ))
+    before = request.to_canonical_bytes()
+    endpoint = registry.lookup(request.target_ref)
+    resolver = build_stage2_fixed_credential_resolver()
+    binding = resolver.resolve_for_target(request.target_ref, request.credential_ref)
+    assert binding.credential_ref == request.credential_ref
+    assert request.to_canonical_bytes() == before
+    assert registry.lookup(request.target_ref) is endpoint
+    # Existing downstream credential-only callers remain Lab1-only, not widened.
+    _assert_error(resolver.resolve, request.credential_ref,
+                  Stage2CredentialResolverFailure.UNKNOWN_CREDENTIAL)
+
+
+def test_resolver_imports_only_offline_contract_and_registry_not_downstream():
+    tree = ast.parse(inspect.getsource(module))
+    imports = {
+        node.module for node in ast.walk(tree) if isinstance(node, ast.ImportFrom)
+    }
+    assert imports == {
+        "__future__", "dataclasses", "enum", "typing",
+        "validation_framework.stage2_vrrp_readonly_contract",
+        "validation_framework.stage2_mikrotik_target_registry",
+    }
+    assert {
+        alias.name for node in ast.walk(tree) if isinstance(node, ast.Import)
+        for alias in node.names
+    } == {"re"}
