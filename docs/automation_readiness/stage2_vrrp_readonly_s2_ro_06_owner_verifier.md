@@ -3,15 +3,41 @@
 ## Decision summary
 
 S2-RO-06 implements bounded offline Owner authenticity verification and one
-exact read-only approval file source. Status: **UNCOMMITTED CANDIDATE**; validation
-and independent review results accompany the handoff. It reuses the accepted Owner trust root and
-S2-RO-05 payload API without modifying any accepted slice.
+exact read-only approval file source. Status: **INTEGRATED** in the accepted
+`main@16ae88774969eca8a86c2c58f74b98886a6081ec` baseline. Independent synthetic
+Lab2 revalidation established **REUSE_WITH_NEW_EXTERNAL_LAB2_DATA_ONLY**:
+the existing production verifier and tests require no change for Lab2.
+It reuses the accepted Owner trust root and S2-RO-05 payload API.
 
 `VERIFIED OWNER APPROVAL != VALID CURRENT AUTHORIZATION != EXECUTION AUTHORITY`
 
-The delivery is exactly one production module, one synthetic test module, and
-this document. It adds no CLI, registry entry, runner, production composition,
-provisioning workflow, or dependency. It does not advance S2-RO-07.
+The original delivery consisted of one production module, one synthetic test
+module, and this document. It added no CLI, registry entry, runner, production
+composition, provisioning workflow, or dependency. This status correction
+does not advance Lab2 S2-RO-07 or Stage 3.
+
+## Lab2 revalidation status
+
+The verifier is target-independent: it contains no Lab1-only production logic
+and does not select an Owner key, trust root, or approval source by Lab target.
+S2-RO-05 validates the exact target/credential pair; S2-RO-06 authenticates its
+complete `owner_verification_payload(envelope)` without a separate Lab2 path.
+Synthetic Lab1/Lab2 verification and cross-payload rejection passed without
+changing production code or repository tests.
+
+Future Lab2 use still requires separately authorized external data:
+
+- A fresh Lab2 S2-RO-05 authorization envelope with a fresh authorization UUID
+  and validity window.
+- The exact `target.mikrotik.lab02` / `credential.mikrotik.lab02` pair.
+- An exact matching approval artifact signed by the existing authorized Owner.
+
+The current contract requires no new Owner key, trust root, or approval source
+for Lab2. This is code/contract compatibility, not validation of deployed
+authority: no real trust-root artifact or private key was inspected, no real
+signature was verified, and no real approval, authorization, credential, or
+replay state was created or consumed by the revalidation. It establishes no
+real Lab2 authority, Owner approval, live readiness, or execution authority.
 
 ## Allowed scope and exclusions
 
@@ -96,7 +122,7 @@ The domain separator belongs exclusively to
 It is not duplicated here. Artifact JSON, selected fields, raw envelope JSON,
 and the payload digest alone are not the signed message. A changed valid
 envelope or byte-different representation fails the signature check. Invalid
-fixed target/credential fields reject through the unchanged S2-RO-05 contract.
+target/credential pairs reject through the existing S2-RO-05 contract.
 
 The four artifact metadata fields are constrained independently. The signature
 authenticates the S2-RO-05 message, not a second metadata message. The result's
@@ -210,6 +236,8 @@ accepted non-rollback storage assumption is unchanged.
 
 ## Validation and acceptance
 
+The following implementation/revalidation checks are not a docs-only gate.
+
 Run focused `python -m pytest tests/stage2/test_owner_verifier.py`, Stage-2
 regressions `python -m pytest tests/stage2`, full `python -m pytest`, and
 `python network_lab.py --task report-index` using the repository-approved
@@ -231,12 +259,13 @@ Synthetic signing occurs in test fixtures only. Source tests never open real
 approval files. Positive and negative tests must prove no ledger, credential,
 network, or subprocess path is reached by the verifier.
 
-Acceptance requires zero failures, classified skips, a policy-accepted
+Implementation acceptance requires zero failures, classified skips, a policy-accepted
 report-index result, no unexpected tracked-file changes, whitespace checks of
-all three untracked files, independent security review, and documentation
+the reviewed files, independent security review, and documentation
 readability review. Optional missing runtime evidence may yield an explicitly
 documented report-index WARN. No additional review artifact is created.
 
-Passing these gates supports only separate local commit authorization. The
-candidate remains unstaged and uncommitted. Commit, push, PR, merge, production
-provisioning, real native access, and S2-RO-07 require separate authorization.
+The production implementation is already integrated. This documentation-only
+correction still requires independent review and separately authorized
+integration. Production provisioning, real native access, and any Lab2
+S2-RO-07-or-later work require separate authorization; this document grants none.
