@@ -2,10 +2,13 @@
 
 ## Decision summary
 
-S2-RO-05 provides strict offline authorization data and permanent local replay
-consumption. It does not authenticate the Owner or authorize execution.
-Status: uncommitted implementation candidate, subject to validation and
-independent review. No earlier slice is modified.
+S2-RO-05 accepts exactly the Lab1/Lab1 and Lab2/Lab2 target/credential pairs
+through the existing S2-RO-03 resolver. Mixed or noncanonical bindings reject
+before replay filesystem access, path identity checks, or SQLite connection.
+The durable replay engine and SQL schema are unchanged. This is an offline
+binding-policy extension, not Owner authentication or execution authorization.
+Status: bounded implementation candidate, subject to validation and independent
+review. No earlier slice or S2-RO-06-or-later production module is modified.
 
 `VALID ENVELOPE != OWNER APPROVAL != EXECUTION AUTHORITY`
 
@@ -30,8 +33,8 @@ No new dependency or CLI registration is added.
 | operation_id | Exact `mikrotik.vrrp_status` (20 characters) |
 | request_sha256 | 64 lowercase hexadecimal characters |
 | authorization_ref | Dotted lowercase ASCII reference beginning `authorization.`, maximum 160 characters |
-| target_ref | Exact `target.mikrotik.lab01` (20 characters) |
-| credential_ref | Exact `credential.mikrotik.lab01` (24 characters) |
+| target_ref | Exact `target.mikrotik.lab01` or `target.mikrotik.lab02`, subject to the pair rule below |
+| credential_ref | Exact matching `credential.mikrotik.lab01` or `credential.mikrotik.lab02` |
 | issued_at | Integer UTC Unix seconds, 0 through 253402300799 |
 | expires_at | Integer UTC Unix seconds, same bound |
 | max_attempts | Exact integer 1 |
@@ -40,11 +43,36 @@ Boolean values are not integers for this contract. Reference segments match
 `[a-z][a-z0-9_-]*`, separated by dots. No normalization, whitespace trimming,
 coercion, optional fields, or defaults are applied.
 
+Only these conceptual pairs are accepted:
+
+- `target.mikrotik.lab01` + `credential.mikrotik.lab01`.
+- `target.mikrotik.lab02` + `credential.mikrotik.lab02`.
+
+S2-RO-03 `resolve_for_target(target_ref, credential_ref)` is the pair authority;
+S2-RO-05 has no duplicate pair registry. Both cross-lab pairs, unknown identities,
+aliases, prefixes, case-confused values, whitespace changes, and noncanonical
+types reject. There is no wildcard, normalization, fallback, or default-to-Lab1.
+Historical Lab1 canonical bytes remain valid under the same schema `1.0`.
+
 The request digest is SHA-256 of S2-RO-01 `to_canonical_bytes()`. It binds all
 request fields including run identity and read-only intent. Explicit operation,
 authorization, target and credential references must also match. S2-RO-02
 lookup and the S2-RO-03 binding remain immutable authorities; S2-RO-04 is neither
 imported nor called. Logical target binding is not physical-device attestation.
+
+Binding validation checks exact envelope/request/registry/binding object types,
+revalidates the envelope, reparses the request, looks up and validates its
+registry endpoint, and resolves the validated target/credential pair through
+S2-RO-03. The supplied binding must equal that canonical result. Operation,
+authorization reference, endpoint target, credential, and exact canonical
+request digest must all match before time validation. Caller-supplied bindings
+cannot override the resolver. S2-RO-02 must be configured with the exact pair
+for a Lab2 lookup; this extension does not discover or provision endpoints.
+
+`consume` still performs binding validation before `_path_identity` and
+`sqlite3.connect`. Invalid bindings have zero ledger filesystem access, path
+identity calls, connections, BEGINs, INSERTs, and durable mutations. Both labs
+follow the same path and bounded failure categories; neither has a relaxed path.
 
 The envelope is a frozen, slotted dataclass of immutable scalars. Exported
 dictionaries are fresh copies. Parsing accepts only built-in bytes, at most
@@ -128,6 +156,12 @@ The replay key is authorization UUID alone. The envelope SHA-256 is audit
 metadata, not a second replay namespace. Same-ID/different-envelope replay is
 rejected. No raw envelope, request, endpoint, credential, or command is stored.
 
+Lab1 and Lab2 share this replay-key meaning: changing the lab or any envelope
+field does not make an already consumed authorization UUID reusable. Only
+temporary pre-provisioned synthetic ledgers are used to validate this extension.
+No real replay database, rows, ledger identity, authorization package, credential
+store, Owner trust-root artifact, or private key is accessed or provisioned.
+
 Records are retained permanently. The limit is 100000 records and 64 MiB of
 database pages. Capacity exhaustion blocks; it never prunes or resets history.
 
@@ -199,11 +233,26 @@ fresh-process replay and concurrent consumers, malformed schema/storage,
 missing storage, busy handling, injected write and ambiguous-commit failures,
 post-commit expiry, sanitized errors, and absent forbidden capabilities.
 
-Run focused tests, S2-RO-01 through S2-RO-04 regressions, full `python -m pytest`,
-and `python network_lab.py --task report-index`. Review all three candidate
-files independently, including documentation readability and no-execution
-boundaries. Validation must not modify existing tracked files. Optional missing
-runtime reports may produce a documented policy-accepted report-index WARN.
+The Lab2 extension adds exact-pair round trips, legacy Lab1 compatibility,
+resolver-authority checks, cross-lab and malformed-input pre-I/O guards, and
+synthetic consume-once/replay cases for both labs. Guards observe zero filesystem,
+path identity, SQLite connect, BEGIN, INSERT, and mutation counts on rejected
+bindings; test-ledger content, size, mtime, and directory entries remain intact.
+Valid consumption uses one exact connection and one parameterized INSERT, with
+no reconnect, retry, fallback ledger, or new replay namespace. Owner payload
+domain bytes and both `execution_authorized=False` contracts are preserved.
 
-Passing validation and review supports only local commit authorization. This
-slice does not itself authorize commit, push, PR, merge, or S2-RO-06 work.
+Validate in this order using a disposable external copy and writable external
+pytest basetemps: focused S2-RO-05, all `tests/stage2`, full pytest, report-index,
+then `git diff --check`. Python uses `-B`; pytest uses `-p no:cacheprovider`
+and `--tb=short`. Never print environment mappings or retain unsanitized
+tracebacks. All tests require zero failures; unchanged platform skips are
+acceptable. Optional missing reports may remain accepted WARN without a
+mandatory failure. No dependency installation or download is part of this task.
+Source HEAD/tree/status and content/size/mtime must remain unchanged during
+external validation; only the three authorized candidate files are applied.
+
+The separately bounded implementation authorization permits one local commit
+only after every mandatory gate passes. Independent review remains a separate
+gate. Push, PR, merge, cleanup, S2-RO-06-or-later Lab2 extension, real authorization
+or replay operations, Lab1/Lab2 contact, and Stage 3 require separate approval.
