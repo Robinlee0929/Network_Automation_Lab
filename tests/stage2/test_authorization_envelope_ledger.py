@@ -1,7 +1,7 @@
 """Synthetic offline S2-RO-05 evidence. No production ledger or credentials."""
 
 import ast
-from dataclasses import FrozenInstanceError, replace
+from dataclasses import FrozenInstanceError, fields, replace
 import hashlib
 import json
 import multiprocessing
@@ -401,3 +401,281 @@ def test_valid_snapshot_rollback_is_explicitly_not_protected(ledger):
     assert consume(ledger)
     doc = Path(__file__).resolve().parents[2] / "docs/automation_readiness/stage2_vrrp_readonly_s2_ro_05_authorization_envelope_ledger.md"
     assert "VALID_SNAPSHOT_ROLLBACK_PROTECTION = OUT_OF_SCOPE" in doc.read_text(encoding="utf-8")
+
+
+# Synthetic identities only. The endpoint is derived from the existing TEST-NET
+# fixture; these tests never connect to an endpoint or inspect a real ledger.
+def pair_inputs(lab):
+    args = inputs()
+    if lab == 1:
+        return args
+    envelope, request, registry, _ = args
+    request = replace(request, target_ref="target.mikrotik.lab02",
+                      credential_ref="credential.mikrotik.lab02")
+    envelope = replace(envelope, target_ref=request.target_ref,
+        credential_ref=request.credential_ref,
+        request_sha256=hashlib.sha256(request.to_canonical_bytes()).hexdigest())
+    first = registry.lookup("target.mikrotik.lab01")
+    second = replace(first, target_ref=request.target_ref, address=first.address[:-1] + "1")
+    registry = replace(registry, _lab2_endpoint=second)
+    binding = build_stage2_fixed_credential_resolver().resolve_for_target(
+        request.target_ref, request.credential_ref)
+    return envelope, request, registry, binding
+
+
+def tampered(instance, **changes):
+    """Bypass constructors only to prove consumption revalidates hostile data."""
+    result = object.__new__(type(instance))
+    for field in fields(instance):
+        object.__setattr__(result, field.name, changes.get(field.name, getattr(instance, field.name)))
+    return result
+
+
+class ReferenceSubclass(str):
+    pass
+
+
+def confused_refs(reference):
+    return (None, {}, "", reference.upper(), reference + ".alias", reference[:-1],
+            reference + "*", " " + reference, reference + " ", reference + "\n",
+            reference + "\x00", reference.replace("lab0", "lab"),
+            ReferenceSubclass(reference), reference.replace("mikrotik", "mikrotіk"))
+
+
+@pytest.mark.parametrize("lab", [1, 2])
+def test_exact_pair_roundtrip_binding_domain_and_no_authority(lab):
+    envelope, request, registry, binding = args = pair_inputs(lab)
+    raw = envelope.to_canonical_bytes()
+    assert m.parse_stage2_authorization_envelope(raw) == envelope
+    assert m.parse_stage2_authorization_envelope(raw).to_canonical_bytes() == raw
+    assert raw == json.dumps(envelope.to_dict(), sort_keys=True, separators=(",", ":"),
+                            ensure_ascii=False, allow_nan=False).encode("utf-8")
+    assert m.validate_stage2_authorization_binding(*args, now=1100) is None
+    assert m.SCHEMA_VERSION == "1.0"
+    domain = b"Network_Automation_Lab/S2-RO-05/authorization-envelope/v1\x00"
+    assert m.OWNER_PAYLOAD_DOMAIN == domain
+    assert m.owner_verification_payload(envelope) == domain + raw
+    assert envelope.execution_authorized is False
+    assert not hasattr(envelope, "__dict__")
+    with pytest.raises(FrozenInstanceError):
+        envelope.target_ref = "changed"
+    assert binding == build_stage2_fixed_credential_resolver().resolve_for_target(
+        request.target_ref, request.credential_ref)
+    assert registry.lookup(request.target_ref).target_ref == envelope.target_ref
+
+
+@pytest.mark.parametrize("lab", [1, 2])
+@pytest.mark.parametrize("field", ["target_ref", "credential_ref"])
+def test_envelope_rejects_mixed_unknown_and_noncanonical_pairs(lab, field):
+    envelope = pair_inputs(lab)[0]
+    other = pair_inputs(3 - lab)[0]
+    original = getattr(envelope, field)
+    for value in (*confused_refs(original), getattr(other, field), original.replace(f"lab0{lab}", "lab03")):
+        with pytest.raises(m.Stage2AuthorizationError) as caught:
+            replace(envelope, **{field: value})
+        assert str(caught.value) == "INVALID_ENVELOPE"
+        assert caught.value.__context__ is None
+        assert caught.value.__cause__ is None
+        # JSON cannot retain a str subclass, so test that case at object ingress.
+        if type(value) is not ReferenceSubclass:
+            with pytest.raises(m.Stage2AuthorizationError, match="INVALID_ENVELOPE"):
+                m.parse_stage2_authorization_envelope(encode(dict(envelope.to_dict(), **{field: value})))
+
+
+@pytest.mark.parametrize("lab", [1, 2])
+def test_pair_envelopes_keep_strict_parser_and_scalar_invariants(lab):
+    envelope = pair_inputs(lab)[0]
+    record, raw = envelope.to_dict(), envelope.to_canonical_bytes()
+    invalid_values = {
+        "schema_version": ("2.0", True), "authorization_id": (AUTH_ID.upper(), "not-a-uuid"),
+        "operation_id": ("other", None), "request_sha256": ("A" * 64, "0" * 63),
+        "authorization_ref": (" authorization.demo", "authorization." + "x" * 160),
+        "issued_at": (True, -1, 1000.0), "expires_at": (1000, 1301, m.MAX_UNIX_SECONDS + 1),
+        "max_attempts": (True, 0, 2),
+    }
+    for field, values in invalid_values.items():
+        for value in values:
+            with pytest.raises(m.Stage2AuthorizationError, match="INVALID_ENVELOPE"):
+                m.parse_stage2_authorization_envelope(encode(dict(record, **{field: value})))
+    for field in record:
+        missing = dict(record)
+        del missing[field]
+        with pytest.raises(m.Stage2AuthorizationError, match="INVALID_ENVELOPE"):
+            m.parse_stage2_authorization_envelope(encode(missing))
+    for candidate in (raw + b"\n", b" " + raw, b"\xef\xbb\xbf" + raw,
+                      json.dumps(record, indent=2).encode(), encode(dict(record, extra=1)),
+                      raw.replace(b'"schema_version":"1.0"', b'"schema_version":"1.0","schema_version":"1.0"'),
+                      raw.replace(b"mikrotik", b"mikrot\\u0069k"), raw + b"\xff"):
+        with pytest.raises(m.Stage2AuthorizationError, match="INVALID_ENVELOPE"):
+            m.parse_stage2_authorization_envelope(candidate)
+
+
+_MISMATCHES = (
+    "other_envelope", "other_binding", "request_cross_target", "request_cross_credential",
+    "envelope_cross_target", "envelope_cross_credential", "digest", "authorization",
+    "operation", "envelope_operation", "all_unknown", "binding_locator", "binding_backend",
+    "binding_type", "registry_type", "envelope_type", "request_type",
+)
+
+
+def invalid_args(lab, case):
+    args, other = list(pair_inputs(lab)), pair_inputs(3 - lab)
+    if case == "other_envelope": args[0] = other[0]
+    elif case == "other_binding": args[3] = other[3]
+    elif case.startswith("request_cross_"):
+        field = "target_ref" if case.endswith("target") else "credential_ref"
+        args[1] = tampered(args[1], **{field: getattr(other[1], field)})
+    elif case.startswith("envelope_cross_"):
+        field = "target_ref" if case.endswith("target") else "credential_ref"
+        args[0] = tampered(args[0], **{field: getattr(other[0], field)})
+    elif case == "digest": args[0] = replace(args[0], request_sha256="0" * 64)
+    elif case == "authorization": args[0] = replace(args[0], authorization_ref="authorization.other")
+    elif case == "operation": args[1] = tampered(args[1], operation_id="operation.other")
+    elif case == "envelope_operation": args[0] = tampered(args[0], operation_id="operation.other")
+    elif case == "all_unknown":
+        for index in (0, 1):
+            args[index] = tampered(args[index], target_ref="target.unknown.lab",
+                                   credential_ref="credential.unknown.lab")
+        args[3] = tampered(args[3], credential_ref="credential.unknown.lab", locator_ref="locator.unknown.lab")
+    elif case == "binding_locator": args[3] = tampered(args[3], locator_ref=other[3].locator_ref)
+    elif case == "binding_backend": args[3] = tampered(args[3], backend_kind="OTHER")
+    else: args[{"binding_type": 3, "registry_type": 2, "envelope_type": 0, "request_type": 1}[case]] = object()
+    return args
+
+
+def assert_pre_io_rejection(ledger, args, monkeypatch):
+    path = ledger._configuration.database_path
+    before = path.read_bytes()
+    before_stat = path.stat()
+    before_entries = sorted(item.name for item in path.parent.iterdir())
+    counts = dict(path_identity=0, filesystem=0, connect=0, begin=0, insert=0, mutation=0)
+
+    def filesystem(*a, **k):
+        counts["filesystem"] += 1
+        raise AssertionError("invalid binding reached filesystem")
+
+    def path_identity(*a, **k):
+        counts["path_identity"] += 1
+        raise AssertionError("invalid binding reached path identity")
+
+    class DeniedConnection:
+        in_transaction = False
+
+        def execute(self, sql, *a):
+            if sql.startswith("BEGIN"): counts["begin"] += 1
+            if sql.startswith("INSERT"): counts["insert"] += 1
+            raise AssertionError("invalid binding reached SQL")
+
+        def commit(self):
+            counts["mutation"] += 1
+            raise AssertionError("invalid binding reached commit")
+
+        def close(self): pass
+
+    def connect(*a, **k):
+        counts["connect"] += 1
+        return DeniedConnection()
+
+    with monkeypatch.context() as guard:
+        guard.setattr(m, "_path_identity", path_identity)
+        guard.setattr(m.sqlite3, "connect", connect)
+        for name in ("resolve", "stat", "lstat", "open", "read_bytes", "write_bytes", "mkdir"):
+            guard.setattr(Path, name, filesystem)
+        with pytest.raises(m.Stage2AuthorizationError) as caught:
+            consume(ledger, args)
+    assert caught.value.code is m.Stage2AuthorizationFailure.INVALID_BINDING
+    assert str(caught.value) == "INVALID_BINDING"
+    assert caught.value.__context__ is None
+    assert caught.value.__cause__ is None
+    assert counts == dict(path_identity=0, filesystem=0, connect=0, begin=0, insert=0, mutation=0)
+    assert path.read_bytes() == before
+    after_stat = path.stat()
+    assert (after_stat.st_size, after_stat.st_mtime_ns) == (before_stat.st_size, before_stat.st_mtime_ns)
+    assert sorted(item.name for item in path.parent.iterdir()) == before_entries
+
+
+@pytest.mark.parametrize("lab", [1, 2])
+@pytest.mark.parametrize("case", _MISMATCHES)
+def test_pair_and_binding_mismatches_have_zero_ledger_io(lab, case, ledger, monkeypatch):
+    assert_pre_io_rejection(ledger, invalid_args(lab, case), monkeypatch)
+
+
+@pytest.mark.parametrize("lab", [1, 2])
+@pytest.mark.parametrize("index,field", [(0, "target_ref"), (0, "credential_ref"),
+                                       (1, "target_ref"), (1, "credential_ref"), (3, "credential_ref")])
+def test_unknown_alias_prefix_case_and_noncanonical_inputs_have_zero_io(lab, index, field, ledger, monkeypatch):
+    original = pair_inputs(lab)
+    reference = getattr(original[index], field)
+    for value in (*confused_refs(reference), reference.replace(f"lab0{lab}", "lab03")):
+        args = list(original)
+        args[index] = tampered(args[index], **{field: value})
+        assert_pre_io_rejection(ledger, args, monkeypatch)
+
+
+@pytest.mark.parametrize("lab", [1, 2])
+def test_valid_pairs_consume_once_and_share_uuid_replay_key(lab, ledger, monkeypatch):
+    args = pair_inputs(lab)
+    real_connect = sqlite3.connect
+    expected_uri = ledger._configuration.database_path.as_uri() + "?mode=rw"
+    calls, statements, commits = [], [], []
+
+    class ObservedConnection:
+        def __init__(self, db): self.db = db
+        def __getattr__(self, name): return getattr(self.db, name)
+        def execute(self, sql, *parameters):
+            statements.append((sql, parameters))
+            return self.db.execute(sql, *parameters)
+        def commit(self):
+            commits.append(1)
+            return self.db.commit()
+
+    def connect(database, **options):
+        calls.append((database, options))
+        assert database == expected_uri
+        assert options == dict(uri=True, timeout=0, isolation_level=None)
+        return ObservedConnection(real_connect(database, **options))
+
+    with monkeypatch.context() as guard:
+        guard.setattr(m.sqlite3, "connect", connect)
+        result = consume(ledger, args)
+        assert len(calls) == 1
+        assert [sql for sql, _ in statements].count("BEGIN IMMEDIATE") == 1
+        inserts = [(sql, params) for sql, params in statements if sql.startswith("INSERT")]
+        assert len(inserts) == 1
+        assert inserts[0][0] == "INSERT INTO consumed_authorizations (authorization_id, envelope_sha256, consumed_at) VALUES (?, ?, ?)"
+        assert inserts[0][1] == ((AUTH_ID, hashlib.sha256(args[0].to_canonical_bytes()).hexdigest(), 1100),)
+        assert commits == [1]
+        assert result.execution_authorized is False
+        for repeated in (args, (replace(args[0], issued_at=1001), *args[1:]), pair_inputs(3 - lab)):
+            before_calls = len(calls)
+            with pytest.raises(m.Stage2AuthorizationError, match="REPLAY"):
+                consume(ledger, repeated)
+            assert len(calls) == before_calls + 1
+            assert commits == [1]
+    with real_connect(ledger._configuration.database_path) as db:
+        assert db.execute("SELECT * FROM consumed_authorizations").fetchall() == [
+            (AUTH_ID, result.envelope_sha256, 1100)]
+
+
+@pytest.mark.parametrize("lab", [1, 2])
+def test_envelope_and_binding_reuse_resolver_authority_before_time(monkeypatch, lab):
+    args = pair_inputs(lab)
+    resolver_type = type(build_stage2_fixed_credential_resolver())
+    original = resolver_type.resolve_for_target
+    calls = []
+
+    def observed(self, target_ref, credential_ref):
+        calls.append((target_ref, credential_ref))
+        return original(self, target_ref, credential_ref)
+
+    with monkeypatch.context() as guard:
+        guard.setattr(resolver_type, "resolve_for_target", observed)
+        args[0].__post_init__()
+    assert calls == [(args[1].target_ref, args[1].credential_ref)]
+    calls.clear()
+    with monkeypatch.context() as guard:
+        guard.setattr(resolver_type, "resolve_for_target", observed)
+        m.validate_stage2_authorization_binding(*args, now=1100)
+    assert calls == [(args[1].target_ref, args[1].credential_ref)] * 2
+    with pytest.raises(m.Stage2AuthorizationError, match="INVALID_BINDING"):
+        m.validate_stage2_authorization_binding(*invalid_args(lab, "other_binding"), now=-1)

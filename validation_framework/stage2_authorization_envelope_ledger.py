@@ -26,7 +26,7 @@ from validation_framework.stage2_mikrotik_target_registry import (
 )
 from validation_framework.stage2_mikrotik_credential_resolver import (
     Stage2CredentialBinding, STAGE2_FIXED_CREDENTIAL_REF,
-    build_stage2_fixed_credential_resolver,
+    Stage2CredentialResolverError, build_stage2_fixed_credential_resolver,
 )
 
 
@@ -106,9 +106,7 @@ class Stage2AuthorizationEnvelope:
 
     def __post_init__(self):
         exact = ((self.schema_version, SCHEMA_VERSION),
-                 (self.operation_id, VRRP_OBSERVATION_OPERATION_ID),
-                 (self.target_ref, STAGE2_FIXED_TARGET_REF),
-                 (self.credential_ref, STAGE2_FIXED_CREDENTIAL_REF))
+                 (self.operation_id, VRRP_OBSERVATION_OPERATION_ID))
         if (any(type(value) is not str or value != expected for value, expected in exact)
                 or not _uuid(self.authorization_id) or not _digest(self.request_sha256)
                 or type(self.authorization_ref) is not str
@@ -117,6 +115,16 @@ class Stage2AuthorizationEnvelope:
                 or not _seconds(self.issued_at) or not _seconds(self.expires_at)
                 or not 1 <= self.expires_at - self.issued_at <= MAX_VALIDITY_SECONDS
                 or type(self.max_attempts) is not int or self.max_attempts != 1):
+            _fail(Stage2AuthorizationFailure.INVALID_ENVELOPE)
+
+        # S2-RO-03 owns the exact pair policy; this check performs no I/O.
+        invalid_pair = False
+        try:
+            build_stage2_fixed_credential_resolver().resolve_for_target(
+                self.target_ref, self.credential_ref)
+        except Stage2CredentialResolverError:
+            invalid_pair = True
+        if invalid_pair:
             _fail(Stage2AuthorizationFailure.INVALID_ENVELOPE)
 
     def __repr__(self):
@@ -186,7 +194,9 @@ def validate_stage2_authorization_binding(envelope, request, registry, credentia
         validated_request = parse_stage2_vrrp_observation_request(request.to_dict())
         endpoint = registry.lookup(validated_request.target_ref)
         endpoint.__post_init__()
-        expected_binding = build_stage2_fixed_credential_resolver().resolve(request.credential_ref)
+        expected_binding = build_stage2_fixed_credential_resolver().resolve_for_target(
+            validated_request.target_ref, validated_request.credential_ref)
+        credential_binding.__post_init__()
         if (credential_binding != expected_binding
                 or envelope.operation_id != request.operation_id
                 or envelope.authorization_ref != request.authorization_ref
