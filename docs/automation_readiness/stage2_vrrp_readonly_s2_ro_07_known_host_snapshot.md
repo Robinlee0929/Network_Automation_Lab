@@ -1,9 +1,30 @@
 # S2-RO-07: Immutable offline known-host snapshot
 
-S2-RO-07 implements acquisition of immutable, exactly pinned server host-trust
-material. A successful snapshot has `execution_authorized=False`. It authorizes
-neither a connection nor authentication or command execution. This is a bounded
-implementation candidate; integration and live operation require separate gates.
+S2-RO-07 is an accepted, **INTEGRATED** Stage-2 component for acquisition of
+immutable, exactly pinned server host-trust material. Lab2 compatibility
+revalidation is complete: **REUSE_WITH_NEW_EXTERNAL_LAB2_DATA_ONLY**.
+A successful snapshot has `execution_authorized=False`. It is neither
+connection, authentication or command execution authority, nor Owner approval
+or replay authorization. Integration grants no fresh live authority.
+
+## Lab2 revalidation status
+
+The existing production acquisition supports Lab2 unchanged and has no Lab1-only
+path. It reuses the exact accepted S2-RO-02 `Stage2FixedTargetEndpoint` and binds
+the source record to its exact `target_ref`, `address` and `port`. No production
+or test change is required for Lab2 compatibility.
+
+Future Lab2 use requires its own separately provisioned external known-host
+source record and exact host-key record, with independently supplied Lab2 source
+path, FileId and complete-source SHA-256 pins and the exact Lab2 endpoint.
+Lab2 MUST NOT reuse Lab1 standing host trust or a shared standing Lab1/Lab2 key.
+No new known-host implementation, host-key algorithm or trust system is required;
+the algorithm remains `ssh-ed25519`.
+
+This is offline compatibility evidence only: no real Lab2 source, path, FileId,
+hash or host key was inspected or provisioned. It establishes no real Lab2 trust,
+Owner approval, credential availability, live host-key verification or live
+readiness. External provisioning and any live use require separate authorization.
 
 ## Purpose and allowed scope
 
@@ -215,21 +236,27 @@ freshness detector in S2-RO-07. A synthetic test demonstrates that limitation.
 There is no monotonic anchor, rollback-proof storage, hot reload or rotation
 service. This is separate from S2-RO-05 replay-ledger rollback assumptions.
 
-## Future S2-RO-09 handoff — documentation only
+## S2-RO-09 handoff boundary — documentation only
 
-Future transport receives the accepted S2-RO-02 endpoint, this immutable snapshot
-and a separate accepted credential path. Before any network access, it must
+The transport handoff receives the accepted S2-RO-02 endpoint, this immutable
+snapshot and a separate accepted credential path. Before any network access, it must
 validate the exact snapshot type, initialized immutable facts and endpoint
 target/address/port binding. Then it must restrict host-key negotiation to
 `ssh-ed25519`, perform SSH key exchange and server-signature verification,
 compare the presented algorithm and **complete public-key blob** exactly, and
 only then permit authentication.
 
-That future sequence must not reopen this source or consult ambient host trust.
+That sequence must not reopen this source or consult ambient host trust.
 None of the transport sequence is implemented here. Snapshot validity alone is
 never authorization to execute it.
 
+The bounded Lab2 compatibility review found no obvious Lab1-only restriction in
+this downstream handoff. It did not fully revalidate S2-RO-09 or prove Lab2
+transport: `FULL_S2_RO_09_COMPATIBILITY_OR_LIVE_READINESS_PROVEN = NO`.
+
 ## Validation and acceptance
+
+The implementation/revalidation safety policy is retained below.
 
 Use the repository-approved Python runtime with plugin autoload disabled,
 bytecode disabled and `-p no:cacheprovider`. On Windows, do not launch raw
@@ -256,14 +283,16 @@ are distinct from invoking device, credential or native acquisition APIs.
 
 Run `network_lab.py --task report-index` under the safe startup boundary after
 pytest passes. Its report-only generated outputs are local evidence, not
-candidate source. Policy-accepted optional-report WARN must be explained.
-Run `git diff --check` and directly check all three untracked files for trailing
+source changes. Policy-accepted optional-report WARN must be explained.
+Run `git diff --check` and directly check the reviewed files for trailing
 whitespace, UTF-8/BOM issues and unintended artifacts.
 
-Acceptance requires classified zero-failure validation, exact three-file scope,
-unchanged prior slices, an exact public API, independent security review and
-documentation readability review with no unresolved material findings. The
-candidate remains unstaged and uncommitted pending separate Owner authorization.
+The original implementation acceptance required classified zero-failure
+validation, exact three-file scope, unchanged prior slices, an exact public API,
+independent security review and
+documentation readability review with no unresolved material findings.
+S2-RO-07 is now accepted and integrated; the completed Lab2 revalidation requires
+only the status clarification above, not a new implementation or test change.
 
 ## References
 
