@@ -2,24 +2,33 @@
 
 ## Decision summary
 
-S2-RO-08 provides one immutable command policy and a bounded offline parser
-for `mikrotik.vrrp_status`. The sole command is `/interface vrrp print detail`.
+S2-RO-08 is an integrated Stage-2 component providing one immutable command
+policy and a bounded offline parser for `mikrotik.vrrp_status`. The sole command
+is `/interface vrrp print detail`.
 Neither component executes that command or grants execution authority.
 
-Current RouterOS 7.24.2 compatibility remediation: implementation candidate
-for independent review. The bounded extension supports dynamic Flags legend
+The RouterOS 7.24.2 compatibility remediation is completed and integrated
+through PR #79. The bounded extension supports dynamic Flags legend
 subsets, comment-only record headers, and `v3-checksum-as-v2`. It preserves
 fail-closed parsing and grants no live-run or retry authority.
 
-Original S2-RO-08 delivery status (historical): validated implementation
-candidate; independent security review PASS.
-Ready for separate local-commit authorization. S2-RO-09 remains future-only.
-The sequence index's earlier planning status is historical; this document
-records the Owner-authorized expanded S2-RO-08 implementation boundary.
+Lab2 command-policy revalidation is PASS: **REUSE_UNCHANGED**. Production
+command policy and parser remain unchanged for this classification. It requires
+no Lab2-specific command policy or external data, no new command, and no new
+parser for command-policy compatibility. It does not prove real Lab2 output
+compatibility, SSH readiness, or live execution.
+
+At original delivery, S2-RO-08 was a validated implementation candidate with
+independent security review PASS, awaiting separate local-commit authorization;
+S2-RO-09 was then future-only. Those are historical milestones, not current
+pending gates. S2-RO-08 and S2-RO-09 were subsequently integrated and used in
+the proven Lab1 Stage-2 workflow recorded in the
+[integration plan](actual_automation_integration_plan.md#stage-2-read-only-lab-adapter).
+That historical live proof grants no new execution authority or Lab2 readiness.
 
 ## Allowed scope and files
 
-The original five-file candidate consists of:
+The original five-file delivery consisted of:
 
 - [Command policy](../../validation_framework/stage2_vrrp_readonly_command_policy.py)
 - [Command-policy tests](../../tests/stage2/test_vrrp_readonly_command_policy.py)
@@ -27,12 +36,15 @@ The original five-file candidate consists of:
 - [Parser tests](../../tests/stage2/test_vrrp_readonly_parser.py)
 - This document.
 
-The current compatibility remediation changes only the parser, its tests,
-and this existing document. Command policy and evidence contracts are unchanged.
+The completed RouterOS compatibility remediation changed only the parser, its
+tests, and this existing document. Command policy and evidence contracts were
+unchanged. The Lab2 status correction changes only this document; production
+and test files, command identity, parser contract, and authority remain unchanged.
 
 The parser and tests are separate modules to keep command identity validation
-independent of untrusted-output parsing. S2-RO-01 through S2-RO-07 remain
-unchanged. No dependencies, CLI tasks, runners, or validation plugins are added.
+independent of untrusted-output parsing. This status correction changes no
+S2-RO-01 through S2-RO-07 component and adds no dependencies, CLI tasks, runners,
+or validation plugins.
 
 ## Forbidden scope
 
@@ -64,6 +76,20 @@ additional argument. Normal mutation, subclassing, copying, and serialization
 of the issued specification are prohibited. Python code with arbitrary
 in-process mutation privileges is outside this data-contract boundary.
 
+### Lab1 / Lab2 command-policy boundary
+
+Valid Lab1 and Lab2 requests resolve to the same exact immutable command spec
+shown above. Command selection is operation-based, not target-based:
+`target_ref` and `credential_ref` are revalidated request fields, not command
+selectors. There is no wildcard, default, or fallback command. Callers cannot
+supply command text or override the command policy version.
+
+Target independence grants neither transport nor execution authority.
+`execution_authorized=False` remains unchanged. S2-RO-08 does not execute
+commands, open SSH, access credentials or known-host trust, consume replay,
+verify Owner approval, or contact devices. Other authority boundaries remain
+separately gated.
+
 ## Repository evidence and selected format
 
 The parser uses the indexed, flag-based detail format demonstrated by
@@ -71,9 +97,9 @@ The parser uses the indexed, flag-based detail format demonstrated by
 historical bounded Stage-2 adapter. The S2-RO-01 contract defines normalized
 field types and limits. Older simplified `state=...` test inputs are not an
 accepted compatibility format. The original grammar used offline repository
-evidence. The current extension addresses three Owner-reported RouterOS 7.24.2
-output characteristics; tests retain only synthetic data. Codex performs no
-device collection or general RouterOS discovery for this remediation.
+evidence. The completed extension addressed three Owner-reported RouterOS 7.24.2
+output characteristics; tests retain only synthetic data. No device collection
+or general RouterOS discovery is performed by this documentation correction.
 
 References:
 
@@ -149,7 +175,7 @@ Optional auxiliary keys are exactly: `mtu`, `mac-address`, `arp`,
 `authentication`, `on-backup`, `on-master`, `on-fail`, `v3-protocol`,
 `sync-connection-tracking`, `connection-tracking-mode`, and
 `v3-checksum-as-v2`. The last key is the sole auxiliary allowlist addition for
-the current compatibility remediation. Their token syntax
+the completed RouterOS 7.24.2 compatibility remediation. Their token syntax
 is validated and their contents discarded; they are not semantically validated
 or executed, including callback-shaped text.
 
@@ -193,22 +219,32 @@ Errors expose only a bounded category with no chained underlying exception:
 
 No successful result is returned when any record fails.
 
-## Future transport boundary: documentation only
+## Transport boundary: historical design and current status
 
-S2-RO-09 must separately implement pinned SSH transport. Its proposed limits
-are one exec of the exact command, no PTY, no interactive shell, 15-second
+At original delivery, the future S2-RO-09 pinned SSH transport was a separate
+implementation gate. Its proposed limits were one exec of the exact command,
+no PTY, no interactive shell, 15-second
 connect timeout, 30-second command timeout, maximum 65,536 output bytes, zero
 retries, and one attempt. Stderr, nonzero exit, timeout, overflow, invalid UTF-8,
-and parser failure must fail closed. No timers, transport, or execution are
-implemented here. S2-RO-10 runtime composition and S2-RO-11 live entrypoint
-remain separately gated.
+and parser failure were required to fail closed. This paragraph retains that
+historical design context, not a claim that transport is still unimplemented.
+
+S2-RO-09 now exists as an integrated
+[pinned SSH transport](stage2_vrrp_readonly_s2_ro_09_pinned_ssh_transport.md)
+and was used in the proven Lab1 Stage-2 live workflow. No timers, transport,
+or execution are implemented by S2-RO-08. Lab2 compatibility/full transport
+revalidation is separate and is not established here. Neither Lab2 S2-RO-10
+runtime composition nor S2-RO-11 live-entrypoint readiness is established by
+this command-policy reuse classification. Stage 3 remains NOT STARTED.
 
 ## Validation and acceptance
 
-Required evidence is guarded focused tests with no skips, Stage-2 regression,
-full pytest, report-index policy acceptance, whitespace checks including new
-files, independent security review, and documentation readability review.
-Every skip must be classified; no S2-RO-08 test may skip.
+The original implementation acceptance required guarded focused tests with no
+skips, Stage-2 regression, full pytest, report-index policy acceptance,
+whitespace checks including new files, independent security review, and
+documentation readability review. Every skip must be classified; no S2-RO-08
+test may skip. These retained implementation criteria are distinct from bounded
+docs-only status validation.
 
 Windows validation disables plugin autoload, bytecode, and pytest cache. Native
 blockers precede pytest import. Source-reviewed ephemeral Colorama and
@@ -217,15 +253,17 @@ Win32 APIs or changing installed packages. Validation uses non-TTY output;
 pytest's TTY-only Colorama wrapper is not emulated. An unexpected native path
 is a stop condition, not permission to extend the guard.
 
-The current remediation must preserve its three-file boundary and pass guarded
-parser/contract/command-policy tests, Stage-2 regressions, full pytest, and
-report-index before its separately Owner-authorized local commit. Independent
-review remains a separate step; the original review below does not cover the
-new remediation. No push, PR, merge, fresh authorization, replay consumption,
-SSH, or second live attempt is authorized. A future live validation requires a
-new package and new direct Owner authorization; spent authorization stays spent.
+The completed RouterOS remediation had a three-file boundary and required
+guarded parser/contract/command-policy tests, Stage-2 regressions, full pytest,
+report-index, separate local-commit authorization, and independent review.
+Its original candidate-era review and commit gates are historical, not pending;
+the remediation was subsequently integrated through PR #79. The original
+S2-RO-08 review below remains evidence only for its original delivery scope.
+This document grants no push, PR, merge, replay consumption, SSH, or new live
+attempt authority. A future live validation requires a new package and new
+direct Owner authorization; spent authorization stays spent.
 
-### RouterOS 7.24.2 remediation validation
+### RouterOS 7.24.2 remediation validation (historical)
 
 Guarded offline validation with Python 3.13.7 and pytest 8.4.2 passed:
 
@@ -236,8 +274,9 @@ Guarded offline validation with Python 3.13.7 and pytest 8.4.2 passed:
 | Full pytest | 3,759 | 3,756 | 0 | 3 |
 
 Report-index: 14/14 PASS, zero failures, warnings, missing, or unknown entries.
-Whitespace and documentation readability review: PASS. Independent remediation
-review remains pending; these results establish readiness for that review only.
+Whitespace and documentation readability review: PASS. These were the
+pre-review remediation results; independent review was pending at that evidence
+checkpoint, not at the current integrated baseline.
 
 The existing offline launcher invokes pytest with
 `-p no:cacheprovider --color=no -ra`, followed by these target arguments:
@@ -271,5 +310,27 @@ results. Pytest 8.4.2 and Colorama 0.4.6 source inspection established that the
 non-TTY startup path requires a Colorama module import with no exported symbol;
 the ephemeral stub therefore exports no Colorama behavior.
 
-The evidence applies to the local candidate and grants no staging, commit,
-push, merge, or live-access authority.
+This historical evidence applies to the original candidate. Its then-pending
+staging/commit milestones do not describe the current integrated component;
+the evidence itself grants no new commit, push, merge, or live-access authority.
+
+### Completed Lab2 command-policy revalidation
+
+The separate offline Lab2 review concluded PASS / `REUSE_UNCHANGED` using an
+external disposable clean copy and guarded synthetic tests:
+
+| Validation | Passed | Failed | Skipped |
+| --- | --- | --- | --- |
+| S2-RO-08 command policy | 38 | 0 | 0 |
+| S2-RO-01 request contract | 84 | 0 | 0 |
+| Lab2 compatibility proof | 30 | 0 | 0 |
+| Report-index fixture tests | 4 | 0 | 0 |
+| Total | 156 | 0 | 0 |
+
+This is synthetic command-policy compatibility evidence, not CI or live-device
+evidence. The existing RouterOS 7.24.2 parser contract remains unchanged; no
+real Lab2 output, parser compatibility on real Lab2 output, or Lab2 SSH/live
+readiness was proven. No real known-host material, host key, credential, or
+fresh Owner authorization is established by this review. No S2-RO-09 Lab2
+revalidation, S2-RO-10 Lab2 composition, or S2-RO-11 Lab2 live entrypoint is
+claimed complete. Any further Lab2 work requires separate exact authorization.
