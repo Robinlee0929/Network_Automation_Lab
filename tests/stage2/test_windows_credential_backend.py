@@ -39,6 +39,7 @@ from validation_framework.stage2_windows_credential_backend import (
 _SYNTHETIC_TARGET = "synthetic.stage2.test.windows-credential-target"
 _SYNTHETIC_USERNAME = "synthetic-readonly-user"
 _SYNTHETIC_SECRET = b"synthetic-secret-bytes"
+_SYNTHETIC_WINDOWS_SECRET = _SYNTHETIC_SECRET.decode("utf-8").encode("utf-16-le")
 
 
 @pytest.fixture(autouse=True)
@@ -107,7 +108,7 @@ def _native_boundary_harness(
     monkeypatch,
     *,
     username=_SYNTHETIC_USERNAME,
-    secret_blob=_SYNTHETIC_SECRET,
+    secret_blob=_SYNTHETIC_WINDOWS_SECRET,
     blob_size=None,
     null_blob=False,
     read_succeeds=True,
@@ -213,7 +214,7 @@ def _configuration(**changes):
 def _record(**changes):
     values = {
         "username": _SYNTHETIC_USERNAME,
-        "secret_blob": _SYNTHETIC_SECRET,
+        "secret_blob": _SYNTHETIC_WINDOWS_SECRET,
     }
     values.update(changes)
     return Stage2WindowsCredentialApiRecord(**values)
@@ -230,10 +231,134 @@ def _backend(*, result=None, error=None):
 def _assert_error(function, code):
     with pytest.raises(Stage2WindowsCredentialError) as captured:
         function()
-    assert captured.value.code is code
-    assert str(captured.value) == code.value
-    assert repr(captured.value) == f"Stage2WindowsCredentialError('{code.value}')"
+    if (
+        captured.value.code is not code
+        or str(captured.value) != code.value
+        or repr(captured.value) != f"Stage2WindowsCredentialError('{code.value}')"
+        or captured.value.__cause__ is not None
+        or captured.value.__context__ is not None
+    ):
+        pytest.fail("credential error sanitization/category mismatch", pytrace=False)
     return captured.value
+
+
+def _assert_secret_equal(actual, expected):
+    """Avoid rendering credential material through assertion introspection."""
+
+    if type(actual) is not bytes or actual != expected:
+        pytest.fail("canonical password bytes mismatch", pytrace=False)
+
+
+@pytest.mark.parametrize(
+    "password",
+    [
+        pytest.param("synthetic-ascii", id="ascii"),
+        pytest.param("synthetic-\u00e9-e\u0301-\u6e2c\U0001f642", id="unicode-unmodified"),
+        pytest.param(" \tsynthetic\r\npassword\n ", id="whitespace-line-endings"),
+        pytest.param(" \t\r\n ", id="whitespace-only"),
+        pytest.param("synthetic\ufeffdata", id="interior-codepoint-preserved"),
+        pytest.param("x" * 2048, id="raw-exact-bound"),
+        pytest.param("\u0800" * 1365 + "x", id="utf8-exact-bound"),
+    ],
+)
+@pytest.mark.parametrize("lab", [0, 1], ids=["lab1", "lab2"])
+def test_stage2_password_contract_preserves_exact_text_for_each_target(password, lab):
+    target_ref, credential_ref = _LAB_PAIRS[lab]
+    binding = build_stage2_fixed_credential_resolver().resolve_for_target(
+        target_ref, credential_ref
+    )
+    raw_blob = password.encode("utf-16-le", errors="strict")
+    record = _record(secret_blob=raw_blob)
+    backend, fake, configuration = _lab_backend(lab, result=record)
+
+    resolved = backend.read_for_target(target_ref, binding)
+
+    _assert_secret_equal(resolved.secret_blob, password.encode("utf-8", errors="strict"))
+    _assert_secret_equal(record.secret_blob, raw_blob)
+    assert fake.read_calls == [configuration.credential_target]
+    assert repr(record) == "Stage2WindowsCredentialApiRecord(<redacted>)"
+    assert str(resolved) == "Stage2ResolvedCredential(<redacted>)"
+
+
+class _BytesSubclass(bytes):
+    pass
+
+
+@pytest.mark.parametrize(
+    "raw_blob",
+    [
+        pytest.param(_BytesSubclass(b"a\0"), id="bytes-subclass"),
+        pytest.param(memoryview(b"a\0"), id="memoryview"),
+        pytest.param(b"abc", id="odd-valid-utf8-no-fallback"),
+        pytest.param(b"\xff\xfe" + b"a\0", id="le-bom"),
+        pytest.param(b"\xfe\xff" + b"\0a", id="be-bom"),
+        pytest.param(b"\x00\xd8", id="lone-high-surrogate"),
+        pytest.param(b"\x00\xdc", id="lone-low-surrogate"),
+        pytest.param(b"\x00\xd8a\0", id="unpaired-surrogate"),
+        pytest.param(b"\x00\xdc\x00\xd8", id="reversed-surrogates"),
+        pytest.param(b"\0\0", id="nul-only"),
+        pytest.param("synthetic\0data".encode("utf-16-le"), id="embedded-nul"),
+    ],
+)
+def test_invalid_stage2_representation_is_sanitized_without_retry_or_fallback(raw_blob):
+    backend, fake = _backend(result=_record(secret_blob=raw_blob))
+
+    _assert_error(
+        lambda: backend.read(_binding()),
+        Stage2WindowsCredentialFailure.CREDENTIAL_SECRET_INVALID,
+    )
+
+    assert fake.read_calls == [_SYNTHETIC_TARGET]
+
+
+def test_valid_raw_blob_with_oversized_utf8_result_is_rejected():
+    raw_blob = ("\u0800" * 1366).encode("utf-16-le")
+    assert len(raw_blob) <= MAX_CREDENTIAL_SECRET_BLOB_LENGTH
+    backend, fake = _backend(result=_record(secret_blob=raw_blob))
+
+    _assert_error(
+        lambda: backend.read(_binding()),
+        Stage2WindowsCredentialFailure.CREDENTIAL_SECRET_TOO_LARGE,
+    )
+
+    assert fake.read_calls == [_SYNTHETIC_TARGET]
+
+
+def test_native_fake_copy_is_freed_before_backend_transcodes(monkeypatch):
+    password = "synthetic-e\u0301-\u6e2c\U0001f642 "
+    raw_blob = password.encode("utf-16-le")
+    backend, library, state = _native_boundary_harness(
+        monkeypatch, secret_blob=raw_blob
+    )
+    original = module._canonical_password_bytes
+
+    def observed_conversion(copied_blob):
+        assert state["freed"] is True
+        _assert_secret_equal(copied_blob, raw_blob)
+        state["events"].append("transcode")
+        return original(copied_blob)
+
+    monkeypatch.setattr(module, "_canonical_password_bytes", observed_conversion)
+    resolved = backend.read(_binding())
+
+    _assert_secret_equal(resolved.secret_blob, password.encode("utf-8"))
+    assert state["events"] == ["cred_read", "secret_read", "cred_free", "transcode"]
+    assert len(library.CredReadW.calls) == len(library.CredFree.calls) == 1
+
+
+def test_native_fake_invalid_encoding_is_freed_and_error_has_no_native_chain(monkeypatch):
+    backend, library, state = _native_boundary_harness(
+        monkeypatch, secret_blob=b"\x00\xd8"
+    )
+
+    _assert_error(
+        lambda: backend.read(_binding()),
+        Stage2WindowsCredentialFailure.CREDENTIAL_SECRET_INVALID,
+    )
+
+    assert state["events"] == ["cred_read", "secret_read", "cred_free"]
+    assert state["freed"] is True
+    assert len(library.CredReadW.calls) == len(library.CredFree.calls) == 1
 
 
 def _tampered_binding(**changes):
@@ -276,7 +401,7 @@ def test_exact_accepted_binding_reads_once_and_returns_immutable_material():
 
     assert type(credential) is Stage2ResolvedCredential
     assert credential.username == _SYNTHETIC_USERNAME
-    assert credential.secret_blob == _SYNTHETIC_SECRET
+    _assert_secret_equal(credential.secret_blob, _SYNTHETIC_SECRET)
     assert fake.read_calls == [_SYNTHETIC_TARGET]
     assert (binding.credential_ref, binding.backend_kind, binding.locator_ref) == before
     with pytest.raises(FrozenInstanceError):
@@ -497,7 +622,7 @@ def test_fake_api_is_used_without_calling_real_adapter(monkeypatch):
     monkeypatch.setattr(module, "_read_windows_credential_exact", unexpected_call)
     backend, fake = _backend(result=_record())
 
-    assert backend.read(_binding()).secret_blob == _SYNTHETIC_SECRET
+    _assert_secret_equal(backend.read(_binding()).secret_blob, _SYNTHETIC_SECRET)
     assert fake.read_calls == [_SYNTHETIC_TARGET]
     assert real_calls == []
 
@@ -523,7 +648,7 @@ def test_native_success_copies_before_free_without_pointer_escape(monkeypatch):
     assert type(resolved.username) is str
     assert type(resolved.secret_blob) is bytes
     assert resolved.username == _SYNTHETIC_USERNAME
-    assert resolved.secret_blob == _SYNTHETIC_SECRET
+    _assert_secret_equal(resolved.secret_blob, _SYNTHETIC_SECRET)
     assert state["events"] == ["cred_read", "secret_read", "cred_free"]
     assert state["freed"] is True
     assert state["win_dll_calls"] == [("Advapi32.dll", True)]
@@ -755,7 +880,7 @@ def test_target_aware_exact_binding_reads_once_with_immutable_redacted_output(la
     assert type(result) is Stage2ResolvedCredential
     assert result.username == _SYNTHETIC_USERNAME
     assert type(result.secret_blob) is bytes
-    assert result.secret_blob == _SYNTHETIC_SECRET
+    _assert_secret_equal(result.secret_blob, _SYNTHETIC_SECRET)
     assert {item.name for item in fields(result)} == {"username", "secret_blob"}
     assert before == tuple(getattr(binding, item.name) for item in fields(binding))
     for attribute, value in (("username", "changed"), ("secret_blob", b"changed")):
