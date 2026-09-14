@@ -4,20 +4,24 @@
 
 S2-RO-04 validates the trusted Stage-2 Windows password representation as strict
 UTF-16LE and returns the same password as strict UTF-8 transport bytes. This
-offline remediation corrects the credential handoff to the unchanged S2-RO-09
-transport. It does not authorize a live retry or claim compatibility PASS.
+remediation corrects the credential handoff to the unchanged S2-RO-09
+transport. Implementation and independent review passed, and PR #88 integrated
+the remediation into main. Separately authorized Lab2 compatibility validation
+passed pin verification, password authentication, and the exact read-only
+command. This evidence grants no new credential access or live authority.
 
 The trusted policy wrapper continues to accept the two exact
 S2-RO-03 target/credential bindings, each with its matching trusted locator.
 Legacy `read(binding)` remains Lab1-only; `read_for_target(target_ref, binding)`
 checks the exact pair through S2-RO-03 before comparing configuration identity.
-The native Windows reader is unchanged. This is an **offline remediation**,
-not permission to read a credential store or contact either lab.
+The native Windows reader is unchanged. S2-RO-04 remains the credential
+retrieval / representation validation boundary; S2-RO-09 owns pinned SSH
+transport. Neither this document nor the backend authorizes live execution.
 
-Status: implementation candidate ready for independent review after validation.
-
-No real Windows credential was read while implementing or validating this
-slice. Every behavioral test uses an injected fake Windows API.
+Status: remediation integrated; accepted Lab2 live authentication PASS.
+No real Windows credential was read during offline implementation or tests.
+Every behavioral test uses an injected fake Windows API. The later, separately
+authorized live evidence is distinguished from those offline tests below.
 
 ## Position in the flow
 
@@ -181,15 +185,64 @@ but failed password authentication; no remote command executed. An authorized
 offline Owner-secret comparison established that the stored bytes matched
 UTF-16LE and did not match UTF-8. The accepted source returned raw Windows
 bytes from S2-RO-04 and supplied them unchanged to S2-RO-09 authentication.
-This remediation corrects only that representation handoff. No credential
-store or device is accessed during this offline implementation or validation.
+The root cause was
+`S2_RO_04_TO_S2_RO_09_CREDENTIAL_ENCODING_CONTRACT_MISMATCH`.
+The bounded remediation corrected only that representation handoff, with no
+credential-store or device access during offline implementation and tests.
 
-`POST_REMEDIATION_LIVE_AUTHENTICATION_RESULT = NOT_YET_VERIFIED`
+### Historical pre-live status
 
-Independent read-only review and any later live retry require separate Owner
-authorization. Offline test success does not establish S2-RO-09 compatibility.
+Before the separately authorized review and live retry, the recorded status was
+`POST_REMEDIATION_LIVE_AUTHENTICATION_RESULT = NOT_YET_VERIFIED`.
+At that point independent review and a live retry still required separate
+Owner authorization; offline test success alone did not prove compatibility.
+This historical status is superseded by the accepted evidence below.
 
-## Offline reviewer evidence
+## Current accepted Lab2 status
+
+```text
+S2_RO_04_REMEDIATION_IMPLEMENTATION = PASS
+S2_RO_04_INDEPENDENT_REVIEW = PASS
+UNRESOLVED_MATERIAL_FINDINGS = 0
+S2_RO_04_MAINLINE_INTEGRATION = COMPLETE
+POST_REMEDIATION_LIVE_AUTHENTICATION_RESULT = PASS
+POST_REMEDIATION_LIVE_AUTHENTICATION_TARGET = target.mikrotik.lab02
+POST_REMEDIATION_LIVE_AUTHENTICATION_SCOPE = BOUNDED_S2_RO_09_COMPATIBILITY_VALIDATION
+```
+
+The accepted Lab2 run used strict UTF-16LE validation/decode followed by strict
+UTF-8 transport bytes from S2-RO-04. Exact S2-RO-07 Ed25519 pin verification
+passed before password authentication succeeded in unchanged S2-RO-09.
+The exact read-only command `/interface vrrp print detail` then succeeded once,
+with remote exit status 0 and no stderr. There were zero retries, no RouterOS
+configuration mutations, and no secret exposure.
+
+Independent review passed with zero unresolved material findings. This is
+bounded Lab2 compatibility evidence, not authority for another credential read,
+live attempt, runtime composition, or later slice. See the
+[S2-RO-09 accepted evidence](stage2_vrrp_readonly_s2_ro_09_pinned_ssh_transport.md#current-accepted-lab2-compatibility)
+for the exact operation and limits.
+
+### Mainline and CI traceability
+
+The accepted live evidence was produced on remediation candidate
+`cbf90a98dee6e11b6b125ad778e73f5ca7f6d1d3`. [PR #88](https://github.com/Robinlee0929/Network_Automation_Lab/pull/88)
+integrated it through normal merge commit
+`7a244c42d5d6f8de0499cd0e4619aee89bba6d9c`. The candidate and merge commit
+have the exact same complete tree, `0f47bb855bcf40c46b14c6feab8aa11c0eda6456`;
+therefore the accepted compatibility evidence applies to the integrated
+mainline content without another live run.
+
+[Post-merge Safe CI 34824181847](https://github.com/Robinlee0929/Network_Automation_Lab/actions/runs/34824181847)
+completed successfully for that exact merge SHA on the `push` event for
+`main`. Python: 4,003 collected, 4,001 passed, two skipped, zero failed.
+Node: 128 passed across nine files. Report-index: WARN, with one pass,
+13 optional reports missing, zero mandatory reports missing, zero failures,
+and zero unknown results. Typecheck, lint, Next.js build, and tracked-file
+immutability checks passed. These are retained results, not new validation
+performed by this documentation correction.
+
+## Historical offline reviewer evidence
 
 Focused tests use only a synthetic target, username, and secret with an injected
 fake API. They prove:
@@ -222,7 +275,7 @@ fake API. They prove:
   test guard denies real Windows library loading unless a test installs its
   deterministic fake boundary.
 
-Validation order is focused S2-RO-04 tests, unchanged focused S2-RO-09 tests,
+The implementation validation order was focused S2-RO-04 tests, unchanged focused S2-RO-09 tests,
 all `tests/stage2`, full pytest, report-index, and `git diff --check`. Python runs use `-B`; pytest disables its
 cache provider. Validation uses an external disposable copy of the exact
 candidate, without dependency downloads or source-worktree runtime artifacts.
@@ -251,9 +304,11 @@ RESTCONF, HTTP, live commands, live-device access, evidence serialization, or
 S2-RO-05 and later capabilities.
 
 No real Credential Manager target, username, password, or secret is committed.
-No real credential store was probed. The bounded implementation authorization
-permits one local commit only after validation passes. Push, pull request,
-merge, branch/worktree cleanup, and S2-RO-05 or later Lab2 work still require
-separate Owner authorization. No Lab2 credential record, known-host data,
+No real credential store was probed during offline implementation or tests.
+The historical implementation authorization allowed one local commit after
+validation; PR #88 integration and the later bounded live validation occurred
+under separate Owner authorizations. Any further push, pull request, merge,
+branch/worktree cleanup, or later Lab2 work requires separate Owner
+authorization. No Lab2 credential record, known-host data,
 authorization package, replay access, private-key access, live attempt, or
 Stage-3 work is authorized here.
