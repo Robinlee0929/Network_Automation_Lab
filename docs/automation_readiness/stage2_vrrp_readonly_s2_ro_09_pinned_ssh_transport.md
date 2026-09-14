@@ -3,13 +3,19 @@
 ## Decision summary
 
 S2-RO-09 implements one bounded pinned SSH transport primitive for the exact
-command `/interface vrrp print detail`. The current compatibility remediation
-adds only `diffie-hellman-group-exchange-sha256`, with a 2048-bit minimum for
-both the request and the server's actual group. Status: validated offline
-remediation candidate; independent security review PASS, zero unresolved
-material findings. Ready for separate local-commit authorization. The original
-slice's delivery evidence is retained below as historical context.
-No live operation is authorized by this document or by a successful result.
+command `/interface vrrp print detail`. Bounded Lab2 compatibility is proven:
+pinned Ed25519 verification, password authentication, and the exact command
+passed after the S2-RO-04 credential representation remediation. PR #88
+integrated the exact live-validated tree; post-merge Safe CI passed.
+Status: implementation and compatibility validation complete;
+ready for canonical closure. No live operation or next slice is authorized
+by this document or by a successful result.
+
+The earlier bounded KEX remediation added only
+`diffie-hellman-group-exchange-sha256`, with a 2048-bit minimum for both the
+request and the server's actual group. Its independent security review passed
+with zero unresolved material findings. Original delivery and offline
+remediation evidence remain historical context below.
 
 The Owner approved a private Paramiko `Transport.preferred_keys` override to
 enforce raw `ssh-ed25519` negotiation. This correction is part of this slice;
@@ -19,7 +25,7 @@ installed dependencies or global Paramiko state.
 
 ## Allowed scope
 
-Exactly three files comprise this candidate:
+The historical transport implementation/remediation candidate comprised three files:
 
 - [Transport](../../validation_framework/stage2_pinned_ssh_transport.py)
 - [Offline tests](../../tests/stage2/test_pinned_ssh_transport.py)
@@ -45,7 +51,9 @@ Arbitrary privileged in-process mutation remains outside the Python contract.
 There is no target resolution, Credential Manager call, known-host acquisition,
 Owner verification, approval acquisition, replay consumption, VRRP parsing,
 final S2-RO-01 evidence construction, or runtime orchestration. S2-RO-10 and
-S2-RO-11 remain separately gated. S2-RO-01 through S2-RO-08 are unchanged.
+S2-RO-11 remain separately gated. The transport remediation did not change
+S2-RO-01 through S2-RO-08; the later S2-RO-04 representation remediation was a
+separately bounded change and left S2-RO-09 source and tests unchanged.
 
 No DNS, hostname, alternate address, retry, reconnect, system/user known_hosts,
 TOFU, host-key rotation fallback, SSH agent, keyfile, public-key authentication,
@@ -108,10 +116,74 @@ exactly `diffie-hellman-group-exchange-sha256` while retaining
 was added. The remediation did not add `mlkem768x25519-sha256`,
 `curve25519-sha256`, `curve25519-sha256@libssh.org`, or any SHA-1 KEX.
 
+### Historical pre-live status
+
+After the offline KEX remediation, the recorded status was
 `POST_REMEDIATION_LIVE_CONNECTION_RESULT = NOT_YET_VERIFIED`.
-Post-remediation live success is not yet verified; this evidence does not
-establish a successful SSH handshake, host-key observation or known-host trust,
-authentication, RouterOS command execution, or a Stage-2 real live run.
+That historical evidence alone did not establish a successful handshake,
+host-key trust, authentication, command execution, or a Stage-2 real live run.
+The current bounded Lab2 result is recorded below.
+
+### Current accepted Lab2 compatibility
+
+Following Lab2 Ed25519 trust provisioning, later Lab2 validation reached
+`AUTHENTICATION_FAILED`. An authorized offline UTF-16LE diagnostic traced this
+to `S2_RO_04_TO_S2_RO_09_CREDENTIAL_ENCODING_CONTRACT_MISMATCH`.
+The bounded S2-RO-04 remediation validated/decoded trusted Windows UTF-16LE
+CredentialBlob bytes and returned strict UTF-8 transport bytes to unchanged
+S2-RO-09. Independent review passed with zero unresolved material findings.
+The separately authorized post-remediation live run then passed:
+
+| Evidence | Accepted result |
+| --- | --- |
+| Target / endpoint | `target.mikrotik.lab02` / `192.168.88.3:22` |
+| Host key / exact S2-RO-07 pin verification | `ssh-ed25519` / PASS |
+| Password authentication | PASS |
+| Exact remote command / dispatch | `/interface vrrp print detail` / PASS |
+| Remote exit status / stderr | 0 / absent |
+| Connection / password authentication attempts in the successful task | 1 / 1 |
+| Remote command executions / retries | 1 / 0 |
+| RouterOS configuration mutation / secret exposure | none / none |
+
+```text
+POST_REMEDIATION_LIVE_CONNECTION_RESULT = PASS
+POST_REMEDIATION_LIVE_AUTHENTICATION_RESULT = PASS
+POST_REMEDIATION_LIVE_COMMAND_RESULT = PASS
+LAB2_REVALIDATION_RESULT = PASS
+S2_RO_09_LAB2_COMPATIBILITY = PASS
+S2_RO_09_TECHNICAL_COMPATIBILITY_STATUS = PROVEN_ON_INTEGRATED_MAINLINE_CONTENT
+S2_RO_09_TECHNICAL_COMPATIBILITY = PROVEN
+S2_RO_09_IMPLEMENTATION_AND_COMPATIBILITY_VALIDATION = COMPLETE
+S2_RO_09_STATUS = READY_FOR_CANONICAL_CLOSURE
+NEXT_SLICE_AUTHORIZATION = SEPARATE_OWNER_DECISION_REQUIRED
+```
+
+This evidence proves bounded S2-RO-09 Lab2 compatibility. It does not prove
+S2-RO-10 runtime composition, S2-RO-11 live entrypoint, full Stage-2 end-to-end
+live execution, production readiness, or configuration mutation capability.
+It adds no Lab1 authentication claim and does not alter the separately recorded
+historical Lab1 closure or S2-RO-10/11 status in the integration plan.
+No password, raw credential blob, raw RouterOS stdout, private key, or secret
+hash is included. No new live validation is needed for this status correction.
+
+### Mainline and CI traceability
+
+The accepted live evidence was produced on remediation candidate
+`cbf90a98dee6e11b6b125ad778e73f5ca7f6d1d3`. [PR #88](https://github.com/Robinlee0929/Network_Automation_Lab/pull/88)
+integrated it through normal merge commit
+`7a244c42d5d6f8de0499cd0e4619aee89bba6d9c`. The candidate and merge commit
+have the exact same complete tree, `0f47bb855bcf40c46b14c6feab8aa11c0eda6456`;
+therefore the accepted compatibility evidence applies to the integrated
+mainline content without another live run.
+
+[Post-merge Safe CI 34824181847](https://github.com/Robinlee0929/Network_Automation_Lab/actions/runs/34824181847)
+completed successfully for that exact merge SHA on the `push` event for
+`main`. Python: 4,003 collected, 4,001 passed, two skipped, zero failed.
+Node: 128 passed across nine files. Report-index: WARN, with one pass,
+13 optional reports missing, zero mandatory reports missing, zero failures,
+and zero unknown results. Typecheck, lint, Next.js build, and tracked-file
+immutability checks passed. These are retained results, not new validation
+performed by this documentation correction.
 
 ### Bounded GEX SHA-256 compatibility
 
@@ -241,7 +313,7 @@ The two real Win32 trust-root tests and the
 Flask process/socket lifecycle test remain explicitly classified safety skips.
 No S2-RO-09 test may skip. No dependency or requirements change is needed.
 
-### Current KEX remediation evidence
+### Historical offline KEX remediation evidence
 
 - Base commit: `2a71dc8eb5d7dcb12f5c3b1e533a339d2744ecea`.
 - Base tree: `48eec05773e8a731ad953f5e86ab5a4e80ec67d1`.
