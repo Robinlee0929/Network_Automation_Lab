@@ -2,12 +2,18 @@
 
 ## Decision summary
 
-S2-RO-10 composes one bounded VRRP observation from the accepted S2-RO-01
-through S2-RO-09 components. Status: validated implementation candidate;
-independent security review PASS, zero unresolved material findings. Ready for
-separate local-commit authorization. It returns only normalized S2-RO-01 evidence.
-No startup executable, CLI, live task registration, or S2-RO-11 behavior is added.
-Implementation and offline validation do not authorize a live invocation.
+Historically, S2-RO-10 composed and proved one bounded Lab1 VRRP observation
+from the accepted S2-RO-01 through S2-RO-09 components. The current candidate
+is a bounded target-aware composition extension for the complete accepted
+Lab1 + Lab2 fixed registry. It returns only normalized S2-RO-01 evidence and
+preserves the historical Lab1 path through the same target-aware operations.
+
+The Lab2 candidate is validated only with synthetic offline data. It does not
+claim a Lab2 live PASS, a Lab2 S2-RO-11 PASS, full Stage-2 Lab2 runtime proof,
+production readiness, or write automation. No startup executable, CLI, live
+task registration, or S2-RO-11 behavior is added.
+
+`OFFLINE_IMPLEMENTATION_AUTHORITY != LIVE_EXECUTION_AUTHORITY`
 
 `OWNER_VERIFIED != AUTHORIZATION_CONSUMED != TRANSPORT_SUCCESS != PARSE_SUCCESS != FINAL_OBSERVATION_SUCCESS`
 
@@ -52,8 +58,12 @@ backend, transport override, or dependency dictionary in configuration.
 
 Exact types and initialized fields are required. Inert nested records are
 captured and revalidated with their accepted constructors before external
-acquisition. Target and known-host configuration must agree. Request fields
-are captured and reparsed with S2-RO-01. Malformed objects and subclasses fail.
+acquisition. The complete supplied S2-RO-02 fixed registry is retained, and
+the request's exact `target_ref` selects its endpoint through the existing
+registry policy. The single trusted known-host configuration must name an
+endpoint in that registry and must equal the endpoint selected for the current
+request before credential access or transport. Request fields are captured
+and reparsed with S2-RO-01. Malformed objects and subclasses fail.
 
 The Owner-root API has no public inert pin configuration validator. Composition
 reuses its private pure path, FileId, and digest syntax checks. This is an
@@ -71,9 +81,11 @@ there is no cache, hot reload, or repeated invocation loop here.
 ## Ordered composition
 
 1. Validate and capture the exact request and trusted configuration.
-2. Parse the canonical S2-RO-05 envelope, resolve and revalidate the S2-RO-02
-   endpoint, resolve the S2-RO-03 credential binding, and validate all bindings
-   against the current UTC time.
+2. Parse the canonical S2-RO-05 envelope, resolve and revalidate the exact
+   request-selected S2-RO-02 endpoint, require the trusted known-host endpoint
+   to equal it, resolve the S2-RO-03 credential binding with
+   `resolve_for_target(request.target_ref, request.credential_ref)`, and
+   validate all bindings against the current UTC time.
 3. Acquire the pinned Owner root once. Construct `Stage2OwnerVerifier` and call
    `verify(envelope)` once. Validate the exact issued result and matching facts.
    S2-RO-06 owns the sole approval read; composition performs no separate
@@ -83,7 +95,8 @@ there is no cache, hot reload, or repeated invocation loop here.
 5. Acquire the S2-RO-07 known-host snapshot once and check the exact endpoint,
    source pins, Ed25519 blob, digest, fingerprint, and non-authority flag.
 6. Revalidate authorization/time, construct the default S2-RO-04 backend, and
-   read the fixed credential binding once.
+   read the selected binding once with
+   `read_for_target(request.target_ref, binding)`.
 7. Resolve the S2-RO-08 command once, revalidate authorization/time immediately
    before transport, then invoke S2-RO-09 once with exactly endpoint, credential,
    snapshot, and command specification. Release the credential reference in a
@@ -100,7 +113,9 @@ there is no cache, hot reload, or repeated invocation loop here.
 
 S2-RO-05 performs additional internal pure binding checks. The S2-RO-08 parser
 internally revalidates command policy. These do not consume another replay
-record, read another credential, or execute another command.
+record, read another credential, or execute another command. Lab1 and Lab2 use
+this one target-aware composition path; there is no Lab2-to-Lab1 fallback,
+alternate credential read, or target-specific retry path.
 
 ## Replay and failure ownership
 
@@ -188,7 +203,11 @@ Python process or caller-owned objects.
 No prior-slice or integration-plan file changes, dependencies, second trust
 root, second evidence schema, environment authority, CLI, interactive prompt,
 startup executable, live registration, scheduler, worker, AI loop, retry,
-configuration backup/change, or S2-RO-11 implementation is included.
+configuration backup/change, or S2-RO-11 implementation is included. S2-RO-09
+is unchanged. The existing S2-RO-10 public API, seven-field configuration,
+sixteen-category failure enum, evidence schema, authority order, and replay
+semantics are unchanged. S2-RO-11 is not modified; its existing one-call handoff
+continues to depend only on request-bearing trusted configuration.
 
 The implementation task performs no real trust-root/approval/known-host read,
 Credential Manager read, persistent replay mutation, loopback, DNS, SSH, or
@@ -196,61 +215,33 @@ RouterOS access. Remote base inspection and local branch creation are separate
 repository operations, not device validation. Staging, commit, push, PR, merge,
 and branch/worktree deletion require separate authorization.
 
-## Validation and review
+## Offline validation and review boundary
 
-Tests use synthetic exact-type records and private module monkeypatches.
-Guards prohibit real acquisition and network. Integration tests use the real
-S2-RO-05 ledger only against disposable synthetic SQLite state, force each
-later failure, and prove the second invocation rejects before credentials or
-transport. Tests also cover strict types, missing fields, ordered counts,
-clock boundaries, unchanged stdout object identity, integrity cross-binding,
-credential reference release, and sanitized failures for every child category.
+Tests use synthetic exact-type records and private module monkeypatches. The
+Lab1 regression and Lab2 success cases verify exact target-aware resolver and
+backend arguments, one Owner verification, one replay consumption, one
+known-host acquisition, one credential acquisition, one command resolution,
+one transport invocation, exact command text, unchanged stdout object identity,
+one normalized evidence object, attempt one, retry zero, and non-authority.
 
-Required validation order: three-file scope, UTF-8 without BOM/LF-only,
-focused tests with no skips, Stage-2 regression, full pytest, report-index,
-whitespace, independent read-only security review, and documentation review.
-The accepted guarded Windows launcher disables native/network operations,
-plugin autoload, cache, and bytecode before pytest startup. Its inert non-TTY
-Colorama/click stubs avoid native console initialization. Allowed Python/Node
-regression children retain guards; Git fixtures remain temporary and local.
+Negative cases reject both cross-lab credential pairs, wrong trusted credential
+locators, known-host/endpoint mismatches, and authorization binding mismatches.
+Disposable SQLite cases prove that Lab2 authorization remains spent after
+known-host, credential, command, transport, parser, and evidence-construction
+failure. They also prove no alternate credential read, second replay success,
+transport fallback, or retry occurs.
 
-The two real Win32 trust-root tests and the Flask process/socket lifecycle test
-are the only accepted local safety skips. No S2-RO-10 test was skipped.
+Guards prohibit real Credential Manager, Owner trust-root, approval artifact,
+known-host source, socket, DNS, SSH, and device access. The real S2-RO-05 ledger
+is used only against disposable synthetic test state. No Lab1 or Lab2 device is
+contacted, and no RouterOS command is emitted. Public failures remain sanitized.
 
-### Recorded candidate evidence
-
-| Validation | Collected | Passed | Failed | Skipped |
-| --- | ---: | ---: | ---: | ---: |
-| Focused S2-RO-10 | 272 | 272 | 0 | 0 |
-| Stage 2 | 1416 | 1414 | 0 | 2 |
-| Full pytest | 3542 | 3539 | 0 | 3 |
-
-- Report-index: 14/14 PASS; zero failures, warnings, missing, or unknown entries.
-- UTF-8 without BOM, LF-only, and whitespace validation: PASS. Because the
-  candidate is untracked, direct file checks supplement `git diff --check`.
-- Independent read-only security review: PASS; zero unresolved material
-  findings. The reviewer inspected all three files and relevant accepted
-  contracts, using the recorded guarded test results without another test run.
-- Documentation readability and local reference links: PASS.
-- Prior S2-RO-01 through S2-RO-09 files: unchanged. Index: empty.
-
-Focused validation executed `tests/stage2/test_trusted_runtime_composition.py`;
-regression executed `tests/stage2` and the full suite. Report-index executed
-`network_lab.py --task report-index`. All used the accepted guarded Python 3.13
-validation setup, pytest 8.4.2, and existing dependencies. Early test-fixture
-issues involving an oversized pytest identifier and a deliberately mutated
-comparison object were corrected in the candidate tests; the final runs pass.
-
-The two Stage-2 skips are
-`test_disposable_regular_file_is_accepted_by_exact_native_path` and
-`test_confirmed_trailing_dot_alias_is_rejected_as_noncanonical`, both requiring
-real Win32 APIs. The additional full-suite skip is
-`test_canonical_flask_process_lifecycle_and_get_only_routes`, which requires
-process/socket lifecycle operations excluded by this task.
-
-Candidate hashes are frozen after validation and review and returned to the
-Owner. This delivery grants no staging, commit, push, PR, merge, or live-access
-authority. S2-RO-11 remains unimplemented and separately gated.
+The required local validation is exact three-file scope, UTF-8 without BOM and
+LF-only text, `git diff --check`, focused S2-RO-10 tests without skips, Stage-2
+regression with only accepted safety skips, full pytest with only accepted
+safety skips, report-index, documentation readability, and secret-diff review.
+An independent read-only security review remains the next task. This candidate
+does not inherit the historical Lab1 security review as a Lab2 review.
 
 References: [integration gates](actual_automation_integration_plan.md),
 [S2-RO-01 evidence](stage2_vrrp_readonly_s2_ro_01_contract.md),

@@ -115,7 +115,11 @@ def _configuration_values(configuration):
     registry = configuration.target_registry
     _exact(registry, _target.Stage2FixedTargetRegistry)
     endpoint = _capture(registry._endpoint, _target.Stage2FixedTargetEndpoint)
-    registry = _target.Stage2FixedTargetRegistry(endpoint)
+    lab2_endpoint = None
+    if registry._lab2_endpoint is not None:
+        lab2_endpoint = _capture(
+            registry._lab2_endpoint, _target.Stage2FixedTargetEndpoint)
+    registry = _target.Stage2FixedTargetRegistry(endpoint, lab2_endpoint)
     path = configuration.owner_trust_root_expected_path
     identity = configuration.owner_trust_root_expected_file_identity
     digest = configuration.owner_trust_root_expected_file_sha256
@@ -131,7 +135,7 @@ def _configuration_values(configuration):
     host = _host.Stage2KnownHostSourceConfiguration(
         host.expected_path, host.expected_file_identity, host.expected_file_sha256,
         _capture(host.expected_endpoint, _target.Stage2FixedTargetEndpoint))
-    _require(host.expected_endpoint == endpoint)
+    _require(registry.lookup(host.expected_endpoint.target_ref) == host.expected_endpoint)
     credential = _capture(configuration.credential_configuration,
                           _windows.Stage2TrustedWindowsCredentialConfiguration)
     return registry, path, identity, digest, ledger, host, credential
@@ -261,9 +265,12 @@ def _run(request, raw_envelope, configuration):
         stage = _F.TARGET_RESOLUTION_FAILED
         endpoint = _capture(configuration.target_registry.lookup(request.target_ref),
                             _target.Stage2FixedTargetEndpoint)
+        _require(configuration.known_host_configuration.expected_endpoint == endpoint)
         stage = _F.CREDENTIAL_BINDING_FAILED
-        binding = _capture(_resolver.build_stage2_fixed_credential_resolver().resolve(request.credential_ref),
-                           _resolver.Stage2CredentialBinding)
+        binding = _capture(
+            _resolver.build_stage2_fixed_credential_resolver().resolve_for_target(
+                request.target_ref, request.credential_ref),
+            _resolver.Stage2CredentialBinding)
         stage = _F.AUTHORIZATION_ENVELOPE_FAILED
         _authorization.validate_stage2_authorization_binding(
             envelope, request, configuration.target_registry, binding, now=_utc_now())
@@ -289,7 +296,8 @@ def _run(request, raw_envelope, configuration):
         stage = _F.CREDENTIAL_ACQUISITION_FAILED
         try:
             credential = _windows.build_stage2_windows_credential_backend(
-                configuration.credential_configuration).read(binding)
+                configuration.credential_configuration).read_for_target(
+                    request.target_ref, binding)
             _validate_credential(credential)
             stage = _F.COMMAND_POLICY_FAILED
             command = _policy.resolve_stage2_vrrp_readonly_command(request)

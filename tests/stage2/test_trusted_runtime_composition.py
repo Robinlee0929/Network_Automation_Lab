@@ -24,6 +24,7 @@ REAL_LEDGER = m._authorization.Stage2ReplayLedger
 REAL_PARSE = m._parser.parse_stage2_vrrp_readonly_output
 REAL_POLICY = m._policy.resolve_stage2_vrrp_readonly_command
 REAL_EVIDENCE = m._contract.Stage2VrrpObservationEvidence
+REAL_RESOLVER = m._resolver.build_stage2_fixed_credential_resolver
 
 
 def issue(kind, **values):
@@ -60,8 +61,11 @@ def setup(monkeypatch, tmp_path):
         "1.0", "mikrotik.vrrp_status", "run.synthetic", "target.mikrotik.lab01",
         "credential.mikrotik.lab01", "authorization.synthetic", True)
     endpoint = m._target.Stage2FixedTargetEndpoint(request.target_ref, "192.0.2.10", 22, "SSH", True)
+    lab2_endpoint = m._target.Stage2FixedTargetEndpoint(
+        m._target.STAGE2_SECOND_TARGET_REF, "192.0.2.20", 22, "SSH", True)
     config = m.Stage2TrustedRuntimeConfiguration(
-        m._target.Stage2FixedTargetRegistry(endpoint), r"c:\synthetic\root.json", IDENTITY, "a" * 64,
+        m._target.Stage2FixedTargetRegistry(endpoint, lab2_endpoint),
+        r"c:\synthetic\root.json", IDENTITY, "a" * 64,
         m._authorization.Stage2ReplayLedgerConfiguration(
             tmp_path / "synthetic.db", INSTANCE, (Path(__file__).resolve().parents[2],)),
         m._host.Stage2KnownHostSourceConfiguration(r"c:\synthetic\host.json", IDENTITY, "b" * 64, endpoint),
@@ -90,11 +94,13 @@ def setup(monkeypatch, tmp_path):
         source_file_identity=IDENTITY, source_artifact_sha256="b" * 64, execution_authorized=False)
     consumed = m._authorization.Stage2ConsumptionRecord(
         AUTH_ID, hashlib.sha256(envelope.to_canonical_bytes()).hexdigest(), 1100)
-    s = SimpleNamespace(request=request, config=config, envelope=envelope, root=root,
+    s = SimpleNamespace(request=request, config=config, envelope=envelope,
+        endpoint=endpoint, lab2_endpoint=lab2_endpoint, root=root,
         verification=verification, snapshot=snapshot, consumed=consumed,
         credential=m._windows.Stage2ResolvedCredential("synthetic-user", SENTINEL.encode()),
         command=REAL_POLICY(request), raw=RAW, trace=[], fail={}, returns={}, spent=False,
-        parser_input=None, transport_inputs=None, credential_released=[], evidence_fields=None)
+        parser_input=None, transport_inputs=None, resolver_inputs=[], credential_inputs=[],
+        credential_released=[], evidence_fields=None)
 
     def step(name, value):
         s.trace.append(name)
@@ -102,8 +108,13 @@ def setup(monkeypatch, tmp_path):
             raise s.fail[name]
         return s.returns.get(name, value)
 
+    class Resolver:
+        def resolve_for_target(self, target_ref, credential_ref):
+            s.resolver_inputs.append((target_ref, credential_ref))
+            return REAL_RESOLVER().resolve_for_target(target_ref, credential_ref)
+
     def acquire_root(**pins):
-        assert pins == dict(expected_path=config.owner_trust_root_expected_path,
+        assert pins == dict(expected_path=s.config.owner_trust_root_expected_path,
                             expected_file_identity=IDENTITY, expected_file_sha256="a" * 64)
         return step("root", s.root)
 
@@ -118,12 +129,13 @@ def setup(monkeypatch, tmp_path):
 
     class Ledger:
         def __init__(self, value):
-            assert value == config.replay_ledger_configuration
+            assert value == s.config.replay_ledger_configuration
             step("ledger", None)
 
         def consume(self, e, r, registry, binding, *, utc_now):
             assert e == s.envelope and r == s.request and registry == s.config.target_registry
-            assert binding == m._resolver.build_stage2_fixed_credential_resolver().resolve(r.credential_ref)
+            assert binding == REAL_RESOLVER().resolve_for_target(
+                r.target_ref, r.credential_ref)
             assert utc_now is m._utc_now
             value = step("consume", s.consumed)
             if s.spent:
@@ -132,20 +144,31 @@ def setup(monkeypatch, tmp_path):
             return value
 
     def host(value):
-        assert value.expected_path == r"c:\synthetic\host.json"
-        assert value.expected_file_identity == IDENTITY and value.expected_file_sha256 == "b" * 64
-        assert value.expected_endpoint.address == "192.0.2.10"
+        expected = s.config.known_host_configuration
+        assert value.expected_path == expected.expected_path
+        assert value.expected_file_identity == expected.expected_file_identity
+        assert value.expected_file_sha256 == expected.expected_file_sha256
+        assert value.expected_endpoint == expected.expected_endpoint
         return step("host", s.snapshot)
 
     class Backend:
-        def read(self, binding):
-            assert binding.credential_ref == request.credential_ref
+        def __init__(self, value):
+            self.configuration = value
+
+        def read_for_target(self, target_ref, binding):
+            s.credential_inputs.append((target_ref, binding))
+            expected = REAL_RESOLVER().resolve_for_target(
+                target_ref, binding.credential_ref)
+            if self.configuration.locator_ref != expected.locator_ref:
+                raise m._windows.Stage2WindowsCredentialError(
+                    m._windows.Stage2WindowsCredentialFailure.UNSUPPORTED_LOCATOR)
+            assert binding == expected
             return step("credential", s.credential)
 
     def backend(value):
-        assert value == config.credential_configuration
+        assert value == s.config.credential_configuration
         step("backend", None)
-        return Backend()
+        return Backend(value)
 
     def command(value):
         assert value == s.request
@@ -153,7 +176,7 @@ def setup(monkeypatch, tmp_path):
 
     def result():
         return issue(m._transport.Stage2PinnedSshCommandResult,
-            schema_version="s2-ro-09.pinned-ssh-command-result.v1", target_ref=request.target_ref,
+            schema_version="s2-ro-09.pinned-ssh-command-result.v1", target_ref=s.request.target_ref,
             command_policy_version=s.command.command_policy_version, stdout_bytes=s.raw,
             stdout_sha256=hashlib.sha256(s.raw).hexdigest(), host_key_fingerprint=s.snapshot.host_key_fingerprint,
             exit_status=0, execution_attempts=1, execution_authorized=False)
@@ -161,7 +184,7 @@ def setup(monkeypatch, tmp_path):
     def transport(*args):
         assert len(args) == 4
         ep, cred, snap, spec = args
-        assert type(ep) is m._target.Stage2FixedTargetEndpoint and ep.address == "192.0.2.10"
+        assert type(ep) is m._target.Stage2FixedTargetEndpoint and ep == s.endpoint
         assert cred is s.credential and snap is s.snapshot and spec is s.command
         s.transport_inputs = (type(ep), type(cred), type(snap), type(spec))
         return step("transport", result())
@@ -186,6 +209,8 @@ def setup(monkeypatch, tmp_path):
         step("binding", None)
         return real_binding(*args, **kwargs)
 
+    monkeypatch.setattr(m._resolver, "build_stage2_fixed_credential_resolver",
+                        lambda: Resolver())
     monkeypatch.setattr(m._root, "acquire_owner_trust_root_configuration", acquire_root)
     monkeypatch.setattr(m._owner, "Stage2OwnerVerifier", Verifier)
     monkeypatch.setattr(m._owner.Stage2ExactOwnerApprovalSource, "read_exact", deny)
@@ -202,6 +227,53 @@ def setup(monkeypatch, tmp_path):
     monkeypatch.setattr(m, "_monotonic_now", lambda: next(ticks))
     s.result = result
     s.call = lambda: m.execute_stage2_vrrp_trusted_runtime(s.request, s.envelope.to_canonical_bytes(), s.config)
+    return s
+
+
+@pytest.fixture
+def lab2_setup(setup):
+    s = setup
+    s.request = m._contract.Stage2VrrpObservationRequest(
+        "1.0", "mikrotik.vrrp_status", "run.synthetic",
+        m._target.STAGE2_SECOND_TARGET_REF,
+        m._resolver.STAGE2_SECOND_CREDENTIAL_REF,
+        "authorization.synthetic", True)
+    s.endpoint = s.lab2_endpoint
+    s.config = replace(
+        s.config,
+        known_host_configuration=m._host.Stage2KnownHostSourceConfiguration(
+            r"c:\synthetic\host.json", IDENTITY, "b" * 64, s.endpoint),
+        credential_configuration=m._windows.Stage2TrustedWindowsCredentialConfiguration(
+            m._resolver.STAGE2_SECOND_CREDENTIAL_LOCATOR_REF,
+            "synthetic-only-target"))
+    s.envelope = m._authorization.Stage2AuthorizationEnvelope(
+        "1.0", AUTH_ID, s.request.operation_id,
+        hashlib.sha256(s.request.to_canonical_bytes()).hexdigest(),
+        s.request.authorization_ref, s.request.target_ref,
+        s.request.credential_ref, 1000, 1300, 1)
+    s.verification = issue(
+        m._owner.Stage2VerifiedOwnerApproval,
+        schema_version=m._owner.APPROVAL_SCHEMA_VERSION,
+        artifact_sha256="c" * 64, approval_ref=s.request.authorization_ref,
+        verified_issuer_ref=s.root.issuer_ref,
+        approval_source_id=s.root.approval_source_id,
+        public_key_fingerprint=s.root.public_key_sha256_fingerprint,
+        payload_sha256=hashlib.sha256(
+            m._authorization.owner_verification_payload(s.envelope)).hexdigest(),
+        verified=True, execution_authorized=False)
+    s.snapshot = issue(
+        m._host.Stage2KnownHostSnapshot,
+        schema_version="s2-ro-07.known-host.v1",
+        target_ref=s.request.target_ref, address=s.endpoint.address, port=22,
+        host_key_algorithm="ssh-ed25519",
+        host_key_blob=s.snapshot.host_key_blob,
+        host_key_sha256=s.snapshot.host_key_sha256,
+        host_key_fingerprint=s.snapshot.host_key_fingerprint,
+        source_file_identity=IDENTITY, source_artifact_sha256="b" * 64,
+        execution_authorized=False)
+    s.consumed = m._authorization.Stage2ConsumptionRecord(
+        AUTH_ID, hashlib.sha256(s.envelope.to_canonical_bytes()).hexdigest(), 1100)
+    s.command = REAL_POLICY(s.request)
     return s
 
 
@@ -239,10 +311,45 @@ def test_success_exact_order_and_evidence(setup):
     assert evidence.raw_output_sha256 == hashlib.sha256(RAW).hexdigest()
     assert evidence.records[0].instance_name == "synthetic-vrrp"
     assert evidence.attempt_count == 1 and evidence.retry_count == 0
+    assert s.resolver_inputs == [(s.request.target_ref, s.request.credential_ref)]
+    assert s.credential_inputs == [(
+        s.request.target_ref,
+        REAL_RESOLVER().resolve_for_target(
+            s.request.target_ref, s.request.credential_ref))]
     assert set(s.evidence_fields) == {f.name for f in fields(REAL_EVIDENCE)}
     assert SENTINEL.encode() not in evidence.to_canonical_bytes()
     assert RAW not in evidence.to_canonical_bytes()
     assert m._contract.parse_stage2_vrrp_evidence_canonical_json(evidence.to_canonical_bytes()) == evidence
+
+
+def test_lab2_success_uses_one_exact_target_aware_path(lab2_setup):
+    s = lab2_setup
+    evidence = s.call()
+    binding = REAL_RESOLVER().resolve_for_target(
+        s.request.target_ref, s.request.credential_ref)
+    assert s.config.target_registry.lookup(s.request.target_ref) == s.endpoint
+    assert s.endpoint.target_ref == m._target.STAGE2_SECOND_TARGET_REF
+    assert binding.credential_ref == m._resolver.STAGE2_SECOND_CREDENTIAL_REF
+    assert s.resolver_inputs == [(s.request.target_ref, s.request.credential_ref)]
+    assert s.credential_inputs == [(s.request.target_ref, binding)]
+    assert s.trace == [
+        "binding", "root", "verifier", "verify", "ledger", "consume", "host",
+        "binding", "backend", "credential", "command", "binding", "transport",
+        "parser", "evidence"]
+    assert s.trace.count("verify") == 1
+    assert s.trace.count("consume") == 1
+    assert s.trace.count("host") == 1
+    assert s.trace.count("credential") == 1
+    assert s.trace.count("command") == 1
+    assert s.trace.count("transport") == 1
+    assert s.command.command_text == "/interface vrrp print detail"
+    assert s.parser_input is s.raw
+    assert type(evidence) is REAL_EVIDENCE
+    assert evidence.target_ref == m._target.STAGE2_SECOND_TARGET_REF
+    assert evidence.attempt_count == 1 and evidence.retry_count == 0
+    assert evidence.execution_authorized is False
+    assert evidence.raw_output_byte_count == len(s.raw)
+    assert evidence.raw_output_sha256 == hashlib.sha256(s.raw).hexdigest()
 
 
 @pytest.mark.parametrize("value", [None, {}, object(), True])
@@ -530,6 +637,43 @@ def test_real_replay_remains_spent_after_each_downstream_failure(setup, monkeypa
     assert "host" not in setup.trace and "credential" not in setup.trace and "transport" not in setup.trace
 
 
+@pytest.mark.parametrize("stage,category", [
+    ("host", F.KNOWN_HOST_ACQUISITION_FAILED),
+    ("credential", F.CREDENTIAL_ACQUISITION_FAILED),
+    ("command", F.COMMAND_POLICY_FAILED),
+    ("transport", F.TRANSPORT_FAILED),
+    ("parser", F.OUTPUT_PARSE_FAILED),
+    ("evidence", F.EVIDENCE_CONSTRUCTION_FAILED),
+])
+def test_lab2_real_replay_remains_spent_after_each_downstream_failure(
+        lab2_setup, monkeypatch, stage, category):
+    s = lab2_setup
+    path = s.config.replay_ledger_configuration.database_path
+    with sqlite3.connect(path) as connection:
+        for ddl in m._authorization._SCHEMA:
+            connection.execute(ddl)
+        connection.execute(
+            "INSERT INTO ledger_metadata VALUES (?, ?)", ("1.0", INSTANCE))
+    monkeypatch.setattr(m._authorization, "Stage2ReplayLedger", REAL_LEDGER)
+    monkeypatch.setattr(m, "_monotonic_now", lambda: 1)
+    s.fail[stage] = RuntimeError(SENTINEL)
+    rejected(s.call, category)
+    with sqlite3.connect(path) as connection:
+        assert connection.execute(
+            "SELECT authorization_id FROM consumed_authorizations").fetchall() == [
+                (AUTH_ID,)]
+    assert s.trace.count("transport") <= 1
+    assert s.trace.count("credential") <= 1
+    assert len(s.credential_inputs) <= 1
+    s.trace.clear()
+    s.credential_inputs.clear()
+    rejected(s.call, F.REPLAY_REJECTED)
+    assert "host" not in s.trace
+    assert "credential" not in s.trace
+    assert "transport" not in s.trace
+    assert s.credential_inputs == []
+
+
 def test_request_and_nested_configuration_captured_before_external_stage(setup, monkeypatch):
     original = m._root.acquire_owner_trust_root_configuration
     # Mutate only caller-owned inputs after private capture.
@@ -543,6 +687,7 @@ def test_request_and_nested_configuration_captured_before_external_stage(setup, 
         object.__setattr__(supplied_config.target_registry._endpoint, "address", "192.0.2.99")
         setup.request = saved_request
         setup.config = saved_config
+        setup.endpoint = saved_config.target_registry.lookup(saved_request.target_ref)
         return value
     monkeypatch.setattr(m._root, "acquire_owner_trust_root_configuration", mutate)
     evidence = m.execute_stage2_vrrp_trusted_runtime(
@@ -595,6 +740,91 @@ def test_unknown_credential_binding_prevents_root(setup):
     setup.request = replace(setup.request, credential_ref="credential.unknown")
     rejected(setup.call, F.CREDENTIAL_BINDING_FAILED)
     assert setup.trace == []
+
+
+def test_lab2_target_rejects_lab1_credential_without_fallback(lab2_setup):
+    s = lab2_setup
+    s.request = replace(
+        s.request, credential_ref=m._resolver.STAGE2_FIXED_CREDENTIAL_REF)
+    rejected(s.call, F.CREDENTIAL_BINDING_FAILED)
+    assert s.resolver_inputs == [(
+        m._target.STAGE2_SECOND_TARGET_REF,
+        m._resolver.STAGE2_FIXED_CREDENTIAL_REF)]
+    assert s.credential_inputs == [] and s.trace == []
+
+
+def test_lab1_target_rejects_lab2_credential_without_fallback(setup):
+    s = setup
+    s.request = replace(
+        s.request, credential_ref=m._resolver.STAGE2_SECOND_CREDENTIAL_REF)
+    rejected(s.call, F.CREDENTIAL_BINDING_FAILED)
+    assert s.resolver_inputs == [(
+        m._target.STAGE2_FIXED_TARGET_REF,
+        m._resolver.STAGE2_SECOND_CREDENTIAL_REF)]
+    assert s.credential_inputs == [] and s.trace == []
+
+
+@pytest.mark.parametrize("fixture_name,wrong_locator", [
+    ("setup", m._resolver.STAGE2_SECOND_CREDENTIAL_LOCATOR_REF),
+    ("lab2_setup", m._resolver.STAGE2_CREDENTIAL_LOCATOR_REF),
+])
+def test_wrong_trusted_credential_locator_rejects_without_acquisition_or_transport(
+        request, fixture_name, wrong_locator):
+    s = request.getfixturevalue(fixture_name)
+    s.config = replace(
+        s.config,
+        credential_configuration=m._windows.Stage2TrustedWindowsCredentialConfiguration(
+            wrong_locator, "synthetic-only-target"))
+    rejected(s.call, F.CREDENTIAL_ACQUISITION_FAILED)
+    assert len(s.credential_inputs) == 1
+    assert s.trace.count("credential") == 0
+    assert s.trace.count("consume") == 1 and s.spent
+    assert "transport" not in s.trace
+
+
+def test_lab2_target_rejects_lab1_known_host_before_credentials(lab2_setup):
+    s = lab2_setup
+    lab1_endpoint = s.config.target_registry.lookup(
+        m._target.STAGE2_FIXED_TARGET_REF)
+    s.config = replace(
+        s.config,
+        known_host_configuration=m._host.Stage2KnownHostSourceConfiguration(
+            r"c:\synthetic\host.json", IDENTITY, "b" * 64, lab1_endpoint))
+    rejected(s.call, F.TARGET_RESOLUTION_FAILED)
+    assert s.resolver_inputs == [] and s.credential_inputs == []
+    assert s.trace == []
+
+
+def test_registry_known_host_endpoint_mismatch_rejects_configuration(setup):
+    s = setup
+    mismatched_endpoint = replace(s.endpoint, address="192.0.2.99")
+    mismatched_host = m._host.Stage2KnownHostSourceConfiguration(
+        r"c:\synthetic\host.json", IDENTITY, "b" * 64, mismatched_endpoint)
+    invalid = drift(s.config, "known_host_configuration", mismatched_host)
+    rejected(
+        lambda: m.execute_stage2_vrrp_trusted_runtime(
+            s.request, s.envelope.to_canonical_bytes(), invalid),
+        F.INVALID_TRUSTED_RUNTIME_CONFIGURATION)
+    assert s.resolver_inputs == [] and s.credential_inputs == []
+    assert s.trace == []
+
+
+@pytest.mark.parametrize("field,value", [
+    ("target_ref", m._target.STAGE2_FIXED_TARGET_REF),
+    ("credential_ref", m._resolver.STAGE2_FIXED_CREDENTIAL_REF),
+])
+def test_lab2_authorization_target_or_credential_mismatch_rejects_before_root(
+        lab2_setup, monkeypatch, field, value):
+    s = lab2_setup
+    mismatched = drift(s.envelope, field, value)
+    monkeypatch.setattr(
+        m._authorization, "parse_stage2_authorization_envelope",
+        lambda raw: mismatched)
+    rejected(
+        lambda: m.execute_stage2_vrrp_trusted_runtime(s.request, b"synthetic", s.config),
+        F.AUTHORIZATION_ENVELOPE_FAILED)
+    assert s.trace == ["binding"]
+    assert s.credential_inputs == []
 
 
 @pytest.mark.parametrize("point,category", [("utc", F.AUTHORIZATION_ENVELOPE_FAILED), ("monotonic", F.INTERNAL_FAILURE)])
