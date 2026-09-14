@@ -2,24 +2,70 @@
 
 ## Decision summary
 
-Historically, S2-RO-10 composed and proved one bounded Lab1 VRRP observation
-from the accepted S2-RO-01 through S2-RO-09 components. The current candidate
-is a bounded target-aware composition extension for the complete accepted
-Lab1 + Lab2 fixed registry. It returns only normalized S2-RO-01 evidence and
-preserves the historical Lab1 path through the same target-aware operations.
+The bounded Lab2 target-aware composition extension is integrated into `main`
+and proven by offline validation, an independent read-only security review,
+and post-merge hosted Safe CI. It retains the complete accepted Lab1 + Lab2
+fixed registry, resolves the request-selected target, and returns only
+normalized S2-RO-01 evidence. Lab1 and Lab2 use the same target-aware path,
+with no Lab2-to-Lab1 fallback.
 
-The Lab2 candidate is validated only with synthetic offline data. It does not
-claim a Lab2 live PASS, a Lab2 S2-RO-11 PASS, full Stage-2 Lab2 runtime proof,
-production readiness, or write automation. No startup executable, CLI, live
-task registration, or S2-RO-11 behavior is added.
+```text
+S2_RO_10_LAB2_OFFLINE_COMPOSITION = PASS
+S2_RO_10_LAB2_MAINLINE_INTEGRATION = COMPLETE
+S2_RO_10_LAB2_HOSTED_CI = PASS
+S2_RO_10_LAB2_OFFLINE_STATUS = INTEGRATED_AND_HOSTED_CI_PROVEN
+INDEPENDENT_SECURITY_REVIEW = PASS
+UNRESOLVED_MATERIAL_FINDINGS = 0
+S2_RO_10_LAB2_LIVE_VALIDATION = NOT_PERFORMED
+S2_RO_10_LAB2_LIVE_AUTHORITY = NOT_GRANTED
+NEXT_LIVE_ACTION = SEPARATE_EXACT_OWNER_AUTHORIZATION_REQUIRED
+CANONICAL_STATUS = OFFLINE_INTEGRATED_AND_HOSTED_CI_PROVEN_LIVE_NOT_AUTHORIZED
+```
+
+This status does not claim a Lab2 live PASS, device compatibility, a Lab2
+S2-RO-11 live PASS, full Stage-2 Lab2 runtime proof, production readiness, or
+write automation. No startup executable, CLI, live task registration, or
+S2-RO-11 behavior was added.
 
 `OFFLINE_IMPLEMENTATION_AUTHORITY != LIVE_EXECUTION_AUTHORITY`
 
 `OWNER_VERIFIED != AUTHORIZATION_CONSUMED != TRANSPORT_SUCCESS != PARSE_SUCCESS != FINAL_OBSERVATION_SUCCESS`
 
+## Historical delivery context
+
+The original S2-RO-10 delivery composed and proved one bounded Lab1 VRRP
+observation from the accepted S2-RO-01 through S2-RO-09 components. A later
+scope review found three Lab1-only assumptions in composition: registry
+retention and the target context supplied to credential resolution and
+credential reading. The bounded extension corrected those assumptions by
+retaining the complete fixed registry and using the existing target-aware
+resolver and backend operations. It subsequently passed offline validation,
+independent review, PR integration, and hosted CI.
+
+## Integration and review evidence
+
+- Implementation commit reviewed: `0750551cc4c1c941b250dc3328816ecb625549fc`.
+- Independent read-only security review: **PASS**, with zero material findings,
+  one non-material observation, and zero unresolved material findings.
+- Pull request: **#90**, which integrated the implementation commit.
+- Merge commit: `1eca8576e1da8aba41cb3c8be23b54a9b720371f`.
+- Merge tree: `2c7fa1ac21221b2d8f26ce47663941549710230c`.
+- Post-merge Safe CI run: **34870907764**, successful for the `push` event on
+  `main` at the merge commit.
+- Python validation: 4,018 collected; 4,016 passed; 2 accepted safety skips;
+  zero failed.
+- Node validation: 128 tests across 9 files passed. Typecheck, lint, build, and
+  immutability checks passed.
+- Report index: WARN with 1 pass, 13 optional reports missing, and zero
+  mandatory missing, failed, or unknown reports.
+
+Hosted CI proves the recorded offline validation and repository checks only.
+It does not prove Lab2 device compatibility, live execution success,
+production readiness, or authority for a live attempt.
+
 ## Allowed scope
 
-The candidate consists of exactly three files:
+The integrated implementation extension was limited to exactly three files:
 
 - [Composition](../../validation_framework/stage2_trusted_runtime_composition.py).
 - [Offline tests](../../tests/stage2/test_trusted_runtime_composition.py).
@@ -203,17 +249,27 @@ Python process or caller-owned objects.
 No prior-slice or integration-plan file changes, dependencies, second trust
 root, second evidence schema, environment authority, CLI, interactive prompt,
 startup executable, live registration, scheduler, worker, AI loop, retry,
-configuration backup/change, or S2-RO-11 implementation is included. S2-RO-09
+configuration backup/change, or S2-RO-11 implementation was included. S2-RO-09
 is unchanged. The existing S2-RO-10 public API, seven-field configuration,
 sixteen-category failure enum, evidence schema, authority order, and replay
-semantics are unchanged. S2-RO-11 is not modified; its existing one-call handoff
-continues to depend only on request-bearing trusted configuration.
+semantics are unchanged.
 
-The implementation task performs no real trust-root/approval/known-host read,
-Credential Manager read, persistent replay mutation, loopback, DNS, SSH, or
-RouterOS access. Remote base inspection and local branch creation are separate
-repository operations, not device validation. Staging, commit, push, PR, merge,
-and branch/worktree deletion require separate authorization.
+S2-RO-11 source is unchanged. Its existing one-call delegation makes a
+separately trusted Lab2 request and matching trusted configuration
+source-reachable through the integrated target-aware composition path. That is
+a configuration-only impact and is neither execution authority nor live proof.
+
+```text
+S2_RO_11_SOURCE = UNCHANGED
+S2_RO_11_LAB2_IMPACT = CONFIGURATION_ONLY
+SOURCE_REACHABLE != EXECUTION_AUTHORIZED
+S2_RO_11_LAB2_LIVE_VALIDATION = NOT_PERFORMED
+```
+
+Offline implementation and validation performed no real trust-root, approval,
+or known-host read; Credential Manager read; persistent replay mutation;
+loopback, DNS, SSH, or RouterOS access. Repository operations are not device
+validation. Any future live attempt requires separate exact Owner authorization.
 
 ## Offline validation and review boundary
 
@@ -236,12 +292,14 @@ known-host source, socket, DNS, SSH, and device access. The real S2-RO-05 ledger
 is used only against disposable synthetic test state. No Lab1 or Lab2 device is
 contacted, and no RouterOS command is emitted. Public failures remain sanitized.
 
-The required local validation is exact three-file scope, UTF-8 without BOM and
-LF-only text, `git diff --check`, focused S2-RO-10 tests without skips, Stage-2
-regression with only accepted safety skips, full pytest with only accepted
-safety skips, report-index, documentation readability, and secret-diff review.
-An independent read-only security review remains the next task. This candidate
-does not inherit the historical Lab1 security review as a Lab2 review.
+The integrated implementation satisfied exact three-file scope, UTF-8 without
+BOM and LF-only text, `git diff --check`, focused S2-RO-10 tests without skips,
+Stage-2 regression and full pytest with only accepted safety skips,
+report-index review, documentation readability, and secret-diff review. Its
+independent read-only security review passed, and post-merge hosted Safe CI
+passed at the merge commit. These offline and hosted results grant no live
+execution authority and do not convert source reachability into a Lab2 live
+PASS.
 
 References: [integration gates](actual_automation_integration_plan.md),
 [S2-RO-01 evidence](stage2_vrrp_readonly_s2_ro_01_contract.md),
