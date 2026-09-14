@@ -2,11 +2,16 @@
 
 ## Decision summary
 
-S2-RO-04 extends only the trusted policy wrapper to accept the two exact
+S2-RO-04 validates the trusted Stage-2 Windows password representation as strict
+UTF-16LE and returns the same password as strict UTF-8 transport bytes. This
+offline remediation corrects the credential handoff to the unchanged S2-RO-09
+transport. It does not authorize a live retry or claim compatibility PASS.
+
+The trusted policy wrapper continues to accept the two exact
 S2-RO-03 target/credential bindings, each with its matching trusted locator.
 Legacy `read(binding)` remains Lab1-only; `read_for_target(target_ref, binding)`
 checks the exact pair through S2-RO-03 before comparing configuration identity.
-The native Windows reader is unchanged. This is an **offline policy extension**,
+The native Windows reader is unchanged. This is an **offline remediation**,
 not permission to read a credential store or contact either lab.
 
 Status: implementation candidate ready for independent review after validation.
@@ -23,13 +28,14 @@ S2-RO-03 immutable non-secret binding
 S2-RO-04 exact Windows credential read
                     |
                     v
-bounded ephemeral credential material
+bounded raw UTF-16LE bytes -> strict validation -> canonical UTF-8 bytes
                     |
                     v
-future transport (not implemented)
+unchanged S2-RO-09 transport (no execution authorized here)
 ```
 
-S2-RO-04 owns bounded credential retrieval policy only. Endpoint selection, authorization,
+S2-RO-04 owns bounded credential retrieval and representation validation.
+Endpoint selection, authorization,
 Owner verification, replay protection, host-key trust, network transport,
 command execution, runtime composition, and live-device access remain outside
 this slice.
@@ -101,10 +107,30 @@ Successful retrieval returns an immutable, slotted
 `Stage2ResolvedCredential` with exactly:
 
 - `username`: a non-empty bounded string of at most 256 characters;
-- `secret_blob`: non-empty immutable bytes of at most 4096 bytes.
+- `secret_blob`: non-empty canonical UTF-8 password bytes of at most 4096 bytes.
 
-The blob remains bytes. S2-RO-04 does not assume UTF-8 or silently decode
-arbitrary credential material.
+`Stage2WindowsCredentialApiRecord.secret_blob` holds raw bytes copied from the
+trusted `CRED_TYPE_GENERIC` Windows `CredentialBlob`. Under the Stage-2
+provisioning contract these bytes contain strict UTF-16LE password data.
+Generic credential blob semantics are application/provisioning-defined: this
+is not a universal claim about every Windows Generic Credential.
+
+The backend has exactly one private conversion: `STRICT_UTF16LE -> STRICT_UTF8`.
+It requires exact `bytes`, non-empty input, the existing 4096-byte raw bound,
+even byte length, and no leading UTF-16 BOM in either byte order. Strict
+UTF-16LE decoding must produce non-empty text without U+0000. Strict UTF-8
+encoding must produce non-empty bytes within the same 4096-byte bound.
+
+The logical password is unchanged, including leading/trailing whitespace,
+Unicode form, case, and line endings. There is no encoding autodetection,
+raw UTF-8 fallback, alternate encoding, repair, replacement, normalization,
+trimming, or retry. Interior U+FEFF is preserved as password data; a leading
+BOM is rejected. Public field names and failure categories remain unchanged.
+
+S2-RO-09 passes these transport-ready bytes exactly to
+`transport.auth_password(username, secret, event=..., fallback=False)`.
+It performs no credential decoding, alternate encoding, or fallback
+authentication. Neither its production code nor its tests change here.
 
 Configuration, raw API records, backend objects, and resolved material all use
 redacted `repr` and `str` output. No `to_dict`, `to_json`, evidence, report,
@@ -119,8 +145,10 @@ filesystem persistence or global cache, and secret material must not be logged
 or serialized. Later consumers must minimize the secret's lifetime and must not
 persist, serialize, or log it.
 
-`GUARANTEED_PYTHON_MEMORY_ZEROIZATION = NO`: Python immutable `bytes` do not
-provide a reliable guarantee that their underlying memory can be zeroized.
+`GUARANTEED_PYTHON_MEMORY_ZEROIZATION = NO`: the conversion may transiently
+create raw Windows bytes, a decoded Python string, and canonical UTF-8 bytes.
+All must remain ephemeral and must never be logged or persisted. Python
+immutable `bytes` and `str` provide no reliable underlying-memory zeroization.
 S2-RO-04 therefore does not claim guaranteed secure erase of Python-managed
 memory. The ephemeral-lifetime intent limits exposure, but it is not a memory
 clearing guarantee.
@@ -138,10 +166,28 @@ the Windows target, username, or secret blob. Deterministic categories cover:
 - Windows read failure;
 - malformed credential record;
 - missing or oversized username;
-- invalid, empty, or oversized secret blob.
+- `CREDENTIAL_SECRET_INVALID` for wrong type, empty, odd-length, BOM-bearing,
+  malformed UTF-16LE, or decoded U+0000 input;
+- `CREDENTIAL_SECRET_TOO_LARGE` for raw or canonical UTF-8 bytes above the bound.
 
-An API exception is converted to a sanitized backend error. There is no retry,
-alternate target, or fallback lookup.
+API and encoding exceptions become sanitized backend errors outside their
+exception handlers, with no native cause/context or representation detail in
+the public error. There is no retry, alternate target, or fallback lookup.
+
+## Sanitized integration finding
+
+Two separately authorized Lab2 attempts passed pinned host-key verification
+but failed password authentication; no remote command executed. An authorized
+offline Owner-secret comparison established that the stored bytes matched
+UTF-16LE and did not match UTF-8. The accepted source returned raw Windows
+bytes from S2-RO-04 and supplied them unchanged to S2-RO-09 authentication.
+This remediation corrects only that representation handoff. No credential
+store or device is accessed during this offline implementation or validation.
+
+`POST_REMEDIATION_LIVE_AUTHENTICATION_RESULT = NOT_YET_VERIFIED`
+
+Independent read-only review and any later live retry require separate Owner
+authorization. Offline test success does not establish S2-RO-09 compatibility.
 
 ## Offline reviewer evidence
 
@@ -149,6 +195,13 @@ Focused tests use only a synthetic target, username, and secret with an injected
 fake API. They prove:
 
 - both exact target-bound identities perform exactly one read;
+- ASCII, non-ASCII (including distinct Unicode forms), and whitespace passwords
+  yield exact UTF-8 bytes from synthetic UTF-16LE input for both targets;
+- raw and canonical size bounds are enforced independently;
+- odd length, either BOM, unpaired surrogates, and decoded U+0000 reject without
+  encoding fallback and with sanitized unchained errors;
+- the fake native DLL copies bytes before `CredFree`; backend conversion occurs
+  after freeing the test-owned Windows allocation, including rejection paths;
 - the 16-case target/credential/binding-locator/configuration-locator matrix
   admits only the two fully matched combinations, with zero calls otherwise;
 - legacy Lab1 calls still work and cannot retrieve Lab2 credentials;
@@ -169,8 +222,8 @@ fake API. They prove:
   test guard denies real Windows library loading unless a test installs its
   deterministic fake boundary.
 
-Validation order is focused S2-RO-04 tests, all `tests/stage2`, full pytest,
-report-index, and `git diff --check`. Python runs use `-B`; pytest disables its
+Validation order is focused S2-RO-04 tests, unchanged focused S2-RO-09 tests,
+all `tests/stage2`, full pytest, report-index, and `git diff --check`. Python runs use `-B`; pytest disables its
 cache provider. Validation uses an external disposable copy of the exact
 candidate, without dependency downloads or source-worktree runtime artifacts.
 The source worktree must retain its pre-validation HEAD/tree, clean status, and
@@ -178,9 +231,16 @@ file content/size/mtime during sandbox validation. Only the three authorized
 backend/test/document files are applied afterward, before the separately
 authorized single local implementation commit.
 
-Every test suite requires zero failures. Existing platform-specific skips are
-acceptable. Report-index may retain WARN only for optional missing artifacts,
-with no mandatory failure. This policy extension does not remediate unrelated
+Windows runs follow the existing guarded, non-TTY policy described in the
+[S2-RO-09 validation evidence](stage2_vrrp_readonly_s2_ro_09_pinned_ssh_transport.md):
+native/network/process guards precede pytest import; plugin autoload and cache
+are disabled, with guards retained in Python/Node regression children. Test
+results must not render synthetic passwords in failure output.
+
+Every test suite requires zero failures. Only the existing accepted safety
+skips may remain; this remediation adds none. Report-index may retain WARN only
+for optional missing artifacts, with no mandatory failure. This remediation
+does not remediate unrelated
 CI maintenance warnings or constitute independent review PASS.
 
 ## Explicit exclusions

@@ -88,7 +88,7 @@ class Stage2TrustedWindowsCredentialConfiguration:
 
 @dataclass(frozen=True, slots=True, repr=False)
 class Stage2WindowsCredentialApiRecord:
-    """Untrusted narrow result returned by the Windows API boundary."""
+    """Untrusted result with raw bytes copied from Windows CredentialBlob."""
 
     username: object = field(repr=False)
     secret_blob: object = field(repr=False)
@@ -101,7 +101,7 @@ class Stage2WindowsCredentialApiRecord:
 
 @dataclass(frozen=True, slots=True, repr=False)
 class Stage2ResolvedCredential:
-    """Bounded ephemeral material for a future transport."""
+    """Bounded ephemeral material; backend output is a UTF-8 password blob."""
 
     username: str = field(repr=False)
     secret_blob: bytes = field(repr=False)
@@ -272,12 +272,41 @@ def _validate_record(record: object) -> Stage2ResolvedCredential:
     ):
         _fail(Stage2WindowsCredentialFailure.MALFORMED_CREDENTIAL_RECORD)
 
-    if type(secret_blob) is not bytes or not secret_blob:
-        _fail(Stage2WindowsCredentialFailure.CREDENTIAL_SECRET_INVALID)
-    if len(secret_blob) > MAX_CREDENTIAL_SECRET_BLOB_LENGTH:
-        _fail(Stage2WindowsCredentialFailure.CREDENTIAL_SECRET_TOO_LARGE)
+    return Stage2ResolvedCredential(
+        username=username, secret_blob=_canonical_password_bytes(secret_blob)
+    )
 
-    return Stage2ResolvedCredential(username=username, secret_blob=secret_blob)
+
+def _canonical_password_bytes(raw_blob: object) -> bytes:
+    """Validate only the trusted Stage-2 UTF-16LE provisioning contract."""
+
+    if type(raw_blob) is not bytes or not raw_blob:
+        _fail(Stage2WindowsCredentialFailure.CREDENTIAL_SECRET_INVALID)
+    if len(raw_blob) > MAX_CREDENTIAL_SECRET_BLOB_LENGTH:
+        _fail(Stage2WindowsCredentialFailure.CREDENTIAL_SECRET_TOO_LARGE)
+    if len(raw_blob) % 2 or raw_blob.startswith((b"\xff\xfe", b"\xfe\xff")):
+        _fail(Stage2WindowsCredentialFailure.CREDENTIAL_SECRET_INVALID)
+
+    invalid_encoding = False
+    try:
+        password = raw_blob.decode("utf-16-le", errors="strict")
+    except UnicodeError:
+        invalid_encoding = True
+    # Raise outside the handler so encoding exceptions retain no public chain.
+    if invalid_encoding:
+        _fail(Stage2WindowsCredentialFailure.CREDENTIAL_SECRET_INVALID)
+    if not password or "\0" in password:
+        _fail(Stage2WindowsCredentialFailure.CREDENTIAL_SECRET_INVALID)
+
+    try:
+        canonical_blob = password.encode("utf-8", errors="strict")
+    except UnicodeError:
+        invalid_encoding = True
+    if invalid_encoding or not canonical_blob:
+        _fail(Stage2WindowsCredentialFailure.CREDENTIAL_SECRET_INVALID)
+    if len(canonical_blob) > MAX_CREDENTIAL_SECRET_BLOB_LENGTH:
+        _fail(Stage2WindowsCredentialFailure.CREDENTIAL_SECRET_TOO_LARGE)
+    return canonical_blob
 
 
 def _is_bounded_windows_target(value: object) -> bool:
