@@ -8,9 +8,12 @@ Flask dashboard. The walkthrough is display- and report-oriented: it does not
 require or authorize live devices, SSH, configuration changes, provider/model
 calls, secrets, or command execution from the dashboard.
 
-**Stage 2 is CLOSED / LIVE PROVEN** for the separately Owner-authorized
-MikroTik Lab1 VRRP workflow. Its recorded result can be explained offline using
-the [canonical closure evidence summary](../automation_readiness/actual_automation_integration_plan.md#stage-2-read-only-lab-adapter).
+**Stage 2 is a CLOSURE CANDIDATE.** Separate Owner-authorized one-shot
+MikroTik Lab1 and Lab2 VRRP proofs completed through the bounded read-only
+runtime. Persistent Lab2 startup reconstruction also passed independent
+review. Final closure still requires independent closure review and remote
+Safe CI. The results can be explained offline using the
+[formal closure candidate](../automation_readiness/stage2_formal_closure.md).
 Stage 3 is **NOT STARTED**.
 
 ## One-Sentence Project Positioning
@@ -38,25 +41,27 @@ boundaries. Those records do not change the current Stage-0 public review path.
 
 ## Recorded Stage-2 Result: Interview Talk Track
 
-"Stage 2 is live-proven for one bounded MikroTik VRRP read-only workflow. A
-fresh Owner authorization was verified and consumed once through replay
-protection. Pinned host trust and a dedicated read-only credential bound the
-operation to Lab1 (`target.mikrotik.lab01`), `mikrotik.vrrp_status`. It executed
-exactly `/interface vrrp print detail` once with zero retries, strictly parsed
-the observed RouterOS 7.24.2 result, and produced valid canonical evidence."
+"Stage 2 has separate bounded Lab1 and Lab2 MikroTik VRRP read-only proofs.
+Each used a fresh Owner authorization consumed once through replay protection,
+pinned host trust, a dedicated read-only credential, operation
+`mikrotik.vrrp_status`, and exactly `/interface vrrp print detail` with zero
+retries. The later Lab2 proof produced normalized `BACKUP` evidence through the
+same target-aware fail-closed runtime. Persistent Lab2 target and known-host
+startup reconstruction subsequently passed independent review."
 
-"Two earlier attempts failed closed: first on real RouterOS parser drift after
-command execution, then on temporary caller instrumentation before any command
-was emitted. The third passed. The temporary guard was restored; it is not a
-permanent runtime component."
+"The historical Lab1 chronology includes two earlier attempts that failed
+closed before its third attempt passed. Lab2 later passed on its own first
+attempt with zero retries. The Lab2 proof did not revalidate Lab1 or establish
+overall VRRP pair health."
 
 Use this as a discussion of completed evidence, not a command to rerun during
-the demo. The proof covers one Lab1 device and operation only. It does not
-establish generic RouterOS/model/version support, multi-vendor live execution,
-arbitrary CLI, write/config automation, automated retries, production HA
-readiness, fleet orchestration, autonomous remediation, anti-rollback replay
-protection, or Stage-3 functionality. Another live attempt requires fresh exact
-Owner authorization. The dashboard walkthrough below stays offline.
+the demo. The proofs cover two separate fixed lab targets and the same one
+read-only operation only. They do not establish generic RouterOS/model/version
+support, multi-vendor live execution, arbitrary CLI, write/config automation,
+automated retries, production HA readiness, fleet orchestration, autonomous
+remediation, anti-rollback replay protection, Dual-Lab AI Query, or Stage-3
+functionality. Another live attempt requires fresh exact Owner authorization.
+The dashboard walkthrough below stays offline.
 
 ## Suggested Reading Order
 
@@ -234,8 +239,8 @@ A reviewer can inspect:
 - report-index behavior and report interpretation;
 - committed summaries and any available local report evidence;
 - dry-run and mock reviewer-evidence chains;
-- the canonical documentation summary of the closed, bounded Stage-2 live
-  validation, without recovering raw stdout or repeating the operation.
+- the canonical documentation summary of the bounded Stage-2 closure candidate,
+  without recovering raw stdout or repeating either operation.
 
 No router, switch, VPN, VRRP, WireGuard, SSH, NETCONF, RESTCONF, iperf3,
 firewall, provider/model service, secret, or private lab configuration is

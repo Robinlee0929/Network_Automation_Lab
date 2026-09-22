@@ -2,12 +2,13 @@
 
 ## Decision summary
 
-The bounded Lab2 target-aware composition extension is integrated into `main`
-and proven by offline validation, an independent read-only security review,
-and post-merge hosted Safe CI. It retains the complete accepted Lab1 + Lab2
-fixed registry, resolves the request-selected target, and returns only
-normalized S2-RO-01 evidence. Lab1 and Lab2 use the same target-aware path,
-with no Lab2-to-Lab1 fallback.
+The bounded target-aware composition supports the fixed Lab1 + Lab2 registry,
+resolves the request-selected target, and returns only normalized S2-RO-01
+evidence. Lab1 and Lab2 use the same fail-closed path, with no cross-target
+fallback. The repository capability was proven offline and in hosted CI; a
+later separately authorized Lab2 invocation also passed. External persistent
+Lab2 startup bindings and fresh-process reconstruction passed independent
+review. Those deployment bindings are not repository authority.
 
 ```text
 S2_RO_10_LAB2_OFFLINE_COMPOSITION = PASS
@@ -16,16 +17,23 @@ S2_RO_10_LAB2_HOSTED_CI = PASS
 S2_RO_10_LAB2_OFFLINE_STATUS = INTEGRATED_AND_HOSTED_CI_PROVEN
 INDEPENDENT_SECURITY_REVIEW = PASS
 UNRESOLVED_MATERIAL_FINDINGS = 0
-S2_RO_10_LAB2_LIVE_VALIDATION = NOT_PERFORMED
-S2_RO_10_LAB2_LIVE_AUTHORITY = NOT_GRANTED
+S2_RO_10_LAB2_LIVE_VALIDATION = PASS
+S2_RO_10_LAB2_LIVE_PROOF_STATUS = CLOSED
+FINAL_PERSISTENT_LAB2_TARGET_STARTUP_BINDING = YES
+FINAL_PERSISTENT_LAB2_KNOWN_HOST_STARTUP_BINDING = YES
+CANONICAL_FRESH_PROCESS_RUNTIME_RECONSTRUCTION = PASS
+PERSISTENT_STARTUP_BINDING_INDEPENDENT_REVIEW = PASS
+STAGE2_RUNTIME_CLOSURE_GAP = NONE
+S2_RO_10_LAB2_FUTURE_LIVE_AUTHORITY = NOT_GRANTED
 NEXT_LIVE_ACTION = SEPARATE_EXACT_OWNER_AUTHORIZATION_REQUIRED
-CANONICAL_STATUS = OFFLINE_INTEGRATED_AND_HOSTED_CI_PROVEN_LIVE_NOT_AUTHORIZED
+CANONICAL_STATUS = LAB2_PROOF_COMPLETE_STAGE2_CLOSURE_CANDIDATE
 ```
 
-This status does not claim a Lab2 live PASS, device compatibility, a Lab2
-S2-RO-11 live PASS, full Stage-2 Lab2 runtime proof, production readiness, or
-write automation. No startup executable, CLI, live task registration, or
-S2-RO-11 behavior was added.
+The accepted Lab2 proof covers one target, one operation, one command, and one
+consumed authorization only. It does not revalidate Lab1, prove overall VRRP
+pair health, establish production readiness or write automation, or grant
+future live authority. Stage 2 remains a closure candidate until the separate
+independent closure review and remote Safe CI complete.
 
 `OFFLINE_IMPLEMENTATION_AUTHORITY != LIVE_EXECUTION_AUTHORITY`
 
@@ -60,8 +68,8 @@ independent review, PR integration, and hosted CI.
   mandatory missing, failed, or unknown reports.
 
 Hosted CI proves the recorded offline validation and repository checks only.
-It does not prove Lab2 device compatibility, live execution success,
-production readiness, or authority for a live attempt.
+The later Lab2 live proof is distinct evidence and does not retroactively
+change what this hosted run proved.
 
 ## Allowed scope
 
@@ -123,6 +131,28 @@ preconditions. This module neither establishes nor repairs them. Arbitrary
 privileged in-process mutation is outside the immutable Python contract.
 Future startup lifecycle and configuration replacement remain separately gated;
 there is no cache, hot reload, or repeated invocation loop here.
+
+### External persistent Lab2 startup binding
+
+The repository exposes the generic seven-field configuration contract; it does
+not contain deployment pins. Separately controlled Owner startup configuration
+now persistently reconstructs the Lab2 target registry and known-host binding
+for a fresh process. The accepted provider
+`stage2_lab2_trusted_runtime_binding.py` has SHA-256
+`b21ff9df445cb3fc2bde3c0ea05dcbdc558c2b996a31c451ad5a6de13a8e77a5`.
+Its external offline test
+`test_stage2_lab2_trusted_runtime_binding.py` has SHA-256
+`22d0473709243de416d1aeccf88338316c81833cf15fcdb36be8874ba4ba0bf4`
+and passed 6/6; focused repository validation passed 397/397. Independent
+review confirmed preserved bytes, Owner-controlled ownership, matching DACLs,
+exact `target.mikrotik.lab02` / `192.168.88.3:22` reconstruction, and the
+accepted known-host and credential bindings.
+
+The personal filesystem prefix, credential contents, private keys, signatures,
+approval material, and raw device output are intentionally not published.
+The external provider is deployment configuration, not a repository startup
+executable and not a source of reusable authority. Historical trusted-startup
+replay provenance remains unresolved.
 
 ## Ordered composition
 
@@ -244,32 +274,37 @@ signature, key, or external path. No logging or alternate failure report is
 emitted. This is not isolation against privileged inspection of a running
 Python process or caller-owned objects.
 
-## Forbidden scope
+## Historical delivery boundary and current forbidden scope
 
-No prior-slice or integration-plan file changes, dependencies, second trust
+The S2-RO-10 delivery added no prior-slice changes, dependencies, second trust
 root, second evidence schema, environment authority, CLI, interactive prompt,
 startup executable, live registration, scheduler, worker, AI loop, retry,
-configuration backup/change, or S2-RO-11 implementation was included. S2-RO-09
-is unchanged. The existing S2-RO-10 public API, seven-field configuration,
+configuration backup/change, or S2-RO-11 implementation. S2-RO-09 remained
+unchanged. The existing S2-RO-10 public API, seven-field configuration,
 sixteen-category failure enum, evidence schema, authority order, and replay
-semantics are unchanged.
+semantics remain unchanged.
 
-S2-RO-11 source is unchanged. Its existing one-call delegation makes a
-separately trusted Lab2 request and matching trusted configuration
-source-reachable through the integrated target-aware composition path. That is
-a configuration-only impact and is neither execution authority nor live proof.
+S2-RO-11 source was unchanged by the S2-RO-10 delivery. Its existing one-call
+delegation made a separately trusted Lab2 request and matching configuration
+source-reachable through the integrated target-aware path. At that historical
+point, this was configuration-only impact and neither execution authority nor
+live proof. The later accepted proof is separately recorded in S2-RO-11 and the
+formal closure candidate.
 
 ```text
 S2_RO_11_SOURCE = UNCHANGED
 S2_RO_11_LAB2_IMPACT = CONFIGURATION_ONLY
 SOURCE_REACHABLE != EXECUTION_AUTHORIZED
-S2_RO_11_LAB2_LIVE_VALIDATION = NOT_PERFORMED
+S2_RO_11_LAB2_LIVE_VALIDATION_AT_S2_RO_10_DELIVERY = NOT_PERFORMED
+S2_RO_11_LAB2_LIVE_VALIDATION_CURRENT = PASS
 ```
 
 Offline implementation and validation performed no real trust-root, approval,
 or known-host read; Credential Manager read; persistent replay mutation;
 loopback, DNS, SSH, or RouterOS access. Repository operations are not device
-validation. Any future live attempt requires separate exact Owner authorization.
+validation during the S2-RO-10 delivery. The later one-shot Lab2 proof used
+separate exact Owner authorization. Any future live attempt still requires a
+new exact Owner authorization.
 
 ## Offline validation and review boundary
 
@@ -297,9 +332,9 @@ BOM and LF-only text, `git diff --check`, focused S2-RO-10 tests without skips,
 Stage-2 regression and full pytest with only accepted safety skips,
 report-index review, documentation readability, and secret-diff review. Its
 independent read-only security review passed, and post-merge hosted Safe CI
-passed at the merge commit. These offline and hosted results grant no live
-execution authority and do not convert source reachability into a Lab2 live
-PASS.
+passed at the merge commit. Those offline and hosted results grant no live
+execution authority. The later Lab2 PASS came only from its separate one-shot
+authorization and is not reusable.
 
 References: [integration gates](actual_automation_integration_plan.md),
 [S2-RO-01 evidence](stage2_vrrp_readonly_s2_ro_01_contract.md),
@@ -308,3 +343,5 @@ References: [integration gates](actual_automation_integration_plan.md),
 [S2-RO-07 snapshot](stage2_vrrp_readonly_s2_ro_07_known_host_snapshot.md),
 [S2-RO-08 policy/parser](stage2_vrrp_readonly_s2_ro_08_command_policy.md), and
 [S2-RO-09 transport](stage2_vrrp_readonly_s2_ro_09_pinned_ssh_transport.md).
+See also the [S2-RO-11 live proof](stage2_vrrp_readonly_s2_ro_11_live_entrypoint.md)
+and [Stage-2 formal closure candidate](stage2_formal_closure.md).

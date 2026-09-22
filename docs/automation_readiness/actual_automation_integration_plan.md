@@ -1,10 +1,13 @@
 # Actual Automation Integration Plan
 
-**Decision summary: Stage 2 is CLOSED / LIVE PROVEN** for the separately
-Owner-authorized MikroTik Lab1 VRRP read-only workflow on observed RouterOS
-7.24.2 output. The third one-shot attempt passed and the closure review passed.
-The default public review path remains Stage-0 offline evidence browsing.
-Stage 3 is **NOT STARTED / requires separate Owner authorization**.
+**Decision summary: Stage 2 is a CLOSURE CANDIDATE.** The historical
+Owner-authorized MikroTik Lab1 VRRP proof remains accepted, and a later,
+separately authorized Lab2 one-shot proof passed through the same target-aware
+runtime. Persistent Lab2 startup bindings, fresh-process reconstruction, and
+their independent review also passed. Final Stage-2 closure still requires the
+separate independent closure review and remote Safe CI. The default public
+review path remains Stage-0 offline evidence browsing. Stage 3 is **NOT
+STARTED / requires separate Owner authorization**.
 
 ## 1. Purpose
 
@@ -97,11 +100,12 @@ Exit gate:
 
 ### Stage 2: Read-only Lab Adapter
 
-Status: **CLOSED / LIVE PROVEN**. The third real one-shot validation passed
-under its exact Owner authorization; formal closure review is PASS. This
-records a completed bounded operation and does not authorize another attempt.
+Status: **CLOSURE CANDIDATE**. The earlier Lab1 proof and later Lab2 proof each
+passed under separate exact Owner authorization. The Lab2 runtime closure gap
+is resolved, but final Stage-2 closure awaits independent closure review and
+remote Safe CI. Neither proof authorizes another attempt.
 
-#### Proven scope and result
+#### Historical Lab1 proven scope and result
 
 - Device: one specified MikroTik **Lab1**, identified publicly only as
   `target.mikrotik.lab01`.
@@ -119,7 +123,7 @@ STAGE2_RUNTIME_CHAIN_PROVEN = YES
 ROUTEROS_7_24_PARSER_COMPATIBILITY_PROVEN_LIVE = YES
 CALLER_GUARD_RESTORATION_PROVEN = YES
 STAGE2_CLOSURE_REVIEW = PASS
-STAGE2_STATUS = CLOSED / LIVE PROVEN
+HISTORICAL_LAB1_PROOF_STATUS = CLOSED / LIVE PROVEN
 ```
 
 #### Three live attempts
@@ -145,14 +149,15 @@ consumption, one credential resolution, one TCP connection, one SSH handshake,
 one authentication, one session, and one RouterOS command, with retry = 0.
 AI does not own or bypass these authorities.
 
-This closure proves only one specified Lab1, one VRRP read-only operation, one
-exact allowlisted command, and the observed RouterOS 7.24.2 output in a one-shot
-safety chain. It does **not** establish generic RouterOS support, all MikroTik
-versions/models, multi-vendor live support, arbitrary CLI, write/config
-automation, automated retries, production HA readiness, fleet orchestration,
-autonomous remediation, an anti-rollback guarantee, or Stage-3 functionality.
-Any further attempt needs fresh exact Owner authorization; scope expansion
-needs separate review and applicable safety gates.
+This historical proof establishes only the specified Lab1 operation and
+observed RouterOS 7.24.2 output. The later Lab2 proof below is separate: it did
+not revalidate Lab1 and cannot establish overall VRRP pair health. Neither
+proof establishes generic RouterOS support, all MikroTik versions/models,
+multi-vendor live support, arbitrary CLI, write/config automation, automated
+retries, production HA readiness, fleet orchestration, autonomous remediation,
+an anti-rollback guarantee, or Stage-3 functionality. Any further attempt
+needs fresh exact Owner authorization; scope expansion needs separate review
+and applicable safety gates.
 
 #### Closure evidence and code baseline
 
@@ -171,6 +176,56 @@ Open npm and Next.js maintenance items remain separate in the
 [project status](../../README.md#post-release-or-deferred); closure does not
 resolve them.
 
+#### Later Lab2 proof and persistent startup closure evidence
+
+The later proof used repository baseline
+`ea73196281e38a01af7bf959cc5e1bc60b0b2499` and a fresh, exact one-shot Owner
+authorization for `target.mikrotik.lab02`, `credential.mikrotik.lab02`, and
+`mikrotik.vrrp_status`. The resolved command was exactly
+`/interface vrrp print detail`. It executed once, with zero retries and a
+bounded duration of 625 ms. The authorization was consumed and cannot be
+reused.
+
+The accepted normalized record is `vrrp-lan`, VRID `88`, priority `100`,
+interval `1000` ms, version `3`, role `BACKUP`, `running=false`,
+`disabled=false`, and `invalid=false`. No raw RouterOS stdout is published.
+`running=false` is not independently characterized as a fault, and this proof
+does not establish Lab1 state or overall Lab1/Lab2 VRRP health.
+
+```text
+LAB2_S2_RO_11_LIVE_PROOF = PASS
+LAB2_LIVE_PROOF_STATUS = CLOSED
+FINAL_PERSISTENT_LAB2_TARGET_STARTUP_BINDING = YES
+FINAL_PERSISTENT_LAB2_KNOWN_HOST_STARTUP_BINDING = YES
+CANONICAL_FRESH_PROCESS_RUNTIME_RECONSTRUCTION = PASS
+PERSISTENT_STARTUP_BINDING_INDEPENDENT_REVIEW = PASS
+STAGE2_RUNTIME_CLOSURE_GAP = NONE
+HISTORICAL_TRUSTED_STARTUP_REPLAY_PROVENANCE = UNRESOLVED
+STAGE2_STATUS = CLOSURE CANDIDATE
+READY_FOR_DUAL_LAB_AI_QUERY = NO
+```
+
+The final deployment binding selects `target.mikrotik.lab02` at
+`192.168.88.3:22`, its exact Owner-controlled known-host snapshot, and the
+logical credential reference `credential.mikrotik.lab02`. The repository does
+not publish the personal filesystem prefix, credentials, keys, signatures,
+approval artifact, or raw output. The Owner-controlled persistent provider and
+external offline test are identified by filenames
+`stage2_lab2_trusted_runtime_binding.py` and
+`test_stage2_lab2_trusted_runtime_binding.py`, with accepted SHA-256 values
+`b21ff9df445cb3fc2bde3c0ea05dcbdc558c2b996a31c451ad5a6de13a8e77a5`
+and `22d0473709243de416d1aeccf88338316c81833cf15fcdb36be8874ba4ba0bf4`.
+The external offline test passed 6/6 and the focused repository validation
+passed 397/397 during independent startup-binding review.
+
+These external deployment pins are not repository capability and grant no
+future authority. Historical trusted-startup replay provenance remains
+unresolved and is not rewritten by the successful reconstruction.
+
+`OFFLINE_IMPLEMENTATION_AUTHORITY != LIVE_EXECUTION_AUTHORITY`
+
+`SOURCE_REACHABLE != EXECUTION_AUTHORIZED`
+
 #### Canonical bounded VRRP read-only sequence
 
 The following sequence indexes components used by the closed bounded workflow.
@@ -188,8 +243,8 @@ Neither this index nor component integration grants fresh execution authority.
 | S2-RO-07 | [Immutable offline known-host snapshot](stage2_vrrp_readonly_s2_ro_07_known_host_snapshot.md) | Formally closed; no transport authority |
 | S2-RO-08 | [Immutable VRRP read-only command policy](stage2_vrrp_readonly_s2_ro_08_command_policy.md) | Implemented bounded policy used by the proven workflow |
 | S2-RO-09 | [Pinned SSH transport](stage2_vrrp_readonly_s2_ro_09_pinned_ssh_transport.md) | Implemented bounded transport used by the proven workflow |
-| S2-RO-10 | [Trusted runtime composition](stage2_vrrp_readonly_s2_ro_10_trusted_runtime_composition.md) | Composed authority chain proven for this exact operation |
-| S2-RO-11 | [One-shot live entrypoint](stage2_vrrp_readonly_s2_ro_11_live_entrypoint.md) | Exact Owner-authorized one-shot invocation proven |
+| S2-RO-10 | [Trusted runtime composition](stage2_vrrp_readonly_s2_ro_10_trusted_runtime_composition.md) | Target-aware Lab1 + Lab2 chain; external persistent Lab2 startup reconstruction independently proven |
+| S2-RO-11 | [One-shot live entrypoint](stage2_vrrp_readonly_s2_ro_11_live_entrypoint.md) | Separate exact Owner-authorized Lab1 and Lab2 one-shot invocations proven; no reusable authority |
 
 The S2-RO-07 → S2-RO-08 → S2-RO-09 order is authoritative for scope
 discovery. It does not imply automatic authorization between slices.
@@ -313,10 +368,13 @@ evidence of a prior explicit Owner authorization and grants no standing live
 authority. Every new live access requires fresh exact Owner authorization.
 
 Stage 0 remains the default mock-only, dry-run, report-only public review path.
-Stage 2 is CLOSED / LIVE PROVEN only for the recorded Owner-authorized Lab1
-VRRP read-only operation. This closure activates no new adapter, protocol,
-provider, credential, device, or execution capability and permits no repeat
-attempt. Stage 3 remains NOT STARTED. Further live access or scope expansion
-requires the applicable capability gates and separate exact Owner approval.
+Stage 2 is a CLOSURE CANDIDATE based on the recorded, separately authorized
+Lab1 and Lab2 VRRP read-only proofs and completed persistent Lab2 startup
+reconstruction. This candidate activates no new adapter, protocol, provider,
+credential, device, or execution capability and permits no repeat attempt.
+Formal closure still requires independent closure review and remote Safe CI.
+Dual-Lab AI Query does not yet exist, and Stage 3 remains NOT STARTED. Further
+live access or scope expansion requires the applicable capability gates and
+separate exact Owner approval.
 
 This document does not start Phase 2C-10 or any implementation phase. It does not create a second safety matrix. It is a durable planning reference for future review and approval decisions.

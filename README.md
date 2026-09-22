@@ -10,10 +10,13 @@ review. Network Automation Lab treats that work as a small QA platform: local
 inputs are validated deterministically, results become machine-readable and
 human-readable evidence, and unsafe or unavailable paths fail closed.
 
-**Stage 2: CLOSED / LIVE PROVEN** for one Owner-authorized MikroTik Lab1 VRRP
-read-only workflow, with observed RouterOS 7.24.2 compatibility, one exact
-command, zero retries, and valid canonical evidence.
-[Closure scope and evidence](docs/automation_readiness/actual_automation_integration_plan.md#stage-2-read-only-lab-adapter).
+**Stage 2: CLOSURE CANDIDATE.** Separate Owner-authorized one-shot VRRP
+read-only proofs completed for MikroTik Lab1 and Lab2, each through the same
+target-aware fail-closed runtime, one exact command, and zero retries. The
+Lab2 proof also has independently reviewed persistent startup bindings and
+fresh-process reconstruction. Final closure still requires independent review
+and remote Safe CI.
+[Closure candidate scope and evidence](docs/automation_readiness/stage2_formal_closure.md).
 
 The August 2026 release baseline is a local Stage-0 product.
 The supported release path is designed for local portfolio review: mock-only,
@@ -56,14 +59,15 @@ This accepted Stage-0 demo path is GET-only. It does not contact devices,
 invoke provider-backed operations, expose command or job execution controls,
 change configuration, or demonstrate production approval.
 
-For the recorded Stage-2 result, explain: a fresh Owner authorization was
+For the recorded Stage-2 result, explain: Lab1 first proved the bounded
+one-shot chain after two earlier attempts failed closed. Lab2 subsequently
+completed its own fresh Owner-authorized proof for
+`target.mikrotik.lab02`, `mikrotik.vrrp_status`. The Lab2 authorization was
 verified and consumed once through replay protection; pinned host trust and a
-dedicated read-only credential bound the workflow to MikroTik Lab1
-`target.mikrotik.lab01`, operation `mikrotik.vrrp_status`. It executed exactly
-`/interface vrrp print detail` once with zero retries, strictly parsed the
-observed RouterOS 7.24.2 result, and produced canonical evidence. Two earlier
-attempts failed closed before the third passed. This is an evidence discussion,
-not a live demo procedure.
+dedicated read-only credential bound the exact command
+`/interface vrrp print detail`, which ran once with zero retries and returned
+normalized evidence. Lab2 did not revalidate Lab1 or establish overall VRRP
+pair health. This is an evidence discussion, not a live demo procedure.
 
 Other internal or legacy surfaces are outside this interview path. For a
 documentation-first tour, use the
@@ -296,25 +300,28 @@ Stage 0 is the formally closed public baseline. Its closure is recorded in the
 It includes contributor and security guidance, Issue and pull request
 templates, newcomer-friendly Issues, and protected-`main` governance through
 pull requests and Safe CI. Stage 1's planning entry is retained as historical
-context. The separately authorized, bounded Stage-2 validation is now closed;
-the canonical [Stage model](docs/automation_readiness/actual_automation_integration_plan.md)
-records its proof and limits.
+context. The separately authorized, bounded Stage-2 implementation and live
+proofs now form a closure candidate; the canonical
+[Stage model](docs/automation_readiness/actual_automation_integration_plan.md)
+and [formal closure candidate](docs/automation_readiness/stage2_formal_closure.md)
+record the proof, remaining review gate, and limits.
 
 | Stage | Purpose | Status |
 | --- | --- | --- |
 | **Stage 0 — Closed public baseline** | Mock-only, dry-run, report-only, reviewer-visible, fail-closed validation and evidence | **CLOSED** |
 | **Stage 1 — Read-only Lab Integration Planning** | Historical planning entry for contracts, allowlists, failure behavior, evidence, and credential boundaries | Historical planning record; see the bounded Stage-2 outcome below |
-| **Stage 2 — Narrow Read-only Lab Adapter** | MikroTik Lab1 only; RouterOS 7.24.2 observed VRRP read-only shape; one exact command, zero retries, canonical evidence | **CLOSED / LIVE PROVEN** |
+| **Stage 2 — Narrow Read-only Lab Adapter** | Separate bounded MikroTik Lab1 and Lab2 VRRP proofs; target-aware composition; one exact command per authorization; zero retries; normalized evidence; persistent Lab2 startup reconstruction | **CLOSURE CANDIDATE — independent closure review and remote Safe CI pending** |
 | **Stage 3 — Controlled Config Plan Generation** | Future human-reviewable configuration plans only; no apply | **NOT STARTED / requires separate Owner authorization** |
 | **Stage 4 — Controlled Change Execution** | Permit narrowly approved lab changes with explicit safeguards and evidence | **Future / separate gate** |
 | **Stage 5 — Production-like Platform** | Add mature access control, audit, rollback, monitoring, and human approval | **Long-term / not currently authorized** |
 
-The bounded Stage-2 exit is the major-development pause point. Closure proves
-only the recorded Lab1 operation. It does not establish generic RouterOS or
-every MikroTik model/version, multi-vendor live execution, arbitrary CLI,
-write/config automation, automated retries, production HA readiness, fleet
-orchestration, autonomous remediation, anti-rollback replay protection, or
-Stage-3 functionality.
+The bounded Stage-2 exit is the major-development pause point. The candidate
+records two independent one-shot operations; the Lab2 proof did not revalidate
+Lab1 and does not establish overall Lab1/Lab2 VRRP pair health. It also does
+not establish generic RouterOS or every MikroTik model/version, multi-vendor
+live execution, arbitrary CLI, write/config automation, automated retries,
+production HA readiness, fleet orchestration, autonomous remediation,
+anti-rollback replay protection, or Stage-3 functionality.
 
 A roadmap item, Issue, pull request, merge, date, or milestone does **not** activate a
 capability. Every Stage advancement requires separate explicit authorization
@@ -481,11 +488,12 @@ release lanes; they are not performed by documentation-only changes.
 
 ## Current Release Status
 
-| Area | Current status (August baseline with Stage-2 closure) |
+| Area | Current status (August baseline with Stage-2 closure candidate) |
 | --- | --- |
 | Stage-0 Network Automation Lab | **CLOSED** at `main@aff250735ade18e4c274be8ac53c9672bb2cb07f` |
-| Stage-1 Read-only Lab Integration Planning | Historical planning-entry record; see Stage-2 closure |
-| Stage-2 bounded MikroTik Lab1 VRRP validation | **CLOSED / LIVE PROVEN** on `main@39da163d80e5d8b2dde215eb6c0979448d0739fd`; closure review PASS |
+| Stage-1 Read-only Lab Integration Planning | Historical planning-entry record; see the Stage-2 closure candidate |
+| Stage-2 bounded MikroTik VRRP validation | Lab1 historical proof retained; Lab2 proof PASS/CLOSED on repository baseline `ea73196281e38a01af7bf959cc5e1bc60b0b2499`; persistent Lab2 startup reconstruction and independent binding review PASS; overall Stage 2 is a **CLOSURE CANDIDATE** |
+| Dual-Lab AI Query | **NOT IMPLEMENTED / not authorized**; eligible only as future work after formal Stage-2 closure |
 | Stage 3 | **NOT STARTED / requires separate Owner authorization** |
 | Canonical reviewer interface | Flask dashboard on `127.0.0.1:5000` |
 | Secondary Next.js interface | Available as a bounded Stage-0 evidence surface |
@@ -518,12 +526,13 @@ future capabilities stay behind their separate authorization and safety gates.
   acceptance gates.
 - Address Node/NVM coexistence only if a later environment-maintenance task
   requires it.
-- Expand the proven Lab1 read-only workflow only through separately authorized
-  safety gates.
+- Begin any Dual-Lab AI Query work only after Stage-2 formal closure and a
+  separate authorized task. The completed Lab1 and Lab2 proofs grant no future
+  live authority.
 - Keep the post-merge Safe CI maintenance findings OPEN: npm has 5
   vulnerabilities (2 moderate, 2 high, 1 critical), and Next.js emitted 7
   filesystem-tracing warnings. These are non-Stage-2-blocking maintenance items;
-  Stage-2 closure does not resolve them.
+  the Stage-2 closure candidate does not resolve them.
 
 Current limitations also include variable local report availability, no
 guarantee that every clean checkout contains generated evidence, and a
@@ -540,6 +549,7 @@ deliberately non-executing public review path.
 - [Canonical Quick Start and demo runbook](docs/phase_2n/phase_2n_01_canonical_quick_start_and_demo_runbook_documentation_only.md)
 - [Accepted Stage-0 user-facing baseline](docs/phase_2n/phase_2n_05_final_user_facing_acceptance_review_phase_closure_review_only.md)
 - [Stage 0 formal closure](docs/automation_readiness/stage0_formal_closure.md)
+- [Stage 2 formal closure candidate](docs/automation_readiness/stage2_formal_closure.md)
 
 ### Architecture and safety
 
@@ -564,6 +574,6 @@ deliberately non-executing public review path.
 
 Historical records describe the state and authorization boundary at the time
 they were written. Use Current Release Status above and the canonical Stage
-model for the August baseline and subsequent bounded Stage-2 closure.
+model for the August baseline and subsequent bounded Stage-2 closure candidate.
 
 This project is distributed under the [MIT License](LICENSE).
