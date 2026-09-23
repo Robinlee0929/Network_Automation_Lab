@@ -2,15 +2,19 @@
 
 ## Decision summary
 
-S2-RO-11 adds a trusted-caller library boundary around the accepted S2-RO-10
-runtime. Status: validated implementation candidate; independent security review PASS,
-zero unresolved material findings. Ready for separate local-commit authorization. It returns only canonical S2-RO-01 evidence bytes, or one
-sanitized failure category. This final Stage-2 implementation slice supplies
-no deployment bootstrap and authorizes no real invocation.
+S2-RO-11 is the trusted-caller library boundary around the accepted S2-RO-10
+runtime. Its implementation and independent security review passed with zero
+unresolved material findings. A later, separately authorized Lab2 one-shot
+invocation also passed and its proof is closed. The entrypoint returns only
+canonical S2-RO-01 evidence bytes or one sanitized failure category. The
+overall Stage-2 status remains **CLOSURE CANDIDATE** pending independent
+closure review and remote Safe CI.
 
 `S2_RO_11_IMPLEMENTED != REAL_RUN_AUTHORIZED`
 
 `S2_RO_11_MERGED != REAL_RUN_AUTHORIZED`
+
+`COMPLETED_ONE_SHOT_PROOF != FUTURE_LIVE_AUTHORITY`
 
 ## Allowed scope and API
 
@@ -57,7 +61,21 @@ Ordinary CLI arguments, environment variables, repository files, home-directory
 search, fallback and implicit defaults cannot supply authority through this
 entrypoint. It does not construct configuration, acquire trust assets, or
 register a task in `network_lab.py`. No standalone executable is delivered.
-External deployment bootstrap remains outside this candidate.
+The repository still supplies no deployment bootstrap. Separately controlled
+Owner startup configuration now persistently reconstructs the accepted Lab2
+target and known-host bindings in a fresh process; that external deployment
+state is not repository authority and is not caller-controlled configuration.
+
+The accepted Owner provider `stage2_lab2_trusted_runtime_binding.py` has
+SHA-256
+`b21ff9df445cb3fc2bde3c0ea05dcbdc558c2b996a31c451ad5a6de13a8e77a5`.
+Its external offline test has SHA-256
+`22d0473709243de416d1aeccf88338316c81833cf15fcdb36be8874ba4ba0bf4`
+and passed 6/6; the focused repository validation passed 397/397. Independent
+review confirmed persistent target and known-host startup bindings and
+canonical fresh-process reconstruction. Personal filesystem prefixes,
+credentials, key material, signatures, and approval artifacts are not
+published in this repository.
 
 ## Evidence and errors
 
@@ -93,6 +111,46 @@ Transient input and evidence references are released; no configuration,
 authorization or evidence cache exists. Reference release does not erase
 immutable bytes, caller-owned objects or copies retained by the caller.
 
+## Accepted Lab2 one-shot live proof
+
+The accepted proof ran from repository baseline
+`ea73196281e38a01af7bf959cc5e1bc60b0b2499` with a fresh exact Owner
+authorization for `target.mikrotik.lab02`, `credential.mikrotik.lab02`, and
+`mikrotik.vrrp_status`. S2-RO-10 resolved exactly
+`/interface vrrp print detail`. The result recorded `attempt_count=1`,
+`retry_count=0`, and `duration_ms=625`.
+
+The published evidence is normalized only:
+
+| Field | Value |
+| --- | --- |
+| instance_name | `vrrp-lan` |
+| vrid | `88` |
+| priority | `100` |
+| interval_ms | `1000` |
+| version | `3` |
+| role | `BACKUP` |
+| running | `false` |
+| disabled | `false` |
+| invalid | `false` |
+
+Raw RouterOS stdout is not published. `running=false` is not independently
+classified as a fault. The proof does not revalidate Lab1 and does not prove
+overall Lab1/Lab2 VRRP pair health.
+
+```text
+LAB2_S2_RO_11_LIVE_PROOF = PASS
+LAB2_LIVE_PROOF_STATUS = CLOSED
+STAGE2_RUNTIME_CLOSURE_GAP = NONE
+STAGE2_STATUS = CLOSURE CANDIDATE
+READY_FOR_DUAL_LAB_AI_QUERY = NO
+```
+
+Owner verification and replay consumption applied to this invocation only.
+The consumed authorization cannot be reset or reused, and the successful proof
+does not grant a future invocation. Historical trusted-startup replay
+provenance remains unresolved.
+
 ## Forbidden scope
 
 Only lab operation `mikrotik.vrrp_status` and inherited command
@@ -108,10 +166,10 @@ perform loopback/DNS/SSH; or invoke RouterOS. Repository metadata checks are
 separate from device validation. Staging, commit, push, PR and merge require
 separate authorization.
 
-## Pre-live deployment checklist
+## Historical pre-live deployment checklist
 
-This checklist is documentation only. No listed asset is provisioned or read
-by this implementation task.
+This checklist records the conditions used to gate the accepted proof. It is
+not standing authorization and cannot be reused for another invocation.
 
 1. S2-RO-10 is closed; S2-RO-11 is independently validated, merged, passed
    post-merge CI and technically closed at an exact main commit.
@@ -189,10 +247,13 @@ Documentation readability and all seven local reference links: PASS. The review
 confirmed the exact trusted-caller boundary, failure mapping, unchanged envelope,
 single runtime call, canonical evidence, no broader authority surface, and all
 13 pre-live requirements. Candidate hashes are returned separately to the Owner.
-No staging, commit, remote publication or live invocation is authorized here.
+No new staging, commit, remote publication, or live invocation is authorized
+by this historical validation record.
 
 References: [integration gates](actual_automation_integration_plan.md),
 [S2-RO-01](stage2_vrrp_readonly_s2_ro_01_contract.md),
 [S2-RO-05](stage2_vrrp_readonly_s2_ro_05_authorization_envelope_ledger.md),
 [S2-RO-09](stage2_vrrp_readonly_s2_ro_09_pinned_ssh_transport.md), and
 [S2-RO-10](stage2_vrrp_readonly_s2_ro_10_trusted_runtime_composition.md).
+The consolidated current status is in the
+[Stage-2 formal closure candidate](stage2_formal_closure.md).
