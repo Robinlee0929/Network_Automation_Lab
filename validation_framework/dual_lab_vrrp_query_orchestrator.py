@@ -3,7 +3,7 @@
 Trusted callers supply the accepted persistent configurations. None represents
 an unavailable startup binding; this module cannot attest provider provenance.
 Both bundles are preflighted before any call. A local rejection skips only that
-target; colliding valid authorization identities reject the pair. Lab1's outcome
+target; colliding parseable authorization identities reject the pair. Lab1's outcome
 is finalized before Lab2 is invoked. Ordering does not imply simultaneous data.
 """
 
@@ -49,39 +49,41 @@ def _utc_now():
 
 
 def _preflight(bundle, target_ref):
-    """Return captured inputs or a local category; never acquire authority.
+    """Return eligible inputs, local failure, and independently retained identity.
 
     Bundle/request errors precede configuration errors, which precede envelope
-    errors. None has its dedicated configuration error. Pair identity comparison
-    uses only identities from successful local preflights.
+    errors. None has its dedicated configuration error. Once an envelope safely
+    parses, retain it for pair comparison even if local binding/time checks fail.
+    This identity grants no execution eligibility and acquires no authority.
     """
     stage = _F.PREFLIGHT_TARGET_BUNDLE_INVALID
+    envelope = None
     try:
         if type(bundle) is not DualLabTargetBundle:
-            return None, stage
+            return None, stage, envelope
         request_bytes, envelope_bytes = bundle.request_bytes, bundle.envelope_bytes
         request = _stage2.parse_stage2_vrrp_request_canonical_json(request_bytes)
         if request.target_ref != target_ref:
-            return None, stage
+            return None, stage, envelope
         binding = _credentials.build_stage2_fixed_credential_resolver().resolve_for_target(
             request.target_ref, request.credential_ref)
         if bundle.trusted_configuration is None:
-            return None, _F.PREFLIGHT_STARTUP_BINDING_UNAVAILABLE
+            return None, _F.PREFLIGHT_STARTUP_BINDING_UNAVAILABLE, envelope
         # Reuse S2-RO-10's pure capture/validation, including every nested record.
         # It performs no asset acquisition and avoids a second configuration schema.
         configuration = _Configuration(*_configuration_values(bundle.trusted_configuration))
         endpoint = configuration.target_registry.lookup(target_ref)
         if (configuration.known_host_configuration.expected_endpoint != endpoint
                 or configuration.credential_configuration.locator_ref != binding.locator_ref):
-            return None, stage
+            return None, stage, envelope
         stage = _F.PREFLIGHT_AUTHORIZATION_INVALID
         envelope = _authorization.parse_stage2_authorization_envelope(envelope_bytes)
         _authorization.validate_stage2_authorization_binding(
             envelope, request, configuration.target_registry, binding, now=_utc_now())
-        return (request_bytes, envelope_bytes, configuration, request, envelope), None
+        return (request_bytes, envelope_bytes, configuration, request, envelope), None, envelope
     except Exception:
         pass
-    return None, stage
+    return None, stage, envelope
 
 
 def _failure(target_ref, category):
@@ -124,11 +126,11 @@ def _run(query, lab1, lab2):
         if type(query) is not _dual.DualLabVrrpQuery:
             return None
         query = _dual.parse_query_canonical_json(query.to_canonical_bytes())
-        first, first_failure = _preflight(lab1, _LAB1)
-        second, second_failure = _preflight(lab2, _LAB2)
-        if first is not None and second is not None:
-            if (first[4].authorization_ref == second[4].authorization_ref
-                    or first[4].authorization_id == second[4].authorization_id):
+        first, first_failure, first_identity = _preflight(lab1, _LAB1)
+        second, second_failure, second_identity = _preflight(lab2, _LAB2)
+        if first_identity is not None and second_identity is not None:
+            if (first_identity.authorization_ref == second_identity.authorization_ref
+                    or first_identity.authorization_id == second_identity.authorization_id):
                 first_failure = second_failure = _F.PREFLIGHT_AUTHORIZATION_NOT_DISTINCT
         first_result = _target_result(_LAB1, first, first_failure)
         second_result = _target_result(_LAB2, second, second_failure)

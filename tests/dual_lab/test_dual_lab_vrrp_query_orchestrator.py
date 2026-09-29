@@ -349,6 +349,12 @@ def test_envelope_rejection_uses_existing_stage2_semantics(setup, index, kind):
         }[kind]
         change_envelope(setup, index, **changes)
     value = setup.call()
+    if kind == "swapped":
+        # A parseable other-target envelope also proves a pair identity collision.
+        for result in outcomes(value):
+            assert_failure(result, F.PREFLIGHT_AUTHORIZATION_NOT_DISTINCT)
+        assert setup.calls == [] and setup.ledger == []
+        return
     assert_failure(outcomes(value)[index], F.PREFLIGHT_AUTHORIZATION_INVALID)
     assert outcomes(value)[1 - index].status == "SUCCESS"
     assert len(setup.calls) == 1
@@ -367,6 +373,85 @@ def test_duplicate_identity_blocks_both_with_zero_invocations(setup, field):
     for result in outcomes(value):
         assert_failure(result, F.PREFLIGHT_AUTHORIZATION_NOT_DISTINCT)
     assert setup.calls == [] and setup.ledger == []
+
+
+@pytest.mark.parametrize("rejected", [(0,), (1,), (0, 1)])
+@pytest.mark.parametrize("field", ["authorization_id", "authorization_ref"])
+@pytest.mark.parametrize("rejection", ["expired", "not-yet-valid", "hash"])
+def test_p1_parseable_collision_overrides_local_rejection(setup, rejected, field, rejection):
+    duplicate = getattr(envelope(request(1), 1), field)
+    change_envelope(setup, 1, **{field: duplicate})
+    if field == "authorization_ref":
+        change_request(setup, 1, authorization_ref=duplicate)
+        change_envelope(setup, 1,
+                        request_sha256=hashlib.sha256(setup.bundles[1].request_bytes).hexdigest())
+    changes = {
+        "expired": {"issued_at": NOW - 100, "expires_at": NOW},
+        "not-yet-valid": {"issued_at": NOW + 1, "expires_at": NOW + 100},
+        "hash": {"request_sha256": "0" * 64},
+    }[rejection]
+    for index in rejected:
+        change_envelope(setup, index, **changes)
+    # Establish valid test construction using the unchanged Stage-2 validators.
+    for index, bundle in enumerate(setup.bundles):
+        parsed = a.parse_stage2_authorization_envelope(bundle.envelope_bytes)
+        req = c.parse_stage2_vrrp_request_canonical_json(bundle.request_bytes)
+        binding = r._resolver.build_stage2_fixed_credential_resolver().resolve_for_target(
+            req.target_ref, req.credential_ref)
+        if index in rejected:
+            with pytest.raises(a.Stage2AuthorizationError) as caught:
+                a.validate_stage2_authorization_binding(
+                    parsed, req, bundle.trusted_configuration.target_registry, binding, now=NOW)
+            assert caught.value.code is {
+                "expired": a.Stage2AuthorizationFailure.EXPIRED,
+                "not-yet-valid": a.Stage2AuthorizationFailure.NOT_YET_VALID,
+                "hash": a.Stage2AuthorizationFailure.INVALID_BINDING,
+            }[rejection]
+        else:
+            a.validate_stage2_authorization_binding(
+                parsed, req, bundle.trusted_configuration.target_registry, binding, now=NOW)
+    value = setup.call()
+    assert setup.calls == [] and setup.ledger == []
+    for result in outcomes(value):
+        assert_failure(result, F.PREFLIGHT_AUTHORIZATION_NOT_DISTINCT)
+
+
+@pytest.mark.parametrize("index", [0, 1])
+@pytest.mark.parametrize("rejection", ["expired", "not-yet-valid", "hash"])
+def test_p1_distinct_identity_preserves_local_failure_and_policy2(setup, index, rejection):
+    change_envelope(setup, index, **{
+        "expired": {"issued_at": NOW - 100, "expires_at": NOW},
+        "not-yet-valid": {"issued_at": NOW + 1, "expires_at": NOW + 100},
+        "hash": {"request_sha256": "0" * 64},
+    }[rejection])
+    value = setup.call()
+    assert_failure(outcomes(value)[index], F.PREFLIGHT_AUTHORIZATION_INVALID)
+    assert outcomes(value)[1 - index].status == "SUCCESS"
+    assert len(setup.calls) == 1
+    assert setup.ledger == [(LABS[1 - index], "begin"), (LABS[1 - index], "end")]
+
+
+@pytest.mark.parametrize("index", [0, 1])
+@pytest.mark.parametrize("malformed", ["invalid-id", "duplicate-key", "truncated"])
+def test_p1_unparseable_identity_does_not_fabricate_collision(setup, index, malformed):
+    # Apparent duplicates inside an invalid envelope are not safe pair identity.
+    raw = setup.bundles[1 - index].envelope_bytes
+    if malformed == "invalid-id":
+        data = json.loads(raw)
+        data["authorization_id"] = "not-a-uuid"
+        raw = canonical(data)
+    elif malformed == "duplicate-key":
+        raw = b'{"max_attempts":1,' + raw[1:]
+    else:
+        raw = raw[:-1]
+    with pytest.raises(a.Stage2AuthorizationError):
+        a.parse_stage2_authorization_envelope(raw)
+    setup.bundles[index] = replace(setup.bundles[index], envelope_bytes=raw)
+    value = setup.call()
+    assert_failure(outcomes(value)[index], F.PREFLIGHT_AUTHORIZATION_INVALID)
+    assert outcomes(value)[1 - index].status == "SUCCESS"
+    assert len(setup.calls) == 1
+    assert setup.ledger == [(LABS[1 - index], "begin"), (LABS[1 - index], "end")]
 
 
 def test_two_local_failures_have_no_invocations(setup):
