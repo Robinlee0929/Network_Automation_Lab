@@ -9,11 +9,12 @@ separate independent closure review and remote Safe CI. The default public
 review path remains Stage-0 offline evidence browsing. Stage 3 is **NOT
 STARTED / requires separate Owner authorization**.
 
-**Dual-Lab local candidate status:** DL-02 candidate
-`bb39e8295a2fa5d69980396dbaf8c374c79a57b3` passed fresh independent review.
-Owner acceptance is **PENDING**; DL-02 is not accepted, integrated, or merged.
+**Dual-Lab local implementation status:** DL-02 implementation
+`bb39e8295a2fa5d69980396dbaf8c374c79a57b3` passed fresh independent review
+and Owner acceptance is **ACCEPTED**. DL-02 is accepted, but not integrated or merged.
 DL-03 and later slices have not started, and no standing or new live authority
-exists. See the [canonical DL-02 candidate record](dual_lab_vrrp_ai_query_mvp.md).
+exists. The complete Dual-Lab MVP remains unfinished, with no live readiness
+granted. See the [canonical DL-02 acceptance record](dual_lab_vrrp_ai_query_mvp.md).
 This status records separately authorized local work without changing historical
 Stage-2 proof or closure semantics or reopening Stage 2.
 
@@ -382,10 +383,10 @@ reconstruction. This candidate activates no new adapter, protocol, provider,
 credential, device, or execution capability and permits no repeat attempt.
 Formal closure still requires independent closure review and remote Safe CI.
 The complete Dual-Lab AI Query MVP remains unfinished: its exact local DL-02
-candidate has fresh independent review PASS and Owner acceptance PENDING, as
-recorded above. DL-02 is not accepted or integrated; DL-03 and later slices
+implementation has fresh independent review PASS and Owner acceptance ACCEPTED,
+as recorded above. DL-02 is accepted but not integrated; DL-03 and later slices
 have not started. Stage 3 remains NOT STARTED. Further live access or scope
 expansion requires the applicable capability gates and separate exact Owner
-approval; this candidate grants no live authority or readiness.
+approval; DL-02 acceptance grants no live authority or readiness.
 
 This document does not start Phase 2C-10 or any implementation phase. It does not create a second safety matrix. It is a durable planning reference for future review and approval decisions.

@@ -1,18 +1,21 @@
-# Dual-Lab VRRP AI Query MVP: DL-02 Reviewed Candidate
+# Dual-Lab VRRP AI Query MVP: DL-02 Accepted Implementation
 
-**Decision summary: the local DL-02 implementation/remediation candidate passed
-fresh independent review; Owner acceptance is PENDING.** The exact reviewed code
-commit is `bb39e8295a2fa5d69980396dbaf8c374c79a57b3`. DL-02 is not accepted,
+**Decision summary: DL-02 passed fresh independent review and Owner acceptance
+completed with ACCEPT / PASS.** The exact accepted implementation
+commit is `bb39e8295a2fa5d69980396dbaf8c374c79a57b3`. DL-02 is not
 integrated into main, merged, or released. DL-03 and later slices have not started,
 and the complete Dual-Lab MVP remains unfinished. No live authority or readiness
 is granted.
 
 ## Purpose and planning boundary
 
-This is the canonical repository record for the DL-02 candidate and its completed
-independent review. It resolves the missing candidate record identified during
-the preceding Owner acceptance attempt. It records evidence for a separate
-acceptance retry; it does not perform that acceptance.
+This is the canonical repository record for the accepted DL-02 implementation,
+its completed independent review, and the completed Owner acceptance decision.
+The pre-acceptance documentation commit
+`76ce998531de59c201eaa6f123e57b1f9d364b19` established the candidate record and
+resolved the documentary gap. The subsequent read-only acceptance retry returned
+ACCEPT / PASS without changing source, tests, or documentation. This update
+records that completed decision without reopening it.
 
 The accepted Dual-Lab VRRP AI Query MVP planning scope, reaffirmed by the Owner's
 documentation reconciliation authorization, defines DL-02 as the fixed
@@ -25,19 +28,21 @@ parallel execution are excluded.
 That planning scope assigns the detailed record to this document and status
 summaries to [the automation plan](actual_automation_integration_plan.md) and
 [README](../../README.md). Stage-2 historical proof and closure semantics remain
-unchanged; this local candidate record does not resolve any Stage-2 closure gate.
+unchanged; this acceptance record does not resolve any Stage-2 closure gate.
 
 ```text
 STAGE2_FILES_REQUIRING_SEMANTIC_CHANGE = NONE
 STAGE2_REOPEN_REQUIRED = NO
 ```
 
-## Exact reviewed code candidate
+## Exact accepted implementation and reviewed candidate
 
 ```text
 DL_02_IMPLEMENTATION_CANDIDATE = YES
 DL_02_CANDIDATE_COMMIT = bb39e8295a2fa5d69980396dbaf8c374c79a57b3
 DL_02_CANDIDATE_PARENT = 314e50ad847caf04a6a200199b63e1b3d3505f61
+DL_02_ACCEPTED_IMPLEMENTATION_COMMIT = bb39e8295a2fa5d69980396dbaf8c374c79a57b3
+DL_02_ACCEPTED_IMPLEMENTATION_PARENT = 314e50ad847caf04a6a200199b63e1b3d3505f61
 DL_02_CHANGED_PATH_COUNT = 2
 DL_02_CHANGED_PATHS =
   validation_framework/dual_lab_vrrp_query_orchestrator.py
@@ -125,21 +130,29 @@ no Lab1/Lab2 access, SSH/NETCONF/RESTCONF execution, provider/API/model operatio
 secrets handling, configuration backup/change, production execution, worker, or
 AI agent loop. It adds no second safety matrix.
 
-## Pending Owner decision
+## Completed Owner acceptance and remaining gates
 
 ```text
-DL_02_OWNER_ACCEPTANCE = PENDING
-DL_02_ACCEPTED = NO
-DL_02_READY_FOR_OWNER_ACCEPTANCE_DECISION = YES
+DL_02_OWNER_ACCEPTANCE = ACCEPTED
+DL_02_ACCEPTED = YES
+DL_02_ACCEPTANCE_RESULT = PASS
+DL_02_ACCEPTANCE_BASIS = FRESH_INDEPENDENT_REVIEW_PASS_AND_OWNER_ACCEPTANCE
+ACCEPTANCE_CANONICAL_STATE_HEAD = 76ce998531de59c201eaa6f123e57b1f9d364b19
 DL_03_IMPLEMENTATION_STARTED = NO
 LIVE_AUTHORITY_GRANTED = NO
 LIVE_READINESS_GRANTED = NO
 CONFIGURATION_MUTATION_AUTHORIZED = NO
-NEXT_REQUIRED_OWNER_DECISION = AUTHORIZE_DL_02_OWNER_ACCEPTANCE_RETRY
+COMPLETE_DUAL_LAB_MVP = NO
+NEXT_REQUIRED_OWNER_DECISION = REVIEW_CANONICAL_PLAN_AND_AUTHORIZE_DL_03_PLANNING_OR_IMPLEMENTATION_AS_DEFINED_BY_GOVERNING_PLAN
 ```
 
-The acceptance retry must bind its decision to the exact reviewed code commit,
-parent, paths, hashes, completed review evidence, and this canonical record.
-Owner acceptance remains a separate decision from integration, remote
-availability, integrated-MVP Safe CI, further slices, live readiness, and
-production readiness. None of those later states is established here.
+Owner acceptance establishes that the exact implementation identified above
+satisfies the defined DL-02 requirements. The accepted implementation identity
+remains separate from the pre-acceptance and post-acceptance documentation
+commits. The review results, hashes, and safety findings remain unchanged.
+
+Integration, remote availability, integrated-MVP Safe CI, further slices, live
+readiness, and production readiness remain separate gates. None of those later
+states, complete Dual-Lab MVP acceptance, or DL-05 completion is established here.
+The next Owner decision requires review of the canonical plan and explicit
+authorization for the DL-03 scope it defines; this record does not start DL-03.
