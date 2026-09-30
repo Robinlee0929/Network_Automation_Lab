@@ -493,7 +493,7 @@ release lanes; they are not performed by documentation-only changes.
 | Stage-0 Network Automation Lab | **CLOSED** at `main@aff250735ade18e4c274be8ac53c9672bb2cb07f` |
 | Stage-1 Read-only Lab Integration Planning | Historical planning-entry record; see the Stage-2 closure candidate |
 | Stage-2 bounded MikroTik VRRP validation | Lab1 historical proof retained; Lab2 proof PASS/CLOSED on repository baseline `ea73196281e38a01af7bf959cc5e1bc60b0b2499`; persistent Lab2 startup reconstruction and independent binding review PASS; overall Stage 2 is a **CLOSURE CANDIDATE** |
-| Dual-Lab AI Query | **NOT IMPLEMENTED / not authorized**; eligible only as future work after formal Stage-2 closure |
+| Dual-Lab AI Query | **DL-02 local candidate reviewed PASS / Owner acceptance PENDING**; not accepted, integrated, merged, or released; DL-03 and later slices NOT STARTED; no live authority |
 | Stage 3 | **NOT STARTED / requires separate Owner authorization** |
 | Canonical reviewer interface | Flask dashboard on `127.0.0.1:5000` |
 | Secondary Next.js interface | Available as a bounded Stage-0 evidence surface |
@@ -504,6 +504,15 @@ release lanes; they are not performed by documentation-only changes.
 | WF-01-03B effect on August closure | Does not block the Stage-0 August release |
 | WF-01-03C through WF-01-03F | Deferred future work / post-release |
 | New project-status infrastructure | Not required; this section is the repository-facing release summary |
+
+The exact DL-02 implementation/remediation candidate is
+`bb39e8295a2fa5d69980396dbaf8c374c79a57b3`. Its fresh independent review passed;
+Owner acceptance remains PENDING (`DL_02_ACCEPTED = NO`). The complete Dual-Lab
+MVP remains unfinished. See the
+[canonical DL-02 candidate record](docs/automation_readiness/dual_lab_vrrp_ai_query_mvp.md)
+for scope, hashes, and validation evidence. This local candidate status grants
+no live authority or readiness and does not change historical Stage-2 proof or
+closure semantics.
 
 `DEFERRED_SECURITY_RESEARCH_BLOCKED` is not a Security PASS, completion,
 activation, or integration claim. Detailed experimental research evidence is
@@ -526,9 +535,10 @@ future capabilities stay behind their separate authorization and safety gates.
   acceptance gates.
 - Address Node/NVM coexistence only if a later environment-maintenance task
   requires it.
-- Begin any Dual-Lab AI Query work only after Stage-2 formal closure and a
-  separate authorized task. The completed Lab1 and Lab2 proofs grant no future
-  live authority.
+- Retry Owner acceptance of the reviewed DL-02 local candidate only under a
+  separate authorized task. Integration and DL-03 or later slices remain
+  separately gated and have not started. The completed Lab1 and Lab2 proofs
+  grant no future live authority.
 - Keep the post-merge Safe CI maintenance findings OPEN: npm has 5
   vulnerabilities (2 moderate, 2 high, 1 critical), and Next.js emitted 7
   filesystem-tracing warnings. These are non-Stage-2-blocking maintenance items;
