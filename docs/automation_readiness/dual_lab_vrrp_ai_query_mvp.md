@@ -1,16 +1,21 @@
-# Dual-Lab VRRP AI Query MVP: DL-02 Accepted Implementation
+# Dual-Lab VRRP AI Query MVP: DL-02 Acceptance and DL-03 Specification
 
 **Decision summary: DL-02 passed fresh independent review and Owner acceptance
-completed with ACCEPT / PASS.** The exact accepted implementation
+completed with ACCEPT / PASS; the DL-03 projection specification is established.**
+The exact accepted DL-02 implementation
 commit is `bb39e8295a2fa5d69980396dbaf8c374c79a57b3`. DL-02 is not
-integrated into main, merged, or released. DL-03 and later slices have not started,
+integrated into main, merged, or released. DL-03 implementation is neither started
+nor authorized; later slices have not started,
 and the complete Dual-Lab MVP remains unfinished. No live authority or readiness
 is granted.
 
 ## Purpose and planning boundary
 
 This is the canonical repository record for the accepted DL-02 implementation,
-its completed independent review, and the completed Owner acceptance decision.
+its completed independent review, the completed Owner acceptance decision, and
+the exact future DL-03 facts-only projection contract. The DL-03 section resolves
+the readiness review's `BLOCKED_CANONICAL_SCOPE_AMBIGUITY` through specification
+only. It does not implement the projection or reopen DL-02 or Stage 2.
 The pre-acceptance documentation commit
 `76ce998531de59c201eaa6f123e57b1f9d364b19` established the candidate record and
 resolved the documentary gap. The subsequent read-only acceptance retry returned
@@ -143,7 +148,7 @@ LIVE_AUTHORITY_GRANTED = NO
 LIVE_READINESS_GRANTED = NO
 CONFIGURATION_MUTATION_AUTHORIZED = NO
 COMPLETE_DUAL_LAB_MVP = NO
-NEXT_REQUIRED_OWNER_DECISION = REVIEW_CANONICAL_PLAN_AND_AUTHORIZE_DL_03_PLANNING_OR_IMPLEMENTATION_AS_DEFINED_BY_GOVERNING_PLAN
+NEXT_REQUIRED_OWNER_DECISION = AUTHORIZE_BOUNDED_DL_03_IMPLEMENTATION
 ```
 
 Owner acceptance establishes that the exact implementation identified above
@@ -154,5 +159,418 @@ commits. The review results, hashes, and safety findings remain unchanged.
 Integration, remote availability, integrated-MVP Safe CI, further slices, live
 readiness, and production readiness remain separate gates. None of those later
 states, complete Dual-Lab MVP acceptance, or DL-05 completion is established here.
-The next Owner decision requires review of the canonical plan and explicit
-authorization for the DL-03 scope it defines; this record does not start DL-03.
+The next Owner decision is separate authorization for the bounded DL-03
+implementation specified below. This record does not start that implementation.
+
+## DL-03 canonical specification: purpose and scope
+
+DL-03 projects an already canonical Dual-Lab aggregate into an immutable,
+deterministic AI/UI-facing summary DTO. Its only claims are observed values,
+availability, existing sanitized failure categories, equality/difference, set
+membership/difference, and record counts. AI/UI-facing describes a data consumer;
+it introduces no model or provider integration.
+
+This specification was established against repository baseline
+`4d0abf0fd87986cb3fb054f9e265f5846ba52b47`. The normative upstream boundaries are
+[DL-01's inert aggregate contract](../../validation_framework/dual_lab_vrrp_query_contract.py)
+and [the inert Stage-2 evidence contract](../../validation_framework/stage2_vrrp_readonly_contract.py).
+The former validates the fixed target pair and tagged results; the latter
+validates normalized records. DL-03 consumes those boundaries without changing
+their schemas or execution semantics.
+
+```text
+DL_03_PURPOSE = DETERMINISTIC_FACTS_ONLY_PROJECTION
+DL_03_EXECUTION_AUTHORITY = NONE
+DL_03_MODEL_PROVIDER_INTEGRATION = NO
+DL_03_INPUT = EXISTING_CANONICAL_DUAL_LAB_AGGREGATE_ONLY
+DL_03_OUTPUT = IMMUTABLE_FACTS_ONLY_SUMMARY_DTO
+DL_03_SCHEMA_VERSION = dual-lab-vrrp-query-summary.v1
+DL_01_AGGREGATE_SCHEMA_CHANGE_REQUIRED = NO
+DL_01_CHANGE_REQUIRED = NO
+DL_02_CHANGE_REQUIRED = NO
+STAGE2_CHANGE_REQUIRED = NO
+```
+
+### Exact public API and input boundary
+
+The future module's public exports are exactly `DualLabVrrpSummary`,
+`DualLabSummaryError`, `project_dual_lab_vrrp_summary`, and
+`parse_summary_canonical_json`. The two functions have these signatures:
+
+```python
+project_dual_lab_vrrp_summary(raw: bytes) -> DualLabVrrpSummary
+parse_summary_canonical_json(raw: bytes) -> DualLabVrrpSummary
+```
+
+`project_dual_lab_vrrp_summary` accepts only exact built-in `bytes`, containing
+the existing DL-01 aggregate's canonical JSON. It delegates validation to
+`parse_aggregate_canonical_json` before deriving any output. Callers holding a
+`DualLabVrrpAggregate` use its existing `to_canonical_bytes()` first. There is no
+duck-typed object, dictionary, text, bytearray, subclass, runtime bundle, or
+executor input overload. Forged objects therefore cannot bypass validation.
+
+The input has exactly `schema_version`, `query_id`, `operation_id`,
+`execution_order`, `lab1`, and `lab2`. Its schema remains
+`dual-lab-vrrp-query.v1`; operation is `mikrotik.vrrp_status`; execution order is
+`LAB1_THEN_LAB2`. Lab1 is bound to `target.mikrotik.lab01`, Lab2 to
+`target.mikrotik.lab02`. Query identity retains DL-01's grammar and 160-character
+bound. Success input carries canonical `evidence`; failure input carries the
+existing bounded `failure_category`. All nested exact-field, value, target,
+canonical JSON, and size checks remain upstream checks. The upstream aggregate
+byte limit is 69,632 bytes. No new input field is permitted, including
+`cross_target_observations`.
+
+Malformed, noncanonical, extra-field, target-swapped, or invalid-success input
+fails closed before projection. Invalid input is not repaired, normalized into
+validity, or converted into a target failure. Contract validation establishes
+data validity, not provenance, freshness, authorization, or device truth.
+
+`parse_summary_canonical_json` accepts only exact built-in `bytes` containing
+canonical summary JSON conforming to the output rules below. It does not accept
+an aggregate, acquire evidence,
+or call the projection entrypoint. It validates the entire DTO and recomputes
+the required observations from its target projections, rejecting inconsistent,
+missing, extra, or differently ordered observations. A parsed summary conveys
+no stronger provenance than its data.
+
+`DualLabVrrpSummary` is factory-created by those functions; direct construction
+is not a public API. Its public data attributes are the seven output fields.
+Its public methods are `to_dict() -> dict[str, object]` and
+`to_canonical_bytes() -> bytes`; its nonserialized `execution_authorized`
+property always returns `False`. Both methods revalidate all fields and derived
+observations, including after deliberate frozen-object tampering. Nested
+representations are private immutable value objects, with fields exactly as
+specified below; arrays are tuples internally and lists only in fresh exports.
+
+All public rejection paths raise `DualLabSummaryError`, a `ValueError` with
+exact message `invalid Dual-Lab summary`. The error retains no input, child
+exception, cause, or context. No partial DTO is returned. DTO and nested-object
+`repr` and `str` return the fixed label `<inert-dual-lab-summary>`.
+
+### Exact output and projected records
+
+Every object is closed to extra or missing fields. Primitive types are exact;
+booleans cannot substitute for integers. The top-level fields are exactly:
+
+| Field | Required value |
+| --- | --- |
+| `schema_version` | `dual-lab-vrrp-query-summary.v1` |
+| `query_id` | Validated input query identity, unchanged |
+| `operation_id` | `mikrotik.vrrp_status`, unchanged |
+| `execution_order` | `LAB1_THEN_LAB2`, unchanged; metadata only |
+| `lab1` | Projection bound to `target.mikrotik.lab01` |
+| `lab2` | Projection bound to `target.mikrotik.lab02` |
+| `cross_target_observations` | Ordered array derived by the rules below |
+
+A successful target has exactly `status`, `target_ref`, `records`, with status
+`SUCCESS`. A failed target has exactly `status`, `target_ref`,
+`failure_category`, with status `FAILURE`. Failure has **no `records` field**:
+neither null nor an empty array is valid there. Success has 0 through 32 records;
+an empty successful observation remains distinct from unavailable evidence.
+
+Each projected record has exactly these nine observed fields, retaining the
+upstream types and bounds without coercion, case folding, trimming, inference,
+or substitutions:
+
+| Field | Exact domain |
+| --- | --- |
+| `instance_name` | Nonempty NFC string; no surrounding whitespace or Unicode category C characters; at most 128 UTF-8 bytes |
+| `role` | `MASTER`, `BACKUP`, `FAILURE`, or `UNKNOWN` |
+| `vrid` | Integer 1 through 255 |
+| `priority` | Integer 0 through 255 |
+| `interval_ms` | Integer 1 through 255,000 |
+| `version` | Integer 2 or 3 |
+| `running` | Boolean |
+| `disabled` | Boolean |
+| `invalid` | Boolean |
+
+No evidence-envelope fields are copied into a success projection. In particular,
+run IDs, authorization IDs/references, policy versions, attempt/retry counts,
+durations, raw-output byte counts, and raw-output hashes are excluded. Raw
+stdout, credentials/references, signatures, private keys, known-host raw data,
+private paths, replay data, exception text, runtime configuration, and SSH/session
+details have no output field. `target_ref` is the existing fixed public logical
+identifier, not an endpoint or credential reference.
+
+### Record order, matching, and duplicate preservation
+
+Sort each target's records ascending by the complete key:
+
+```text
+(instance_name, vrid, role, priority, interval_ms, version, running, disabled, invalid)
+```
+
+Strings use Python Unicode code-point order, integers numeric order, and booleans
+`False` before `True`. The primary key is `(instance_name, vrid)`; the remaining
+seven observable fields form the complete tie-breaker. Byte-identical duplicates
+remain repeated entries. Upstream permits duplicate matching keys and identical
+records, so DL-03 must neither reject valid duplicates nor collapse them.
+
+Group records on each side by exact `(instance_name, vrid)`. Field comparisons
+are emitted only when that key has exactly one record on each side. A common key
+with multiplicity greater than one on either side yields one
+`MATCH_KEY_MULTIPLICITY` observation with the two counts; it yields no field
+comparison. This reports the ambiguity without inventing a record pairing.
+
+A key occurring only on one side yields an unmatched-key observation with its
+occurrence count, including all duplicates. It is never matched by array
+position, role, priority, similar spelling, or VRID alone. Sorting does not
+establish a cross-target pairing.
+
+```text
+RECORD_MATCHING_KEY = (instance_name, vrid)
+INPUT_ORDER_INDEPENDENT = YES
+DUPLICATE_RECORD_COLLAPSE = NO
+DETERMINISTIC_OUTPUT = YES
+```
+
+Equivalent inputs with the same query identity, target statuses/failure labels,
+and per-target record multisets produce identical output bytes. Changes only
+to valid upstream evidence-envelope metadata also cannot affect the summary.
+Canonical input bytes may contain any valid record-array order; DL-03 sorts its
+output without rewriting or relaxing upstream canonical JSON validation.
+
+### Closed cross-target observation vocabulary
+
+```text
+CROSS_TARGET_OBSERVATIONS_SOURCE = DERIVED_FROM_CANONICAL_LAB1_AND_LAB2_RESULTS_ONLY
+CROSS_TARGET_OBSERVATION_SCHEMA = kind, subject, lab1_value, lab2_value
+```
+
+Every observation contains exactly those four fields. `kind` is one of the 14
+literal strings in the table. `subject` and both values are constrained by its
+row; there is no free-text explanation, arbitrary mapping, or extension kind.
+`K` means an exact object with `instance_name` and `vrid`, using record domains.
+`KF` means an exact object with `instance_name`, `vrid`, and `field`. `field` is
+one of `role`, `priority`, `interval_ms`, `version`, `running`, `disabled`,
+`invalid`. Array values are sorted unique sets, not record arrays.
+
+| Permitted kind | Exact subject | Exact lab1_value / lab2_value | Emission condition |
+| --- | --- | --- | --- |
+| `RESULT_AVAILABILITY` | `null` | Boolean / boolean | Always once; true iff that target is SUCCESS |
+| `VRID_SET_EQUAL` | `null` | Integer array / integer array | Both succeed and observed VRID sets equal |
+| `VRID_SET_DIFFERENT` | `null` | Integer array / integer array | Both succeed and observed VRID sets differ |
+| `VRID_ONLY_LAB1` | Integer VRID | `true` / `false` | One per VRID in Lab1 set minus Lab2 set |
+| `VRID_ONLY_LAB2` | Integer VRID | `false` / `true` | One per VRID in Lab2 set minus Lab1 set |
+| `INSTANCE_NAME_SET_EQUAL` | `null` | String array / string array | Both succeed and observed name sets equal |
+| `INSTANCE_NAME_SET_DIFFERENT` | `null` | String array / string array | Both succeed and observed name sets differ |
+| `RECORD_COUNT_EQUAL` | `null` | Integer count / integer count | Both succeed and full record counts equal |
+| `RECORD_COUNT_DIFFERENT` | `null` | Integer count / integer count | Both succeed and full record counts differ |
+| `RECORD_ONLY_LAB1` | `K` | Positive count / `0` | Key exists only in Lab1 |
+| `RECORD_ONLY_LAB2` | `K` | `0` / positive count | Key exists only in Lab2 |
+| `MATCH_KEY_MULTIPLICITY` | `K` | Positive count / positive count | Common key has count greater than one on either side |
+| `FIELD_EQUAL` | `KF` | Observed scalar / observed scalar | Unique key on each side, selected field equal |
+| `FIELD_DIFFERENT` | `KF` | Observed scalar / observed scalar | Unique key on each side, selected field different |
+
+All rows other than availability require both targets to succeed. Counts range
+from 0 through 32, or 1 through 32 where positive is specified. VRID and name
+arrays contain at most 32 entries in their upstream domains. Field values have
+exactly the selected field's domain. Set comparisons intentionally remove
+duplicate set members; record projections and record counts never do.
+
+The observation array has this exact order, with no optional rows:
+
+1. One `RESULT_AVAILABILITY` row.
+2. If either target failed, stop: the array contains only that row.
+3. Exactly one VRID set equality/difference row; then all `VRID_ONLY_LAB1`
+   rows ascending by VRID; then all `VRID_ONLY_LAB2` rows ascending by VRID.
+4. Exactly one instance-name set equality/difference row.
+5. Exactly one full record-count equality/difference row.
+6. All `RECORD_ONLY_LAB1` rows ascending by K; then all `RECORD_ONLY_LAB2`
+   rows ascending by K.
+7. All `MATCH_KEY_MULTIPLICITY` rows ascending by K.
+8. For every key unique on both sides, ascending by K, exactly seven field
+   equality/difference rows in this field order: `role`, `priority`,
+   `interval_ms`, `version`, `running`, `disabled`, `invalid`.
+
+K uses the record primary sort order. Field equality is exact typed equality,
+not health evaluation. Equal priorities yield `FIELD_EQUAL`; different priorities
+yield `FIELD_DIFFERENT`; neither produces a recommendation. No timestamp, skew,
+convergence, paired-health, or simultaneous-snapshot claim is available.
+
+For example, two successful empty results produce exactly four rows:
+availability `(true, true)`, VRID-set equality `([], [])`, name-set equality
+`([], [])`, and count equality `(0, 0)`. Two identical single records produce
+those four kinds of rows followed by seven `FIELD_EQUAL` rows. A shared key
+with two Lab1 records and one Lab2 record emits multiplicity `(2, 1)` and zero
+field rows for that key, retaining all three projected records.
+
+### Failures and prohibited inference
+
+Failure projection preserves the fixed target and exact upstream enum spelling:
+
+```text
+PREFLIGHT_TARGET_BUNDLE_INVALID
+PREFLIGHT_AUTHORIZATION_INVALID
+PREFLIGHT_AUTHORIZATION_NOT_DISTINCT
+PREFLIGHT_STARTUP_BINDING_UNAVAILABLE
+CANONICAL_EVIDENCE_VALIDATION_FAILED
+INVALID_REQUEST_INPUT
+INVALID_AUTHORIZATION_INPUT
+INVALID_TRUSTED_CONFIGURATION
+TRUSTED_RUNTIME_FAILED
+OUTPUT_RENDER_FAILED
+INTERNAL_FAILURE
+```
+
+Lab1-success/Lab2-failure yields only availability `(true, false)`; the reverse
+yields `(false, true)`; both failures yield `(false, false)`. The successful
+target's records are still projected and sorted. No comparison involving the
+unavailable target is emitted: not even a zero count or empty set. There is no
+historical substitution, copied peer evidence, fabricated record, inferred
+failure explanation, or retry/fallback advice.
+
+Closed fields and discriminated value domains make the DTO incapable of issuing
+health, readiness, configuration-correctness, root-cause, or remediation
+verdicts. In particular, no status or kind may be `HEALTHY`, `UNHEALTHY`,
+`DEGRADED`, `FAILOVER_READY`, `HA_READY`, `PRODUCTION_READY`, `SPLIT_BRAIN`,
+`MISCONFIGURED`, `CORRECT_CONFIGURATION`, `INCORRECT_CONFIGURATION`,
+`ROOT_CAUSE`, or `REMEDIATION_REQUIRED`.
+
+There are no remediation/configuration command, retry/fallback advice,
+credential/endpoint selection, authorization decision, command selection, or
+execution-instruction fields. A valid observed instance name is opaque data,
+even if it spells a prohibited verdict or resembles a command. Preserve it as
+data; never interpret or render it as a verdict or executable instruction.
+This distinction preserves upstream compatibility without allowing free-form
+claims in structural fields.
+
+### Canonical serialization and isolation
+
+Use the existing JSON convention: `json.dumps` with `allow_nan=False`,
+`ensure_ascii=False`, `separators=(",", ":")`, `sort_keys=True`, then strict
+UTF-8 encoding. No BOM, trailing newline, whitespace variation, alternate key
+ordering, duplicate JSON keys at any depth, nonfinite numbers, coercion, or
+extra fields are accepted by the summary parser. Re-encoding must equal the
+input bytes exactly. Record and observation arrays must already have their
+specified order when parsing a summary; the parser rejects rather than repairs
+unsorted summaries. The projection entrypoint is responsible for sorting valid
+aggregate records.
+
+The summary canonical byte limit is 262,144 bytes; observations are limited to
+356 rows (a conservative bound: 4 base rows, up to 64 VRID-only rows, up to 64
+key-level rows, and up to 224 field rows). Upstream record/name limits keep all
+valid derived summaries within this byte bound, including JSON escaping of
+128-byte names. These output limits do not change upstream limits.
+
+All nested DTO values are immutable and detached from upstream objects. Every
+`to_dict()` returns fresh dictionaries/lists throughout. Mutating an exported
+dictionary cannot change the DTO, another export, or later bytes. Serialization
+and parsing enforce the full exact schema and derived-row consistency. They
+introduce no alternative serialization framework or dependency.
+
+```text
+CANONICAL_SERIALIZATION_REQUIRED = YES
+IMMUTABLE_DTO_REQUIRED = YES
+EXACT_FIELD_VALIDATION_REQUIRED = YES
+DUPLICATE_JSON_KEY_REJECTION_REQUIRED = YES
+INPUT_OUTPUT_ISOLATION_REQUIRED = YES
+```
+
+### Future implementation boundary and validation contract
+
+Only the following two new files are the canonical scope for a separately
+authorized implementation. They are not created by this specification task.
+
+```text
+DL_03_AUTHORIZED_SOURCE_FILES = validation_framework/dual_lab_vrrp_query_summary.py
+DL_03_AUTHORIZED_TEST_FILES = tests/dual_lab/test_dual_lab_vrrp_query_summary.py
+EXISTING_SOURCE_FILES_TO_MODIFY = NONE
+EXISTING_TEST_FILES_TO_MODIFY = NONE
+DEPENDENCY_CHANGE_REQUIRED = NO
+```
+
+The future module may reuse the inert DL-01 and Stage-2 contract modules and
+standard-library data/JSON facilities. It must not import or invoke S2-RO-11,
+the DL-02 orchestrator, runners, adapters, brokers, or live entrypoints. No
+network query, Lab1/Lab2 access, credential resolution, authorization acquisition
+or signing, replay consumption, command selection, or trusted runtime-config
+access is permitted. No SSH, NETCONF, RESTCONF, external API/provider/model,
+queue, scheduler, worker, AI loop, config backup/change, or production execution
+path is added. No CLI/task-registry/report renderer/dashboard integration,
+Day1-Day160 rewrite, second safety matrix, or next-slice implementation belongs
+to this scope. If implementation cannot satisfy the contract in these two new
+files, stop and report the exact conflict; do not broaden the scope.
+
+The future test file must establish the following deterministic assertions.
+These are acceptance tests for the future implementation, not tests run by
+this documentation task.
+
+| Test | Required assertion |
+| ---: | --- |
+| 1 | Both targets SUCCESS: exact target projections and complete ordered derived rows. |
+| 2 | Lab1 SUCCESS / Lab2 FAILURE: availability true/false only; Lab1 records retained. |
+| 3 | Lab1 FAILURE / Lab2 SUCCESS: availability false/true only; Lab2 records retained. |
+| 4 | Both FAILURE: availability false/false only; exact failure categories retained. |
+| 5 | Both SUCCESS with zero records: exactly the four rows specified above. |
+| 6 | Identical single records: exactly eleven rows, seven field equalities. |
+| 7 | Multiple records: all records retained and sorted by the full key. |
+| 8 | Reverse/shuffle either target's records: identical summary canonical bytes. |
+| 9 | Repeat equivalent input, reorder input object keys before canonical encoding, or vary valid discarded envelope metadata: identical output bytes. |
+| 10 | Exactly seven top-level fields; missing/extra fields reject in summary parsing. |
+| 11 | Exact success/failure field sets; failure records absent, null/empty variants reject. |
+| 12 | Exactly nine record fields; wrong domains, missing/extra fields reject. |
+| 13 | Upstream envelope metadata excluded; sensitive/raw field injection rejected at every schema depth; sanitized errors retain no rejected input or child exception. |
+| 14 | Same VRID sets: one VRID_SET_EQUAL row with sorted unique sets. |
+| 15 | Different VRID sets: one VRID_SET_DIFFERENT and exact directional VRID-only rows. |
+| 16 | Lab1-only record keys: RECORD_ONLY_LAB1 with full occurrence count and peer zero. |
+| 17 | Lab2-only record keys: RECORD_ONLY_LAB2 with peer zero and full occurrence count. |
+| 18 | Unique exact matched key with equal fields: seven ordered FIELD_EQUAL rows. |
+| 19 | Change each comparable field independently: exactly that field's row becomes FIELD_DIFFERENT with exact values. |
+| 20 | Equal priority values: factual equality only, no role/health inference. |
+| 21 | Different priority values: factual difference only, no preference/advice. |
+| 22 | All boolean flag combinations compare exact booleans; integers reject as flags. |
+| 23 | Same VRID/different name, same name/different VRID, similar names, positions, or priorities never establish a match. |
+| 24 | Identical and differing duplicates survive; complete tie-breakers are stable; common duplicate key yields counts and no field pairing. |
+| 25 | Failed target never receives records, historical/peer substitution, zero-count, or empty-set comparisons. |
+| 26 | Malformed/noncanonical/oversize aggregate bytes, wrong input types, subclasses, and forged objects reject with no DTO. |
+| 27 | Extra aggregate fields, especially cross_target_observations, reject through DL-01 validation. |
+| 28 | Swapped targets or mismatched target/evidence bindings reject. |
+| 29 | Invalid success evidence, including forged/out-of-domain record values, rejects. |
+| 30 | Health/readiness/configuration verdict kinds and fields reject; verdict-like instance names remain opaque observed data. |
+| 31 | Root-cause kinds/fields reject. |
+| 32 | Remediation kinds/fields reject. |
+| 33 | Configuration command/instruction kinds/fields reject; command-like names remain inert data. |
+| 34 | Retry/fallback advice kinds/fields reject. |
+| 35 | Import and all public valid/rejected paths make zero execution/network calls and no application file/runtime I/O beyond normal Python module loading; existing execution boundaries are unreachable. |
+| 36 | Import and all public paths make zero provider/model calls and load no provider integration. |
+| 37 | Same/different instance-name sets yield exact sorted set rows, including empty sets. |
+| 38 | Equal/different full counts include duplicates; all 11 failure categories preserve exact spelling. |
+| 39 | Canonical summary round-trip; duplicate JSON keys at every depth, wrong byte framing, unsorted arrays, altered/missing/extra/inconsistent derived rows reject. |
+| 40 | Frozen nested DTOs, fresh-export isolation, and revalidation after tampering; execution_authorized remains false. |
+| 41 | Maximum 32 records per target, maximum UTF-8 names with escaping, Unicode ordering, and duplicate-heavy inputs stay within output bounds. |
+| 42 | Exact public export set and byte-only signatures; no executor, callback, runtime-config, or authorization argument. |
+
+Future validation must include
+`python -m pytest tests/dual_lab/test_dual_lab_vrrp_query_summary.py`,
+`python -m pytest tests/dual_lab/test_dual_lab_vrrp_query_contract.py`,
+`python -m pytest`, and `python network_lab.py --task report-index` under the
+repository's offline safety controls. Negative cases must demonstrate zero
+execution, not merely an error result. No dedicated runner is introduced.
+Record exact counts, skips, guard outcomes, and any optional-report WARN; none
+of those results is pre-approved by this specification.
+
+### Specification decision and documentation review
+
+The consistency/readability review confirms that the summary/input schemas are
+distinct, all observation types and ordering are closed, duplicate handling is
+compatible with upstream, failure absence is explicit, and only two future new
+files are in scope. The accepted DL-02 identity, review evidence, and Stage-2
+closure remain unchanged. README and the automation plan's existing DL-02
+acceptance and unstarted-DL-03 status remain consistent; only this document
+establishes the detailed DL-03 specification. This review changes no runtime
+behavior and is not a second safety matrix.
+
+```text
+DL_02_ACCEPTED = YES
+DL_03_SPECIFICATION_STATUS = ESTABLISHED
+DL_03_IMPLEMENTATION_STARTED = NO
+DL_03_IMPLEMENTATION_AUTHORIZED = NO
+MINIMUM_TEST_MATRIX_ESTABLISHED = YES
+DOCUMENTATION_CONSISTENCY_REVIEW = PASS
+DOCUMENTATION_READABILITY_REVIEW = PASS
+COMPLETE_DUAL_LAB_MVP = NO
+LIVE_AUTHORITY_GRANTED = NO
+LIVE_READINESS_GRANTED = NO
+NEXT_REQUIRED_OWNER_DECISION = AUTHORIZE_BOUNDED_DL_03_IMPLEMENTATION
+```
