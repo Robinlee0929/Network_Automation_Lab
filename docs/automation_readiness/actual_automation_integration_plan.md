@@ -12,13 +12,13 @@ STARTED / requires separate Owner authorization**.
 **Dual-Lab local implementation status:** DL-02 implementation
 `bb39e8295a2fa5d69980396dbaf8c374c79a57b3` passed fresh independent review
 and Owner acceptance is **ACCEPTED**. DL-02 is accepted, but not integrated or merged.
-DL-03 candidate `e4c529507c6f5a26a289af4f6d3bfc9e0b170c18` is implemented
-with fresh review **PASS**; Owner acceptance is **PENDING**, so DL-03 is not
-accepted or integrated. The review used fresh inspection and validation in the
-same conversation, without a separate-reviewer identity claim. DL-04 has not
+DL-03 implementation `e4c529507c6f5a26a289af4f6d3bfc9e0b170c18` is
+**ACCEPTED**, with governed review **PASS** and Owner acceptance **ACCEPTED**.
+DL-03 is not integrated or merged. The review used fresh inspection and validation
+in the same conversation, without a separate-reviewer identity claim. DL-04 has not
 started, and no standing or new live authority exists. The complete Dual-Lab MVP
 remains unfinished, with no live readiness granted. See the
-[canonical DL-02 acceptance and DL-03 candidate record](dual_lab_vrrp_ai_query_mvp.md).
+[canonical DL-02 and DL-03 acceptance record](dual_lab_vrrp_ai_query_mvp.md).
 This status records separately authorized local work without changing historical
 Stage-2 proof or closure semantics or reopening Stage 2.
 
@@ -388,10 +388,10 @@ credential, device, or execution capability and permits no repeat attempt.
 Formal closure still requires independent closure review and remote Safe CI.
 The complete Dual-Lab AI Query MVP remains unfinished: its exact local DL-02
 implementation has fresh independent review PASS and Owner acceptance ACCEPTED,
-as recorded above. DL-02 is accepted but not integrated; DL-03 is implemented
-with fresh review PASS and Owner acceptance PENDING, and remains not accepted.
+as recorded above. DL-02 and DL-03 are accepted but not integrated; DL-03 has
+governed review PASS and completed Owner acceptance ACCEPTED.
 DL-04 has not started. Stage 3 remains NOT STARTED. Further live access or scope
 expansion requires the applicable capability gates and separate exact Owner
-approval; DL-02 acceptance grants no live authority or readiness.
+approval; DL-02 and DL-03 acceptance grants no live authority or readiness.
 
 This document does not start Phase 2C-10 or any implementation phase. It does not create a second safety matrix. It is a durable planning reference for future review and approval decisions.

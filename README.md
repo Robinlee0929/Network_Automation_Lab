@@ -493,7 +493,7 @@ release lanes; they are not performed by documentation-only changes.
 | Stage-0 Network Automation Lab | **CLOSED** at `main@aff250735ade18e4c274be8ac53c9672bb2cb07f` |
 | Stage-1 Read-only Lab Integration Planning | Historical planning-entry record; see the Stage-2 closure candidate |
 | Stage-2 bounded MikroTik VRRP validation | Lab1 historical proof retained; Lab2 proof PASS/CLOSED on repository baseline `ea73196281e38a01af7bf959cc5e1bc60b0b2499`; persistent Lab2 startup reconstruction and independent binding review PASS; overall Stage 2 is a **CLOSURE CANDIDATE** |
-| Dual-Lab AI Query | **DL-02 accepted; DL-03 implemented / fresh review PASS / Owner acceptance PENDING / not accepted**; not integrated, merged, or released; DL-04 NOT STARTED; complete MVP unfinished; no live authority |
+| Dual-Lab AI Query | **DL-02 and DL-03 accepted; DL-03 governed review PASS / Owner acceptance ACCEPTED**; not integrated, merged, or released; DL-04 NOT STARTED; complete MVP unfinished; no live authority |
 | Stage 3 | **NOT STARTED / requires separate Owner authorization** |
 | Canonical reviewer interface | Flask dashboard on `127.0.0.1:5000` |
 | Secondary Next.js interface | Available as a bounded Stage-0 evidence surface |
@@ -507,12 +507,13 @@ release lanes; they are not performed by documentation-only changes.
 
 The exact accepted DL-02 implementation commit is
 `bb39e8295a2fa5d69980396dbaf8c374c79a57b3`. Its fresh independent review passed;
-Owner acceptance completed (`DL_02_ACCEPTED = YES`). The exact DL-03 implementation
-candidate is `e4c529507c6f5a26a289af4f6d3bfc9e0b170c18`, with fresh review PASS
-and Owner acceptance PENDING (`DL_03_ACCEPTED = NO`). That review used fresh
-inspection and validation in the same conversation, without a separate-reviewer
-identity claim. The complete Dual-Lab MVP remains unfinished. See the
-[canonical DL-02 acceptance and DL-03 candidate record](docs/automation_readiness/dual_lab_vrrp_ai_query_mvp.md)
+Owner acceptance completed (`DL_02_ACCEPTED = YES`). The exact accepted DL-03
+implementation is `e4c529507c6f5a26a289af4f6d3bfc9e0b170c18`, with governed
+review PASS and completed Owner acceptance ACCEPTED (`DL_03_ACCEPTED = YES`).
+That review used fresh inspection and validation in the same conversation,
+without a separate-reviewer identity claim. The complete Dual-Lab MVP remains
+unfinished. See the
+[canonical DL-02 and DL-03 acceptance record](docs/automation_readiness/dual_lab_vrrp_ai_query_mvp.md)
 for scope, hashes, and retained validation evidence. These local states grant
 no standing live permission or live readiness and imply no production
 readiness. Historical Stage-2 proof and closure semantics remain unchanged.
@@ -538,9 +539,9 @@ future capabilities stay behind their separate authorization and safety gates.
   acceptance gates.
 - Address Node/NVM coexistence only if a later environment-maintenance task
   requires it.
-- The next required Owner decision is `AUTHORIZE_DL_03_OWNER_ACCEPTANCE` for
-  the reviewed candidate. Acceptance has not been performed. Integration and
-  DL-04 remain separately gated and have not started. The completed Lab1 and
+- Review the canonical plan before separately authorizing DL-04 readiness or
+  specification work. DL-03 Owner acceptance is complete; integration, DL-04,
+  and later slices remain separately gated future work. The completed Lab1 and
   Lab2 proofs grant no future live authority.
 - Keep the post-merge Safe CI maintenance findings OPEN: npm has 5
   vulnerabilities (2 moderate, 2 high, 1 critical), and Next.js emitted 7

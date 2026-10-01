@@ -1,11 +1,12 @@
-# Dual-Lab VRRP AI Query MVP: DL-02 Acceptance and DL-03 Reviewed Candidate
+# Dual-Lab VRRP AI Query MVP: DL-02 and DL-03 Acceptance
 
 **Decision summary: DL-02 remains accepted; the DL-03 facts-only projection is
-implemented and fresh review passed, with Owner acceptance PENDING.**
+implemented, governed review passed, and Owner acceptance completed ACCEPT / PASS.**
 The exact accepted DL-02 implementation
 commit is `bb39e8295a2fa5d69980396dbaf8c374c79a57b3`. DL-02 is not
-integrated into main, merged, or released. The exact DL-03 candidate is
-`e4c529507c6f5a26a289af4f6d3bfc9e0b170c18`; it is not accepted or integrated.
+integrated into main, merged, or released. The exact accepted DL-03 implementation
+is `e4c529507c6f5a26a289af4f6d3bfc9e0b170c18`; it is not integrated,
+merged, or released.
 DL-04 has not started, and the complete Dual-Lab MVP remains unfinished.
 No live authority or readiness is granted.
 
@@ -13,11 +14,13 @@ No live authority or readiness is granted.
 
 This is the canonical repository record for the accepted DL-02 implementation,
 its completed independent review and Owner acceptance, plus the DL-03 canonical
-specification, implemented candidate, and completed fresh review. The DL-03
-specification resolved the readiness review's `BLOCKED_CANONICAL_SCOPE_AMBIGUITY`;
-the separately authorized implementation and review are now recorded below.
+specification, accepted implementation, completed governed review, and completed
+Owner acceptance decision. The DL-03 specification resolved the readiness
+review's `BLOCKED_CANONICAL_SCOPE_AMBIGUITY`; the separately authorized
+implementation, review, and acceptance are recorded below.
 This documentation reconciliation performs no implementation, repeated review,
-validation rerun, or Owner acceptance, and does not reopen DL-02 or Stage 2.
+validation rerun, or repeated Owner acceptance, and does not reopen DL-02 or
+Stage 2.
 The pre-acceptance documentation commit
 `76ce998531de59c201eaa6f123e57b1f9d364b19` established the candidate record and
 resolved the documentary gap. The subsequent read-only acceptance retry returned
@@ -159,10 +162,11 @@ commits. The review results, hashes, and safety findings remain unchanged.
 Integration, remote availability, integrated-MVP Safe CI, further slices, live
 readiness, and production readiness remain separate gates. None of those later
 states, complete Dual-Lab MVP acceptance, or DL-05 completion is established here.
-The next Owner decision is authorization for DL-03 Owner acceptance. The
-reviewed candidate below remains pending that separately governed decision.
+DL-03 Owner acceptance also completed, as recorded below. Reviewing the canonical
+plan and authorizing any DL-04 readiness or specification work remains a separate
+Owner decision; this record does not start that work.
 
-## DL-03 implemented candidate and pending Owner acceptance
+## DL-03 accepted implementation and completed Owner acceptance
 
 The canonical specification was established by commit
 `fe4877a6a9c812e1f8e03ccdaceff8528f9fba7a`. Its direct child below implements
@@ -184,19 +188,24 @@ DL_03_CHANGED_PATHS =
 DL_03_SOURCE_SHA256 = 54c35c63b43dacc5d7f5d50a468a4ffe27d9094504766a42f737234784dac234
 DL_03_TEST_SHA256 = 700c746c704bf2f51f2b9bff6fa0eb299493563b390a5272cf94bfc9e0dbd2c9
 DL_03_SCHEMA_VERSION = dual-lab-vrrp-query-summary.v1
-DL_03_OWNER_ACCEPTANCE = PENDING
-DL_03_ACCEPTED = NO
-DL_03_STATUS = PENDING_OWNER_ACCEPTANCE
-DL_03_READY_FOR_OWNER_ACCEPTANCE_DECISION = YES
+DL_03_OWNER_ACCEPTANCE = ACCEPTED
+DL_03_ACCEPTANCE_RESULT = PASS
+DL_03_ACCEPTED = YES
+DL_03_STATUS = ACCEPTED
+DL_03_ACCEPTED_IMPLEMENTATION_COMMIT = e4c529507c6f5a26a289af4f6d3bfc9e0b170c18
+DL_03_ACCEPTED_IMPLEMENTATION_PARENT = fe4877a6a9c812e1f8e03ccdaceff8528f9fba7a
+DL_03_FRESH_GOVERNED_REVIEW_RESULT = PASS
+DL_03_ACCEPTANCE_BASIS = GOVERNED_REVIEW_PASS_AND_OWNER_ACCEPTANCE
+DL_03_ACCEPTANCE_CANONICAL_STATE_HEAD = 3709a9eded6cf66205a1ac7d4113cf2d06e433ea
 DL_04_IMPLEMENTATION_STARTED = NO
 COMPLETE_DUAL_LAB_MVP = NO
 LIVE_AUTHORITY_GRANTED = NO
 LIVE_READINESS_GRANTED = NO
 CONFIGURATION_MUTATION_AUTHORIZED = NO
-NEXT_REQUIRED_OWNER_DECISION = AUTHORIZE_DL_03_OWNER_ACCEPTANCE
+NEXT_REQUIRED_OWNER_DECISION = REVIEW_CANONICAL_PLAN_AND_AUTHORIZE_DL_04_READINESS_OR_SPECIFICATION_WORK
 ```
 
-The candidate source is the [DL-03 summary module](../../validation_framework/dual_lab_vrrp_query_summary.py),
+The accepted source is the [DL-03 summary module](../../validation_framework/dual_lab_vrrp_query_summary.py),
 with [DL-03 contract tests](../../tests/dual_lab/test_dual_lab_vrrp_query_summary.py).
 It preserves the DL-01 aggregate schema and DL-02/Stage-2 behavior. It derives
 observations only from canonical Lab1 and Lab2 results, preserves duplicates,
@@ -262,7 +271,22 @@ DL_03_REPORT_INDEX_MANDATORY_MISSING = 0
 DL_03_REPORT_INDEX_UNKNOWN = 0
 ```
 
-Owner acceptance remains PENDING. This record grants no Lab1/Lab2 access,
+### Completed acceptance decision and limits
+
+The pre-acceptance candidate documentation commit
+`3709a9eded6cf66205a1ac7d4113cf2d06e433ea` recorded the reviewed candidate
+with Owner acceptance pending. The subsequent authorized read-only decision
+returned `OWNER_ACCEPTANCE_DECISION = ACCEPT`, `ACCEPTANCE_RESULT = PASS`,
+and `DL_03_ACCEPTED = YES`, with no repository mutation or validation rerun.
+This reconciliation records that completed decision without repeating it.
+
+Acceptance establishes only that implementation
+`e4c529507c6f5a26a289af4f6d3bfc9e0b170c18` satisfies the canonical DL-03
+specification and governed-review requirements. Its identity remains separate
+from the pre-acceptance and post-acceptance documentation commits. The retained
+review results, hashes, and same-conversation process meaning remain unchanged.
+
+This record grants no Lab1/Lab2 access,
 execution authority, configuration mutation, live or production readiness,
 complete-MVP acceptance, integration into main, remote Safe CI completion, or
 DL-04 implementation authority.
@@ -271,7 +295,7 @@ DL-04 implementation authority.
 
 The following specification is retained from its establishment commit. Its
 references to "future" implementation describe that original specification
-boundary; the current implemented, reviewed, pending-acceptance state is
+boundary; the current implemented, reviewed, Owner-accepted state is
 recorded above. The contract and validation requirements are not broadened.
 
 DL-03 projects an already canonical Dual-Lab aggregate into an immutable,
@@ -667,10 +691,10 @@ and input schemas, closed observation types and ordering, duplicate handling
 compatible with upstream, explicit failure absence, and a scope of two new
 files. The accepted DL-02 identity, review evidence, and Stage-2
 closure remain unchanged. The current documentation reconciliation aligns this
-record, README, and the automation plan on DL-03 implemented / fresh review PASS /
-Owner acceptance PENDING. The conclusion, allowed documentation scope, excluded
-execution scope, candidate identity, retained evidence, and next Owner decision
-are explicit. This documentation review changes no runtime behavior or
+record, README, and the automation plan on DL-03 implemented / governed review PASS /
+Owner acceptance ACCEPTED. The conclusion, allowed documentation scope, excluded
+execution scope, accepted implementation identity, retained evidence, and next
+Owner decision are explicit. This documentation review changes no runtime behavior or
 specification requirement and creates no second safety matrix.
 
 ```text
@@ -678,9 +702,10 @@ DL_02_ACCEPTED = YES
 DL_03_SPECIFICATION_STATUS = ESTABLISHED
 DL_03_IMPLEMENTED = YES
 DL_03_FRESH_INDEPENDENT_REVIEW_RESULT = PASS
-DL_03_OWNER_ACCEPTANCE = PENDING
-DL_03_ACCEPTED = NO
-DL_03_READY_FOR_OWNER_ACCEPTANCE_DECISION = YES
+DL_03_FRESH_GOVERNED_REVIEW_RESULT = PASS
+DL_03_OWNER_ACCEPTANCE = ACCEPTED
+DL_03_ACCEPTANCE_RESULT = PASS
+DL_03_ACCEPTED = YES
 DL_04_IMPLEMENTATION_STARTED = NO
 MINIMUM_TEST_MATRIX_ESTABLISHED = YES
 DOCUMENTATION_CONSISTENCY_REVIEW = PASS
@@ -688,5 +713,5 @@ DOCUMENTATION_READABILITY_REVIEW = PASS
 COMPLETE_DUAL_LAB_MVP = NO
 LIVE_AUTHORITY_GRANTED = NO
 LIVE_READINESS_GRANTED = NO
-NEXT_REQUIRED_OWNER_DECISION = AUTHORIZE_DL_03_OWNER_ACCEPTANCE
+NEXT_REQUIRED_OWNER_DECISION = REVIEW_CANONICAL_PLAN_AND_AUTHORIZE_DL_04_READINESS_OR_SPECIFICATION_WORK
 ```
