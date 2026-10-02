@@ -1,31 +1,43 @@
-# Dual-Lab VRRP AI Query MVP: DL-02 and DL-03 Acceptance
+# Dual-Lab VRRP AI Query MVP: Accepted Predecessors and DL-04 Closure Specification
 
 **Decision summary: DL-02 remains accepted; the DL-03 facts-only projection is
-implemented, governed review passed, and Owner acceptance completed ACCEPT / PASS.**
+implemented, governed review passed, and Owner acceptance completed ACCEPT / PASS.
+The DL-04 closure specification is established; closure execution and acceptance
+have not started.**
 The exact accepted DL-02 implementation
 commit is `bb39e8295a2fa5d69980396dbaf8c374c79a57b3`. DL-02 is not
 integrated into main, merged, or released. The exact accepted DL-03 implementation
 is `e4c529507c6f5a26a289af4f6d3bfc9e0b170c18`; it is not integrated,
 merged, or released.
-DL-04 has not started, and the complete Dual-Lab MVP remains unfinished.
+DL-04 implementation has not started, and the complete Dual-Lab MVP remains unfinished.
 No live authority or readiness is granted.
+
+The current next Owner decision is
+`AUTHORIZE_BOUNDED_DL_04_CLOSURE_EXECUTION`. The
+[DL-04 closure contract](#dl-04-canonical-closure-contract) below is the governing
+specification for that future decision, not execution authorization.
 
 ## Purpose and planning boundary
 
 This is the canonical repository record for the accepted DL-02 implementation,
 its completed independent review and Owner acceptance, plus the DL-03 canonical
 specification, accepted implementation, completed governed review, and completed
-Owner acceptance decision. The DL-03 specification resolved the readiness
+Owner acceptance decision, and the separately authorized DL-04 closure
+specification. The DL-03 specification resolved the readiness
 review's `BLOCKED_CANONICAL_SCOPE_AMBIGUITY`; the separately authorized
 implementation, review, and acceptance are recorded below.
-This documentation reconciliation performs no implementation, repeated review,
-validation rerun, or repeated Owner acceptance, and does not reopen DL-02 or
-Stage 2.
-The pre-acceptance documentation commit
+This DL-04 documentation-only task performs no implementation, runtime validation,
+closure execution, or Owner acceptance, and does not reopen DL-01, DL-02, DL-03,
+or Stage 2. Only this canonical record changes. README and the automation plan
+retain their earlier summaries: their DL-04 NOT STARTED label still describes
+implementation/closure execution. Their readiness/specification next-step text
+predates this authorization; the current next decision is recorded here.
+
+In the retained DL-02 history, the pre-acceptance documentation commit
 `76ce998531de59c201eaa6f123e57b1f9d364b19` established the candidate record and
 resolved the documentary gap. The subsequent read-only acceptance retry returned
-ACCEPT / PASS without changing source, tests, or documentation. This update
-retains that completed decision without reopening it.
+ACCEPT / PASS without changing source, tests, or documentation. That completed
+decision remains unchanged.
 
 The accepted Dual-Lab VRRP AI Query MVP planning scope, reaffirmed by the Owner's
 documentation reconciliation authorization, defines DL-02 as the fixed
@@ -162,9 +174,9 @@ commits. The review results, hashes, and safety findings remain unchanged.
 Integration, remote availability, integrated-MVP Safe CI, further slices, live
 readiness, and production readiness remain separate gates. None of those later
 states, complete Dual-Lab MVP acceptance, or DL-05 completion is established here.
-DL-03 Owner acceptance also completed, as recorded below. Reviewing the canonical
-plan and authorizing any DL-04 readiness or specification work remains a separate
-Owner decision; this record does not start that work.
+DL-03 Owner acceptance also completed, as recorded below. The subsequent DL-04
+readiness review and documentation-only specification authorization are recorded
+in the DL-04 section; neither starts closure execution.
 
 ## DL-03 accepted implementation and completed Owner acceptance
 
@@ -202,7 +214,7 @@ COMPLETE_DUAL_LAB_MVP = NO
 LIVE_AUTHORITY_GRANTED = NO
 LIVE_READINESS_GRANTED = NO
 CONFIGURATION_MUTATION_AUTHORIZED = NO
-NEXT_REQUIRED_OWNER_DECISION = REVIEW_CANONICAL_PLAN_AND_AUTHORIZE_DL_04_READINESS_OR_SPECIFICATION_WORK
+DL_03_POST_ACCEPTANCE_NEXT_OWNER_DECISION_HISTORICAL = REVIEW_CANONICAL_PLAN_AND_AUTHORIZE_DL_04_READINESS_OR_SPECIFICATION_WORK
 ```
 
 The accepted source is the [DL-03 summary module](../../validation_framework/dual_lab_vrrp_query_summary.py),
@@ -713,5 +725,553 @@ DOCUMENTATION_READABILITY_REVIEW = PASS
 COMPLETE_DUAL_LAB_MVP = NO
 LIVE_AUTHORITY_GRANTED = NO
 LIVE_READINESS_GRANTED = NO
-NEXT_REQUIRED_OWNER_DECISION = REVIEW_CANONICAL_PLAN_AND_AUTHORIZE_DL_04_READINESS_OR_SPECIFICATION_WORK
+DL_03_POST_ACCEPTANCE_NEXT_OWNER_DECISION_HISTORICAL = REVIEW_CANONICAL_PLAN_AND_AUTHORIZE_DL_04_READINESS_OR_SPECIFICATION_WORK
+```
+
+## DL-04 canonical closure contract
+
+**Specification established; fresh closure execution requires separate Owner
+authorization.** DL-04 is the integrated offline validation, reviewer-evidence,
+security-review, and closure layer over the accepted DL-01 through DL-03 behavior.
+It adds no runtime capability. The completed readiness decision was
+`DL_04_CANONICAL_SPECIFICATION_REQUIRED`: all 28 reviewed areas have predecessor
+coverage, and no missing negative scenario or production-code defect was
+demonstrated. This contract resolves the documentary scope gap without reopening
+predecessor acceptance or creating tests merely to name a DL-04 file.
+
+The specification base is `d3bbe767fa5653bb7ee213594959877fd4ff80fe` on
+`codex/dual-lab-vrrp-ai-query-mvp`. Accepted DL-02 and DL-03 implementation SHAs
+remain the exact identities above. The resulting documentation commit is
+identified externally by its actual SHA and parent; no self-referential commit
+identifier is guessed inside its own contents.
+
+### Purpose, authority, and mutation boundary
+
+```text
+DL_04_PURPOSE = INTEGRATED_OFFLINE_NEGATIVE_REGRESSION_VALIDATION_AND_REVIEWER_EVIDENCE_CLOSURE
+DL_04_RUNTIME_CAPABILITY_ADDED = NO
+DL_04_NEW_PRODUCTION_SOURCE_REQUIRED = NO
+DL_04_EXISTING_PRODUCTION_SOURCE_MODIFICATION_REQUIRED = NO
+DL_04_EXECUTION_AUTHORITY = NONE
+DL_04_MODEL_PROVIDER_INTEGRATION = NO
+DL_04_LIVE_AUTHORITY = NO
+DL_04_CONFIG_MUTATION_AUTHORITY = NO
+PRODUCTION_SOURCE_CHANGES = NONE
+EXISTING_PRODUCTION_SOURCE_CHANGES = NONE
+NEW_TEST_FILES = NONE
+EXISTING_TEST_FILE_CHANGES = NONE
+DEPENDENCY_CHANGES = NONE
+WORKFLOW_CHANGES = NONE
+EXISTING_ACCEPTED_COVERAGE_MUST_BE_REUSED = YES
+DUPLICATIVE_TEST_CREATION_REQUIRED = NO
+NO_MISSING_NEGATIVE_SCENARIO_CURRENTLY_DEMONSTRATED = YES
+```
+
+The current specification task may modify only this document and create its one
+local documentation commit. A later closure-execution task may produce fresh
+external validation/reviewer evidence and candidate provenance after separate
+authorization. Its default repository mutation scope is empty, including this
+document. Canonical status/documentation reconciliation needs a separately named
+Owner authorization and exact paths; it is not implied by a passing run.
+
+No source, test, dependency, workflow, configuration, AGENTS.md, historical
+Stage-2 record, Day1-Day160 artifact, dashboard, runner, or task registry change
+is part of DL-04. No dedicated Stage-2 regression file is required. No live
+Lab1/Lab2 access, SSH/NETCONF/RESTCONF, provider/model call, credential acquisition,
+configuration backup/change, production execution, or DL-05 work is authorized.
+If a genuine uncovered canonical requirement or defect is discovered, stop and
+report it. Adding/fixing tests, source, or guard policy requires separate Owner
+authorization; closure execution must not silently become a repair task.
+
+### Existing coverage and reviewer navigation
+
+DL-01 is the [inert aggregate contract](../../validation_framework/dual_lab_vrrp_query_contract.py).
+DL-02 is the [fixed synchronous orchestrator](../../validation_framework/dual_lab_vrrp_query_orchestrator.py),
+whose structural preflight and POLICY_2 behavior are described above. Pair-level
+identity collisions reject both targets before invocation, even when a safely
+parsed identity belongs to a locally ineligible target. With distinct identities,
+a locally rejected target does not prevent the eligible peer's single mocked
+handoff. DL-03 is the [facts-only projection](../../validation_framework/dual_lab_vrrp_query_summary.py):
+deterministic sorting, exact comparisons, preserved multiplicity, failure absence,
+and no health/root-cause/remediation inference. Data validity grants no authority.
+
+Every row below has classification
+`EXISTING_BUT_REQUIRES_DL04_REVALIDATION`. This means fresh closure evidence is
+required, not that accepted DL-01/02/03 behavior is being reopened. These are
+coverage references, not a second safety matrix. Test symbols are resolved at
+the candidate; all parameterized instances run through the complete suites.
+
+- **C**: [DL-01 tests](../../tests/dual_lab/test_dual_lab_vrrp_query_contract.py).
+- **O**: [DL-02 tests](../../tests/dual_lab/test_dual_lab_vrrp_query_orchestrator.py).
+- **S**: [DL-03 tests](../../tests/dual_lab/test_dual_lab_vrrp_query_summary.py).
+
+| ID | Existing area | Representative test symbols (all prefixed `test_`) |
+| ---: | --- | --- |
+| 1 | Canonical aggregate validation | C: `all_outcome_combinations_round_trip`, `strict_json_framing_types_limits_and_canonical_bytes`; O: `final_aggregate_failure_returns_no_partial_output` |
+| 2 | Immutable/exact-field contracts | C: `every_aggregate_field_required`, `immutability_direct_construction_and_input_output_isolation`; S: `10_to_13_every_field_required_and_extras_reject`, `40_serializers_revalidate_tampering` |
+| 3 | Duplicate JSON-key rejection | C: `duplicate_keys_rejected_at_every_depth`; S: `39_summary_duplicate_keys_at_each_depth`, `39_aggregate_duplicate_keys_at_each_depth` |
+| 4 | Target binding | C: `aggregate_slot_target_binding`; O: `other_lab_request_binding_rejected`; S: `28_29_upstream_binding_and_identity_rejections` |
+| 5 | Authorization ID/reference distinctness | O: `duplicate_identity_blocks_both_with_zero_invocations`, `p1_parseable_collision_overrides_local_rejection` |
+| 6 | Malformed/expired authorization | O: `envelope_rejection_uses_existing_stage2_semantics`, `p1_distinct_identity_preserves_local_failure_and_policy2`, `p1_unparseable_identity_does_not_fabricate_collision` |
+| 7 | Cross-target swaps | O: `invalid_bundle_only_skips_its_target`, `configuration_preflight_is_structural_and_target_local`, `envelope_rejection_uses_existing_stage2_semantics`; S: `summary_target_binding_and_tag_validation` |
+| 8 | Missing runtime/startup binding | O: `both_preflights_finish_before_any_invocation`, `configuration_preflight_is_structural_and_target_local`, `two_local_failures_have_no_invocations` |
+| 9 | No retry | O: `six_runtime_failures_preserved_independently_without_retry`, `exact_public_surface_no_executor_and_no_parallel_or_alternate_path` |
+| 10 | No fallback | O: `invalid_bundle_only_skips_its_target`, `candidate_evidence_revalidated_without_substitution`, `exact_public_surface_no_executor_and_no_parallel_or_alternate_path` |
+| 11 | No parallelism | O: `success_order_overlap_call_limit_and_canonical_roundtrip`, `exact_public_surface_no_executor_and_no_parallel_or_alternate_path` |
+| 12 | No threads | O: `exact_public_surface_no_executor_and_no_parallel_or_alternate_path`; S: `35_36_42_static_public_surface_and_inert_import` |
+| 13 | No async | C: `exact_public_surface_and_no_execution_capabilities`; O: `exact_public_surface_no_executor_and_no_parallel_or_alternate_path`; S: `35_36_42_static_public_surface_and_inert_import` |
+| 14 | No queue | Same C/O/S restricted-surface tests as row 13, with source inspection |
+| 15 | No scheduler | Same C/O/S restricted-surface tests as row 13, with source inspection |
+| 16 | No worker | Same C/O/S restricted-surface tests as row 13, with source inspection |
+| 17 | Canonical evidence revalidation | C: `direct_success_detaches_evidence_and_revalidates_forged_records`, `serialization_rechecks_objects_altered_after_construction`; O: `candidate_evidence_revalidated_without_substitution` |
+| 18 | Raw-output leakage rejection | C: `prohibited_data_cannot_enter_evidence_or_record`; O: `six_runtime_failures_preserved_independently_without_retry`; S: `13_envelope_exclusion_and_exact_fields`, `public_errors_discard_outer_context_and_upstream_failure` |
+| 19 | Credential/signature/path leakage rejection | C: `unknown_and_prohibited_top_level_fields_rejected`; O: `bundle_immutable_redacted_exact_fields_and_no_leakage`; S: `10_to_13_every_field_required_and_extras_reject`, `27_extra_aggregate_fields_rejected_upstream` |
+| 20 | Deterministic DL-03 projection | S: `07_to_09_multirecord_sort_permutations_metadata_and_identity`, `39_derived_rows_recomputed_and_exactly_typed` |
+| 21 | Multi-record projection | S: `07_to_09_multirecord_sort_permutations_metadata_and_identity`, `41_maximum_records_name_lengths_and_serialization_bounds` |
+| 22 | Duplicate matching-key handling | S: `24_duplicate_multiplicity_never_pairs_or_collapses`, `24_complete_duplicate_sort_tie_breaker` |
+| 23 | Missing-evidence behavior | S: `01_to_04_outcomes_and_failure_absence`, `11_failure_cannot_have_records`, `25_38_failure_vocabulary_and_no_fabrication` |
+| 24 | Prohibited health inference | S: `30_to_34_prohibited_structures_and_opaque_observed_names`; closed observation vocabulary above |
+| 25 | Prohibited root-cause inference | S: `30_to_34_prohibited_structures_and_opaque_observed_names` (`ROOT_CAUSE`) |
+| 26 | Prohibited remediation output | S: `30_to_34_prohibited_structures_and_opaque_observed_names`, `33_command_like_name_remains_only_data` |
+| 27 | No provider/model integration | C: `exact_public_surface_and_no_execution_capabilities`; O: `exact_public_surface_no_executor_and_no_parallel_or_alternate_path`; S: `35_36_42_static_public_surface_and_inert_import` |
+| 28 | No execution authority in DL-03 | S: `01_to_04_outcomes_and_failure_absence`, `35_36_42_static_public_surface_and_inert_import`, `40_serializers_revalidate_tampering` |
+
+Restricted imports/public surfaces and source inspection support the absence of
+threads/queue/scheduler/worker; do not describe them as separate dynamic tests
+for every mechanism. Leakage checks cover schema exclusion, envelope removal,
+sanitized errors/representations, and output silence. Opaque observed names are
+not a general secret-detection mechanism. No new end-to-end composition test is
+mandated by this contract; any later proposed coverage addition needs its own
+demonstrated gap and authorization.
+
+### Candidate identity and deterministic offline command map
+
+Before a future run, the Owner must name the exact candidate SHA **C**, its parent
+**P**, the comparison base **B**, and the specification commit **S** containing
+this contract. Record all four as full resolved SHAs in `candidate-manifest.json`.
+The specification's base above is fixed; do not assume that it is also a future
+candidate's parent. No floating HEAD or branch-only identity suffices. Require
+the clean authorized branch, the accepted predecessor identities, and unchanged
+accepted source/test bytes before starting. A moved candidate or ambiguous base
+blocks the run; do not move history to repair it.
+Require C to equal S or be an explicitly authorized documentation-only descendant
+of S. Compare the complete production-source/test file sets and bytes with S;
+no source/test delta is allowed. Record the comparison with B separately rather
+than treating an arbitrary comparison base as permission for new behavior.
+
+Use a fresh external disposable checkout/copy of C, preserving exact tracked raw
+bytes and required local fixture Git behavior. The primary checkout remains
+unchanged. Verify any preinstalled interpreter/dependency assets without
+installation, network fetch, or dependency changes. Record versions, executable
+fingerprints, import-root identities, platform, non-TTY mode, guard and launcher
+hashes, and the resolved command map externally. Never capture environment dumps,
+credential stores, live startup bindings, or private runtime configuration.
+
+All commands below are **future logical invocations inside the guarded external
+launcher**, not permission to run unguarded CLI commands. The deterministic
+procedure is to select one row, install the accepted guard before importing
+pytest/application modules, then call `pytest.main` with this exact common argv:
+
+```text
+[-p, no:cacheprovider, --color=no, -q, --tb=short, -rs,
+ --basetemp, <fresh-external-run-root>/pytest, <row-targets...>]
+```
+
+| Logical mode | Canonical targets / logical command | Required artifact |
+| --- | --- | --- |
+| `focused-dl01` | `python -m pytest tests/dual_lab/test_dual_lab_vrrp_query_contract.py` | `focused-dl01.json` |
+| `focused-dl02` | `python -m pytest tests/dual_lab/test_dual_lab_vrrp_query_orchestrator.py` | `focused-dl02.json` |
+| `focused-dl03` | `python -m pytest tests/dual_lab/test_dual_lab_vrrp_query_summary.py` | `focused-dl03.json` |
+| `dual-lab` | `python -m pytest tests/dual_lab` | `dual-lab.json` |
+| `stage2` | `python -m pytest tests/stage2` | `stage2.json` |
+| `full` | `python -m pytest` (no target restriction) | `full-pytest.json` |
+| `report` | `python network_lab.py --task report-index` | `report-index.log` and `report-index.json` |
+
+Run rows serially, with fresh external temporary storage per mode. Disable plugin
+autoload, pytest cache and bytecode writes; clear injected pytest options/plugins.
+Do not use selectors, deselection, fail-open mocking, response files, or extra
+skips to reduce required coverage. Preserve collection counts, every test outcome,
+exit status, exact skip reasons, guard observations and sanitized logs. A test
+failure, collection error, missing proof, or guard discrepancy stops promotion;
+retain failed/setup-attempt evidence instead of overwriting it with a retry.
+
+The accepted guard is the external `frozen_v3_guard.py`, SHA256
+`0c0357e7291efb90b9c0a21aec212ddb183cc8778182060020e087ea60d4a5bb`.
+Resolve it through retained evidence, never by an unverified same-name file.
+The external launcher may relocate approved disposable/evidence/tool paths and
+map the modes above, and add result collection, without changing frozen guard
+bytes or denial/skip semantics. Review and fingerprint that launcher before
+execution. If the guard or required baseline cannot be recovered, or relocation
+needs a guard-policy change, stop for Owner resolution; do not improvise a weaker
+guard or install dependencies. This task creates or executes no launcher.
+
+Preserve guard coverage through collection, execution, teardown, ordinary Python
+children, Windows spawn, and permitted Node subprocesses. Deny real sockets/DNS,
+native credential/trust acquisition, provider calls, uncontrolled subprocesses,
+private configuration, and live device I/O. The existing narrow synthetic-memory,
+disposable SQLite, fixture-Git, guarded child-process, and symlink test allowances
+may be reused only unchanged. They prove existing offline regressions, not new
+production threads/workers/parallel execution. The guard is a trusted regression
+harness, not a sandbox for arbitrary hostile code. Do not broaden its guarantees.
+
+The six following proofs must each report call-phase `passed` in the complete
+fresh full-suite result. Extract their node IDs/outcomes into
+`workflow-proofs.json`; a count, collection-only result, xfail, or skip is not PASS:
+
+```text
+tests/stage2/test_authorization_envelope_ledger.py::test_competing_processes_and_process_restart
+tests/workflow_governance/test_validate_fast.py::test_cli_plan_rejects_response_file_path_with_deterministic_json
+tests/workflow_governance/test_validate_fast.py::test_symlink_escape_changed_path_is_rejected_when_supported
+tests/workflow_governance/test_validate_scope.py::test_option_like_revision_cli_emits_json_and_exit_two[base]
+tests/workflow_governance/test_validate_scope.py::test_option_like_revision_cli_emits_json_and_exit_two[head]
+tests/workflow_governance/test_validate_scope.py::test_symlink_escape_is_rejected_when_supported
+```
+
+These are preservation checks for the accepted workflow/replay behavior. They
+neither reopen deferred workflow research nor authorize running Safe CI.
+
+```text
+HISTORICAL_RESULTS_COUNT_AS_FRESH_DL04_EVIDENCE = NO
+FRESH_DL04_VALIDATION_REQUIRED = YES
+```
+
+### Exact established skips and guard-denial baseline
+
+The identity set below comes from the retained accepted DL-03 review evidence
+summarized above, inspected during this specification task without rerunning it.
+Logical baseline artifact fingerprints bind that source without publishing its
+private retention path:
+
+| Historical artifact | Raw SHA256 |
+| --- | --- |
+| `verification.json` | `1b982be6d356c1ec2af3548b26123563127c3205bcc46854aa6d1adcdf73eba6` |
+| `stage2.json` | `69b273aa9f2aee28f05791e81b3a96bd8bb50d24a1d29fb19415f16e2ae063d9` |
+| `full.json` | `52cc9c288bfc0401e8497db352aced56703a32ecb2a980371fe987f8cfb1b1d0` |
+
+Historical artifacts are read-only comparison inputs, not files to copy into the
+fresh result slots. Their retrieval location is supplied locally outside the
+repository. Missing artifacts or fingerprint mismatch blocks exact baseline
+comparison. The 211/652/1890/4669 passes, established 2/3 skips, 66 external probes,
+three denials and 13 optional missing reports remain historical results only.
+DL-04 does not require duplicating the old external probe suite or its test count;
+it requires the mapped current tests and fresh security review below.
+
+| Accepted skip node ID | Exact reason | Applicable suite/environment |
+| --- | --- | --- |
+| `tests/stage2/test_live_authorization_owner_trust_root.py::test_disposable_regular_file_is_accepted_by_exact_native_path` | `Accepted Stage-2 offline safety exclusion: real Win32 trust-root source operations are forbidden.` | Stage-2 and full, accepted Windows offline guard |
+| `tests/stage2/test_live_authorization_owner_trust_root.py::test_confirmed_trailing_dot_alias_is_rejected_as_noncanonical` | `Accepted Stage-2 offline safety exclusion: real Win32 trust-root source operations are forbidden.` | Stage-2 and full, accepted Windows offline guard |
+| `tests/test_phase_2n_02_canonical_flask_demo_smoke.py::test_canonical_flask_process_lifecycle_and_get_only_routes` | `Accepted full-suite offline safety exclusion: Flask server/socket lifecycle and native process inspection are forbidden.` | Full only, accepted Windows offline guard |
+
+All three predate C and are classified `ACCEPTED_PRE_EXISTING` only after baseline
+and candidate source/environment checks. `skip-classification.json` records each
+full node ID, exact observed reason, applicability, baseline evidence reference,
+predates-candidate proof and disposition. The three focused suites and complete
+Dual-Lab permit no skips. Stage-2 must match exactly its two rows, and full exactly
+all three; counts alone do not establish a match. Changed environments do not
+silently inherit these exclusions. An unexpected, missing, renamed or unexplained
+skip blocks promotion and requires classification/Owner resolution; no additional
+skip may be approved during closure execution.
+
+```text
+UNEXPECTED_SKIP_COUNT = 0
+NEW_OR_UNEXPLAINED_SKIP_RESULT = DL_04_CLOSURE_RESULT: FAIL_OR_BLOCKED
+```
+
+The known full-suite denial set is exactly the following three call-phase events,
+one occurrence each. The table lists the ordered repository frames from the
+denied operation outward; the retained full artifact supplies the guard frames.
+
+| Denial node ID | Exact ordered repository frame signature (`file:function:line`) |
+| --- | --- |
+| `tests/test_day13_multi_router_wireguard_validation.py::test_multi_device_live_validation_reminds_before_next_router` | `mikrotik_day2_auto_setup.py:connect_ssh_keyboard_interactive:311` → `mikrotik_day2_auto_setup.py:connect_ssh:338` → `mikrotik_day2_auto_setup.py:connect_ssh_with_auth_retry:370` → `mikrotik_day13_multi_router_wireguard_validation.py:run_router_lan_host_ping:911` → `mikrotik_day13_multi_router_wireguard_validation.py:run_day12_for_devices:950` → `mikrotik_day13_multi_router_wireguard_validation.py:main:1323` → `tests/test_day13_multi_router_wireguard_validation.py:test_multi_device_live_validation_reminds_before_next_router:628` |
+| `tests/test_day8_iperf3_command_builder.py::test_default_args_use_40_second_duration_and_10_second_omit` | `performance_test.py:infer_wan_client_ip:126` → `performance_test.py:build_config_from_args:259` → `tests/test_day8_iperf3_command_builder.py:test_default_args_use_40_second_duration_and_10_second_omit:114` |
+| `tests/workflow_governance/test_validate_scope.py::test_invalid_or_missing_revision_is_structured_error[missing-revision]` | `scripts/validate_scope.py:run_read_only_git:110` → `scripts/validate_scope.py:resolve_commit:193` → `scripts/validate_scope.py:validate_scope:321` → `tests/workflow_governance/test_validate_scope.py:test_invalid_or_missing_revision_is_structured_error:257` |
+
+These are blocked attempts inside historical tests; their names do not grant
+live permission. In particular, historical Day1-Day160 retry-oriented function
+names do not describe DL-02 retry behavior and must not be rewritten here.
+The operation must remain denied before the forbidden side effect. A passing
+pytest assertion alone cannot excuse a different denial or an actual side effect.
+
+The corresponding raw source/test fingerprints, verified equal to the retained
+review workspace at specification time, are:
+
+| Repository-relative file | SHA256 |
+| --- | --- |
+| `mikrotik_day2_auto_setup.py` | `707e60fd71e414f063f438d61dba1acff01e26a68c24d600a4d1c8cc7c1e75ee` |
+| `mikrotik_day13_multi_router_wireguard_validation.py` | `97944fbebfad7a45ce597decf72a1c15555eed68d1474a0cb0a7e6a622022e74` |
+| `tests/test_day13_multi_router_wireguard_validation.py` | `4711b59b14894ecd966ddccfcb3d1e02ef7433b08f4cbbff702fb87301e73ccd` |
+| `performance_test.py` | `b0f28cf4555cc0b4519d4d7949bd690cfda8e49c29dce1cf1778b39ee6f88a60` |
+| `tests/test_day8_iperf3_command_builder.py` | `e10cc5c3753a2e45bfd6728e7ca3e3d583161b40270419f05ee05badca82871a` |
+| `scripts/validate_scope.py` | `e7a90e7e543439dfa2c7da9e51e9438ec23fc29ca064a2116cbfefd2be49f3e2` |
+| `tests/workflow_governance/test_validate_scope.py` | `0e4e94c89f44aa45ed0e11f5f70b8b1f196cce5cdd52db375cdf6562184abd11` |
+
+`guard-classification.json` must compare node ID, call phase, occurrence count,
+guard fingerprint, ordered source frames and raw source bytes with this baseline.
+Normalize only path separators and disposable-root prefixes; do not discard
+function names, line numbers, test parameters, or causality. Record sanitized
+event identities and process/accounting scope. The historical counter observes
+the top-level parent; do not claim it counts every child. Preserve guard
+installation in children and the required child-process proof outcomes. Any
+observed child denial/error must be classified and cannot be hidden by parent
+counts. Fresh focused/Dual-Lab/Stage-2/report modes require zero denials; full
+requires exactly these three. Any new/unclassified or DL-04-caused denial blocks
+closure, even inside a known test. Guard weakening to obtain zero denials fails.
+
+```text
+KNOWN_PRE_EXISTING_GUARD_DENIAL_COUNT = 3
+KNOWN_PRE_EXISTING_GUARD_DENIAL_SET_MATCH = YES
+NEW_OR_UNCLASSIFIED_GUARD_DENIAL_COUNT = 0
+DL04_CAUSED_GUARD_DENIAL_COUNT = 0
+```
+
+### Stage-2 preservation and candidate-bound security review
+
+```text
+S2_RO_01_THROUGH_S2_RO_11_SEMANTICS_CHANGED = NO
+STAGE2_CHANGE_REQUIRED = NO
+STAGE2_REOPEN_REQUIRED = NO
+DEDICATED_DL04_STAGE2_REGRESSION_FILE_REQUIRED = NO
+```
+
+Use the complete existing Stage-2 suite and inspect the accepted boundaries for
+Owner authorization, replay consumption, credential binding, pinned-host
+verification, exact read-only command policy and one-shot handoff. Relevant
+existing suites include `test_owner_verifier.py`,
+`test_authorization_envelope_ledger.py`, `test_mikrotik_credential_resolver.py`,
+`test_windows_credential_backend.py`, `test_known_host_snapshot.py`,
+`test_vrrp_readonly_command_policy.py`, `test_pinned_ssh_transport.py`,
+`test_trusted_runtime_composition.py` and `test_vrrp_readonly_live_entrypoint.py`,
+all under `tests/stage2`. Combine them with the mapped DL-02 collision,
+zero-invocation and evidence-revalidation cases. Mock/synthetic coverage is not
+fresh live proof and does not resolve historical Stage-2 closure or replay
+provenance limits.
+
+A fresh review of C against B must record reviewer/process provenance, exact
+reviewed paths, assertion-to-source/test/result references, limitations, findings
+and dispositions in `security-review.json`. A same-conversation review must be
+labeled as such; do not invent a separate reviewer identity. Existing static
+surface checks support, but do not replace, fresh inspection. Historical security
+PASS cannot substitute for this review. The following are mandatory PASS
+assertions about the Dual-Lab product boundary and authorized offline run, not
+claims that the entire historical repository contains no process facilities:
+
+```text
+NO_ARBITRARY_EXECUTOR = YES
+NO_RETRY = YES
+NO_FALLBACK = YES
+NO_PARALLEL_EXECUTION = YES
+NO_THREADS = YES
+NO_ASYNC = YES
+NO_QUEUE = YES
+NO_SCHEDULER = YES
+NO_WORKER = YES
+NO_PROVIDER_MODEL_CALLS = YES
+NO_SECRET_LEAKAGE = YES
+NO_RAW_STDOUT_LEAKAGE = YES
+NO_CONFIG_MUTATION = YES
+NO_LIVE_AUTHORITY_EXPANSION = YES
+NO_PROHIBITED_INFERENCE = YES
+NO_HISTORICAL_EVIDENCE_SUBSTITUTION = YES
+PAIR_IDENTITY_COLLISION_PRECEDENCE = PASS
+REJECTED_TARGET_ZERO_INVOCATION = PASS
+CANONICAL_EVIDENCE_BINDING_REVALIDATION = PASS
+IMMUTABLE_CLOSED_SCHEMAS = PASS
+SANITIZED_FAILURE_BOUNDARY = PASS
+STAGE2_AUTHORITY_BOUNDARIES_UNCHANGED = PASS
+```
+
+No arbitrary executor argument, alternate handoff, guessed duplicate pairing,
+health/root-cause/remediation verdict, or weakening of fixed errors/schemas may
+appear. Rejected targets must have zero handoff where the existing contract
+requires it; a valid peer's POLICY_2 handoff remains bounded and mocked. A
+material security finding fails the candidate gate; missing proof blocks it.
+Neither permits an in-task repair or reopening accepted slices automatically.
+
+### Report-index, external artifacts, and provenance
+
+Fresh `report-index` must exit successfully and return PASS, or WARN only with
+zero failures, zero mandatory missing, zero unknown, and every missing artifact
+documented as optional under the existing registry. Thirteen optional missing
+reports is the historical baseline, not a fixed expected total. Classify any
+change and retain item-level evidence; do not relabel a new mandatory missing
+artifact as optional to obtain WARN. No registry or report-rendering changes are
+authorized.
+
+Use one fresh non-repository evidence root with deterministic logical names
+below. Physical locations remain external/private. JSON artifacts contain the
+common metadata fields `candidate_sha`, `candidate_parent_sha`, `comparison_base_sha`,
+`specification_sha`, `procedure`, `scope`, `result`, and `evidence_kind` (`FRESH`
+or `HISTORICAL_BASELINE`). Include run identity and UTC start/end timestamps for
+fresh run provenance; time alone is never proof of freshness. Commands use
+logical root/tool aliases with fingerprinted resolutions, not personal paths or
+environment values. Each result must reference the actual invocation and exact
+input/source identities. Log metadata belongs in its companion JSON.
+
+| Required logical artifact | Required contents / generation procedure |
+| --- | --- |
+| `candidate-manifest.json` | C/P/B/S, branch, accepted predecessor SHAs, platform/tool/guard/launcher fingerprints, frozen command map and baseline references; prepared before execution, finalized with artifact index |
+| `focused-dl01.json` | Fresh mapped DL-01 suite invocation, collection/outcomes, exit status, skips and guard results |
+| `focused-dl02.json` | Same for DL-02 |
+| `focused-dl03.json` | Same for DL-03 |
+| `dual-lab.json` | Complete fresh Dual-Lab suite results |
+| `stage2.json` | Complete fresh guarded Stage-2 results and exact established skips |
+| `full-pytest.json` | Complete fresh guarded full-suite results, node outcomes, exact skips and denial references |
+| `workflow-proofs.json` | Extracted six required call-phase outcomes and references into `full-pytest.json` |
+| `report-index.log` | Sanitized fresh report-index output |
+| `report-index.json` | Common metadata, log hash, exit status, item classifications, failure/mandatory-missing/unknown counts and WARN rationale |
+| `skip-classification.json` | Exact observed/expected identity sets, reasons, applicability, predecessor proof and unexpected-count decision |
+| `guard-classification.json` | Exact baseline matching, event/source fingerprints, process scope, denied-before-side-effect proof, new/unclassified and candidate-causality decisions |
+| `security-review.json` | Fresh candidate/base-bound review of all assertions and six preservation proofs; findings/dispositions and reviewer/process limitations |
+| `tracked-integrity.json` | Before/after primary and disposable tracked-file sets/raw hashes, C/P/B identity checks, status results and mutation classification |
+| `reviewer-readability.json` | Navigation/coverage mapping, readability assertions, exact reviewed document hash and evidence references |
+| `dl04-closure-result.json` | Each completion predicate, findings, state reached, evidence references, `DL_04_ACCEPTED = NO` until a separate acceptance receipt |
+| `governed-review.json` | Later fresh governed review of the frozen closure candidate; cannot be generated as completed evidence by the earlier execution gate |
+| `owner-acceptance.json` | Later explicit Owner decision tied to C and the reviewed evidence manifest; absent/pending until that separate decision |
+
+The manifest indexes every completed artifact by logical name, byte size,
+SHA256, procedure, scope and freshness. It does not hash itself recursively:
+freeze and hash the finalized manifest externally, and have later review/Owner
+receipts reference that hash. Later receipts are append-only artifacts, each
+with its own metadata, not edits that silently change the reviewed manifest.
+The pre-run manifest snapshot and all failed attempts remain identifiable.
+No artifact may contain credentials, private keys, signatures, raw device output,
+raw secret-like environment values, or private live runtime details. Baseline
+artifacts with local operational paths remain private comparison inputs; publish
+only sanitized identities/fingerprints and logical references in new evidence.
+
+```text
+DL_04_EVIDENCE_PROVENANCE_REQUIRED = YES
+HISTORICAL_EVIDENCE_MAY_IMPERSONATE_FRESH_EVIDENCE = NO
+```
+
+### Candidate integrity and reviewer readability
+
+Before validation, enumerate the candidate's exact tracked-file set and record
+raw-byte SHA256 for every file in both primary and disposable copies, together
+with commit/tree identities and clean status. After all runs/reviews, compare
+the same complete sets and bytes, especially source/tests, and recheck candidate
+SHA and clean primary worktree. Git content normalization alone is insufficient
+for raw-byte equality. No unexpected additions, deletions, index/ref changes, or
+tracked mutation is acceptable. Evidence stays external.
+
+The frozen harness may create only its already permitted disposable temporary
+fixtures and untracked generated report outputs in the disposable copy. Classify
+them explicitly; they are not permission to alter tracked reports or publish
+runtime artifacts. A tracked-content change yields `DL_04_CLOSURE_RESULT = FAIL`.
+This contract grants no restoration exception: stop and preserve evidence rather
+than cleaning away the discrepancy. A future exception would require an existing
+explicit canonical rule and exact authorized restoration proof, not an ad hoc
+rule invented after the run. Final candidate/worktree identity must be clean.
+
+The reviewer uses this single navigation layer, its linked contracts/tests,
+command map, exact skip/guard tables, and the external manifest. Record C/P/B/S,
+artifact provenance, report interpretation, candidate-bound security result,
+integrity proof, closure state and incomplete-MVP status together. Do not add
+another safety matrix or duplicate historical Stage-2 documentation. Missing
+readability evidence blocks completion; readability PASS never overrides a
+technical/security failure. Require these assertions in `reviewer-readability.json`:
+
+```text
+REVIEWER_NAVIGATION_CLEAR = YES
+COMMAND_MAP_COMPLETE = YES
+REQUIREMENT_TO_EVIDENCE_MAPPING_CLEAR = YES
+SKIP_EXPLANATIONS_CLEAR = YES
+GUARD_EXPLANATIONS_CLEAR = YES
+SECURITY_BOUNDARIES_CLEAR = YES
+NO_LIVE_AUTHORITY_CLAIM_CLEAR = YES
+NO_PROVIDER_MODEL_AUTHORITY_CLAIM_CLEAR = YES
+COMPLETE_MVP_STATUS_CLEAR = YES
+```
+
+### Closure states, checkpoints, and completion gate
+
+States advance only on the named evidence/authorization. A later gate cannot
+retroactively satisfy an earlier one. FAIL means a demonstrated failed predicate;
+BLOCKED means missing/unverifiable evidence, environment or authorization. Both
+stop promotion, leave acceptance NO, and require an exact reason. No automatic
+repair, retry, acceptance or documentation reconciliation follows.
+
+| Ordered state | Required transition checkpoint |
+| --- | --- |
+| `DL_04_SPECIFICATION_ESTABLISHED` | This bounded document is reviewed and committed; no execution or acceptance |
+| `DL_04_CLOSURE_EXECUTION_AUTHORIZED` | Separate Owner authorization names C/P/B/S, external evidence boundary and unchanged mutation exclusions; clean status and pre-run integrity verified |
+| `DL_04_FRESH_VALIDATION_PASS` | All seven command-map runs pass their policies; six workflow/replay proofs, skip/guard classification and integrity pass |
+| `DL_04_REVIEWER_EVIDENCE_COMPLETE` | Validation, classification, integrity, requirement mapping, provenance and readability artifacts complete; security review and closure-result artifacts remain pending at their distinct checkpoints |
+| `DL_04_SECURITY_REVIEW_PASS` | Fresh review of the same C/B and frozen validation inputs satisfies all security assertions with zero unresolved material findings |
+| `DL_04_CLOSURE_CANDIDATE` | All predicates below pass, C unchanged and worktree clean; record candidate result with acceptance NO, then finalize and freeze the artifact manifest |
+| `DL_04_FRESH_GOVERNED_REVIEW` | Separately authorized fresh review verifies C, frozen manifest hash, complete evidence, findings and integrity; record actual process/identity without claiming unperformed independence |
+| `DL_04_OWNER_ACCEPTANCE` | Separate Owner ACCEPT/REJECT decision references exact C and governed-review receipt; a review PASS is not that decision |
+| `DL_04_ACCEPTED` | Only after Owner ACCEPT with passing review and unchanged evidence identity; repository status reconciliation still requires separate exact documentation authority |
+
+If canonical candidate documentation is requested between candidate creation and
+governed review, that is a separate documentation-only authorization and commit
+**D**. Record D and its parent alongside the unchanged validated C and frozen
+manifest. Verify its exact permitted documentation diff; it must not masquerade
+as the validated code commit. Any non-documentation candidate change invalidates
+freshness and requires new scope/validation authority. The same distinction
+applies to post-acceptance reconciliation: it records a decision, not new tests,
+runtime acceptance or integration. No documentation write is implicitly granted
+by this state machine.
+
+A closure candidate requires **every** predicate below, supported by fresh
+candidate-bound artifacts; the listed values are requirements, not current results:
+
+```text
+DL01_FOCUSED = PASS
+DL02_FOCUSED = PASS
+DL03_FOCUSED = PASS
+DUAL_LAB = PASS
+STAGE2 = PASS_WITH_ONLY_ESTABLISHED_SKIPS
+FULL_PYTEST = PASS_WITH_ONLY_ESTABLISHED_SKIPS
+WORKFLOW_GOVERNANCE_PROOFS = PASS
+REPORT_INDEX = ACCEPTABLE
+UNEXPECTED_SKIP_COUNT = 0
+KNOWN_GUARD_SET_MATCH = YES
+NEW_GUARD_DENIAL_COUNT = 0
+DL04_CAUSED_GUARD_DENIAL_COUNT = 0
+SECURITY_REVIEW = PASS
+EVIDENCE_PROVENANCE = PASS
+TRACKED_INTEGRITY = PASS
+REVIEWER_DOCUMENTATION = COMPLETE
+READABILITY_REVIEW = PASS
+UNRESOLVED_MATERIAL_FINDINGS = 0
+DL_04_ACCEPTED = NO
+```
+
+Even this candidate does not establish acceptance until separate fresh governed
+review and Owner acceptance. DL-04 acceptance is local slice acceptance only.
+DL-05 retains independent acceptance plus Safe CI at the integrated implementation
+commit. Do not claim `SAFE_CI = COMPLETE`,
+`FINAL_INTEGRATED_MVP_ACCEPTANCE = COMPLETE`, or
+`LIVE_DUAL_LAB_AUTHORIZED = YES` from any DL-04 state.
+
+```text
+DL_04_SAFE_CI_REQUIRED = NO
+DL_05_SAFE_CI_BOUNDARY_PRESERVED = YES
+```
+
+### Current specification result and next Owner decision
+
+This specification's documentation consistency/readability review checks all 28
+coverage references, the command/proof map, exact baseline identities, external
+artifact contract, security predicates and distinct state transitions. Its
+conclusion, allowed writes, forbidden execution, acceptance limits and next Owner
+decision are explicit. Accepted predecessor statuses and historical Stage-2
+semantics remain unchanged. No runtime pytest, report-index, closure execution,
+new security-validation result, or Safe CI is performed by this task.
+
+```text
+DL_02_ACCEPTED = YES
+DL_03_ACCEPTED = YES
+DL_04_SPECIFICATION_STATUS = ESTABLISHED
+DL_04_IMPLEMENTATION_STARTED = NO
+DL_04_CLOSURE_EXECUTION_STARTED = NO
+DL_04_ACCEPTED = NO
+DL_05_STARTED = NO
+COMPLETE_DUAL_LAB_MVP = NO
+LIVE_AUTHORITY_GRANTED = NO
+LIVE_READINESS_GRANTED = NO
+CONFIGURATION_MUTATION_AUTHORIZED = NO
+NEXT_REQUIRED_OWNER_DECISION = AUTHORIZE_BOUNDED_DL_04_CLOSURE_EXECUTION
 ```
