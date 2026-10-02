@@ -1553,6 +1553,26 @@ It is not the final integrated implementation commit merely because it contains
 accepted history. A later Owner authorization must name that exact candidate,
 source branch, trusted repository, target `main`, and permitted remote actions.
 
+Pre-merge provenance distinguishes three immutable commit identities:
+
+| Identity | Meaning |
+| --- | --- |
+| `DL_05_PREMERGE_PR_HEAD_SHA` | Exact head commit of the feature branch submitted by the PR; the approved `DL_05_PREMERGE_CANDIDATE_SHA` must equal this SHA. |
+| `DL_05_PREMERGE_BASE_SHA` | Authoritative `main` commit forming the PR integration base at the validated PR state. |
+| `DL_05_PREMERGE_TEST_SHA` | Synthetic PR merge commit represented by `refs/pull/<PR_NUMBER>/merge` and actually checked out/tested by the unchanged Safe CI `pull_request` workflow. |
+
+The workflow's pinned `actions/checkout` has no explicit `ref`. Its default
+`pull_request` checkout tests the PR merged result. PR head and tested merge SHA
+are separate provenance facts; their difference is expected, and equality must
+not be required. Do not invent a future synthetic merge SHA before the PR exists.
+
+```text
+PREMERGE_CHECKOUT_EXPLICIT_PR_HEAD_REF = NO
+PREMERGE_DEFAULT_PULL_REQUEST_MERGE_REF_BEHAVIOR = YES
+PREMERGE_PR_HEAD_SHA_IS_SAFE_CI_CHECKOUT_SHA = NO
+PREMERGE_SAFE_CI_TESTS_MERGED_RESULT = YES
+```
+
 After separately authorized integration, capture the resulting authoritative
 `main` SHA as `DL_05_INTEGRATED_IMPLEMENTATION_COMMIT`. This is the final DL-05
 acceptance target. Resolve every candidate, parent/base, workflow, and final main
@@ -1579,10 +1599,12 @@ content comparison, and clean repository state. Unexpected behavior changes give
 
 The future pre-merge operation requires separate Owner authorization to push the
 exact branch and create its PR targeting authoritative `main`. Record PR number,
-URL, base and exact head. Let the existing PR-triggered Safe CI run, capture its
-receipt, and verify all required jobs/steps before a separate read-only pre-merge
-CI/integration review. Only after that review passes may the Owner separately
-authorize merge. A branch push alone does not trigger the required Safe CI.
+URL, head ref/SHA, base ref/SHA, merge ref, and exact tested merge SHA separately.
+Let the existing PR-triggered Safe CI run on that PR's merged-result ref, capture
+its receipt, and verify all required jobs/steps and head/base/test correspondence
+before a separate read-only pre-merge CI/integration review. Only after that
+review passes may the Owner separately authorize merge. A branch push alone
+does not trigger the required Safe CI.
 
 ```text
 REMOTE_BRANCH_REQUIRED = YES
@@ -1684,10 +1706,11 @@ neither reuse/copy that wrapper for its evidence procedure nor rely on its
 recorded argv for exact command attestation.
 
 DL-05 command evidence instead binds the committed workflow definition and its
-exact source/blob at the target SHA to GitHub run ID, run attempt, exact run head,
-job identity, step identity, step outcome, and available hosted logs. Preserve
-literal non-path command arguments in any captured description; workflow source
-and hosted execution evidence must be distinguishable from summaries.
+exact source/blob at the target SHA to GitHub run ID, run attempt, run-head
+metadata, actual checkout/test SHA, job identity, step identity, step outcome,
+and available hosted logs. Preserve literal non-path command arguments in any
+captured description; workflow source and hosted execution evidence must be
+distinguishable from summaries.
 
 ```text
 DL_05_REUSES_DL04_WRAPPER = NO
@@ -1718,7 +1741,8 @@ field and its effect on the gate. Missing mandatory proof blocks promotion.
 | Receipt group | Required evidence |
 | --- | --- |
 | Repository/workflow | Repository identity; workflow name, ID, path, source at the target SHA and blob identity where available; action pins/version |
-| Invocation | Run ID and URL/identity, attempt, event/trigger, branch/ref, exact run head SHA, expected target SHA |
+| Invocation | Run ID and URL/identity, attempt, event/trigger, branch/ref, separately labeled run-head metadata, actual checkout/test ref and SHA, expected target identity |
+| Pre-merge identities | PR number and URL/identity; PR head ref and `DL_05_PREMERGE_PR_HEAD_SHA`; base ref `main` and `DL_05_PREMERGE_BASE_SHA`; merge ref `refs/pull/<PR_NUMBER>/merge` and `DL_05_PREMERGE_TEST_SHA` |
 | Timing/result | Start/completion timestamps, completed state, run conclusion |
 | Jobs/steps | Required job ID/name/conclusion; every mandatory step identity/name/outcome; command exit status established by hosted results/logs |
 | Python | Safely available pytest summary, collected/passed/failed/error/skip outcomes where reported, exact hosted skip identities/reasons and classifications |
@@ -1731,18 +1755,55 @@ or private live configuration. Receipts stay external; canonical documentation
 records stable identities, sanitized findings, and status. No workflow artifact
 upload or workflow modification is required or authorized by this contract.
 
-Required correspondence is literal full-SHA equality:
+The pre-merge receipt must prove all six conditions below for the captured
+run/attempt and validated PR state:
+
+1. `DL_05_PREMERGE_PR_HEAD_SHA` exactly equals the expected pushed Dual-Lab
+   branch HEAD and approved pre-merge candidate.
+2. The PR base ref is authoritative `main`; record its applicable full base SHA.
+3. The Safe CI `pull_request` event belongs to the exact intended PR.
+4. The actual checkout/test SHA is `DL_05_PREMERGE_TEST_SHA`, corresponding to
+   that PR's `refs/pull/<PR_NUMBER>/merge` at the validated state.
+5. The tested synthetic merge integrates both the exact expected PR head and
+   the applicable authoritative main base. Retain immutable commit relationship
+   evidence for both; a later value of the moving merge ref is insufficient.
+6. Every required Safe CI result passes for that tested merged result. This proves
+   the candidate integrated with its PR base, not the feature commit in isolation.
+
+These are mandatory predicates for a future pre-merge PASS, not current results:
 
 ```text
-PR_HEAD_SHA = SAFE_CI_PREMERGE_RUN_HEAD_SHA
-AUTHORITATIVE_MAIN_SHA = SAFE_CI_POSTMERGE_RUN_HEAD_SHA
-REVIEW_TARGET_SHA = AUTHORITATIVE_MAIN_SHA = SAFE_CI_POSTMERGE_RUN_HEAD_SHA
+DL_05_PREMERGE_PR_HEAD_SHA_MATCH = YES
+DL_05_PREMERGE_BASE_REF = main
+DL_05_PREMERGE_TEST_REF = refs/pull/<PR_NUMBER>/merge
+DL_05_PREMERGE_TEST_SHA_MATCH = YES
+DL_05_PREMERGE_TEST_SHA_CONTAINS_EXPECTED_PR_HEAD = YES
+DL_05_PREMERGE_TEST_SHA_CONTAINS_EXPECTED_BASE = YES
+PREMERGE_EVIDENCE_DISTINGUISHES_HEAD_BASE_AND_TEST_SHA = YES
 ```
 
-Record the actual checkout SHA/ref separately when available. If a hosted PR
-checkout uses a generated merge ref, identify it and its relationship to the PR
-head/base; do not relabel that checkout as the PR head or use it as the final
-main proof. This distinction does not relax either run-head equality above.
+Record any run API `head_sha` as `SAFE_CI_PREMERGE_RUN_HEAD_METADATA_SHA`, with
+its source and meaning, separately from the PR head and actual checkout/test
+SHA. Run metadata alone cannot establish checkout identity. Never label the
+synthetic merge SHA as the PR head SHA or require those identities to match.
+The workflow ID/source, run ID/attempt/event, and every required job/step outcome
+must bind to this same receipt and tested state.
+
+Post-merge correspondence retains literal full-SHA equality. The integrated
+implementation commit is the exact authoritative main SHA after merge; the
+required Safe CI event remains `push` to `main`:
+
+```text
+DL_05_INTEGRATED_IMPLEMENTATION_COMMIT = POSTMERGE_AUTHORITATIVE_MAIN_SHA
+AUTHORITATIVE_MAIN_SHA = SAFE_CI_POSTMERGE_RUN_HEAD_SHA
+REVIEW_TARGET_SHA = AUTHORITATIVE_MAIN_SHA = SAFE_CI_POSTMERGE_RUN_HEAD_SHA
+SAFE_CI_POSTMERGE_CHECKOUT_SHA = DL_05_INTEGRATED_IMPLEMENTATION_COMMIT
+FINAL_EXACT_SHA_REVIEW_TARGET = DL_05_INTEGRATED_IMPLEMENTATION_COMMIT
+```
+
+The pre-merge synthetic SHA must never become the final accepted DL-05
+implementation identity. Mandatory checkout proof is required for both receipts;
+post-merge run metadata does not substitute for actual checkout evidence.
 Any target mismatch, moved candidate, or unexplained workflow/content difference
 blocks acceptance. Never infer correspondence from a branch label or successful
 run for another commit.
@@ -1826,7 +1887,7 @@ No future receipt is represented as already created by this specification.
 | ---: | --- |
 | 1 | Exact pre-merge candidate identity and approved scope |
 | 2 | PR number and URL/identity |
-| 3 | Exact PR head SHA |
+| 3 | PR head ref/exact SHA; base ref/applicable SHA; PR merge ref/exact tested merge SHA |
 | 4 | Pre-merge Safe CI run ID and attempt |
 | 5 | `DL05_PREMERGE_SAFE_CI_RECEIPT` |
 | 6 | Merge/integration result, authorization reference, method, and content comparison |
@@ -1872,7 +1933,7 @@ DL_05_SPECIFICATION_ESTABLISHED
 -> OWNER_AUTHORIZES_REMOTE_BRANCH_PUSH_AND_PR_CREATION
 -> REMOTE_BRANCH_PUSHED
 -> PR_CREATED_TARGETING_MAIN
--> PREMERGE_SAFE_CI_RUNS_ON_EXACT_PR_HEAD
+-> PREMERGE_SAFE_CI_RUNS_ON_PR_MERGED_RESULT_REF
 -> PREMERGE_SAFE_CI_PASS
 -> FRESH_PREMERGE_CI_AND_INTEGRATION_REVIEW
 -> OWNER_AUTHORIZES_MERGE
