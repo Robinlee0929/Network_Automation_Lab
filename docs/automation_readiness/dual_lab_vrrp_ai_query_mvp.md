@@ -1,10 +1,11 @@
-# Dual-Lab VRRP AI Query MVP: Accepted DL-02, DL-03, and DL-04 Closure
+# Dual-Lab VRRP AI Query MVP: Accepted Predecessors and DL-05 Specification
 
 **Decision summary: DL-02 remains accepted; the DL-03 facts-only projection is
 implemented, governed review passed, and Owner acceptance completed ACCEPT / PASS.
 DL-04 closure execution completed PASS and fresh governed review passed with zero
 material findings and one open non-blocking P3 finding. Owner acceptance completed
-ACCEPT / PASS; DL-04 is accepted.**
+ACCEPT / PASS; DL-04 is accepted. The DL-05 integration and Safe CI specification
+is established; DL-05 execution has not started.**
 The exact accepted DL-02 implementation
 commit is `bb39e8295a2fa5d69980396dbaf8c374c79a57b3`. DL-02 is not
 integrated into main, merged, or released. The exact accepted DL-03 implementation
@@ -15,7 +16,9 @@ Dual-Lab MVP remains unfinished.
 No live authority or readiness is granted.
 
 The current next Owner decision is
-`AUTHORIZE_DL_05_READINESS_AND_P3_IMPACT_REVIEW`. The
+`AUTHORIZE_DL_05_REMOTE_BRANCH_PUSH_AND_PR_CREATION`. The
+[DL-05 canonical contract](#dl-05-canonical-integration-and-safe-ci-contract)
+defines the separately gated future work. The
 [accepted DL-04 closure record](#dl-04-reviewed-closure-candidate) identifies
 the exact candidate and sealed evidence separately from this documentation commit.
 The [DL-04 closure contract](#dl-04-canonical-closure-contract) remains unchanged
@@ -28,17 +31,18 @@ its completed independent review and Owner acceptance, plus the DL-03 canonical
 specification, accepted implementation, completed governed review, and completed
 Owner acceptance decision, and the DL-04 closure specification, completed closure
 execution, completed fresh governed review, and completed Owner acceptance.
+It also establishes the DL-05 integration, Safe CI, evidence, fresh exact-SHA
+review, and Owner-acceptance contract.
 The DL-03 specification resolved the readiness
 review's `BLOCKED_CANONICAL_SCOPE_AMBIGUITY`; the separately authorized
 implementation, review, and acceptance are recorded below.
-This separately authorized DL-04 post-acceptance documentation reconciliation
-records the completed decision without repeating implementation, runtime
-validation, closure execution, governed review, or Owner acceptance. It does not
-reopen DL-01, DL-02, DL-03, or Stage 2. Changes are limited to this canonical
-record and the conflicting
-status summaries in README and the automation plan. Source, tests, the sealed
-external evidence and wrapper, and the historical Stage-2 closure record remain
-unchanged. The P3 finding is recorded, not repaired.
+The prior DL-04 post-acceptance reconciliation recorded that completed decision.
+The current Owner authorization permits only the DL-05 specification in this
+canonical document and one local documentation commit. README, the automation
+plan, source, tests, workflows, configuration, dependencies, sealed DL-04 evidence,
+the external wrapper, and historical Stage-2 records remain unchanged. This task
+performs no application validation, remote mutation, Safe CI, acceptance, or
+P3 remediation, and reopens no accepted predecessor.
 
 In the retained DL-02 history, the pre-acceptance documentation commit
 `76ce998531de59c201eaa6f123e57b1f9d364b19` established the candidate record and
@@ -737,6 +741,12 @@ DL_03_POST_ACCEPTANCE_NEXT_OWNER_DECISION_HISTORICAL = REVIEW_CANONICAL_PLAN_AND
 
 ## DL-04 reviewed closure candidate
 
+This retained post-acceptance record describes the reconciliation at
+`d3216f774d28e84b828355a727bc9807f1ce3b46`. References below to that
+reconciliation and its next decision are historical; current DL-05 status and
+authority are defined in the [DL-05 contract](#dl-05-canonical-integration-and-safe-ci-contract).
+Acceptance, candidate identity, evidence, and the open finding remain unchanged.
+
 **DL-04 is accepted: closure PASS, fresh governed review PASS, and completed
 Owner acceptance ACCEPT / PASS.** The completed review found zero unresolved
 material findings and exactly one open non-blocking P3 finding. This
@@ -777,7 +787,7 @@ COMPLETE_DUAL_LAB_MVP = NO
 LIVE_AUTHORITY_GRANTED = NO
 LIVE_READINESS_GRANTED = NO
 CONFIGURATION_MUTATION_AUTHORIZED = NO
-NEXT_REQUIRED_OWNER_DECISION = AUTHORIZE_DL_05_READINESS_AND_P3_IMPACT_REVIEW
+DL_04_POST_ACCEPTANCE_NEXT_OWNER_DECISION_HISTORICAL = AUTHORIZE_DL_05_READINESS_AND_P3_IMPACT_REVIEW
 ```
 
 The sealed external execution is identified by run ID
@@ -914,8 +924,9 @@ test, report-index, closure validation, or governed review is repeated.
 DL-02 and DL-03 remain accepted without integration or release. DL-04 is accepted
 for the exact closure candidate above, based on closure PASS, fresh governed
 review PASS, and completed Owner acceptance ACCEPT / PASS. DL-05 remains
-unstarted, and its integrated-implementation Safe CI has not run. The next Owner
-decision is `AUTHORIZE_DL_05_READINESS_AND_P3_IMPACT_REVIEW`. This documentation
+unstarted, and its integrated-implementation Safe CI has not run. At this
+reconciliation, the next Owner decision was
+`AUTHORIZE_DL_05_READINESS_AND_P3_IMPACT_REVIEW`. This documentation
 grants no Lab1/Lab2 access, SSH/NETCONF/RESTCONF, provider/model operation, secrets
 handling, configuration backup/change, production readiness, or complete-MVP
 acceptance. No Stage-2 semantics, historical proof, or safety gate is changed.
@@ -1472,4 +1483,492 @@ LIVE_AUTHORITY_GRANTED = NO
 LIVE_READINESS_GRANTED = NO
 CONFIGURATION_MUTATION_AUTHORIZED = NO
 NEXT_REQUIRED_OWNER_DECISION = AUTHORIZE_BOUNDED_DL_04_CLOSURE_EXECUTION
+```
+
+
+## DL-05 canonical integration and Safe CI contract
+
+**Decision summary: the DL-05 specification is established. Execution, remote
+mutation, Safe CI, and acceptance remain unstarted.** DL-05 will integrate the
+accepted Dual-Lab content into authoritative `main`, require both pre-merge and
+post-merge Safe CI, and obtain fresh exact-SHA governed review before a separate
+Owner acceptance decision. The P3 argv-recording finding remains open and
+non-blocking because DL-05 does not use the affected wrapper for command evidence.
+
+### Specification basis and permitted scope
+
+The specification base is
+`d3216f774d28e84b828355a727bc9807f1ce3b46` on
+`codex/dual-lab-vrrp-ai-query-mvp`. The completed
+`DL_05_READINESS_AND_P3_IMPACT_REVIEW_ONLY` response in the same conversation
+returned `DL_05_CANONICAL_SPECIFICATION_REQUIRED`. The subsequent Owner
+specification authorization resolves its identified gaps through this contract;
+it does not convert the prior review into an execution or acceptance result.
+
+At readiness review, the feature branch and PR were absent remotely; the current
+canonical HEAD and accepted DL-02/03/04 SHAs were local only. Authoritative remote
+`main` was `d57b802e5d7a9cbe1d684c3dd058527685c56d62`. These are retained
+readiness observations, not fresh remote-state checks by this specification task.
+Future remote work must verify current remote identity and state again.
+
+| Retained accepted identity | Exact value |
+| --- | --- |
+| DL-02 implementation | `bb39e8295a2fa5d69980396dbaf8c374c79a57b3` |
+| DL-03 implementation | `e4c529507c6f5a26a289af4f6d3bfc9e0b170c18` |
+| DL-04 closure candidate | `0972910c4d5e2bb7d70acbb50c4721234f20d0dc` |
+| DL-04 accepted manifest SHA256 | `f7dd14e1ea471032cf68e108d2ea85b144096d28f3aa6c339efd89bf27567449` |
+
+```text
+DL_05_PURPOSE = INTEGRATE_ACCEPTED_DUAL_LAB_MVP_TO_AUTHORITATIVE_MAIN_AND_PROVE_EXACT_MAIN_SHA_WITH_SAFE_CI_AND_FRESH_EXACT_SHA_ACCEPTANCE
+DL_05_NEW_PRODUCTION_BEHAVIOR = NO
+DL_05_SOURCE_FEATURE_IMPLEMENTATION = NO
+DL_05_TEST_FEATURE_IMPLEMENTATION = NO
+DL_05_LIVE_AUTHORITY = NO
+DL_05_CONFIG_MUTATION_AUTHORITY = NO
+DL_05_MODEL_PROVIDER_INTEGRATION = NO
+```
+
+The current task may edit only this canonical MVP record and create its one local
+specification commit. No README, automation-plan, Stage-2 closure, source, test,
+workflow, dependency, configuration, wrapper, or sealed-evidence change is
+permitted. No application test, report-index, push, PR, merge, Safe CI, P3 repair,
+Owner acceptance, or live operation belongs to this task. No accepted DL-02,
+DL-03, or DL-04 decision is reopened. No new runtime feature, runner, adapter,
+queue, scheduler, worker, AI loop, arbitrary executor, Day1-Day160 rewrite, or
+second safety matrix is introduced.
+
+The unchanged README and automation plan retain the earlier readiness next-step
+summary. Their accepted-predecessor, unstarted-DL-05, incomplete-MVP, and no-live
+statuses remain compatible. This canonical section supplies the newly authorized
+DL-05 specification and next decision; those summaries receive no implicit edit
+authority. Historical Stage-2 semantics and its distinct closure gates remain
+unchanged.
+
+### Integrated commit and candidate identity
+
+Before integration, the exact approved feature/PR HEAD is
+`DL_05_PREMERGE_CANDIDATE_SHA`. It contains the complete accepted Dual-Lab branch
+content and approved canonical documentation state, including this specification.
+It is not the final integrated implementation commit merely because it contains
+accepted history. A later Owner authorization must name that exact candidate,
+source branch, trusted repository, target `main`, and permitted remote actions.
+
+After separately authorized integration, capture the resulting authoritative
+`main` SHA as `DL_05_INTEGRATED_IMPLEMENTATION_COMMIT`. This is the final DL-05
+acceptance target. Resolve every candidate, parent/base, workflow, and final main
+identity to a full immutable SHA; branch names alone are insufficient.
+
+```text
+DL_05_INTEGRATED_IMPLEMENTATION_COMMIT_BEFORE_MERGE = NOT_YET_CREATED
+INTEGRATED_COMMIT_MUST_BE_ON_AUTHORITATIVE_MAIN = YES
+CURRENT_LOCAL_HEAD_IS_FINAL_INTEGRATED_COMMIT = NO
+FINAL_DL05_ACCEPTANCE_TARGET = POSTMERGE_AUTHORITATIVE_MAIN_SHA
+```
+
+The merge strategy remains governed by repository integration policy and the
+separate merge authorization. This specification selects no merge method. Do not
+require accepted feature commits to become first-parent main commits. Regardless
+of strategy, compare the resulting main tree/content with the approved integration
+candidate: the accepted source/tests and approved documentation must be present,
+the complete diff must be understood, and no unauthorized material change may
+have entered. Record transformed commit relationships, the exact result SHA,
+content comparison, and clean repository state. Unexpected behavior changes give
+`DL_05_RESULT = FAIL_OR_BLOCKED`; do not repair or rewrite history in that gate.
+
+### Pre-merge and post-merge CI gates
+
+The future pre-merge operation requires separate Owner authorization to push the
+exact branch and create its PR targeting authoritative `main`. Record PR number,
+URL, base and exact head. Let the existing PR-triggered Safe CI run, capture its
+receipt, and verify all required jobs/steps before a separate read-only pre-merge
+CI/integration review. Only after that review passes may the Owner separately
+authorize merge. A branch push alone does not trigger the required Safe CI.
+
+```text
+REMOTE_BRANCH_REQUIRED = YES
+PR_TARGET = main
+PREMERGE_SAFE_CI_REQUIRED = YES
+PREMERGE_SAFE_CI_TRIGGER = pull_request targeting main
+MERGE_BEFORE_PREMERGE_SAFE_CI_PASS = NO
+```
+
+After authorized integration reaches authoritative main, capture its exact SHA
+and the Safe CI run caused by the push to main. Require that post-merge run to
+pass and retain its receipt before the final governed review. Pre-merge success
+cannot replace this evidence, even if a merge strategy preserves the feature
+commit SHA.
+
+```text
+POSTMERGE_SAFE_CI_REQUIRED = YES
+POSTMERGE_SAFE_CI_TRIGGER = push to main
+PREMERGE_CI_MAY_SUBSTITUTE_FOR_POSTMERGE_CI = NO
+POSTMERGE_CI_MAY_BE_SKIPPED = NO
+```
+
+The existing `workflow_dispatch` trigger remains available in the workflow but
+is not a substitute for either required event in this DL-05 sequence. No trigger
+is invoked by this specification. Failed, cancelled, skipped, pending, missing,
+or unverifiable mandatory results block promotion; they authorize no automatic
+repair, retry, workflow change, merge, or acceptance.
+
+### Safe CI workflow and command contract
+
+Use the existing [Safe CI workflow](../../.github/workflows/safe-ci.yml) and its
+[governing CI policy](../phase_2m/phase_2m_05_platform_quality_continuation_and_closure_authorization_gate_planning_only.md#workflow-trigger-and-permission-boundary).
+The readiness-verified workflow ID is `311663833`; the specification-base Git blob
+is `717eb0fc4cd54f1c1554137327c26cd2fe82e610`. These identify the baseline.
+Each future receipt must identify the actual workflow source at its target SHA,
+including action pins/version comments; a workflow change requires separate
+scope resolution and cannot inherit this baseline silently.
+
+```text
+SAFE_CI_WORKFLOW = .github/workflows/safe-ci.yml
+SAFE_CI_WORKFLOW_NAME = Safe CI
+SAFE_CI_REQUIRED_JOB = validate
+SAFE_CI_DISPLAYED_JOB = Node and Python quality gates
+SAFE_CI_RUNNER = ubuntu-latest
+SAFE_CI_TIMEOUT_MINUTES = 30
+SAFE_CI_PERMISSIONS = contents: read
+CHECKOUT_PERSIST_CREDENTIALS = false
+SAFE_CI_SECRET_DEPENDENCY_REQUIRED = NO
+SAFE_CI_ARTIFACT_UPLOAD_REQUIRED = NO
+```
+
+All twelve steps below are mandatory and ordered. A successful job label alone
+is insufficient if a mandatory step did not succeed.
+
+| Order | Exact workflow step | Command or required setup |
+| ---: | --- | --- |
+| 1 | Check out repository | Pinned `actions/checkout`; `persist-credentials: false` |
+| 2 | Set up Node.js 22 | Pinned `actions/setup-node`; Node `22`, package-manager cache disabled |
+| 3 | Install committed Node dependencies | `npm ci` |
+| 4 | Typecheck | `npm run typecheck` |
+| 5 | Lint with zero warnings | `npm run lint`; zero-warning policy retained |
+| 6 | Run Node unit tests | `npm run test:unit` |
+| 7 | Build Next.js with telemetry disabled | `npm run build`; `NEXT_TELEMETRY_DISABLED=1` |
+| 8 | Set up Python 3.13 | Pinned `actions/setup-python`; Python `3.13` |
+| 9 | Install committed Python dependencies | `python -m pip install -r requirements.txt` |
+| 10 | Run Python tests | `python -m pytest` |
+| 11 | Validate report index | `python network_lab.py --task report-index` |
+| 12 | Prove validation changed no tracked file | `git diff --exit-code` |
+
+Every mandatory command must exit zero. Report-index must be PASS or WARN only
+under the existing optional-report policy: zero failures, zero mandatory missing,
+zero unknowns, and evidence that every missing report is optional. The retained
+13 optional reports are a comparison baseline, not a forced hosted count.
+Validation must not change tracked files.
+
+Existing CI policy permits public dependency-registry access needed to materialize
+the committed lockfile and requirements in the ephemeral hosted runner. It grants
+no dependency updates, arbitrary packages, device/private-service access, or
+repository writes. Offline product validation does not mean the dependency setup
+uses no Internet connection.
+
+Safe CI grants no Lab1/Lab2 access, SSH, NETCONF, RESTCONF, device commands,
+configuration backup/change, signing, credentials/private runtime configuration,
+new live Owner authorization, provider/model API use, production execution,
+queue/worker/scheduler, AI loop, or arbitrary execution authority.
+
+```text
+SAFE_CI_LIVE_NETWORK_ACCESS = NO
+SAFE_CI_CONFIG_MUTATION = NO
+SAFE_CI_PROVIDER_MODEL_ACCESS = NO
+SAFE_CI_SECRET_DEPENDENCY_REQUIRED = NO
+```
+
+### Command attestation and open P3 disposition
+
+`DL04_REVIEW_P3_PYTEST_ARGV_RECORDING` remains `OPEN_NON_BLOCKING`. The existing
+hosted workflow does not use the affected external `run_review.py`. DL-05 must
+neither reuse/copy that wrapper for its evidence procedure nor rely on its
+recorded argv for exact command attestation.
+
+DL-05 command evidence instead binds the committed workflow definition and its
+exact source/blob at the target SHA to GitHub run ID, run attempt, exact run head,
+job identity, step identity, step outcome, and available hosted logs. Preserve
+literal non-path command arguments in any captured description; workflow source
+and hosted execution evidence must be distinguishable from summaries.
+
+```text
+DL_05_REUSES_DL04_WRAPPER = NO
+DL_05_DEPENDS_ON_WRAPPER_ARGV_ATTESTATION = NO
+P3_AFFECTS_SAFE_CI_VALIDITY = NO
+P3_REMEDIATION_REQUIRED_BEFORE_SAFE_CI = NO
+P3_REMEDIATION_REQUIRED_BEFORE_DL05_ACCEPTANCE = NO
+P3_MUST_BE_CLOSED_FOR_DL05_ACCEPTANCE = NO
+P3_ARGV_RECORDING_FINDING_STATUS = OPEN_NON_BLOCKING
+```
+
+The finding may remain open beyond DL-05 unless separately prioritized. Do not
+repair or close it as part of DL-05. Future work choosing to reuse the affected
+argv recording must separately address the finding. The sealed DL-04 bundle and
+wrapper remain unchanged; this disposition does not reopen DL-04 acceptance.
+
+### External CI receipts and SHA correspondence
+
+Retain two external read-only evidence receipts with these logical identities:
+
+- `DL05_PREMERGE_SAFE_CI_RECEIPT` for the required PR run.
+- `DL05_POSTMERGE_SAFE_CI_RECEIPT` for the required main push run; mandatory final
+  acceptance evidence.
+
+Both receipts must include the following fields or explicitly record a missing
+field and its effect on the gate. Missing mandatory proof blocks promotion.
+
+| Receipt group | Required evidence |
+| --- | --- |
+| Repository/workflow | Repository identity; workflow name, ID, path, source at the target SHA and blob identity where available; action pins/version |
+| Invocation | Run ID and URL/identity, attempt, event/trigger, branch/ref, exact run head SHA, expected target SHA |
+| Timing/result | Start/completion timestamps, completed state, run conclusion |
+| Jobs/steps | Required job ID/name/conclusion; every mandatory step identity/name/outcome; command exit status established by hosted results/logs |
+| Python | Safely available pytest summary, collected/passed/failed/error/skip outcomes where reported, exact hosted skip identities/reasons and classifications |
+| Other validation | Node quality-gate outcomes, report-index result and WARN rationale, tracked-diff exit/result |
+| Provenance | GitHub source URLs/identities, available supporting logs, evidence-capture procedure and capture identity/time; limitations |
+
+Do not substitute a historical/local DL-04 result for an unavailable hosted
+result. Store no secrets, raw private runtime content, credentials, signatures,
+or private live configuration. Receipts stay external; canonical documentation
+records stable identities, sanitized findings, and status. No workflow artifact
+upload or workflow modification is required or authorized by this contract.
+
+Required correspondence is literal full-SHA equality:
+
+```text
+PR_HEAD_SHA = SAFE_CI_PREMERGE_RUN_HEAD_SHA
+AUTHORITATIVE_MAIN_SHA = SAFE_CI_POSTMERGE_RUN_HEAD_SHA
+REVIEW_TARGET_SHA = AUTHORITATIVE_MAIN_SHA = SAFE_CI_POSTMERGE_RUN_HEAD_SHA
+```
+
+Record the actual checkout SHA/ref separately when available. If a hosted PR
+checkout uses a generated merge ref, identify it and its relationship to the PR
+head/base; do not relabel that checkout as the PR head or use it as the final
+main proof. This distinction does not relax either run-head equality above.
+Any target mismatch, moved candidate, or unexplained workflow/content difference
+blocks acceptance. Never infer correspondence from a branch label or successful
+run for another commit.
+
+### Hosted skips and retained DL-04 evidence
+
+Ubuntu hosted results require environment-specific classification. The local
+Windows skip set is comparison evidence only. Record each actual hosted skip's
+exact node identity, reason, environment applicability, and canonical-policy
+basis. Valid documented environment differences may change counts; numeric
+equality with DL-04's local totals is not required. Unexplained skips are never
+accepted. If available hosted evidence cannot establish exact skip identities,
+stop for a separately authorized evidence-resolution decision; do not infer them
+from a count or change the workflow/tests inside a review task.
+
+```text
+WINDOWS_SKIP_SET_AUTOMATICALLY_ACCEPTED_ON_UBUNTU = NO
+SAFE_CI_UNEXPLAINED_SKIP_COUNT = 0
+```
+
+| Retained DL-04 evidence | DL-05 classification |
+| --- | --- |
+| Accepted manifest | `REUSABLE_BASELINE` |
+| Closure results | `REUSABLE_BASELINE` |
+| Accepted Windows skip set | `BASELINE_ONLY / REQUIRES_FRESH_SAFE_CI_ENVIRONMENT_CONFIRMATION` |
+| Guard baseline | `REQUIRES_FRESH_DL05_REVIEW` |
+| 28-area mapping | `REQUIRES_FRESH_DL05_EXACT_SHA_REVIEW` |
+| Security assertions | `REQUIRES_FRESH_DL05_EXACT_SHA_REVIEW` |
+| Tracked-integrity baseline | `REQUIRES_FRESH_DL05_EXACT_SHA_REVIEW` |
+
+The hosted workflow does not install the external DL-04 guard. Its old denial
+counts and exclusions cannot be claimed as fresh hosted observations. Fresh
+DL-05 review must assess preservation at the exact integrated content without
+weakening the accepted safety boundaries or reopening predecessor acceptance.
+
+### Fresh independent acceptance and findings gate
+
+DL-05 independent acceptance means a fresh, read-only, separately authorized
+exact-SHA governed review task after integration into authoritative main,
+successful post-merge Safe CI, and capture of its exact evidence. Use a separate
+task context with a fresh review mandate and fresh inspection. A new conversation,
+separate human, or different agent identity is not required. Record the actual
+process and its limitations; same-model technical review must not be presented
+as an attestation by a different human or agent.
+
+```text
+EXACT_SHA_REVIEW_REQUIRED = YES
+SAFE_CI_EVIDENCE_REQUIRED_BEFORE_REVIEW = YES
+POSTMERGE_REVIEW_REQUIRED = YES
+SEPARATE_TASK_CONTEXT_REQUIRED = YES
+SEPARATE_CONVERSATION_REQUIRED = NO
+SEPARATE_HUMAN_REVIEWER_REQUIRED = NO
+SEPARATE_AGENT_IDENTITY_REQUIRED = NO
+ZERO_UNRESOLVED_MATERIAL_FINDINGS_REQUIRED = YES
+NONBLOCKING_FINDINGS_PERMITTED = YES
+```
+
+The fresh review must verify the authoritative main SHA and approved Dual-Lab
+source/test/document content; preserved DL-02/03/04 accepted state; actual workflow
+identity; post-merge exact-SHA correspondence; every required job/step PASS;
+acceptable report-index; valid evidence provenance; and no unexpected content
+drift, authority expansion, live access, provider/model integration, or
+configuration mutation. Recheck the retained coverage/security/integrity evidence
+against that exact target and accurately classify P3. Implementation, merge,
+pre-merge-review, or historical review conclusions cannot replace fresh inspection.
+
+The retained predecessor has `DL04_UNRESOLVED_MATERIAL_FINDINGS = 0` and
+`DL04_NONBLOCKING_FINDINGS = 1`. These are baseline facts. The final review must
+freshly establish `DL05_UNRESOLVED_MATERIAL_FINDINGS = 0` and return PASS.
+An open non-blocking finding alone does not fail this gate. A material finding
+fails it; missing evidence blocks it. Either outcome stops acceptance and requires
+separate resolution authority, not an in-task repair.
+
+### Required evidence package and documentation checkpoints
+
+The canonical package contains all twenty items below. It may remain external
+under existing evidence practice, with stable references in the canonical record.
+No future receipt is represented as already created by this specification.
+
+| Item | Required content |
+| ---: | --- |
+| 1 | Exact pre-merge candidate identity and approved scope |
+| 2 | PR number and URL/identity |
+| 3 | Exact PR head SHA |
+| 4 | Pre-merge Safe CI run ID and attempt |
+| 5 | `DL05_PREMERGE_SAFE_CI_RECEIPT` |
+| 6 | Merge/integration result, authorization reference, method, and content comparison |
+| 7 | Exact authoritative post-merge main SHA |
+| 8 | Post-merge Safe CI run ID and attempt |
+| 9 | `DL05_POSTMERGE_SAFE_CI_RECEIPT` |
+| 10 | Actual workflow source/blob/version identity |
+| 11 | All mandatory job/step outcomes |
+| 12 | Hosted pytest result and exact skip classifications |
+| 13 | Hosted report-index result and optional-WARN rationale |
+| 14 | Hosted tracked-diff cleanliness result and reviewed repository clean state |
+| 15 | Accepted DL-04 candidate/manifest and retained-baseline references |
+| 16 | Fresh exact-SHA governed review result and actual reviewer/process provenance |
+| 17 | Findings list, severity, material/non-blocking classification, disposition |
+| 18 | Fresh zero-unresolved-material-findings determination |
+| 19 | Canonical DL-05 candidate status tied to the reviewed main SHA and evidence |
+| 20 | Later separate Owner-acceptance decision record tied to that candidate |
+
+Capture receipts and supporting records externally with stable logical identities
+and provenance; retain failed attempts separately. Later records reference the
+captured run/attempt and exact SHA without overwriting earlier evidence. Repository
+candidate/status documentation records sanitized stable identities and requires
+separate exact documentation authorization. Owner acceptance cannot precede the
+canonical candidate record. Post-acceptance reconciliation records the completed
+decision under its own authorization.
+
+Candidate and acceptance documentation commits are distinct from the validated
+integrated implementation SHA. Record their actual hashes/parents externally;
+never silently relabel a documentation descendant as the reviewed main target.
+A proposed new acceptance target requires its own matching post-merge CI and fresh
+review evidence. Any intervening change must be identified and classified before
+acceptance, with no unsupported claim that the new HEAD was already validated.
+
+### Required state and authorization sequence
+
+The order below is mandatory. Each transition requires its preceding evidence
+and the named separate authorization. Remote mutation, merge, fresh review, and
+Owner acceptance must not be collapsed into one task. Receipt capture accompanies
+each CI gate; canonical documentation writes require separately scoped authority.
+
+```text
+DL_05_SPECIFICATION_ESTABLISHED
+-> OWNER_AUTHORIZES_REMOTE_BRANCH_PUSH_AND_PR_CREATION
+-> REMOTE_BRANCH_PUSHED
+-> PR_CREATED_TARGETING_MAIN
+-> PREMERGE_SAFE_CI_RUNS_ON_EXACT_PR_HEAD
+-> PREMERGE_SAFE_CI_PASS
+-> FRESH_PREMERGE_CI_AND_INTEGRATION_REVIEW
+-> OWNER_AUTHORIZES_MERGE
+-> MERGE_TO_AUTHORITATIVE_MAIN
+-> POSTMERGE_MAIN_SHA_CAPTURED
+-> POSTMERGE_SAFE_CI_RUNS_ON_EXACT_MAIN_SHA
+-> POSTMERGE_SAFE_CI_PASS
+-> POSTMERGE_CI_EVIDENCE_CAPTURED
+-> FRESH_EXACT_SHA_DL05_GOVERNED_REVIEW
+-> DL_05_REVIEW_PASS
+-> CANONICAL_DL05_CANDIDATE_STATUS_RECORDED
+-> OWNER_ACCEPTANCE
+-> POST_ACCEPTANCE_DOCUMENTATION_RECONCILIATION
+-> DL_05_ACCEPTED
+```
+
+Recheck trusted remote, source/target refs, exact authorized candidate, clean
+status, and policy before each future remote mutation. Repository-mandated
+post-merge validation remains required under the later task's offline boundary;
+local results cannot replace hosted post-merge CI. A failed or missing gate stops
+the sequence. This document grants no blanket execution, merge, retry, cleanup,
+conflict repair, or future-phase authorization.
+
+### Owner acceptance and offline completion semantics
+
+Owner acceptance is a separate decision after every requirement below is proven.
+These are future gate predicates, not results of this specification task:
+
+```text
+INTEGRATED_IMPLEMENTATION_COMMIT_ESTABLISHED = YES
+POSTMERGE_SAFE_CI_PASS = YES
+SAFE_CI_EXACT_SHA_MATCH = YES
+FRESH_EXACT_SHA_GOVERNED_REVIEW = PASS
+UNRESOLVED_MATERIAL_FINDINGS = 0
+EVIDENCE_PROVENANCE = PASS
+CANONICAL_CANDIDATE_RECORD = ESTABLISHED
+```
+
+Before Owner acceptance, `DL_05_ACCEPTED = NO` and
+`COMPLETE_DUAL_LAB_MVP = NO`. A review PASS or green CI alone cannot set either
+acceptance status. Successful Owner acceptance completes the bounded offline
+Dual-Lab MVP; subsequent documentation reconciliation records the decision and
+finishes the canonical `DL_05_ACCEPTED` state. Reconciliation cannot manufacture
+acceptance or validate a different implementation SHA.
+
+The following values apply only after successful DL-05 Owner acceptance:
+
+```text
+COMPLETE_DUAL_LAB_MVP = YES
+OFFLINE_DUAL_LAB_MVP_ACCEPTED = YES
+LIVE_AUTHORITY_GRANTED = NO
+LIVE_READINESS_GRANTED = NO
+CONFIGURATION_MUTATION_AUTHORIZED = NO
+PROVIDER_MODEL_INTEGRATION_AUTHORIZED = NO
+```
+
+Offline acceptance authorizes no new live query and changes no Stage-2 live-proof
+or closure semantics. Any future Dual-Lab live proof remains a separately gated
+later capability. No exact DL-06 execution contract is established here; a future
+readiness/specification/exact Owner-authorization flow is required before live
+work. No DL-06 procedure, command, target credential, or live approval is invented.
+
+```text
+DL_06_SEPARATE_LIVE_AUTHORIZATION_REQUIRED = YES
+DL_06_EXECUTION_CONTRACT_STATUS = NOT_ESTABLISHED
+```
+
+### Current specification result and next Owner decision
+
+Documentation review checks the conclusion, exact accepted identities, integrated
+commit definition, both CI gates, SHA correspondence, P3 disposition, reviewer
+meaning, twenty-item evidence package, ordered authorization boundaries, and
+conditional offline completion. Local links, whitespace, one-file scope, preserved
+predecessor contracts/evidence, and explicit no-live status are checked before
+commit. Application validation, Safe CI, integration, and acceptance are not run.
+
+The following is the current state after this specification, not the future
+completion predicates above:
+
+```text
+DL_02_ACCEPTED = YES
+DL_03_ACCEPTED = YES
+DL_04_ACCEPTED = YES
+DL_05_SPECIFICATION_STATUS = ESTABLISHED
+DL_05_STARTED = NO
+REMOTE_BRANCH_PUSHED = NO
+PR_CREATED = NO
+PREMERGE_SAFE_CI_RUN = NO
+MERGED_TO_MAIN = NO
+POSTMERGE_SAFE_CI_RUN = NO
+SAFE_CI_RUN = NO
+DL_05_ACCEPTED = NO
+COMPLETE_DUAL_LAB_MVP = NO
+P3_ARGV_RECORDING_FINDING_STATUS = OPEN_NON_BLOCKING
+LIVE_AUTHORITY_GRANTED = NO
+LIVE_READINESS_GRANTED = NO
+CONFIGURATION_MUTATION_AUTHORIZED = NO
+NEXT_REQUIRED_OWNER_DECISION = AUTHORIZE_DL_05_REMOTE_BRANCH_PUSH_AND_PR_CREATION
 ```
