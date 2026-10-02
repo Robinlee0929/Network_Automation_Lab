@@ -1,37 +1,42 @@
-# Dual-Lab VRRP AI Query MVP: Accepted Predecessors and DL-04 Closure Specification
+# Dual-Lab VRRP AI Query MVP: Accepted Predecessors and Reviewed DL-04 Closure Candidate
 
 **Decision summary: DL-02 remains accepted; the DL-03 facts-only projection is
 implemented, governed review passed, and Owner acceptance completed ACCEPT / PASS.
-The DL-04 closure specification is established; closure execution and acceptance
-have not started.**
+DL-04 closure execution completed PASS and fresh governed review passed with zero
+material findings and one open non-blocking P3 finding. Owner acceptance is
+PENDING; DL-04 is not accepted.**
 The exact accepted DL-02 implementation
 commit is `bb39e8295a2fa5d69980396dbaf8c374c79a57b3`. DL-02 is not
 integrated into main, merged, or released. The exact accepted DL-03 implementation
 is `e4c529507c6f5a26a289af4f6d3bfc9e0b170c18`; it is not integrated,
 merged, or released.
-DL-04 implementation has not started, and the complete Dual-Lab MVP remains unfinished.
+DL-04 adds no production implementation. DL-05 has not started, and the complete
+Dual-Lab MVP remains unfinished.
 No live authority or readiness is granted.
 
 The current next Owner decision is
-`AUTHORIZE_BOUNDED_DL_04_CLOSURE_EXECUTION`. The
-[DL-04 closure contract](#dl-04-canonical-closure-contract) below is the governing
-specification for that future decision, not execution authorization.
+`AUTHORIZE_DL_04_OWNER_ACCEPTANCE`. The
+[reviewed DL-04 candidate record](#dl-04-reviewed-closure-candidate) identifies
+the exact candidate and sealed evidence separately from this documentation commit.
+The [DL-04 closure contract](#dl-04-canonical-closure-contract) remains unchanged
+in scope and requirements.
 
 ## Purpose and planning boundary
 
 This is the canonical repository record for the accepted DL-02 implementation,
 its completed independent review and Owner acceptance, plus the DL-03 canonical
 specification, accepted implementation, completed governed review, and completed
-Owner acceptance decision, and the separately authorized DL-04 closure
-specification. The DL-03 specification resolved the readiness
+Owner acceptance decision, and the DL-04 closure specification, completed closure
+execution, and completed fresh governed review. The DL-03 specification resolved the readiness
 review's `BLOCKED_CANONICAL_SCOPE_AMBIGUITY`; the separately authorized
 implementation, review, and acceptance are recorded below.
-This DL-04 documentation-only task performs no implementation, runtime validation,
-closure execution, or Owner acceptance, and does not reopen DL-01, DL-02, DL-03,
-or Stage 2. Only this canonical record changes. README and the automation plan
-retain their earlier summaries: their DL-04 NOT STARTED label still describes
-implementation/closure execution. Their readiness/specification next-step text
-predates this authorization; the current next decision is recorded here.
+This separately authorized DL-04 documentation reconciliation records completed
+work without repeating implementation, runtime validation, closure execution, or
+governed review. It does not perform Owner acceptance or reopen DL-01, DL-02,
+DL-03, or Stage 2. Changes are limited to this canonical record and the conflicting
+status summaries in README and the automation plan. Source, tests, the sealed
+external evidence and wrapper, and the historical Stage-2 closure record remain
+unchanged. The P3 finding is recorded, not repaired.
 
 In the retained DL-02 history, the pre-acceptance documentation commit
 `76ce998531de59c201eaa6f123e57b1f9d364b19` established the candidate record and
@@ -728,10 +733,179 @@ LIVE_READINESS_GRANTED = NO
 DL_03_POST_ACCEPTANCE_NEXT_OWNER_DECISION_HISTORICAL = REVIEW_CANONICAL_PLAN_AND_AUTHORIZE_DL_04_READINESS_OR_SPECIFICATION_WORK
 ```
 
+## DL-04 reviewed closure candidate
+
+**Closure PASS and fresh governed review PASS are recorded; Owner acceptance
+remains PENDING.** The completed review found zero unresolved material findings
+and exactly one open non-blocking P3 finding. This documentation-only descendant
+records those results; it does not replace, amend, or revalidate the candidate.
+
+### Exact candidate, evidence identity, and current status
+
+```text
+DL_02_ACCEPTED = YES
+DL_03_ACCEPTED = YES
+DL_04_SPECIFICATION_STATUS = ESTABLISHED
+DL_04_SPECIFICATION_COMMIT = 0972910c4d5e2bb7d70acbb50c4721234f20d0dc
+DL_04_CLOSURE_EXECUTION_STARTED = YES
+DL_04_CLOSURE_EXECUTION_COMPLETED = YES
+DL_04_CLOSURE_RESULT = PASS
+DL_04_CLOSURE_CANDIDATE = YES
+DL_04_CANDIDATE_COMMIT = 0972910c4d5e2bb7d70acbb50c4721234f20d0dc
+DL_04_CANDIDATE_PARENT = d3bbe767fa5653bb7ee213594959877fd4ff80fe
+DL_04_MANIFEST_SHA256 = f7dd14e1ea471032cf68e108d2ea85b144096d28f3aa6c339efd89bf27567449
+DL_04_FRESH_GOVERNED_REVIEW_RESULT = PASS
+DL_04_REVIEW_MATERIAL_FINDINGS = 0
+DL_04_REVIEW_NONBLOCKING_FINDINGS = 1
+DL_04_OWNER_ACCEPTANCE = PENDING
+DL_04_ACCEPTED = NO
+DL_04_STATUS = PENDING_OWNER_ACCEPTANCE
+DL_04_READY_FOR_OWNER_ACCEPTANCE_DECISION = YES
+DL_04_SAFE_CI_REQUIRED = NO
+SAFE_CI_RUN = NO
+DL_05_SAFE_CI_BOUNDARY_PRESERVED = YES
+DL_05_STARTED = NO
+COMPLETE_DUAL_LAB_MVP = NO
+LIVE_AUTHORITY_GRANTED = NO
+LIVE_READINESS_GRANTED = NO
+CONFIGURATION_MUTATION_AUTHORIZED = NO
+NEXT_REQUIRED_OWNER_DECISION = AUTHORIZE_DL_04_OWNER_ACCEPTANCE
+```
+
+The sealed external execution is identified by run ID
+`nal_dl04_closure_20261002_01`. Its evidence root is represented here as
+`<closure-root>/evidence`; its physical retention path stays outside the public
+repository. The root contains `candidate-manifest.json` and
+`dl04-closure-result.json`; `manifest-receipt.json` is retained beside the evidence
+root. The receipt binds the exact manifest hash above to the candidate and parent.
+The specification and candidate identities are equal; the comparison base equals
+the parent. This reconciliation commit has that candidate as its direct parent;
+its own actual hash is reported after commit, never guessed inside this record.
+
+The completed fresh review established exact manifest hash/candidate binding,
+valid provenance, all 14 required artifacts present, and all 26 sealed evidence
+files unchanged. Fresh execution results were distinguished from historical
+comparison inputs. All 1,021 tracked candidate files retained their raw bytes
+during closure execution and review. These are retained results for the candidate,
+not a claim that this later documentation commit was closure-tested.
+
+The completed governed review is recorded in the preceding authorized review
+response in the same conversation and reaffirmed by the Owner's reconciliation
+authorization. It was fresh technical/governed inspection of the exact candidate
+and frozen evidence, with read-only checks and no required validation rerun. It
+was not a separate-human, separate-agent-identity, or separate-conversation
+attestation. Those process limits do not change its PASS result. This record does
+not claim a new external `governed-review.json` or Owner-acceptance receipt was
+created. The sealed execution artifact correctly retains its earlier
+`PENDING_FRESH_GOVERNED_REVIEW` status; this later canonical record records the
+completed review without altering that frozen artifact.
+
+### Reviewed fresh closure results
+
+These results belong to the completed fresh DL-04 execution. They are recorded
+from the sealed bundle and completed governed review, not rerun by this task.
+Use the [canonical command map](#candidate-identity-and-deterministic-offline-command-map)
+and manifest index to navigate to the exact suite evidence.
+
+| Validation | Collected | Passed | Established skips | Unexpected skips | Failures / errors | Logical artifact |
+| --- | ---: | ---: | ---: | ---: | --- | --- |
+| DL-01 focused | 256 | 256 | 0 | 0 | 0 / 0 | `focused-dl01.json` |
+| DL-02 focused | 185 | 185 | 0 | 0 | 0 / 0 | `focused-dl02.json` |
+| DL-03 focused | 211 | 211 | 0 | 0 | 0 / 0 | `focused-dl03.json` |
+| Complete Dual-Lab | 652 | 652 | 0 | 0 | 0 / 0 | `dual-lab.json` |
+| Stage-2 offline | 1892 | 1890 | 2 | 0 | 0 / 0 | `stage2.json` |
+| Full offline | 4672 | 4669 | 3 | 0 | 0 / 0 | `full-pytest.json` |
+
+All six exact workflow/governance proofs passed (`workflow-proofs.json`), and all
+28 canonical coverage areas passed (`requirement-to-evidence.json`). The review
+checked suite membership and test-level outcomes, exact established skip
+identities, source fingerprints, denial causality, and requirement mappings;
+matching totals alone were not the basis for PASS.
+
+```text
+WORKFLOW_REQUIRED_PROOF_COUNT = 6
+WORKFLOW_REQUIRED_PROOFS_PASSED = 6
+CANONICAL_COVERAGE_AREA_COUNT = 28
+CANONICAL_COVERAGE_AREAS_PASSED = 28
+KNOWN_PRE_EXISTING_GUARD_DENIAL_COUNT = 3
+KNOWN_PRE_EXISTING_GUARD_DENIAL_SET_MATCH = YES
+NEW_OR_UNCLASSIFIED_GUARD_DENIAL_COUNT = 0
+DL04_CAUSED_GUARD_DENIAL_COUNT = 0
+REPORT_INDEX_RESULT = WARN
+REPORT_INDEX_EXIT_CODE = 0
+REPORT_INDEX_FAILURE_COUNT = 0
+REPORT_INDEX_OPTIONAL_MISSING_COUNT = 13
+REPORT_INDEX_MANDATORY_MISSING_COUNT = 0
+REPORT_INDEX_UNKNOWN_COUNT = 0
+REPORT_INDEX_WARN_ACCEPTABLE = YES
+```
+
+The guard counter covers the top-level parent process. The exact classifications
+remain in `skip-classification.json` and `guard-classification.json`. Each missing
+report in `report-index.log` and `report-index.json` was verified optional under
+the unchanged registry. The WARN does not establish a safety or regression issue.
+
+The candidate-bound security review's sixteen assertions and six preservation
+checks passed. Stage-2 authority, Owner authorization, replay, credential,
+pinned-host, and exact read-only command boundaries remain unchanged. Pair
+identity collision precedence, rejected-target zero invocation, canonical
+evidence revalidation, closed immutable schemas, and sanitized failures remain
+supported. No secret or raw live data was found in the evidence. The external
+preparation command-length failure occurred before process startup, affected no
+repository state, and did not contaminate accepted evidence. Read-only review
+probe corrections likewise changed no repository or sealed evidence files.
+
+### Open non-blocking review finding
+
+```text
+FINDING_ID = DL04_REVIEW_P3_PYTEST_ARGV_RECORDING
+SEVERITY = P3
+TITLE = Preserve non-path arguments in recorded pytest argv
+LOCATION = external closure wrapper run_review.py, reviewed line 67
+CLASSIFICATION = NON_BLOCKING
+MATERIAL_FINDING = NO
+CLOSURE_INVALIDATED = NO
+SEALED_EVIDENCE_CONTAMINATED = NO
+REPOSITORY_AFFECTED = NO
+NONBLOCKING_FINDINGS = 1
+UNRESOLVED_MATERIAL_FINDINGS = 0
+P3_ARGV_RECORDING_FINDING_STATUS = OPEN_NON_BLOCKING
+```
+
+The external wrapper's recorded pytest argv does not preserve all non-path
+arguments with complete fidelity: the recorded `no:cacheprovider` option value
+is rendered as `<external>/no:cacheprovider`. The fingerprinted guard passed the
+correct literal argument to pytest. The fresh governed review independently
+verified actual suite membership, test-level outcomes, exact skips, evidence
+provenance, and candidate integrity, so this recording limitation does not
+invalidate closure evidence. The finding is not fixed; neither wrapper nor sealed
+evidence is edited by this reconciliation.
+
+If future DL-05 evidence generation reuses the affected wrapper, the finding must
+be considered before relying on recorded argv as exact command-attestation
+evidence. That condition does not authorize a repair or start DL-05.
+
+### Documentation checks and remaining decision
+
+This reconciliation aligns the decision summary, exact identities, evidence
+references, finding counts, pending acceptance, and next decision with README
+and the automation plan. Documentation checks cover consistency, readability,
+local links/references, authorized path scope, and whitespace. No application
+test, report-index, closure validation, or governed review is repeated.
+
+DL-02 and DL-03 remain accepted without integration or release. DL-04 remains a
+reviewed closure candidate pending separate Owner acceptance. DL-05 and its
+integrated-implementation Safe CI gate remain unstarted. This documentation
+grants no Lab1/Lab2 access, SSH/NETCONF/RESTCONF, provider/model operation, secrets
+handling, configuration backup/change, production readiness, or complete-MVP
+acceptance. No Stage-2 semantics, historical proof, or safety gate is changed.
+
 ## DL-04 canonical closure contract
 
-**Specification established; fresh closure execution requires separate Owner
-authorization.** DL-04 is the integrated offline validation, reviewer-evidence,
+**Retained specification: the separately authorized execution and review are
+recorded above; its scope and requirements remain unchanged.** References below
+to a future run or the specification task describe the original contract boundary.
+DL-04 is the integrated offline validation, reviewer-evidence,
 security-review, and closure layer over the accepted DL-01 through DL-03 behavior.
 It adds no runtime capability. The completed readiness decision was
 `DL_04_CANONICAL_SPECIFICATION_REQUIRED`: all 28 reviewed areas have predecessor
@@ -1251,7 +1425,11 @@ DL_04_SAFE_CI_REQUIRED = NO
 DL_05_SAFE_CI_BOUNDARY_PRESERVED = YES
 ```
 
-### Current specification result and next Owner decision
+### Historical specification result and next Owner decision
+
+At specification establishment, before the later execution and review recorded
+above, the following status and next decision applied. This historical block is
+not the current DL-04 status.
 
 This specification's documentation consistency/readability review checks all 28
 coverage references, the command/proof map, exact baseline identities, external

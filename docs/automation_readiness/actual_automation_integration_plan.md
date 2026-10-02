@@ -15,10 +15,16 @@ and Owner acceptance is **ACCEPTED**. DL-02 is accepted, but not integrated or m
 DL-03 implementation `e4c529507c6f5a26a289af4f6d3bfc9e0b170c18` is
 **ACCEPTED**, with governed review **PASS** and Owner acceptance **ACCEPTED**.
 DL-03 is not integrated or merged. The review used fresh inspection and validation
-in the same conversation, without a separate-reviewer identity claim. DL-04 has not
-started, and no standing or new live authority exists. The complete Dual-Lab MVP
-remains unfinished, with no live readiness granted. See the
-[canonical DL-02 and DL-03 acceptance record](dual_lab_vrrp_ai_query_mvp.md).
+in the same conversation, without a separate-reviewer identity claim.
+DL-04 closure execution completed **PASS** and fresh governed review **PASS**;
+it is a **CLOSURE CANDIDATE / PENDING_OWNER_ACCEPTANCE**, with zero material
+findings and one **OPEN_NON_BLOCKING** P3 argv-recording finding. DL-04 is not
+accepted. Its review was fresh technical inspection in the same conversation,
+not a separate-human, separate-agent-identity, or separate-conversation attestation.
+DL-05 has not started; Safe CI is not required at DL-04 and remains a DL-05 gate.
+No standing or new live authority exists. The complete Dual-Lab MVP remains
+unfinished, with no live readiness granted. See the
+[canonical accepted predecessors and reviewed DL-04 candidate](dual_lab_vrrp_ai_query_mvp.md#dl-04-reviewed-closure-candidate).
 This status records separately authorized local work without changing historical
 Stage-2 proof or closure semantics or reopening Stage 2.
 
@@ -390,7 +396,12 @@ The complete Dual-Lab AI Query MVP remains unfinished: its exact local DL-02
 implementation has fresh independent review PASS and Owner acceptance ACCEPTED,
 as recorded above. DL-02 and DL-03 are accepted but not integrated; DL-03 has
 governed review PASS and completed Owner acceptance ACCEPTED.
-DL-04 has not started. Stage 3 remains NOT STARTED. Further live access or scope
+DL-04 closure and fresh governed review passed; Owner acceptance is PENDING and
+`DL_04_ACCEPTED = NO`. Its one P3 argv-recording finding remains OPEN_NON_BLOCKING;
+unresolved material findings are zero. The next Owner decision is
+`AUTHORIZE_DL_04_OWNER_ACCEPTANCE`. DL-05 remains NOT STARTED, with Safe CI
+preserved for that separate gate; no Safe CI was run for DL-04.
+Stage 3 remains NOT STARTED. Further live access or scope
 expansion requires the applicable capability gates and separate exact Owner
 approval; DL-02 and DL-03 acceptance grants no live authority or readiness.
 
