@@ -9,28 +9,33 @@ separate independent closure review and remote Safe CI. The default public
 review path remains Stage-0 offline evidence browsing. Stage 3 is **NOT
 STARTED / requires separate Owner authorization**.
 
-**Dual-Lab local implementation status:** DL-02 implementation
-`bb39e8295a2fa5d69980396dbaf8c374c79a57b3` passed fresh independent review
-and Owner acceptance is **ACCEPTED**. DL-02 is accepted, but not integrated or merged.
-DL-03 implementation `e4c529507c6f5a26a289af4f6d3bfc9e0b170c18` is
-**ACCEPTED**, with governed review **PASS** and Owner acceptance **ACCEPTED**.
-DL-03 is not integrated or merged. The review used fresh inspection and validation
-in the same conversation, without a separate-reviewer identity claim.
-DL-04 is **ACCEPTED**, with closure execution **PASS**, fresh governed review
-**PASS**, and completed Owner acceptance **ACCEPTED / PASS**. Its exact accepted
-closure candidate is `0972910c4d5e2bb7d70acbb50c4721234f20d0dc`; its accepted
-manifest SHA256 is
-`f7dd14e1ea471032cf68e108d2ea85b144096d28f3aa6c339efd89bf27567449`.
-There are zero material findings and one **OPEN_NON_BLOCKING** P3 argv-recording
-finding. Its review was fresh technical inspection in the same conversation,
-not a separate-human, separate-agent-identity, or separate-conversation attestation.
-DL-05 has not started; Safe CI is not required at DL-04 and remains a DL-05 gate.
-Safe CI has not run for DL-04 or DL-05.
-No standing or new live authority exists. The complete Dual-Lab MVP remains
-unfinished, with no live readiness granted. See the
-[canonical accepted DL-02, DL-03, and DL-04 closure record](dual_lab_vrrp_ai_query_mvp.md#dl-04-reviewed-closure-candidate).
-This status records separately authorized local work without changing historical
-Stage-2 proof or closure semantics or reopening Stage 2.
+**Dual-Lab status: DL-05 candidate established, ready for Owner acceptance.**
+DL-02 implementation `bb39e8295a2fa5d69980396dbaf8c374c79a57b3`, DL-03
+implementation `e4c529507c6f5a26a289af4f6d3bfc9e0b170c18`, and DL-04 closure
+candidate `0972910c4d5e2bb7d70acbb50c4721234f20d0dc` remain accepted. Their
+content is integrated by PR #93 at
+`0e5dfbc1d143a6de7ba59e4bff9bd1788e809043`. The accepted DL-04 manifest
+SHA256 remains `f7dd14e1ea471032cf68e108d2ea85b144096d28f3aa6c339efd89bf27567449`.
+
+DL-05 has started and its specification is established. Pre-merge Safe CI,
+post-merge Safe CI on the exact integrated SHA, and fresh exact-SHA governed
+review all passed, with zero unresolved material findings. The fresh review used
+a separate Owner-authorized task context in the same conversation; it claimed
+no separate human or agent identity. P3 remains OPEN_NON_BLOCKING, does not affect
+Safe CI validity, and requires no remediation before DL-05 acceptance. Seven
+pre-existing Next.js tracing warnings remain non-blocking maintenance items.
+
+`DL_05_CANDIDATE_RECORD = ESTABLISHED` and
+`DL_05_READY_FOR_OWNER_ACCEPTANCE = YES`; `DL_05_OWNER_ACCEPTANCE = PENDING`,
+`DL_05_ACCEPTED = NO`, `COMPLETE_DUAL_LAB_MVP = NO`, and offline MVP acceptance
+remains NO. The next Owner decision is `AUTHORIZE_DL_05_OWNER_ACCEPTANCE`.
+See the [canonical DL-05 candidate record](dual_lab_vrrp_ai_query_mvp.md#dl-05-reviewed-exact-sha-candidate)
+for exact evidence identities. This local documentation descendant is distinct
+from the reviewed implementation SHA and does not inherit its CI/review; the
+record has not been pushed or merged. No live authority, live readiness,
+configuration mutation, or provider/model integration is authorized. DL-06 live
+work requires separate exact authority. Historical Stage-2 proof and closure
+semantics remain unchanged, and Stage 2 is not reopened.
 
 ## 1. Purpose
 
@@ -396,19 +401,15 @@ Lab1 and Lab2 VRRP read-only proofs and completed persistent Lab2 startup
 reconstruction. This candidate activates no new adapter, protocol, provider,
 credential, device, or execution capability and permits no repeat attempt.
 Formal closure still requires independent closure review and remote Safe CI.
-The complete Dual-Lab AI Query MVP remains unfinished: its exact local DL-02
-implementation has fresh independent review PASS and Owner acceptance ACCEPTED,
-as recorded above. DL-02 and DL-03 are accepted but not integrated; DL-03 has
-governed review PASS and completed Owner acceptance ACCEPTED.
-DL-04 closure and fresh governed review passed; Owner acceptance completed
-ACCEPT / PASS and `DL_04_ACCEPTED = YES`. Its one P3 argv-recording finding remains
-OPEN_NON_BLOCKING; unresolved material findings are zero. The next Owner decision
-is `AUTHORIZE_DL_05_READINESS_AND_P3_IMPACT_REVIEW`. Future DL-05 planning must
-decide whether remediation is required before reusing the affected wrapper for
-exact argv / command-attestation evidence. DL-05 remains NOT STARTED, with Safe CI
-preserved for that separate gate; Safe CI has not run for DL-04 or DL-05.
-Stage 3 remains NOT STARTED. Further live access or scope
-expansion requires the applicable capability gates and separate exact Owner
-approval; DL-02, DL-03, and DL-04 acceptance grants no live authority or readiness.
+The complete Dual-Lab AI Query MVP remains unaccepted. DL-02, DL-03, and DL-04
+remain accepted and their content is integrated through PR #93. DL-05's exact
+implementation SHA is `0e5dfbc1d143a6de7ba59e4bff9bd1788e809043`; pre/post-merge
+Safe CI and fresh exact-SHA review passed. Its canonical candidate is established
+and ready for Owner acceptance, with zero unresolved material findings and P3
+OPEN_NON_BLOCKING. `DL_05_OWNER_ACCEPTANCE = PENDING`, `DL_05_ACCEPTED = NO`,
+and `COMPLETE_DUAL_LAB_MVP = NO`. The next Owner decision is
+`AUTHORIZE_DL_05_OWNER_ACCEPTANCE`. This status grants no live authority or
+readiness. Stage 3 remains NOT STARTED. Further live access or scope expansion
+requires the applicable capability gates and separate exact Owner approval.
 
 This document does not start Phase 2C-10 or any implementation phase. It does not create a second safety matrix. It is a durable planning reference for future review and approval decisions.
