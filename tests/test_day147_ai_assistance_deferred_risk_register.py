@@ -66,7 +66,12 @@ def test_day147_risk_register_covers_required_categories_with_no_unsafe_flags():
             assert risk["unsafe_flags"][field] is False
 
 
-def test_day147_cli_does_not_execute_provider_network_or_prior_day_paths(monkeypatch, capsys):
+def test_day147_cli_does_not_execute_provider_network_or_prior_day_paths(monkeypatch, capsys, tmp_path):
+    json_output = tmp_path / "day147.json"
+    html_output = tmp_path / "day147.html"
+    monkeypatch.setattr(day147, "REPORT_JSON", json_output)
+    monkeypatch.setattr(day147, "REPORT_HTML", html_output)
+
     def fail_subprocess(*args, **kwargs):
         raise AssertionError("Day147 must not execute subprocess")
 
@@ -102,6 +107,8 @@ def test_day147_cli_does_not_execute_provider_network_or_prior_day_paths(monkeyp
     assert "live_network_enabled: false" in output
     assert "secrets_required: false" in output
     assert "[PASS] AI_ASSISTANCE_DEFERRED_RISK_REGISTER_READY" in output
+    assert json_output.is_file()
+    assert html_output.is_file()
 
 
 def test_day147_negative_validation_blocks_unsafe_flags_and_gate_mutation():
@@ -229,3 +236,40 @@ def test_day147_docs_preserve_required_deferred_risk_boundaries():
         assert "KEEP_AI_ASSISTANCE_DEFERRED_AND_NEXT_PHASE_FALSE" in doc
         for category in day147.REQUIRED_CATEGORIES:
             assert category.rstrip(".") in doc
+
+
+def test_day147_report_outputs_are_lf_and_preserve_semantics(tmp_path):
+    report = day147.build_day147_ai_assistance_deferred_risk_register(PROJECT_ROOT)
+    expected = copy.deepcopy(report)
+
+    json_path, html_path = day147.write_day147_ai_assistance_deferred_risk_register_reports(
+        tmp_path, report
+    )
+    json_bytes = json_path.read_bytes()
+    html_bytes = html_path.read_bytes()
+
+    for data in (json_bytes, html_bytes):
+        assert b"\n" in data
+        assert b"\r" not in data
+    assert json.loads(json_bytes) == expected
+    assert report == expected
+    assert expected["overall_status"] == "PASS"
+    assert expected["status"] == "AI_ASSISTANCE_DEFERRED_RISK_REGISTER_READY"
+    assert expected["next_phase_allowed"] is False
+    for field in day147.REQUIRED_TRUE_FIELDS:
+        assert expected[field] is True
+    for field in day147.REQUIRED_FALSE_FIELDS:
+        assert expected[field] is False
+
+
+def test_day147_repeated_report_generation_is_byte_identical(tmp_path):
+    report = day147.build_day147_ai_assistance_deferred_risk_register(PROJECT_ROOT)
+    first_json, first_html = day147.write_day147_ai_assistance_deferred_risk_register_reports(
+        tmp_path / "first", report
+    )
+    second_json, second_html = day147.write_day147_ai_assistance_deferred_risk_register_reports(
+        tmp_path / "second", report
+    )
+
+    assert first_json.read_bytes() == second_json.read_bytes()
+    assert first_html.read_bytes() == second_html.read_bytes()

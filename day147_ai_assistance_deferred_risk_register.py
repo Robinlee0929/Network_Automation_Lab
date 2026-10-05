@@ -539,7 +539,11 @@ def write_day147_ai_assistance_deferred_risk_register_reports(
     json_path = Path(project_root) / REPORT_JSON
     html_path = Path(project_root) / REPORT_HTML
     json_path.parent.mkdir(parents=True, exist_ok=True)
-    json_path.write_text(json.dumps(safe_report, indent=2), encoding="utf-8")
+    json_path.write_text(
+        json.dumps(safe_report, indent=2),
+        encoding="utf-8",
+        newline="\n",
+    )
     write_day147_ai_assistance_deferred_risk_register_html(safe_report, html_path)
     return json_path, html_path
 
@@ -594,6 +598,7 @@ def write_day147_ai_assistance_deferred_risk_register_html(
 </html>
 """,
         encoding="utf-8",
+        newline="\n",
     )
 
 
