@@ -493,7 +493,7 @@ release lanes; they are not performed by documentation-only changes.
 | Stage-0 Network Automation Lab | **CLOSED** at `main@aff250735ade18e4c274be8ac53c9672bb2cb07f` |
 | Stage-1 Read-only Lab Integration Planning | Historical planning-entry record; see the Stage-2 closure candidate |
 | Stage-2 bounded MikroTik VRRP validation | Lab1 historical proof retained; Lab2 proof PASS/CLOSED on repository baseline `ea73196281e38a01af7bf959cc5e1bc60b0b2499`; persistent Lab2 startup reconstruction and independent binding review PASS; overall Stage 2 is a **CLOSURE CANDIDATE** |
-| Dual-Lab AI Query | **DL-02, DL-03, and DL-04 accepted**; PR #93 merged; DL-05 candidate established / ready for Owner acceptance; pre/post-merge Safe CI PASS and fresh exact-SHA review PASS; 0 unresolved material findings; P3 open/non-blocking; DL-05 acceptance pending, complete MVP not accepted; no live authority |
+| Dual-Lab AI Query | **DL-02, DL-03, DL-04, and DL-05 accepted; bounded offline MVP complete**; PR #93 merged; pre/post-merge Safe CI PASS, fresh exact-SHA review PASS, Owner acceptance ACCEPT / PASS; 0 unresolved material findings; P3 open/non-blocking; 7 maintenance build warnings retained; no live authority; DL-06 contract not established |
 | Stage 3 | **NOT STARTED / requires separate Owner authorization** |
 | Canonical reviewer interface | Flask dashboard on `127.0.0.1:5000` |
 | Secondary Next.js interface | Available as a bounded Stage-0 evidence surface |
@@ -519,23 +519,29 @@ argv-recording finding. Owner acceptance completed ACCEPT / PASS
 `f7dd14e1ea471032cf68e108d2ea85b144096d28f3aa6c339efd89bf27567449`.
 That DL-04 review was fresh technical/governed inspection in the same conversation,
 not a separate-human, separate-agent-identity, or separate-conversation attestation.
-DL-05 is integrated through PR #93 at
-`0e5dfbc1d143a6de7ba59e4bff9bd1788e809043`. Its specification is established;
-pre-merge Safe CI, exact-main post-merge Safe CI, and fresh exact-SHA governed
-review passed with zero unresolved material findings. The candidate record is
-**ESTABLISHED / REVIEWED_READY_FOR_OWNER_ACCEPTANCE**. The fresh review used a
-separately authorized task context in the same conversation, without a
-separate-human or separate-agent identity claim.
+DL-05 Owner acceptance completed **ACCEPT / PASS** for the exact implementation
+integrated through PR #93 at `main@0e5dfbc1d143a6de7ba59e4bff9bd1788e809043`.
+Pre-merge Safe CI, exact-main post-merge Safe CI, and fresh exact-SHA governed
+review passed with zero unresolved material findings. All seven Owner acceptance
+predicates passed. The fresh review used a separately authorized task context
+in the same conversation, without a separate-human or separate-agent identity claim.
 
-`DL_05_OWNER_ACCEPTANCE = PENDING`, `DL_05_ACCEPTED = NO`, and
-`COMPLETE_DUAL_LAB_MVP = NO`; offline MVP acceptance remains NO. The
-[canonical DL-05 candidate record](docs/automation_readiness/dual_lab_vrrp_ai_query_mvp.md#dl-05-reviewed-exact-sha-candidate)
-contains the exact identities, sealed receipt hashes, hosted results, and retained
-findings. This local documentation descendant is not the validated implementation
-SHA and does not inherit its CI/review. The record has not been pushed or merged.
-No live authority, live readiness, configuration mutation, provider/model
-integration, or production readiness is granted. Historical Stage-2 proof and
-closure semantics remain unchanged.
+`DL_05_OWNER_ACCEPTANCE = ACCEPTED`, `DL_05_ACCEPTANCE_RESULT = PASS`,
+`DL_05_ACCEPTED = YES`, `COMPLETE_DUAL_LAB_MVP = YES`, and
+`OFFLINE_DUAL_LAB_MVP_ACCEPTED = YES`: the bounded offline Dual-Lab MVP is
+complete. The [canonical DL-05 acceptance record](docs/automation_readiness/dual_lab_vrrp_ai_query_mvp.md#completed-owner-acceptance-and-active-status)
+retains the exact implementation, sealed evidence, review, and completed decision.
+This post-acceptance documentation descends from candidate record
+`c275b1b58a696b85a9d516ab1b15cceb77432ad2`; it does not replace the accepted
+implementation or inherit its application CI/review. The documentation branch
+remains local and has not been pushed or merged.
+
+P3 remains OPEN_NON_BLOCKING, and seven pre-existing Next.js tracing warnings
+remain maintenance items. `LIVE_AUTHORITY_GRANTED = NO` and
+`LIVE_READINESS_GRANTED = NO`; configuration mutation, provider/model integration,
+and production readiness remain unauthorized. `DL_06_EXECUTION_CONTRACT_STATUS = NOT_ESTABLISHED`; future DL-06 work requires separate readiness/specification and
+exact Owner authorization. Historical Stage-2 proof and closure semantics remain
+unchanged.
 
 `DEFERRED_SECURITY_RESEARCH_BLOCKED` is not a Security PASS, completion,
 activation, or integration claim. Detailed experimental research evidence is
@@ -558,12 +564,14 @@ future capabilities stay behind their separate authorization and safety gates.
   acceptance gates.
 - Address Node/NVM coexistence only if a later environment-maintenance task
   requires it.
-- The next Owner decision is `AUTHORIZE_DL_05_OWNER_ACCEPTANCE` for the
-  established reviewed candidate. P3 remains OPEN_NON_BLOCKING: DL-05 does not
-  use the affected wrapper, Safe CI validity is unaffected, and remediation is
-  not required before acceptance. The seven retained Next.js tracing warnings
-  remain non-blocking for this candidate. Nothing here fixes those findings or
-  authorizes another Lab1/Lab2 live operation.
+- DL-05 Owner acceptance and canonical reconciliation are complete for the
+  bounded offline MVP. Future documentation publication requires separate
+  authority. DL-06's execution contract is not established and requires separate
+  future specification/readiness and exact Owner authorization.
+- P3 remains OPEN_NON_BLOCKING: DL-05 does not use the affected wrapper, Safe CI
+  validity is unaffected, and remediation was not required before acceptance.
+  The seven retained Next.js tracing warnings remain non-blocking maintenance
+  items. These findings remain open; no further Lab1/Lab2 operation is authorized.
 - Keep the post-merge Safe CI maintenance findings OPEN: npm has 5
   vulnerabilities (2 moderate, 2 high, 1 critical), and Next.js emitted 7
   filesystem-tracing warnings. These are non-Stage-2-blocking maintenance items;

@@ -1,26 +1,27 @@
-# Dual-Lab VRRP AI Query MVP: DL-05 Reviewed Candidate
+# Dual-Lab VRRP AI Query MVP: DL-05 Accepted
 
-**Decision summary: DL-05 is integrated and its canonical candidate record is
-established, ready for separate Owner acceptance.** PR #93 merged the accepted
-Dual-Lab content into `main` at
-`0e5dfbc1d143a6de7ba59e4bff9bd1788e809043`. Pre-merge Safe CI, post-merge
-Safe CI on that exact main SHA, and the fresh exact-SHA governed review all
-passed. There are zero unresolved material findings. DL-02, DL-03, and DL-04
-remain accepted. P3 remains open and non-blocking; seven pre-existing build
-warnings remain maintenance items.
+**Decision summary: DL-05 is ACCEPTED / PASS; the bounded offline Dual-Lab MVP
+is complete.** The separate Owner acceptance decision accepted implementation
+`0e5dfbc1d143a6de7ba59e4bff9bd1788e809043`, integrated into `main` through
+PR #93. Pre-merge Safe CI, post-merge Safe CI on that exact SHA, and the fresh
+exact-SHA governed review passed. All seven acceptance predicates passed, with
+zero unresolved material findings. DL-02, DL-03, and DL-04 remain accepted.
 
-DL-05 Owner acceptance is **PENDING**. `DL_05_ACCEPTED = NO`,
-`COMPLETE_DUAL_LAB_MVP = NO`, and `OFFLINE_DUAL_LAB_MVP_ACCEPTED = NO`.
-No live authority or readiness is granted. The current next Owner decision is
-`AUTHORIZE_DL_05_OWNER_ACCEPTANCE`.
+`DL_05_OWNER_ACCEPTANCE = ACCEPTED`, `DL_05_ACCEPTANCE_RESULT = PASS`,
+`DL_05_ACCEPTED = YES`, `COMPLETE_DUAL_LAB_MVP = YES`, and
+`OFFLINE_DUAL_LAB_MVP_ACCEPTED = YES`. P3 remains OPEN_NON_BLOCKING; seven
+pre-existing build warnings remain maintenance items. No live authority,
+live readiness, configuration mutation, provider/model integration, or production
+readiness is granted. DL-06's execution contract remains NOT_ESTABLISHED.
 
-The [DL-05 reviewed candidate record](#dl-05-reviewed-exact-sha-candidate)
-binds this status to its implementation SHA and sealed evidence. The
-[DL-05 canonical contract](#dl-05-canonical-integration-and-safe-ci-contract)
-retains the acceptance requirements. The
-[accepted DL-04 closure record](#dl-04-reviewed-closure-candidate) and
-[DL-04 closure contract](#dl-04-canonical-closure-contract) retain their
-accepted identities, evidence, and safety boundaries.
+The [DL-05 record](#dl-05-reviewed-exact-sha-candidate) retains the reviewed
+candidate and [completed Owner acceptance](#completed-owner-acceptance-and-active-status).
+The [DL-05 canonical contract](#dl-05-canonical-integration-and-safe-ci-contract)
+retains its requirements. Earlier specification and predecessor status snapshots
+are historical; the completed DL-05 acceptance below defines current status.
+The [accepted DL-04 closure record](#dl-04-reviewed-closure-candidate) and
+[DL-04 closure contract](#dl-04-canonical-closure-contract) retain their accepted
+identities, evidence, and safety boundaries.
 
 ## Purpose and planning boundary
 
@@ -35,14 +36,15 @@ The DL-03 specification resolved the readiness
 review's `BLOCKED_CANONICAL_SCOPE_AMBIGUITY`; the separately authorized
 implementation, review, and acceptance are recorded below.
 The prior DL-04 post-acceptance reconciliation recorded that completed decision.
-The current Owner authorization permits candidate-status reconciliation in this
-record, README, and the automation plan, followed by one local documentation
-commit directly above the reviewed implementation SHA. It authorizes no source,
-test, workflow, dependency, sealed-evidence, external-wrapper, or Stage-2 closure
-change. This task reruns no application validation or Safe CI, performs no push,
-merge, Owner acceptance, P3 remediation, or live operation, and reopens no
-accepted predecessor. Its documentation descendant is not a replacement
-validation target and has no claim to the preceding implementation CI/review.
+The current Owner authorization permits post-acceptance status reconciliation in
+this record, README, and the automation plan, followed by one local documentation
+commit above pre-acceptance record `c275b1b58a696b85a9d516ab1b15cceb77432ad2`.
+It records the completed decision without repeating acceptance or review.
+No source, test, workflow, dependency, sealed-evidence, external-wrapper, or
+Stage-2 closure change is authorized. No application validation, Safe CI rerun,
+push, merge, branch deletion, P3 remediation, or live operation is performed.
+The documentation descendant does not replace the accepted implementation SHA
+or inherit its application CI/review. Accepted predecessors remain unchanged.
 
 In the retained DL-02 history, the pre-acceptance documentation commit
 `76ce998531de59c201eaa6f123e57b1f9d364b19` established the candidate record and
@@ -1488,11 +1490,13 @@ NEXT_REQUIRED_OWNER_DECISION = AUTHORIZE_BOUNDED_DL_04_CLOSURE_EXECUTION
 
 ## DL-05 reviewed exact-SHA candidate
 
-**Candidate established: REVIEWED_READY_FOR_OWNER_ACCEPTANCE.** The accepted
-predecessor content is integrated; both Safe CI gates and the separately authorized
-fresh exact-SHA review passed. Owner acceptance remains pending. This section is
-the active DL-05 status; earlier specification and predecessor status snapshots
-elsewhere in this document are historical.
+**Accepted: Owner acceptance completed ACCEPT / PASS.** The candidate was
+established as REVIEWED_READY_FOR_OWNER_ACCEPTANCE in pre-acceptance documentation
+commit `c275b1b58a696b85a9d516ab1b15cceb77432ad2`. Both Safe CI gates and the
+separately authorized fresh exact-SHA review had passed. The later, separately
+authorized read-only Owner decision passed all seven acceptance predicates.
+The heading is retained for stable links; this section now records accepted
+status. Earlier specification and predecessor status snapshots remain historical.
 
 ### Integrated implementation and evidence identities
 
@@ -1620,54 +1624,103 @@ NO_DL04_ACCEPTANCE_REGRESSION = YES
 DL_06_SEPARATE_LIVE_AUTHORIZATION_REQUIRED = YES
 ```
 
-### Active candidate status and documentation boundary
+### Completed Owner acceptance and active status
+
+The completed `DL_05_OWNER_ACCEPTANCE_DECISION_ONLY` report in the preceding
+separately Owner-authorized task is the acceptance decision record. It returned
+DONE, ACCEPT / PASS, with no blocker and all seven predicates satisfied. That
+task verified authoritative main, the clean exact candidate record, and sealed
+evidence integrity; it changed no files and reran no validation or review.
+This reconciliation records that completed decision and completes canonical
+documentation for the bounded offline DL-01 through DL-05 MVP.
+
+| Acceptance predicate | Completed decision result |
+| --- | --- |
+| Integrated implementation established | PASS; exact main SHA, tree, and merge parents above |
+| Post-merge Safe CI | PASS; run 37281683818, attempt 1, twelve mandatory steps successful |
+| Exact-SHA correspondence | PASS; main, CI head, actual checkout, and review target match |
+| Fresh exact-SHA governed review | PASS; 28 of 28 canonical coverage areas preserved |
+| Unresolved material findings | 0 |
+| Evidence provenance | PASS; accepted receipt/index hashes above, 13 sealed files unchanged |
+| Canonical candidate record | ESTABLISHED at `c275b1b58a696b85a9d516ab1b15cceb77432ad2` |
 
 ```text
 DL_02_ACCEPTED = YES
 DL_03_ACCEPTED = YES
 DL_04_ACCEPTED = YES
+DL_04_ACCEPTED_CLOSURE_CANDIDATE = 0972910c4d5e2bb7d70acbb50c4721234f20d0dc
+DL_04_ACCEPTED_MANIFEST_SHA256 = f7dd14e1ea471032cf68e108d2ea85b144096d28f3aa6c339efd89bf27567449
 DL_05_SPECIFICATION_STATUS = ESTABLISHED
 DL_05_STARTED = YES
 DL_05_CANDIDATE_RECORD = ESTABLISHED
-DL_05_CANDIDATE_STATUS = REVIEWED_READY_FOR_OWNER_ACCEPTANCE
-DL_05_READY_FOR_OWNER_ACCEPTANCE = YES
-DL_05_OWNER_ACCEPTANCE = PENDING
-DL_05_ACCEPTED = NO
-COMPLETE_DUAL_LAB_MVP = NO
-OFFLINE_DUAL_LAB_MVP_ACCEPTED = NO
+DL_05_STATUS = ACCEPTED
+DL_05_OWNER_ACCEPTANCE = ACCEPTED
+DL_05_ACCEPTANCE_RESULT = PASS
+OWNER_ACCEPTANCE_DECISION = ACCEPT
+OWNER_ACCEPTANCE_PREDICATE_COUNT = 7
+OWNER_ACCEPTANCE_PREDICATES_PASSED = 7
+UNMET_OWNER_ACCEPTANCE_PREDICATES = NONE
+DL_05_ACCEPTED = YES
+DL_05_ACCEPTED_IMPLEMENTATION_COMMIT = 0e5dfbc1d143a6de7ba59e4bff9bd1788e809043
+DL_05_ACCEPTED_IMPLEMENTATION_TREE = 6252c2c632d217b4f02804626aac797b546f87f8
+DL_05_ACCEPTED_POSTMERGE_RECEIPT_SHA256 = 68d5b93163ee70c0c2aeb70aec0814e20864b42e8938d02c356a935e03cbdb1c
+DL_05_ACCEPTED_REVIEW_RESULT = PASS
+DL_05_ACCEPTANCE_BASIS = POSTMERGE_SAFE_CI_PASS_PLUS_FRESH_EXACT_SHA_REVIEW_PASS_PLUS_OWNER_ACCEPTANCE
+DL_05_POSTMERGE_SAFE_CI = PASS
+DL_05_FRESH_EXACT_SHA_REVIEW = PASS
+UNRESOLVED_MATERIAL_FINDINGS = 0
+COMPLETE_DUAL_LAB_MVP = YES
+OFFLINE_DUAL_LAB_MVP_ACCEPTED = YES
 LIVE_AUTHORITY_GRANTED = NO
 LIVE_READINESS_GRANTED = NO
 CONFIGURATION_MUTATION_AUTHORIZED = NO
 PROVIDER_MODEL_INTEGRATION_AUTHORIZED = NO
+DL_06_SEPARATE_LIVE_AUTHORIZATION_REQUIRED = YES
+DL_06_EXECUTION_CONTRACT_STATUS = NOT_ESTABLISHED
 P3_ARGV_RECORDING_FINDING_STATUS = OPEN_NON_BLOCKING
 P3_AFFECTS_SAFE_CI_VALIDITY = NO
 P3_REMEDIATION_REQUIRED_BEFORE_DL05_ACCEPTANCE = NO
-NEXT_REQUIRED_OWNER_DECISION = AUTHORIZE_DL_05_OWNER_ACCEPTANCE
+BUILD_WARNING_COUNT = 7
+BUILD_WARNING_CLASSIFICATION = PRE_EXISTING_NON_BLOCKING_MAINTENANCE
+PRE_ACCEPTANCE_CANDIDATE_RECORD_COMMIT = c275b1b58a696b85a9d516ab1b15cceb77432ad2
 ```
 
-This candidate documentation is a distinct local descendant directly above
-`0e5dfbc1d143a6de7ba59e4bff9bd1788e809043`; its actual commit hash and parent
-are reported externally after commit. It is not the validated implementation
-SHA and did not receive the preceding post-merge CI or exact-SHA review. The
-candidate record is local and has not been pushed or merged. This reconciliation
-performs no Owner acceptance, application validation, Safe CI rerun, evidence
-regeneration, P3 remediation, or live operation. Separate Owner acceptance is the
-next decision; any later publication or post-acceptance reconciliation needs its
-own authority. Stage-2 proof and closure semantics remain unchanged.
+### Documentation provenance and remaining boundary
 
-Documentation checks cover exact identities, evidence hashes, current status
-consistency, readability, local links, authorized three-file scope, and both
-unstaged and staged whitespace checks. Application tests and report-index are
-not rerun under this documentation-only authorization. Review PASS does not
-complete the offline MVP or authorize live use.
+The historical pre-acceptance record at
+`c275b1b58a696b85a9d516ab1b15cceb77432ad2`, directly above the accepted
+implementation, recorded Owner acceptance PENDING, `DL_05_ACCEPTED = NO`,
+and `COMPLETE_DUAL_LAB_MVP = NO`. Those values remained in repository text
+during the read-only acceptance decision. This separately authorized
+post-acceptance reconciliation replaces that temporary active status.
+
+The new documentation commit descends directly from that pre-acceptance record.
+Its actual hash and parent are reported externally after commit; neither
+documentation commit is the accepted implementation
+`0e5dfbc1d143a6de7ba59e4bff9bd1788e809043`. Neither inherits that
+implementation's application Safe CI or exact-SHA review. The documentation
+branch remains local and unpublished; no push or merge is performed here.
+
+Documentation checks cover exact identities, receipt/index hashes, retained
+review and acceptance results, status consistency, readability, links/anchors,
+protected-file hashes, and unstaged/staged whitespace. Application tests,
+report-index, Safe CI, exact-SHA review, and Owner acceptance are not repeated.
+Sealed evidence, P3, and the seven maintenance warnings remain unchanged.
+
+No further Owner decision is required to complete this documentation task.
+Future publication needs separate authority. DL-06 remains unestablished and
+requires its own readiness/specification and exact Owner authorization; it is
+not started. Offline acceptance grants no standing Lab1/Lab2 access, live query,
+configuration mutation, provider/model integration, or production readiness.
+Historical Stage-2 proof and closure semantics remain unchanged.
 
 ## DL-05 canonical integration and Safe CI contract
 
 **Retained canonical specification.** Its requirements remain authoritative;
 references below to future integration, CI, or review describe the specification
 boundary when established. Those gates have since passed for the exact candidate
-in the [active DL-05 record](#dl-05-reviewed-exact-sha-candidate). Owner
-acceptance remains pending; the open P3 disposition is unchanged.
+in the [active DL-05 record](#dl-05-reviewed-exact-sha-candidate). Separate Owner
+acceptance has completed ACCEPT / PASS; the open P3 disposition is unchanged.
 
 ### Specification basis and permitted scope
 
