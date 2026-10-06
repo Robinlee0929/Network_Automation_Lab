@@ -1698,8 +1698,14 @@ The new documentation commit descends directly from that pre-acceptance record.
 Its actual hash and parent are reported externally after commit; neither
 documentation commit is the accepted implementation
 `0e5dfbc1d143a6de7ba59e4bff9bd1788e809043`. Neither inherits that
-implementation's application Safe CI or exact-SHA review. The documentation
-branch remains local and unpublished; no push or merge is performed here.
+implementation's application Safe CI or exact-SHA review. At the time of the post-acceptance reconciliation task, this documentation
+branch was local and unpublished.
+
+Publication through [PR #94](https://github.com/Robinlee0929/Network_Automation_Lab/pull/94)
+occurred later under separate authorization; the reconciliation task itself
+performed no push or merge. Publication does not redefine the accepted
+implementation SHA. Merging PR #94 is a separate action requiring its own
+Owner authorization.
 
 Documentation checks cover exact identities, receipt/index hashes, retained
 review and acceptance results, status consistency, readability, links/anchors,

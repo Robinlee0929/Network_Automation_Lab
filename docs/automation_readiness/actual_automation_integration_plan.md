@@ -42,7 +42,14 @@ See the [canonical DL-05 acceptance record](dual_lab_vrrp_ai_query_mvp.md#comple
 for exact evidence and decision identities. Post-acceptance documentation
 descends from pre-acceptance record `c275b1b58a696b85a9d516ab1b15cceb77432ad2`;
 it does not replace the accepted implementation SHA or inherit its application
-CI/review. The documentation branch remains local and unpublished.
+CI/review. At the time of the post-acceptance reconciliation task, this documentation
+branch was local and unpublished.
+
+Publication through [PR #94](https://github.com/Robinlee0929/Network_Automation_Lab/pull/94)
+occurred later under separate authorization; the reconciliation task itself
+performed no push or merge. Publication does not redefine the accepted
+implementation SHA. Merging PR #94 is a separate action requiring its own
+Owner authorization.
 
 `LIVE_AUTHORITY_GRANTED = NO`, `LIVE_READINESS_GRANTED = NO`, and
 `DL_06_EXECUTION_CONTRACT_STATUS = NOT_ESTABLISHED`. Configuration mutation,
