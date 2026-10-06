@@ -545,9 +545,27 @@ Owner authorization.
 P3 remains OPEN_NON_BLOCKING, and seven pre-existing Next.js tracing warnings
 remain maintenance items. `LIVE_AUTHORITY_GRANTED = NO` and
 `LIVE_READINESS_GRANTED = NO`; configuration mutation, provider/model integration,
-and production readiness remain unauthorized. `DL_06_EXECUTION_CONTRACT_STATUS = NOT_ESTABLISHED`; future DL-06 work requires separate readiness/specification and
-exact Owner authorization. Historical Stage-2 proof and closure semantics remain
-unchanged.
+and production readiness remain unauthorized. `DL_06_EXECUTION_CONTRACT_STATUS = NOT_ESTABLISHED`.
+The [DL-06-00 readiness specification](docs/automation_readiness/dual_lab_vrrp_ai_query_mvp.md#dl-06-00-transition-observer-readiness-and-specification)
+is established for an offline transition contract; no implementation or live
+authority is granted. Day35 remains the proven historical manual live failover
+predecessor. DL-06 composes accepted Stage-2, DL-02 and DL-03 using a
+PREAUTHORIZED_ONE_SHOT_SNAPSHOT_SCHEDULE with no authorization reuse. A valid
+sample with a positively classified observation-level target failure may lead
+to the next distinct preauthorized sample; authorization/session-integrity or
+ambiguous failures terminate. The current coarse failure mapping does not yet
+prove that distinction. No retry, fallback, parallel execution, automatic
+failover or configuration mutation is permitted.
+
+The 30-second limit requires hard whole-observer completion, including in-flight
+work and cleanup. Shared deadline propagation/enforcement is NOT_ESTABLISHED;
+DL-06-03 repeated live observation remains BLOCKED until separately authorized
+enforcement is implemented and proven, with trusted failure classification also
+required. DL-06-01 offline transition-contract implementation is the next Owner
+decision. The deadline blocker does not prevent that offline work or a separately
+authorized DL-06-02 single live Dual-Lab snapshot proof. That current-baseline
+single proof is required before repeated observation and cannot claim DL-06-03
+readiness. Historical Stage-2 proof and closure semantics remain unchanged.
 
 `DEFERRED_SECURITY_RESEARCH_BLOCKED` is not a Security PASS, completion,
 activation, or integration claim. Detailed experimental research evidence is

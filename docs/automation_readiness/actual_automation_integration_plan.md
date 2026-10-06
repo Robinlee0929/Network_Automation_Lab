@@ -33,7 +33,7 @@ remain non-blocking maintenance items.
 | DL-03 | ACCEPTED |
 | DL-04 | ACCEPTED |
 | DL-05 | ACCEPTED; bounded offline MVP integration and acceptance complete |
-| DL-06 | NOT ESTABLISHED; requires separate future readiness/specification and exact Owner authorization |
+| DL-06 | DL-06-00 readiness specification established; offline contract not implemented; execution contract NOT_ESTABLISHED and live authority absent |
 
 `DL_05_OWNER_ACCEPTANCE = ACCEPTED`, `DL_05_ACCEPTANCE_RESULT = PASS`,
 `DL_05_ACCEPTED = YES`, `COMPLETE_DUAL_LAB_MVP = YES`, and
@@ -56,6 +56,26 @@ Owner authorization.
 provider/model integration, production readiness, and standing Lab1/Lab2 access
 remain unauthorized. Future live work needs separate exact authority. Historical
 Stage-2 proof and closure semantics remain unchanged; Stage 2 is not reopened.
+
+The [DL-06-00 readiness specification](dual_lab_vrrp_ai_query_mvp.md#dl-06-00-transition-observer-readiness-and-specification)
+composes accepted Stage-2 observations, DL-02 ordering and DL-03 facts into a
+proposed outer timeline. Day35 remains the proven historical manual live failover
+predecessor. The selected PREAUTHORIZED_ONE_SHOT_SNAPSHOT_SCHEDULE permits no
+authorization reuse. A valid sample with a positively classified observation-level
+target failure may be followed by the next distinct preauthorized sample;
+authorization/session-integrity or ambiguous failures terminate. The current
+coarse failure mapping does not prove that distinction. No retry, fallback,
+parallel execution, automatic failover or configuration mutation is permitted.
+
+The 30-second bound is hard whole-observer completion, including in-flight work
+and cleanup. Shared deadline propagation/enforcement is NOT_ESTABLISHED, so
+DL-06-03 repeated live observation remains BLOCKED until separately authorized
+enforcement is implemented and proven; trusted failure classification is also
+required. DL-06-01 offline transition-contract implementation is the next Owner
+decision. This deadline blocker does not prevent that offline work or separately
+authorized DL-06-02 single live Dual-Lab snapshot proof. The current-baseline
+single proof remains required before repeated live observation and cannot claim
+DL-06-03 readiness. No implementation or live authority is granted here.
 
 ## 1. Purpose
 
@@ -431,8 +451,9 @@ and seven pre-existing build warnings remain maintenance items.
 `DL_05_OWNER_ACCEPTANCE = ACCEPTED`, `DL_05_ACCEPTANCE_RESULT = PASS`,
 `DL_05_ACCEPTED = YES`, `COMPLETE_DUAL_LAB_MVP = YES`, and
 `OFFLINE_DUAL_LAB_MVP_ACCEPTED = YES`.
-No live authority or readiness is granted. DL-06 remains NOT_ESTABLISHED and
-requires separate future readiness/specification and exact Owner authorization.
+No live authority or readiness is granted. DL-06-00 readiness/specification is
+established; DL-06's execution contract remains NOT_ESTABLISHED. The next
+possible Owner decision is offline transition-contract implementation only.
 Stage 3 remains NOT STARTED. Further live access or scope expansion requires
 the applicable capability gates and separate exact Owner approval.
 

@@ -16,6 +16,8 @@ readiness is granted. DL-06's execution contract remains NOT_ESTABLISHED.
 
 The [DL-05 record](#dl-05-reviewed-exact-sha-candidate) retains the reviewed
 candidate and [completed Owner acceptance](#completed-owner-acceptance-and-active-status).
+The [DL-06-00 readiness specification](#dl-06-00-transition-observer-readiness-and-specification)
+defines a future outer transition timeline; implementation and live execution remain unauthorized.
 The [DL-05 canonical contract](#dl-05-canonical-integration-and-safe-ci-contract)
 retains its requirements. Earlier specification and predecessor status snapshots
 are historical; the completed DL-05 acceptance below defines current status.
@@ -1487,6 +1489,474 @@ CONFIGURATION_MUTATION_AUTHORIZED = NO
 NEXT_REQUIRED_OWNER_DECISION = AUTHORIZE_BOUNDED_DL_04_CLOSURE_EXECUTION
 ```
 
+
+## DL-06-00 transition observer readiness and specification
+
+**Decision: establish the offline transition specification; live execution remains
+LOCKED.** Day35 already proved manual live VRRP failover. DL-06 adds bounded,
+ordered observations and deterministic change facts through the accepted
+Stage-2 / DL-02 / DL-03 composition. It does not create another Day35 tester.
+This section is the current DL-06-00 planning record; earlier statements that
+DL-06 readiness/specification had not begun are historical. The accepted DL-01
+through DL-05 implementation, evidence and decisions remain unchanged.
+
+Planning baseline: public `main@5431f7491015fe7ab2ae9227bc6a48814356641e`.
+Accepted DL-05 implementation: `0e5dfbc1d143a6de7ba59e4bff9bd1788e809043`,
+tree `6252c2c632d217b4f02804626aac797b546f87f8`. Specification does not grant
+implementation authority, live readiness, a new signed approval, or execution.
+
+```text
+DL_06_00_SPECIFICATION_STATUS = ESTABLISHED
+DL_06_OFFLINE_TRANSITION_CONTRACT_STATUS = SPECIFIED_NOT_IMPLEMENTED
+DL_06_EXECUTION_CONTRACT_STATUS = NOT_ESTABLISHED
+DL_06_REPEATED_LIVE_READINESS = BLOCKED_DEADLINE_ENFORCEMENT_UNPROVEN
+LIVE_AUTHORITY_GRANTED = NO
+LIVE_READINESS_GRANTED = NO
+CONFIGURATION_MUTATION_AUTHORIZED = NO
+PROVIDER_MODEL_INTEGRATION_AUTHORIZED = NO
+```
+
+### Evidence basis and actual delta
+
+The [Day35 implementation](../../mikrotik_day35_vrrp_failover_validation.py),
+[tests](../../tests/test_mikrotik_day35_vrrp_failover_validation.py),
+[profile](../../topology_profiles/day35_vrrp_failover_validation.json),
+[plan](../roadmap/day35_vrrp_failover_validation_plan.md), and
+[safety record](../roadmap/day35_vrrp_failover_validation_safety.md) establish:
+
+- A real-device command-based workflow using Paramiko through the inherited
+  `connect_ssh_with_auth_retry` and `run_raw_command` helpers. This is historical
+  architecture, not Stage-2 authorization and not a new invocation in this task.
+- Three coarse phases: baseline expects Lab01 MASTER and Lab02 BACKUP;
+  operator disconnects Lab01 LAN cable, then an eight-second countdown precedes
+  failover collection; operator reconnects it, then another eight-second
+  countdown precedes recovery collection. Pings precede router collection.
+- Seven read-only commands, including `/interface vrrp print detail`, plus
+  identity, IP address, interface, route, NAT and filter `print` commands.
+  The safety filter checks print-command shape and blocked operation words;
+  it is not the accepted Stage-2 exact-command authority chain.
+- Source-specific PC pings to both lab interfaces, the VIP and LAN server;
+  three packets per target, with a 20-second subprocess timeout per ping.
+- Day32 summary parsing plus Day35 flag fallback; scenario-specific PASS/FAIL
+  evaluation. Recovery without Lab01 preemption is PASS_WITH_NOTES rather
+  than an unconditional failure. JSON/HTML/TXT reports include phase evidence,
+  redacted command output, summary and explicit no-configuration-change text.
+
+[Day36](../roadmap/day36_vrrp_failover_evidence_review_report_hardening.md)
+records historical PASS, Lab02 becoming MASTER after manual disconnection,
+VIP reachability, and Lab01 MASTER after reconnection. It explicitly says exact
+convergence timing was not measured. [Day37's evidence policy](../roadmap/day37_vrrp_report_regression_evidence_policy.md)
+retains documentation and regression fixtures in Git; full runtime reports stay
+local. The historical proof is accepted as documented, not rerun or newly
+attested from raw reports here. Synthetic test fixtures alone are not live proof.
+
+The new value is: first observed changed role/MASTER target, ordered repeated
+evidence around a transition, explicit unavailable/ambiguous observation gaps,
+conservative sample time windows, and deterministic facts suitable for later
+presentation. It cannot measure exact failover/convergence latency, continuous
+availability, packet loss, causation, or simultaneous pair state. Intermediate
+states can be missed between samples. A valid sample with a positively classified
+observation-level target failure may be followed by a distinct preauthorized
+sample while all session gates remain valid. Later observation or recovery is
+not guaranteed within the finite schedule and hard duration limit.
+
+### Day35 reuse and replacement decisions
+
+These classifications apply only to future DL-06 composition. Day35 files and
+historical semantics are retained unchanged; this is not a second safety matrix.
+
+| Day35 behavior | Classification | DL-06 decision |
+| --- | --- | --- |
+| Manual cable disconnection | REUSE_CONCEPT_ONLY | Human causes the event under a future exact run authorization; observer never triggers it. |
+| Manual reconnect/recovery | REUSE_CONCEPT_ONLY | Human owns restoration; no blocking prompt inside the timed observer. |
+| Baseline/failover/recovery phases | REUSE_CONCEPT_ONLY | Useful demonstration narrative, not mandatory expected states or a new evaluator. |
+| Fixed eight-second waits | DO_NOT_REUSE | Use a finite sample plan and measured windows; do not assume convergence after a fixed wait. |
+| Direct Paramiko connection | SUPERSEDE_WITH_STAGE2 | Use the accepted pinned transport through S2-RO-11, never the Day35 connection helper. |
+| Direct RouterOS execution | SUPERSEDE_WITH_STAGE2 | Only the existing fixed VRRP operation and exact command policy. |
+| Command allow/block filter | SUPERSEDE_WITH_STAGE2 | Preserve accepted request, Owner verification, replay, trust, credential and exact-command gates. |
+| `/interface vrrp print detail` | REUSE_UNCHANGED | Same command text, resolved only by accepted Stage-2 policy. |
+| Interface/route/firewall auxiliary commands | DO_NOT_REUSE | Outside the initial observer operation. |
+| PC ping checks | DO_NOT_REUSE | No reachability claim; separately scoped possible follow-up. |
+| VRRP parser/state extraction | SUPERSEDE_WITH_STAGE2 | Reuse strict Stage-2 normalized records; no second device parser. |
+| PASS/FAIL phase evaluator | RETAIN_AS_HISTORICAL_PREDECESSOR | DL-06 emits observation facts, not Day35 scenario verdicts. |
+| JSON/HTML/TXT evidence model | SUPERSEDE_WITH_DUAL_LAB | Preserve accepted single-snapshot evidence and summary; add only an outer canonical timeline. HTML/TXT are not MVP requirements. |
+| Secret redaction | REUSE_CONCEPT_ONLY | Keep data minimization; exclude raw streams and authority material rather than importing Day35 regex filtering. |
+| No-config-change safety statement | REUSE_UNCHANGED | NAL observes only; mutation and automated fault injection remain forbidden. |
+
+### Accepted composition and authorization
+
+[DL-01](../../validation_framework/dual_lab_vrrp_query_contract.py) owns the
+unchanged query/aggregate schema. [DL-02](../../validation_framework/dual_lab_vrrp_query_orchestrator.py)
+preflights both bundles, then invokes its private binding to
+`run_stage2_vrrp_live_once()` at most once per eligible target, Lab1 then Lab2.
+A Lab1 failure does not suppress an otherwise eligible Lab2 within that same
+sample. [DL-03](../../validation_framework/dual_lab_vrrp_query_summary.py)
+projects and revalidates facts without retaining authority-bearing inputs.
+All three are reusable unchanged. S2-RO-11 and trusted composition remain the
+live path; a new direct Day35 Paramiko path is not required.
+
+The [envelope and ledger](../../validation_framework/stage2_authorization_envelope_ledger.py)
+enforce integer `max_attempts == 1`. Durable uniqueness is keyed by
+`authorization_id` alone; duplicate consumption returns `REPLAY`, including
+same-ID/different-envelope attempts. Consumption remains spent after downstream
+failure. Existing non-rollback storage assumptions remain unchanged.
+
+Recommended model: **PREAUTHORIZED_ONE_SHOT_SNAPSHOT_SCHEDULE**. This is a
+finite trusted-caller input plan, not a scheduler service or reusable session
+authorization. For every sample and target, require a distinct `run_id`,
+`authorization_ref`, `authorization_id`, request hash and request-bound envelope,
+and independently issued Owner approval. Query IDs are also unique per sample.
+Requests and envelope bytes differ across samples; a failure cannot insert,
+replace or replenish entries in the fixed preauthorized schedule.
+Ten samples require at most twenty one-shot target invocations and twenty
+distinct approval/envelope identities. A count is a ceiling, not a quota to fill.
+
+Before any future session, a trusted caller must validate the complete finite
+plan using accepted inert parsers/binding rules, reject collisions across the
+whole plan, and verify that all required trusted configurations are available.
+Malformed/missing plan entries reject the session before any DL-02 invocation.
+This preflight neither consumes nor authenticates approvals; Stage-2 retains
+exclusive Owner verification and consumption on each actual invocation.
+Expiry is rechecked by the accepted path; no validity extension is invented.
+
+No observer signer, dynamic minting, automatic approval generation, ledger
+reset, fallback ledger, envelope reuse or automatic restart is allowed.
+Unused entries are not replenished or reused by this session after termination.
+Retained external evidence must bind the plan, exact baseline, query IDs and
+accepted request/envelope identities without publishing their private contents.
+
+This model is security-consistent and manageable for at most twenty preissued
+approvals, but current deployment readiness is unproven. The accepted envelope
+lifetime is at most 300 seconds; external preparation and a current valid
+start window must be demonstrated separately. No batch signer is assumed to
+exist. A reusable session authorization would change replay and consumption
+semantics and requires a separate security contract; it is not selected.
+
+### Proposed bounds and unresolved live deadline gate
+
+Select a maximum of **10 samples**, **2000 ms minimum delay** from completion of
+one sample to admission of the next, and a proposed **30-second hard session
+duration** from the first sample's admission. Setup/manual preparation occurs
+before that clock starts. There is no catch-up, parallelism or compressed delay.
+The ten-sample ceiling provides repeated evidence with at least 18 seconds of
+inter-sample delay and leaves nominal time for observations; completing ten is
+not guaranteed. Stop earlier when a bound or failure condition applies.
+
+The hard duration is a future requirement, **not an existing guarantee**.
+[S2-RO-09](../../validation_framework/stage2_pinned_ssh_transport.py) currently
+allows 15 seconds for connection/authentication, followed by a separate
+30-second command phase per target, plus cleanup. S2-RO-10 validates a maximum
+60,000 ms successful evidence duration after work; it does not implement a
+30-second session cancellation mechanism. DL-02 has no absolute-deadline input
+or cancellation boundary between its two target calls. Local acquisition time
+also must be accounted for. Checking elapsed time between samples cannot
+enforce the proposed whole-session limit.
+
+Accordingly, DL-06-03 is blocked until separately authorized deadline design,
+implementation and negative validation establish the hard bound across both
+targets, acquisition, command and cleanup without weakening security. The
+present specification does not authorize modifying Stage-2 or the accepted
+DL-02 contract to achieve that. Do not silently relabel the bound as an admission
+window, shorten inherited timeouts, use a background worker, abandon a running
+operation, patch private call bindings, or claim a killed process proves clean
+termination. The selected requirement remains hard whole-observer completion
+within 30 seconds. This deadline blocker applies to repeated live observation;
+it does not block separately authorized offline timeline work or a separately
+authorized single live Dual-Lab snapshot with its own explicit time budget.
+Neither establishes repeated-observer readiness.
+
+```text
+PROPOSED_MAX_SNAPSHOT_COUNT = 10
+PROPOSED_INTER_SAMPLE_DELAY_MS = 2000
+PROPOSED_MAX_OBSERVER_DURATION_SECONDS = 30
+HARD_WHOLE_OBSERVER_COMPLETION_LIMIT = YES
+HARD_SESSION_DEADLINE_CURRENTLY_ENFORCEABLE = NOT_ESTABLISHED
+DL_06_03_REPEATED_LIVE_OBSERVER_READY = NO
+DL_06_03_BLOCK_REASON = WHOLE_SESSION_DEADLINE_PROPAGATION_AND_ENFORCEMENT_NOT_PROVEN
+PARALLEL_EXECUTION_ALLOWED = NO
+RETRY_ALLOWED = NO
+FALLBACK_ALLOWED = NO
+INFINITE_POLLING_ALLOWED = NO
+DYNAMIC_AUTHORIZATION_MINTING_ALLOWED = NO
+AUTOMATIC_FAILOVER_TRIGGER_ALLOWED = NO
+CONFIGURATION_MUTATION_ALLOWED = NO
+```
+
+### Offline outer timeline contract
+
+Canonical schema identity: **`dual-lab-vrrp-transition.v1`**. DL-06-01 is an
+inert transformer/validator, with no imports of orchestration, transport,
+credential, authorization acquisition or device parsing. It consumes accepted
+DL-03 summaries and caller-supplied elapsed metadata; data validity does not
+attest live origin, timing authenticity, or authority.
+
+The exact top-level fields are `schema_version`, `timeline_id`, `execution_order`,
+`planned_sample_count`, `inter_sample_delay_ms`, `max_duration_ms`, `samples`,
+`termination`, and `facts`. `timeline_id` uses the accepted lowercase dotted
+reference grammar with prefix `timeline.` and maximum 160 characters;
+`execution_order` is `LAB1_THEN_LAB2`. Bounds are integer planned count 1..10,
+delay exactly 2000, and duration exactly 30000; booleans are not integers.
+
+Each sample has exactly `sample_index`, `elapsed_start_ms`, `elapsed_finish_ms`,
+and `summary`. Indices are consecutive starting at 1, with no skipped or
+reordered entries, and count cannot exceed the planned count. Summary is the
+unchanged JSON object of `dual-lab-vrrp-query-summary.v1`; re-encode canonically
+and validate through `parse_summary_canonical_json`, including recomputation of
+its cross-target observations. Reject repeated query IDs. Do not duplicate
+Lab1/Lab2 records beside the embedded summary or create another snapshot schema.
+
+Elapsed values are exact nonnegative integers with start <= finish <= 30000;
+first start is zero. Each later start is at least previous finish + 2000.
+Values represent a monotonic session-relative observation window, not UTC or
+individual device timestamps. No caller-provided float, negative, bool,
+overlap, backdating, reordering or normalization is accepted. A live overrun
+cannot be truncated to 30000 or certified as a valid bounded timeline; retain
+prior valid evidence and report the overrun outside this valid-result schema.
+
+`termination` has exactly `reason` and `elapsed_ms`. Reasons are
+`COUNT_REACHED`, `SESSION_INTEGRITY_FAILURE`, `DURATION_LIMIT`, `PRECHECK_REJECTED`, and
+`INVALID_SAMPLE`. Elapsed is an integer 0..30000, no earlier than the final
+sample finish. COUNT_REACHED requires the planned number of samples; valid
+observation-level failures do not prohibit it. SESSION_INTEGRITY_FAILURE retains
+the valid prefix (possibly empty), including the final failed aggregate if it
+can be canonically summarized, and records termination when the fatal gate is
+detected. It does not fabricate a sample for an uncollected target pair.
+DURATION_LIMIT requires elapsed 30000 and fewer than the planned count.
+PRECHECK_REJECTED requires no samples, no facts, and elapsed zero. INVALID_SAMPLE
+requires fewer than the planned count and retains only the preceding valid
+prefix (possibly empty); rejected bytes and exception details are excluded.
+Retained valid samples in any prefix may contain observation-level failures.
+No samples may follow termination. These are collection outcomes, not health
+verdicts. Termination metadata is a caller claim, not proof of its cause. The
+offline validator checks structure, bounds and derived facts, but cannot infer
+authorization integrity from a coarse target failure category. Acceptance of
+an offline failure/recovery narrative never authorizes live continuation; that
+requires the separate trusted classification gate described below.
+
+For deterministic offline validation, every current DL-01 failure category
+except TRUSTED_RUNTIME_FAILED explicitly denotes request, authorization,
+configuration, evidence or internal integrity failure. Such a category may
+appear only in the final retained sample and requires
+SESSION_INTEGRITY_FAILURE. TRUSTED_RUNTIME_FAILED remains ambiguous: an offline
+fixture may represent an observation-only failure and a later sample with that
+preserved category, but no live caller may infer permission from its spelling.
+No category is renamed or added to the accepted aggregate or summary schema.
+
+Canonical encoding follows existing compact sorted-key strict UTF-8 JSON:
+no BOM/newline, NaN/Infinity, duplicate keys at any depth, unknown/missing fields,
+alternate noncanonical byte representation or coercion. Maximum outer bytes:
+4,194,304; maximum facts: 4096. Existing per-summary and 32-record-per-target
+bounds remain in force. Reject over-limit input before returning any partial
+timeline. Revalidate exact-type nested objects at serialization; return fresh
+detached data, `execution_authorized=False`, and sanitized fixed errors.
+
+### Exact deterministic transition vocabulary
+
+Only the following nine fact kinds are permitted. Every fact has exactly
+`kind`, `from_sample`, `to_sample`, `target_ref`, `subject`, `from_value`, and
+`to_value`. Recompute all facts from validated samples; parser acceptance
+requires byte equality with that complete ordered derivation. User-supplied
+facts are never trusted. Adjacent pairs only: N -> N+1; never bridge a gap.
+
+| Kind | Exact derivation |
+| --- | --- |
+| TARGET_RESULT_STATUS_CHANGED | Per target, emit only if adjacent SUCCESS/FAILURE tags differ; null subject, string old/new status. |
+| ROLE_CHANGED | Per target and unique `(instance_name, vrid)` present exactly once in both adjacent successful summaries, emit unequal role strings. |
+| RUNNING_CHANGED | Same unique-key rule; emit unequal exact boolean `running` values. |
+| PRIORITY_CHANGED | Same unique-key rule; emit unequal integer priority values. |
+| INTERVAL_CHANGED | Same unique-key rule; emit unequal integer `interval_ms` values. |
+| VERSION_CHANGED | Same unique-key rule; emit unequal integer version values. |
+| VRID_SET_CHANGED | Per target, both adjacent results successful; unequal sorted distinct VRID integer arrays; null subject. |
+| MASTER_TARGET_CHANGED | For one key, both targets must have exactly one record in each of the two successful samples; all four records have disabled=false and invalid=false, and each sample has exactly one MASTER and one BACKUP. Emit only when the observed MASTER target differs. `target_ref` is null, subject is that key, and old/new values are fixed logical target references. Running flags do not imply health or override role. |
+| OBSERVATION_GAP | Emit one per target/sample FAILURE (from_sample=to_sample, null subject, from_value=null, to_value=the preserved failure category). For two adjacent successful results, emit one per key missing or duplicated at either end: subject is that key, old/new values are exact record counts. Do not select, collapse or pair duplicate records. |
+
+Record-specific subjects have exactly `instance_name` and `vrid`. Target refs
+are only the accepted Lab1/Lab2 logical refs. Field facts are derived only from
+uniquely paired records, even when disabled or invalid; those flags remain
+visible in the complete embedded summaries. The nine-kind MVP does not emit
+additional flag-change verdicts. Empty SUCCESS records are an observed empty
+set, not a transport failure; changed VRID sets or missing-key gaps preserve it.
+
+Order facts by `(to_sample, from_sample, kind_rank, target_rank, subject_key)`.
+Kind rank is the table order; target rank is Lab1, Lab2, then null; null subject
+sorts before a key, whose order is Unicode code-point instance name then integer
+VRID. Every derivation has one row per applicable target/key; duplicates or
+omitted rows reject. First-sample failures produce gaps but no change facts.
+An uncollected or invalid sample has no invented target records; termination
+records its absence.
+
+MASTER_TARGET_CHANGED means the unique observed MASTER label changed across
+two sequential sample windows. It does not mean both routers had those states
+at one instant. Display, for example: "Between samples 3 and 4, the observed
+MASTER target changed from Lab1 to Lab2; each sample observed Lab1 first."
+Any approximate timing is limited to the enclosing interval from sample 3's
+start through sample 4's finish. It is not an exact transition timestamp,
+convergence duration, or proof that only one transition occurred.
+
+HEALTHY, UNHEALTHY, FAILOVER_SUCCESS, FAILOVER_READY and SPLIT_BRAIN are excluded.
+With an unavailable target, a surviving target's ROLE_CHANGED can be recorded,
+but MASTER_TARGET_CHANGED cannot infer the missing target's role.
+
+For example, assume the same unique VRRP key throughout the observed successful
+results, with other fields unchanged:
+
+| Sample | Lab1 observation | Lab2 observation |
+| --- | --- | --- |
+| 1 | MASTER | BACKUP |
+| 2 | MASTER | BACKUP |
+| Human action between 2 and 3 | Owner manually disconnects Lab1 LAN | No observer-triggered action |
+| 3 | Target observation FAILURE | MASTER |
+| 4, if later observation is possible within the remaining plan and deadline | BACKUP | MASTER |
+
+The permitted facts are Lab1 TARGET_RESULT_STATUS_CHANGED from SUCCESS to
+FAILURE (2 -> 3), Lab1 OBSERVATION_GAP at 3, Lab2 ROLE_CHANGED from BACKUP to
+MASTER (2 -> 3), and Lab1 TARGET_RESULT_STATUS_CHANGED from FAILURE to SUCCESS
+(3 -> 4). Emit them in the canonical ordering above. There is no Lab1
+ROLE_CHANGED bridging 2 -> 4 and no MASTER_TARGET_CHANGED across the missing
+Lab1 observation. Do not infer Lab1's role at 3, simultaneous state, causation,
+or FAILOVER_SUCCESS. If collection ends at 3, retain only those observed facts.
+
+### Failure, connectivity and manual-action boundaries
+
+**Observation-level target failure may permit the next scheduled sample;
+authorization or session-integrity failure terminates fail-closed.** These are
+future observer requirements, not capabilities granted to the current live path.
+A valid canonical DL-02 aggregate alone does not establish which failure class
+occurred. Preserve its exact accepted failure category and DL-03 summary.
+
+Observation-level failures include temporary target unavailability, transport
+timeout or a target-local runtime failure only when trusted classification
+establishes that authorization and session integrity remain valid. Record the
+valid sample and derive OBSERVATION_GAP and any other exact permitted facts.
+After at least 2000 ms from completion, the next already-preauthorized sample
+may proceed only if it exists, has fresh identities for both targets, all
+integrity gates remain valid, and the hard whole-session deadline can still be
+enforced. There is no new attempt for the failed request or its authorization.
+
+| Condition | Required outcome |
+| --- | --- |
+| Positively classified observation-level target failure in a valid canonical sample | Retain evidence and applicable gap facts; permit only the distinct next planned sample while all guards hold. |
+| Invalid/malformed session contract or schedule, missing authorization material, cardinality mismatch, prohibited identity collision, or unavailable/invalid trusted configuration found in complete-plan precheck | PRECHECK_REJECTED before DL-02; no authorization consumption or live calls. |
+| Authorization expiry, replay, invalid binding, or Owner verification rejection at invocation | SESSION_INTEGRITY_FAILURE; no later scheduled sample, renewal, reuse or replacement authority. |
+| Trust/credential/configuration rejection, opaque failure classification, internal accounting failure, or later schedule-integrity failure | SESSION_INTEGRITY_FAILURE; fail closed rather than guess that it is an observation failure. |
+| Canonical evidence rejection | Preserve DL-02 CANONICAL_EVIDENCE_VALIDATION_FAILED if returned and canonically summarizable, then terminate for integrity failure; malformed aggregate/summary gives INVALID_SAMPLE without publishing rejected material. |
+| Continuing would require inventing, repairing, replacing or dynamically generating authority | Terminate for integrity failure; no authority repair. |
+| Hard whole-session deadline exhaustion | Terminate the entire observer, including in-flight activity and cleanup, within the hard bound. An overrun is not a valid bounded timeline. Until enforcement is proven, repeated live execution remains blocked. |
+
+Current mapping limitation: [S2-RO-11](../../validation_framework/stage2_vrrp_readonly_live_entrypoint.py)
+maps TRANSPORT_FAILED and REPLAY_REJECTED, among other gate failures, to
+TRUSTED_RUNTIME_FAILED. DL-02 and DL-03 preserve that coarse category. Therefore
+neither a canonical summary nor a fresh next envelope proves that an opaque
+failure was observation-only. It must remain fatal unless a separately approved
+trusted classification mechanism proves the distinction. Do not infer cause
+from exception text, private tracebacks or target unreachability assumptions.
+No new classifier, public failure field, or accepted schema change is authorized
+here. Classification and session-integrity enforcement must be designed,
+implemented and negatively tested under a future gate before repeated live
+continuation can be ready, in addition to the hard-deadline prerequisite.
+
+Retain DL-02's existing independent Lab1-then-Lab2 behavior inside a sample:
+an eligible Lab2 can still run after Lab1 fails. At the outer sample boundary,
+a fatal integrity result prevents every later scheduled sample. The present
+API does not promise a new mid-sample integrity-abort hook. Any requirement to
+abort the remaining target immediately, and deadline propagation through both
+calls and cleanup, needs separately reviewed enforcement; this specification
+does not silently alter accepted orchestration.
+
+For example, sample 4 uses requests R4-L1 / R4-L2 and authorizations A4-L1 /
+A4-L2. If R4-L1 has an observation-level failure, R4-L1 is never executed again
+and A4-L1 stays spent. Sample 5 was already planned and uses R5-L1 / R5-L2 with
+A5-L1 / A5-L2: different run_id, authorization_ref, authorization_id, request
+hash and envelope for each target. Its existence and position do not depend
+on sample 4 failing. It is a distinct observation, not a retry, replacement
+sample, hidden recovery probe or automatic restart. The finite original count
+and hard duration still apply.
+
+```text
+CONTINUE_AFTER_CANONICAL_TARGET_OBSERVATION_FAILURE = YES
+NEXT_PREAUTHORIZED_SAMPLE_AFTER_OBSERVATION_GAP_ALLOWED = YES
+FAILED_REQUEST_RETRIED = NO
+FAILED_AUTHORIZATION_REUSED = NO
+NEXT_SAMPLE_IS_RETRY = NO
+SAME_REQUEST_REEXECUTION_ALLOWED = NO
+AUTHORIZATION_REUSE_ALLOWED = NO
+CONTINUE_AFTER_AUTHORIZATION_FAILURE = NO
+CONTINUE_AFTER_REPLAY = NO
+CONTINUE_AFTER_SCHEDULE_INTEGRITY_FAILURE = NO
+CONTINUE_AFTER_HARD_DEADLINE = NO
+DYNAMIC_AUTHORIZATION_REPAIR = NO
+```
+
+The two YES values specify the conditional future observation-only policy;
+they do not classify every TargetFailure as continuable or grant live readiness.
+
+Initial connectivity scope is **VRRP_ROLE_STATE_ONLY**. No PC/device ping,
+VIP reachability timeline, auxiliary commands or additional transport is added.
+Reachability is a separately scoped possible follow-up, not required for the
+transition observer. No observed role is presented as a connectivity result.
+
+`FAILOVER_TRIGGER_OWNED_BY_NAL = NO`,
+`FAILOVER_TRIGGER_MODE = MANUAL_OPERATOR_ACTION`, and `NAL_ROLE = OBSERVE_ONLY`.
+NAL must never disable/enable interfaces or VRRP, change priority or configuration,
+reboot, inject a fault or run arbitrary commands. Human disconnect/reconnect
+occurs outside observer control and grants no automatic recovery action.
+
+### Slice sequence and future validation gates
+
+| Slice | Bounded purpose | Gate / current status |
+| --- | --- | --- |
+| DL-06-00 | Day35 review and this canonical readiness/specification | Documentation only; no implementation or live grant. |
+| DL-06-01 | Offline outer contract and deterministic derivation tests | Next Owner decision only; inert summaries and synthetic times, zero runtime calls. |
+| DL-06-02 | Current-baseline single live Dual-Lab snapshot proof | Separate exact Owner authorization, baseline verification, trusted deployment and fresh one-shot approvals. One Lab1 invocation then one Lab2; no loop, failover or mutation. |
+| DL-06-03 | Bounded transition observer with manual operator event | Separate implementation/review/live gates; single-snapshot proof required first; hard deadline enforcement and trusted observation-versus-integrity failure classification must be proven. |
+| DL-06-04 | Optional presentation of validated timeline | Not required for observer completeness; any real provider/model use needs separate authority. |
+
+Day35 and the historical individual Stage-2 proofs do not prove the current
+paired Dual-Lab composition live. Therefore
+`DL_06_SINGLE_LIVE_SNAPSHOT_PROOF_REQUIRED = YES` and
+`TRANSITION_OBSERVER_LIVE_RUN_ALLOWED_BEFORE_SINGLE_PROOF = NO`.
+One successful live snapshot proves neither repeated-observation deadlines nor
+reusable authority. DL-06-02 must define its own exact single-proof time budget;
+this document does not impose a false 30-second guarantee on the existing path.
+The repeated-observation blocker does not prevent independently authorized
+DL-06-01 offline work or DL-06-02 single-proof work. Neither may claim DL-06-03
+readiness, and neither is implemented or executed by this documentation task.
+
+DL-06-01 acceptance requires canonical round trips and exact nine-kind fact
+recomputation; zero/single/ten samples; every termination branch; empty and
+failed targets; duplicate/missing keys; role and MASTER changes in both
+directions; no bridge over gaps; stable Unicode ordering; booleans versus
+integers; limits; unknown fields and facts; forged/missing/extra facts;
+tampered nested objects; sanitized errors; and import/use no-I/O proof.
+Fixtures must include a manual-event narrative with a target failure followed
+by a later distinct scheduled sample, no inferred state across the gap, and
+fatal integrity termination. Offline acceptance does not prove authority or
+the cause of opaque failures. No Day35 runner or live-entrypoint call
+belongs in these tests. Validate accepted summary compatibility and preserve
+all accepted schemas and implementation bytes.
+
+Future live review must additionally prove whole-plan collision rejection,
+missing/expired approvals, replay denial, spent-after-failure behavior,
+independent within-sample target ordering, zero subsequent samples after
+authorization/session-integrity or ambiguous failures, and continuation only
+after positively classified observation failures with distinct next scheduled
+identities and deterministic accounting. Prove no request retry, authority
+reuse, dynamic repair or failure-driven schedule change; fixed count/delay,
+non-overlap, and deadline behavior including stalled acquisition/transport/
+cleanup and no late command. A fake clock can validate
+the offline representation; it cannot establish an actual runtime deadline.
+
+The observer and complete evidence must work without an external AI model.
+Deterministic intent/UI or a later facts renderer is distinct from provider
+access. No model/provider/voice/MCP integration is included. No second Day35
+implementation, direct Paramiko failover path, device parser, authorization
+system or single-snapshot evidence model is created.
+
+The smallest next decision is
+`AUTHORIZE_DL_06_01_OFFLINE_TRANSITION_CONTRACT_IMPLEMENTATION`.
+It authorizes nothing until the Owner supplies that separate instruction.
+P3 remains OPEN_NON_BLOCKING; seven existing build warnings and all prior
+acceptance and Stage-2 closure boundaries remain unchanged.
 
 ## DL-05 reviewed exact-SHA candidate
 
