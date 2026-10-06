@@ -1,4 +1,12 @@
-# Dual-Lab VRRP AI Query MVP: DL-05 Accepted
+# Dual-Lab VRRP AI Query MVP: DL-05 and Offline DL-06-01 Accepted
+
+**Current DL-06 decision: DL-06-01 is Owner accepted / PASS for the offline
+transition contract, local and NOT_PUBLISHED.** Specification
+`d481dfb41e9a5547ad2b2dd12f5e6a21fc8cfd5b` and accepted implementation
+`016ef20f8bfa0c91be4e68195a98037ad03af1de` remain distinct from this documentation
+descendant. The [DL-06-01 acceptance record](#dl-06-01-accepted-offline-transition-contract)
+records the completed review and decision. DL-06-02 is NOT_AUTHORIZED;
+DL-06-03 remains blocked. No live authority or readiness is granted.
 
 **Decision summary: DL-05 is ACCEPTED / PASS; the bounded offline Dual-Lab MVP
 is complete.** The separate Owner acceptance decision accepted implementation
@@ -17,10 +25,13 @@ readiness is granted. DL-06's execution contract remains NOT_ESTABLISHED.
 The [DL-05 record](#dl-05-reviewed-exact-sha-candidate) retains the reviewed
 candidate and [completed Owner acceptance](#completed-owner-acceptance-and-active-status).
 The [DL-06-00 readiness specification](#dl-06-00-transition-observer-readiness-and-specification)
-defines a future outer transition timeline; implementation and live execution remain unauthorized.
+defines the accepted offline outer transition contract and the still-unimplemented
+live-observer requirements. DL-06-01 review and Owner acceptance have completed;
+live execution remains unauthorized.
 The [DL-05 canonical contract](#dl-05-canonical-integration-and-safe-ci-contract)
 retains its requirements. Earlier specification and predecessor status snapshots
-are historical; the completed DL-05 acceptance below defines current status.
+are historical; the completed DL-05 and DL-06-01 acceptance records define their
+respective current status.
 The [accepted DL-04 closure record](#dl-04-reviewed-closure-candidate) and
 [DL-04 closure contract](#dl-04-canonical-closure-contract) retain their accepted
 identities, evidence, and safety boundaries.
@@ -33,15 +44,17 @@ specification, accepted implementation, completed governed review, and completed
 Owner acceptance decision, and the DL-04 closure specification, completed closure
 execution, completed fresh governed review, and completed Owner acceptance.
 It also establishes the DL-05 integration, Safe CI, evidence, fresh exact-SHA
-review, and Owner-acceptance contract.
+review, and Owner-acceptance contract, plus the DL-06-00 specification and
+accepted DL-06-01 offline implementation.
 The DL-03 specification resolved the readiness
 review's `BLOCKED_CANONICAL_SCOPE_AMBIGUITY`; the separately authorized
 implementation, review, and acceptance are recorded below.
 The prior DL-04 post-acceptance reconciliation recorded that completed decision.
 The current Owner authorization permits post-acceptance status reconciliation in
 this record, README, and the automation plan, followed by one local documentation
-commit above pre-acceptance record `c275b1b58a696b85a9d516ab1b15cceb77432ad2`.
-It records the completed decision without repeating acceptance or review.
+commit directly above accepted DL-06-01 implementation
+`016ef20f8bfa0c91be4e68195a98037ad03af1de`.
+It records the completed DL-06-01 decision without repeating acceptance or review.
 No source, test, workflow, dependency, sealed-evidence, external-wrapper, or
 Stage-2 closure change is authorized. No application validation, Safe CI rerun,
 push, merge, branch deletion, P3 remediation, or live operation is performed.
@@ -1490,20 +1503,176 @@ NEXT_REQUIRED_OWNER_DECISION = AUTHORIZE_BOUNDED_DL_04_CLOSURE_EXECUTION
 ```
 
 
+## DL-06-01 accepted offline transition contract
+
+**Decision: Owner acceptance completed ACCEPT / PASS for
+`OFFLINE_TRANSITION_CONTRACT_ONLY`.** The exact implementation below passed
+fresh governed review, then a separate Owner-authorized acceptance decision
+with all seven predicates satisfied. This reconciliation records those completed
+decisions; it does not repeat them or publish the implementation.
+
+### Exact accepted identities and provenance
+
+| Identity | Accepted value |
+| --- | --- |
+| DL-06-00 specification commit | `d481dfb41e9a5547ad2b2dd12f5e6a21fc8cfd5b` |
+| DL-06-01 implementation commit | `016ef20f8bfa0c91be4e68195a98037ad03af1de` |
+| Implementation parent | `d481dfb41e9a5547ad2b2dd12f5e6a21fc8cfd5b` |
+| Implementation commit message | `Implement DL-06 offline transition contract` |
+| Accepted source | [dual_lab_vrrp_transition.py](../../validation_framework/dual_lab_vrrp_transition.py) |
+| Source SHA256 | `9f1f1a39d1576dc4a075018a8cd326b5983308729f1c7f67dbe231d4e5b7dcb2` |
+| Accepted tests | [test_dual_lab_vrrp_transition.py](../../tests/dual_lab/test_dual_lab_vrrp_transition.py) |
+| Test SHA256 | `e357331c4a64468ea4cd4d7d61341fa271ea48a06af56f71594628c2b8f453e5` |
+| Authoritative remote main at reconciliation | `5431f7491015fe7ab2ae9227bc6a48814356641e` |
+
+The candidate added exactly those two files. Accepted predecessors, Stage-2,
+Day35, documentation, workflows, `package.json` and `package-lock.json` were
+unchanged by the implementation. The `DL_06_01_FRESH_GOVERNED_REVIEW_ONLY`
+response and later `DL_06_01_OWNER_ACCEPTANCE_ONLY` response in the same
+conversation are the review and decision records, reaffirmed by this task's
+Owner authorization. No separate-human or separate-agent review identity is
+claimed, and no external review receipt is invented.
+
+The acceptance task rechecked the exact commit, parent, two-file scope, hashes,
+remote baseline and clean worktree; it changed no files and reran no tests.
+All seven predicates passed: identity, scope, specification conformance, safety
+properties, conservative inference, validation evidence and the closed live boundary.
+
+### Accepted behavior and fresh governed review evidence
+
+The inert `dual-lab-vrrp-transition.v1` layer reuses accepted DL-03 summaries.
+It provides ordered finite transition evidence and deterministic facts, with
+conservative observation-gap handling. Missing roles are never guessed; opaque
+failure is never a role, and `MASTER_TARGET_CHANGED` is not inferred through
+insufficient evidence or across gaps. Each sample preserves Lab1-then-Lab2
+sequential observation semantics, not simultaneous pair state. Output is facts-only.
+
+Exactly nine fact kinds are accepted: `TARGET_RESULT_STATUS_CHANGED`,
+`ROLE_CHANGED`, `RUNNING_CHANGED`, `PRIORITY_CHANGED`, `INTERVAL_CHANGED`,
+`VERSION_CHANGED`, `VRID_SET_CHANGED`, `MASTER_TARGET_CHANGED`, and
+`OBSERVATION_GAP`. Their derivation and ordering remain the unchanged
+[DL-06-00 contract](#exact-deterministic-transition-vocabulary).
+
+**Accepted fresh governed review evidence**, tied to the implementation SHA above:
+
+| Command run by the fresh review | Accepted result |
+| --- | --- |
+| `python -m pytest tests/dual_lab/test_dual_lab_vrrp_transition.py -q` | 198 passed |
+| `python -m pytest tests/dual_lab -q` | 850 passed |
+| `python -m pytest tests/stage2 -q` | 1,892 passed |
+| `python -m pytest` | 4,870 collected and passed; 0 skipped, 0 failed, 0 errors |
+| `python -B network_lab.py --task report-index` | WARN; 13 optional missing, 0 failures, 0 mandatory missing, 0 unknown |
+
+The requirement-to-test mapping was COMPLETE with zero material untested
+requirements. Gap non-inference, fail-closed canonical parsing, deterministic
+serialization and immutability reviews passed. Static inspection and guarded
+use established no live I/O dependency or execution authority. A separate
+in-memory review probe confirmed oversized-input rejection before JSON decoding
+by both public parsers. These results are retained evidence, not application
+tests rerun by documentation reconciliation.
+
+### Three retained non-blocking findings
+
+| Finding | Evidence and retained status |
+| --- | --- |
+| Dependency maintenance | Environment-restoration npm reported 12 vulnerabilities. The candidate changed neither package manifest nor lockfile. `OPEN_NON_BLOCKING_DEPENDENCY_MAINTENANCE`; this is not a claim that vulnerabilities are harmless generally. |
+| Redundant parametrization | Four transition-test parametrizations repeat input coverage. `OPEN_NON_BLOCKING_TEST_MAINTENANCE`; the 198-test count does not imply 198 distinct scenarios. |
+| Oversize-test precision | One oversized-input payload is also invalid JSON. The fresh review independently confirmed both parsers reject oversize input before decoding. `OPEN_NON_BLOCKING_TEST_PRECISION`. |
+
+`UNRESOLVED_MATERIAL_FINDINGS = 0` and `NONBLOCKING_FINDINGS = 3`.
+No finding is repaired by acceptance or this documentation task. Earlier
+dependency observations, P3 and seven retained build warnings remain historical
+or predecessor maintenance evidence; they are not silently replaced or resolved.
+
+### Active slice status and live restrictions
+
+```text
+DL_06_00_SPECIFICATION_STATUS = ESTABLISHED
+DL_06_00_SPECIFICATION_SHA = d481dfb41e9a5547ad2b2dd12f5e6a21fc8cfd5b
+DL_06_01_IMPLEMENTED = YES
+DL_06_01_REVIEW_RESULT = PASS
+DL_06_01_OWNER_ACCEPTED = YES
+DL_06_01_ACCEPTANCE_RESULT = PASS
+DL_06_01_ACCEPTED_IMPLEMENTATION_SHA = 016ef20f8bfa0c91be4e68195a98037ad03af1de
+DL_06_01_ACCEPTANCE_SCOPE = OFFLINE_TRANSITION_CONTRACT_ONLY
+DL_06_01_TRANSITION_SCHEMA = dual-lab-vrrp-transition.v1
+DL_06_01_TRANSITION_FACT_COUNT = 9
+DL_06_OFFLINE_TRANSITION_CONTRACT_STATUS = OWNER_ACCEPTED_OFFLINE_TRANSITION_CONTRACT
+DL_06_EXECUTION_CONTRACT_STATUS = NOT_ESTABLISHED
+LIVE_DEVICE_ACCESSED = NO
+LIVE_AUTHORITY_GRANTED = NO
+LIVE_READINESS_GRANTED = NO
+DL_06_02_AUTHORIZED = NO
+DL_06_03_REPEATED_LIVE_OBSERVER_READY = NO
+AUTOMATIC_FAILOVER_AUTHORITY_GRANTED = NO
+CONFIGURATION_MUTATION_AUTHORIZED = NO
+PROVIDER_MODEL_INTEGRATION_AUTHORIZED = NO
+RUNTIME_LOOP_IMPLEMENTED = NO
+AUTHORIZATION_SCHEDULE_IMPLEMENTED = NO
+RETRY_IMPLEMENTED = NO
+HARD_WHOLE_OBSERVER_COMPLETION_LIMIT_SECONDS = 30
+LIVE_HARD_DEADLINE_ENFORCEMENT_IMPLEMENTED = NO
+HARD_SESSION_DEADLINE_RUNTIME_PROVEN = NO
+DL_06_01_PUBLICATION_STATUS = NOT_PUBLISHED
+REMOTE_MAIN_CONTAINS_DL_06_01 = NO
+```
+
+These runtime and access statements describe DL-06-01 and this reconciliation;
+they do not erase the separately authorized historical Stage-2 or Day35 proofs.
+Day35 remains a real-device, operator-triggered failover predecessor using direct
+commands/Paramiko, not Stage-2 authorization. DL-06-01 adds no live transport,
+device parser, Day35 evaluator, authorization consumption or execution path.
+
+The 30-second requirement is hard whole-observer completion, including in-flight
+work and cleanup. It must not become an admission-window-only limit. Repeated live
+observation remains blocked pending separately authorized deadline propagation,
+enforcement and proof; trusted observation-versus-integrity failure classification
+is also required. The blocker does not prohibit a separately authorized single
+Dual-Lab snapshot with its own time budget. DL-06-02 is not authorized here and
+cannot establish repeated-observer readiness.
+
+### Local reconciliation and next Owner decision
+
+The local documentation commit directly descends from the accepted implementation
+and uses message `Record DL-06-01 acceptance status`. Its actual SHA and parent
+are reported after commit; its identity never replaces the accepted implementation
+SHA or inherits that implementation's application tests or review. Authoritative
+public main remains the verified baseline above and contains neither accepted
+transition file. No push, PR or merge is performed by this task.
+
+Documentation validation covers identity/status consistency, links, readability,
+protected-file integrity and whitespace. Repository-standard report-index is
+run separately as a documentation check, with optional-only WARN acceptable;
+its actual result is reported by this task. Full pytest and the application test
+matrix are not rerun. No new implementation, live proof or acceptance occurs.
+
+Following the established separation of documentation and publication authority,
+the next required Owner decision is
+`AUTHORIZE_DL_06_01_PUBLICATION_READINESS_REVIEW`: a read-only review of this
+documentation descendant and the exact branch scope before proposing publication.
+This does not grant push, PR, merge, DL-06-02 or DL-06-03 authority, and that next
+action is not performed by reconciliation.
+
 ## DL-06-00 transition observer readiness and specification
 
-**Decision: establish the offline transition specification; live execution remains
-LOCKED.** Day35 already proved manual live VRRP failover. DL-06 adds bounded,
+**Specification established; DL-06-01 is now Owner accepted offline, while live
+execution remains LOCKED.** Day35 already proved manual live VRRP failover.
+DL-06 adds bounded,
 ordered observations and deterministic change facts through the accepted
 Stage-2 / DL-02 / DL-03 composition. It does not create another Day35 tester.
-This section is the current DL-06-00 planning record; earlier statements that
-DL-06 readiness/specification had not begun are historical. The accepted DL-01
+This section retains the DL-06-00 contract established at
+`d481dfb41e9a5547ad2b2dd12f5e6a21fc8cfd5b`; the acceptance record above governs
+current implementation status. Earlier statements that DL-06 readiness/specification
+had not begun are historical. The accepted DL-01
 through DL-05 implementation, evidence and decisions remain unchanged.
 
 Planning baseline: public `main@5431f7491015fe7ab2ae9227bc6a48814356641e`.
 Accepted DL-05 implementation: `0e5dfbc1d143a6de7ba59e4bff9bd1788e809043`,
 tree `6252c2c632d217b4f02804626aac797b546f87f8`. Specification does not grant
 implementation authority, live readiness, a new signed approval, or execution.
+
+Historical status at specification establishment, before separately authorized
+implementation, review and acceptance:
 
 ```text
 DL_06_00_SPECIFICATION_STATUS = ESTABLISHED
@@ -1905,11 +2074,11 @@ occurs outside observer control and grants no automatic recovery action.
 
 | Slice | Bounded purpose | Gate / current status |
 | --- | --- | --- |
-| DL-06-00 | Day35 review and this canonical readiness/specification | Documentation only; no implementation or live grant. |
-| DL-06-01 | Offline outer contract and deterministic derivation tests | Next Owner decision only; inert summaries and synthetic times, zero runtime calls. |
-| DL-06-02 | Current-baseline single live Dual-Lab snapshot proof | Separate exact Owner authorization, baseline verification, trusted deployment and fresh one-shot approvals. One Lab1 invocation then one Lab2; no loop, failover or mutation. |
-| DL-06-03 | Bounded transition observer with manual operator event | Separate implementation/review/live gates; single-snapshot proof required first; hard deadline enforcement and trusted observation-versus-integrity failure classification must be proven. |
-| DL-06-04 | Optional presentation of validated timeline | Not required for observer completeness; any real provider/model use needs separate authority. |
+| DL-06-00 | Day35 review and this canonical readiness/specification | SPECIFICATION_ESTABLISHED; no live grant. |
+| DL-06-01 | Offline outer contract and deterministic derivation tests | OWNER_ACCEPTED_OFFLINE_TRANSITION_CONTRACT; local, NOT_PUBLISHED; zero runtime calls. |
+| DL-06-02 | Current-baseline single live Dual-Lab snapshot proof | NOT_AUTHORIZED; needs separate exact Owner authorization, baseline verification, trusted deployment and fresh one-shot approvals. One Lab1 invocation then one Lab2; no loop, failover or mutation. |
+| DL-06-03 | Bounded transition observer with manual operator event | BLOCKED_PENDING_HARD_DEADLINE_PROPAGATION_AND_ENFORCEMENT; separate implementation/review/live gates, single-snapshot proof and trusted observation-versus-integrity failure classification also required. |
+| DL-06-04 | Optional presentation of validated timeline | NOT_STARTED / OPTIONAL; not required for observer completeness; real provider/model use needs separate authority. |
 
 Day35 and the historical individual Stage-2 proofs do not prove the current
 paired Dual-Lab composition live. Therefore
@@ -1922,7 +2091,8 @@ The repeated-observation blocker does not prevent independently authorized
 DL-06-01 offline work or DL-06-02 single-proof work. Neither may claim DL-06-03
 readiness, and neither is implemented or executed by this documentation task.
 
-DL-06-01 acceptance requires canonical round trips and exact nine-kind fact
+DL-06-01 acceptance criteria, satisfied by the accepted fresh review above,
+require canonical round trips and exact nine-kind fact
 recomputation; zero/single/ten samples; every termination branch; empty and
 failed targets; duplicate/missing keys; role and MASTER changes in both
 directions; no bridge over gaps; stable Unicode ordering; booleans versus
@@ -1952,9 +2122,10 @@ access. No model/provider/voice/MCP integration is included. No second Day35
 implementation, direct Paramiko failover path, device parser, authorization
 system or single-snapshot evidence model is created.
 
-The smallest next decision is
+Historically, the next decision at DL-06-00 establishment was
 `AUTHORIZE_DL_06_01_OFFLINE_TRANSITION_CONTRACT_IMPLEMENTATION`.
-It authorizes nothing until the Owner supplies that separate instruction.
+Implementation, review and Owner acceptance subsequently completed; the current
+next decision is in the DL-06-01 acceptance record above.
 P3 remains OPEN_NON_BLOCKING; seven existing build warnings and all prior
 acceptance and Stage-2 closure boundaries remain unchanged.
 
@@ -2183,9 +2354,11 @@ protected-file hashes, and unstaged/staged whitespace. Application tests,
 report-index, Safe CI, exact-SHA review, and Owner acceptance are not repeated.
 Sealed evidence, P3, and the seven maintenance warnings remain unchanged.
 
-No further Owner decision is required to complete this documentation task.
-Future publication needs separate authority. DL-06 remains unestablished and
-requires its own readiness/specification and exact Owner authorization; it is
+At the historical DL-05 post-acceptance reconciliation, no further Owner decision
+was required to complete that documentation task. The following DL-06 status
+describes that earlier point; the DL-06-01 acceptance record above supersedes it.
+Future publication needed separate authority. DL-06 remained unestablished and
+required its own readiness/specification and exact Owner authorization; it was
 not started. Offline acceptance grants no standing Lab1/Lab2 access, live query,
 configuration mutation, provider/model integration, or production readiness.
 Historical Stage-2 proof and closure semantics remain unchanged.
