@@ -493,7 +493,8 @@ release lanes; they are not performed by documentation-only changes.
 | Stage-0 Network Automation Lab | **CLOSED** at `main@aff250735ade18e4c274be8ac53c9672bb2cb07f` |
 | Stage-1 Read-only Lab Integration Planning | Historical planning-entry record; see the Stage-2 closure candidate |
 | Stage-2 bounded MikroTik VRRP validation | Lab1 historical proof retained; Lab2 proof PASS/CLOSED on repository baseline `ea73196281e38a01af7bf959cc5e1bc60b0b2499`; persistent Lab2 startup reconstruction and independent binding review PASS; overall Stage 2 is a **CLOSURE CANDIDATE** |
-| Dual-Lab AI Query | **DL-02, DL-03, DL-04, and DL-05 accepted; bounded offline MVP complete**; PR #93 merged; pre/post-merge Safe CI PASS, fresh exact-SHA review PASS, Owner acceptance ACCEPT / PASS; 0 unresolved material findings; P3 open/non-blocking; 7 maintenance build warnings retained; no live authority; DL-06 contract not established |
+| Dual-Lab AI Query | **DL-02, DL-03, DL-04, and DL-05 accepted; bounded offline MVP complete**; PR #93 merged; pre/post-merge Safe CI PASS, fresh exact-SHA review PASS, Owner acceptance ACCEPT / PASS; 0 unresolved material findings; P3 open/non-blocking; 7 maintenance build warnings retained; no live authority |
+| DL-06 offline transition contract | **DL-06-00 specification established; DL-06-01 Owner accepted / PASS, local and NOT_PUBLISHED**; 0 unresolved material findings; 3 retained non-blocking findings; DL-06-02 NOT_AUTHORIZED; DL-06-03 BLOCKED; no live authority |
 | Stage 3 | **NOT STARTED / requires separate Owner authorization** |
 | Canonical reviewer interface | Flask dashboard on `127.0.0.1:5000` |
 | Secondary Next.js interface | Available as a bounded Stage-0 evidence surface |
@@ -545,9 +546,59 @@ Owner authorization.
 P3 remains OPEN_NON_BLOCKING, and seven pre-existing Next.js tracing warnings
 remain maintenance items. `LIVE_AUTHORITY_GRANTED = NO` and
 `LIVE_READINESS_GRANTED = NO`; configuration mutation, provider/model integration,
-and production readiness remain unauthorized. `DL_06_EXECUTION_CONTRACT_STATUS = NOT_ESTABLISHED`; future DL-06 work requires separate readiness/specification and
-exact Owner authorization. Historical Stage-2 proof and closure semantics remain
-unchanged.
+and production readiness remain unauthorized. `DL_06_EXECUTION_CONTRACT_STATUS = NOT_ESTABLISHED`.
+The [DL-06-00 readiness specification](docs/automation_readiness/dual_lab_vrrp_ai_query_mvp.md#dl-06-00-transition-observer-readiness-and-specification)
+is established at `d481dfb41e9a5547ad2b2dd12f5e6a21fc8cfd5b`.
+**DL-06-01 implementation `016ef20f8bfa0c91be4e68195a98037ad03af1de` is
+Owner accepted / PASS for `OFFLINE_TRANSITION_CONTRACT_ONLY`.** Fresh governed
+review passed; the separate Owner decision passed all seven predicates.
+The [canonical acceptance record](docs/automation_readiness/dual_lab_vrrp_ai_query_mvp.md#dl-06-01-accepted-offline-transition-contract)
+retains exact hashes, evidence provenance and the three open findings.
+
+The accepted `dual-lab-vrrp-transition.v1` schema has exactly nine fact kinds.
+It preserves finite ordered evidence, deterministic derivation and Lab1-then-Lab2
+sequential observation windows. Missing roles are never guessed, and
+`MASTER_TARGET_CHANGED` is not inferred through insufficient evidence or gaps.
+Day35 remains the historical operator-triggered real-device failover proof using
+direct commands/Paramiko. DL-06-01 has no live transport or Day35 runtime.
+
+**Accepted fresh governed review evidence:** 198 focused, 850 Dual-Lab,
+1,892 Stage-2 and 4,870 full pytest tests passed, with zero skipped, failed or
+errors in the full run. Accepted report-index evidence is WARN for 13 optional
+missing reports, with zero failures, mandatory missing or unknown results.
+These application tests were not rerun during documentation reconciliation.
+
+There are zero unresolved material findings and three retained non-blocking
+findings: 12 npm-reported vulnerabilities (`OPEN_NON_BLOCKING_DEPENDENCY_MAINTENANCE`),
+four redundant parametrizations (`OPEN_NON_BLOCKING_TEST_MAINTENANCE`), and an
+oversize test that also uses invalid JSON (`OPEN_NON_BLOCKING_TEST_PRECISION`).
+The fresh review separately proved rejection before decoding for both parsers.
+The candidate changed neither package manifest nor lockfile; this does not
+declare dependency vulnerabilities harmless generally. No finding is repaired here.
+
+The accepted implementation remains local: `DL_06_01_PUBLICATION_STATUS = NOT_PUBLISHED` and
+`REMOTE_MAIN_CONTAINS_DL_06_01 = NO`, verified against authoritative remote
+`main@5431f7491015fe7ab2ae9227bc6a48814356641e`. This documentation descendant
+does not replace the accepted implementation or inherit its test/review result.
+The next separately required Owner decision is
+`AUTHORIZE_DL_06_01_PUBLICATION_READINESS_REVIEW`: review the documentation and
+exact branch scope before proposing publication. It grants no push, PR or merge.
+
+The 30-second limit requires hard whole-observer completion, including in-flight
+work and cleanup. Shared deadline propagation/enforcement is NOT_ESTABLISHED;
+DL-06-03 repeated live observation remains BLOCKED until separately authorized
+enforcement is implemented and proven, with trusted failure classification also
+required. `HARD_WHOLE_OBSERVER_COMPLETION_LIMIT_SECONDS = 30`,
+`LIVE_HARD_DEADLINE_ENFORCEMENT_IMPLEMENTED = NO`, and
+`HARD_SESSION_DEADLINE_RUNTIME_PROVEN = NO`; this is not an admission-window-only
+limit. `DL_06_02_AUTHORIZED = NO` and `DL_06_03_REPEATED_LIVE_OBSERVER_READY = NO`.
+The deadline blocker applies to repeated live observation; a single snapshot
+still needs separate exact authority and its own time budget. No live authority,
+readiness, automatic failover, configuration mutation or provider/model authority
+is granted. DL-06-01 implements no runtime loop, authorization schedule or retry.
+The future preauthorized schedule and trusted failure-classification requirements
+remain unimplemented live gates. DL-06-04 is NOT_STARTED / OPTIONAL.
+Historical Stage-2 proof and closure semantics remain unchanged.
 
 `DEFERRED_SECURITY_RESEARCH_BLOCKED` is not a Security PASS, completion,
 activation, or integration claim. Detailed experimental research evidence is
@@ -570,18 +621,20 @@ future capabilities stay behind their separate authorization and safety gates.
   acceptance gates.
 - Address Node/NVM coexistence only if a later environment-maintenance task
   requires it.
-- DL-05 Owner acceptance and canonical reconciliation are complete for the
-  bounded offline MVP. Future documentation publication requires separate
-  authority. DL-06's execution contract is not established and requires separate
-  future specification/readiness and exact Owner authorization.
+- DL-05 remains accepted. DL-06-01 acceptance documentation is reconciled locally;
+  publication readiness review requires separate Owner authorization. DL-06-02
+  is NOT_AUTHORIZED and DL-06-03 remains blocked; the live execution contract is
+  NOT_ESTABLISHED. Offline acceptance grants no live authority.
 - P3 remains OPEN_NON_BLOCKING: DL-05 does not use the affected wrapper, Safe CI
   validity is unaffected, and remediation was not required before acceptance.
   The seven retained Next.js tracing warnings remain non-blocking maintenance
   items. These findings remain open; no further Lab1/Lab2 operation is authorized.
-- Keep the post-merge Safe CI maintenance findings OPEN: npm has 5
+- Keep the historical post-merge Safe CI maintenance findings OPEN: that run reported 5
   vulnerabilities (2 moderate, 2 high, 1 critical), and Next.js emitted 7
   filesystem-tracing warnings. These are non-Stage-2-blocking maintenance items;
-  the Stage-2 closure candidate does not resolve them.
+  the Stage-2 closure candidate does not resolve them. The later DL-06-01
+  environment-restoration observation reported 12 vulnerabilities, retained above;
+  these are distinct observations, not evidence of remediation.
 
 Current limitations also include variable local report availability, no
 guarantee that every clean checkout contains generated evidence, and a

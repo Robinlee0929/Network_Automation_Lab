@@ -33,7 +33,11 @@ remain non-blocking maintenance items.
 | DL-03 | ACCEPTED |
 | DL-04 | ACCEPTED |
 | DL-05 | ACCEPTED; bounded offline MVP integration and acceptance complete |
-| DL-06 | NOT ESTABLISHED; requires separate future readiness/specification and exact Owner authorization |
+| DL-06-00 | SPECIFICATION_ESTABLISHED |
+| DL-06-01 | OWNER_ACCEPTED_OFFLINE_TRANSITION_CONTRACT; local, NOT_PUBLISHED |
+| DL-06-02 | NOT_AUTHORIZED |
+| DL-06-03 | BLOCKED_PENDING_HARD_DEADLINE_PROPAGATION_AND_ENFORCEMENT; trusted failure classification also unproven |
+| DL-06-04 | NOT_STARTED / OPTIONAL |
 
 `DL_05_OWNER_ACCEPTANCE = ACCEPTED`, `DL_05_ACCEPTANCE_RESULT = PASS`,
 `DL_05_ACCEPTED = YES`, `COMPLETE_DUAL_LAB_MVP = YES`, and
@@ -56,6 +60,60 @@ Owner authorization.
 provider/model integration, production readiness, and standing Lab1/Lab2 access
 remain unauthorized. Future live work needs separate exact authority. Historical
 Stage-2 proof and closure semantics remain unchanged; Stage 2 is not reopened.
+
+The [DL-06-00 readiness specification](dual_lab_vrrp_ai_query_mvp.md#dl-06-00-transition-observer-readiness-and-specification)
+is established at `d481dfb41e9a5547ad2b2dd12f5e6a21fc8cfd5b`.
+**DL-06-01 implementation `016ef20f8bfa0c91be4e68195a98037ad03af1de` is
+Owner accepted / PASS for `OFFLINE_TRANSITION_CONTRACT_ONLY`.** Fresh governed
+review passed and the separate acceptance decision passed all seven predicates.
+The [canonical DL-06-01 record](dual_lab_vrrp_ai_query_mvp.md#dl-06-01-accepted-offline-transition-contract)
+retains source/test hashes and decision provenance. Its
+`dual-lab-vrrp-transition.v1` schema has exactly nine fact kinds, reusing accepted
+DL-03 summaries for finite ordered evidence and deterministic facts. Lab1-then-Lab2
+windows remain sequential; gaps never supply missing roles or justify
+`MASTER_TARGET_CHANGED` through insufficient evidence. Day35 remains the historical
+operator-triggered real-device proof through direct commands/Paramiko.
+DL-06-01 is offline and has no live transport or Day35 runtime.
+
+**Accepted fresh governed review evidence:** 198 focused, 850 Dual-Lab,
+1,892 Stage-2 and 4,870 full pytest tests passed; the full run had zero skipped,
+failed or errors. Accepted report-index evidence is WARN: 13 optional missing,
+zero failures, mandatory missing or unknown. These application tests were not
+rerun by documentation reconciliation. Zero material findings remain unresolved.
+
+The three retained findings are 12 npm-reported vulnerabilities
+(`OPEN_NON_BLOCKING_DEPENDENCY_MAINTENANCE`), four redundant parametrizations
+(`OPEN_NON_BLOCKING_TEST_MAINTENANCE`), and oversize-test precision
+(`OPEN_NON_BLOCKING_TEST_PRECISION`). The oversized test is also invalid JSON;
+the fresh review independently proved pre-decoder rejection by both parsers.
+Package manifest/lock identities were unchanged by the candidate. The dependency
+finding does not declare the vulnerabilities harmless generally; no finding is repaired.
+
+`DL_06_01_PUBLICATION_STATUS = NOT_PUBLISHED` and
+`REMOTE_MAIN_CONTAINS_DL_06_01 = NO`; authoritative remote main remains
+`5431f7491015fe7ab2ae9227bc6a48814356641e`. This local documentation descendant
+preserves the accepted implementation identity and does not inherit its review
+or application validation. The next separately required Owner decision is
+`AUTHORIZE_DL_06_01_PUBLICATION_READINESS_REVIEW`, limited to documentation and
+exact branch-scope review before proposing publication. Push, PR and merge are
+separate operations and are not performed here.
+
+The 30-second bound is hard whole-observer completion, including in-flight work
+and cleanup. Shared deadline propagation/enforcement is NOT_ESTABLISHED, so
+DL-06-03 repeated live observation remains BLOCKED until separately authorized
+enforcement is implemented and proven; trusted failure classification is also
+required. `HARD_WHOLE_OBSERVER_COMPLETION_LIMIT_SECONDS = 30`,
+`LIVE_HARD_DEADLINE_ENFORCEMENT_IMPLEMENTED = NO`, and
+`HARD_SESSION_DEADLINE_RUNTIME_PROVEN = NO`; the bound must not become an
+admission-window-only limit. `DL_06_02_AUTHORIZED = NO` and
+`DL_06_03_REPEATED_LIVE_OBSERVER_READY = NO`. A separately authorized single
+snapshot may use its own explicit time budget; it cannot prove repeated-observer
+readiness. No live device was accessed by this reconciliation, and no live,
+automatic failover, configuration mutation or provider/model authority is granted.
+DL-06-01 implements no runtime loop, authorization schedule, retry or authority
+reuse. The future PREAUTHORIZED_ONE_SHOT_SNAPSHOT_SCHEDULE and trusted distinction
+between observation failures and session-integrity failures remain live gates;
+opaque failures cannot authorize continuation.
 
 ## 1. Purpose
 
@@ -431,8 +489,12 @@ and seven pre-existing build warnings remain maintenance items.
 `DL_05_OWNER_ACCEPTANCE = ACCEPTED`, `DL_05_ACCEPTANCE_RESULT = PASS`,
 `DL_05_ACCEPTED = YES`, `COMPLETE_DUAL_LAB_MVP = YES`, and
 `OFFLINE_DUAL_LAB_MVP_ACCEPTED = YES`.
-No live authority or readiness is granted. DL-06 remains NOT_ESTABLISHED and
-requires separate future readiness/specification and exact Owner authorization.
+No live authority or readiness is granted. DL-06-00 readiness/specification is
+established, and DL-06-01 is Owner accepted for the offline transition contract.
+The accepted implementation remains local and NOT_PUBLISHED; DL-06's execution
+contract remains NOT_ESTABLISHED. The next Owner decision is publication readiness
+review only. DL-06-02 is NOT_AUTHORIZED and DL-06-03 remains blocked by unproven
+hard whole-observer deadline enforcement and trusted failure classification.
 Stage 3 remains NOT STARTED. Further live access or scope expansion requires
 the applicable capability gates and separate exact Owner approval.
 
