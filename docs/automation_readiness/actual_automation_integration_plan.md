@@ -34,7 +34,7 @@ remain non-blocking maintenance items.
 | DL-04 | ACCEPTED |
 | DL-05 | ACCEPTED; bounded offline MVP integration and acceptance complete |
 | DL-06-00 | SPECIFICATION_ESTABLISHED |
-| DL-06-01 | OWNER_ACCEPTED_OFFLINE_TRANSITION_CONTRACT; local, NOT_PUBLISHED |
+| DL-06-01 | OWNER_ACCEPTED_AND_PUBLISHED_OFFLINE_TRANSITION_CONTRACT; PR #95; pre/post-merge Safe CI PASS |
 | DL-06-02 | NOT_AUTHORIZED |
 | DL-06-03 | BLOCKED_PENDING_HARD_DEADLINE_PROPAGATION_AND_ENFORCEMENT; trusted failure classification also unproven |
 | DL-06-04 | NOT_STARTED / OPTIONAL |
@@ -87,16 +87,42 @@ The three retained findings are 12 npm-reported vulnerabilities
 (`OPEN_NON_BLOCKING_TEST_PRECISION`). The oversized test is also invalid JSON;
 the fresh review independently proved pre-decoder rejection by both parsers.
 Package manifest/lock identities were unchanged by the candidate. The dependency
-finding does not declare the vulnerabilities harmless generally; no finding is repaired.
+finding does not declare the vulnerabilities harmless generally; none of these
+three retained findings is repaired.
 
-`DL_06_01_PUBLICATION_STATUS = NOT_PUBLISHED` and
-`REMOTE_MAIN_CONTAINS_DL_06_01 = NO`; authoritative remote main remains
-`5431f7491015fe7ab2ae9227bc6a48814356641e`. This local documentation descendant
-preserves the accepted implementation identity and does not inherit its review
-or application validation. The next separately required Owner decision is
-`AUTHORIZE_DL_06_01_PUBLICATION_READINESS_REVIEW`, limited to documentation and
-exact branch-scope review before proposing publication. Push, PR and merge are
-separate operations and are not performed here.
+**DL-06-01 is Owner accepted and published to main through
+[PR #95](https://github.com/Robinlee0929/Network_Automation_Lab/pull/95).**
+`DL_06_01_OWNER_ACCEPTED = YES`,
+`DL_06_01_PUBLICATION_STATUS = PUBLISHED_TO_MAIN`, and
+`REMOTE_MAIN_CONTAINS_DL_06_01 = YES`.
+`DL_06_01_MERGED_PR = 95`; both `DL_06_01_MERGE_COMMIT` and
+`DL_06_01_PUBLIC_MAIN_SHA` are `d2cbf5b885ba9bfda923258fbb026ef7f627f376`.
+The accepted implementation identity remains unchanged.
+
+[Pre-merge Safe CI](https://github.com/Robinlee0929/Network_Automation_Lab/actions/runs/37448715570)
+and [post-merge Safe CI](https://github.com/Robinlee0929/Network_Automation_Lab/actions/runs/37596390147)
+passed. The latter tested the actual merge SHA with all 12 mandatory steps
+successful: 9 Node files / 128 tests, typecheck, lint, build and 21/21 static pages;
+Python 4868 passed / 2 reviewed Win32-only skips / 0 failed / 0 errors.
+Report-index was WARN with 14 total, 1 PASS, 13 optional missing and zero
+mandatory missing, failures or unknowns; the tracked-diff check passed.
+These are retained hosted results, not application tests rerun by reconciliation.
+
+The [canonical publication and evidence record](dual_lab_vrrp_ai_query_mvp.md#published-integration-and-safe-ci-evidence)
+retains exact head/base/test/merge identities and equal pre/post-merge trees.
+The [external receipt record](dual_lab_vrrp_ai_query_mvp.md#external-post-merge-receipt-and-resolved-status-finding)
+binds `DL06_01_POSTMERGE_SAFE_CI_RECEIPT` and its supporting index by SHA256:
+27 read-only files, supporting hashes PASS, provenance PASS, zero unsupported
+claims. The three DL-06 findings remain open; hosted npm reported 12 vulnerabilities
+(2 moderate, 9 high, 1 critical). Seven tracing warnings remain separate
+`RETAINED_NON_BLOCKING_MAINTENANCE` items; no harmlessness or remediation is claimed.
+
+`PUBLICATION_STATUS_DOCUMENTATION_FINDING = RESOLVED_BY_POSTMERGE_RECONCILIATION`.
+This new documentation commit remains local and does not inherit the public
+merge's application CI. The next required Owner decision is
+`AUTHORIZE_DL_06_01_POSTMERGE_DOCUMENTATION_PUBLICATION_READINESS_REVIEW`:
+read-only review of this documentation diff before separately authorized
+publication. It does not authorize push, PR, merge or DL-06-02.
 
 The 30-second bound is hard whole-observer completion, including in-flight work
 and cleanup. Shared deadline propagation/enforcement is NOT_ESTABLISHED, so
@@ -491,9 +517,10 @@ and seven pre-existing build warnings remain maintenance items.
 `OFFLINE_DUAL_LAB_MVP_ACCEPTED = YES`.
 No live authority or readiness is granted. DL-06-00 readiness/specification is
 established, and DL-06-01 is Owner accepted for the offline transition contract.
-The accepted implementation remains local and NOT_PUBLISHED; DL-06's execution
-contract remains NOT_ESTABLISHED. The next Owner decision is publication readiness
-review only. DL-06-02 is NOT_AUTHORIZED and DL-06-03 remains blocked by unproven
+The accepted implementation is published to main through PR #95 with pre/post-merge
+Safe CI PASS. This post-merge documentation commit remains local and requires
+separate publication-readiness review; DL-06's execution contract remains
+NOT_ESTABLISHED. DL-06-02 is NOT_AUTHORIZED and DL-06-03 remains blocked by unproven
 hard whole-observer deadline enforcement and trusted failure classification.
 Stage 3 remains NOT STARTED. Further live access or scope expansion requires
 the applicable capability gates and separate exact Owner approval.
