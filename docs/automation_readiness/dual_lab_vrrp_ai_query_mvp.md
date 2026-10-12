@@ -1,12 +1,15 @@
 # Dual-Lab VRRP AI Query MVP: DL-05 and Offline DL-06-01 Accepted
 
 **Current DL-06 decision: DL-06-01 is Owner accepted / PASS for the offline
-transition contract, local and NOT_PUBLISHED.** Specification
+transition contract, published to main through PR #95 with pre/post-merge
+Safe CI PASS.** Specification
 `d481dfb41e9a5547ad2b2dd12f5e6a21fc8cfd5b` and accepted implementation
 `016ef20f8bfa0c91be4e68195a98037ad03af1de` remain distinct from this documentation
 descendant. The [DL-06-01 acceptance record](#dl-06-01-accepted-offline-transition-contract)
-records the completed review and decision. DL-06-02 is NOT_AUTHORIZED;
-DL-06-03 remains blocked. No live authority or readiness is granted.
+records the completed review and decision, plus verified integration at
+`d2cbf5b885ba9bfda923258fbb026ef7f627f376`. This post-merge documentation
+reconciliation remains a separate local commit pending publication review.
+DL-06-02 is NOT_AUTHORIZED; DL-06-03 remains blocked. No live authority or readiness is granted.
 
 **Decision summary: DL-05 is ACCEPTED / PASS; the bounded offline Dual-Lab MVP
 is complete.** The separate Owner acceptance decision accepted implementation
@@ -50,11 +53,12 @@ The DL-03 specification resolved the readiness
 review's `BLOCKED_CANONICAL_SCOPE_AMBIGUITY`; the separately authorized
 implementation, review, and acceptance are recorded below.
 The prior DL-04 post-acceptance reconciliation recorded that completed decision.
-The current Owner authorization permits post-acceptance status reconciliation in
+The current Owner authorization permits post-merge status reconciliation in
 this record, README, and the automation plan, followed by one local documentation
-commit directly above accepted DL-06-01 implementation
-`016ef20f8bfa0c91be4e68195a98037ad03af1de`.
-It records the completed DL-06-01 decision without repeating acceptance or review.
+commit directly above integrated main
+`d2cbf5b885ba9bfda923258fbb026ef7f627f376`.
+It records completed DL-06-01 acceptance, publication and hosted CI evidence
+without repeating application validation, acceptance or governed review.
 No source, test, workflow, dependency, sealed-evidence, external-wrapper, or
 Stage-2 closure change is authorized. No application validation, Safe CI rerun,
 push, merge, branch deletion, P3 remediation, or live operation is performed.
@@ -1508,8 +1512,10 @@ NEXT_REQUIRED_OWNER_DECISION = AUTHORIZE_BOUNDED_DL_04_CLOSURE_EXECUTION
 **Decision: Owner acceptance completed ACCEPT / PASS for
 `OFFLINE_TRANSITION_CONTRACT_ONLY`.** The exact implementation below passed
 fresh governed review, then a separate Owner-authorized acceptance decision
-with all seven predicates satisfied. This reconciliation records those completed
-decisions; it does not repeat them or publish the implementation.
+with all seven predicates satisfied. The accepted implementation was subsequently
+published through PR #95 and verified by post-merge Safe CI on the actual merge.
+This reconciliation records those completed decisions and evidence; its own
+local documentation commit requires separate publication review.
 
 ### Exact accepted identities and provenance
 
@@ -1523,7 +1529,9 @@ decisions; it does not repeat them or publish the implementation.
 | Source SHA256 | `9f1f1a39d1576dc4a075018a8cd326b5983308729f1c7f67dbe231d4e5b7dcb2` |
 | Accepted tests | [test_dual_lab_vrrp_transition.py](../../tests/dual_lab/test_dual_lab_vrrp_transition.py) |
 | Test SHA256 | `e357331c4a64468ea4cd4d7d61341fa271ea48a06af56f71594628c2b8f453e5` |
-| Authoritative remote main at reconciliation | `5431f7491015fe7ab2ae9227bc6a48814356641e` |
+| Historical main at post-acceptance reconciliation | `5431f7491015fe7ab2ae9227bc6a48814356641e` |
+| Post-acceptance documentation commit | `9ff347a586b16a42e78eed6df5873e89ed872543` |
+| Public merge / main at post-merge reconciliation | `d2cbf5b885ba9bfda923258fbb026ef7f627f376` |
 
 The candidate added exactly those two files. Accepted predecessors, Stage-2,
 Day35, documentation, workflows, `package.json` and `package-lock.json` were
@@ -1575,14 +1583,16 @@ tests rerun by documentation reconciliation.
 
 | Finding | Evidence and retained status |
 | --- | --- |
-| Dependency maintenance | Environment-restoration npm reported 12 vulnerabilities. The candidate changed neither package manifest nor lockfile. `OPEN_NON_BLOCKING_DEPENDENCY_MAINTENANCE`; this is not a claim that vulnerabilities are harmless generally. |
+| Dependency maintenance | Environment-restoration npm reported 12 vulnerabilities; pre/post-merge hosted npm also reported 12 (2 moderate, 9 high, 1 critical). The candidate changed neither package manifest nor lockfile. `OPEN_NON_BLOCKING_DEPENDENCY_MAINTENANCE`; this is not a claim that vulnerabilities are harmless generally. |
 | Redundant parametrization | Four transition-test parametrizations repeat input coverage. `OPEN_NON_BLOCKING_TEST_MAINTENANCE`; the 198-test count does not imply 198 distinct scenarios. |
 | Oversize-test precision | One oversized-input payload is also invalid JSON. The fresh review independently confirmed both parsers reject oversize input before decoding. `OPEN_NON_BLOCKING_TEST_PRECISION`. |
 
 `UNRESOLVED_MATERIAL_FINDINGS = 0` and `NONBLOCKING_FINDINGS = 3`.
-No finding is repaired by acceptance or this documentation task. Earlier
-dependency observations, P3 and seven retained build warnings remain historical
-or predecessor maintenance evidence; they are not silently replaced or resolved.
+None of these three findings is repaired by acceptance or this documentation task.
+Seven equivalent dynamic-filesystem tracing warnings remain separately classified
+`RETAINED_NON_BLOCKING_MAINTENANCE`; they are not part of the three-finding count.
+Earlier dependency observations and P3 remain unchanged. Only the separate
+publication-status documentation finding is resolved below.
 
 ### Active slice status and live restrictions
 
@@ -1597,7 +1607,7 @@ DL_06_01_ACCEPTED_IMPLEMENTATION_SHA = 016ef20f8bfa0c91be4e68195a98037ad03af1de
 DL_06_01_ACCEPTANCE_SCOPE = OFFLINE_TRANSITION_CONTRACT_ONLY
 DL_06_01_TRANSITION_SCHEMA = dual-lab-vrrp-transition.v1
 DL_06_01_TRANSITION_FACT_COUNT = 9
-DL_06_OFFLINE_TRANSITION_CONTRACT_STATUS = OWNER_ACCEPTED_OFFLINE_TRANSITION_CONTRACT
+DL_06_OFFLINE_TRANSITION_CONTRACT_STATUS = OWNER_ACCEPTED_AND_PUBLISHED_OFFLINE_TRANSITION_CONTRACT
 DL_06_EXECUTION_CONTRACT_STATUS = NOT_ESTABLISHED
 LIVE_DEVICE_ACCESSED = NO
 LIVE_AUTHORITY_GRANTED = NO
@@ -1613,8 +1623,11 @@ RETRY_IMPLEMENTED = NO
 HARD_WHOLE_OBSERVER_COMPLETION_LIMIT_SECONDS = 30
 LIVE_HARD_DEADLINE_ENFORCEMENT_IMPLEMENTED = NO
 HARD_SESSION_DEADLINE_RUNTIME_PROVEN = NO
-DL_06_01_PUBLICATION_STATUS = NOT_PUBLISHED
-REMOTE_MAIN_CONTAINS_DL_06_01 = NO
+DL_06_01_PUBLICATION_STATUS = PUBLISHED_TO_MAIN
+REMOTE_MAIN_CONTAINS_DL_06_01 = YES
+DL_06_01_MERGED_PR = 95
+DL_06_01_MERGE_COMMIT = d2cbf5b885ba9bfda923258fbb026ef7f627f376
+DL_06_01_PUBLIC_MAIN_SHA = d2cbf5b885ba9bfda923258fbb026ef7f627f376
 ```
 
 These runtime and access statements describe DL-06-01 and this reconciliation;
@@ -1631,27 +1644,148 @@ is also required. The blocker does not prohibit a separately authorized single
 Dual-Lab snapshot with its own time budget. DL-06-02 is not authorized here and
 cannot establish repeated-observer readiness.
 
+### Published integration and Safe CI evidence
+
+**PR #95 is merged; pre-merge and actual-main post-merge Safe CI passed.**
+The publication-readiness review verified the three-commit, five-path branch
+scope before separately authorized push and PR creation. The subsequent
+`DL_06_01_FRESH_SAFE_CI_AND_TESTED_MERGE_CANDIDATE_REVIEW_ONLY` task returned
+PASS. Separate merge authorization then produced the normal two-parent merge
+below. The `DL_06_01_POSTMERGE_SAFE_CI_EVIDENCE_CAPTURE_ONLY` task verified the
+actual merged main checkout, all required results and external evidence.
+These completed task records are in the same conversation; no new acceptance
+or independent-human review is claimed by documentation reconciliation.
+
+Repository: `Robinlee0929/Network_Automation_Lab`.
+[PR #95](https://github.com/Robinlee0929/Network_Automation_Lab/pull/95) is
+CLOSED / MERGED. The accepted implementation remains
+`016ef20f8bfa0c91be4e68195a98037ad03af1de`; the public merge and each documentation
+commit have separate identities.
+
+```text
+PREMERGE_SAFE_CI_RUN_ID = 37448715570
+PREMERGE_SAFE_CI_RUN_ATTEMPT = 1
+PREMERGE_SAFE_CI_EVENT = pull_request
+PREMERGE_SAFE_CI_RESULT = PASS
+PREMERGE_PR_HEAD_SHA = 9ff347a586b16a42e78eed6df5873e89ed872543
+PREMERGE_PR_BASE_SHA = 5431f7491015fe7ab2ae9227bc6a48814356641e
+PREMERGE_TESTED_MERGE_SHA = 621ca9d0539abcef96e0453ebbc96bc9a4dd3f79
+PREMERGE_TESTED_TREE = 79eec8c2cb33092af882dc70543d019ca4f03b01
+POSTMERGE_MAIN_SHA = d2cbf5b885ba9bfda923258fbb026ef7f627f376
+POSTMERGE_MAIN_PARENT_1 = 5431f7491015fe7ab2ae9227bc6a48814356641e
+POSTMERGE_MAIN_PARENT_2 = 9ff347a586b16a42e78eed6df5873e89ed872543
+POSTMERGE_MAIN_TREE = 79eec8c2cb33092af882dc70543d019ca4f03b01
+POSTMERGE_SAFE_CI_RUN_ID = 37596390147
+POSTMERGE_SAFE_CI_RUN_ATTEMPT = 1
+POSTMERGE_SAFE_CI_EVENT = push
+POSTMERGE_SAFE_CI_RESULT = PASS
+POSTMERGE_HOSTED_SAFE_CI_EVIDENCE = PASS
+POSTMERGE_ACTUAL_CHECKOUT_SHA = d2cbf5b885ba9bfda923258fbb026ef7f627f376
+POSTMERGE_ACTUAL_CHECKOUT_SHA_MATCH = YES
+POSTMERGE_ACTUAL_CHECKOUT_REF = refs/remotes/origin/main
+POSTMERGE_JOB_ID = 112709969535
+POSTMERGE_MANDATORY_STEPS = 12 success / 0 failed / 0 cancelled / 0 skipped
+POSTMERGE_TRACKED_DIFF_RESULT = PASS
+PREMERGE_POSTMERGE_TREE_MATCH = YES
+PREMERGE_POSTMERGE_VALIDATION_EQUIVALENT = YES
+```
+
+The [pre-merge run](https://github.com/Robinlee0929/Network_Automation_Lab/actions/runs/37448715570)
+tested the synthetic PR merge, distinct from its PR-head metadata. The normal
+merge produced a different commit SHA while preserving that exact reviewed tree.
+The [post-merge run](https://github.com/Robinlee0929/Network_Automation_Lab/actions/runs/37596390147)
+was `push` to `main`, attempt 1, completed/success. Its checkout logs show the
+fetch into `refs/remotes/origin/main` and `git log -1 --format=%H` returning the
+actual main SHA above. Run metadata alone was not used as checkout proof.
+The [required job](https://github.com/Robinlee0929/Network_Automation_Lab/actions/runs/37596390147/job/112709969535)
+passed every mandatory step. Safe CI workflow ID `311663833`, path
+`.github/workflows/safe-ci.yml`, and blob
+`717eb0fc4cd54f1c1554137327c26cd2fe82e610` were unchanged.
+
+These are retained hosted results for the actual merge, not tests rerun by this
+documentation task or validation inherited by its new documentation commit:
+
+| Hosted gate | Post-merge result |
+| --- | --- |
+| Typecheck / zero-warning lint | PASS / PASS |
+| Node unit tests | 9 files passed; 128 tests passed |
+| Next.js build / static pages | PASS; 21/21 generated |
+| Full Python suite | Linux, Python 3.13.15, pytest 8.4.2; 4870 outcomes: 4868 passed, 2 skipped, 0 failed, 0 errors |
+| DL-06-01 tests in full suite | 198 passed, 0 skipped |
+| Report-index | WARN; 14 total, 1 PASS, 13 explicitly optional missing; 0 mandatory missing, failures, warn items or unknowns |
+| Tracked diff | `git diff --exit-code` PASS; validation changed no tracked files |
+| npm maintenance observation | 12 vulnerabilities: 2 moderate, 9 high, 1 critical; dependency graph unchanged by DL-06-01 |
+| Build maintenance | 7 dynamic-filesystem tracing warnings, equivalent class and locations to the reviewed baseline; retained separately from the three DL-06 findings |
+
+The two skips in `tests/stage2/test_live_authorization_owner_trust_root.py` are
+`test_disposable_regular_file_is_accepted_by_exact_native_path`
+(reason `requires the reviewed Win32 APIs`) and
+`test_confirmed_trailing_dot_alias_is_rejected_as_noncanonical`
+(reason `requires ordinary Win32 path aliases`). Both predicates are
+`os.name != "nt"`. Hosted progress, immutable source ordering and collection
+configuration jointly established the exact identities; unexplained skips are
+zero. The logs have no `-rs` reason records. These tests did not execute on Linux,
+and this hosted evidence supplies no fresh Windows coverage.
+
+### External post-merge receipt and resolved status finding
+
+```text
+POSTMERGE_RECEIPT_IDENTITY = DL06_01_POSTMERGE_SAFE_CI_RECEIPT
+POSTMERGE_RECEIPT_SHA256 = 365b6bec3f6cf59845d4f26a1d9c139e2a94177485cfac9377fbf80feb77aaa7
+POSTMERGE_SUPPORTING_INDEX_IDENTITY = supporting-evidence-index.json
+POSTMERGE_SUPPORTING_INDEX_SHA256 = 03b8984687d305bd81865109caedcb932642e93a4fba1d471c7a8871e6309edc
+POSTMERGE_EVIDENCE_BUNDLE_FILE_COUNT = 27
+POSTMERGE_EVIDENCE_BUNDLE_READ_ONLY_FILE_COUNT = 27
+POSTMERGE_SUPPORTING_FILE_COUNT = 25
+POSTMERGE_SUPPORTING_HASH_RESULT = PASS
+EVIDENCE_PROVENANCE_RESULT = PASS
+UNSUPPORTED_RECEIPT_CLAIM_COUNT = 0
+PUBLICATION_STATUS_DOCUMENTATION_FINDING = RESOLVED_BY_POSTMERGE_RECONCILIATION
+```
+
+The external receipt retains sanitized provenance, source identities, checkout
+proof, job/step results and supporting evidence. Its hashes and all supporting
+hashes were rechecked for this reconciliation without modifying the bundle.
+No private retention paths or raw authentication material are published here.
+Read-only attributes and hashes are neither a cryptographic signer nor a claim
+of tamper-proof storage. No separate canonical pre-merge receipt hash is claimed;
+the pre-merge review and retained supporting evidence identify that run.
+
+The pre-merge review's `OPEN_NON_BLOCKING_DOCUMENTATION_STATUS` finding concerned
+publication wording that lagged branch publication and later merge. This
+reconciliation resolves that wording consistently in this record, README and
+the automation plan. It does not resolve any of the three retained DL-06
+findings, the seven build warnings or predecessor P3.
+
 ### Local reconciliation and next Owner decision
 
-The local documentation commit directly descends from the accepted implementation
-and uses message `Record DL-06-01 acceptance status`. Its actual SHA and parent
-are reported after commit; its identity never replaces the accepted implementation
-SHA or inherits that implementation's application tests or review. Authoritative
-public main remains the verified baseline above and contains neither accepted
-transition file. No push, PR or merge is performed by this task.
+Historically, documentation commit
+`9ff347a586b16a42e78eed6df5873e89ed872543`, message
+`Record DL-06-01 acceptance status`, directly followed the accepted implementation
+and recorded its then-local publication state. Publication-readiness review,
+PR #95, merge and hosted evidence capture subsequently completed under separate
+authorizations. That earlier next-action wording is superseded by this record.
 
-Documentation validation covers identity/status consistency, links, readability,
-protected-file integrity and whitespace. Repository-standard report-index is
-run separately as a documentation check, with optional-only WARN acceptable;
+The new local documentation commit directly descends from public merge
+`d2cbf5b885ba9bfda923258fbb026ef7f627f376` and uses message
+`Record DL-06-01 post-merge status`. Its actual SHA and parent are reported after
+commit. It records the already-published implementation and remains a separate
+local documentation change; it does not inherit the merge's application CI.
+No push, PR creation, merge or branch deletion is performed by this task.
+
+Documentation validation covers identity/status consistency, links/anchors,
+receipt/index integrity, readability, protected-file hashes, private-path
+exclusion, stale-status removal and whitespace. Repository-standard report-index
+runs separately as a documentation check, with optional-only WARN acceptable;
 its actual result is reported by this task. Full pytest and the application test
 matrix are not rerun. No new implementation, live proof or acceptance occurs.
 
-Following the established separation of documentation and publication authority,
-the next required Owner decision is
-`AUTHORIZE_DL_06_01_PUBLICATION_READINESS_REVIEW`: a read-only review of this
-documentation descendant and the exact branch scope before proposing publication.
-This does not grant push, PR, merge, DL-06-02 or DL-06-03 authority, and that next
-action is not performed by reconciliation.
+Following the established read-only publication-readiness review before separate
+push/PR/CI/merge authority, the next required Owner decision is
+`AUTHORIZE_DL_06_01_POSTMERGE_DOCUMENTATION_PUBLICATION_READINESS_REVIEW`.
+This applies only to the new documentation commit and its exact diff from the
+verified public merge. It grants no publication or live authority, starts no
+DL-06-02 work and is not executed by this reconciliation.
 
 ## DL-06-00 transition observer readiness and specification
 
@@ -2075,7 +2209,7 @@ occurs outside observer control and grants no automatic recovery action.
 | Slice | Bounded purpose | Gate / current status |
 | --- | --- | --- |
 | DL-06-00 | Day35 review and this canonical readiness/specification | SPECIFICATION_ESTABLISHED; no live grant. |
-| DL-06-01 | Offline outer contract and deterministic derivation tests | OWNER_ACCEPTED_OFFLINE_TRANSITION_CONTRACT; local, NOT_PUBLISHED; zero runtime calls. |
+| DL-06-01 | Offline outer contract and deterministic derivation tests | OWNER_ACCEPTED_AND_PUBLISHED_OFFLINE_TRANSITION_CONTRACT; PR #95 merged; pre/post-merge Safe CI PASS; zero runtime calls. |
 | DL-06-02 | Current-baseline single live Dual-Lab snapshot proof | NOT_AUTHORIZED; needs separate exact Owner authorization, baseline verification, trusted deployment and fresh one-shot approvals. One Lab1 invocation then one Lab2; no loop, failover or mutation. |
 | DL-06-03 | Bounded transition observer with manual operator event | BLOCKED_PENDING_HARD_DEADLINE_PROPAGATION_AND_ENFORCEMENT; separate implementation/review/live gates, single-snapshot proof and trusted observation-versus-integrity failure classification also required. |
 | DL-06-04 | Optional presentation of validated timeline | NOT_STARTED / OPTIONAL; not required for observer completeness; real provider/model use needs separate authority. |

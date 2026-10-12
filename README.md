@@ -494,7 +494,7 @@ release lanes; they are not performed by documentation-only changes.
 | Stage-1 Read-only Lab Integration Planning | Historical planning-entry record; see the Stage-2 closure candidate |
 | Stage-2 bounded MikroTik VRRP validation | Lab1 historical proof retained; Lab2 proof PASS/CLOSED on repository baseline `ea73196281e38a01af7bf959cc5e1bc60b0b2499`; persistent Lab2 startup reconstruction and independent binding review PASS; overall Stage 2 is a **CLOSURE CANDIDATE** |
 | Dual-Lab AI Query | **DL-02, DL-03, DL-04, and DL-05 accepted; bounded offline MVP complete**; PR #93 merged; pre/post-merge Safe CI PASS, fresh exact-SHA review PASS, Owner acceptance ACCEPT / PASS; 0 unresolved material findings; P3 open/non-blocking; 7 maintenance build warnings retained; no live authority |
-| DL-06 offline transition contract | **DL-06-00 specification established; DL-06-01 Owner accepted / PASS, local and NOT_PUBLISHED**; 0 unresolved material findings; 3 retained non-blocking findings; DL-06-02 NOT_AUTHORIZED; DL-06-03 BLOCKED; no live authority |
+| DL-06 offline transition contract | **DL-06-00 specification established; DL-06-01 Owner accepted / PASS and published to main through PR #95; pre/post-merge Safe CI PASS**; 0 unresolved material findings; 3 retained non-blocking findings; DL-06-02 NOT_AUTHORIZED; DL-06-03 BLOCKED; no live authority |
 | Stage 3 | **NOT STARTED / requires separate Owner authorization** |
 | Canonical reviewer interface | Flask dashboard on `127.0.0.1:5000` |
 | Secondary Next.js interface | Available as a bounded Stage-0 evidence surface |
@@ -574,15 +574,42 @@ four redundant parametrizations (`OPEN_NON_BLOCKING_TEST_MAINTENANCE`), and an
 oversize test that also uses invalid JSON (`OPEN_NON_BLOCKING_TEST_PRECISION`).
 The fresh review separately proved rejection before decoding for both parsers.
 The candidate changed neither package manifest nor lockfile; this does not
-declare dependency vulnerabilities harmless generally. No finding is repaired here.
+declare dependency vulnerabilities harmless generally. None of these three retained
+findings is repaired here.
 
-The accepted implementation remains local: `DL_06_01_PUBLICATION_STATUS = NOT_PUBLISHED` and
-`REMOTE_MAIN_CONTAINS_DL_06_01 = NO`, verified against authoritative remote
-`main@5431f7491015fe7ab2ae9227bc6a48814356641e`. This documentation descendant
-does not replace the accepted implementation or inherit its test/review result.
-The next separately required Owner decision is
-`AUTHORIZE_DL_06_01_PUBLICATION_READINESS_REVIEW`: review the documentation and
-exact branch scope before proposing publication. It grants no push, PR or merge.
+**DL-06-01 is Owner accepted and published to main through
+[PR #95](https://github.com/Robinlee0929/Network_Automation_Lab/pull/95).**
+`DL_06_01_OWNER_ACCEPTED = YES`,
+`DL_06_01_PUBLICATION_STATUS = PUBLISHED_TO_MAIN`, and
+`REMOTE_MAIN_CONTAINS_DL_06_01 = YES`.
+`DL_06_01_MERGED_PR = 95`; both `DL_06_01_MERGE_COMMIT` and
+`DL_06_01_PUBLIC_MAIN_SHA` are `d2cbf5b885ba9bfda923258fbb026ef7f627f376`.
+The accepted implementation identity remains unchanged.
+
+[Pre-merge Safe CI](https://github.com/Robinlee0929/Network_Automation_Lab/actions/runs/37448715570)
+and [post-merge Safe CI](https://github.com/Robinlee0929/Network_Automation_Lab/actions/runs/37596390147)
+passed. The latter tested the actual merge SHA with all 12 mandatory steps
+successful: 9 Node files / 128 tests, typecheck, lint, build and 21/21 static pages;
+Python 4868 passed / 2 reviewed Win32-only skips / 0 failed / 0 errors.
+Report-index was WARN with 14 total, 1 PASS, 13 optional missing and zero
+mandatory missing, failures or unknowns; the tracked-diff check passed.
+These are retained hosted results, not application tests rerun by reconciliation.
+
+The [canonical publication and evidence record](docs/automation_readiness/dual_lab_vrrp_ai_query_mvp.md#published-integration-and-safe-ci-evidence)
+retains exact head/base/test/merge identities and equal pre/post-merge trees.
+The [external receipt record](docs/automation_readiness/dual_lab_vrrp_ai_query_mvp.md#external-post-merge-receipt-and-resolved-status-finding)
+binds `DL06_01_POSTMERGE_SAFE_CI_RECEIPT` and its supporting index by SHA256:
+27 read-only files, supporting hashes PASS, provenance PASS, zero unsupported
+claims. The three DL-06 findings remain open; hosted npm reported 12 vulnerabilities
+(2 moderate, 9 high, 1 critical). Seven tracing warnings remain separate
+`RETAINED_NON_BLOCKING_MAINTENANCE` items; no harmlessness or remediation is claimed.
+
+`PUBLICATION_STATUS_DOCUMENTATION_FINDING = RESOLVED_BY_POSTMERGE_RECONCILIATION`.
+This new documentation commit remains local and does not inherit the public
+merge's application CI. The next required Owner decision is
+`AUTHORIZE_DL_06_01_POSTMERGE_DOCUMENTATION_PUBLICATION_READINESS_REVIEW`:
+read-only review of this documentation diff before separately authorized
+publication. It does not authorize push, PR, merge or DL-06-02.
 
 The 30-second limit requires hard whole-observer completion, including in-flight
 work and cleanup. Shared deadline propagation/enforcement is NOT_ESTABLISHED;
@@ -621,9 +648,10 @@ future capabilities stay behind their separate authorization and safety gates.
   acceptance gates.
 - Address Node/NVM coexistence only if a later environment-maintenance task
   requires it.
-- DL-05 remains accepted. DL-06-01 acceptance documentation is reconciled locally;
-  publication readiness review requires separate Owner authorization. DL-06-02
-  is NOT_AUTHORIZED and DL-06-03 remains blocked; the live execution contract is
+- DL-05 remains accepted. DL-06-01 is Owner accepted and published to main;
+  this post-merge documentation commit needs separate publication-readiness review.
+  DL-06-02 is NOT_AUTHORIZED and DL-06-03 remains blocked; the live execution
+  contract is
   NOT_ESTABLISHED. Offline acceptance grants no live authority.
 - P3 remains OPEN_NON_BLOCKING: DL-05 does not use the affected wrapper, Safe CI
   validity is unaffected, and remediation was not required before acceptance.
