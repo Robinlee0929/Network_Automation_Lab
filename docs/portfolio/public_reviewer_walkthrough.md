@@ -65,6 +65,13 @@ The dashboard walkthrough below stays offline.
 
 ## Suggested Reading Order
 
+For an offline manual-lab example, read the
+[2026-10-20 Manual VRRP Failover / Recovery summary](manual_vrrp_failover_20261020.md)
+(中英文摘要). It records **MANUAL PASS_WITH_PACKET_LOSS**, distinguishes original
+inputs from Owner-reported role observations, and requires no device commands.
+This external manual result is separate from historical Day35 and DL-06-02
+official Live Proof; it does not change their formal decisions or grant live authority.
+
 1. `README.md`
 2. `AGENTS.md`
 3. `docs/portfolio/public_reviewer_walkthrough.md`
