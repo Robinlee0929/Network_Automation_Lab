@@ -4,8 +4,11 @@
 Owner-authorized MikroTik Lab1 VRRP proof remains accepted, and a later,
 separately authorized Lab2 one-shot proof passed through the same target-aware
 runtime. Persistent Lab2 startup bindings, fresh-process reconstruction, and
-their independent review also passed. Final Stage-2 closure still requires the
-separate independent closure review and remote Safe CI. The default public
+their independent review also passed. The 2026-11-08 prospective candidate
+preserves the historical PR #92 declaration and the unresolved pre-commit
+review provenance. Final Stage-2 closure requires the unchanged pre-commit
+review, commit/push, exact-commit Safe CI, and independent post-CI review
+sequence in the [closure record](stage2_formal_closure.md). The default public
 review path remains Stage-0 offline evidence browsing. Stage 3 is **NOT
 STARTED / requires separate Owner authorization**.
 
@@ -234,8 +237,16 @@ Exit gate:
 
 Status: **CLOSURE CANDIDATE**. The earlier Lab1 proof and later Lab2 proof each
 passed under separate exact Owner authorization. The Lab2 runtime closure gap
-is resolved, but final Stage-2 closure awaits independent closure review and
-remote Safe CI. Neither proof authorizes another attempt.
+is resolved. A new prospective documentation candidate was prepared on
+2026-11-08 from `c09e634100f7d87516838b573e0d29037e422fc7`. Historical PR #92
+merged and declared closure, but its pre-commit independent review remains
+NOT_ESTABLISHED; recovered historical post-CI review is
+PASS_WITH_PROVENANCE_LIMITATION. Those historical records do not satisfy the
+new candidate's Gates. Its pre-commit independent review is PENDING, its commit
+is NOT_CREATED, and its remote Safe CI and post-CI review are NOT_RUN. Follow
+the unchanged [Closure Contract section 13](stage2_formal_closure.md#13-closure-criteria).
+Neither live proof authorizes another attempt, and this prospective work does
+not revalidate the historical technical results or grant deployment authority.
 
 **A-02 FIX-04: Candidate technical acceptance is ACCEPTED_WITH_NOTES;
 Deployment Acceptance remains PENDING.** The Owner designated this Stage-2

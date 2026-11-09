@@ -5,25 +5,33 @@
 Stage 2 is a **CLOSURE CANDIDATE**, not formally closed. The repository's
 bounded S2-RO-01 through S2-RO-11 capability is complete; separate one-shot
 Lab1 and Lab2 live proofs are accepted; and persistent Lab2 target and
-known-host startup reconstruction passed independent review. Final closure
-does not require another local validation run: the accepted local validation
-for this closure candidate is complete. The remaining sequence is an
-independent review of the repaired documentation, a local closure commit, a
-branch push, remote Safe CI, and a subsequent independent post-Safe-CI closure
-review. Only after every remaining gate passes may Stage 2 be marked formally
-closed.
+known-host startup reconstruction passed independent review. This is a new
+prospective documentation candidate prepared on **2026-11-08**, not a backdated
+historical review. Historical PR #92 declared closure, but its pre-commit
+independent review provenance remains NOT_ESTABLISHED. The recovered historical
+post-CI PASS does not resolve that gap or validate this new candidate.
+
+The existing section 13 sequence remains controlling: local candidate and
+offline validation, independent documentation review, a separately authorized
+local commit, branch push, exact-commit remote Safe CI, and independent
+post-Safe-CI closure review. Only after all required Gates pass may the Owner
+make the formal closure decision. This preparation task grants no authority
+for those later actions.
 
 ```text
 STAGE2_STATUS = CLOSURE CANDIDATE
 STAGE2_FORMAL_STATUS = CLOSURE_CANDIDATE
 STAGE2_RUNTIME_CLOSURE_GAP = NONE
-LOCAL_VALIDATION_STATUS = COMPLETED
+LOCAL_VALIDATION_STATUS = PENDING_CURRENT_CANDIDATE_VALIDATION
 REMOTE_SAFE_CI_STATUS = PENDING
 POST_SAFE_CI_CLOSURE_REVIEW_STATUS = PENDING
 READY_FOR_DUAL_LAB_AI_QUERY = NO
 ```
 
-This record does not authorize another live attempt or begin Dual-Lab AI Query.
+This record does not authorize another live attempt or begin any next phase.
+Later, separately accepted offline Dual-Lab work retains its own evidence and
+authority boundaries in the [Integration Plan](actual_automation_integration_plan.md);
+it does not fill this candidate's missing closure Gates.
 
 ## 1. Scope
 
@@ -50,6 +58,55 @@ ea73196281e38a01af7bf959cc5e1bc60b0b2499
 Repository code defines the bounded capability and validation contracts.
 Repository-external Owner-controlled deployment assets supply live pins and
 authority. Those are distinct trust domains.
+
+### Prospective reconciliation: 2026-11-08
+
+The Owner authorized a new six-file candidate from the committed base below.
+The isolated candidate uses the committed Portfolio document; it does not
+import the original worktree's unpublished Portfolio edits.
+
+Historical closure commit `cf216d0870a3019925faee1870790adfdd093a3d` was
+integrated by [PR #92](https://github.com/Robinlee0929/Network_Automation_Lab/pull/92)
+at merge `d57b802e5d7a9cbe1d684c3dd058527685c56d62`.
+The historical [Safe CI run 35743788235](https://github.com/Robinlee0929/Network_Automation_Lab/actions/runs/35743788235)
+passed. PR #92's formal-closure declaration is retained as historical evidence.
+Owner-authorized provenance reconciliation found the original post-CI review
+PASS, but could not establish the preceding independent pre-commit PASS; the
+historical Owner closure instruction was conditional. These are retained
+findings, not a new search or a replacement historical PASS. The full historical
+closure chain therefore remains unconfirmed.
+
+```text
+HISTORICAL_PRE_COMMIT_REVIEW = NOT_ESTABLISHED
+HISTORICAL_POST_CI_REVIEW = PASS_WITH_PROVENANCE_LIMITATION
+PR92_MERGE = COMPLETED
+CURRENT_CANDIDATE_DATE = 2026-11-08
+CURRENT_CANDIDATE_BASE = c09e634100f7d87516838b573e0d29037e422fc7
+CURRENT_PRECOMMIT_INDEPENDENT_REVIEW = PENDING
+CURRENT_CANDIDATE_COMMIT = NOT_CREATED
+CURRENT_CANDIDATE_REMOTE_SAFE_CI = NOT_RUN
+CURRENT_POST_CI_REVIEW = NOT_RUN
+STAGE2_FORMAL_STATUS = CLOSURE_CANDIDATE
+FIX04_CANDIDATE_ACCEPTANCE = ACCEPTED_WITH_NOTES
+FIX04_INACTIVE_RUNTIME_BINDING = NOT_ESTABLISHED
+FIX04_DEPLOYMENT_ACCEPTANCE = PENDING
+ROOT_ACTIVATION_AUTHORIZED = NO
+APPROVAL_SIGNING_AUTHORIZED = NO
+APPROVAL_PLACEMENT_AUTHORIZED = NO
+DL06_02_LIVE_AUTHORIZED = NO
+```
+
+The base includes the separately committed FIX-04 Candidate technical record;
+it is not the new Stage-2 closure commit. FIX-04 Provisioning wrote assets under
+separate authorization; its later acceptance was read-only. Its
+[six Owner acceptance notes](actual_automation_integration_plan.md#stage-2-read-only-lab-adapter)
+remain verbatim and unresolved. Startup Pins comparison does not independently
+prove current Runtime inactivity. FIX-04 Deployment Acceptance remains pending.
+
+The document author prepares and self-validates this candidate. A different
+Agent's pre-commit independent review is a separate, pending task; author
+self-checks do not satisfy it. No historical review is backfilled and no
+section 13 criterion or Gate order is waived.
 
 ## 3. S2-RO-01 through S2-RO-11 completion status
 
@@ -182,13 +239,15 @@ test passed 6/6 and its focused repository tests passed 397/397. Earlier
 S2-RO-10 and S2-RO-11 integration records retain their own focused, Stage-2,
 full-suite, report-index, independent-review, and hosted-CI evidence.
 
-This closure-candidate change separately completed focused Stage-2 validation,
+The historical closure-candidate change separately completed focused Stage-2 validation,
 the complete Stage-2 suite, full pytest, report-index classification, and a
 local documentation consistency/readability check. None of those checks
 contacted Lab1 or Lab2. Remote Safe CI and the independent post-Safe-CI closure
-review remain pending and do not require another local validation run.
+review were still pending at that record's preparation time. The later PR #92
+and provenance findings are recorded above; this paragraph is not current
+candidate evidence.
 
-Local closure-candidate validation completed with the repository code unchanged:
+Historical local closure-candidate validation completed with repository code unchanged:
 
 | Check | Result |
 | --- | --- |
@@ -201,7 +260,21 @@ Local closure-candidate validation completed with the repository code unchanged:
 The authoritative reruns used an isolated Windows pytest temporary directory.
 The full-suite rerun used the existing installed Node dependency tree so Node
 subprocess fixtures could resolve TypeScript; no dependency was installed or
-changed. These are local checks only. Remote Safe CI remains pending.
+changed. These are historical local checks only, not the 2026-11-08 candidate's
+validation or proof that the newly installed Node tree is identical to the
+historical environment.
+
+### Current candidate validation
+
+The prospective candidate requires fresh focused target-registry/composition/
+entrypoint tests, complete `tests/stage2`, full `python -m pytest`, and
+`python network_lab.py --task report-index`, followed by document/Diff checks.
+Each pytest run uses its own new Windows temporary directory outside the
+repository, preserving the replay ledger's repository-exclusion Gate.
+Python 3.13.7 / pytest 8.4.2 and Node 22.23.2 / npm 10.9.8 / TypeScript 5.9.3
+are the verified local environment. No dependency installation or live proof
+is part of this task. Current results and candidate hashes must be recorded
+before handoff; historical counts above are not substitutes.
 
 ## 11. Historical limitations and unresolved provenance
 
@@ -227,15 +300,16 @@ This candidate must not be interpreted to mean that:
 - repository source reachability grants execution authority;
 - generic RouterOS, multi-vendor, arbitrary-command, write, production, fleet,
   or autonomous-remediation capability exists;
-- Dual-Lab AI Query already exists; or
+- this candidate grants Dual-Lab AI Query authority (later offline acceptance
+  has its own separate record); or
 - Stage 2 is formally closed before remote Safe CI and the subsequent
   independent post-Safe-CI closure review.
 
 ## 13. Closure criteria
 
-Local validation for the current closure candidate is complete. Stage 2 may be
-labeled formally closed only after the remaining governance sequence also
-completes. The controlling order is:
+The prospective candidate must satisfy the existing local validation Gates
+with its own evidence. Stage 2 may be labeled formally closed only after the
+full governance sequence completes. The controlling order is unchanged:
 
 ```text
 local closure candidate

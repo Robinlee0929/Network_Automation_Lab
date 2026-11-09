@@ -11,10 +11,24 @@ calls, secrets, or command execution from the dashboard.
 **Stage 2 is a CLOSURE CANDIDATE.** Separate Owner-authorized one-shot
 MikroTik Lab1 and Lab2 VRRP proofs completed through the bounded read-only
 runtime. Persistent Lab2 startup reconstruction also passed independent
-review. Final closure still requires independent closure review and remote
-Safe CI. The results can be explained offline using the
+review. The 2026-11-08 prospective documentation candidate starts from
+`c09e634100f7d87516838b573e0d29037e422fc7`. Historical PR #92 merged and declared
+closure, but its pre-commit independent review provenance remains
+NOT_ESTABLISHED; recovered historical post-CI PASS has a provenance limitation.
+It is not a new-candidate PASS. Pre-commit independent review is PENDING,
+the new commit is NOT_CREATED, and new remote Safe CI/post-CI review are NOT_RUN.
+The existing review -> commit/push -> exact-commit Safe CI -> independent
+post-CI review sequence still controls formal closure. Explain these boundaries
+and the retained technical results offline using the
 [formal closure candidate](../automation_readiness/stage2_formal_closure.md).
 Stage 3 is **NOT STARTED**.
+
+FIX-04 Candidate technical acceptance is ACCEPTED_WITH_NOTES, while Inactive
+Runtime Binding is NOT_ESTABLISHED and Deployment Acceptance remains PENDING.
+Keep the [six Owner acceptance notes](../automation_readiness/actual_automation_integration_plan.md#stage-2-read-only-lab-adapter)
+with this explanation. Startup Pins comparison does not prove Runtime
+inactivity. This walkthrough grants no Root Activation, Approval
+Signing/Placement, NAL Live, or next-phase authority.
 
 ## One-Sentence Project Positioning
 
