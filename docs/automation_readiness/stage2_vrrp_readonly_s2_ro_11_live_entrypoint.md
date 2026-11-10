@@ -7,9 +7,22 @@ runtime. Its implementation and independent security review passed with zero
 unresolved material findings. A later, separately authorized Lab2 one-shot
 invocation also passed and its proof is closed. The entrypoint returns only
 canonical S2-RO-01 evidence bytes or one sanitized failure category. The
-overall Stage-2 status remains **CLOSURE CANDIDATE** under the unchanged
-[section 13 closure sequence](stage2_formal_closure.md#13-closure-criteria).
+overall Stage-2 status is **CLOSED for DOCUMENTATION_ONLY_FIXED_HEAD** following
+the unchanged [section 13 closure sequence](stage2_formal_closure.md#13-closure-criteria).
 
+The Owner approved **DOCUMENTATION_ONLY_FIXED_HEAD** closure on **2026-11-10**
+for `0f774c47b2529a5f93c0b0abd7c245b85e2d61d2`.
+[PR #98](https://github.com/Robinlee0929/Network_Automation_Lab/pull/98) is MERGED
+at main `18fd0d6ce4230e947acdb1d57d5e3a9128c0ccb6`;
+[post-merge Safe CI 42760192089](https://github.com/Robinlee0929/Network_Automation_Lab/actions/runs/42760192089)
+is SUCCESS. The [closure record](stage2_formal_closure.md#decision-summary) separates that fixed decision
+from later publication and retained historical evidence.
+
+The 18 npm-affected groups (including Critical), 7 Build Warnings, and 13
+Optional Missing reports remain unresolved; closure grants no security exemption.
+Next.js restart/deployment requires separate security remediation and validation.
+
+**Historical preparation snapshot — 2026-11-08 (not current status):**
 The 2026-11-08 prospective documentation candidate starts from
 `c09e634100f7d87516838b573e0d29037e422fc7`. Historical PR #92 merged and declared
 closure, but its pre-commit independent review is NOT_ESTABLISHED; recovered
@@ -153,6 +166,9 @@ Raw RouterOS stdout is not published. `running=false` is not independently
 classified as a fault. The proof does not revalidate Lab1 and does not prove
 overall Lab1/Lab2 VRRP pair health.
 
+The following block preserves the earlier Lab2/candidate status. Its Stage-2
+CLOSURE CANDIDATE label is historical, not the current formal decision.
+
 ```text
 LAB2_S2_RO_11_LIVE_PROOF = PASS
 LAB2_LIVE_PROOF_STATUS = CLOSED
@@ -271,4 +287,4 @@ References: [integration gates](actual_automation_integration_plan.md),
 [S2-RO-09](stage2_vrrp_readonly_s2_ro_09_pinned_ssh_transport.md), and
 [S2-RO-10](stage2_vrrp_readonly_s2_ro_10_trusted_runtime_composition.md).
 The consolidated current status is in the
-[Stage-2 formal closure candidate](stage2_formal_closure.md).
+[Stage-2 formal closure record](stage2_formal_closure.md).

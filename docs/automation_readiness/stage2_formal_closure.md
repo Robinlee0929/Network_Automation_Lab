@@ -1,6 +1,59 @@
-# Stage 2 Formal Closure Candidate
+# Stage 2 Formal Closure Record
 
 ## Decision summary
+
+**Stage 2 is CLOSED for DOCUMENTATION_ONLY_FIXED_HEAD.** On 2026-11-10,
+the Owner approved the completed technical results, documentation consistency,
+and accepted validation evidence at the fixed closure commit below. This
+records the existing decision; it does not restart Stage-2 review, waive
+section 13, or approve subsequent commits or deployment.
+
+```text
+OWNER_FORMAL_CLOSURE_DECISION = APPROVED
+OWNER_FORMAL_CLOSURE_DATE = 2026-11-10
+STAGE2_FORMAL_STATUS = CLOSED
+CLOSURE_SCOPE = DOCUMENTATION_ONLY_FIXED_HEAD
+CLOSURE_SHA = 0f774c47b2529a5f93c0b0abd7c245b85e2d61d2
+PR98_STATUS = MERGED
+MAIN_MERGE_SHA = 18fd0d6ce4230e947acdb1d57d5e3a9128c0ccb6
+POST_MERGE_SAFE_CI_RUN = 42760192089
+POST_MERGE_SAFE_CI_RESULT = SUCCESS
+FIX04_CANDIDATE_ACCEPTANCE = ACCEPTED_WITH_NOTES
+FIX04_INACTIVE_RUNTIME_BINDING = NOT_ESTABLISHED
+FIX04_DEPLOYMENT_ACCEPTANCE = PENDING
+HISTORICAL_PRE_COMMIT_REVIEW = NOT_ESTABLISHED
+STAGE3_AUTHORIZED = NO
+NAL_LIVE_AUTHORIZED = NO
+ROOT_ACTIVATION_AUTHORIZED = NO
+APPROVAL_SIGNING_AUTHORIZED = NO
+APPROVAL_PLACEMENT_AUTHORIZED = NO
+```
+
+The Owner's accepted closure basis includes 523 focused, 1,892 complete Stage-2,
+and 4,870 full pytest passes, acceptable Report-index WARN, different-Agent
+pre-commit and post-CI review PASS, and
+[exact-head Safe CI 42601576002](https://github.com/Robinlee0929/Network_Automation_Lab/actions/runs/42601576002).
+These are retained results, not checks rerun by this reconciliation.
+[PR #98](https://github.com/Robinlee0929/Network_Automation_Lab/pull/98) subsequently
+published the candidate; [post-merge Safe CI 42760192089](https://github.com/Robinlee0929/Network_Automation_Lab/actions/runs/42760192089)
+completed successfully at the main merge SHA. Publication does not redefine
+the Owner's fixed closure SHA.
+
+The 18 npm-affected package groups, including Critical, remain unrepaired.
+Seven Build Warnings and 13 Optional Missing reports remain open. This
+documentation-only closure creates no security exemption or deployment-safety
+claim. Next.js must receive separately authorized security remediation and
+validation before restart or deployment.
+FIX-04's [six Owner acceptance notes](actual_automation_integration_plan.md#stage-2-read-only-lab-adapter)
+remain verbatim and unresolved. Stage 3, NAL Live, Root Activation, and
+Approval Signing/Placement remain unauthorized. CLOSED is neither completed
+deployment nor a claim of safe production operation.
+
+## Historical decision summary — 2026-11-08
+
+The following preparation-time snapshot is retained verbatim. Its present-tense
+CLOSURE CANDIDATE and PENDING labels describe 2026-11-08, not current status.
+The later decision above does not backfill historical review provenance.
 
 Stage 2 is a **CLOSURE CANDIDATE**, not formally closed. The repository's
 bounded S2-RO-01 through S2-RO-11 capability is complete; separate one-shot
@@ -60,6 +113,10 @@ Repository-external Owner-controlled deployment assets supply live pins and
 authority. Those are distinct trust domains.
 
 ### Prospective reconciliation: 2026-11-08
+
+This section preserves the preparation-time evidence, including all then-PENDING,
+NOT_CREATED, and NOT_RUN values. CURRENT_* names below belong to that historical
+snapshot; the current formal decision is recorded in the decision summary.
 
 The Owner authorized a new six-file candidate from the committed base below.
 The isolated candidate uses the committed Portfolio document; it does not
@@ -264,7 +321,10 @@ changed. These are historical local checks only, not the 2026-11-08 candidate's
 validation or proof that the newly installed Node tree is identical to the
 historical environment.
 
-### Current candidate validation
+### Historical candidate validation requirements — 2026-11-08
+
+The following requirements and environment describe candidate preparation.
+They do not request another validation run or reopen the completed closure.
 
 The prospective candidate requires fresh focused target-registry/composition/
 entrypoint tests, complete `tests/stage2`, full `python -m pytest`, and

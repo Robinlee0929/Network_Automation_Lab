@@ -26,15 +26,28 @@ PERSISTENT_STARTUP_BINDING_INDEPENDENT_REVIEW = PASS
 STAGE2_RUNTIME_CLOSURE_GAP = NONE
 S2_RO_10_LAB2_FUTURE_LIVE_AUTHORITY = NOT_GRANTED
 NEXT_LIVE_ACTION = SEPARATE_EXACT_OWNER_AUTHORIZATION_REQUIRED
-CANONICAL_STATUS = LAB2_PROOF_COMPLETE_STAGE2_CLOSURE_CANDIDATE
+CANONICAL_STATUS = LAB2_PROOF_COMPLETE_STAGE2_DOCUMENTATION_ONLY_CLOSED
 ```
 
 The accepted Lab2 proof covers one target, one operation, one command, and one
 consumed authorization only. It does not revalidate Lab1, prove overall VRRP
 pair health, establish production readiness or write automation, or grant
-future live authority. Stage 2 remains a closure candidate under the unchanged
-[section 13 closure sequence](stage2_formal_closure.md#13-closure-criteria).
+future live authority. Stage 2 is **CLOSED for DOCUMENTATION_ONLY_FIXED_HEAD**
+following the unchanged [section 13 closure sequence](stage2_formal_closure.md#13-closure-criteria).
 
+The Owner approved **DOCUMENTATION_ONLY_FIXED_HEAD** closure on **2026-11-10**
+for `0f774c47b2529a5f93c0b0abd7c245b85e2d61d2`.
+[PR #98](https://github.com/Robinlee0929/Network_Automation_Lab/pull/98) is MERGED
+at main `18fd0d6ce4230e947acdb1d57d5e3a9128c0ccb6`;
+[post-merge Safe CI 42760192089](https://github.com/Robinlee0929/Network_Automation_Lab/actions/runs/42760192089)
+is SUCCESS. The [closure record](stage2_formal_closure.md#decision-summary) separates that fixed decision
+from later publication and retained historical evidence.
+
+The 18 npm-affected groups (including Critical), 7 Build Warnings, and 13
+Optional Missing reports remain unresolved; closure grants no security exemption.
+Next.js restart/deployment requires separate security remediation and validation.
+
+**Historical preparation snapshot — 2026-11-08 (not current status):**
 The 2026-11-08 prospective documentation candidate starts from
 `c09e634100f7d87516838b573e0d29037e422fc7`. Historical PR #92 merged and declared
 closure; its pre-commit independent review remains NOT_ESTABLISHED and its
@@ -304,7 +317,7 @@ delegation made a separately trusted Lab2 request and matching configuration
 source-reachable through the integrated target-aware path. At that historical
 point, this was configuration-only impact and neither execution authority nor
 live proof. The later accepted proof is separately recorded in S2-RO-11 and the
-formal closure candidate.
+formal closure record.
 
 ```text
 S2_RO_11_SOURCE = UNCHANGED
@@ -359,4 +372,4 @@ References: [integration gates](actual_automation_integration_plan.md),
 [S2-RO-08 policy/parser](stage2_vrrp_readonly_s2_ro_08_command_policy.md), and
 [S2-RO-09 transport](stage2_vrrp_readonly_s2_ro_09_pinned_ssh_transport.md).
 See also the [S2-RO-11 live proof](stage2_vrrp_readonly_s2_ro_11_live_entrypoint.md)
-and [Stage-2 formal closure candidate](stage2_formal_closure.md).
+and [Stage-2 formal closure record](stage2_formal_closure.md).

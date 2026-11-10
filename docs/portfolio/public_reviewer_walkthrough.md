@@ -8,6 +8,21 @@ Flask dashboard. The walkthrough is display- and report-oriented: it does not
 require or authorize live devices, SSH, configuration changes, provider/model
 calls, secrets, or command execution from the dashboard.
 
+**Stage 2 is CLOSED for DOCUMENTATION_ONLY_FIXED_HEAD.**
+The Owner approved **DOCUMENTATION_ONLY_FIXED_HEAD** closure on **2026-11-10**
+for `0f774c47b2529a5f93c0b0abd7c245b85e2d61d2`.
+[PR #98](https://github.com/Robinlee0929/Network_Automation_Lab/pull/98) is MERGED
+at main `18fd0d6ce4230e947acdb1d57d5e3a9128c0ccb6`;
+[post-merge Safe CI 42760192089](https://github.com/Robinlee0929/Network_Automation_Lab/actions/runs/42760192089)
+is SUCCESS. The [closure record](../automation_readiness/stage2_formal_closure.md#decision-summary) separates that fixed decision
+from later publication and retained historical evidence.
+
+The 18 npm-affected groups (including Critical), 7 Build Warnings, and 13
+Optional Missing reports remain unresolved. Closure creates no security
+exemption or deployment-safety claim; Next.js restart/deployment requires
+separate security remediation and validation.
+
+**Historical preparation snapshot — 2026-11-08 (not current status):**
 **Stage 2 is a CLOSURE CANDIDATE.** Separate Owner-authorized one-shot
 MikroTik Lab1 and Lab2 VRRP proofs completed through the bounded read-only
 runtime. Persistent Lab2 startup reconstruction also passed independent
@@ -20,7 +35,7 @@ the new commit is NOT_CREATED, and new remote Safe CI/post-CI review are NOT_RUN
 The existing review -> commit/push -> exact-commit Safe CI -> independent
 post-CI review sequence still controls formal closure. Explain these boundaries
 and the retained technical results offline using the
-[formal closure candidate](../automation_readiness/stage2_formal_closure.md).
+[formal closure record](../automation_readiness/stage2_formal_closure.md).
 Stage 3 is **NOT STARTED**.
 
 FIX-04 Candidate technical acceptance is ACCEPTED_WITH_NOTES, while Inactive
@@ -260,7 +275,7 @@ A reviewer can inspect:
 - report-index behavior and report interpretation;
 - committed summaries and any available local report evidence;
 - dry-run and mock reviewer-evidence chains;
-- the canonical documentation summary of the bounded Stage-2 closure candidate,
+- the canonical documentation summary of the bounded Stage-2 documentation-only closure,
   without recovering raw stdout or repeating either operation.
 
 No router, switch, VPN, VRRP, WireGuard, SSH, NETCONF, RESTCONF, iperf3,

@@ -10,19 +10,24 @@ review. Network Automation Lab treats that work as a small QA platform: local
 inputs are validated deterministically, results become machine-readable and
 human-readable evidence, and unsafe or unavailable paths fail closed.
 
-**Stage 2: CLOSURE CANDIDATE.** Separate Owner-authorized one-shot VRRP
-read-only proofs completed for MikroTik Lab1 and Lab2, each through the same
-target-aware fail-closed runtime, one exact command, and zero retries. The
-Lab2 proof also has independently reviewed persistent startup bindings and
-fresh-process reconstruction. A new prospective documentation candidate dated
-**2026-11-08** starts at `c09e634100f7d87516838b573e0d29037e422fc7`.
-Historical PR #92 merged and declared closure, but its pre-commit independent
-review provenance remains **NOT_ESTABLISHED**; the recovered historical
-post-CI PASS has a provenance limitation. Neither result supplies this new
-candidate's review or CI. The unchanged closure sequence still requires a
-different Agent's pre-commit review, a separately authorized commit and push,
-exact-commit Safe CI, and independent post-CI review before formal closure.
-[Closure candidate scope and evidence](docs/automation_readiness/stage2_formal_closure.md).
+**Stage 2: CLOSED — documentation-only, fixed-head scope.** The completed
+bounded Lab1/Lab2 technical results and their original safety limits remain
+unchanged; this status update does not repeat their validation.
+
+The Owner approved **DOCUMENTATION_ONLY_FIXED_HEAD** closure on **2026-11-10**
+for `0f774c47b2529a5f93c0b0abd7c245b85e2d61d2`.
+[PR #98](https://github.com/Robinlee0929/Network_Automation_Lab/pull/98) is MERGED
+at main `18fd0d6ce4230e947acdb1d57d5e3a9128c0ccb6`;
+[post-merge Safe CI 42760192089](https://github.com/Robinlee0929/Network_Automation_Lab/actions/runs/42760192089)
+is SUCCESS. The [closure record](docs/automation_readiness/stage2_formal_closure.md#decision-summary) separates that fixed decision
+from later publication and retained historical evidence.
+
+**Historical preparation (2026-11-08):** the prospective candidate began at
+`c09e634100f7d87516838b573e0d29037e422fc7`. Historical PR #92 declared closure,
+but its pre-commit independent review provenance remains **NOT_ESTABLISHED**;
+the recovered historical post-CI PASS retains its provenance limitation.
+The then-pending candidate Gates remain recorded as historical evidence in
+the closure record. They were not backdated to PASS.
 
 FIX-04 Candidate technical acceptance remains **ACCEPTED_WITH_NOTES**;
 Inactive Runtime Binding is **NOT_ESTABLISHED** and Deployment Acceptance is
@@ -313,21 +318,21 @@ It includes contributor and security guidance, Issue and pull request
 templates, newcomer-friendly Issues, and protected-`main` governance through
 pull requests and Safe CI. Stage 1's planning entry is retained as historical
 context. The separately authorized, bounded Stage-2 implementation and live
-proofs now form a closure candidate; the canonical
-[Stage model](docs/automation_readiness/actual_automation_integration_plan.md)
-and [formal closure candidate](docs/automation_readiness/stage2_formal_closure.md)
-record the proof, remaining review gate, and limits.
+proofs are covered by the Owner's fixed-head documentation-only closure; the
+canonical [Stage model](docs/automation_readiness/actual_automation_integration_plan.md)
+and [formal closure record](docs/automation_readiness/stage2_formal_closure.md)
+record the decision, publication evidence, historical Gates, and retained limits.
 
 | Stage | Purpose | Status |
 | --- | --- | --- |
 | **Stage 0 — Closed public baseline** | Mock-only, dry-run, report-only, reviewer-visible, fail-closed validation and evidence | **CLOSED** |
 | **Stage 1 — Read-only Lab Integration Planning** | Historical planning entry for contracts, allowlists, failure behavior, evidence, and credential boundaries | Historical planning record; see the bounded Stage-2 outcome below |
-| **Stage 2 — Narrow Read-only Lab Adapter** | Separate bounded MikroTik Lab1 and Lab2 VRRP proofs; target-aware composition; one exact command per authorization; zero retries; normalized evidence; persistent Lab2 startup reconstruction | **CLOSURE CANDIDATE — independent closure review and remote Safe CI pending** |
+| **Stage 2 — Narrow Read-only Lab Adapter** | Separate bounded MikroTik Lab1 and Lab2 VRRP proofs; target-aware composition; one exact command per authorization; zero retries; normalized evidence; persistent Lab2 startup reconstruction | **CLOSED — Owner approved 2026-11-10; documentation-only fixed-head scope** |
 | **Stage 3 — Controlled Config Plan Generation** | Future human-reviewable configuration plans only; no apply | **NOT STARTED / requires separate Owner authorization** |
 | **Stage 4 — Controlled Change Execution** | Permit narrowly approved lab changes with explicit safeguards and evidence | **Future / separate gate** |
 | **Stage 5 — Production-like Platform** | Add mature access control, audit, rollback, monitoring, and human approval | **Long-term / not currently authorized** |
 
-The bounded Stage-2 exit is the major-development pause point. The candidate
+The bounded Stage-2 exit is the major-development pause point. The closure record
 records two independent one-shot operations; the Lab2 proof did not revalidate
 Lab1 and does not establish overall Lab1/Lab2 VRRP pair health. It also does
 not establish generic RouterOS or every MikroTik model/version, multi-vendor
@@ -500,11 +505,11 @@ release lanes; they are not performed by documentation-only changes.
 
 ## Current Release Status
 
-| Area | Current status (August baseline with Stage-2 closure candidate) |
+| Area | Current status (August baseline with Stage-2 documentation-only closure) |
 | --- | --- |
 | Stage-0 Network Automation Lab | **CLOSED** at `main@aff250735ade18e4c274be8ac53c9672bb2cb07f` |
-| Stage-1 Read-only Lab Integration Planning | Historical planning-entry record; see the Stage-2 closure candidate |
-| Stage-2 bounded MikroTik VRRP validation | Lab1 historical proof retained; Lab2 proof PASS/CLOSED on repository baseline `ea73196281e38a01af7bf959cc5e1bc60b0b2499`; persistent Lab2 startup reconstruction and independent binding review PASS; overall Stage 2 is a **CLOSURE CANDIDATE** |
+| Stage-1 Read-only Lab Integration Planning | Historical planning-entry record; see the Stage-2 closure record |
+| Stage-2 bounded MikroTik VRRP validation | Lab1 historical proof retained; Lab2 proof PASS/CLOSED on repository baseline `ea73196281e38a01af7bf959cc5e1bc60b0b2499`; persistent Lab2 startup reconstruction and independent binding review PASS; overall Stage 2 is **CLOSED for DOCUMENTATION_ONLY_FIXED_HEAD** |
 | Dual-Lab AI Query | **DL-02, DL-03, DL-04, and DL-05 accepted; bounded offline MVP complete**; PR #93 merged; pre/post-merge Safe CI PASS, fresh exact-SHA review PASS, Owner acceptance ACCEPT / PASS; 0 unresolved material findings; P3 open/non-blocking; 7 maintenance build warnings retained; no live authority |
 | DL-06 offline transition contract | **DL-06-00 specification established; DL-06-01 Owner accepted / PASS and published to main through PR #95; pre/post-merge Safe CI PASS**; 0 unresolved material findings; 3 retained non-blocking findings; DL-06-02 NOT_AUTHORIZED; DL-06-03 BLOCKED; no live authority |
 | Stage 3 | **NOT STARTED / requires separate Owner authorization** |
@@ -653,6 +658,12 @@ future capabilities stay behind their separate authorization and safety gates.
 
 ### Post-release or deferred
 
+The 18 npm-affected package groups, including Critical, remain unrepaired.
+Seven Build Warnings and 13 Optional Missing reports remain open. This
+documentation-only closure creates no security exemption or deployment-safety
+claim. Next.js must receive separately authorized security remediation and
+validation before restart or deployment.
+
 - Continue WF-01-03B security research only after explicit reauthorization.
 - Revisit C017/AppContainer research if it remains relevant.
 - Plan WF-01-03C through WF-01-03F as separate future work.
@@ -672,7 +683,7 @@ future capabilities stay behind their separate authorization and safety gates.
 - Keep the historical post-merge Safe CI maintenance findings OPEN: that run reported 5
   vulnerabilities (2 moderate, 2 high, 1 critical), and Next.js emitted 7
   filesystem-tracing warnings. These are non-Stage-2-blocking maintenance items;
-  the Stage-2 closure candidate does not resolve them. The later DL-06-01
+  the Stage-2 documentation-only closure does not resolve them. The later DL-06-01
   environment-restoration observation reported 12 vulnerabilities, retained above;
   these are distinct observations, not evidence of remediation.
 
@@ -691,7 +702,7 @@ deliberately non-executing public review path.
 - [Canonical Quick Start and demo runbook](docs/phase_2n/phase_2n_01_canonical_quick_start_and_demo_runbook_documentation_only.md)
 - [Accepted Stage-0 user-facing baseline](docs/phase_2n/phase_2n_05_final_user_facing_acceptance_review_phase_closure_review_only.md)
 - [Stage 0 formal closure](docs/automation_readiness/stage0_formal_closure.md)
-- [Stage 2 formal closure candidate](docs/automation_readiness/stage2_formal_closure.md)
+- [Stage 2 formal closure record](docs/automation_readiness/stage2_formal_closure.md)
 
 ### Architecture and safety
 
@@ -716,6 +727,6 @@ deliberately non-executing public review path.
 
 Historical records describe the state and authorization boundary at the time
 they were written. Use Current Release Status above and the canonical Stage
-model for the August baseline and subsequent bounded Stage-2 closure candidate.
+model for the August baseline and subsequent bounded Stage-2 documentation-only closure.
 
 This project is distributed under the [MIT License](LICENSE).
