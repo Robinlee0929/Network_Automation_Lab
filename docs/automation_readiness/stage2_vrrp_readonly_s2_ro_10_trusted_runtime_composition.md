@@ -32,8 +32,23 @@ CANONICAL_STATUS = LAB2_PROOF_COMPLETE_STAGE2_CLOSURE_CANDIDATE
 The accepted Lab2 proof covers one target, one operation, one command, and one
 consumed authorization only. It does not revalidate Lab1, prove overall VRRP
 pair health, establish production readiness or write automation, or grant
-future live authority. Stage 2 remains a closure candidate until the separate
-independent closure review and remote Safe CI complete.
+future live authority. Stage 2 remains a closure candidate under the unchanged
+[section 13 closure sequence](stage2_formal_closure.md#13-closure-criteria).
+
+The 2026-11-08 prospective documentation candidate starts from
+`c09e634100f7d87516838b573e0d29037e422fc7`. Historical PR #92 merged and declared
+closure; its pre-commit independent review remains NOT_ESTABLISHED and its
+recovered post-CI review is PASS_WITH_PROVENANCE_LIMITATION. This component's
+accepted technical evidence below is preserved and supplies neither the new
+pre-commit review nor its exact-commit Safe CI. New review is PENDING, the new
+commit is NOT_CREATED, and new remote CI/post-CI review are NOT_RUN.
+
+FIX-04 Candidate acceptance is ACCEPTED_WITH_NOTES; Inactive Runtime Binding
+is NOT_ESTABLISHED and Deployment Acceptance is PENDING. The historical Lab2
+startup proof below does not prove whether Runtime uses the new FIX-04 Root.
+The [six retained FIX-04 notes](actual_automation_integration_plan.md#stage-2-read-only-lab-adapter)
+remain applicable. No activation, Approval Signing/Placement, live invocation,
+or next-phase authority is granted by this documentation preparation.
 
 `OFFLINE_IMPLEMENTATION_AUTHORITY != LIVE_EXECUTION_AUTHORITY`
 

@@ -14,9 +14,21 @@ human-readable evidence, and unsafe or unavailable paths fail closed.
 read-only proofs completed for MikroTik Lab1 and Lab2, each through the same
 target-aware fail-closed runtime, one exact command, and zero retries. The
 Lab2 proof also has independently reviewed persistent startup bindings and
-fresh-process reconstruction. Final closure still requires independent review
-and remote Safe CI.
+fresh-process reconstruction. A new prospective documentation candidate dated
+**2026-11-08** starts at `c09e634100f7d87516838b573e0d29037e422fc7`.
+Historical PR #92 merged and declared closure, but its pre-commit independent
+review provenance remains **NOT_ESTABLISHED**; the recovered historical
+post-CI PASS has a provenance limitation. Neither result supplies this new
+candidate's review or CI. The unchanged closure sequence still requires a
+different Agent's pre-commit review, a separately authorized commit and push,
+exact-commit Safe CI, and independent post-CI review before formal closure.
 [Closure candidate scope and evidence](docs/automation_readiness/stage2_formal_closure.md).
+
+FIX-04 Candidate technical acceptance remains **ACCEPTED_WITH_NOTES**;
+Inactive Runtime Binding is **NOT_ESTABLISHED** and Deployment Acceptance is
+**PENDING**. The [six retained Owner notes](docs/automation_readiness/actual_automation_integration_plan.md#stage-2-read-only-lab-adapter)
+remain binding. No Root Activation, Approval Signing/Placement, or NAL Live
+authority is granted.
 
 The August 2026 release baseline is a local Stage-0 product.
 The supported release path is designed for local portfolio review: mock-only,

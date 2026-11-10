@@ -4,8 +4,11 @@
 Owner-authorized MikroTik Lab1 VRRP proof remains accepted, and a later,
 separately authorized Lab2 one-shot proof passed through the same target-aware
 runtime. Persistent Lab2 startup bindings, fresh-process reconstruction, and
-their independent review also passed. Final Stage-2 closure still requires the
-separate independent closure review and remote Safe CI. The default public
+their independent review also passed. The 2026-11-08 prospective candidate
+preserves the historical PR #92 declaration and the unresolved pre-commit
+review provenance. Final Stage-2 closure requires the unchanged pre-commit
+review, commit/push, exact-commit Safe CI, and independent post-CI review
+sequence in the [closure record](stage2_formal_closure.md). The default public
 review path remains Stage-0 offline evidence browsing. Stage 3 is **NOT
 STARTED / requires separate Owner authorization**.
 
@@ -234,8 +237,48 @@ Exit gate:
 
 Status: **CLOSURE CANDIDATE**. The earlier Lab1 proof and later Lab2 proof each
 passed under separate exact Owner authorization. The Lab2 runtime closure gap
-is resolved, but final Stage-2 closure awaits independent closure review and
-remote Safe CI. Neither proof authorizes another attempt.
+is resolved. A new prospective documentation candidate was prepared on
+2026-11-08 from `c09e634100f7d87516838b573e0d29037e422fc7`. Historical PR #92
+merged and declared closure, but its pre-commit independent review remains
+NOT_ESTABLISHED; recovered historical post-CI review is
+PASS_WITH_PROVENANCE_LIMITATION. Those historical records do not satisfy the
+new candidate's Gates. Its pre-commit independent review is PENDING, its commit
+is NOT_CREATED, and its remote Safe CI and post-CI review are NOT_RUN. Follow
+the unchanged [Closure Contract section 13](stage2_formal_closure.md#13-closure-criteria).
+Neither live proof authorizes another attempt, and this prospective work does
+not revalidate the historical technical results or grant deployment authority.
+
+**A-02 FIX-04: Candidate technical acceptance is ACCEPTED_WITH_NOTES;
+Deployment Acceptance remains PENDING.** The Owner designated this Stage-2
+section as the formal record solely for this bounded Candidate technical
+acceptance; this designation does not redefine all FIX-04 governance documents.
+The accepted evidence covers the Candidate Directory, approvals directory, and
+Owner Trust Root JSON against the fixed historical baseline at the time below.
+
+FIX-04 Provisioning was a separately authorized asset-creation operation that
+wrote Candidate assets. The subsequent Candidate acceptance was read-only.
+This documentation update records those completed results without repeating
+either operation. It does not change the historical Lab1/Lab2 evidence or
+complete Stage-2 closure. It grants no authority to apply Startup Pins, activate
+the Root, sign or place Approvals, or perform NAL Live operations.
+
+```text
+FIX04_PROVISIONING = SUCCESS
+CANDIDATE_TECHNICAL_REVIEW = PASS_WITH_NOTES
+OWNER_CANDIDATE_ACCEPTANCE = ACCEPTED_WITH_NOTES
+ACCEPTANCE_EVIDENCE_TIME = 2026-11-05 09:36:17.897018–09:36:17.908829 Asia/Taipei
+INACTIVE_RUNTIME_BINDING_VERIFICATION = NOT_ESTABLISHED
+OWNER_DEPLOYMENT_ACCEPTANCE = PENDING
+```
+
+Required Owner acceptance notes (retained verbatim):
+
+1. 本次僅接受指定觀察時點的技術證據，不構成持續安全保證。
+2. Inactive Runtime Binding 仍為 NOT_ESTABLISHED，不能宣稱 Root 已獨立證明未啟用。
+3. Startup Pins 比對成功且量測器未套用，不代表所有 Startup／Runtime 均未指向新 Root。
+4. 本次量測獨立於 Provisioning，但仍由同一 Assistant 執行；不同人員／Agent 獨立性未建立。原生量測來自 Codex Sandbox，非 Owner Console。
+5. LastAccessTime 有 7 個物件變動、1 個不變，變動原因未建立；其餘必要一致性檢查全部 PASS。
+6. 未取得原子快照、持續監控或所有未知寫入者不存在的證明；SACL 未讀取。
 
 #### Historical Lab1 proven scope and result
 

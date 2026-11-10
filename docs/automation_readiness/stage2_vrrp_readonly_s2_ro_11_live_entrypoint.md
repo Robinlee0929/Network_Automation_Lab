@@ -7,8 +7,23 @@ runtime. Its implementation and independent security review passed with zero
 unresolved material findings. A later, separately authorized Lab2 one-shot
 invocation also passed and its proof is closed. The entrypoint returns only
 canonical S2-RO-01 evidence bytes or one sanitized failure category. The
-overall Stage-2 status remains **CLOSURE CANDIDATE** pending independent
-closure review and remote Safe CI.
+overall Stage-2 status remains **CLOSURE CANDIDATE** under the unchanged
+[section 13 closure sequence](stage2_formal_closure.md#13-closure-criteria).
+
+The 2026-11-08 prospective documentation candidate starts from
+`c09e634100f7d87516838b573e0d29037e422fc7`. Historical PR #92 merged and declared
+closure, but its pre-commit independent review is NOT_ESTABLISHED; recovered
+historical post-CI review is PASS_WITH_PROVENANCE_LIMITATION. Those results and
+the component evidence below do not validate this new candidate. Its separate
+pre-commit review is PENDING, commit NOT_CREATED, and remote CI/post-CI review
+NOT_RUN. Author self-validation cannot replace a different Agent's review.
+
+FIX-04 Candidate acceptance remains ACCEPTED_WITH_NOTES, Inactive Runtime
+Binding NOT_ESTABLISHED, and Deployment Acceptance PENDING. The
+[six retained Owner notes](actual_automation_integration_plan.md#stage-2-read-only-lab-adapter)
+are unchanged. The historical startup reconstruction below does not establish
+the new FIX-04 Root's current Runtime use. No Root Activation, Approval
+Signing/Placement, live entrypoint invocation, or next-phase authority follows.
 
 `S2_RO_11_IMPLEMENTED != REAL_RUN_AUTHORIZED`
 
@@ -18,7 +33,7 @@ closure review and remote Safe CI.
 
 ## Allowed scope and API
 
-Exactly three candidate files are included:
+The historical S2-RO-11 implementation candidate included exactly three files:
 
 - [Entrypoint](../../validation_framework/stage2_vrrp_readonly_live_entrypoint.py).
 - [Offline tests](../../tests/stage2/test_vrrp_readonly_live_entrypoint.py).
