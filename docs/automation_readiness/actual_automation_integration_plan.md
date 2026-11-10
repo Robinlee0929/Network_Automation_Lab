@@ -1,16 +1,16 @@
 # Actual Automation Integration Plan
 
-**Decision summary: Stage 2 is a CLOSURE CANDIDATE.** The historical
-Owner-authorized MikroTik Lab1 VRRP proof remains accepted, and a later,
-separately authorized Lab2 one-shot proof passed through the same target-aware
-runtime. Persistent Lab2 startup bindings, fresh-process reconstruction, and
-their independent review also passed. The 2026-11-08 prospective candidate
-preserves the historical PR #92 declaration and the unresolved pre-commit
-review provenance. Final Stage-2 closure requires the unchanged pre-commit
-review, commit/push, exact-commit Safe CI, and independent post-CI review
-sequence in the [closure record](stage2_formal_closure.md). The default public
-review path remains Stage-0 offline evidence browsing. Stage 3 is **NOT
-STARTED / requires separate Owner authorization**.
+**Decision summary: Stage 2 is CLOSED for DOCUMENTATION_ONLY_FIXED_HEAD.**
+The Owner approved closure on 2026-11-10 for
+`0f774c47b2529a5f93c0b0abd7c245b85e2d61d2` after the existing section 13
+sequence completed. [PR #98](https://github.com/Robinlee0929/Network_Automation_Lab/pull/98)
+published the result at main `18fd0d6ce4230e947acdb1d57d5e3a9128c0ccb6`;
+[post-merge Safe CI 42760192089](https://github.com/Robinlee0929/Network_Automation_Lab/actions/runs/42760192089)
+is SUCCESS. The [closure record](stage2_formal_closure.md#decision-summary)
+retains the fixed decision, historical provenance gap, and maintenance limits.
+This reconciliation does not repeat acceptance or extend the decision to later
+commits. The public path remains Stage-0 offline evidence browsing. Stage 3 is
+**NOT STARTED / requires separate Owner authorization**.
 
 **Dual-Lab status: DL-05 ACCEPTED / PASS; bounded offline MVP complete.**
 DL-02 implementation `bb39e8295a2fa5d69980396dbaf8c374c79a57b3`, DL-03
@@ -235,6 +235,29 @@ Exit gate:
 
 ### Stage 2: Read-only Lab Adapter
 
+Current formal status: **CLOSED**, limited to the Owner's 2026-11-10
+`DOCUMENTATION_ONLY_FIXED_HEAD` decision. PR #98 and its post-merge CI are
+publication evidence, not deployment acceptance.
+
+```text
+STAGE2_FORMAL_STATUS = CLOSED
+OWNER_FORMAL_CLOSURE_DECISION = APPROVED
+OWNER_FORMAL_CLOSURE_DATE = 2026-11-10
+CLOSURE_SCOPE = DOCUMENTATION_ONLY_FIXED_HEAD
+CLOSURE_SHA = 0f774c47b2529a5f93c0b0abd7c245b85e2d61d2
+PR98_STATUS = MERGED
+MAIN_MERGE_SHA = 18fd0d6ce4230e947acdb1d57d5e3a9128c0ccb6
+POST_MERGE_SAFE_CI_RUN = 42760192089
+POST_MERGE_SAFE_CI_RESULT = SUCCESS
+```
+
+The 18 npm-affected package groups, including Critical, remain unrepaired.
+Seven Build Warnings and 13 Optional Missing reports remain open. This
+documentation-only closure creates no security exemption or deployment-safety
+claim. Next.js must receive separately authorized security remediation and
+validation before restart or deployment.
+
+**Historical preparation snapshot — 2026-11-08 (not current status):**
 Status: **CLOSURE CANDIDATE**. The earlier Lab1 proof and later Lab2 proof each
 passed under separate exact Owner authorization. The Lab2 runtime closure gap
 is resolved. A new prospective documentation candidate was prepared on
@@ -366,6 +389,9 @@ interval `1000` ms, version `3`, role `BACKUP`, `running=false`,
 `disabled=false`, and `invalid=false`. No raw RouterOS stdout is published.
 `running=false` is not independently characterized as a fault, and this proof
 does not establish Lab1 state or overall Lab1/Lab2 VRRP health.
+
+The following status block preserves the earlier Lab2/candidate observation;
+its CLOSURE CANDIDATE label is historical, not the current formal decision.
 
 ```text
 LAB2_S2_RO_11_LIVE_PROOF = PASS
@@ -543,11 +569,12 @@ evidence of a prior explicit Owner authorization and grants no standing live
 authority. Every new live access requires fresh exact Owner authorization.
 
 Stage 0 remains the default mock-only, dry-run, report-only public review path.
-Stage 2 is a CLOSURE CANDIDATE based on the recorded, separately authorized
-Lab1 and Lab2 VRRP read-only proofs and completed persistent Lab2 startup
-reconstruction. This candidate activates no new adapter, protocol, provider,
-credential, device, or execution capability and permits no repeat attempt.
-Formal closure still requires independent closure review and remote Safe CI.
+Stage 2 is CLOSED for the Owner's fixed-head documentation-only scope,
+based on the completed section 13 sequence and the recorded, separately
+authorized Lab1/Lab2 proofs and persistent Lab2 startup reconstruction.
+Closure activates no adapter, protocol, provider, credential, device, or
+execution capability and permits no repeat attempt. Deployment acceptance,
+maintenance findings, and future execution authority remain separate.
 The bounded offline Dual-Lab AI Query MVP is accepted and complete. DL-01 is the
 completed prerequisite contract; DL-02, DL-03, DL-04, and DL-05 are accepted.
 DL-05's accepted implementation remains
