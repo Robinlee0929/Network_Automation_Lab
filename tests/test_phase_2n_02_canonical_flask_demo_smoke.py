@@ -340,13 +340,22 @@ def _build_runtime_evidence(
     process_exit_code: int | None,
     process_exited: bool,
     statuses: dict[str, int],
+    http_requests: list[dict[str, object]],
     child_identities: list[ChildProcessIdentity],
     classification: ChildProcessClassification,
     post_cleanup_live_child_ids: list[int],
     unexpected_live_child_ids: list[int],
     bridge_exited_automatically: bool,
     port_closed: bool,
+    report_files_unchanged: bool | None = None,
 ) -> dict[str, object]:
+    methods = sorted({request["method"] for request in http_requests})
+    command_posts = [
+        request for request in http_requests
+        if request["method"] == "POST"
+        and str(request["path"]).startswith("/commands/")
+        and str(request["path"]).endswith("/run")
+    ]
     runtime_bridge_detected = classification.runtime_bridge is not None
     return {
         "interpreter_classification": (
@@ -362,8 +371,17 @@ def _build_runtime_evidence(
         "port": PORT,
         "startup_timeout_seconds": STARTUP_TIMEOUT_SECONDS,
         "http_statuses": statuses,
-        "request_method": "GET",
-        "command_run_post_performed": False,
+        # Retain the legacy summary keys, but describe actual HTTP attempts.
+        "request_method": methods[0] if len(methods) == 1 else ("MIXED" if methods else "NOT_ATTEMPTED"),
+        "request_methods": methods,
+        "http_requests": http_requests,
+        "command_run_post_performed": bool(command_posts),
+        "command_run_post_attempts": command_posts,
+        "command_execution": {
+            "status": "NOT_INDEPENDENTLY_MEASURED",
+            "scope": "Child-process runner/subprocess calls are not instrumented; HTTP rejection alone does not measure execution side effects.",
+        },
+        "report_files_unchanged": report_files_unchanged,
         "non_local_network_contact_performed": False,
         "child_process_ids": [child.pid for child in child_identities],
         "pre_cleanup_child_identities": _generic_child_identity_evidence(
@@ -414,7 +432,34 @@ def _json_string_values(
     return []
 
 
-def _wait_for_get(path: str, process: subprocess.Popen[str]) -> tuple[int, str]:
+def _observed_urlopen(
+    request: Request,
+    http_requests: list[dict[str, object]],
+    *,
+    timeout: float,
+):
+    # Record dispatch attempts, not pre-planned requests or inferred execution.
+    # None means no HTTP response was observed, including transport failures.
+    observation = {
+        "method": request.get_method(),
+        "path": urlparse(request.full_url).path,
+        "response_status": None,
+    }
+    http_requests.append(observation)
+    try:
+        response = urlopen(request, timeout=timeout)
+    except HTTPError as exc:
+        observation["response_status"] = exc.code
+        raise
+    observation["response_status"] = response.status
+    return response
+
+
+def _wait_for_get(
+    path: str,
+    process: subprocess.Popen[str],
+    http_requests: list[dict[str, object]],
+) -> tuple[int, str]:
     deadline = time.monotonic() + STARTUP_TIMEOUT_SECONDS
     last_error = "no response"
     url = f"{BASE_URL}{path}"
@@ -424,7 +469,7 @@ def _wait_for_get(path: str, process: subprocess.Popen[str]) -> tuple[int, str]:
             pytest.fail(f"Flask exited during startup with code {process.returncode}")
         try:
             request = Request(url, method="GET")
-            with urlopen(request, timeout=1.0) as response:
+            with _observed_urlopen(request, http_requests, timeout=1.0) as response:
                 return response.status, response.read().decode("utf-8", errors="replace")
         except (HTTPError, URLError, TimeoutError, ConnectionError, OSError) as exc:
             last_error = str(exc)
@@ -442,25 +487,25 @@ def _report_file_hashes() -> dict[str, str]:
     }
 
 
-def _assert_canonical_reviewer_http_boundary() -> None:
+def _assert_canonical_reviewer_http_boundary(http_requests: list[dict[str, object]]) -> None:
     command_paths = [f"/commands/{key}/run" for key in ("pytest_all", "topology_summary", "not_allowed")]
     # Fail before sending any POST if the real entry point accidentally uses Legacy.
     for path in command_paths:
         with pytest.raises(HTTPError) as rejected:
-            urlopen(Request(f"{BASE_URL}{path}", method="OPTIONS"), timeout=2)
+            _observed_urlopen(Request(f"{BASE_URL}{path}", method="OPTIONS"), http_requests, timeout=2)
         assert rejected.value.code == 404
         rejected.value.close()
     for method, path in [("POST", path) for path in command_paths] + [
         (method, command_paths[1]) for method in ("PUT", "PATCH", "DELETE")
     ]:
         with pytest.raises(HTTPError) as rejected:
-            urlopen(Request(f"{BASE_URL}{path}", data=b"mode=legacy", method=method), timeout=2)
+            _observed_urlopen(Request(f"{BASE_URL}{path}", data=b"mode=legacy", method=method), http_requests, timeout=2)
         assert rejected.value.code == 404
         rejected.value.close()
-    with urlopen(Request(f"{BASE_URL}/", method="HEAD"), timeout=2) as response:
+    with _observed_urlopen(Request(f"{BASE_URL}/", method="HEAD"), http_requests, timeout=2) as response:
         assert response.status == 200
         assert response.read() == b""
-    with urlopen(Request(f"{BASE_URL}/", method="OPTIONS"), timeout=2) as response:
+    with _observed_urlopen(Request(f"{BASE_URL}/", method="OPTIONS"), http_requests, timeout=2) as response:
         assert response.status == 200
         assert {item.strip() for item in response.headers["Allow"].split(",")} == {"GET", "HEAD", "OPTIONS"}
 
@@ -482,6 +527,8 @@ def test_canonical_flask_process_lifecycle_and_get_only_routes() -> None:
         text=True,
     )
     statuses: dict[str, int] = {}
+    http_requests: list[dict[str, object]] = []
+    report_files_unchanged = None
     child_identities: list[ChildProcessIdentity] = []
     classification = ChildProcessClassification(None, ())
     post_cleanup_live_child_ids: list[int] = []
@@ -489,17 +536,18 @@ def test_canonical_flask_process_lifecycle_and_get_only_routes() -> None:
     bridge_exited_automatically = True
     server_output = ""
     try:
-        landing_status, landing_html = _wait_for_get("/", process)
+        landing_status, landing_html = _wait_for_get("/", process, http_requests)
         statuses["/"] = landing_status
         assert landing_status == 200
         assert "Network Automation Lab - Portfolio Demo" in landing_html
 
         for route in GET_ROUTES[1:]:
-            status, _ = _wait_for_get(route, process)
+            status, _ = _wait_for_get(route, process, http_requests)
             statuses[route] = status
         assert statuses == {route: 200 for route in GET_ROUTES}
-        _assert_canonical_reviewer_http_boundary()
-        assert _report_file_hashes() == reports_before
+        _assert_canonical_reviewer_http_boundary(http_requests)
+        report_files_unchanged = _report_file_hashes() == reports_before
+        assert report_files_unchanged
 
         child_identities = _child_process_identities(process.pid)
         classification = _classify_child_processes(
@@ -544,6 +592,8 @@ def test_canonical_flask_process_lifecycle_and_get_only_routes() -> None:
             process_exit_code=process.returncode,
             process_exited=process.poll() is not None,
             statuses=statuses,
+            http_requests=http_requests,
+            report_files_unchanged=report_files_unchanged,
             child_identities=child_identities,
             classification=classification,
             post_cleanup_live_child_ids=post_cleanup_live_child_ids,
@@ -567,6 +617,15 @@ def test_canonical_flask_process_lifecycle_and_get_only_routes() -> None:
 
     assert process.returncode is not None
     assert "Running on http://127.0.0.1:5000" in server_output
+    assert evidence["command_run_post_performed"] is True
+    assert evidence["command_run_post_attempts"] == [
+        {"method": "POST", "path": f"/commands/{key}/run", "response_status": 404}
+        for key in ("pytest_all", "topology_summary", "not_allowed")
+    ]
+    assert evidence["request_method"] == "MIXED"
+    assert evidence["request_methods"] == ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+    assert evidence["report_files_unchanged"] is True
+    assert evidence["command_execution"]["status"] == "NOT_INDEPENDENTLY_MEASURED"
 
 
 SYNTHETIC_PARENT_PID = 100
@@ -603,6 +662,7 @@ def _synthetic_classification(
 
 def _synthetic_runtime_evidence(
     child: ChildProcessIdentity,
+    http_requests: list[dict[str, object]] | None = None,
 ) -> dict[str, object]:
     classification = _synthetic_classification([child])
     return _build_runtime_evidence(
@@ -610,6 +670,7 @@ def _synthetic_runtime_evidence(
         process_exit_code=0,
         process_exited=True,
         statuses={route: 200 for route in GET_ROUTES},
+        http_requests=http_requests if http_requests is not None else [],
         child_identities=[child],
         classification=classification,
         post_cleanup_live_child_ids=[],
@@ -651,6 +712,7 @@ def test_runtime_evidence_redacts_supplied_private_path_values() -> None:
         unexpected_live_child_ids=[],
         bridge_exited_automatically=True,
         port_closed=True,
+        http_requests=[],
     )
 
     assert "interpreter" not in evidence
@@ -663,6 +725,58 @@ def test_runtime_evidence_redacts_supplied_private_path_values() -> None:
             assert sensitive_value not in value, (
                 f"private runtime value exposed at {selector}"
             )
+
+
+def test_runtime_evidence_before_http_does_not_claim_post_or_execution() -> None:
+    evidence = _synthetic_runtime_evidence(_synthetic_child())
+    assert evidence["command_run_post_performed"] is False
+    assert evidence["command_run_post_attempts"] == []
+    assert evidence["request_method"] == "NOT_ATTEMPTED"
+    assert evidence["request_methods"] == []
+    assert evidence["report_files_unchanged"] is None
+    assert evidence["command_execution"]["status"] == "NOT_INDEPENDENTLY_MEASURED"
+
+
+@pytest.mark.parametrize(
+    "failure_method,failure_status,post_count",
+    [("OPTIONS", 405, 0), ("POST", 503, 2), ("POST", None, 2)],
+)
+def test_runtime_evidence_preserves_partial_http_attempts(
+    monkeypatch, failure_method, failure_status, post_count,
+) -> None:
+    calls = []
+    observations = []
+
+    def fake_urlopen(request, *, timeout):
+        method = request.get_method()
+        calls.append(method)
+        failing = method == failure_method and (
+            method == "OPTIONS" or calls.count("POST") == 2
+        )
+        if failing and failure_status is None:
+            raise URLError("synthetic transport failure")
+        raise HTTPError(
+            request.full_url, failure_status if failing else 404,
+            "synthetic rejection", {}, None,
+        )
+
+    monkeypatch.setattr(sys.modules[__name__], "urlopen", fake_urlopen)
+    expected_error = URLError if failure_status is None else AssertionError
+    with pytest.raises(expected_error):
+        _assert_canonical_reviewer_http_boundary(observations)
+
+    evidence = _synthetic_runtime_evidence(_synthetic_child(), observations)
+    assert calls.count("POST") == post_count
+    assert evidence["command_run_post_performed"] is (post_count > 0)
+    assert evidence["command_run_post_attempts"] == [
+        {"method": "POST", "path": f"/commands/{key}/run", "response_status": status}
+        for key, status in zip(("pytest_all", "topology_summary"), (404, failure_status))
+    ][:post_count]
+    assert evidence["http_requests"][-1]["response_status"] == failure_status
+    assert evidence["request_methods"] == sorted(set(calls))
+    assert evidence["request_method"] == ("MIXED" if post_count else "OPTIONS")
+    assert evidence["report_files_unchanged"] is None
+    assert evidence["command_execution"]["status"] == "NOT_INDEPENDENTLY_MEASURED"
 
 
 def test_runtime_evidence_exposes_generic_bridge_classification() -> None:
