@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import ctypes
+import hashlib
 from dataclasses import dataclass
 import json
 import ntpath
@@ -433,12 +434,44 @@ def _wait_for_get(path: str, process: subprocess.Popen[str]) -> tuple[int, str]:
     )
 
 
+def _report_file_hashes() -> dict[str, str]:
+    return {
+        path.relative_to(PROJECT_ROOT).as_posix(): hashlib.sha256(path.read_bytes()).hexdigest()
+        for path in (PROJECT_ROOT / "reports").rglob("*")
+        if path.is_file()
+    }
+
+
+def _assert_canonical_reviewer_http_boundary() -> None:
+    command_paths = [f"/commands/{key}/run" for key in ("pytest_all", "topology_summary", "not_allowed")]
+    # Fail before sending any POST if the real entry point accidentally uses Legacy.
+    for path in command_paths:
+        with pytest.raises(HTTPError) as rejected:
+            urlopen(Request(f"{BASE_URL}{path}", method="OPTIONS"), timeout=2)
+        assert rejected.value.code == 404
+        rejected.value.close()
+    for method, path in [("POST", path) for path in command_paths] + [
+        (method, command_paths[1]) for method in ("PUT", "PATCH", "DELETE")
+    ]:
+        with pytest.raises(HTTPError) as rejected:
+            urlopen(Request(f"{BASE_URL}{path}", data=b"mode=legacy", method=method), timeout=2)
+        assert rejected.value.code == 404
+        rejected.value.close()
+    with urlopen(Request(f"{BASE_URL}/", method="HEAD"), timeout=2) as response:
+        assert response.status == 200
+        assert response.read() == b""
+    with urlopen(Request(f"{BASE_URL}/", method="OPTIONS"), timeout=2) as response:
+        assert response.status == 200
+        assert {item.strip() for item in response.headers["Allow"].split(",")} == {"GET", "HEAD", "OPTIONS"}
+
+
 def test_canonical_flask_process_lifecycle_and_get_only_routes() -> None:
     assert not _port_is_listening(), (
         "Canonical port 127.0.0.1:5000 is already occupied; the smoke test will "
         "not terminate an unrelated process or substitute another port."
     )
     _assert_port_can_be_bound()
+    reports_before = _report_file_hashes()
 
     process = subprocess.Popen(
         [sys.executable, "dashboard_app.py"],
@@ -465,6 +498,8 @@ def test_canonical_flask_process_lifecycle_and_get_only_routes() -> None:
             status, _ = _wait_for_get(route, process)
             statuses[route] = status
         assert statuses == {route: 200 for route in GET_ROUTES}
+        _assert_canonical_reviewer_http_boundary()
+        assert _report_file_hashes() == reports_before
 
         child_identities = _child_process_identities(process.pid)
         classification = _classify_child_processes(

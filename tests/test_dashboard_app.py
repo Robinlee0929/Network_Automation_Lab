@@ -1442,3 +1442,115 @@ def test_flask_routes_are_available(tmp_path):
     assert html_response.status_code == 200
     json_response = client.get("/reports/json/router1/day9_performance_regression_report.json")
     assert json_response.status_code == 200
+
+
+@pytest.fixture
+def reviewer_surface(tmp_path):
+    reports_dir = tmp_path / "reports"
+    write_json(reports_dir / "router1" / "sample.json", {"result": "PASS", "fixture": "reviewer-evidence"})
+    (reports_dir / "router1" / "sample.html").write_text("<html>reviewer-evidence</html>", encoding="utf-8")
+    logs_dir = tmp_path / "execution_logs"
+    app = dashboard.create_reviewer_app(reports_dir, logs_dir)
+    app.testing = True
+    return app, tmp_path, reports_dir, logs_dir
+
+
+def test_reviewer_route_inventory_preserves_shared_get_handlers(reviewer_surface):
+    reviewer, _, reports_dir, logs_dir = reviewer_surface
+    legacy = dashboard.create_app(reports_dir, logs_dir)
+    legacy_get = {rule.rule: rule.endpoint for rule in legacy.url_map.iter_rules() if "GET" in rule.methods}
+    reviewer_get = {rule.rule: rule.endpoint for rule in reviewer.url_map.iter_rules()}
+    assert reviewer_get == legacy_get
+    assert "run_command" not in reviewer.view_functions
+    assert all(rule.methods <= {"GET", "HEAD", "OPTIONS"} for rule in reviewer.url_map.iter_rules())
+    for endpoint in legacy_get.values():
+        assert reviewer.view_functions[endpoint].__code__ is legacy.view_functions[endpoint].__code__
+    assert any(rule.rule == "/commands/<command_id>/run" and "POST" in rule.methods for rule in legacy.url_map.iter_rules())
+
+
+@pytest.mark.parametrize("method", ["POST", "PUT", "PATCH", "DELETE"])
+def test_reviewer_rejects_requests_without_execution_or_writes(reviewer_surface, monkeypatch, method):
+    import subprocess
+    from unittest.mock import Mock
+
+    import dashboard_command_runner as runner
+    import network_lab
+
+    app, root, _, logs_dir = reviewer_surface
+    client = app.test_client()
+    client.set_cookie("reviewer_only", "false")
+    before = {p.relative_to(root): p.read_bytes() for p in root.rglob("*") if p.is_file()}
+    guards = {name: Mock(side_effect=AssertionError(name)) for name in (
+        "runner", "subprocess", "execution_log", "report_rebuild", "file_write",
+    )}
+    with monkeypatch.context() as patch:
+        patch.setattr(dashboard, "execute_registered_command", guards["runner"])
+        patch.setattr(runner, "execute_registered_command", guards["runner"])
+        patch.setattr(runner, "execute_command", guards["runner"])
+        patch.setattr(subprocess, "run", guards["subprocess"])
+        patch.setattr(subprocess, "Popen", guards["subprocess"])
+        patch.setattr(runner, "_write_log", guards["execution_log"])
+        patch.setattr(network_lab, "write_report_index_html", guards["report_rebuild"])
+        for name in ("write_text", "write_bytes", "mkdir", "touch"):
+            patch.setattr(Path, name, guards["file_write"])
+        for command_id in ("pytest_all", "topology_summary", "not_allowed"):
+            response = client.open(
+                f"/commands/{command_id}/run?reviewer_only=false&mode=legacy",
+                method=method,
+                headers={"X-Reviewer-Only": "false", "X-HTTP-Method-Override": "POST"},
+                data={"reviewer_only": "false", "mode": "legacy"},
+            )
+            assert response.status_code == 404
+        for route in ("/", "/reports", "/commands", "/commands/logs", "/ai-checklist", "/ai-intent-reviewer"):
+            assert client.open(route, method=method).status_code == 405
+    for guard in guards.values():
+        guard.assert_not_called()
+    assert not logs_dir.exists()
+    assert {p.relative_to(root): p.read_bytes() for p in root.rglob("*") if p.is_file()} == before
+
+
+def test_reviewer_get_head_options_and_evidence_remain_display_only(reviewer_surface, monkeypatch):
+    from unittest.mock import Mock
+
+    app, _, _, _ = reviewer_surface
+    execution = Mock(side_effect=AssertionError("Reviewer display invoked runner"))
+    monkeypatch.setattr(dashboard, "execute_registered_command", execution)
+    client = app.test_client()
+    routes = (
+        "/", "/reports", "/commands", "/commands/logs", "/ai-checklist", "/ai-intent-reviewer",
+        "/reports/json/router1/sample.json", "/reports/open/router1/sample.html",
+        "/reports/evidence/reports/router1/sample.html",
+    )
+    for route in routes:
+        with client.get(route) as response:
+            assert response.status_code == 200
+            if "sample" in route:
+                assert b"reviewer-evidence" in response.data
+        with client.head(route) as response:
+            assert response.status_code == 200
+            assert response.data == b""
+        with client.options(route) as response:
+            assert response.status_code == 200
+            assert set(response.allow) == {"GET", "HEAD", "OPTIONS"}
+    for method in ("GET", "HEAD", "OPTIONS"):
+        assert client.open("/commands/pytest_all/run", method=method).status_code == 404
+    assert client.get("/reports/open/../outside.html").status_code == 404
+    execution.assert_not_called()
+
+
+def test_legacy_fixed_command_post_contract_remains_compatible(tmp_path, monkeypatch):
+    from unittest.mock import Mock
+
+    execution = Mock(return_value={"log_id": "synthetic_legacy_result"})
+    monkeypatch.setattr(dashboard, "execute_registered_command", execution)
+    logs_dir = tmp_path / "execution_logs"
+    app = dashboard.create_app(tmp_path / "reports", logs_dir)
+    response = app.test_client().post("/commands/topology_summary/run")
+    assert response.status_code == 302
+    assert response.headers["Location"] == "/commands/logs/synthetic_legacy_result"
+    execution.assert_called_once()
+    registry, command_id, actual_logs_dir = execution.call_args.args
+    assert command_id == "topology_summary"
+    assert registry[command_id].enabled
+    assert actual_logs_dir == logs_dir
+    assert not logs_dir.exists()
