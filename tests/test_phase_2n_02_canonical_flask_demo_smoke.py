@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import ctypes
 import hashlib
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 import json
 import ntpath
 import os
@@ -48,6 +48,16 @@ class ChildProcessIdentity:
 class ChildProcessClassification:
     runtime_bridge: ChildProcessIdentity | None
     unexpected_children: tuple[ChildProcessIdentity, ...]
+
+
+@dataclass
+class LifecycleProgress:
+    sampling_started: bool = False
+    sampling_completed: bool = False
+    classification_completed: bool = False
+    cleanup_completed: bool = False
+    post_cleanup_check_completed: bool = False
+    port_check_completed: bool = False
 
 
 def _port_is_listening() -> bool:
@@ -341,6 +351,7 @@ def _build_runtime_evidence(
     process_exited: bool,
     statuses: dict[str, int],
     http_requests: list[dict[str, object]],
+    lifecycle: LifecycleProgress,
     child_identities: list[ChildProcessIdentity],
     classification: ChildProcessClassification,
     post_cleanup_live_child_ids: list[int],
@@ -356,9 +367,22 @@ def _build_runtime_evidence(
         and str(request["path"]).startswith("/commands/")
         and str(request["path"]).endswith("/run")
     ]
-    runtime_bridge_detected = classification.runtime_bridge is not None
+    classification_verified = lifecycle.sampling_completed and lifecycle.classification_completed
+    exit_verified = lifecycle.sampling_completed and lifecycle.post_cleanup_check_completed
+    classification_failed = classification_verified and classification.unexpected_children != ()
+    exit_failed = exit_verified and post_cleanup_live_child_ids != []
+    if classification_failed or exit_failed:
+        identity_status = "FAIL"
+    elif not (classification_verified and exit_verified and lifecycle.cleanup_completed):
+        identity_status = "NOT_VERIFIED"
+    else:
+        identity_status = "PASS" if bridge_exited_automatically else "FAIL"
+    exit_status = ("FAIL" if exit_failed else "PASS") if exit_verified else "NOT_VERIFIED"
+    runtime_bridge_detected = classification_verified and classification.runtime_bridge is not None
     return {
         "interpreter_classification": (
+            "NOT_VERIFIED" if not classification_verified else
+            "unexpected_or_unclassified" if classification_failed else
             "environment_runtime_bridge"
             if runtime_bridge_detected
             else "direct_runtime"
@@ -399,16 +423,17 @@ def _build_runtime_evidence(
                 "alive": child.pid in post_cleanup_live_child_ids,
             }
             for child in child_identities
-        ],
+        ] if exit_verified else [],
         "unexpected_live_children": unexpected_live_child_ids,
-        "identity_aware_contract_result": (
-            classification.unexpected_children == ()
-            and bridge_exited_automatically
-            and unexpected_live_child_ids == []
-        ),
+        "lifecycle_progress": asdict(lifecycle),
+        "cleanup_scope": "Exact spawned parent and stdout; captured-child exit is verified separately.",
+        "lifecycle_result_semantics": "False with NOT_VERIFIED means unverified, not an observed failure.",
+        "identity_aware_contract_result": identity_status == "PASS",
+        "identity_aware_contract_status": identity_status,
         "process_exit_code": process_exit_code,
         "process_exited": process_exited,
-        "child_processes_exited": post_cleanup_live_child_ids == [],
+        "child_processes_exited": exit_status == "PASS",
+        "child_processes_exit_status": exit_status,
         "port_closed": port_closed,
     }
 
@@ -533,7 +558,10 @@ def test_canonical_flask_process_lifecycle_and_get_only_routes() -> None:
     classification = ChildProcessClassification(None, ())
     post_cleanup_live_child_ids: list[int] = []
     unexpected_live_child_ids: list[int] = []
-    bridge_exited_automatically = True
+    bridge_exited_automatically = False
+    lifecycle = LifecycleProgress()
+    process_exited = False
+    port_closed = False
     server_output = ""
     try:
         landing_status, landing_html = _wait_for_get("/", process, http_requests)
@@ -549,7 +577,9 @@ def test_canonical_flask_process_lifecycle_and_get_only_routes() -> None:
         report_files_unchanged = _report_file_hashes() == reports_before
         assert report_files_unchanged
 
+        lifecycle.sampling_started = True
         child_identities = _child_process_identities(process.pid)
+        lifecycle.sampling_completed = True
         classification = _classify_child_processes(
             child_identities,
             parent_pid=process.pid,
@@ -557,42 +587,65 @@ def test_canonical_flask_process_lifecycle_and_get_only_routes() -> None:
             executable=sys.executable,
             base_executable=getattr(sys, "_base_executable", None),
         )
+        lifecycle.classification_completed = True
         assert classification.unexpected_children == (), (
             "The canonical debug=False Flask entry point unexpectedly spawned "
             "unclassified child processes: "
             f"{[child.pid for child in classification.unexpected_children]}"
         )
     finally:
-        if process.poll() is None:
-            process.terminate()
-            try:
-                process.wait(timeout=5)
-            except subprocess.TimeoutExpired:
-                process.kill()
-                process.wait(timeout=5)
-        captured_child_ids = [child.pid for child in child_identities]
-        post_cleanup_live_child_ids = _wait_for_captured_processes_exit(
-            captured_child_ids
-        )
-        unexpected_live_child_ids = _unexpected_live_child_ids(
-            captured_child_ids,
-            post_cleanup_live_child_ids,
-        )
-        bridge_exited_automatically = (
-            classification.runtime_bridge is None
-            or classification.runtime_bridge.pid not in post_cleanup_live_child_ids
-        )
-        if process.stdout is not None:
-            server_output = process.stdout.read()
-            process.stdout.close()
+        original_failure = sys.exc_info()[1]
+        cleanup_errors: list[Exception] = []
+        try:
+            if process.poll() is None:
+                process.terminate()
+                try:
+                    process.wait(timeout=5)
+                except subprocess.TimeoutExpired:
+                    process.kill()
+                    process.wait(timeout=5)
+            process_exited = process.poll() is not None
+        except Exception as exc:
+            cleanup_errors.append(exc)
+        # An empty captured set is meaningful only after a completed sample.
+        try:
+            if lifecycle.sampling_completed:
+                captured_child_ids = [child.pid for child in child_identities]
+                post_cleanup_live_child_ids = _wait_for_captured_processes_exit(captured_child_ids)
+                lifecycle.post_cleanup_check_completed = True
+                unexpected_live_child_ids = _unexpected_live_child_ids(
+                    captured_child_ids, post_cleanup_live_child_ids,
+                )
+                if lifecycle.classification_completed:
+                    bridge_exited_automatically = (
+                        classification.runtime_bridge is None
+                        or classification.runtime_bridge.pid not in post_cleanup_live_child_ids
+                    )
+        except Exception as exc:
+            cleanup_errors.append(exc)
+        try:
+            if process.stdout is not None:
+                try:
+                    if process_exited:
+                        server_output = process.stdout.read()
+                finally:
+                    process.stdout.close()
+            lifecycle.cleanup_completed = process_exited
+        except Exception as exc:
+            cleanup_errors.append(exc)
 
-        port_closed = _wait_for_port_closed()
+        try:
+            port_closed = _wait_for_port_closed()
+            lifecycle.port_check_completed = True
+        except Exception as exc:
+            cleanup_errors.append(exc)
         evidence = _build_runtime_evidence(
             process_pid=process.pid,
             process_exit_code=process.returncode,
-            process_exited=process.poll() is not None,
+            process_exited=process_exited,
             statuses=statuses,
             http_requests=http_requests,
+            lifecycle=lifecycle,
             report_files_unchanged=report_files_unchanged,
             child_identities=child_identities,
             classification=classification,
@@ -601,22 +654,36 @@ def test_canonical_flask_process_lifecycle_and_get_only_routes() -> None:
             bridge_exited_automatically=bridge_exited_automatically,
             port_closed=port_closed,
         )
+        evidence["cleanup_error_types"] = [type(exc).__name__ for exc in cleanup_errors]
         print("PHASE_2N_02_RUNTIME_EVIDENCE=" + json.dumps(evidence, sort_keys=True))
-        assert process.poll() is not None, "The exact spawned Flask process did not exit"
-        assert classification.unexpected_children == (), (
-            "Unexpected Flask child processes remained unclassified"
-        )
-        assert bridge_exited_automatically, (
-            "The accepted Windows environment runtime bridge did not exit automatically"
-        )
-        assert unexpected_live_child_ids == [], (
-            "Captured child processes remained alive after exact parent cleanup: "
-            f"{unexpected_live_child_ids}"
-        )
-        assert port_closed, "Canonical port 127.0.0.1:5000 remained open after shutdown"
+        if cleanup_errors:
+            if original_failure is None:
+                raise cleanup_errors[0]
+            original_failure.add_note(
+                "Lifecycle cleanup/observation also failed: "
+                + ", ".join(evidence["cleanup_error_types"])
+            )
+
+    # Do not replace an earlier failure with a cleanup assertion.
+    assert process.poll() is not None, "The exact spawned Flask process did not exit"
+    assert classification.unexpected_children == (), (
+        "Unexpected Flask child processes remained unclassified"
+    )
+    assert bridge_exited_automatically, (
+        "The accepted Windows environment runtime bridge did not exit automatically"
+    )
+    assert unexpected_live_child_ids == [], (
+        "Captured child processes remained alive after exact parent cleanup: "
+        f"{unexpected_live_child_ids}"
+    )
+    assert port_closed, "Canonical port 127.0.0.1:5000 remained open after shutdown"
 
     assert process.returncode is not None
     assert "Running on http://127.0.0.1:5000" in server_output
+    assert evidence["identity_aware_contract_result"] is True
+    assert evidence["identity_aware_contract_status"] == "PASS"
+    assert evidence["child_processes_exited"] is True
+    assert evidence["child_processes_exit_status"] == "PASS"
     assert evidence["command_run_post_performed"] is True
     assert evidence["command_run_post_attempts"] == [
         {"method": "POST", "path": f"/commands/{key}/run", "response_status": 404}
@@ -671,6 +738,10 @@ def _synthetic_runtime_evidence(
         process_exited=True,
         statuses={route: 200 for route in GET_ROUTES},
         http_requests=http_requests if http_requests is not None else [],
+        lifecycle=LifecycleProgress(
+            sampling_started=True, sampling_completed=True, classification_completed=True,
+            cleanup_completed=True, post_cleanup_check_completed=True, port_check_completed=True,
+        ),
         child_identities=[child],
         classification=classification,
         post_cleanup_live_child_ids=[],
@@ -713,6 +784,10 @@ def test_runtime_evidence_redacts_supplied_private_path_values() -> None:
         bridge_exited_automatically=True,
         port_closed=True,
         http_requests=[],
+        lifecycle=LifecycleProgress(
+            sampling_started=True, sampling_completed=True, classification_completed=True,
+            cleanup_completed=True, post_cleanup_check_completed=True, port_check_completed=True,
+        ),
     )
 
     assert "interpreter" not in evidence
@@ -786,6 +861,200 @@ def test_runtime_evidence_exposes_generic_bridge_classification() -> None:
     assert evidence["environment_runtime_bridge_detected"] is True
     assert evidence["exact_identity_match"] is True
     assert evidence["executable_paths_redacted"] is True
+
+
+@pytest.fixture
+def mocked_canonical_lifecycle(monkeypatch):
+    from types import SimpleNamespace
+    from unittest.mock import MagicMock, Mock
+
+    module = sys.modules[__name__]
+    process = Mock(pid=SYNTHETIC_PARENT_PID, returncode=None)
+    process.poll.side_effect = lambda: process.returncode
+    process.terminate.side_effect = lambda: setattr(process, "returncode", 1)
+    process.stdout.read.return_value = "Running on http://127.0.0.1:5000"
+    state = SimpleNamespace(
+        html=b"Network Automation Lab - Portfolio Demo", options_status=404,
+        process=process, popen=Mock(return_value=process),
+        hashes=Mock(side_effect=[{"fixture": "same"}, {"fixture": "same"}]),
+        sample=Mock(return_value=[]), classify=Mock(wraps=_classify_child_processes),
+        exit_check=Mock(return_value=[]), port_check=Mock(return_value=True),
+    )
+
+    def fake_urlopen(request, *, timeout):
+        method = request.get_method()
+        if urlparse(request.full_url).path.startswith("/commands/"):
+            raise HTTPError(
+                request.full_url, state.options_status if method == "OPTIONS" else 404,
+                "synthetic rejection", {}, None,
+            )
+        response = MagicMock(status=200, headers={"Allow": "GET, HEAD, OPTIONS"})
+        response.__enter__.return_value = response
+        response.read.return_value = b"" if method == "HEAD" else state.html
+        return response
+
+    monkeypatch.setattr(module, "urlopen", fake_urlopen)
+    monkeypatch.setattr(subprocess, "Popen", state.popen)
+    monkeypatch.setattr(socket, "socket", Mock(side_effect=AssertionError("Unexpected real socket")))
+    monkeypatch.setattr(module, "_port_is_listening", Mock(return_value=False))
+    monkeypatch.setattr(module, "_assert_port_can_be_bound", Mock())
+    monkeypatch.setattr(module, "_report_file_hashes", state.hashes)
+    monkeypatch.setattr(module, "_child_process_identities", state.sample)
+    monkeypatch.setattr(module, "_classify_child_processes", state.classify)
+    monkeypatch.setattr(module, "_wait_for_captured_processes_exit", state.exit_check)
+    monkeypatch.setattr(module, "_wait_for_port_closed", state.port_check)
+    return state
+
+
+def _captured_runtime_receipt(capsys) -> dict[str, object]:
+    prefix = "PHASE_2N_02_RUNTIME_EVIDENCE="
+    receipts = [line[len(prefix):] for line in capsys.readouterr().out.splitlines() if line.startswith(prefix)]
+    assert len(receipts) == 1
+    return json.loads(receipts[0])
+
+
+@pytest.mark.parametrize("failure_stage", ["GET", "OPTIONS", "HASH"])
+def test_lifecycle_early_failure_receipt_is_unverified(
+    mocked_canonical_lifecycle, capsys, failure_stage,
+) -> None:
+    runtime = mocked_canonical_lifecycle
+    if failure_stage == "GET":
+        runtime.html = b"Unexpected landing page"
+    elif failure_stage == "OPTIONS":
+        runtime.options_status = 405
+    else:
+        runtime.hashes.side_effect = [{"fixture": "before"}, {"fixture": "after"}]
+
+    with pytest.raises(AssertionError) as failure:
+        test_canonical_flask_process_lifecycle_and_get_only_routes()
+    expected_origin = (
+        "_assert_canonical_reviewer_http_boundary" if failure_stage == "OPTIONS"
+        else "test_canonical_flask_process_lifecycle_and_get_only_routes"
+    )
+    assert failure.traceback[-1].name == expected_origin
+    evidence = _captured_runtime_receipt(capsys)
+    assert evidence["lifecycle_progress"] == {
+        "sampling_started": False, "sampling_completed": False,
+        "classification_completed": False, "cleanup_completed": True,
+        "post_cleanup_check_completed": False, "port_check_completed": True,
+    }
+    assert evidence["identity_aware_contract_result"] is False
+    assert evidence["identity_aware_contract_status"] == "NOT_VERIFIED"
+    assert evidence["child_processes_exited"] is False
+    assert evidence["child_processes_exit_status"] == "NOT_VERIFIED"
+    assert evidence["interpreter_classification"] == "NOT_VERIFIED"
+    assert evidence["process_exited"] is True
+    assert evidence["port_closed"] is True
+    assert evidence["cleanup_error_types"] == []
+    assert evidence["command_run_post_performed"] is (failure_stage == "HASH")
+    assert len(evidence["command_run_post_attempts"]) == (3 if failure_stage == "HASH" else 0)
+    assert all(item["response_status"] == 404 for item in evidence["command_run_post_attempts"])
+    assert evidence["report_files_unchanged"] is (False if failure_stage == "HASH" else None)
+    runtime.sample.assert_not_called()
+    runtime.classify.assert_not_called()
+    runtime.exit_check.assert_not_called()
+    runtime.process.terminate.assert_called_once()
+    runtime.process.stdout.close.assert_called_once()
+
+
+@pytest.mark.parametrize("unexpected,still_alive", [(False, False), (True, False), (True, True)])
+def test_lifecycle_completed_observations_keep_independent_results(
+    mocked_canonical_lifecycle, capsys, unexpected, still_alive,
+) -> None:
+    runtime = mocked_canonical_lifecycle
+    if unexpected:
+        runtime.sample.return_value = [_synthetic_child(filename="unknown.exe", full_image_path=None)]
+    if still_alive:
+        runtime.exit_check.return_value = [SYNTHETIC_CHILD_PID]
+    if unexpected:
+        with pytest.raises(AssertionError, match="unexpectedly spawned unclassified child processes"):
+            test_canonical_flask_process_lifecycle_and_get_only_routes()
+    else:
+        test_canonical_flask_process_lifecycle_and_get_only_routes()
+    evidence = _captured_runtime_receipt(capsys)
+    assert all(evidence["lifecycle_progress"].values())
+    assert evidence["identity_aware_contract_result"] is (not unexpected)
+    assert evidence["identity_aware_contract_status"] == ("FAIL" if unexpected else "PASS")
+    assert evidence["child_processes_exited"] is (not still_alive)
+    assert evidence["child_processes_exit_status"] == ("FAIL" if still_alive else "PASS")
+    assert evidence["command_run_post_performed"] is True
+    assert len(evidence["command_run_post_attempts"]) == 3
+    assert evidence["process_exited"] is True
+    runtime.sample.assert_called_once_with(SYNTHETIC_PARENT_PID)
+    runtime.exit_check.assert_called_once_with([SYNTHETIC_CHILD_PID] if unexpected else [])
+
+
+@pytest.mark.parametrize("failure_stage", ["sampling", "classification"])
+def test_lifecycle_incomplete_observation_preserves_original_error(
+    mocked_canonical_lifecycle, capsys, failure_stage,
+) -> None:
+    runtime = mocked_canonical_lifecycle
+    original = OSError("Synthetic observation failure")
+    (runtime.sample if failure_stage == "sampling" else runtime.classify).side_effect = original
+    with pytest.raises(OSError) as failure:
+        test_canonical_flask_process_lifecycle_and_get_only_routes()
+    assert failure.value is original
+    evidence = _captured_runtime_receipt(capsys)
+    sampled = failure_stage == "classification"
+    assert evidence["lifecycle_progress"]["sampling_started"] is True
+    assert evidence["lifecycle_progress"]["sampling_completed"] is sampled
+    assert evidence["lifecycle_progress"]["classification_completed"] is False
+    assert evidence["lifecycle_progress"]["post_cleanup_check_completed"] is sampled
+    assert evidence["identity_aware_contract_status"] == "NOT_VERIFIED"
+    assert evidence["identity_aware_contract_result"] is False
+    assert evidence["child_processes_exited"] is sampled
+    assert evidence["child_processes_exit_status"] == ("PASS" if sampled else "NOT_VERIFIED")
+    assert evidence["interpreter_classification"] == "NOT_VERIFIED"
+    assert evidence["process_exited"] is True
+
+
+@pytest.mark.parametrize("failed_cleanup", ["stdout", "port"])
+def test_lifecycle_cleanup_error_does_not_mask_get_failure(
+    mocked_canonical_lifecycle, capsys, failed_cleanup,
+) -> None:
+    runtime = mocked_canonical_lifecycle
+    runtime.html = b"Unexpected landing page"
+    operation = runtime.process.stdout.close if failed_cleanup == "stdout" else runtime.port_check
+    operation.side_effect = OSError("Synthetic cleanup failure")
+    with pytest.raises(AssertionError, match="Network Automation Lab - Portfolio Demo") as failure:
+        test_canonical_flask_process_lifecycle_and_get_only_routes()
+    assert failure.traceback[-1].name == "test_canonical_flask_process_lifecycle_and_get_only_routes"
+    evidence = _captured_runtime_receipt(capsys)
+    assert evidence["cleanup_error_types"] == ["OSError"]
+    assert evidence["lifecycle_progress"]["cleanup_completed"] is (failed_cleanup != "stdout")
+    assert evidence["lifecycle_progress"]["port_check_completed"] is (failed_cleanup != "port")
+    assert evidence["identity_aware_contract_status"] == "NOT_VERIFIED"
+    assert evidence["child_processes_exit_status"] == "NOT_VERIFIED"
+    assert evidence["process_exited"] is True
+    runtime.process.terminate.assert_called_once()
+    runtime.process.stdout.close.assert_called_once()
+
+
+@pytest.mark.parametrize("unexpected", [False, True])
+def test_lifecycle_failed_exit_inspection_cannot_claim_children_exited(
+    mocked_canonical_lifecycle, capsys, unexpected,
+) -> None:
+    runtime = mocked_canonical_lifecycle
+    original = OSError("Synthetic exit inspection failure")
+    runtime.exit_check.side_effect = original
+    if unexpected:
+        runtime.sample.return_value = [_synthetic_child(filename="unknown.exe", full_image_path=None)]
+        with pytest.raises(AssertionError, match="unexpectedly spawned unclassified child processes"):
+            test_canonical_flask_process_lifecycle_and_get_only_routes()
+    else:
+        with pytest.raises(OSError) as failure:
+            test_canonical_flask_process_lifecycle_and_get_only_routes()
+        assert failure.value is original
+    evidence = _captured_runtime_receipt(capsys)
+    assert evidence["lifecycle_progress"]["sampling_completed"] is True
+    assert evidence["lifecycle_progress"]["classification_completed"] is True
+    assert evidence["lifecycle_progress"]["post_cleanup_check_completed"] is False
+    assert evidence["identity_aware_contract_status"] == ("FAIL" if unexpected else "NOT_VERIFIED")
+    assert evidence["identity_aware_contract_result"] is False
+    assert evidence["child_processes_exit_status"] == "NOT_VERIFIED"
+    assert evidence["child_processes_exited"] is False
+    assert evidence["post_cleanup_child_state"] == []
+    assert evidence["cleanup_error_types"] == ["OSError"]
 
 
 def test_runtime_bridge_classifier_accepts_exact_single_base_executable() -> None:
