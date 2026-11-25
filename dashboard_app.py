@@ -1848,6 +1848,24 @@ def create_app(
     reports_dir: Optional[Path] = None,
     execution_logs_dir: Optional[Path] = None,
 ) -> Flask:
+    """Legacy dashboard with the existing fixed-command execution route."""
+    return _create_dashboard_app(reports_dir, execution_logs_dir, reviewer_only=False)
+
+
+def create_reviewer_app(
+    reports_dir: Optional[Path] = None,
+    execution_logs_dir: Optional[Path] = None,
+) -> Flask:
+    """Display-only dashboard; HTTP command execution is not registered."""
+    return _create_dashboard_app(reports_dir, execution_logs_dir, reviewer_only=True)
+
+
+def _create_dashboard_app(
+    reports_dir: Optional[Path],
+    execution_logs_dir: Optional[Path],
+    *,
+    reviewer_only: bool,
+) -> Flask:
     if Flask is None:
         raise RuntimeError(
             "Flask is required for the Day10 dashboard. Install it with: pip install flask"
@@ -1941,18 +1959,19 @@ def create_app(
             recent_logs=logs[:5],
         )
 
-    @app.post("/commands/<command_id>/run")
-    def run_command(command_id: str):
-        registry = build_command_registry(PROJECT_ROOT)
-        try:
-            log = execute_registered_command(
-                registry,
-                command_id,
-                app.config["EXECUTION_LOGS_DIR"],
-            )
-        except (KeyError, CommandUnavailableError):
-            abort(404)
-        return redirect(url_for("command_log_detail", log_id=log["log_id"]))
+    if not reviewer_only:
+        @app.post("/commands/<command_id>/run")
+        def run_command(command_id: str):
+            registry = build_command_registry(PROJECT_ROOT)
+            try:
+                log = execute_registered_command(
+                    registry,
+                    command_id,
+                    app.config["EXECUTION_LOGS_DIR"],
+                )
+            except (KeyError, CommandUnavailableError):
+                abort(404)
+            return redirect(url_for("command_log_detail", log_id=log["log_id"]))
 
     @app.route("/commands/logs")
     def command_logs():
@@ -2072,4 +2091,4 @@ def create_app(
 
 
 if __name__ == "__main__":
-    create_app().run(host="127.0.0.1", port=5000, debug=False)
+    create_reviewer_app().run(host="127.0.0.1", port=5000, debug=False)

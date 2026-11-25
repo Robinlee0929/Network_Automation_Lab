@@ -164,6 +164,19 @@ dashboard_app.py
 http://127.0.0.1:5000/
 ```
 
+`python dashboard_app.py` uses `create_reviewer_app()`, bound to
+`127.0.0.1:5000` with `debug=False`. Reviewer = no HTTP command execution
+route: `/commands/<command_id>/run` is not registered, including for valid
+command IDs. GET displays, HEAD, and Flask's automatic OPTIONS remain
+available; request parameters, cookies, headers, and bodies cannot switch
+factories.
+
+Legacy `create_app(reports_dir=None, execution_logs_dir=None)` retains its
+existing fixed-command registry and POST execution route for compatibility.
+It is outside the interview Reviewer entry point. The repository still has
+CLI and legacy execution capabilities; this change does not grant live access.
+Both factories share the same GET handlers and evidence presentation.
+
 Its current public review surfaces include:
 
 | Route | Current purpose |
