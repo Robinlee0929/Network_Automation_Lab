@@ -81,6 +81,8 @@
     .section-grid > section, .section-grid + section { margin-top: 24px; }
     .link { margin-top: 12px; }
     .project-context { font-size: 14px; }
+    .historical-entry { margin-top: 22px; padding: 18px; border: 1px solid var(--border); border-left: 4px solid var(--blue); border-radius: 12px; background: var(--panel); }
+    .historical-entry a { display: inline-block; margin-top: 10px; font-weight: 750; }
     @media (max-width: 760px) {
       .hero { align-items: flex-start; }
       .hero-marker { display: none; }
@@ -281,6 +283,13 @@
     {% endif %}
   </section>
 
+
+  <section class="historical-entry" id="stage2-history-entry" aria-labelledby="stage2-history-entry-heading">
+    <div class="eyebrow">STAGE 2 · 歷史證據</div>
+    <h2 id="stage2-history-entry-heading">真實設備驗證，保留當時的證據與限制</h2>
+    <p>查看各自獨立的 Lab1／Lab2 唯讀驗證，以及 2026-10-20 人工切換觀察。與上方 Stage-0 Fake Adapter 模擬流程分開；不表示目前設備狀態。</p>
+    <a href="{{ url_for('reports') }}#stage2-historical-vrrp">查看 Stage 2 VRRP 歷史成果與來源 →</a>
+  </section>
 
   <details class="project-context">
     <summary>平台定位與展示範圍 · 工程師補充說明</summary>
